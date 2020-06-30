@@ -9,5 +9,5 @@ dependencies
 	api project(':util:concurrent')
 	api project(':serialization:xml')
 	
-	apiNoAndroidRuntime 'org.antlr:antlr-runtime:3.1.3'
+	api 'org.antlr:antlr-runtime:3.1.3'
 }

@@ -14,7 +14,7 @@ a) In Jadex, services are described by POJO Java interfaces.
 
 b) Publishing of services is as simple as adding a *@ProvidedServices* annotation to a Java class.
 
-c) In Jadex discovery is supported by a combination of two mechanisms. First, [platform awareness](../../remote/remote.md#awareness) automatically discovers all available Jadex platforms in local networks and potentially across the whole Internet. Second, the [service search](../../guides/ac/05%20Services.md#service-search)) potentially traverses all known platforms looking for the desired service and thus potentially finds any matching service available somewhere on the Internet.
+c) In Jadex discovery is supported by a combination of several mechanisms. Local and global registries allow for fast lookup and efficient querying of private and public services. When no registry can be found for a given network, a fallback and bootstrap mechanism called [platform awareness](../../remote/remote.md#awareness) automatically discovers available Jadex platforms in local networks and potentially across the whole Internet. The discovered platformes are then traversed looking for desired services.
 
 ### Challenge 2: Components with internal behavior
 
@@ -30,7 +30,7 @@ E.g. the time provider component's periodic task for sending out time values is 
 
 In Jadex, a set of message transports assures that platforms can communicate in local networks as well as across the Internet. For the protocol level, Jadex comes with ready to use implementations for [commonly used interaction patterns](../../futures/futures.md)) like publish/subscribe.
 
-On the application level, interaction may use classes and interfaces as needed for the data types. Jadex provides automatic conversion of objects to transer formats like binary, JSON and XML.
+On the application level, interaction may use classes and interfaces as needed for the data types. Jadex provides automatic conversion of objects to transfer formats like binary, JSON and XML.
 
 [//]: # (*todo: ref to conversion docs?*)
 
@@ -44,10 +44,13 @@ Using the available interaction pattern for publish/subscribe, Jadex will automa
 
 *"Providing and accessing services across the Internet involves many security issues. E.g. potentially security critical services should by default be shielded from unauthorized access. On the other hand, no complicated security setup should be necessary for uncritical services like the time service."*
 
-In Jadex, by default only trusted platform may invoke services of each other, therefore running a Jadex platform is safe by default. More fine-grained treatment of security issues is supported by security annotations. These annotations can be placed alongside the component code and allows a clean separation between component functionality and non-functional aspects like security. E.g., the *Security.UNRESTRICTED* flag is used on the time service interface to mark the service as being safe to be called from the outside without prior authentication or authorization.
+In Jadex, by default only trusted platforms may invoke services of each other, therefore running a Jadex platform is safe by default. More fine-grained treatment of security issues is supported by security annotations. These annotations can be placed alongside the component code and allows a clean separation between component functionality and non-functional aspects like security. E.g., the *Security.UNRESTRICTED* flag is used on the time service interface to mark the service as being safe to be called from the outside without prior authentication or authorization.
 
 ## Where To Go Next?
 
 There are several possible paths for further exploring the features of Jadex. For practical experiences, you can continue by looking at examples provided in the *jadex-application-xyz* jars. These can be started after adding the jar to the JCC starter panel. Some examples are also available online as [webstart applications](https://www.activecomponents.org/index.html#docs/examples) or as [web applications](http://www.activecomponents.org/jadex-applications-web/).
 
-If you prefer more reading, the [documentation overview page](https://www.activecomponents.org/index.html#/docs/overview) guides you to the available documentation. In case you would like more hands-on exercises, you can choose from a set of tutorials, which are specifically designed to introduce a specific Jadex component type.
+If you prefer more reading, the [documentation overview page](../../index.md) guides you to the available documentation. In case you would like more hands-on exercises, you can choose from a set of tutorials, which are specifically designed to introduce a specific Jadex component type.
+
+---
+[[Back: 04 Time Provider](04%20Time%20Provider.md) | [Up: Documentation Overview](../../index.md)]

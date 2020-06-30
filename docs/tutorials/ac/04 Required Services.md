@@ -91,7 +91,7 @@ In this execise we will use another service of the platform and invoke a method 
 
 ## Verify the intended behavior
 
-Start the platform and the agent and check if the component descriptions are printed out. The output should look similar to the console snapshot shown below. Please note that the component management service is one of the central services of the Jadex platform. It can e.g. be used to *create*, *kill*, *suspend* and resume components. Feel free to inspect the [IComponentManagementService interface](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/types/cms/IComponentManagementService.html) to learn more about theses functionalities.
+Start the platform and the agent and check if the component descriptions are printed out. The output should look similar to the console snapshot shown below. Please note that the component management service is one of the central services of the Jadex platform. It can e.g. be used to *create*, *kill*, *suspend* and resume components. Feel free to inspect the [IComponentManagementService interface](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/bridge/service/types/cms/IComponentManagementService.html) to learn more about theses functionalities.
 
 ![04 Required Services@console1.png](console1.png)
 * Console snaphsot*

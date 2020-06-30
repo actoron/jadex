@@ -216,7 +216,7 @@ public class JCCWebAgent implements IJCCWebService
 
 		final Future<Object> ret = (Future<Object>)SFuture.getNoTimeoutFuture(rtype, agent);
 
-		if(methodname.indexOf("getNF")!=-1)
+		if(methodname.indexOf("getNFPropertyMeta")!=-1)
 			System.out.println("invokeServiceMethod: "+servicetype+" "+methodname+" "+Arrays.toString(args)+" "+rettype);
 		
 		// Search service with startpoint of given platform 

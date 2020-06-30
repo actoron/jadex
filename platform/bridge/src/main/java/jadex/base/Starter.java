@@ -347,7 +347,7 @@ public class Starter
 	 *  @param config The PlatformConfiguration object.
 	 *  @return The external access of the root component.
 	 */
-	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration pconfig, final String[] args)
+	public static IFuture<IExternalAccess> createPlatform(IPlatformConfiguration pconfig, String... args)
 	{
 		return createPlatform(pconfig, parseArgs(args));
 	}
@@ -392,7 +392,8 @@ public class Starter
 //		if(!Boolean.TRUE.equals(config.getValues().get("bisimulation")))
 //			System.out.println("no bisim");
 		
-		config.setReadOnly(true);
+		// Once a config is used to create a platform it must not be altered (performance optimization to avoid unnecessary copying of configs).
+		PlatformConfigurationHandler.makeImmutable(config);
 		
 		if(config.getExtendedPlatformConfiguration().isDropPrivileges())
 			VmHacks.get().tryChangeUser(null);
@@ -499,10 +500,8 @@ public class Starter
 				if(IComponentIdentifier.LOCAL.get()==null)
 					IComponentIdentifier.LOCAL.set(cid);
 				
-				boolean readonlysettings = false;
-				readonlysettings |= config.isReadOnly();
-				if (args != null)
-					readonlysettings |= Boolean.TRUE.equals(args.get("settings.readonly"));
+				boolean readonlysettings = Boolean.TRUE.equals(config.getValue("settings.readonly", model))
+					|| args!=null && Boolean.TRUE.equals(args.get("settings.readonly"));
 				IPlatformSettings settings = (IPlatformSettings) SReflect.newInstance("jadex.platform.service.settings.PlatformSettings", cid, readonlysettings);
 				putPlatformValue(cid, DATA_PLATFORMSETTINGS, settings);
 				

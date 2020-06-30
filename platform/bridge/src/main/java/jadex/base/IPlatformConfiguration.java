@@ -603,19 +603,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
 	 *  Clone this configuration.
 	 */
 	public IPlatformConfiguration clone();
-	
-	/**
-	 *  Set the readonly state.
-	 *  @param readonly The readonly state.
-	 */
-	public void setReadOnly(boolean readonly);
-	
-	/**
-	 *  Get the readonly state.
-	 *  @return The readonly state.
-	 */
-	public boolean isReadOnly();
-	
+		
 	/**
 	 *  Get a value per key.
 	 *  @param key The key.

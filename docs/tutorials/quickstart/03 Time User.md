@@ -4,80 +4,81 @@ This chapter shows how to discover and use the time service.
 
 ## Agent Implementation
 
-Create Java file *TimeUserAgent.java* in the package *jadex.micro.quickstart* and paste the contents as shown below.
+Create Java file `TimeUserAgent.java` in the package `jadex.micro.quickstart` and paste the contents as shown below.
 
 ```java
 package jadex.micro.quickstart;
 
-import jadex.base.PlatformConfiguration;
+import java.text.DateFormat;
+
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.ServiceScope;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentService;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 
 /**
  *  Simple agent that uses globally available time services.
  */
 @Agent
-@RequiredServices(@RequiredService(name="timeservices", type=ITimeService.class, multiple=true,
-    binding=@Binding(scope=Binding.SCOPE_GLOBAL)))
 public class TimeUserAgent
 {
     /**
-     *  The time services are searched and added at agent startup.
+     *  Subscribe to any newly found time service and print the results when they arrive.
      */
-    @AgentService
+    @OnService(requiredservice = @RequiredService(scope = ServiceScope.GLOBAL))
     public void    addTimeService(ITimeService timeservice)
     {
-        ISubscriptionIntermediateFuture<String>    subscription    = timeservice.subscribe();
+        String location = timeservice.getLocation().get();
+        DateFormat format = DateFormat.getDateTimeInstance();
+        ISubscriptionIntermediateFuture<String> subscription = timeservice.subscribe(format);
         while(subscription.hasNextIntermediateResult())
         {
-            String    time    = subscription.getNextIntermediateResult();
-            String    platform    = ((IService)timeservice).getServiceIdentifier().getProviderId().getPlatformName();
-            System.out.println("New time received from "+platform+" at "+timeservice.getLocation()+": "+time);
+            String time = subscription.getNextIntermediateResult();
+            String platform = ((IService)timeservice).getServiceId().getProviderId().getPlatformName();
+            System.out.println("New time received from "+platform+" in "+location+": "+time);
         }
     }
 
     /**
      *  Start a Jadex platform and the TimeUserAgent.
      */
-    public static void    main(String[] args)
+    public static void main(String[] args)
     {
-        PlatformConfiguration    config    = PlatformConfiguration.getMinimalRelayAwareness();
+        IPlatformConfiguration config = PlatformConfigurationHandler.getMinimalComm();
         config.addComponent(TimeUserAgent.class);
-        Starter.createPlatform(config).get();
+        Starter.createPlatform(config, args).get();
     }
 }
 ```
 
 ### Execute the Agent
 
-Start the Jadex platform and the agent with the provided *main()* method. In case there are any time services online, you should see their time printed to the console in periodic updates. In the next chapter you will learn how to start a local time provider.
+Start the Jadex platform and the agent with the provided `main()` method. In case there are any time services online, you should see their time printed to the console in periodic updates. In the next chapter you will learn how to start a local time provider.
 
-The details of the time user agent are explained in the following subsections. Furthermore, you can see [Platform.Starting a Platform](../../platform/platform.md#starting-a-platform) for details on platform configurations and [Tools.JCC Overview](../../tools/02%20JCC%20Overview.md) for details on the Jadex control center window (JCC)).
+The details of the time user agent are explained in the following subsections. Furthermore, you can see [Platform.Starting a Platform](../../platform/platform.md#starting-a-platform) for details on platform configurations.
 
-### Class Name and @Agent Annotation
+### Class Name and `@Agent` Annotation
 
-To identify the class as an agent that can be started on the platform, the @Agent annotation is used. Furthermore, to speed up the scanning for startable agents, all agent classes must end with 'Agent' by convention. Before the 'Agent' part, any valid Java identifier can be used.
+To identify the class as an agent that can be started on the platform, the `@Agent` annotation is used. Since Jadex 4.x agent classes need no longer end with 'Agent', but in our examples we keep this as a useful convention.
 
 ### The Required Service Declaration and Injection
 
-A Jadex agent may use services provided by other agents. An agent might search for arbitrary services dynamically, but it also can declare required services as part of its public interface. A declaration of a required service is advantageous, because it makes the dependencies of an agent more explicit. Furthermore, the declarative specification of a required service allows separating details, such as service binding, from the agent implementation.
+A Jadex agent may use services provided by other agents. An agent might search for arbitrary services dynamically (in code), but it also can declare required services using annotations. A declaration of a required service is advantageous, because it makes the dependencies of an agent more explicit. Furthermore, the declarative specification of a required service allows separating details, such as service binding, from the agent implementation.
 
-The time user agent declares the usage of the ITimeService by the @RequiredService annotation. The annotation here states, that the agent is interested in multiple instances of the service at once (```multiple=true```) and that all platforms world wide should be searched for available services (```binding=@Binding(scope=Binding.SCOPE_GLOBAL)```).
-
-The ```@AgentService``` annotation to the ```addTimeService()``` method states that at startup a service search should be started and the method should be called with every found service as given in the required service declaration. The corresponding required service declaration is found by matching the method name to the name given in the @RequireService annotation.
+The `@OnService(requiredservice=...)` annotation to the `addTimeService()` method states that while the agent is alive a continuous service query should be executed. The method will then be called with every found service that matches the type of the method argument (i.e. `ITimeService`) and the required service declaration (`@RequiredService(scope = ServiceScope.GLOBAL)`). Therefore all time service implementations running on some world wide Jadex platform will be found and passed to the method `addTimeService()`.
 
 ## The Agent Behavior
 
-The *addTimeService()* method is called for each found service. In this method, the agent subscribes to the found time service and receives the client side of the subscription future as described in the [last section](02%20Time%20Service%20Interface.md#the-subscribe-method). In the while loop, *hasNextIntermediateResult()* blocks until the next time notification becomes available and can be fetched by *getNextIntermediateResult()*.
+In the `addTimeService()`, the agent subscribes to each found time service and receives the client side of the subscription future as described in the [last section](02%20Time%20Service%20Interface.md#the-subscribe-method). In the while loop, `hasNextIntermediateResult()` blocks until the next time notification becomes available and can be fetched by `getNextIntermediateResult()`.
 
 [//]: # (*todo: describe IService and service identifier?*)
 
 [//]: # (*todo: describe main method details?*)
 
-[//]: # (*todo: consistency of class/method name highlighting throughout all guides!!!???*)
+---
+[[Back: 02 Time Service Interface](02%20Time%20Service%20Interface.md) | [Next: 04 Time Provider](04%20Time%20Provider.md)]

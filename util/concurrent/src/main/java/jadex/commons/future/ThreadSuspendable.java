@@ -62,7 +62,14 @@ public class ThreadSuspendable extends ThreadLocalTransferHelper implements ISus
 			
 			if(!resumed)
 			{
-				throw new TimeoutException(("Timeout: "+timeout+", realtime="+realtime));
+				if(timeout>0)
+				{
+					throw new TimeoutException("Timeout: "+timeout+", realtime="+realtime);
+				}
+				else
+				{
+					throw new IllegalStateException("Future.wait() returned unexpectedly. Timeout: "+timeout+", realtime="+realtime);
+				}
 			}
 		}
 	}

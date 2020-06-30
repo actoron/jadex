@@ -1,34 +1,72 @@
 //apply plugin: 'maven-publish'
-
 apply plugin: 'signing'
-
 apply plugin: 'de.marcphilipp.nexus-publish'
 
-// Settings for staging when publishing to central repo
-if(project.hasProperty('repo') && "central".equals(repo)) {
-	project.rootProject.plugins.apply('io.codearte.nexus-staging') // auto-close nexus-oss staging
+// -------------------------------------
+// ---------- Repositories -------------
+// -------------------------------------
+
+if(project.hasProperty('repos'))
+{
+	for(String repo: repos.split(","))
+	{
+		// Parse credentials from environment
+        def repourl = getVar('repo' + repo, project)
+        def repoaccess = parseURLWithCredentials(repourl)
+    	//println 'publishing to: ' + repoaccess.url
+        //println 'repouser: ' + repoaccess.user
+ 	    //println 'repopassword: ' + repoaccess.password
+		            
 	
-	project.rootProject.afterEvaluate {
-	    nexusStaging {
-	        packageGroup = "org.activecomponents" //optional if packageGroup == project.getGroup()
-	        stagingProfileId = "5bcba2b9075ec8" //when not defined will be got from server using "packageGroup"
-	        username = getVar("repouser", project)
-	        password = getVar("repopassword", project)
+		// Settings for staging when publishing to central repo
+		if("central".equals(repo))
+		{
+			project.rootProject.plugins.apply('io.codearte.nexus-staging') // auto-close nexus-oss staging
+			
+			project.rootProject.afterEvaluate {
+			    nexusStaging {
+			        packageGroup = "org.activecomponents" //optional if packageGroup == project.getGroup()
+			        stagingProfileId = "5bcba2b9075ec8" //when not defined will be got from server using "packageGroup"
+			        username = repoaccess.user
+			        password = repoaccess.password
+			    }	   
+			}
+			
+			nexusPublishing {
+				repositories {
+			    	sonatype() {
+			        	connectTimeout = Duration.ofMinutes(10)
+			        	clientTimeout = Duration.ofMinutes(10)
+			        	username = repoaccess.user
+			        	password = repoaccess.password
+			        }
+			    }
+			}
 	    }
-	   
-	}
-	
-	nexusPublishing {
-		repositories {
-	    	sonatype() {
-	        	connectTimeout = Duration.ofMinutes(10)
-	        	clientTimeout = Duration.ofMinutes(10)
-	        	username = getVar("repouser", project)
-	        	password = getVar("repopassword", project)
-	        }
-	    }
+	    
+		// Settings for non-staging publications like nexus.actoron.com
+		else
+		{
+			publishing
+			{
+		        repositories 
+		        {
+		            maven {
+		                url repoaccess.url
+		                credentials {
+		                    username repoaccess.user
+		                    password repoaccess.password
+		                }
+		            }
+		        }
+		    }
+		}
 	}
 }
+
+// -------------------------------------
+// ---------- POM contents -------------
+// -------------------------------------
 
 def common() {
 	return {
@@ -119,31 +157,13 @@ def canSign = project.hasProperty('signing.secretKeyRingFile') || getVar("signin
 
 //// Selects the projects to publish, add a better heuristic here if available
 //def includedproject = getProjectDepth(project) > 1
-//// Empty project
-//includedproject &= !project.path.equals(':android:applications')
 
 def configurePom(pom) {
     pom.withXml {
         def root = asNode()
         root.appendNode('description', project.description)
         root.appendNode('name', project.name)
-        if (isAndroidProject(project)) 
-        {
-            root.get('packaging').get(0).setValue('aar')
-            def dependenciesNode = asNode().appendNode('dependencies')
-            project.configurations.implementation.allDependencies.each 
-            {
-                // Ensure dependencies such as fileTree are not included.
-                if (it.name != 'unspecified') 
-                {
-                    def dependencyNode = dependenciesNode.appendNode('dependency')
-                    dependencyNode.appendNode('groupId', it.group)
-                    dependencyNode.appendNode('artifactId', it.name)
-                    dependencyNode.appendNode('version', it.version)
-                }
-            }
-        } 
-        else if (!root.get('packaging').isEmpty()) 
+        if (!root.get('packaging').isEmpty()) 
         {
             root.remove(root.get('packaging'))
         }
@@ -152,66 +172,80 @@ def configurePom(pom) {
     }
 }
 
+/**
+ * Sign the (single) output of another task.
+ */
+def createSignTask(origtask, classi, exten) {
+    def signtask = project.tasks.create('sign' + origtask.name.capitalize(), Sign) {
+    	outputs.cacheIf { true }
+   		dependsOn origtask
+    }
+    signtask.sign(classi, origtask.outputs.files.singleFile)
+	signtask.signatureFiles.each { sigfile ->
+		publishing.publications.mavenJava.artifact(sigfile)
+		{
+			builtBy signtask
+			classifier classi
+			extension exten + sigfile.name.substring(sigfile.name.lastIndexOf('.'))
+		}
+	}
+	// Signatory getting created for each task takes a long time -> reuse one signatory for all tasks
+	project.afterEvaluate {
+		def signat	= rootProject.ext.signatory
+		if(signat==null) {
+			signat	= signtask.signatory
+			rootProject.ext.signatory	= signat
+		} else {
+			signtask.setSignatory(signat)
+		}
+	}
+}
 
 publishing {
-/*
-	println "can publish: "+canPublishToNexus
-	println "commercial: "+isCommercial(project)+" repo comm: "+repo_commercial+" repo noncomm:"+repo_noncommercial
-	println "can sign:"+canSign
-*/	
-	// Settings for non-staging publications like nexus.actoron.com
-	if(project.hasProperty('repo') && !"central".equals(repo))
-	{
-        repositories 
-        {
-            def myrepourl = getVar('repo' + repo + 'url', project)
-            def myrepouser = getVar('repo' + repo + 'user', project)
-            def myrepopassword = getVar('repo' + repo + 'password', project);
-            
-//            println "publishing to: "+myrepourl
-//            println "repouser: "+myrepouser
-//            println "repopassword: "+myrepopassword
-            
-            maven {
-                url myrepourl
-                credentials {
-                    username myrepouser
-                    password myrepopassword
-                }
-            }
-        }
-    }
 
     publications {
-        if(canSign && (!isAndroidProject(project) || isAndroidLibraryProject(project)))  // dont publish apks
+        if(canSign)
         { 
         	// publish plugin requires each subproject having mavenJava
         
         	mavenJava(MavenPublication)
         	{
+        		// Sign archives and pom in separate tasks as archive signing can be cached while pom signing cannot, when jadex version changes.
+        		createSignTask(generatePomFileForMavenJavaPublication, null, 'pom')
+        		
+        		// Disable generation of module.json
+        		tasks.matching { it.name == "generateMetadataFileFor${name.capitalize()}Publication" }.all {
+        			onlyIf { false }
+        		}
+        		
 	        	if(gradle.ext.webprojects.contains(project.getPath()))
 	            {
         			from components.web
+        			createSignTask(war, null, 'war')
+        			
         			
                   	// default artifact is xyz.war so add xyz.jar xyz-sources.jar and xyz-javadoc.jar for maven central to be happy
         			project.tasks.withType(Jar) 
                     {
                         if(it.name.equals('jar') || it.name.equals('sourcesJar') || it.name.equals('javadocJar')) 
                         {
-                            artifact(it)
+                            def arti 	= artifact(it)
+                            createSignTask(it, arti.classifier, arti.extension)
                         }
                     }
         		}
         		else
         		{
         			from components.java
+        			createSignTask(jar, null, 'jar')
         			
                    	// add xyz-sources.jar and xyz-javadoc.jar for maven central to be happy
         			project.tasks.withType(Jar) 
                     {
                         if(it.name.equals('sourcesJar') || it.name.equals('javadocJar')) 
                         {
-                            artifact(it)
+                            def arti 	= artifact(it)
+                            createSignTask(it, arti.classifier, arti.extension)
                         }
                     }
         		}
@@ -240,20 +274,8 @@ if(canSign) {
 		def signingPassword = getVar("signingPassword", project)
 		//println("sign key2: "+signingKey)
 		useInMemoryPgpKeys(signingKey, signingPassword)
-	
-//		sign configurations.archives
-		if (isAndroidProject(project)) { // add manually because somehow, those tasks do not end up in configurations.archives??
-			sign project.tasks.androidsourcesJar
-			sign project.tasks.androidjavadocsJar
-		}
-// uncomment with gradle 4.8
-// signing poms with maven-publish is supported with gradle 4.8, however, 4.8 seems to be incompatible with bintray 1.8 :/
-		if (!isAndroidProject(project) || isAndroidLibraryProject(project)) { // dont publish apks
-			//sign publishing.publications.ProjectPublication
-			sign publishing.publications.mavenJava
-		}
+
+		// Sign archives and pom in separate tasks as archive signing can be cached while pom signing cannot, when jadex version changes.
+		//sign publishing.publications.mavenJava
 	}
-	
 }
-
-

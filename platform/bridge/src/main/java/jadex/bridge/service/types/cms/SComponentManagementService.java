@@ -330,7 +330,7 @@ public class SComponentManagementService
 	 */
 	public static void notifyListenersRemoved(IComponentDescription desc, Exception ex, Map<String, Object> results)
 	{
-		System.out.println("terminated event for: "+desc);
+//		System.out.println("terminated event for: "+desc);
 		
 		// listeners are copied to be threadsafe
 		
@@ -1514,7 +1514,7 @@ public class SComponentManagementService
 //						// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
 //						// todo: killcomponent should only be called once for each component?
 						
-						//agent.getLogger().info("Terminating component: "+cid.getName());
+						agent.getLogger().info("Terminating component: "+cid.getName());
 						
 						//if(cid.toString().indexOf("Sokrates")!=-1)
 						//	System.out.println("Terminating component: "+cid.getName());

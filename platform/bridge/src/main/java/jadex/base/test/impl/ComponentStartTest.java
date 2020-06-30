@@ -25,7 +25,6 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITuple2Future;
 import junit.framework.TestResult;
 
 
@@ -67,13 +66,13 @@ public class ComponentStartTest extends ComponentTest
 	 * @param cid The cid, set as soon as known.
 	 */
 	protected void componentStarted(IFuture<IExternalAccess> fut)
-	{		
-		IComponentIdentifier cid = null;
-		try
+	{
+		// For start-test kill component after some delay. Let base test collect the result (start exception vs. finished vs. timeout)
+		System.out.println("component start test 0: "+filename);
+		fut.addResultListener(exta ->
 		{
-			final IExternalAccess exta = fut.get();
-			cid = exta.getId();
-			System.out.println("component start test 1: "+cid);
+			IComponentIdentifier	cid = exta.getId();
+			System.out.println("component start test 1: "+filename+", "+cid);
 
 			// Wait some time (simulation and real time) and kill the component
 			// afterwards.
@@ -139,22 +138,7 @@ public class ComponentStartTest extends ComponentTest
 					return ia.getFeature(IExecutionFeature.class).waitForDelay(delay, true);
 				}
 			}).addResultListener(lis);
-		}
-		catch(ComponentTerminatedException cte)
-		{
-			System.out.println("component start test 5: "+cid);
-			// Ignore if component already terminated.
-		}
-		catch(RuntimeException e)
-		{
-			System.out.println("component start test 6: "+cid);
-			// Ignore if component already terminated.
-			if(!(e.getCause() instanceof ComponentTerminatedException))
-			{
-				throw e;
-			}
-		}
-		System.out.println("component start test 7: "+cid);
+		});
 	}
 
 	/**

@@ -38,7 +38,7 @@ There are two kinds of passwords:
 
 By default, a Jadex platform is secured by a password which is generated at first startup and printed to the console. If a remote platform knows this password, it is able to find and invoke any services available on the local platform.
 This password-protection may be switched off by setting ```PlatformConfiguration.setUsePass(false)``` (**NOT recommended!**)
-Remote platforms can set platform passwords to access remote platforms within the [JCC Security Settings](../tools/05%20Security%20Settings.md#remote-platform-password-settings) or by accessing the [ISecurityService](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/types/security/ISecurityService.html) programmatically.
+Remote platforms can set platform passwords to access remote platforms within the [JCC Security Settings](../tools/05%20Security%20Settings.md#remote-platform-password-settings) or by accessing the [ISecurityService](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/bridge/service/types/security/ISecurityService.html) programmatically.
 
 ### Network passwords
 
@@ -141,7 +141,7 @@ While the build-in Java serialization works and is quick, it has some serious dr
 
 ## Annotation-based
 
-If you don't want to add bean-conform getters/setters to your classes, you may also use the [@IncludeFields](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/commons/transformation/annotations/IncludeFields.html) annotation:
+If you don't want to add bean-conform getters/setters to your classes, you may also use the [@IncludeFields](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/commons/transformation/annotations/IncludeFields.html) annotation:
 
 ```java
 @IncludeFields
@@ -154,7 +154,7 @@ public class Customer {
     }
 ```
 
-You may also use an explicit [@Include](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/commons/transformation/annotations/Include.html) annotation on every field to include it.
+You may also use an explicit [@Include](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/commons/transformation/annotations/Include.html) annotation on every field to include it.
 
 ```java
 public class Customer {
@@ -186,7 +186,7 @@ public class Customer {
 }
 ```
 
-As with public fields, you may also use an explicit [@Include](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/commons/transformation/annotations/Include.html) annotation on every field to include it.
+As with public fields, you may also use an explicit [@Include](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/commons/transformation/annotations/Include.html) annotation on every field to include it.
 
 ```java
 public class Customer {

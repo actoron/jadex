@@ -804,8 +804,16 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				@Override
 				public void intermediateResultAvailable(ISuperpeerService sp)
 				{
+					// Hack!!! TODO: fix network queries
+					if(!((IService)sp).getServiceId().getNetworkNames().contains(networkname))
+					{
+//						System.out.println("Found wrong superpeer for network "+networkname+": "+((IService)sp).getServiceId());
+						return;
+					}
+					
 					if(running && superpeer==null)	// Hack!!! Bug in query deduplication -> receiving same ssp over and over !?
 					{
+						agent.getLogger().info("Found superpeer for network "+networkname+": "+((IService)sp).getServiceId());
 //						System.out.println(agent+" query result: "+sq.getId()+", "+sp);
 						
 						adjustConnectionTimeout();
@@ -1239,6 +1247,17 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									// Just remove from lists and try again
 									futures.remove(fut);
 									Collection<String>	failed_networks	= networkspersuperpeer.remove(superpeer);
+									
+									// Check if manager still thinks it is connected
+									for(String networkname: failed_networks)
+									{
+										NetworkManager	manager	= connections.get(networkname);
+										if(manager!=null && superpeer.equals(manager.superpeer))
+										{
+											manager.startSuperpeerSearch();
+										}
+									}
+									
 									updateQuery(failed_networks.toArray(new String[failed_networks.size()]));
 								}
 							}

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import java.awt.Color;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
@@ -16,6 +17,7 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 
 
+@Ignore	// TODO RS call test without external dependency!
 public class RSChartTest
 {
 	private IExternalAccess extAcc;
