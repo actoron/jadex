@@ -121,7 +121,7 @@ checkDocs:
 publishCentral:
   stage: deployandpublish
   script: 
-    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -P repos=central $GRADLE_EXTRA
+    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -P repos=central --max-workers=32 $GRADLE_EXTRA
   rules:
     - if: $PUBLISHCENTRAL=="true" || $PUBLISHCENTRAL!="false" && $CI_COMMIT_REF_SLUG=~$PUBLISHCENTRAL_BRANCHES
       when: on_success
@@ -129,7 +129,7 @@ publishCentral:
 publishActoron:
   stage: deployandpublish
   script: 
-    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -P repos=actoron $GRADLE_EXTRA
+    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -P repos=actoron --max-workers=32 $GRADLE_EXTRA
   rules:
     - if: $PUBLISHACTORON=="true" || $PUBLISHACTORON!="false" && $CI_COMMIT_REF_SLUG=~$PUBLISHACTORON_BRANCHES
       when: on_success
