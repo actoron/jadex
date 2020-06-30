@@ -14,10 +14,10 @@ class ComponentTree extends BaseElement
 	
 	attributeChangedCallback(name, oldVal, newVal) 
 	{
-	    console.log('attribute change: ', name, newVal, oldVal);
+	    //console.log('attribute change: ', name, newVal, oldVal);
 	    super.attributeChangedCallback(name, oldVal, newVal);
 	    
-		console.log("components cid: "+this.cid);
+		//console.log("components cid: "+this.cid);
 		if(name=="cid")
 			this.init();
 	}
@@ -185,7 +185,7 @@ class ComponentTree extends BaseElement
 								
 								// args IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req
 								var sid = encodeURIComponent(JSON.stringify(node.original.sid));
-								console.log("SID: "+sid);
+								//console.log("SID: "+sid);
 								axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0=null&args_1='+sid, self.transform)
 								.then(function(resp)
 								{

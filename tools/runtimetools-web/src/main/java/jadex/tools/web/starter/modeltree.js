@@ -12,10 +12,10 @@ class ModelTree extends BaseElement {
 	
 	attributeChangedCallback(name, oldVal, newVal) 
 	{
-	    console.log('attribute change: ', name, newVal, oldVal);
+	    //console.log('attribute change: ', name, newVal, oldVal);
 	    super.attributeChangedCallback(name, oldVal, newVal);
 	    
-		console.log("modeltree: "+this.cid);
+		//console.log("modeltree: "+this.cid);
 		if(name=="cid")
 			this.init();
 	}
@@ -159,20 +159,19 @@ class ModelTree extends BaseElement {
 	{
 		var self = this;
 		
-		console.log("selected: "+filename);
+		//console.log("selected: "+filename);
 		
 		axios.get(this.getMethodPrefix()+'&methodname=loadComponentModel&args_0='+filename+"&argtypes_0=java.lang.String", this.transform).then(function(resp)
 		{
-			console.log("selected model is: "+resp.data);
-			//self.model = resp.data;
+			//console.log("selected model is: "+resp.data);
 			
-			var event = new CustomEvent("jadex-selected-model", 
+			var event = new CustomEvent("jadex-model-selected", 
 			{ 
-				detail: { model: self.model },
+				detail: {model: resp.data},
 	            bubbles: true, 
 	            composed: true 
 	        });
-	        this.dispatchEvent(event);
+	        self.dispatchEvent(event);
 			
 	        //self.requestUpdate();
 		});
