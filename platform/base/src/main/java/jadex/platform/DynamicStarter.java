@@ -2,6 +2,7 @@ package jadex.platform;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -41,7 +42,16 @@ public class DynamicStarter
 					{
 					}
 				}
-				URLClassLoader newcl = new URLClassLoader(clurls.toArray(new URL[clurls.size()]), null);
+				ClassLoader parent = null;
+				try
+				{
+					Method m = ClassLoader.class.getMethod("getPlatformClassLoader");
+					parent = (ClassLoader) m.invoke(null);
+				}
+				catch (Exception e)
+				{
+				}
+				URLClassLoader newcl = new URLClassLoader(clurls.toArray(new URL[clurls.size()]), parent);
 				Thread.currentThread().setContextClassLoader(newcl);
 				starter = Thread.currentThread().getContextClassLoader().loadClass("jadex.base.Starter");
 				platformconf = Thread.currentThread().getContextClassLoader().loadClass("jadex.base.IPlatformConfiguration");
