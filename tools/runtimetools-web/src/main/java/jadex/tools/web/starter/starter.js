@@ -1,5 +1,3 @@
-console.log("starter script started loading");
-
 import {LitElement} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
 import {html} from 'https://unpkg.com/lit-html@latest/lit-html.js?module';
 import {css} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
@@ -27,35 +25,32 @@ class StarterElement extends BaseElement {
 		console.log("starter");
 		
 		this.cid = null;
-		this.models = []; // available component models [filename, classname]
 		this.model = null; // loaded model
 		this.reversed = false;
 		this.myservice = "jadex.tools.web.starter.IJCCStarterService";
 		
 		var self = this;
 		
-		var treeid = "modeltree";
-		
 		var res1 = "jadex/tools/web/starter/modeltree.js";
 		var res2 = "jadex/tools/web/starter/componenttree.js";
 		var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
 		var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 
-		//console.log(ures1);
-		//console.log(ures2);
-		
-		// dynamically load jstree lib and style
-		//self.loadFiles(["libs/jstree_3.2.1.min.css", "libs/jstree_3.2.1.min.js"], function()
-		
-		// load files is only for javascript and css because it is added to dom
-		console.log("starter load files start");
-		
+		// load subcomponents
 		var p1 = this.loadScript(ures1);
 		var p2 = this.loadScript(ures2);
 		
 		Promise.all([p1, p2]).then((values) => 
 		{
 			console.log("starter load files ok");
+		});
+		
+		//const myElement = document.querySelector('my-element');
+		this.addEventListener('jadex-model-selected', (e) => 
+		{
+			console.log(e)
+			self.model = e.detail.model;
+			self.requestUpdate();
 		});
 	}
 	
@@ -118,9 +113,10 @@ class StarterElement extends BaseElement {
 			{
 				for(var i=0; i<this.model.arguments.length; i++)
 				{
-					var el = document.getElementById('arg_'+i);
+					var el = this.shadowRoot.getElementById('arg_'+i);
 					var argval = el.value;
 					console.log('arg_'+i+": "+argval);
+					args[this.model.arguments[i].name] = argval;
 				}
 			}
 			
@@ -132,6 +128,7 @@ class StarterElement extends BaseElement {
 			ci.monitoring = mon;
 			if(name!=null && name.length>0)
 				ci.name = name;
+			ci.arguments = args;
 			
 			//axios.get(self.getMethodPrefix()+'&methodname=createComponent&args_0='+selected+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
 			//console.log("starting: "+ci);
@@ -201,6 +198,7 @@ class StarterElement extends BaseElement {
 					</div>
 				</div>
 				
+				${this.model!=null? html`
 				<div class="bgwhitealpha m-2 p-2"> <!-- sticky-top  -->
 					<div class="row m-1">
 						<div class="col-12">
@@ -257,16 +255,16 @@ class StarterElement extends BaseElement {
 					</div>
 					
 					<div class="row m-1">
-						${this.getArguments().map(arg => html`
+						${this.getArguments().map((arg, i) => html`
 						<div class="col-4"">
 							${"["+arg.clazz.value+"] "+arg.name}
 						</div>
 						<div class="col-4 p-0">
-							<input class="w100" type="text" value="{arg.value}" readonly></input>
+							<input class="w100" type="text" value="${arg.value!=null? arg.value: ''}" readonly></input>
 						</div>
-						<!--<div class="col-4 pl-2">  ref="{'arg_'+i} 
-							<input class="w100" type="text" id="{'arg_'+i}">
-						</div>-->
+						<div class="col-4 pl-2"> 
+							<input class="w100" type="text" id="${'arg_'+i}">
+						</div>
 						`)}
 					</div>
 					
@@ -278,11 +276,10 @@ class StarterElement extends BaseElement {
 						</div>
 					</div>
 				</div>
+				`: ''}
 			</div>
 		`;
 	}
 }
 
 customElements.define('jadex-starter', StarterElement);
-
-console.log("starter script ended loading");
