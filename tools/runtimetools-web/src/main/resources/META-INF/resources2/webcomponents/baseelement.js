@@ -6,6 +6,9 @@ export class BaseElement extends LitElement
 {
 	static loaded = {};
 	
+	cid;
+	jadexservice;
+	
 	loadStyle(url)
 	{
 		var self = this;
@@ -92,6 +95,23 @@ export class BaseElement extends LitElement
    				});
    	    	}
 		});	
+    }
+	
+	loadServiceScript(scriptpath)
+    {
+		let prefix = 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.jadexservice;
+		let url = prefix+'&methodname=loadResource&args_0='+scriptpath+"&argtypes_0=java.lang.String";
+		return loadScript(url);
+    }
+	
+	loadServiceScripts(scriptpaths)
+    {
+		let scriptpromises = [];
+		scripts.forEach(function(scriptpath) {
+			scriptpromises.push(loadServiceScript(scriptpath))
+		})
+		
+		return Promise.all(scriptpromises);
     }
 }
 

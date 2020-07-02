@@ -1,12 +1,10 @@
-// import {LitElement} from 'lit-element';
-// import {LitElement} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
-// import {html} from 'https://unpkg.com/lit-html@latest/lit-html.js?module';
-// import {css} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
-import {LitElement, html, css} from 'lit-element';
+import {LitElement} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
+import {html} from 'https://unpkg.com/lit-html@latest/lit-html.js?module';
+import {css} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
 import {BaseElement} from '/webcomponents/baseelement.js'
 
 // Tag name 'jadex-starter'
-class StarterElement extends BaseElement {
+class BpmnElement extends BaseElement {
 
 	static get properties() 
 	{ 
@@ -18,33 +16,25 @@ class StarterElement extends BaseElement {
 	    console.log('attribute change: ', name, newVal, oldVal);
 	    super.attributeChangedCallback(name, oldVal, newVal);
 	    
-		console.log("starter: "+this.cid);
+		console.log("bpmn: "+this.cid);
 	}
 	
 	constructor() {
 		super();
 
-		console.log("starter");
+		console.log("bpmn");
 		
 		this.cid = null;
 		this.model = null; // loaded model
 		this.reversed = false;
-		this.myservice = "jadex.tools.web.starter.IJCCStarterService";
+		this.jadexservice = "jadex.tools.web.starter.IJCCStarterService";
 		
-		var self = this;
+		let self = this;
 		
-		var res1 = "jadex/tools/web/starter/modeltree.js";
-		var res2 = "jadex/tools/web/starter/componenttree.js";
-		var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
-		var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
-
-		// load subcomponents
-		var p1 = this.loadScript(ures1);
-		var p2 = this.loadScript(ures2);
-		
-		Promise.all([p1, p2]).then((values) => 
+		let scripts = ["jadex/tools/web/bpmn/bpmnmodeler.js"]
+		loadServiceScripts(scripts).then((values) => 
 		{
-			console.log("starter load files ok");
+			console.log("BPMN load files ok");
 		});
 		
 		//const myElement = document.querySelector('my-element');
@@ -56,91 +46,6 @@ class StarterElement extends BaseElement {
 		});
 	}
 	
-	getMethodPrefix() 
-	{
-		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.myservice;
-	}
-		
-	// todo: order by name
-	orderBy(data) 
-	{ 
-		var order = this.reversed ? -1 : 1;
-		
-		var res = data.slice().sort(function(a, b) 
-		{ 
-			return a===b? 0: a > b? order: -order 
-		});
-		
-		return res; 
-	}
-		
-	getConfigurationNames()
-	{
-		var ret = [];
-		if(this.model!=null)
-		{
-			if(this.model.configurations!=null)
-			{
-				for(var i=0; i<this.model.configurations.length; i++)
-				{
-					if(i==0)
-						ret.push("");
-					ret.push(this.model.configurations[i].name);
-				}
-			}
-		}
-		return ret;
-	}
-		
-	getArguments()
-	{
-		return this.model!=null && this.model.arguments!=null? this.model.arguments: [];
-	}
-		
-	start(e)
-	{
-		if(this.model!=null)
-		{
-			var conf = this.shadowRoot.getElementById("config").value;
-			var sync = this.shadowRoot.getElementById("synchronous").checked;
-			var sus = this.shadowRoot.getElementById("suspended").checked;
-			var mon = this.shadowRoot.getElementById("monitoring").value;
-			
-			var gen = this.shadowRoot.getElementById("autogen").checked;
-			var gencnt = this.shadowRoot.getElementById("gencnt").value;
-			var name = this.shadowRoot.getElementById("name").value;
-
-			var args = {};
-			if(this.model!=null && this.model.arguments!=null)
-			{
-				for(var i=0; i<this.model.arguments.length; i++)
-				{
-					var el = this.shadowRoot.getElementById('arg_'+i);
-					var argval = el.value;
-					console.log('arg_'+i+": "+argval);
-					args[this.model.arguments[i].name] = argval;
-				}
-			}
-			
-			var ci = {filename: this.model.filename};
-			if(conf!=null && conf.length>0)
-				ci.configuration = conf;
-			ci.synchronous = sync;
-			ci.suspended = sus;
-			ci.monitoring = mon;
-			if(name!=null && name.length>0)
-				ci.name = name;
-			ci.arguments = args;
-			
-			//axios.get(self.getMethodPrefix()+'&methodname=createComponent&args_0='+selected+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
-			//console.log("starting: "+ci);
-			axios.get(this.getMethodPrefix()+'&methodname=createComponent&args_0='+JSON.stringify(ci)+"&argtypes_0=jadex.bridge.service.types.cms.CreationInfo", this.transform).then(function(resp)
-			{
-				// todo: show running components?!
-				console.log("started: "+resp.data);
-			});
-		}
-	}
 		
 	static get styles() {
 	    return css`
@@ -284,4 +189,4 @@ class StarterElement extends BaseElement {
 	}
 }
 
-customElements.define('jadex-starter', StarterElement);
+customElements.define('jadex-bpmn', BpmnElement);

@@ -70,9 +70,16 @@ class PlatformElement extends LitElement {
 	            
 			    if(i==1)
 			    {
-			    	var script = "<script type='module'>"+taghtml+"</script>";
+			    	//var script = "<script type='module'>"+taghtml+"</script>";
 			    	//document.getElementsByTagName("head")[0].append(script);
-			    	$('head').append(script);
+			    	//$('head').append(script);
+			    	/* let script = document.createElement("script");
+			    	script.type='module-shim';
+			    	script.innerHTML=taghtml;
+			    	alert(taghtml);
+			    	document.head.append(script); */
+			    	importShim.topLevelLoad(importShim.getFakeUrl(), taghtml).then(x => console.log(x));
+
 			    }
 			});
 						
