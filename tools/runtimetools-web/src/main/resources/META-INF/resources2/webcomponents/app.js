@@ -1,7 +1,8 @@
 import { LitElement, html, css } from 'lit-element';
+import { BaseElement } from 'base-element';
 
 // Defined as <jadex-app> tag
-class AppElement extends LitElement {
+class AppElement extends BaseElement {
 
 	messsage = null;
 	

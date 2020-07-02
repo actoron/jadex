@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit-element';
+import { BaseElement } from 'base-element';
 
-class PlatformsElement extends LitElement {
+class PlatformsElement extends BaseElement {
 
 	reversed = false;
 	platforms = [];
