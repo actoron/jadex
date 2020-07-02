@@ -181,6 +181,14 @@ def createSignTask(origtask, classi, exten) {
    		dependsOn origtask
     }
     signtask.sign(classi, origtask.outputs.files.singleFile)
+    
+    // Change name of signature file to not include version number -> allows caching across version as long as jar contents haven't changed
+    if(origtask instanceof AbstractArchiveTask) {
+	    signtask.signatures.each { sig ->
+	    	sig.name	= origtask.archiveBaseName.get() + (classi!=null ? '-' + classi : '') + '.' + exten + sig.name.substring(sig.name.lastIndexOf('.'))
+	    }
+	}
+	
 	signtask.signatureFiles.each { sigfile ->
 		publishing.publications.mavenJava.artifact(sigfile)
 		{

@@ -261,8 +261,7 @@ subprojects
 			}
 			war.archiveBaseName = getArtifactName(project)
 		}
-		//jar.archiveBaseName = getArtifactName(project)
-       	jar.archiveName = getArtifactName(project) + '.jar' 
+		jar.archiveBaseName = getArtifactName(project)
 //			test {
 //				reports.html.enabled = false
 //			}
@@ -430,8 +429,8 @@ subprojects
 			}
 		}
 
-		// Create distZip task
-		task distZip(type: Zip) {
+		// Create jadexDistZip task
+		task jadexDistZip(type: Zip) {
 			archiveName 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
 			duplicatesStrategy DuplicatesStrategy.EXCLUDE // TODO: Workaround for our broken mechanism
 			gradle.projectsEvaluated() {
@@ -567,18 +566,18 @@ subprojects
 		// https://stackoverflow.com/questions/26459067/how-to-run-gradle-script-from-gradle
 		// https://discuss.gradle.org/t/replacement-for-task-execute/27545
 		task checkDist(type: GradleBuild) {
-			dependsOn unzipSources, distZip
+			dependsOn unzipSources, jadexDistZip
 			def rebuilddirfile	= new File(project.unzipSources.outputs.files.files.first(), 'sources')
 //			println 'rebuilddirfile: '+rebuilddirfile
 			dir	= rebuilddirfile
 			buildFile = new File(rebuilddirfile, 'build.gradle')
 			buildName = 'rebuild-'+distname	// required to avoid name clashes in newer gradle versions, grrr.
-			tasks = ["distZip"]
+			tasks = ["jadexDistZip"]
 			startParameter.projectProperties << ["dist": distname]
 			
 			doLast {					
 				// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
-				def distzip = project.distZip.outputs.files.first().canonicalPath
+				def distzip = project.jadexDistZip.outputs.files.first().canonicalPath
 				//def distzip2 = rebuilddirfile.getCanonicalPath() + '/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
 				def distzip2 = rebuilddirfile.getCanonicalPath() + '/build/distributions/zips/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
 				def diff	= diffZips(distzip, distzip2)
@@ -675,7 +674,7 @@ task schemasZip(type: Zip) {
 // for shared stable/master jenkinsfile in buildscripts
 task distZips()  {
 	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
-	dependsOn subprojects.collect({p -> p.tasks.matching{it.name.equals('distZip')}}).flatten()
+	dependsOn subprojects.collect({p -> p.tasks.matching{it.name.equals('jadexDistZip')}}).flatten()
 }
 
 

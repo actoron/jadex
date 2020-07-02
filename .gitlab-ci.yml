@@ -1,6 +1,3 @@
-# TODO: Severe
-# * fix start scripts not working from dist zips (jadex.bat etc...)
-
 # TODO: Minor
 # * performanceTests (publish results?)
 # * fix sonarqube and upload result?
@@ -8,13 +5,11 @@
 # * deploy infrastructure applications or use other update mechanism? (ssp1, timeprovider, anything else...?)
 
 # TODO: Contingeny
-# * speedup by caching build artifacts?
 # * avoid xlib install for test job
 # * enable junit view in gitlab
-# * fix runtime of GlobalSuperpeerTest (>2 min, really?)
-# * 15 sec. time delay after gradle configure when executing publish task
 # * auto-close staging repository
 # * allow combining deployJavadocs and deployZips (currently different distributions)
+# use distribution plugin for distZip task
 
 image: openjdk:11-jdk
 
