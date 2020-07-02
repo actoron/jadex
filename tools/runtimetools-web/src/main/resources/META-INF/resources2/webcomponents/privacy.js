@@ -1,35 +1,11 @@
 import { LitElement, html, css } from 'lit-element';
+import { BaseElement } from 'base-element';
 
 // Defined as <jadex-privacy> tag
-class PrivacyElement extends LitElement {
+class PrivacyElement extends BaseElement {
 
 	constructor() {
 		super();
-	}
-	
-	static get styles() {
-	    return css`
-	    	/* Navbar styling. */
-	    	/* background color. */
-	    	.navbar-custom {
-	    		background-color: #aaaaaa;
-	    	}
-	    	/* brand and text color */
-	    	.navbar-custom .navbar-brand,
-	    	.navbar-custom .navbar-text {
-	    		color: rgba(255,255,255,.8);
-	    	}
-	    	/* link color */
-	    	.navbar-custom .navbar-nav .nav-link {
-	    		color: rgba(255,255,255,.5);
-	    	}
-	    	/* color of active or hovered links */
-	    	.navbar-custom .nav-item.active .nav-link,
-	    	.navbar-custom .nav-item:focus .nav-link,
-	    	.navbar-custom .nav-item:hover .nav-link {
-	    		color: #ffffff;
-	    	}
-	    `;
 	}
 	
 	render() {

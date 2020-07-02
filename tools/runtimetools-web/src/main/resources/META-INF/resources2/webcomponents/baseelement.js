@@ -6,6 +6,11 @@ export class BaseElement extends LitElement
 {
 	static loaded = {};
 	
+	constructor() {
+		super();
+		this.loadStyle("/css/style.css").then(()=>{console.log("loaded jadex css")}).catch((e)=>{console.log("error loading jadex css: "+e)});
+	}
+	
 	loadStyle(url)
 	{
 		var self = this;

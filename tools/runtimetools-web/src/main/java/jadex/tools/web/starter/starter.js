@@ -141,7 +141,11 @@ class StarterElement extends BaseElement {
 	}
 		
 	static get styles() {
-	    return css`
+		var ret = [];
+		if(super.styles!=null)
+			ret.push(super.styles);
+		ret.push(
+		    css`
 	    	/* Navbar styling. */
 	    	/* background color. */
 	    	.navbar-custom {
@@ -178,7 +182,8 @@ class StarterElement extends BaseElement {
 	  			0% { transform: rotate(0deg); }
 	  			100% { transform: rotate(360deg); }
 			}
-	    `;
+		    `);
+		return ret;
 	}
 	
 	render() {

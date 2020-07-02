@@ -89,7 +89,7 @@
 					{"["+arg.clazz.value+"] "+arg.name}
 				</div>
 				<div class="col-4 p-0">
-					<input class="w100" type="text" value="{arg.value}" readonly></input>
+					<input class="w100" type="text" value="${arg.value!=null? arg.value: ''}" readonly></input>
 				</div>
 				<div class="col-4 pl-2"> <!-- ref="{'arg_'+i} -->
 					<input class="w100" type="text" id="{'arg_'+i}">
