@@ -62,6 +62,8 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	public String getPluginUIPath()
 	{
 		return "jadex/tools/web/security/security.tag";
+		//return "jadex/tools/web/starter/security.js";
+
 	}
 	
 	/**
