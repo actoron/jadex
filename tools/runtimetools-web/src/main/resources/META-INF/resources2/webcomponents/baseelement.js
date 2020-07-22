@@ -9,9 +9,21 @@ export class BaseElement extends LitElement
 	cid;
 	jadexservice;
 	
-	constructor() {
+	constructor() 
+	{
 		super();
-		this.loadStyle("/css/style.css").then(()=>{console.log("loaded jadex css")}).catch((e)=>{console.log("error loading jadex css: "+e)});
+		this.loadStyle("/css/style.css")
+			.then(()=>{console.log("loaded jadex css")})
+			.catch((e)=>{console.log("error loading jadex css: "+e)});
+		this.loadStyle("https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css")
+			.then(()=>{console.log("loaded bootstrap css")})
+			.catch((e)=>{console.log("error loading boostrap css: "+e)});
+		this.loadScript("libs/jquery_3.4.1/jquery.js")
+			.then(()=>{console.log("loaded jquery")})
+			.catch((e)=>{console.log("error loading jquery: "+e)});
+		this.loadScript("https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js")
+			.then(()=>{console.log("loaded bootstrap")})
+			.catch((e)=>{console.log("error loading bootstrap: "+e)});
 	}
 	
 	loadStyle(url)
@@ -118,6 +130,12 @@ export class BaseElement extends LitElement
 		
 		return Promise.all(scriptpromises);
     }
+	
+	switchLanguage() 
+	{
+	    language.switchLanguage(); 
+	    this.requestUpdate(); // needs manual update as language.lang is not mapped to an attribute 
+	}
 }
 
 //customElements.define('jadex-base', StarterElement);

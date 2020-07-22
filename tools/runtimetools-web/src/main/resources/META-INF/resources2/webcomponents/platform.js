@@ -1,14 +1,17 @@
 import {LitElement, html, css} from 'lit-element';
-import { BaseElement } from 'base-element';
+import {BaseElement} from 'base-element';
 
 // Tag name 'jadex-platform'
-class PlatformElement extends BaseElement {
+class PlatformElement extends BaseElement 
+{
 
-	static get properties() { 
+	static get properties() 
+	{ 
 		return { cid: { type: String }};
 	}
 	
-	attributeChangedCallback(name, oldVal, newVal) {
+	attributeChangedCallback(name, oldVal, newVal) 
+	{
 	    console.log('attribute change: ', name, newVal, oldVal);
 	    super.attributeChangedCallback(name, oldVal, newVal);
 	    
@@ -17,7 +20,8 @@ class PlatformElement extends BaseElement {
 	    }
 	}
 	
-	constructor() {
+	constructor() 
+	{
 		super();
 
 		console.log("platform");
@@ -31,11 +35,12 @@ class PlatformElement extends BaseElement {
 	{
 		// Logic for setting the active link in the navbar
 		var el = $('#plugins .navbar-nav').find('li.active');
+		var sel = event.target.parentElement.parentElement;
 		for(var i=0; i<el.length; i++)
 			el[i].classList.remove('active');
-		event.target.parentElement.parentElement.classList.add("active");
+		sel.classList.add("active");
 		
-		this.showPlugin2(event.item.p);
+		this.showPlugin2(event.item);
 	}
 	
 	showPlugin2(p)
@@ -47,7 +52,8 @@ class PlatformElement extends BaseElement {
 		this.requestUpdate();
 	}
 	
-	loadPlugins() {
+	loadPlugins() 
+	{
 		var self = this;
 		axios.get('webjcc/getPluginFragments?cid='+this.cid, this.transform).then(function(resp)
 		{
@@ -126,7 +132,7 @@ class PlatformElement extends BaseElement {
 				<ul class="navbar-nav mr-auto">
 					${this.plugins.map((p) => html`
 					<li class="nav-item active">
-						<div class="nav-link" @click="${(e) => showPlugin(e)}"><h2>${p.name.toUpperCase()}</h2></div>
+						<div class="nav-link" @click="${(e) => {e.item = p; this.showPlugin(e)}}"><h2>${p.name.toUpperCase()}</h2></div>
 					</li>
 					`)}
 				</ul>
@@ -134,11 +140,6 @@ class PlatformElement extends BaseElement {
 			
 			<div id="plugin"></div>
 		`;
-	}
-	
-	switchLanguage() {
-	    language.switchLanguage(); 
-	    this.requestUpdate(); // needs manual update as language.lang is not mapped to an attribute 
 	}
 }
 
