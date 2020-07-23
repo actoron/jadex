@@ -14,7 +14,7 @@ class AppElement extends BaseElement {
 		console.log("app element");
 		
 		page.base('/#');
-		page('/index2.html', () => {
+		page('/index.html', () => {
 			page.redirect("/platforms");
 	    });
 	    page('/', () => {

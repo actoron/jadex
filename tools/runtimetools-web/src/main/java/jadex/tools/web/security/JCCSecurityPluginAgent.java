@@ -43,7 +43,7 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	 */
 	public IFuture<String> getPluginName()
 	{
-		return new Future<String>("security");
+		return new Future<String>("Security");
 	}
 	
 	/**

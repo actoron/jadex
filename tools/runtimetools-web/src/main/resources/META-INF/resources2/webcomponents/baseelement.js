@@ -118,14 +118,15 @@ export class BaseElement extends LitElement
     {
 		let prefix = 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.jadexservice;
 		let url = prefix+'&methodname=loadResource&args_0='+scriptpath+"&argtypes_0=java.lang.String";
-		return loadScript(url);
+		return this.loadScript(url);
     }
 	
 	loadServiceScripts(scriptpaths)
     {
 		let scriptpromises = [];
-		scripts.forEach(function(scriptpath) {
-			scriptpromises.push(loadServiceScript(scriptpath))
+		let self = this;
+		scriptpaths.forEach(function(scriptpath) {
+			scriptpromises.push(self.loadServiceScript(scriptpath));
 		})
 		
 		return Promise.all(scriptpromises);

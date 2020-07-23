@@ -43,7 +43,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	 */
 	public IFuture<String> getPluginName()
 	{
-		return new Future<String>("starter");
+		return new Future<String>("Starter");
 	}
 	
 	/**

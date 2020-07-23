@@ -55,6 +55,7 @@ public abstract class JCCPluginAgent
 		Scanner sc = null;
 		try
 		{
+			System.out.println("LOAD " + name);
 			InputStream is = SUtil.getResource0(name, agent.getClassLoader());
 			sc = new Scanner(is);
 			ret = sc.useDelimiter("\\A").next();

@@ -115,7 +115,7 @@ public class JCCCloudviewPluginAgent extends JCCPluginAgent implements IJCCCloud
 	 */
 	public IFuture<String> getPluginName()
 	{
-		return new Future<>("cloudview");
+		return new Future<>("Cloudview");
 	}
 	
 	/**

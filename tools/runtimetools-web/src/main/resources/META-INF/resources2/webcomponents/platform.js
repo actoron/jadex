@@ -45,9 +45,11 @@ class PlatformElement extends BaseElement
 	
 	showPlugin2(p)
 	{
-		console.log("plugin: "+p.name+" "+this.cid);
+		let lcname = p.name.toLowerCase(); 
+		console.log("plugin: "+lcname+" "+this.cid);
 		
-		var html = "<jadex-"+p.name+" cid='"+this.cid+"'></jadex-"+p.name+">";
+		let html = "<jadex-"+lcname+" cid='"+this.cid+"'></jadex-"+lcname+">";
+		console.log('tag is ' + html)
 		this.shadowRoot.getElementById("plugin").innerHTML = html;
 		this.requestUpdate();
 	}
@@ -75,19 +77,15 @@ class PlatformElement extends BaseElement
 	            //script.type = 'text/javascript';
 	            //script.src = files[i];
 	            
-			    if(i==1)
-			    {
-			    	//var script = "<script type='module'>"+taghtml+"</script>";
-			    	//document.getElementsByTagName("head")[0].append(script);
-			    	//$('head').append(script);
-			    	/* let script = document.createElement("script");
-			    	script.type='module-shim';
-			    	script.innerHTML=taghtml;
-			    	alert(taghtml);
-			    	document.head.append(script); */
-			    	importShim.topLevelLoad(importShim.getFakeUrl(), taghtml).then(x => console.log(x));
-
-			    }
+		    	//var script = "<script type='module'>"+taghtml+"</script>";
+		    	//document.getElementsByTagName("head")[0].append(script);
+		    	//$('head').append(script);
+		    	/* let script = document.createElement("script");
+		    	script.type='module-shim';
+		    	script.innerHTML=taghtml;
+		    	alert(taghtml);
+		    	document.head.append(script); */
+		    	importShim.topLevelLoad(importShim.getFakeUrl(), taghtml).then(x => console.log(x));
 			});
 						
 			if(i>0)
@@ -132,7 +130,7 @@ class PlatformElement extends BaseElement
 				<ul class="navbar-nav mr-auto">
 					${this.plugins.map((p) => html`
 					<li class="nav-item active">
-						<div class="nav-link" @click="${(e) => {e.item = p; this.showPlugin(e)}}"><h2>${p.name.toUpperCase()}</h2></div>
+						<div class="nav-link" @click="${(e) => {e.item = p; this.showPlugin(e)}}"><h2>${p.name}</h2></div>
 					</li>
 					`)}
 				</ul>

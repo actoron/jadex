@@ -21,18 +21,17 @@ class BpmnElement extends BaseElement {
 	
 	constructor() {
 		super();
-
 		console.log("bpmn");
 		
 		this.cid = null;
 		this.model = null; // loaded model
 		this.reversed = false;
-		this.jadexservice = "jadex.tools.web.starter.IJCCStarterService";
+		this.jadexservice = "jadex.tools.web.starter.IJCCBpmnService";
 		
 		let self = this;
 		
 		let scripts = ["jadex/tools/web/bpmn/bpmnmodeler.js"]
-		loadServiceScripts(scripts).then((values) => 
+		this.loadServiceScripts(scripts).then((values) => 
 		{
 			console.log("BPMN load files ok");
 		});
@@ -89,103 +88,7 @@ class BpmnElement extends BaseElement {
 	}
 	
 	render() {
-		return html`
-			<div class="container-fluid">
-				<div class="row m-1">
-					<div class="col-12 m-1">
-						<h3>Components</h3>
-						<jadex-componenttree cid='${this.cid}'></jadex-componenttree>
-					</div>
-				</div>
-				
-				<div class="row m-1">
-					<div class="col-12 m-1">
-						<h3>Available Models</h3>
-						<jadex-modeltree cid='${this.cid}'></jadex-modeltree>
-					</div>
-				</div>
-				
-				${this.model!=null? html`
-				<div class="bgwhitealpha m-2 p-2"> <!-- sticky-top  -->
-					<div class="row m-1">
-						<div class="col-12">
-							<h3>Settings</h3>
-						</div>
-					</div>
-					<div class="row m-1">
-						<div class="col-2">
-							Filename
-						</div>
-						<div class="col-10" id="filename">
-							<input type="text" ref="filename" class="w100" value="${this.model!=null? this.model.filename: ''}">
-						</div>
-					</div>
-					<div class="row m-1">
-						<div class="col-2">
-							Configuration
-						</div>
-						<div class="col-10">
-							<select id="config" class="w100">
-		   						${this.getConfigurationNames().map((c) => html`<option value="${c}"></option>`)}
-		 					</select>
-						</div>
-					</div>
-					<div class="row m-1">
-						<div class="col-2">
-							Comp. name
-						</div>
-						<div class="col-5">
-							<input type="text" class="w100" value="${this.model!=null && this.model.instancename!=null? this.model.instancename: ''}" id="name"></input>
-						</div>
-						<div class="col-3">
-							<input type="checkbox" id="autogen">Auto generate</input>
-						</div>
-						<div class="col-2">
-							<input class="w100" type="number" value="1" id="gencnt"></input>
-						</div>
-					</div>
-					<div class="row m-1">
-						<div class="col-4">
-							<input type="checkbox" id="suspended">Suspended</input>
-						</div>
-						<div class="col-4">
-							<input type="checkbox" id="synchronous">Synchronous</input>
-						</div>
-						<div class="col-4">
-							<select id="monitoring" class="w100">
-		   						<option value="OFF">OFF</option> 
-		   						<option value="COARSE">COARSE</option> 
-		   						<option value="MEDIUM">MEDIUM</option> 
-		   						<option value="FINE">FINE</option> 
-		 					</select>
-		 				</div>
-					</div>
-					
-					<div class="row m-1">
-						${this.getArguments().map((arg, i) => html`
-						<div class="col-4"">
-							${"["+arg.clazz.value+"] "+arg.name}
-						</div>
-						<div class="col-4 p-0">
-							<input class="w100" type="text" value="${arg.value!=null? arg.value: ''}" readonly></input>
-						</div>
-						<div class="col-4 pl-2"> 
-							<input class="w100" type="text" id="${'arg_'+i}">
-						</div>
-						`)}
-					</div>
-					
-					<div class="row m-1">
-						<div class="col-10">
-						</div>
-						<div class="col-2">
-							<button class=" float-right" @click="${e => this.start(e)}">Start</button> <!-- class="w100" -->
-						</div>
-					</div>
-				</div>
-				`: ''}
-			</div>
-		`;
+		return html`<h1>Tolles BPMN</h1>`;
 	}
 }
 
