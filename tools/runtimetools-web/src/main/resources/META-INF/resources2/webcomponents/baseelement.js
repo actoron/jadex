@@ -71,7 +71,6 @@ export class BaseElement extends LitElement
 			window.calls = {};
 			window.loadedScript = function(url)
 			{
-				console.log("LOADED SCRIPT: "+url);
 				var callback = window.calls[url];
 				if(callback!=null)
 				{
@@ -130,11 +129,25 @@ export class BaseElement extends LitElement
 		});	
     }
 	
+	loadServiceStyle(stylepath)
+    {
+		return this.loadStyle(this.getResourceUrl(stylepath));
+    }
+	
+	loadServiceStyles(stylepaths)
+    {
+		let stylepromises = [];
+		let self = this;
+		stylepaths.forEach(function(stylepath) {
+			stylepromises.push(self.loadServiceStyle(stylepath));
+		})
+		
+		return Promise.all(stylepromises);
+    }
+	
 	loadServiceScript(scriptpath)
     {
-		let prefix = 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.jadexservice;
-		let url = prefix+'&methodname=loadResource&args_0='+scriptpath+"&argtypes_0=java.lang.String";
-		return this.loadScript(url);
+		return this.loadScript(this.getResourceUrl(scriptpath));
     }
 	
 	loadServiceScripts(scriptpaths)
@@ -147,6 +160,32 @@ export class BaseElement extends LitElement
 		
 		return Promise.all(scriptpromises);
     }
+	
+	loadServiceFont(fontfamily, fontpath)
+	{
+		let self = this;
+		console.log("loadServiceFont");
+		return new Promise(function(resolve, reject) 
+		{
+			console.log("loadServiceFont Promise exec");
+			let font = new FontFace(fontfamily, 'url(' + self.getResourceUrl(fontpath) + ')');
+			font.load().then(function(fontface)
+			{
+			    document.fonts.add(fontface)
+			    resolve(fontface);
+			}).catch(function(err)
+			{
+				reject(err);
+			});
+		});
+	}
+	
+	getResourceUrl(respath)
+	{
+		let prefix = 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.jadexservice;
+		let url = prefix+'&methodname=loadResource&args_0='+respath+"&argtypes_0=java.lang.String";
+		return url;
+	}
 	
 	switchLanguage() 
 	{
