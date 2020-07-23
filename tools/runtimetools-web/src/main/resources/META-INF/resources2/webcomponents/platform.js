@@ -49,7 +49,6 @@ class PlatformElement extends BaseElement
 		console.log("plugin: "+lcname+" "+this.cid);
 		
 		let html = "<jadex-"+lcname+" cid='"+this.cid+"'></jadex-"+lcname+">";
-		console.log('tag is ' + html)
 		this.shadowRoot.getElementById("plugin").innerHTML = html;
 		this.requestUpdate();
 	}

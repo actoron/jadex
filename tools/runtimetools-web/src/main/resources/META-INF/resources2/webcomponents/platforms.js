@@ -49,7 +49,7 @@ class PlatformsElement extends BaseElement {
 				</div>
 				<table>
 					<tbody>
-						<tr class="bg-success">
+						<tr>
 							<th>Name</th>
 							<!-- <th>Connected</th> 
 							<th>Protocol</th>-->
