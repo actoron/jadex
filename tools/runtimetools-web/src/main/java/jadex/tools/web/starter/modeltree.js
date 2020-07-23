@@ -4,37 +4,16 @@ import {BaseElement} from '/webcomponents/baseelement.js'
 
 // Tag name 'jadex-modeltree'
 class ModelTree extends BaseElement {
-
-	static get properties() 
-	{ 
-		return { cid: { type: String }};
-	}
 	
-	attributeChangedCallback(name, oldVal, newVal) 
+	init()
 	{
-	    //console.log('attribute change: ', name, newVal, oldVal);
-	    super.attributeChangedCallback(name, oldVal, newVal);
-	    
-		//console.log("modeltree: "+this.cid);
-		if(name=="cid")
-			this.init();
-	}
-	
-	constructor() 
-	{
-		super();
-
 		console.log("modeltree");
 		
-		this.cid = null;
 		this.models = []; // available component models [filename, classname]
 		this.reversed = false;
 		//this.myservice = "jadex.tools.web.starter.IJCCStarterService";
 		this.treeid = "modeltree";
-	}
-	
-	init()
-	{
+		
 		var self = this;
 		
 		this.loadJSTree().then(function()

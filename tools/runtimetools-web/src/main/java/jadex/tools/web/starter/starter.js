@@ -7,26 +7,10 @@ import {BaseElement} from '/webcomponents/baseelement.js'
 
 // Tag name 'jadex-starter'
 class StarterElement extends BaseElement {
-
-	static get properties() 
-	{ 
-		return { cid: { type: String }};
-	}
 	
-	attributeChangedCallback(name, oldVal, newVal) 
-	{
-	    console.log('attribute change: ', name, newVal, oldVal);
-	    super.attributeChangedCallback(name, oldVal, newVal);
-	    
-		console.log("starter: "+this.cid);
-	}
-	
-	constructor() {
-		super();
-
+	init() {
 		console.log("starter");
 		
-		this.cid = null;
 		this.model = null; // loaded model
 		this.reversed = false;
 		this.myservice = "jadex.tools.web.starter.IJCCStarterService";

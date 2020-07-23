@@ -22,9 +22,8 @@ class ComponentTree extends BaseElement
 			this.init();
 	}
 	
-	constructor() 
+	init() 
 	{
-		super();
 
 		this.components = []; // component descriptions
 		this.typemap = null;
@@ -61,10 +60,7 @@ class ComponentTree extends BaseElement
 		}
 		
 		console.log("components");
-	}
-	
-	init() 
-	{
+		
 		console.log("components init: "+this.cid);
 
 		var self = this;

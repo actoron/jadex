@@ -19,14 +19,12 @@ class BpmnElement extends BaseElement {
 		console.log("bpmn: "+this.cid);
 	}
 	
-	constructor() {
-		super();
+	init() {
 		console.log("bpmn");
 		
-		this.cid = null;
 		this.model = null; // loaded model
 		this.reversed = false;
-		this.jadexservice = "jadex.tools.web.starter.IJCCBpmnService";
+		this.jadexservice = "jadex.tools.web.bpmn.IJCCBpmnService";
 		
 		let self = this;
 		

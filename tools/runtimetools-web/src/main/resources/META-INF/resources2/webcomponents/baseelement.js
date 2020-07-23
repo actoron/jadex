@@ -6,8 +6,24 @@ export class BaseElement extends LitElement
 {
 	static loaded = {};
 	
-	cid;
-	jadexservice;
+	cid = null;
+	jadexservice = null;
+	
+	static get properties() 
+	{ 
+		return { cid: { type: String }};
+	}
+	
+	attributeChangedCallback(name, oldVal, newVal) 
+	{
+	    console.log('attribute change: ', name, newVal, oldVal);
+	    super.attributeChangedCallback(name, oldVal, newVal);
+	    
+	    if (name === 'cid' && typeof this.init === 'function')
+	    	this.init();
+	    
+		console.log("starter: "+this.cid);
+	}
 	
 	constructor() 
 	{

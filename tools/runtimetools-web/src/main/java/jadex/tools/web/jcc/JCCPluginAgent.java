@@ -97,7 +97,7 @@ public abstract class JCCPluginAgent
 	 *  @return The text from the file.
 	 */
 	public IFuture<byte[]> loadResource(String filename)
-	{
+	{System.out.println("LOADRESOURCE!" + filename);
 		try
 		{
 		InputStream is = SUtil.getResource0(filename, agent.getClassLoader());

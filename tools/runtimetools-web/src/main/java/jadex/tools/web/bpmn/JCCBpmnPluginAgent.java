@@ -36,7 +36,6 @@ public class JCCBpmnPluginAgent extends JCCPluginAgent implements IJCCBpmnServic
 	/** The plugin component string. */
 	protected String component;
 	
-	
 	/**
 	 *  Get the plugin name.
 	 *  @return The plugin name.

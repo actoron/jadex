@@ -212,6 +212,7 @@ public class JCCWebAgent implements IJCCWebService
 	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, 
 		final String methodname, final Object[] args, final ClassInfo[] argtypes, @FutureReturnType final ClassInfo rettype)
 	{
+		System.out.println("INVOKE: " + methodname + " " + servicetype);
 		Class<?> rtype = rettype!=null? rettype.getType(agent.getClassLoader(), agent.getModel().getAllImports()): null;
 
 		final Future<Object> ret = (Future<Object>)SFuture.getNoTimeoutFuture(rtype, agent);
@@ -237,7 +238,7 @@ public class JCCWebAgent implements IJCCWebService
 			public void exceptionOccurred(Exception exception)
 			{
 				// Did not find the service, so use it locally with cid
-				
+				System.out.println("locally with cid: "+ methodname + " " + servicetype);
 				IService ser = (IService)agent.getLocalService(servicetype.getType(agent.getClassLoader()));
 				
 				Object[] args2 = new Object[args!=null? args.length+1: 1];
