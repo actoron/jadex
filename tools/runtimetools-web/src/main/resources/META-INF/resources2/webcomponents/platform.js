@@ -86,7 +86,6 @@ class PlatformElement extends BaseElement
 			    	alert(taghtml);
 			    	document.head.append(script); */
 			    	importShim.topLevelLoad(importShim.getFakeUrl(), taghtml).then(x => console.log(x));
-
 			    }
 			});
 						

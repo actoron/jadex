@@ -63,7 +63,6 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	{
 		return "jadex/tools/web/security/security.tag";
 		//return "jadex/tools/web/starter/security.js";
-
 	}
 	
 	/**
