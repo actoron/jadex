@@ -6,9 +6,10 @@ import {LitElement, html, css} from 'lit-element';
 import {BaseElement} from '/webcomponents/baseelement.js'
 
 // Tag name 'jadex-starter'
-class StarterElement extends BaseElement {
-	
-	init() {
+class StarterElement extends BaseElement 
+{	
+	init() 
+	{
 		console.log("starter");
 		
 		this.model = null; // loaded model
@@ -126,7 +127,8 @@ class StarterElement extends BaseElement {
 		}
 	}
 		
-	static get styles() {
+	static get styles() 
+	{
 		var ret = [];
 		if(super.styles!=null)
 			ret.push(super.styles);

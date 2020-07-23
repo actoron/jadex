@@ -4,23 +4,10 @@ import {BaseElement} from '/webcomponents/baseelement.js'
 // Tag name 'jadex-security'
 class SecurityElement extends BaseElement 
 {
-
-	static get properties() 
-	{ 
-		return { cid: { type: String }};
-	}
-	
-	attributeChangedCallback(name, oldVal, newVal) 
+	constructor()
 	{
-	    console.log('attribute change: ', name, newVal, oldVal);
-	    super.attributeChangedCallback(name, oldVal, newVal);
-	    
-		console.log("security: "+this.cid);
-	}
-	
-	constructor() {
 		super();
-
+		
 		console.log("security");
 		
 		this.cid = null;
@@ -28,11 +15,11 @@ class SecurityElement extends BaseElement
 		
 		//console.log("security plugin started: "+opts);
 				
-		self.secstate = {};
-		self.nn_option = "option1";
-		self.progress = 0;
-		self.secret = null;
-		self.selected = null;
+		this.secstate = {};
+		this.nn_option = "option1";
+		this.progress = 0;
+		this.secret = null;
+		this.selected = null;
 		
 		/*$("#nn_opts :input").change(function() 
 		{
@@ -45,7 +32,8 @@ class SecurityElement extends BaseElement
 		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.myservice;
 	}
 				
-	static get styles() {
+	static get styles() 
+	{
 		var ret = [];
 		if(super.styles!=null)
 			ret.push(super.styles);
@@ -68,7 +56,8 @@ class SecurityElement extends BaseElement
 		return ret;
 	}
 	
-	render() {
+	render() 
+	{
 		return html`
 			<div class="container-fluid">
 				<div id="accordion">
@@ -80,16 +69,16 @@ class SecurityElement extends BaseElement
 							<div class="card-body">
 								<div class="row m-1">
 									<div class="col-6">
-										<input type="checkbox" ref="usesecret" @click="${useSecret}" checked="${secstate.useSecret}">Use secret</input>
+										<input type="checkbox" id="usesecret" @click="${e => {this.useSecret()}}" checked="${this.secstate.useSecret}">Use secret</input>
 									</div>
 									<div class="col-6">
-										<input type="checkbox" ref="printsecret" @click="${printSecret}" checked="${secstate.printSecret}">Print secret</input>
+										<input type="checkbox" id="printsecret" @click="${e => {this.printSecret()}}" checked="${this.secstate.printSecret}">Print secret</input>
 									</div>
 								</div>
 								<div class="row m-1">
 									<div class="col-12">
 										<label for="platformsecret">Platform Secret (Password, Key, Certificate)</label>
-  										<textarea class="form-control rounded-0" id="platformsecret" rows="10" ref="platformsecret" disabled="true">${secstate.platformSecret}</textarea>
+  										<textarea class="form-control rounded-0" id="platformsecret" rows="10" id="platformsecret" disabled="true">${this.secstate.platformSecret}</textarea>
 									</div>
 								</div>
 	      					</div>
@@ -113,7 +102,7 @@ class SecurityElement extends BaseElement
 					  						</thead>
 					  						<tbody>
 												${this.getNetworks().map((net) => html`
-						    						<tr class="d-flex net" @click="{this.selectNetwork(${net})}">
+						    						<tr class="d-flex net" @click="${e => {this.selectNetwork(net)}}">
 						      							<td class="col-4">{net[0]}</td>
 						     							<td class="col-8">{net[1]}</td>
 												    </tr>
@@ -126,77 +115,77 @@ class SecurityElement extends BaseElement
 									<div class="col-9">
 									</div>
 									<div class="col-3">
-										<button type="button" class="btn w100" @click="${this.removeNetwork()}" disabled="${this.isNetworkRemoveDisabled()}">Remove Network</button>
+										<button type="button" class="btn w100" @click="${e => {this.removeNetwork()}}" disabled="${this.isNetworkRemoveDisabled()}">Remove Network</button>
 									</div>
 								</div>
 								<div class="row m-1">
 									<div class="col">
-										<input class="w100 h100" type="text" placeholder="Network Name" ref="network" @change="${update()}" required>
+										<input class="w100 h100" type="text" placeholder="Network Name" id="network" @change="${this.requestUpdate()}" required>
 									</div>
 								</div>
 								<div class="row m-1">
 									<div class="col">
 										<div class="btn-group btn-group-toggle" data-toggle="buttons">
-											<label class="btn btn-secondary active" @click="${this.networksOptionsClicked()}">
+											<label class="btn btn-secondary active" @click="${e => this.networksOptionsClicked()}">
 												<input type="radio" name="options" id="option1" autocomplete="off" checked> Key
 											</label>
-											<label class="btn btn-secondary" @click="${this.networksOptionsClicked()}">
+											<label class="btn btn-secondary" @click="${e => this.networksOptionsClicked()}">
 												<input type="radio" name="options" id="option2" autocomplete="off"> Password
 											</label>
-											<label class="btn btn-secondary" @click="${this.networksOptionsClicked()}">
+											<label class="btn btn-secondary" @click="${e => this.networksOptionsClicked()}">
 												<input type="radio" name="options" id="option3" autocomplete="off"> X509 Certificates
 											</label>
-											<label class="btn btn-secondary" @click="${this.networksOptionsClicked()}">
+											<label class="btn btn-secondary" @click="${e => this.networksOptionsClicked()}">
 												<input type="radio" name="options" id="option4" autocomplete="off"> Encoded Secret
 											</label>
 										</div>
 									</div>
 								</div>
-								<div class="row m-1 p-0" show="{nn_option=='option1'}">
+								<div class="row m-1 p-0" show="${this.nn_option=='option1'}">
 									<div class="col m-0 p-0">
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-9">
-												<input class="w100 h100" type="text" placeholder="Key" ref="key" disabled="true">
+												<input class="w100 h100" type="text" placeholder="Key" id="key" disabled="true">
 											</div>
 											<div class="col-3">
-												<button type="button" class="btn w100 h100" @click="${this.generateRandom()}">Generate Key</button>
+												<button type="button" class="btn w100 h100" @click="${e => this.generateRandom()}">Generate Key</button>
 											</div>
 										</div>
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-6">
-												<input class="w100 h100" type="text" placeholder="Password (min 16 characters, 24 recommended)" ref="pass">
+												<input class="w100 h100" type="text" placeholder="Password (min 16 characters, 24 recommended)" id="pass">
 											</div>
 											<div class="col-3">
 												<div class="progress w100 h100">
-		  											<div class="progress-bar progress-bar-striped" style="width: ${progress}%">${progress}%</div>
+		  											<div class="progress-bar progress-bar-striped" style="width: ${this.progress}%">${this.progress}%</div>
 												</div> 
 											</div>
 											<div class="col-3">
-												<button type="button" class="btn w100 h100" @click="${this.generateFromPassword()}">Derive Key</button>
+												<button type="button" class="btn w100 h100" @click="${e => this.generateFromPassword()}">Derive Key</button>
 											</div>
 										</div>
 									</div>
 								</div>
-								<div class="row m-1" show="${nn_option=='option2'}">
+								<div class="row m-1" show="${this.nn_option=='option2'}">
 									<div class="col m-0 p-0">
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-12">
-												<input class="w100 h100" type="text" placeholder="Password (min 10 characters)" ref="pass2" @change="${this.pass2Changed()}">
+												<input class="w100 h100" type="text" placeholder="Password (min 10 characters)" id="pass2" @change="${e => this.pass2Changed()}">
 											</div>
 										</div>
 									</div>
 								</div>
-								<div class="row m-1" show="${nn_option=='option3'}">
+								<div class="row m-1" show="${this.nn_option=='option3'}">
 									<div class="col">
 										Option 3
 									</div>
 								</div>
-								<div class="row m-1" show="${nn_option=='option4'}">
+								<div class="row m-1" show="${this.nn_option=='option4'}">
 									<div class="col m-0 p-0">
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-12">
 												<label for="rawsecret">Secret (Password, Key, Certificate) in Jadex format (pw:, key:, pem:)</label>
-		  										<textarea class="form-control rounded-0" id="rawsecret" rows="10" ref="rawsecret" @change="${this.rawSecretChanged()}"></textarea>
+		  										<textarea class="form-control rounded-0" id="rawsecret" rows="10" @change="${e => this.rawSecretChanged()}"></textarea>
 											</div>
 										</div>
 									</div>
@@ -205,7 +194,7 @@ class SecurityElement extends BaseElement
 									<div class="col-9">
 									</div>
 									<div class="col-3">
-										<button type="button" class="btn w100" @click="${this.addNetwork()}" disabled="${this.isNetworkDisabled()}">Add Network</button>
+										<button type="button" class="btn w100" @click="${e => this.addNetwork()}" disabled="${this.isNetworkDisabled()}">Add Network</button>
 									</div>
 								</div>
 							</div>
@@ -229,7 +218,7 @@ class SecurityElement extends BaseElement
 					  						</thead>
 					  						<tbody>
 												${this.getRoles().map((roles) => html`
-						    						<tr class="role" @click="${this.selectRole()}">
+						    						<tr class="role" @click="${e => this.selectRole()}">
 						      							<td>${roles[0]}</td>
 						     							<td>${roles[1]}</td>
 												    </tr>
@@ -240,10 +229,10 @@ class SecurityElement extends BaseElement
 								</div>
 								<div class="row m-1">
 									<div class="col-4">
-										<input type="text" placeholder="Entity" ref="entity" @change="${update()}" required>
+										<input type="text" placeholder="Entity" id="entity" @change="${this.requestUpdate()}" required>
 									</div>
 									<div class="col-4">
-										<input type="text" placeholder="Role" ref="role" @change="${update()}" required>
+										<input type="text" placeholder="Role" id="role" @change="${this.requestUpdate()}" required>
 									</div>
 									<div class="col-4">
 										<button type="button" class="btn" @click="${e => this.addRole(e)}" disabled="${this.isRoleDisabled()}">Add</button>
@@ -272,7 +261,7 @@ class SecurityElement extends BaseElement
 					  						</thead>
 					  						<tbody>
 												${this.getNameAuthorities().map((na) => html`
-						    						<tr class="na" @click="{this.selectNameAuthority()}">
+						    						<tr class="na" @click="${e => this.selectNameAuthority()}">
 						      							<td>{na[0]}</td>
 						     							<td>{na[1]}</td>
 						     							<td>{na[2]}</td>
@@ -302,7 +291,7 @@ class SecurityElement extends BaseElement
 					  						</thead>
 					  						<tbody>
 												${this.getTrustedPlatformNames().map((tpn) => html`
-						    						<tr class="tpn" @click="${this.selectTrustedPlatformName()}">
+						    						<tr class="tpn" @click="${e => this.selectTrustedPlatformName()}">
 					      								<td>${tpn}</td>
 											   		</tr>
 												`)}
@@ -312,11 +301,11 @@ class SecurityElement extends BaseElement
 								</div>
 								<div class="row m-1">
 									<div class="col-8">
-										<input class="w100 h100" type="text" placeholder="Trusted Platform Name" ref="tpn" @change="${update}" required>
+										<input class="w100 h100" type="text" placeholder="Trusted Platform Name" id="tpn" @change="${this.requestUpdate()}" required>
 									</div>
 									<div class="col-4">
-										<button type="button" class="btn" @click="${this.addTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">Add</button>
-										<button type="button" class="btn" @click="${this.removeTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">Remove</button>
+										<button type="button" class="btn" @click="${e => this.addTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">Add</button>
+										<button type="button" class="btn" @click="${e => this.removeTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">Remove</button>
 									</div>
 								</div>
 							</div>
@@ -326,7 +315,7 @@ class SecurityElement extends BaseElement
 			
 				<div class="row m-1">
 					<div class="col">
-						<button type="button" class="btn btn-success" @click="${this.refresh()}">Refresh</button>
+						<button type="button" class="btn btn-success" @click="${e => this.refresh()}">Refresh</button>
 					</div>
 				</div>
 			</div>
@@ -335,41 +324,42 @@ class SecurityElement extends BaseElement
 	
 	getMethodPrefix()
 	{
-		return 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
+		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.myservice;
 	}
 	
 	networksOptionsClicked(e)
 	{
 		//console.log("change: "+e);
-		self.nn_option = e.target.children[0].id;
-		self.update();
+		this.nn_option = e.target.children[0].id;
+		this.requestUpdate();
 	}
 	
 	getNetworks()
 	{
-		return self.secstate!=null? self.secstate.networks: [];
+		return this.secstate.networks!=null? this.secstate.networks: [];
 	}
 	
 	getRoles()
 	{
-		return self.secstate!=null? self.secstate.roles: [];
+		return this.secstate.roles!=null? this.secstate.roles: [];
 	}
 	
 	getNameAuthorities()
 	{
-		return self.secstate!=null? self.secstate.nameAuthorities: [];
+		return this.secstate.nameAuthorities!=null? this.secstate.nameAuthorities: [];
 	}
 	
 	getTrustedPlatformNames()
 	{
-		return self.secstate!=null? self.secstate.trustedPlatformNames: [];
+		return this.secstate.trustedPlatformNames!=null? this.secstate.trustedPlatformNames: [];
 	}
 	
 	useSecret(e)
 	{
-		var val = self.refs.usesecret.value;
-		if(self.secstate!=null)
-			self.secstate.usesecret = val;
+		var val = this.shadowRoot.getElementById("usesecret").checked;
+		
+		if(this.secstate!=null)
+			this.secstate.usesecret = val;
 		axios.get(self.getMethodPrefix()+'&methodname=setUseSecret&args_0='+val+"&argtypes_0=boolean", self.transform).then(function(resp)
 		{
 			console.log("setUseSecret: "+resp.data);
@@ -378,7 +368,8 @@ class SecurityElement extends BaseElement
 	
 	printSecret(e)
 	{
-		var val = self.refs.printsecret.value;
+		var val = this.shadowRoot.getElementById("printsecret").checked;
+		
 		if(self.secstate!=null)
 			self.secstate.usesecret = val;
 		axios.get(self.getMethodPrefix()+'&methodname=setPrintSecret&args_0='+val+"&argtypes_0=boolean", self.transform).then(function(resp)
@@ -389,11 +380,13 @@ class SecurityElement extends BaseElement
 	
 	refresh()
 	{
+		var self = this;
+		
 		axios.get(self.getMethodPrefix()+'&methodname=getSecurityState', self.transform).then(function(resp)
 		{
 			console.log("ss: "+resp.data);
 			self.secstate = resp.data;
-			self.update();
+			self.requestUpdate();
 		}).catch(error => 
 		{
 		    console.log(error);
@@ -402,8 +395,9 @@ class SecurityElement extends BaseElement
 	
 	addRole(e)
 	{
-		var en = self.refs.entity.value;
-		var ro = self.refs.role.value;
+		var self = this;
+		var en = this.shadowRoot.getElementById("entity").value;
+		var en = this.shadowRoot.getElementById("role").value;
 		
 		console.log("add role: "+en+" "+ro);
 		
@@ -416,8 +410,9 @@ class SecurityElement extends BaseElement
 	
 	removeRole(e)
 	{
-		var en = self.refs.entity.value;
-		var ro = self.refs.role.value;
+		var self = this;
+		var en = this.shadowRoot.getElementById("entity").value;
+		var en = this.shadowRoot.getElementById("role").value;
 		
 		console.log("remove role: "+en+" "+ro);
 		
@@ -431,14 +426,17 @@ class SecurityElement extends BaseElement
 	selectRole(e)
 	{
 		//console.log(e);
-		self.selectRow("role", e.currentTarget);
-		self.refs.entity.value = e.item.roles[0];
-		self.refs.role.value = e.item.roles[1];
+		this.selectRow("role", e.currentTarget);
+		this.shadowRoot.getElementById("entity").value = e.item.roles[0];
+		this.shadowRoot.getElementById("role").value = e.item.roles[1];
 	}
 	
 	isRoleDisabled()
 	{
-		var ret = self.refs.entity.value.length==0 || self.refs.role.value.length==0;
+		if(this.shadowRoot.getElementById("role")==null)
+			return true;
+		
+		var ret = this.shadowRoot.getElementById("entity").value.length==0 || this.shadowRoot.getElementById("role").value.length==0;
 		//console.log("isRoleDis: "+ret);
 		return ret;
 	}
@@ -452,13 +450,14 @@ class SecurityElement extends BaseElement
 		//console.log("b64key: "+b64key);
 		self.refs.key.value = "key:"+b64key;
 		self.secret = self.refs.key.value;
-		self.update();
+		self.requestUpdate();
 		return key;
 	}
 	
 	generateFromPassword()
 	{
-		var pass = self.refs.pass.value;
+		var self = this;
+		var pass = this.shadowRoot.getElementById("pass").value;
 		
 		if(pass.length<16)
 		{
@@ -484,7 +483,7 @@ class SecurityElement extends BaseElement
 	            	self.refs.key.value = "key:"+btoa(String.fromCharCode.apply(null, key));
 	            	self.progress = 0;
 	            	self.secret = self.refs.key.value;
-	            	self.update();
+	            	self.requestUpdate();
 	        	} 
 	        	else
 	        	{
@@ -492,7 +491,7 @@ class SecurityElement extends BaseElement
 	        		var oldp = self.progress;
 	        		self.progress = Math.round(progress*100);
 	        		if(self.progress!=oldp)
-	        			self.update();
+	        			self.requestUpdate();
 	        	}
 			});
 		}
@@ -500,26 +499,31 @@ class SecurityElement extends BaseElement
 	
 	isNetworkDisabled()
 	{
-		var network = self.refs.network.value;
+		if(this.shadowRoot.getElementById("network")==null)
+			return true;
+		
+		var network = this.shadowRoot.getElementById("network").value;
+		
 		if(network==null || network.length==0)
 			return true;
 		
 		var ret = true;
-		if(self.nn_option=='option1')
+		if(this.nn_option=='option1')
 		{
-			ret = self.secret==null;
+			ret = this.secret==null;
 		}
 		else if(self.nn_option=='option2')
 		{
-			var pw = self.refs.pass2.value;
+			var pw = this.shadowRoot.getElementById("pass2").value;
 			ret = pw==null || pw.length<10; 
 		}
 		else if(self.nn_option=='option3')
 		{
+			console.log("to do option3");
 		}
 		else if(self.nn_option=='option4')
 		{
-			var s = self.refs.rawsecret.value;
+			var s = this.shadowRoot.getElementById("rawsecret").value;
 			ret = s==null || s.length==0; 
 		}
 		
@@ -534,7 +538,9 @@ class SecurityElement extends BaseElement
 	
 	addNetwork()
 	{
-		var network = self.refs.network.value;
+		var self = this;
+		var network = this.shadowRoot.getElementById("network").value;
+		
 		console.log("add network: "+network+" "+self.secret);
 		
 		axios.get(self.getMethodPrefix()+'&methodname=addNetwork&args_0='+network+'&args_1='+self.secret, self.transform).then(function(resp)
@@ -546,9 +552,10 @@ class SecurityElement extends BaseElement
 	
 	removeNetwork()
 	{			
-		if(self.selected!=null)
+		var self = this;
+		if(this.selected!=null)
 		{
-			console.log("remove network: "+self.selected);
+			console.log("remove network: "+this.selected);
 
 			axios.get(self.getMethodPrefix()+'&methodname=removeNetwork&args_0='+self.selected[0]+'&args_1='+self.selected[1], self.transform).then(function(resp)
 			{
@@ -561,31 +568,36 @@ class SecurityElement extends BaseElement
 	selectNetwork(e)
 	{
 		//console.log(e.item);
-		self.selectRow("net", e.currentTarget);
-		self.selected = e.item.net;
+		this.selectRow("net", e.currentTarget);
+		this.selected = e.item.net;
 	}
 	
 	selectNameAuthority(e)
 	{
-		self.selectRow("na", e.currentTarget);
+		this.selectRow("na", e.currentTarget);
 	}
 	
 	selectTrustedPlatformName(e)
 	{
-		self.selectRow("tpn", e.currentTarget);
-		self.refs.tpn.value = e.item.tpn;
+		this.selectRow("tpn", e.currentTarget);
+		this.refs.tpn.value = e.item.tpn;
 	}
 	
 	isTrustedPlatformNameDisabled()
 	{
-		var ret = self.refs.tpn.value.length==0;
+		if(this.shadowRoot.getElementById("tpn")==null)
+			return true;
+		
+		var ret = this.shadowRoot.getElementById("tpn").value.length==0;
+
 		//console.log("isTPNDis: "+ret);
 		return ret;
 	}
 	
 	addTrustedPlatformName()
 	{
-		var name = self.refs.tpn.value;
+		var self = this;
+		var name = this.shadowRoot.getElementById("tpn").value
 		
 		if(name.length>0)
 		{
@@ -599,8 +611,9 @@ class SecurityElement extends BaseElement
 	
 	removeTrustedPlatformName(e)
 	{
-		var name = self.refs.tpn.value;
-		
+		var self = this;
+		var name = this.shadowRoot.getElementById("tpn").value
+
 		if(name.length>0)
 		{
 			axios.get(self.getMethodPrefix()+'&methodname=removeTrustedPlatformName&args_0='+name, self.transform).then(function(resp)
@@ -632,14 +645,14 @@ class SecurityElement extends BaseElement
 	
 	pass2Changed(e)
 	{
-		self.secret = "pw:"+self.refs.pass2.value;
-		self.update();
+		this.secret = "pw:"+this.shadowRoot.getElementById("pass2").value;
+		this.requestUpdate();
 	}
 	
 	rawSecretChanged(e)
 	{
-		self.secret = self.refs.rawsecret.value;
-		self.update();
+		self.secret = this.shadowRoot.getElementById("rawsecret").value
+		self.requestUpdate();
 	}
 	
 	stringToUtf8 = function(str) 
