@@ -457,6 +457,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 				if(ok)
 					okms.add(ms[i]);
 			}
+			ms = okms.toArray(new java.lang.reflect.Method[okms.size()]);
 		}
 		else
 		{
