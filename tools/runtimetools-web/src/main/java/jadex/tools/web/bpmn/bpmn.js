@@ -6,6 +6,8 @@ import {BaseElement} from '/webcomponents/baseelement.js'
 // Tag name 'jadex-starter'
 class BpmnElement extends BaseElement {
 
+	bpmnmodeler = null;
+	
 	static get properties() 
 	{ 
 		return { cid: { type: String }};
@@ -44,12 +46,14 @@ class BpmnElement extends BaseElement {
 				{
 					console.log("BPMN load scripts ok");
 					let celem = this.shadowRoot.getElementById('bpmnview');
-					let bpmnmodeler = new BpmnJS({
+					self.bpmnmodeler = new BpmnJS({
 			        	container: celem,
 			        	keyboard: {
 			          		bindTo: window
 			        	}
 					});
+					// Load empty model.
+					self.bpmnmodeler.createDiagram();
 				});
 			});
 		});
