@@ -1743,7 +1743,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							
 							return IFuture.DONE;
 						}
-					}, true).addResultListener(new DelegationResultListener<>(ret));;
+					}, true);//.addResultListener(new DelegationResultListener<>(ret));; // this seems wrong, causing duplicate results, result is set internally.
 				}
 				return cryptoreset;
 			}
