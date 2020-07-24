@@ -8,16 +8,8 @@ import {BaseElement} from '/webcomponents/baseelement.js'
 // Tag name 'jadex-starter'
 class StarterElement extends BaseElement {
 	
-	/*attributeChangedCallback(name, oldVal, newVal) 
-	{
-	    console.log('attribute change: ', name, newVal, oldVal);
-	    super.attributeChangedCallback(name, oldVal, newVal);
-	    
-		console.log("starter: "+this.cid);
-	}*/
-	
 	init() {
-		console.log("=-=========================================starter");
+		console.log("starter");
 		
 		this.model = null; // loaded model
 		this.reversed = false;
