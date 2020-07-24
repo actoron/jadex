@@ -55,7 +55,7 @@ public abstract class JCCPluginAgent
 		Scanner sc = null;
 		try
 		{
-			System.out.println("LOAD " + name);
+			//System.out.println("LOAD " + name);
 			InputStream is = SUtil.getResource0(name, agent.getClassLoader());
 			sc = new Scanner(is);
 			ret = sc.useDelimiter("\\A").next();
@@ -97,7 +97,8 @@ public abstract class JCCPluginAgent
 	 *  @return The text from the file.
 	 */
 	public IFuture<byte[]> loadResource(String filename)
-	{System.out.println("LOADRESOURCE!" + filename);
+	{
+		//System.out.println("LOADRESOURCE!" + filename);
 		try
 		{
 		InputStream is = SUtil.getResource0(filename, agent.getClassLoader());

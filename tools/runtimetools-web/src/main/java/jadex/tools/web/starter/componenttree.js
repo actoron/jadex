@@ -24,7 +24,6 @@ class ComponentTree extends BaseElement
 	
 	init() 
 	{
-
 		this.components = []; // component descriptions
 		this.typemap = null;
 		this.treedata = {};

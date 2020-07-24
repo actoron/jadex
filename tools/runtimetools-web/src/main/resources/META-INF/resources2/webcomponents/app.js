@@ -36,9 +36,9 @@ class AppElement extends BaseElement {
 	    page('/privacy', () => {
 	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-privacy></jadex-privacy>";
 	    });
-	    page('*', (ctx, next) => {
-	    	console.log("not found: "+ctx);
-	    });
+	    /*page('*', (ctx, next) => {
+	    	console.log("nav not found: "+ctx);
+	    });*/
 	    
 		/*var curpage = null;
 	   	var target = "div#content";

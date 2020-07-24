@@ -32,12 +32,15 @@ export class BaseElement extends LitElement
 			.then(()=>{console.log("loaded jadex css")})
 			.catch((e)=>{console.log("error loading jadex css: "+e)});
 		this.loadStyle("https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css")
+		//this.loadStyle("libs/bootstrap_5.0.0/bootstrap.min.css")
 			.then(()=>{console.log("loaded bootstrap css")})
 			.catch((e)=>{console.log("error loading boostrap css: "+e)});
 		this.loadScript("libs/jquery_3.4.1/jquery.js")
 			.then(()=>{console.log("loaded jquery")})
 			.catch((e)=>{console.log("error loading jquery: "+e)});
 		this.loadScript("https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js")
+		//this.loadScript("libs/bootstrap_5.0.0/bootstrap.bundle.min.js")
+		//this.loadScript("https://cdn.jsdelivr.net/npm/bootstrap.native@3.0.0/dist/bootstrap-native.min.js")
 			.then(()=>{console.log("loaded bootstrap")})
 			.catch((e)=>{console.log("error loading bootstrap: "+e)});
 	}

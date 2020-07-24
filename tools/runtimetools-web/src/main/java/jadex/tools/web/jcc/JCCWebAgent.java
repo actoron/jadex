@@ -212,13 +212,13 @@ public class JCCWebAgent implements IJCCWebService
 	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, 
 		final String methodname, final Object[] args, final ClassInfo[] argtypes, @FutureReturnType final ClassInfo rettype)
 	{
-		System.out.println("INVOKE: " + methodname + " " + servicetype);
+		//System.out.println("INVOKE: " + methodname + " " + servicetype);
 		Class<?> rtype = rettype!=null? rettype.getType(agent.getClassLoader(), agent.getModel().getAllImports()): null;
 
 		final Future<Object> ret = (Future<Object>)SFuture.getNoTimeoutFuture(rtype, agent);
 
-		//if(methodname.indexOf("getNFPropertyMeta")!=-1)
-		//	System.out.println("invokeServiceMethod: "+servicetype+" "+methodname+" "+Arrays.toString(args)+" "+rettype);
+		if(methodname.indexOf("getSecurityS")!=-1)
+			System.out.println("invokeServiceMethod: "+servicetype+" "+methodname+" "+Arrays.toString(args)+" "+rettype);
 		
 		// Search service with startpoint of given platform 
 		agent.searchService(new ServiceQuery<IService>(servicetype).setSearchStart(cid.getRoot()).setScope(ServiceScope.PLATFORM))

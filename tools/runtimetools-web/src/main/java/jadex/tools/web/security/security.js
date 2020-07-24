@@ -11,7 +11,7 @@ class SecurityElement extends BaseElement
 		console.log("security");
 		
 		this.cid = null;
-		this.myservice = "jadex.tools.web.starter.IJCCSecurityService";
+		this.myservice = "jadex.tools.web.security.IJCCSecurityService";
 		
 		//console.log("security plugin started: "+opts);
 				
@@ -26,6 +26,41 @@ class SecurityElement extends BaseElement
 			console.log(this); 
 		});*/
 	}
+	
+	init()
+	{
+		this.refresh();
+	}
+	
+	firstUpdated(p) 
+	{
+		var el = this.shadowRoot.getElementById("panel");
+		el.addEventListener("click", this.collapseOnClick);
+	}
+	
+	// Bootstrap collapse not working in shadow dom :-(
+	// This method allows for opening closing collapse elements
+	collapseOnClick(e)
+	{
+    	var target = e.target.getAttribute("data-target")
+		if(target==null)
+			target = e.target.getAttribute("href");
+		if(target!=null)
+		{
+			if(target.startsWith("#"))
+				target = target.substring(1);
+			//var el = $(target, this.parentNode);
+			var el = this.parentNode.getElementById(target);
+			if(el!=null)
+			{
+    			//el.collapse('toggle');
+				if(el.classList.contains("show"))
+					el.classList.remove("show");
+				else
+					el.classList.add("show");
+			}
+		}
+    }
 	
 	getMethodPrefix() 
 	{
@@ -59,7 +94,7 @@ class SecurityElement extends BaseElement
 	render() 
 	{
 		return html`
-			<div class="container-fluid">
+			<div id="panel" class="container-fluid">
 				<div id="accordion">
 					<div class="card m-2">
 						<div class="card-header">
@@ -103,8 +138,8 @@ class SecurityElement extends BaseElement
 					  						<tbody>
 												${this.getNetworks().map((net) => html`
 						    						<tr class="d-flex net" @click="${e => {this.selectNetwork(net)}}">
-						      							<td class="col-4">{net[0]}</td>
-						     							<td class="col-8">{net[1]}</td>
+						      							<td class="col-4">${net[0]}</td>
+						     							<td class="col-8">${net[1]}</td>
 												    </tr>
 												`)}
 											</tbody>
@@ -360,7 +395,7 @@ class SecurityElement extends BaseElement
 		
 		if(this.secstate!=null)
 			this.secstate.usesecret = val;
-		axios.get(self.getMethodPrefix()+'&methodname=setUseSecret&args_0='+val+"&argtypes_0=boolean", self.transform).then(function(resp)
+		axios.get(this.getMethodPrefix()+'&methodname=setUseSecret&args_0='+val+"&argtypes_0=boolean", this.transform).then(function(resp)
 		{
 			console.log("setUseSecret: "+resp.data);
 		});
@@ -372,7 +407,7 @@ class SecurityElement extends BaseElement
 		
 		if(self.secstate!=null)
 			self.secstate.usesecret = val;
-		axios.get(self.getMethodPrefix()+'&methodname=setPrintSecret&args_0='+val+"&argtypes_0=boolean", self.transform).then(function(resp)
+		axios.get(this.getMethodPrefix()+'&methodname=setPrintSecret&args_0='+val+"&argtypes_0=boolean", this.transform).then(function(resp)
 		{
 			console.log("setPrintSecret: "+resp.data);
 		});
