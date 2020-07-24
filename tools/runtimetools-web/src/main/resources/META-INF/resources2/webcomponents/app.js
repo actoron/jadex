@@ -27,6 +27,10 @@ class AppElement extends BaseElement {
 	    	console.log("router, cid: "+ctx.params.cid);
 	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platform cid='"+ctx.params.cid+"'></jadex-platform>";
 	    });
+	    page('/platform/:cid/:plugin', (ctx, next) => {
+	    	console.log("router, cid: "+ctx.params.cid+ " plugin: " + ctx.params.plugin);
+	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platform cid='"+ctx.params.cid+"' plugin='"+ctx.params.plugin+"'></jadex-platform>";
+	    });
 	    page('/about', () => {
 	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-about></jadex-about>";
 	    });

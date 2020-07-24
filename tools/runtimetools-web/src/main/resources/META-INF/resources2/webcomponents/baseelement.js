@@ -1,6 +1,6 @@
-import {LitElement} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
-import {html} from 'https://unpkg.com/lit-html@latest/lit-html.js?module';
-import {css} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
+import {LitElement} from 'lit-element';
+import {html} from 'lit-element';
+import {css} from 'lit-element';
 
 export class BaseElement extends LitElement 
 {
@@ -10,7 +10,7 @@ export class BaseElement extends LitElement
 	jadexservice = null;
 	
 	static get properties() 
-	{ 
+	{
 		return { cid: { type: String }};
 	}
 	
@@ -19,10 +19,14 @@ export class BaseElement extends LitElement
 	    console.log('attribute change: ', name, newVal, oldVal);
 	    super.attributeChangedCallback(name, oldVal, newVal);
 	    
+	    console.log('checking for init function.... ' + typeof this.init + " " + this.constructor.name);
 	    if (name === 'cid' && typeof this.init === 'function')
+	    {
+	    	console.log('init found, calling...');
 	    	this.init();
+	    }
 	    
-		console.log("starter: "+this.cid);
+		console.log("baseelement: "+this.cid);
 	}
 	
 	constructor() 
@@ -31,15 +35,19 @@ export class BaseElement extends LitElement
 		this.loadStyle("/css/style.css")
 			.then(()=>{console.log("loaded jadex css")})
 			.catch((e)=>{console.log("error loading jadex css: "+e)});
-		this.loadStyle("https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css")
+		this.loadStyle("/libs/bootstrap_4.5.0/bootstrap.min.css")
 			.then(()=>{console.log("loaded bootstrap css")})
 			.catch((e)=>{console.log("error loading boostrap css: "+e)});
 		this.loadScript("libs/jquery_3.4.1/jquery.js")
 			.then(()=>{console.log("loaded jquery")})
 			.catch((e)=>{console.log("error loading jquery: "+e)});
-		this.loadScript("https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js")
+		this.loadScript("/libs/bootstrap_4.5.0/bootstrap.bundle.min.js")
 			.then(()=>{console.log("loaded bootstrap")})
 			.catch((e)=>{console.log("error loading bootstrap: "+e)});
+	}
+	
+	init()
+	{
 	}
 	
 	loadStyle(url)
@@ -116,7 +124,68 @@ export class BaseElement extends LitElement
    		            document.getElementsByTagName("head")[0].appendChild(script);
    		            // https://stackoverflow.com/questions/40663150/script-injected-with-innerhtml-doesnt-trigger-onload-and-onerror
    		            // append child returns BEFORE script is executed :-( In contrast to text
-
+   		            
+   		            //console.log('APPENDED: '+url);
+   		            //setInterval(function(){ resolve(); }, 1000);
+   				})
+   				.catch(function(err)
+   				{
+   					console.log("Error loading script: "+url);
+   					reject();
+   				});
+   	    	}
+		});	
+    }
+	
+	loadSubmodule(url)
+    {
+		if(window.loadedScript==null)
+		{
+			window.calls = {};
+			window.loadedScript = function(url)
+			{
+				var callback = window.calls[url];
+				if(callback!=null)
+				{
+					delete window.calls[url];
+					callback();
+				}
+				else
+				{
+					console.log("Callback not found for: "+url);
+				}
+			}
+		}
+		
+   		return new Promise(function(resolve, reject) 
+		{
+   			if(BaseElement.loaded[url]!=null)
+   	    	{
+   	    		console.log("already loaded script: "+url);
+   	    		resolve();
+   	    	}
+   	    	else
+   	    	{
+   	    		BaseElement.loaded[url] = url;
+   	    		
+   				console.log("loading script content start: "+url);
+   	    		axios.get(url).then(function(resp)
+   				{
+   					console.log("loaded script content end: "+url);//+" "+resp.data);
+   					
+   					// directly loading via a script src attributes has the
+   					// disadvantage that the type is checked from the response
+   					// throwing check errors :-(
+   							
+   					var js = resp.data;
+   		            //script.innerHTML = js;
+   		            //script.async = false;
+   		            //script.onload = function() {console.log("LOADED SCRIPT: "+url);};
+   		            window.calls[url] = resolve;
+   		            // https://stackoverflow.com/questions/40663150/script-injected-with-innerhtml-doesnt-trigger-onload-and-onerror
+   		            // append child returns BEFORE script is executed :-( In contrast to text
+   		            importShim.topLevelLoad(importShim.getFakeUrl(), js+"\n window.loadedScript('"+url+"')");
+   		            
    		            //console.log('APPENDED: '+url);
    		            //setInterval(function(){ resolve(); }, 1000);
    				})

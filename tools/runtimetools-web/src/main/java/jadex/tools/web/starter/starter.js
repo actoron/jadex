@@ -1,15 +1,23 @@
 // import {LitElement} from 'lit-element';
-// import {LitElement} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
-// import {html} from 'https://unpkg.com/lit-html@latest/lit-html.js?module';
-// import {css} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
+// import {LitElement} from 'lit-element';
+// import {html} from 'lit-html';
+// import {css} from 'lit-element';
 import {LitElement, html, css} from 'lit-element';
 import {BaseElement} from '/webcomponents/baseelement.js'
 
 // Tag name 'jadex-starter'
 class StarterElement extends BaseElement {
 	
+	/*attributeChangedCallback(name, oldVal, newVal) 
+	{
+	    console.log('attribute change: ', name, newVal, oldVal);
+	    super.attributeChangedCallback(name, oldVal, newVal);
+	    
+		console.log("starter: "+this.cid);
+	}*/
+	
 	init() {
-		console.log("starter");
+		console.log("=-=========================================starter");
 		
 		this.model = null; // loaded model
 		this.reversed = false;
@@ -23,8 +31,8 @@ class StarterElement extends BaseElement {
 		var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 
 		// load subcomponents
-		var p1 = this.loadScript(ures1);
-		var p2 = this.loadScript(ures2);
+		var p1 = this.loadSubmodule(ures1);
+		var p2 = this.loadSubmodule(ures2);
 		
 		Promise.all([p1, p2]).then((values) => 
 		{
@@ -273,4 +281,5 @@ class StarterElement extends BaseElement {
 	}
 }
 
-customElements.define('jadex-starter', StarterElement);
+if (customElements.get('jadex-starter') === undefined)
+	customElements.define('jadex-starter', StarterElement);

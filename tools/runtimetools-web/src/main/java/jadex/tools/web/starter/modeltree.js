@@ -1,5 +1,5 @@
-import {html} from 'https://unpkg.com/lit-html@latest/lit-html.js?module';
-import {css} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
+import {html} from 'lit-element';
+import {css} from 'lit-element';
 import {BaseElement} from '/webcomponents/baseelement.js'
 
 // Tag name 'jadex-modeltree'
