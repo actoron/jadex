@@ -4,6 +4,19 @@ import {BaseElement} from '/webcomponents/baseelement.js'
 // Tag name 'jadex-security'
 class SecurityElement extends BaseElement 
 {
+	static get properties() 
+	{
+		var ret = {};
+		if(super.properties!=null)
+		{
+			for (let key in super.properties)
+				ret[key]=super.properties[key];
+		}
+		ret['secstate'] = {attribute: false};
+		ret['selected'] = {attribute: false};
+		return ret;
+	}
+	
 	constructor()
 	{
 		super();
@@ -137,7 +150,7 @@ class SecurityElement extends BaseElement
 					  						</thead>
 					  						<tbody>
 												${this.getNetworks().map((net) => html`
-						    						<tr class="d-flex net" @click="${e => {this.selectNetwork(net)}}">
+						    						<tr class="d-flex net" @click="${e => {this.selectNetwork(net, e)}}">
 						      							<td class="col-4">${net[0]}</td>
 						     							<td class="col-8">${net[1]}</td>
 												    </tr>
@@ -161,22 +174,22 @@ class SecurityElement extends BaseElement
 								<div class="row m-1">
 									<div class="col">
 										<div class="btn-group btn-group-toggle" data-toggle="buttons">
-											<label class="btn btn-secondary active" @click="${e => this.networksOptionsClicked()}">
-												<input type="radio" name="options" id="option1" autocomplete="off" checked> Key
+											<label class="btn btn-secondary active" data-target="#option1" @click="${e => this.networksOptionsClicked(e)}">
+												<input type="radio" name="options" autocomplete="off" checked> Key
 											</label>
-											<label class="btn btn-secondary" @click="${e => this.networksOptionsClicked()}">
-												<input type="radio" name="options" id="option2" autocomplete="off"> Password
+											<label class="btn btn-secondary" data-target="#option2" @click="${e => this.networksOptionsClicked(e)}">
+												<input type="radio" name="options" autocomplete="off"> Password
 											</label>
-											<label class="btn btn-secondary" @click="${e => this.networksOptionsClicked()}">
-												<input type="radio" name="options" id="option3" autocomplete="off"> X509 Certificates
+											<label class="btn btn-secondary" data-target="#option3" @click="${e => this.networksOptionsClicked(e)}">
+												<input type="radio" name="options" autocomplete="off"> X509 Certificates
 											</label>
-											<label class="btn btn-secondary" @click="${e => this.networksOptionsClicked()}">
-												<input type="radio" name="options" id="option4" autocomplete="off"> Encoded Secret
+											<label class="btn btn-secondary" data-target="#option4" @click="${e => this.networksOptionsClicked(e)}">
+												<input type="radio" name="options" autocomplete="off"> Encoded Secret
 											</label>
 										</div>
 									</div>
 								</div>
-								<div class="row m-1 p-0" show="${this.nn_option=='option1'}">
+								<div class="row m-1 p-0" id="option1" class="collapse">
 									<div class="col m-0 p-0">
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-9">
@@ -201,7 +214,7 @@ class SecurityElement extends BaseElement
 										</div>
 									</div>
 								</div>
-								<div class="row m-1" show="${this.nn_option=='option2'}">
+								<div class="row m-1" id="option2" class="collapse">
 									<div class="col m-0 p-0">
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-12">
@@ -210,12 +223,12 @@ class SecurityElement extends BaseElement
 										</div>
 									</div>
 								</div>
-								<div class="row m-1" show="${this.nn_option=='option3'}">
+								<div class="row m-1" id="option3" class="collapse">
 									<div class="col">
 										Option 3
 									</div>
 								</div>
-								<div class="row m-1" show="${this.nn_option=='option4'}">
+								<div class="row m-1" id="option4" class="collapse">
 									<div class="col m-0 p-0">
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-12">
@@ -296,7 +309,7 @@ class SecurityElement extends BaseElement
 					  						</thead>
 					  						<tbody>
 												${this.getNameAuthorities().map((na) => html`
-						    						<tr class="na" @click="${e => this.selectNameAuthority()}">
+						    						<tr class="na" @click="${e => this.selectNameAuthority(e)}">
 						      							<td>{na[0]}</td>
 						     							<td>{na[1]}</td>
 						     							<td>{na[2]}</td>
@@ -326,7 +339,7 @@ class SecurityElement extends BaseElement
 					  						</thead>
 					  						<tbody>
 												${this.getTrustedPlatformNames().map((tpn) => html`
-						    						<tr class="tpn" @click="${e => this.selectTrustedPlatformName()}">
+						    						<tr class="tpn" @click="${e => this.selectTrustedPlatformName(tpn, e)}">
 					      								<td>${tpn}</td>
 											   		</tr>
 												`)}
@@ -364,9 +377,9 @@ class SecurityElement extends BaseElement
 	
 	networksOptionsClicked(e)
 	{
-		//console.log("change: "+e);
-		this.nn_option = e.target.children[0].id;
-		this.requestUpdate();
+		console.log("change: "+e);
+		//this.nn_option = e.target.children[0].id;
+		//this.requestUpdate();
 	}
 	
 	getNetworks()
@@ -600,11 +613,11 @@ class SecurityElement extends BaseElement
 		}
 	}
 	
-	selectNetwork(e)
+	selectNetwork(net, e)
 	{
 		//console.log(e.item);
 		this.selectRow("net", e.currentTarget);
-		this.selected = e.item.net;
+		this.selected = net;
 	}
 	
 	selectNameAuthority(e)
@@ -612,10 +625,10 @@ class SecurityElement extends BaseElement
 		this.selectRow("na", e.currentTarget);
 	}
 	
-	selectTrustedPlatformName(e)
+	selectTrustedPlatformName(tpn, e)
 	{
 		this.selectRow("tpn", e.currentTarget);
-		this.refs.tpn.value = e.item.tpn;
+		//this.tpn = tpn;
 	}
 	
 	isTrustedPlatformNameDisabled()
@@ -664,7 +677,8 @@ class SecurityElement extends BaseElement
 	{
 		var sel = -1;
 		var oldsel = -1;
-		var elems = document.querySelectorAll("."+clazz);
+		//var elems = document.querySelectorAll("."+clazz);
+		var elems = this.shadowRoot.querySelectorAll("."+clazz);
 		for(var i=0; i<elems.length; i++)
 		{
 			if(elems[i].classList.contains("selected"))
@@ -725,4 +739,5 @@ class SecurityElement extends BaseElement
 	};
 }
 
-customElements.define('jadex-security', SecurityElement);
+if(customElements.get('jadex-security') === undefined)
+	customElements.define('jadex-security', SecurityElement);

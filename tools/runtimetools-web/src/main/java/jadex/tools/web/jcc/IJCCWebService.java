@@ -43,4 +43,9 @@ public interface IJCCWebService
 	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, 
 		String methodname, Object[] args, ClassInfo[] argtypes, @QueryParam("returntype") @FutureReturnType ClassInfo rettype);
 	
+	/**
+	 *  Check if a platform is available.
+	 */
+	public IFuture<Boolean> isPlatformAvailable(IComponentIdentifier cid);
+
 }

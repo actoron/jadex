@@ -4,19 +4,51 @@ import {BaseElement} from 'base-element';
 // Tag name 'jadex-platform'
 class PlatformElement extends BaseElement 
 {
+	loaded = false;
+	plugin = null;
 
 	static get properties() 
-	{ 
-		return { cid: { type: String }};
+	{
+		var ret = {};
+		if(super.properties!=null)
+		{
+			for (let key in super.properties)
+				ret[key]=super.properties[key];
+		}
+		ret['plugin'] = { type: String }
+		return ret;
 	}
 	
 	attributeChangedCallback(name, oldVal, newVal) 
 	{
-	    console.log('attribute change: ', name, newVal, oldVal);
+	    //console.log('attribute change: ', name, newVal, oldVal);
 	    super.attributeChangedCallback(name, oldVal, newVal);
 	    
-	    if("cid"==name) {
-	    	this.loadPlugins();
+	    if("cid"==name) 
+		{
+	    	let self = this;
+	
+			// Continously check platform availability
+			this.checkPlatform(10000);
+
+	    	this.loadPlugins().then(function()
+	    	{
+	    		self.loaded = true;
+	    		if(self.plugin != null)
+	    			self.showPlugin2({ "name" : self.plugin });
+	    		else if(self.plugins.length > 0)
+	    			self.showPlugin2(self.plugins[0]);
+	    	}).catch(function(err) 
+			{
+				console.log("err: "+err);
+			});
+	    }
+	    
+	    if("plugin"==name) 
+		{
+	    	this.plugin = newVal;
+	    	if(this.loaded)
+	    		this.showPlugin2({ "name" : newVal });
 	    }
 	}
 	
@@ -41,63 +73,93 @@ class PlatformElement extends BaseElement
 		sel.classList.add("active");
 		
 		this.showPlugin2(event.item);
+		history.pushState(null, "", "/#/platform/"+this.cid+"/"+event.item.name);
 	}
 	
 	showPlugin2(p)
 	{
 		let lcname = p.name.toLowerCase(); 
-		console.log("plugin: "+lcname+" "+this.cid);
+		//console.log("plugin: "+lcname+" "+this.cid);
 		
 		let html = "<jadex-"+lcname+" cid='"+this.cid+"'></jadex-"+lcname+">";
+		//console.log("Insert plugin element: " + p.name);
 		this.shadowRoot.getElementById("plugin").innerHTML = html;
+		//console.log("Req update: " + p.name);
 		this.requestUpdate();
+		//console.log("Updated: " + p.name);
+	}
+	
+	checkPlatform(interval) 
+	{
+		var self = this;
+		axios.get('webjcc/isPlatformAvailable?cid='+self.cid, self.transform).then(function(resp)
+		{
+			setTimeout(function(){self.checkPlatform();}, interval!=undefined? interval: 10000)
+		})
+		.catch(function(err) 
+		{
+			console.log("platform cannot be reached: "+err);	
+			//history.pushState(null, "", "/#/platforms");
+			window.location.href = "/#/platforms";
+		});
 	}
 	
 	loadPlugins() 
 	{
 		var self = this;
-		axios.get('webjcc/getPluginFragments?cid='+this.cid, this.transform).then(function(resp)
+		return new Promise(function(resolve, reject) 
 		{
-			//console.log("received: "+resp);	
-			
-			var map = resp.data;
-			//console.log(map);
-			
-			var i = 0;
-			Object.keys(map).forEach(function(tagname) 
+			axios.get('webjcc/getPluginFragments?cid='+self.cid, self.transform).then(function(resp)
 			{
-			    var taghtml = map[tagname];
+				//console.log("received: "+resp);	
 				
-			    self.plugins[i] = {name: tagname, html: taghtml};
-			    
-			    i++;
-			    
-			    //var script = document.createElement('script');
-	            //script.type = 'text/javascript';
-	            //script.src = files[i];
-	            
-		    	//var script = "<script type='module'>"+taghtml+"</script>";
-		    	//document.getElementsByTagName("head")[0].append(script);
-		    	//$('head').append(script);
-		    	/* let script = document.createElement("script");
-		    	script.type='module-shim';
-		    	script.innerHTML=taghtml;
-		    	alert(taghtml);
-		    	document.head.append(script); */
-		    	importShim.topLevelLoad(importShim.getFakeUrl(), taghtml).then(x => console.log(x));
+				var map = resp.data;
+				//console.log(map);
+				
+				var i = 0;
+				let promises = [];
+				Object.keys(map).forEach(function(tagname) 
+				{
+				    var taghtml = map[tagname];
+					
+				    self.plugins[i] = {name: tagname, html: taghtml};
+				    
+				    //var script = document.createElement('script');
+		            //script.type = 'text/javascript';
+		            //script.src = files[i];
+		            
+			    	//var script = "<script type='module'>"+taghtml+"</script>";
+			    	//document.getElementsByTagName("head")[0].append(script);
+			    	//$('head').append(script);
+			    	/* let script = document.createElement("script");
+			    	script.type='module-shim';
+			    	script.innerHTML=taghtml;
+			    	alert(taghtml);
+			    	document.head.append(script); */
+				    if (!taghtml.startsWith('<'))
+				    {
+					    i++;
+				    	let promise = importShim.topLevelLoad(importShim.getFakeUrl(), taghtml);
+				    	promises.push(promise);
+				    }
+				});
+				
+				Promise.all(promises).then(function(x)
+				{
+					if(i>0)
+						self.showPlugin2(self.plugins[0]);
+					else
+						self.requestUpdate();
+					resolve();
+				});
+				
+				//return PROMISE_DONE;
+				
+			}).catch(function(err) 
+			{
+				console.log("err: "+err);	
+				reject(err);
 			});
-						
-			if(i>0)
-				self.showPlugin2(self.plugins[0]);
-			else
-				self.requestUpdate();
-			
-			//return PROMISE_DONE;
-			
-		}).catch(function(err) 
-		{
-			console.log("err: "+err);	
-			//return this.PROMISE_DONE;
 		});
 	}
 	

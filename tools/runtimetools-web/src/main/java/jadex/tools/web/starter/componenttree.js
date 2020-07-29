@@ -1,5 +1,5 @@
-import {html} from 'https://unpkg.com/lit-html@latest/lit-html.js?module';
-import {css} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
+import {html} from 'lit-element';
+import {css} from 'lit-element';
 import {BaseElement} from '/webcomponents/baseelement.js'
 
 //import { LitElement, html, css} from 'lit-element';
@@ -60,8 +60,6 @@ class ComponentTree extends BaseElement
 		
 		console.log("components");
 		
-		console.log("components init: "+this.cid);
-
 		var self = this;
 		
 		this.loadJSTree().then(function()
@@ -91,7 +89,7 @@ class ComponentTree extends BaseElement
 					{
 						function getChildData(id)
 						{
-							console.log("loading node: "+id);
+							//console.log("loading node: "+id);
 							
 							var children = self.treedata[id+"_children"];
 							var data = [];
@@ -131,7 +129,7 @@ class ComponentTree extends BaseElement
 						// nodeid_children = [ids] for children ids
 						else
 						{
-							console.log("loading node: "+node.id);
+							//console.log("loading node: "+node.id);
 						
 							// cont() fetches the child data and calls the jstree callback that fetching is finished for this node 
 							function cont()
@@ -184,7 +182,7 @@ class ComponentTree extends BaseElement
 								axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0=null&args_1='+sid, self.transform)
 								.then(function(resp)
 								{
-									console.log("nf prov props:"+resp.data);		
+									//console.log("nf prov props:"+resp.data);		
 								
 									var res = resp.data;
 									
@@ -199,7 +197,7 @@ class ComponentTree extends BaseElement
 													+"&args_1="+JSON.stringify(node.original.sid)+"&args_2=null&args_3=null&args_4="+node.original.propname, self.transform)
 												.then(function(resp)
 												{
-													console.log("refresh nfnode: "+node);
+													//console.log("refresh nfnode: "+node);
 													var res = resp.data;
 													var val = res[node.original.propname];
 													var txt = node.original.propname+": "+val;
@@ -242,7 +240,7 @@ class ComponentTree extends BaseElement
 								axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
 								.then(function(resp)
 								{
-									console.log("nf req props:"+resp.data);		
+									//console.log("nf req props:"+resp.data);		
 									
 									var res = resp.data;
 									
@@ -257,7 +255,7 @@ class ComponentTree extends BaseElement
 													+"&args_1=null&args_2=null&args_3=true&args_4="+node.original.propname, self.transform)
 												.then(function(resp)
 												{
-													console.log("refresh nfnode: "+node);
+													//console.log("refresh nfnode: "+node);
 													var res = resp.data;
 													var val = res[node.original.propname];
 													var txt = node.original.propname+": "+val;
@@ -319,7 +317,7 @@ class ComponentTree extends BaseElement
 								axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.id, self.transform)
 								.then(function(resp)
 								{
-									console.log("nf props:"+resp.data);	
+									//console.log("nf props:"+resp.data);	
 
 									var res = resp.data;
 									
@@ -337,7 +335,7 @@ class ComponentTree extends BaseElement
 													+"&args_1=null&args_2=null&args_3=null&args_4="+node.original.propname, self.transform)
 												.then(function(resp)
 												{
-													console.log("refresh nfnode: "+node);
+													//console.log("refresh nfnode: "+node);
 													var res = resp.data;
 													var val = res[node.original.propname];
 													var txt = node.original.propname+": "+val;
@@ -389,7 +387,7 @@ class ComponentTree extends BaseElement
 											var psid = serid+"_"+res[0][i].name;
 											var txt = res[0][i].type.value.split(".");
 											txt = txt[txt.length-1];
-											console.log("sid: "+res[2][i]);
+											//console.log("sid: "+res[2][i]);
 											var psnode = {"id": psid, "text": txt, "type": "provided", "children": true, "sid": res[2][i]};
 											ch.push(psnode);
 										}
@@ -464,7 +462,7 @@ class ComponentTree extends BaseElement
 	                                	// self.refreshCMSSubscription();
 	                                	if(node.original.refreshcmd!=null)
 	                                	{
-	                                		console.log("refresh cmd for: "+node.id);
+	                                		//console.log("refresh cmd for: "+node.id);
 	                                		node.original.refreshcmd(node);
 	                                	}
 	                                },
@@ -520,14 +518,14 @@ class ComponentTree extends BaseElement
 			var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
 			var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 	
-			console.log("jstree load files start");
+			//console.log("jstree load files start");
 			
 			var p1 = self.loadStyle(ures1);
 			var p2 = self.loadScript(ures2);
 			
 			Promise.all([p1, p2]).then((values) => 
 			{
-				console.log("js tree load files ok");
+				//console.log("js tree load files ok");
 				resolve();
 			})
 			.catch(err => 
@@ -817,5 +815,7 @@ class ComponentTree extends BaseElement
 	}
 }
 
-customElements.define('jadex-componenttree', ComponentTree);
+
+if(customElements.get('jadex-componenttree') === undefined)
+	customElements.define('jadex-componenttree', ComponentTree);
 

@@ -1,5 +1,5 @@
-import {html} from 'https://unpkg.com/lit-html@latest/lit-html.js?module';
-import {css} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
+import {html} from 'lit-element';
+import {css} from 'lit-element';
 import {BaseElement} from '/webcomponents/baseelement.js'
 
 // Tag name 'jadex-modeltree'
@@ -43,7 +43,7 @@ class ModelTree extends BaseElement {
 				});
 				
 				// no args here
-				console.log("getComponentModels start");
+				//console.log("getComponentModels start");
 				axios.get(self.getMethodPrefix()+'&methodname=getComponentModels', self.transform).then(function(resp)
 				{
 					//console.log("getComponentModels"+resp.data);
@@ -83,19 +83,19 @@ class ModelTree extends BaseElement {
 			var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
 			var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 	
-			console.log("jstree load files start");
+			//console.log("jstree load files start");
 			
 			var p1 = self.loadStyle(ures1);
 			var p2 = self.loadScript(ures2);
 			
 			Promise.all([p1, p2]).then((values) => 
 			{
-				console.log("js tree load files ok");
+				//console.log("js tree load files ok");
 				resolve();
 			})
 			.catch(err => 
 			{
-				console.log("js tree load files err: "+err);
+				//console.log("js tree load files err: "+err);
 				reject(err);
 			});
 		});
@@ -181,7 +181,7 @@ class ModelTree extends BaseElement {
 				break;
 			}
 		}
-		console.log(idx);
+		//console.log(idx);
 		
 		if(idx>-1)
 		{
@@ -292,7 +292,7 @@ class ModelTree extends BaseElement {
 			<div class="container-fluid">
 				<div class="row m-1">
 					<div class="col-12 m-1">
-						<input id="model" list="models" class="w100" type="text" @change="${(e) => this.select(e)}"></input>
+						<input id="model" list="models" placeholder="Search models..." class="w100" type="text" @change="${(e) => this.select(e)}"></input>
 						<datalist id="models">
 							${this.getModelNames().map((model) => html`<option class="w100" value="${model.name+' ['+model.pck+']'}"></option>`)}
 						</datalist>
@@ -314,4 +314,5 @@ class ModelTree extends BaseElement {
 	}
 }
 
-customElements.define('jadex-modeltree', ModelTree);
+if(customElements.get('jadex-modeltree') === undefined)
+	customElements.define('jadex-modeltree', ModelTree);

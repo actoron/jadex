@@ -1,45 +1,47 @@
 import { LitElement, html, css } from 'lit-element';
 import { BaseElement } from 'base-element';
 
-class PlatformsElement extends BaseElement {
-
+class PlatformsElement extends BaseElement 
+{
 	reversed = false;
 	platforms = [];
-	serverdown = false;
+	//serverdown = false;
 	
-	constructor() {
-		super();
-		
+	constructor() 
+	{
+		super();	
 		console.log("platforms");
-		
+		this.subscribe();
+	}
+	
+	subscribe()
+	{
 		var self = this;
-		
 		jadex.getIntermediate('webjcc/subscribeToPlatforms',
 			function(resp)
 			{
-				console.log(resp.data.service);
+				//console.log(resp.data.service);
 				self.updatePlatform(resp.data.service.name, resp.data.service.type);
 				//return this.PROMISE_DONE;
 			},
 			function(err)
 			{
-				console.log("Err: "+JSON.stringify(err));
-				self.serverdown = true;
+				console.log("Could not reach Jadex webjcc.");
+				//console.log("Err: "+JSON.stringify(err));
+				//self.serverdown = true;
 				self.requestUpdate();
-				//return this.PROMISE_DONE;
+				
+				setTimeout(function()
+				{
+					console.log("Retrying Jadex webjcc connection...");
+					self.subscribe();
+				}, 5000);
 			}
 		);
 	}
 	
-	/*static get styles() {
-	    return css`
-	    	:host {
-	    		color: green;
-	    	}
-	    `;
-	}*/
-	
-	render() {
+	render() 
+	{
 		return html`
 			<link rel="stylesheet" href="css/style.css">
 			<div class="actwtable section">
@@ -81,7 +83,7 @@ class PlatformsElement extends BaseElement {
 	
 	updatePlatform(platform, rem)
 	{
-		console.log("updatePlatform: "+platform+" "+rem);
+		//console.log("updatePlatform: "+platform+" "+rem);
 		
 		var	found = false;
 		

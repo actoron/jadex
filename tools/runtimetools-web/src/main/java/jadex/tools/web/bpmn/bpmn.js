@@ -1,11 +1,13 @@
-import {LitElement} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
-import {html} from 'https://unpkg.com/lit-html@latest/lit-html.js?module';
-import {css} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
+import {LitElement} from 'lit-element';
+import {html} from 'lit-element';
+import {css} from 'lit-element';
 import {BaseElement} from '/webcomponents/baseelement.js'
 
 // Tag name 'jadex-starter'
 class BpmnElement extends BaseElement {
 
+	bpmnmodeler = null;
+	
 	static get properties() 
 	{ 
 		return { cid: { type: String }};
@@ -44,12 +46,14 @@ class BpmnElement extends BaseElement {
 				{
 					console.log("BPMN load scripts ok");
 					let celem = this.shadowRoot.getElementById('bpmnview');
-					let bpmnmodeler = new BpmnJS({
+					self.bpmnmodeler = new BpmnJS({
 			        	container: celem,
 			        	keyboard: {
 			          		bindTo: window
 			        	}
 					});
+					// Load empty model.
+					self.bpmnmodeler.createDiagram();
 				});
 			});
 		});
@@ -72,5 +76,5 @@ class BpmnElement extends BaseElement {
 		`;
 	}
 }
-
-customElements.define('jadex-bpmn', BpmnElement);
+if (customElements.get('jadex-bpmn') === undefined)
+	customElements.define('jadex-bpmn', BpmnElement);

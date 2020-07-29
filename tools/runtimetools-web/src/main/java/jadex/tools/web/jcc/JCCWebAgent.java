@@ -207,6 +207,42 @@ public class JCCWebAgent implements IJCCWebService
 	}
 	
 	/**
+	 *  Check if a platform is available.
+	 *  @param cid The platform id.
+	 *  @return True if platform is available.
+	 */
+	public IFuture<Boolean> isPlatformAvailable(IComponentIdentifier cid)
+	{
+		Future<Boolean> ret = new Future<>();
+		
+		if(cid.getRoot().equals(agent.getId().getRoot()))
+		{
+			ret.setResult(Boolean.TRUE);
+		}
+		else
+		{
+			new ServiceQuery<IExternalAccess>(IExternalAccess.class);
+			
+			agent.searchService(new ServiceQuery<IExternalAccess>(IExternalAccess.class).setSearchStart(cid.getRoot()).setScope(ServiceScope.PLATFORM))
+				.addResultListener(new IResultListener<IExternalAccess>()
+			{
+				public void exceptionOccurred(Exception exception) 
+				{
+					ret.setResult(Boolean.FALSE);
+				}
+				
+				public void resultAvailable(IExternalAccess result) 
+				{
+					ret.setResult(Boolean.TRUE);
+				}
+			});
+		}
+		
+		return ret;
+	}
+	
+	
+	/**
 	 *  Invoke a Jadex service on the managed platform.
 	 */
 	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, 

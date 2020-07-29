@@ -35,114 +35,6 @@ public class ServiceQuery<T>
 	/** The (default) decoupled proxy type (decouples from component thread to caller thread). */
 	public static final String	PROXYTYPE_DECOUPLED	= BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED;
 	
-	//-------- query multiplicity --------
-	
-	/**
-	 *  Define cases for multiplicity.
-	 */
-	public static class	Multiplicity
-	{
-		//-------- constants --------
-		
-		/** '0..1' multiplicity for single optional service. */
-		public static Multiplicity	ZERO_ONE	= new Multiplicity(0, 1);
-		
-		/** '1' multiplicity for required service (default for searchService methods). */
-		public static Multiplicity	ONE			= new Multiplicity(1, 1);
-		
-		/** '0..*' multiplicity for optional multi service (default for searchServices methods). */
-		public static Multiplicity	ZERO_MANY	= new Multiplicity(0, -1);
-
-		/** '1..*' multiplicity for required service (default for searchService methods). */
-		public static Multiplicity	ONE_MANY	= new Multiplicity(1, -1);
-		
-		//-------- attributes --------
-		
-		/** The minimal number of services required. Otherwise search ends with ServiceNotFoundException. */
-		private int	from;
-		
-		/** The maximal number of services returned. Afterwards search/query will terminate. */
-		private int to;
-		
-		//-------- constructors --------
-
-		/**
-		 *  Bean constructor.
-		 *  Not meant for direct use.
-		 *  Defaults to invalid multiplicity ('0..0')!
-		 */
-		public Multiplicity()
-		{
-			this.from = -2; // = UNDEFINED
-			this.to = -2;
-		}
-		
-		/**
-		 *  Create a multiplicity.
-		 *  @param from The minimal number of services for the search/query being considered successful (positive integer or 0).
-		 *  @param to The maximal number of services returned by the search/query (positive integer or -1 for unlimited).
-		 */
-		public Multiplicity(int from, int to)
-		{
-			setFrom(from);
-			setTo(to);
-		}
-		
-		//-------- methods --------
-		
-		/**
-		 *  Get the 'from' value, i.e. the minimal number of services required.
-		 *  Otherwise search ends with ServiceNotFoundException. 
-		 */
-		public int getFrom()
-		{
-			return from;
-		}
-		
-		/**
-		 *  Set the 'from' value, i.e. the minimal number of services required.
-		 *  Otherwise search ends with ServiceNotFoundException. 
-		 *  @param from Positive integer or 0
-		 */
-		public void setFrom(int from)
-		{
-			if(from<0)
-				throw new IllegalArgumentException("'from' must be a positive value or 0.");
-				
-			this.from = from;
-		}
-		
-		/**
-		 *  Get the 'to' value, i.e. The maximal number of services returned.
-		 *  Afterwards search/query will terminate.
-		 */
-		public int getTo()
-		{
-			return to;
-		}
-		
-		/**
-		 *  Get the 'to' value, i.e. The maximal number of services returned.
-		 *  Afterwards search/query will terminate.
-		 *  @param to	Positive integer or -1 for unlimited.
-		 */
-		public void setTo(int to)
-		{
-			if(to!=-1 && to<1)
-				throw new IllegalArgumentException("'to' must be a positive value or -1.");
-			
-			this.to = to;
-		}
-		
-		/**
-		 *  Get a string representation of the multiplicity.		
-		 */
-		@Override
-		public String toString()
-		{
-			return from==to ? Integer.toString(from) : from + ".." + (to==-1 ? "*" : Integer.toString(to));
-		}
-	}
 	
 	//-------- constants --------
 	
@@ -1007,5 +899,114 @@ public class ServiceQuery<T>
 			
 		ret.append(")");
 		return ret.toString();
+	}
+	
+	//-------- query multiplicity --------
+	
+	/**
+	 *  Define cases for multiplicity.
+	 */
+	public static class	Multiplicity
+	{
+		//-------- constants --------
+		
+		/** '0..1' multiplicity for single optional service. */
+		public static Multiplicity	ZERO_ONE	= new Multiplicity(0, 1);
+		
+		/** '1' multiplicity for required service (default for searchService methods). */
+		public static Multiplicity	ONE			= new Multiplicity(1, 1);
+		
+		/** '0..*' multiplicity for optional multi service (default for searchServices methods). */
+		public static Multiplicity	ZERO_MANY	= new Multiplicity(0, -1);
+
+		/** '1..*' multiplicity for required service (default for searchService methods). */
+		public static Multiplicity	ONE_MANY	= new Multiplicity(1, -1);
+		
+		//-------- attributes --------
+		
+		/** The minimal number of services required. Otherwise search ends with ServiceNotFoundException. */
+		private int	from;
+		
+		/** The maximal number of services returned. Afterwards search/query will terminate. */
+		private int to;
+		
+		//-------- constructors --------
+
+		/**
+		 *  Bean constructor.
+		 *  Not meant for direct use.
+		 *  Defaults to invalid multiplicity ('0..0')!
+		 */
+		public Multiplicity()
+		{
+			this.from = -2; // = UNDEFINED
+			this.to = -2;
+		}
+		
+		/**
+		 *  Create a multiplicity.
+		 *  @param from The minimal number of services for the search/query being considered successful (positive integer or 0).
+		 *  @param to The maximal number of services returned by the search/query (positive integer or -1 for unlimited).
+		 */
+		public Multiplicity(int from, int to)
+		{
+			setFrom(from);
+			setTo(to);
+		}
+		
+		//-------- methods --------
+		
+		/**
+		 *  Get the 'from' value, i.e. the minimal number of services required.
+		 *  Otherwise search ends with ServiceNotFoundException. 
+		 */
+		public int getFrom()
+		{
+			return from;
+		}
+		
+		/**
+		 *  Set the 'from' value, i.e. the minimal number of services required.
+		 *  Otherwise search ends with ServiceNotFoundException. 
+		 *  @param from Positive integer or 0
+		 */
+		public void setFrom(int from)
+		{
+			if(from<0)
+				throw new IllegalArgumentException("'from' must be a positive value or 0.");
+				
+			this.from = from;
+		}
+		
+		/**
+		 *  Get the 'to' value, i.e. The maximal number of services returned.
+		 *  Afterwards search/query will terminate.
+		 */
+		public int getTo()
+		{
+			return to;
+		}
+		
+		/**
+		 *  Get the 'to' value, i.e. The maximal number of services returned.
+		 *  Afterwards search/query will terminate.
+		 *  @param to	Positive integer or -1 for unlimited.
+		 */
+		public void setTo(int to)
+		{
+			if(to!=-1 && to<1)
+				throw new IllegalArgumentException("'to' must be a positive value or -1.");
+			
+			this.to = to;
+		}
+		
+		/**
+		 *  Get a string representation of the multiplicity.		
+		 */
+		@Override
+		public String toString()
+		{
+			return from==to ? Integer.toString(from) : from + ".." + (to==-1 ? "*" : Integer.toString(to));
+		}
 	}
 }
