@@ -163,7 +163,8 @@ class PlatformElement extends BaseElement
 		});
 	}
 	
-	static get styles() {
+	static get styles() 
+	{
 	    return css`
 	    	.navbar-custom {
 	    		background-color: #aaaaaa;

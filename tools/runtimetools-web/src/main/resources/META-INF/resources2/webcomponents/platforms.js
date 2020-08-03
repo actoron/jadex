@@ -5,16 +5,30 @@ class PlatformsElement extends BaseElement
 {
 	reversed = false;
 	platforms = [];
-	//serverdown = false;
+	connected = false;
+	
+	static get properties() 
+	{
+		var ret = {};
+		if(super.properties!=null)
+		{
+			for(let key in super.properties)
+				ret[key]=super.properties[key];
+		}
+		ret['reversed'] = {attribute: false, type: Boolean};
+		ret['platforms'] = {attribute: false};
+		ret['connected'] = {attribute: false, type: Boolean};
+		return ret;
+	}
 	
 	constructor() 
 	{
 		super();	
 		console.log("platforms");
-		this.subscribe();
+		this.subscribe(5000);
 	}
 	
-	subscribe()
+	subscribe(interval)
 	{
 		var self = this;
 		jadex.getIntermediate('webjcc/subscribeToPlatforms',
@@ -22,20 +36,21 @@ class PlatformsElement extends BaseElement
 			{
 				//console.log(resp.data.service);
 				self.updatePlatform(resp.data.service.name, resp.data.service.type);
-				//return this.PROMISE_DONE;
+				self.connected = true;
 			},
 			function(err)
 			{
 				console.log("Could not reach Jadex webjcc.");
 				//console.log("Err: "+JSON.stringify(err));
-				//self.serverdown = true;
+				self.connected = false;
+				self.platforms = [];
 				self.requestUpdate();
 				
 				setTimeout(function()
 				{
 					console.log("Retrying Jadex webjcc connection...");
 					self.subscribe();
-				}, 5000);
+				}, interval);
 			}
 		);
 	}
@@ -46,7 +61,11 @@ class PlatformsElement extends BaseElement
 			<link rel="stylesheet" href="css/style.css">
 			<div class="actwtable section">
 				<div>
-					<h3 id="HConnectedPlatforms">Connected Platforms</h3>
+					<div class="head">
+						<h3 class="fl" id="HConnectedPlatforms">Connected Platforms</h3>
+						<!--<img class="fl" src="data:image/png;base64, wolQTkcNChoKAAAADUlIRFIAAAABAAAAAQgGAAAAHxXDhMKJAAAACklEQVR4AWMAAQAABQABNsOQwojDnQAAAABJRU5Ewq5CYMKC">-->
+						<span id="connected" class="dot fl ${this.connected? "green": "red"}"></span>
+					</div>
 					<p>This page shows a self-updating list of remote platforms known to this Jadex platform.</p>
 				</div>
 				<table>
@@ -103,6 +122,27 @@ class PlatformsElement extends BaseElement
 			this.platforms.push(platform);
 		
 		this.requestUpdate();
+	}
+	
+	static get styles() 
+	{
+	    return css`
+			h3 {
+				display:inline
+			}
+	    	.dot {
+				display: inline-block;
+				border-radius: 50%;
+   				width: 20px; /* CSS can't align width to height (of H3 here) :-( */
+				height: 20px;
+			}
+			.red {
+				background-color: red;
+			}
+			.green {
+				background-color: green;
+			}
+	    `;
 	}
 	
 }

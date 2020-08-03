@@ -1,14 +1,11 @@
-// import {LitElement} from 'lit-element';
-// import {LitElement} from 'lit-element';
-// import {html} from 'lit-html';
-// import {css} from 'lit-element';
 import {LitElement, html, css} from 'lit-element';
 import {BaseElement} from '/webcomponents/baseelement.js'
 
 // Tag name 'jadex-starter'
-class StarterElement extends BaseElement {
-	
-	init() {
+class StarterElement extends BaseElement 
+{
+	init() 
+	{
 		console.log("starter");
 		
 		this.model = null; // loaded model
