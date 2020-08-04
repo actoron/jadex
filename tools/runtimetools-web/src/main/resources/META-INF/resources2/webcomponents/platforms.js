@@ -63,7 +63,6 @@ class PlatformsElement extends BaseElement
 				<div>
 					<div class="head">
 						<h3 class="fl" id="HConnectedPlatforms">Connected Platforms</h3>
-						<!--<img class="fl" src="data:image/png;base64, wolQTkcNChoKAAAADUlIRFIAAAABAAAAAQgGAAAAHxXDhMKJAAAACklEQVR4AWMAAQAABQABNsOQwojDnQAAAABJRU5Ewq5CYMKC">-->
 						<span id="connected" class="dot fl ${this.connected? "green": "red"}"></span>
 					</div>
 					<p>This page shows a self-updating list of remote platforms known to this Jadex platform.</p>
@@ -147,6 +146,7 @@ class PlatformsElement extends BaseElement
 	
 }
 
-customElements.define('jadex-platforms', PlatformsElement);
+if(customElements.get('jadex-platforms') === undefined)
+	customElements.define('jadex-platforms', PlatformsElement);
 
 

@@ -2,6 +2,14 @@
     height: 100vh;
 }
 
+.visible {
+	display: block;
+}
+
+.hidden {
+	display: none;
+}
+
 .navbar-custom {
     /*color: #FFFFFF;*/
     background-color: rgb(95,95,95);

@@ -34,6 +34,7 @@
 	
 	var language = {
 		lang: "en",
+		listeners: [],
 		messages: {
     		en: {
    				message: {
@@ -81,7 +82,26 @@
 		switchLanguage: function()
 		{
 			this.lang=='de'? this.lang='en': this.lang='de';
+			for(var i=0; i<this.listeners.length; i++)
+			{
+				this.listeners[i]({lang: this.lang});
+			}
 			console.log("language is: "+this.lang);
+		},
+		addListener: function(listener)
+		{
+			this.listeners.push(listener);
+		},
+		removeListener: function(listener)
+		{
+			for(var i=0; i < this.listeners.length; i++) 
+			{
+				if(this.listeners[i] === listener) 
+				{
+					this.listeners.remove(i);
+					break;
+			    } 
+			}
 		}
 	};
 	

@@ -203,4 +203,5 @@ class PlatformElement extends BaseElement
 	}
 }
 
-customElements.define('jadex-platform', PlatformElement);
+if(customElements.get('jadex-platform') === undefined)
+	customElements.define('jadex-platform', PlatformElement);

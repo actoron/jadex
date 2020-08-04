@@ -8,16 +8,21 @@ export class BaseElement extends LitElement
 	
 	cid = null;
 	jadexservice = null;
+	langlistener = null;
 	
 	static get properties() 
 	{
-		return { cid: { type: String }};
+		return { 
+			cid: { type: String },
+			language: { attribute: false }
+		};
 	}
 	
-	attributeChangedCallback(name, oldVal, newVal) 
+	attributeChangedCallback(name, oldval, newval) 
 	{
-	    //console.log('attribute change: ', name, newVal, oldVal);
-	    super.attributeChangedCallback(name, oldVal, newVal);
+	    console.log('attribute change: ', this, name, newval, oldval);
+	    
+		super.attributeChangedCallback(name, oldval, newval);
 	    
 	    //console.log('checking for init function.... ' + typeof this.init + " " + this.constructor.name);
 	    if(name === 'cid' && typeof this.init === 'function')
@@ -32,6 +37,7 @@ export class BaseElement extends LitElement
 	constructor() 
 	{
 		super();
+		this.language = language;
 		this.loadStyle("/css/style.css")
 			//.then(()=>{console.log("loaded jadex css")})
 			.catch((e)=>{console.log("error loading jadex css: "+e)});
@@ -51,6 +57,28 @@ export class BaseElement extends LitElement
 	
 	init()
 	{
+	}
+	
+	connectedCallback() 
+	{
+		var self = this;
+		super.connectedCallback()
+		//console.log('connected')
+		
+		if(this.langlistener==null)
+		this.langlistener = e => 
+		{
+			//console.log("update: "+self);
+			self.requestUpdate();
+		};
+		
+		language.addListener(this.langlistener);
+	}
+	
+	disconnectedCallback()
+	{
+		if(this.langlistener!=null)
+			language.removeListener(this.langlistener);
 	}
 	
 	loadStyle(url)
@@ -262,7 +290,7 @@ export class BaseElement extends LitElement
 	switchLanguage() 
 	{
 	    language.switchLanguage(); 
-	    this.requestUpdate(); // needs manual update as language.lang is not mapped to an attribute 
+	    //this.requestUpdate(); // needs manual update as language.lang is not mapped to an attribute 
 	}
 }
 
