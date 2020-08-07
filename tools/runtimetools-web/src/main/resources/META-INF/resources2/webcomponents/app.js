@@ -4,7 +4,8 @@ import { BaseElement } from 'base-element';
 // Defined as <jadex-app> tag
 class AppElement extends BaseElement 
 {
-	messsage = null;
+	message = {};
+	listener = null;
 	
 	constructor() 
 	{
@@ -46,6 +47,32 @@ class AppElement extends BaseElement
 	    });*/
 	}
 	
+	connectedCallback() 
+	{
+		super.connectedCallback();
+
+		var self = this;
+		if(this.listener==null)
+		{
+			this.listener = (e) => 
+			{
+				//console.log(e)
+				self.message = e.detail==null? {}: e.detail;
+				self.requestUpdate();
+			}
+		}
+		
+		//const myElement = document.querySelector('my-element');
+		this.addEventListener('jadex-message', this.listener);
+	}
+	
+	/*disconnectedCallback()
+	{
+		super.disconnectedCallback();
+		if(this.listener!=null)
+			this.removeEventListener(this.listener);
+	}*/
+	
 	firstUpdated(changedProperties) 
 	{
 		page();
@@ -84,18 +111,22 @@ class AppElement extends BaseElement
 		
 			<div id="content"></div>
 		
-			${this.message!=null? html`
-			<div class="container-fluid pt-0 pl-3 pr-3 pb-3">
-				<div class="row">
+			<div class="container-fluid pt-0 pl-3 pr-3 pb-3 ${this.message.text!=null? 'visible': 'hidden'}">
+				<div class="row p-1">
 					<div class="col">
-						<div class="{'alert-danger': message.type=='error', 'alert-info': message.type=='info'}" class="alert m-0 p-3" role="alert">
-							${this.message.text}
-							<button type="button" class="btn btn-primary mr-1" align="right" style="width: 100px" onclick="clearMessage()">Close</button>
+						<div class="alert m-1 p-1 ${(this.message.type=='error'? 'alert-danger': 'alert-info')}">
+							<div class="row p-1 m-1">
+								<div class="col-10 p-0 align-self-center">
+									${this.message.text}
+								</div>
+								<div class="col-2 p-0 m-0">
+									<button type="button" class="float-right btn btn-primary" @click="${e => this.clearMessage()}">Close</button>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			`: ''}
 		
 			<footer class="container-fluid footer navbar-light bg-light">
 		        <span class="text-muted">Copyright by <a href="http://www.actoron.com">Actoron GmbH</a> 2017-${new Date().getFullYear()}</span>
@@ -106,12 +137,6 @@ class AppElement extends BaseElement
 		    	</div>
 		    </footer>
 		`;
-	}
-	
-	clearMessage() 
-	{
-		this.message = null;
-		//self.update();
 	}
 }
 

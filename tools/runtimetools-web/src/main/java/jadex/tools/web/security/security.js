@@ -404,25 +404,29 @@ class SecurityElement extends BaseElement
 	
 	useSecret(e)
 	{
+		var self = this;
 		var val = this.shadowRoot.getElementById("usesecret").checked;
 		
 		if(this.secstate!=null)
 			this.secstate.usesecret = val;
 		axios.get(this.getMethodPrefix()+'&methodname=setUseSecret&args_0='+val+"&argtypes_0=boolean", this.transform).then(function(resp)
 		{
-			console.log("setUseSecret: "+resp.data);
+			self.createInfoMessage("Changed use secret to "+val);
+			//console.log("setUseSecret: "+resp.data);
 		});
 	}
 	
 	printSecret(e)
 	{
+		var self = this;
 		var val = this.shadowRoot.getElementById("printsecret").checked;
 		
 		if(self.secstate!=null)
 			self.secstate.usesecret = val;
 		axios.get(this.getMethodPrefix()+'&methodname=setPrintSecret&args_0='+val+"&argtypes_0=boolean", this.transform).then(function(resp)
 		{
-			console.log("setPrintSecret: "+resp.data);
+			self.createInfoMessage("Changed print secret to "+val);
+			//console.log("setPrintSecret: "+resp.data);
 		});
 	}
 	
@@ -437,7 +441,8 @@ class SecurityElement extends BaseElement
 			self.requestUpdate();
 		}).catch(error => 
 		{
-		    console.log(error);
+			self.createErrorMessage("Refresh error ",error);
+		    //console.log(error);
 		});
 	}
 	
@@ -451,7 +456,8 @@ class SecurityElement extends BaseElement
 		
 		axios.get(self.getMethodPrefix()+'&methodname=addRole&args_0='+en+'&args_1='+ro, self.transform).then(function(resp)
 		{
-			console.log("added role: "+en+" "+ro);
+			self.createInfoMessage("added role: "+en+" "+ro);
+			//console.log("added role: "+en+" "+ro);
 			self.refresh();
 		});
 	}
@@ -466,7 +472,8 @@ class SecurityElement extends BaseElement
 		
 		axios.get(self.getMethodPrefix()+'&methodname=removeRole&args_0='+en+'&args_1='+ro, self.transform).then(function(resp)
 		{
-			console.log("removed role: "+en+" "+ro);
+			self.createInfoMessage("added role: "+en+" "+ro);
+			//console.log("removed role: "+en+" "+ro);
 			self.refresh();
 		});
 	}
@@ -593,7 +600,8 @@ class SecurityElement extends BaseElement
 		
 		axios.get(self.getMethodPrefix()+'&methodname=addNetwork&args_0='+network+'&args_1='+self.secret, self.transform).then(function(resp)
 		{
-			console.log("added network: "+network+" "+self.secret);
+			self.createInfoMessage("added network: "+network+" "+self.secret);
+			//console.log("added network: "+network+" "+self.secret);
 			self.refresh();
 		});
 	}
@@ -607,7 +615,8 @@ class SecurityElement extends BaseElement
 
 			axios.get(self.getMethodPrefix()+'&methodname=removeNetwork&args_0='+self.selected[0]+'&args_1='+self.selected[1], self.transform).then(function(resp)
 			{
-				console.log("removed network: "+self.selected);
+				self.createInfoMessage("removed network: "+self.selected);
+				//console.log("removed network: "+self.selected);
 				self.refresh();
 			});
 		}
@@ -651,7 +660,8 @@ class SecurityElement extends BaseElement
 		{
 			axios.get(self.getMethodPrefix()+'&methodname=addTrustedPlatformName&args_0='+name, self.transform).then(function(resp)
 			{
-				console.log("added trusted platform name: "+name);
+				self.createInfoMessage("added trusted platform name: "+name);
+				//console.log("added trusted platform name: "+name);
 				self.refresh();
 			});
 		}
@@ -666,7 +676,8 @@ class SecurityElement extends BaseElement
 		{
 			axios.get(self.getMethodPrefix()+'&methodname=removeTrustedPlatformName&args_0='+name, self.transform).then(function(resp)
 			{
-				console.log("removed trusted platform name: "+name);
+				self.createInfoMessage("removed trusted platform name: "+name);
+				//console.log("removed trusted platform name: "+name);
 				self.refresh();
 			});
 		}

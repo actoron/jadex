@@ -20,7 +20,7 @@ export class BaseElement extends LitElement
 	
 	attributeChangedCallback(name, oldval, newval) 
 	{
-	    console.log('attribute change: ', this, name, newval, oldval);
+	    //console.log('attribute change: ', this, name, newval, oldval);
 	    
 		super.attributeChangedCallback(name, oldval, newval);
 	    
@@ -61,8 +61,9 @@ export class BaseElement extends LitElement
 	
 	connectedCallback() 
 	{
+		super.connectedCallback();
+
 		var self = this;
-		super.connectedCallback()
 		//console.log('connected')
 		
 		if(this.langlistener==null)
@@ -77,6 +78,7 @@ export class BaseElement extends LitElement
 	
 	disconnectedCallback()
 	{
+		super.disconnectedCallback();
 		if(this.langlistener!=null)
 			language.removeListener(this.langlistener);
 	}
@@ -290,7 +292,34 @@ export class BaseElement extends LitElement
 	switchLanguage() 
 	{
 	    language.switchLanguage(); 
-	    //this.requestUpdate(); // needs manual update as language.lang is not mapped to an attribute 
+	    //this.requestUpdate(); // update is done via event listeners on the language object
+	}
+	
+	createErrorMessage(text, data) 
+	{
+		var text = data!=null? data: "No further info";
+		this.dispatchMessageEvent({text: text, type: "error"});
+	}
+	
+	createInfoMessage(text) 
+	{
+		this.dispatchMessageEvent({text: text, type: "info"});
+	}
+	
+	clearMessage()
+	{
+		this.dispatchMessageEvent(null);
+	}
+	
+	dispatchMessageEvent(detail)
+	{
+		var event = new CustomEvent("jadex-message", 
+		{ 
+			detail: detail==null? {}: detail,
+            bubbles: true, 
+            composed: true 
+        });
+	    this.dispatchEvent(event);
 	}
 }
 

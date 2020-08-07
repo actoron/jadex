@@ -10,7 +10,8 @@
 	console.log("body");
 	
 	// Add a format method for Date 
-	Date.prototype.yyyymmdd = function(sep) {
+	Date.prototype.yyyymmdd = function(sep) 
+	{
 		var mm = (this.getMonth() + 1).toString();
 		var dd = this.getDate().toString();
 		return [this.getFullYear(), (mm.length===2 ? '' : '0')+mm, (dd.length===2 ? '' : '0')+dd].join(sep? sep: '');
@@ -18,7 +19,8 @@
 	//var now = new Date();
 	//alert(now.yyyymmdd()+" "+now.yyyymmdd('-'));
 	
-	Array.prototype.equals = function(a, b) {
+	Array.prototype.equals = function(a, b) 
+	{
 		if (a === b) return true;
 		if (a == null || b == null) return false;
 		if (a.length != b.length) return false;
@@ -98,48 +100,10 @@
 			{
 				if(this.listeners[i] === listener) 
 				{
-					this.listeners.remove(i);
+					this.listeners.splice(i, 1);
 					break;
 			    } 
 			}
-		}
-	};
-	
-	var message = {
-		listeners: [],
-		createErrorMessage: function(text, data) 
-		{
-			var txt = data!=null? data: "No further info";
-			var msg = {type: "error", text: text+txt};
-			this.trigger('message', msg);
-		},
-		createInfoMessage: function(text) 
-		{
-			var msg = {type: "info", text: text};
-			this.trigger('message', msg);
-		},
-		clearMessage: function() 
-		{
-			this.trigger('message', null);
-		},
-		addChangeListener: function(listener)
-		{
-			this.listeners.push(listener);
-		},
-		removeChangeListener: function(listener)
-		{
-			var i=0;
-			for(let l in listeners) {
-				if(l===listener){
-					listeners.remove(i);
-					break;
-				}	
-				i++;
-			}
-		},
-		notifyListeners()
-		{
-			
 		}
 	};
 		
@@ -419,64 +383,6 @@
             });
         },
 	};
-	
-	/*var litloader = 
-	{
-		loaded: {},
-	    loadLitElement: function()
-	    {
-	    	
-	    }
-	};*/	
-	/*var language = "en";
-	var switchLanguage = function() 
-	{
-		if(this.language=="en") {
-	    	this.language="de";
-		} 
-		else {
-	    	this.language="en";
-		}
-		this.trigger('language', this.language);  
-		//console.log(this.language);
-	};	
-		
-	var cnt = 0;*/
-		
-	// Activates the jadex-app in the content div
-	//var content = document.getElementById("content");
-	//content.innerHTML = "<jadex-app></jadex-app>"
-	
-   	/*var curpage = null;
-   	var target = "div#content";
-   	var routes = ["platforms", "platform", "about", "imprint", "privacy"];
-   	riot.store.language = "en";
-   	
-   	// As subpaths are supplied by separate args, internally arguments are used
-   	route(function changePath(path) 
-   	{
-   		path = path.toLowerCase();
-   		var paths = [];
-   		var params = null;
-   		for(i=0; i<arguments.length; i++)
-   		{
-   			if(arguments[i].indexOf("=")!=-1)
-   				params = arguments[i];
-   			else
-   				paths.push(arguments[i]);
-   		}
-   		//console.log(path);
-   		if(path.length==0)
-   			path="platforms";
-   		if(routes.includes(path)) 
-   		{ 
-   			if(curpage)
-				curpage.unmount(true);
-   	        var tags = riot.mount(target, path, {paths: paths, params: params});
-   	        curpage = tags[0];
-   	        //console.log(tags);
-   		}
-   	});*/
 </script>
 
 <jadex-app></jadex-app>

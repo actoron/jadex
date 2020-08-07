@@ -40,7 +40,8 @@ class PlatformElement extends BaseElement
 	    			self.showPlugin2(self.plugins[0]);
 	    	}).catch(function(err) 
 			{
-				console.log("err: "+err);
+				self.createErrorMessage("Could not load plugins", err);
+				//console.log("err: "+err);
 			});
 	    }
 	    
@@ -157,7 +158,7 @@ class PlatformElement extends BaseElement
 				
 			}).catch(function(err) 
 			{
-				console.log("err: "+err);	
+				//console.log("err: "+err);	
 				reject(err);
 			});
 		});

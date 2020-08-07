@@ -4,6 +4,8 @@ import {BaseElement} from '/webcomponents/baseelement.js'
 // Tag name 'jadex-starter'
 class StarterElement extends BaseElement 
 {
+	listener;
+	
 	init() 
 	{
 		console.log("starter");
@@ -27,14 +29,32 @@ class StarterElement extends BaseElement
 		{
 			//console.log("starter load files ok");
 		});
+	}
+	
+	connectedCallback() 
+	{
+		super.connectedCallback();
+
+		var self = this;
+		if(this.listener==null)
+		{
+			this.listener = (e) => 
+			{
+				console.log(e)
+				self.model = e.detail.model;
+				self.requestUpdate();
+			}
+		}
 		
 		//const myElement = document.querySelector('my-element');
-		this.addEventListener('jadex-model-selected', (e) => 
-		{
-			console.log(e)
-			self.model = e.detail.model;
-			self.requestUpdate();
-		});
+		this.addEventListener('jadex-model-selected', this.listener);
+	}
+	
+	disconnectedCallback()
+	{
+		super.disconnectedCallback();
+		if(this.listener!=null)
+			this.removeEventListener('jadex-model-selected', this.listener);
 	}
 	
 	getMethodPrefix() 

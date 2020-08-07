@@ -6,6 +6,7 @@ class PlatformsElement extends BaseElement
 	reversed = false;
 	platforms = [];
 	connected = false;
+	termcmd = null;
 	
 	static get properties() 
 	{
@@ -25,22 +26,44 @@ class PlatformsElement extends BaseElement
 	{
 		super();	
 		console.log("platforms");
+		
+	}
+	
+	connectedCallback() 
+	{
+		super.connectedCallback();
 		this.subscribe(5000);
+	}
+	
+	disconnectedCallback()
+	{
+		this.terminateSubscription();
+	}
+	
+	terminateSubscription()
+	{
+		if(this.termcmd!=null)
+			this.termcmd().then(() => {console.log("Terminated subscription.")})
+				.catch(() => {console.log("Could not terminate subscription")});
 	}
 	
 	subscribe(interval)
 	{
 		var self = this;
-		jadex.getIntermediate('webjcc/subscribeToPlatforms',
+		
+		this.terminateSubscription();
+			
+		this.termcmd = jadex.getIntermediate('webjcc/subscribeToPlatforms',
 			function(resp)
 			{
-				//console.log(resp.data.service);
+				console.log("Set up subscription");
 				self.updatePlatform(resp.data.service.name, resp.data.service.type);
 				self.connected = true;
 			},
 			function(err)
 			{
 				console.log("Could not reach Jadex webjcc.");
+				self.createErrorMessage("Could not reach Jadex WebJCC platform", err);
 				//console.log("Err: "+JSON.stringify(err));
 				self.connected = false;
 				self.platforms = [];
