@@ -14,6 +14,7 @@ class SecurityElement extends BaseElement
 		}
 		ret['secstate'] = {attribute: false};
 		ret['selected'] = {attribute: false};
+		ret['nn_option'] = {type: String, attribute: false};
 		return ret;
 	}
 	
@@ -42,7 +43,29 @@ class SecurityElement extends BaseElement
 	
 	init()
 	{
-		this.refresh();
+		this.myservice = "jadex.tools.web.security.IJCCSecurityService";
+
+		var res1 ="jadex/tools/web/security/scrypt.js";
+		var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+
+		//console.log("jstree load files start");
+		
+		this.loadScript(ures1).then((values) => 
+		{
+			console.log("scrypt load ok");
+			if(window.scrypt!=null)
+				this.scrypt = window.scrypt;
+			this.refresh();
+		})
+		.catch(err => 
+		{
+			console.log("js tree load files err: "+err);
+		});
+	}
+	
+	getMethodPrefix() 
+	{
+		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.myservice;
 	}
 	
 	firstUpdated(p) 
@@ -117,10 +140,11 @@ class SecurityElement extends BaseElement
 							<div class="card-body">
 								<div class="row m-1">
 									<div class="col-6">
-										<input type="checkbox" id="usesecret" @click="${e => {this.useSecret()}}" checked="${this.secstate.useSecret}">Use secret</input>
+										<input type="checkbox" id="usesecret" @click="${e => {this.useSecret()}}" .checked="${this.secstate.useSecret}">Use secret</input>
+										${this.secstate.useSecret}
 									</div>
 									<div class="col-6">
-										<input type="checkbox" id="printsecret" @click="${e => {this.printSecret()}}" checked="${this.secstate.printSecret}">Print secret</input>
+										<input type="checkbox" id="printsecret" @click="${e => {this.printSecret()}}" .checked="${this.secstate.printSecret}">Print secret</input>
 									</div>
 								</div>
 								<div class="row m-1">
@@ -163,7 +187,7 @@ class SecurityElement extends BaseElement
 									<div class="col-9">
 									</div>
 									<div class="col-3">
-										<button type="button" class="btn w100" @click="${e => {this.removeNetwork()}}" disabled="${this.isNetworkRemoveDisabled()}">Remove Network</button>
+										<button type="button" class="btn btn-info w100" @click="${e => {this.removeNetwork()}}" ?disabled="${this.isNetworkRemoveDisabled()}">Remove Network</button>
 									</div>
 								</div>
 								<div class="row m-1">
@@ -173,30 +197,30 @@ class SecurityElement extends BaseElement
 								</div>
 								<div class="row m-1">
 									<div class="col">
-										<div class="btn-group btn-group-toggle" data-toggle="buttons">
-											<label class="btn btn-secondary active" data-target="#option1" @click="${e => this.networksOptionsClicked(e)}">
+										<div class="btn-group btn-group-toggle">
+											<label class="btn btn-secondary ${this.nn_option=='option1'? 'active': ''}" @click="${e => this.nn_option='option1'}">
 												<input type="radio" name="options" autocomplete="off" checked> Key
 											</label>
-											<label class="btn btn-secondary" data-target="#option2" @click="${e => this.networksOptionsClicked(e)}">
+											<label class="btn btn-secondary ${this.nn_option=='option2'? 'active': ''}" @click="${e => { console.log('opt2'); this.nn_option='option2'}}">
 												<input type="radio" name="options" autocomplete="off"> Password
 											</label>
-											<label class="btn btn-secondary" data-target="#option3" @click="${e => this.networksOptionsClicked(e)}">
+											<label class="btn btn-secondary ${this.nn_option=='option3'? 'active': ''}" @click="${e => this.nn_option='option3'}">
 												<input type="radio" name="options" autocomplete="off"> X509 Certificates
 											</label>
-											<label class="btn btn-secondary" data-target="#option4" @click="${e => this.networksOptionsClicked(e)}">
+											<label class="btn btn-secondary ${this.nn_option=='option4'? 'active': ''}" @click="${e => this.nn_option='option4'}">
 												<input type="radio" name="options" autocomplete="off"> Encoded Secret
 											</label>
 										</div>
 									</div>
 								</div>
-								<div class="row m-1 p-0" id="option1" class="collapse">
+								<div class="row m-1 p-0" class="${this.nn_option==='option1'? 'visible': 'hidden'}">
 									<div class="col m-0 p-0">
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-9">
 												<input class="w100 h100" type="text" placeholder="Key" id="key" disabled="true">
 											</div>
 											<div class="col-3">
-												<button type="button" class="btn w100 h100" @click="${e => this.generateRandom()}">Generate Key</button>
+												<button type="button" class="btn btn-info w100 h100" @click="${e => this.generateRandom()}">Generate Key</button>
 											</div>
 										</div>
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
@@ -209,12 +233,12 @@ class SecurityElement extends BaseElement
 												</div> 
 											</div>
 											<div class="col-3">
-												<button type="button" class="btn w100 h100" @click="${e => this.generateFromPassword()}">Derive Key</button>
+												<button type="button" class="btn btn-info w100 h100" @click="${e => this.generateFromPassword()}">Derive Key</button>
 											</div>
 										</div>
 									</div>
 								</div>
-								<div class="row m-1" id="option2" class="collapse">
+								<div class="row m-1" class="${this.nn_option==='option2'? 'visible': 'hidden'}">
 									<div class="col m-0 p-0">
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-12">
@@ -223,12 +247,12 @@ class SecurityElement extends BaseElement
 										</div>
 									</div>
 								</div>
-								<div class="row m-1" id="option3" class="collapse">
+								<div class="row m-1" class="${this.nn_option==='option3'? 'visible': 'hidden'}">
 									<div class="col">
 										Option 3
 									</div>
 								</div>
-								<div class="row m-1" id="option4" class="collapse">
+								<div class="row m-1" class="${this.nn_option==='option4'? 'visible': 'hidden'}">
 									<div class="col m-0 p-0">
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-12">
@@ -242,7 +266,7 @@ class SecurityElement extends BaseElement
 									<div class="col-9">
 									</div>
 									<div class="col-3">
-										<button type="button" class="btn w100" @click="${e => this.addNetwork()}" disabled="${this.isNetworkDisabled()}">Add Network</button>
+										<button type="button" class="btn btn-info w100" @click="${e => this.addNetwork()}" disabled="${this.isNetworkDisabled()}">Add Network</button>
 									</div>
 								</div>
 							</div>
@@ -283,8 +307,8 @@ class SecurityElement extends BaseElement
 										<input type="text" placeholder="Role" id="role" @change="${this.requestUpdate()}" required>
 									</div>
 									<div class="col-4">
-										<button type="button" class="btn" @click="${e => this.addRole(e)}" disabled="${this.isRoleDisabled()}">Add</button>
-										<button type="button" class="btn" @click="${e => this.removeRole(e)}" disabled="${this.isRoleDisabled()}">Remove</button>
+										<button type="button" class="btn btn-info" @click="${e => this.addRole(e)}" disabled="${this.isRoleDisabled()}">Add</button>
+										<button type="button" class="btn btn-info" @click="${e => this.removeRole(e)}" disabled="${this.isRoleDisabled()}">Remove</button>
 									</div>
 								</div>
 							</div>
@@ -352,8 +376,8 @@ class SecurityElement extends BaseElement
 										<input class="w100 h100" type="text" placeholder="Trusted Platform Name" id="tpn" @change="${this.requestUpdate()}" required>
 									</div>
 									<div class="col-4">
-										<button type="button" class="btn" @click="${e => this.addTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">Add</button>
-										<button type="button" class="btn" @click="${e => this.removeTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">Remove</button>
+										<button type="button" class="btn btn-info" @click="${e => this.addTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">Add</button>
+										<button type="button" class="btn btn-info" @click="${e => this.removeTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">Remove</button>
 									</div>
 								</div>
 							</div>
@@ -436,7 +460,7 @@ class SecurityElement extends BaseElement
 		
 		axios.get(self.getMethodPrefix()+'&methodname=getSecurityState', self.transform).then(function(resp)
 		{
-			console.log("ss: "+resp.data);
+			console.log("refresh");
 			self.secstate = resp.data;
 			self.requestUpdate();
 		}).catch(error => 
@@ -503,9 +527,11 @@ class SecurityElement extends BaseElement
 		var b64key = btoa(String.fromCharCode.apply(null, key));
 		//console.log("key: "+key);
 		//console.log("b64key: "+b64key);
-		self.refs.key.value = "key:"+b64key;
-		self.secret = self.refs.key.value;
-		self.requestUpdate();
+		
+		var elem = this.shadowRoot.getElementById("key");
+		elem.value = "key:"+b64key;
+		this.secret = elem.value;
+		this.requestUpdate();
 		return key;
 	}
 	
@@ -516,17 +542,19 @@ class SecurityElement extends BaseElement
 		
 		if(pass.length<16)
 		{
-			console.log("Minimum 16 characters");
+			//console.log("Minimum 16 characters");
+			self.createErrorMessage("Minimum 16 characters");
 		}
 		else if(self.progress!=0)
 		{
-			console.log("Key generation is running");
+			//console.log("Key generation is running");
+			self.createErrorMessage("Key generation is running");
 		}
 		else
 		{
-			var passb = stringToUtf8(pass);
+			var passb = this.stringToUtf8(pass);
 			var saltb = passb;
-			scrypt(passb, saltb, 131072, 8, 4, 32, function(error, progress, key) 
+			this.scrypt(passb, saltb, 131072, 8, 4, 32, function(error, progress, key) 
 			{
 	        	if(error) 
 	        	{
@@ -535,10 +563,12 @@ class SecurityElement extends BaseElement
 	        	else if(key) 
 	        	{
 	        		console.log("key: "+key);
-	            	self.refs.key.value = "key:"+btoa(String.fromCharCode.apply(null, key));
-	            	self.progress = 0;
-	            	self.secret = self.refs.key.value;
-	            	self.requestUpdate();
+	            			
+					var elem = self.shadowRoot.getElementById("key");
+					elem.value = "key:"+btoa(String.fromCharCode.apply(null, key));
+					self.secret = elem.value;
+					self.progress = 0;
+					self.requestUpdate();
 	        	} 
 	        	else
 	        	{
@@ -711,8 +741,8 @@ class SecurityElement extends BaseElement
 	
 	rawSecretChanged(e)
 	{
-		self.secret = this.shadowRoot.getElementById("rawsecret").value
-		self.requestUpdate();
+		this.secret = this.shadowRoot.getElementById("rawsecret").value
+		this.requestUpdate();
 	}
 	
 	stringToUtf8 = function(str) 
