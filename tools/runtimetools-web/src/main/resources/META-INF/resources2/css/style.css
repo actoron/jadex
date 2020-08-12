@@ -10,6 +10,14 @@
 	display: none;
 }
 
+.w100 {
+	width: 100%;
+}
+
+.h100 {
+	height: 100%;
+}
+
 .navbar-custom {
     /*color: #FFFFFF;*/
     background-color: rgb(95,95,95);
