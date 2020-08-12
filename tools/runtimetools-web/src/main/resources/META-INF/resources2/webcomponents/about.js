@@ -4,13 +4,6 @@ import { BaseElement } from 'base-element';
 // Defined as <jadex-about> tag
 class AboutElement extends BaseElement 
 {
-	static get styles() 
-	{
-	    return css`
-	    	
-	    `;
-	}
-	
 	render() 
 	{
 		return html`

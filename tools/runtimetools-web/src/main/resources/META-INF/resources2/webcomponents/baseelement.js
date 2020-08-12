@@ -38,21 +38,25 @@ export class BaseElement extends LitElement
 	{
 		super();
 		this.language = language;
-		this.loadStyle("/css/style.css")
-			//.then(()=>{console.log("loaded jadex css")})
-			.catch((e)=>{console.log("error loading jadex css: "+e)});
-		//this.loadStyle("libs/bootstrap_5.0.0/bootstrap.min.css")
+
+		// must load sync to ensure that style.css rules are defined and gain precedence		
 		this.loadStyle("/libs/bootstrap_4.5.0/bootstrap.min.css")
-			//.then(()=>{console.log("loaded bootstrap css")})
-			.catch((e)=>{console.log("error loading boostrap css: "+e)});
-		this.loadScript("libs/jquery_3.4.1/jquery.js")
-			//.then(()=>{console.log("loaded jquery")})
-			.catch((e)=>{console.log("error loading jquery: "+e)});
-		//this.loadScript("libs/bootstrap_5.0.0/bootstrap.bundle.min.js")
-		//this.loadScript("https://cdn.jsdelivr.net/npm/bootstrap.native@3.0.0/dist/bootstrap-native.min.js")
-		this.loadScript("/libs/bootstrap_4.5.0/bootstrap.bundle.min.js")
-			//.then(()=>{console.log("loaded bootstrap")})
-			.catch((e)=>{console.log("error loading bootstrap: "+e)});
+		.then(()=>
+		{
+			console.log("loaded bootstrap css")
+			this.loadScript("libs/jquery_3.4.1/jquery.js")
+			.then(()=>
+			{
+				console.log("loaded jquery")
+				this.loadScript("/libs/bootstrap_4.5.0/bootstrap.bundle.min.js")
+				.then(()=>
+				{
+					console.log("loaded bootstrap")
+					this.loadStyle("/css/style.css")
+					.then(()=>{console.log("loaded jadex css")})
+				});
+			});
+		});
 	}
 	
 	init()

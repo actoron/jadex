@@ -13,7 +13,9 @@ class SecurityElement extends BaseElement
 				ret[key]=super.properties[key];
 		}
 		ret['secstate'] = {attribute: false};
-		ret['selected'] = {attribute: false};
+		ret['selnet'] = {attribute: false};
+		ret['netname'] = {attribute: false};
+		ret['secret'] = {attribute: false};
 		ret['nn_option'] = {type: String, attribute: false};
 		return ret;
 	}
@@ -33,8 +35,9 @@ class SecurityElement extends BaseElement
 		this.nn_option = "option1";
 		this.progress = 0;
 		this.secret = null;
-		this.selected = null;
-		
+		this.selnet = null;
+		this.netname = null;
+				
 		/*$("#nn_opts :input").change(function() 
 		{
 			console.log(this); 
@@ -187,12 +190,12 @@ class SecurityElement extends BaseElement
 									<div class="col-9">
 									</div>
 									<div class="col-3">
-										<button type="button" class="btn btn-info w100" @click="${e => {this.removeNetwork()}}" ?disabled="${this.isNetworkRemoveDisabled()}">Remove Network</button>
+										<button type="button" class="btn btn-info w100" @click="${e => {this.removeNetwork()}}" ?disabled="${this.selnet == null}">Remove Network</button>
 									</div>
 								</div>
 								<div class="row m-1">
 									<div class="col">
-										<input class="w100 h100" type="text" placeholder="Network Name" id="network" @change="${this.requestUpdate()}" required>
+										<input class="w100 h100" type="text" placeholder="Network Name" id="network" @change="${e=> this.netname=e.target.value}" required>
 									</div>
 								</div>
 								<div class="row m-1">
@@ -204,16 +207,16 @@ class SecurityElement extends BaseElement
 											<label class="btn btn-secondary ${this.nn_option=='option2'? 'active': ''}" @click="${e => { console.log('opt2'); this.nn_option='option2'}}">
 												<input type="radio" name="options" autocomplete="off"> Password
 											</label>
-											<label class="btn btn-secondary ${this.nn_option=='option3'? 'active': ''}" @click="${e => this.nn_option='option3'}">
+											<!--<label class="btn btn-secondary ${this.nn_option=='option3'? 'active': ''}" @click="${e => this.nn_option='option3'}">
 												<input type="radio" name="options" autocomplete="off"> X509 Certificates
-											</label>
+											</label>-->
 											<label class="btn btn-secondary ${this.nn_option=='option4'? 'active': ''}" @click="${e => this.nn_option='option4'}">
 												<input type="radio" name="options" autocomplete="off"> Encoded Secret
 											</label>
 										</div>
 									</div>
 								</div>
-								<div class="row m-1 p-0" class="${this.nn_option==='option1'? 'visible': 'hidden'}">
+								<div class="row m-1 p-0 ${this.nn_option==='option1'? 'visible': 'hidden'}">
 									<div class="col m-0 p-0">
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-9">
@@ -238,26 +241,26 @@ class SecurityElement extends BaseElement
 										</div>
 									</div>
 								</div>
-								<div class="row m-1" class="${this.nn_option==='option2'? 'visible': 'hidden'}">
+								<div class="row m-1 ${this.nn_option==='option2'? 'visible': 'hidden'}">
 									<div class="col m-0 p-0">
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-12">
-												<input class="w100 h100" type="text" placeholder="Password (min 10 characters)" id="pass2" @change="${e => this.pass2Changed()}">
+												<input class="w100 h100" type="text" placeholder="Password (min 10 characters)" id="pass2" @change="${e => this.secret = "pw:"+e.target.value}">
 											</div>
 										</div>
 									</div>
 								</div>
-								<div class="row m-1" class="${this.nn_option==='option3'? 'visible': 'hidden'}">
+								<!--<div class="row m-1 ${this.nn_option==='option3'? 'visible': 'hidden'}">
 									<div class="col">
 										Option 3
 									</div>
-								</div>
-								<div class="row m-1" class="${this.nn_option==='option4'? 'visible': 'hidden'}">
+								</div>-->
+								<div class="row m-1 ${this.nn_option==='option4'? 'visible': 'hidden'}">
 									<div class="col m-0 p-0">
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-12">
 												<label for="rawsecret">Secret (Password, Key, Certificate) in Jadex format (pw:, key:, pem:)</label>
-		  										<textarea class="form-control rounded-0" id="rawsecret" rows="10" @change="${e => this.rawSecretChanged()}"></textarea>
+		  										<textarea class="form-control rounded-0" id="rawsecret" rows="10" @change="${e => this.secret = e.target.value}"></textarea>
 											</div>
 										</div>
 									</div>
@@ -266,7 +269,7 @@ class SecurityElement extends BaseElement
 									<div class="col-9">
 									</div>
 									<div class="col-3">
-										<button type="button" class="btn btn-info w100" @click="${e => this.addNetwork()}" disabled="${this.isNetworkDisabled()}">Add Network</button>
+										<button type="button" class="btn btn-info w100" @click="${e => this.addNetwork()}" ?disabled="${this.netname==null || this.secret==null}">Add Network</button>
 									</div>
 								</div>
 							</div>
@@ -616,11 +619,6 @@ class SecurityElement extends BaseElement
 		return ret;
 	}
 	
-	isNetworkRemoveDisabled()
-	{
-		return self.selected == null;
-	}
-	
 	addNetwork()
 	{
 		var self = this;
@@ -639,14 +637,14 @@ class SecurityElement extends BaseElement
 	removeNetwork()
 	{			
 		var self = this;
-		if(this.selected!=null)
+		if(this.selnet!=null)
 		{
-			console.log("remove network: "+this.selected);
+			console.log("remove network: "+this.selnet);
 
-			axios.get(self.getMethodPrefix()+'&methodname=removeNetwork&args_0='+self.selected[0]+'&args_1='+self.selected[1], self.transform).then(function(resp)
+			axios.get(self.getMethodPrefix()+'&methodname=removeNetwork&args_0='+self.selnet[0]+'&args_1='+self.selnet[1], self.transform).then(function(resp)
 			{
-				self.createInfoMessage("removed network: "+self.selected);
-				//console.log("removed network: "+self.selected);
+				self.createInfoMessage("removed network: "+self.selnet);
+				//console.log("removed network: "+self.selnet);
 				self.refresh();
 			});
 		}
@@ -656,7 +654,7 @@ class SecurityElement extends BaseElement
 	{
 		//console.log(e.item);
 		this.selectRow("net", e.currentTarget);
-		this.selected = net;
+		this.selnet = net;
 	}
 	
 	selectNameAuthority(e)
@@ -731,18 +729,6 @@ class SecurityElement extends BaseElement
 		}
 		if(sel!=oldsel)
 			selel.classList.add("selected");
-	}
-	
-	pass2Changed(e)
-	{
-		this.secret = "pw:"+this.shadowRoot.getElementById("pass2").value;
-		this.requestUpdate();
-	}
-	
-	rawSecretChanged(e)
-	{
-		this.secret = this.shadowRoot.getElementById("rawsecret").value
-		this.requestUpdate();
 	}
 	
 	stringToUtf8 = function(str) 
