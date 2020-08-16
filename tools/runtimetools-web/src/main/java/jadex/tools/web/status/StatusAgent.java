@@ -40,7 +40,6 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -67,7 +66,6 @@ public class StatusAgent implements IStatusService
 	@Agent
 	protected IInternalAccess agent;
 	
-	//@AgentCreated
 	@OnInit
 	protected IFuture<Void>	setup()
 	{
@@ -187,7 +185,7 @@ public class StatusAgent implements IStatusService
 		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getId());
 		for(ServiceQueryInfo<?> sqi: reg.getAllQueries())
 		{
-			if(scopes==null || scopes.contains(sqi.getQuery().getScope()))
+			if(scopes==null || scopes.contains(sqi.getQuery().getScope().name()))
 			{
 				ret.addIntermediateResult(sqi.getQuery());
 			}
@@ -262,6 +260,7 @@ public class StatusAgent implements IStatusService
 
 //		config.getExtendedPlatformConfiguration().setRsPublish(true);
 		config.setValue("jettyrspublish", true);
+		config.setValue("nanorspublish", false);
 		
 		Starter.createPlatform(config).get();
 	}
