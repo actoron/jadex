@@ -47,5 +47,11 @@ public interface IJCCWebService
 	 *  Check if a platform is available.
 	 */
 	public IFuture<Boolean> isPlatformAvailable(IComponentIdentifier cid);
-
+	
+	/**
+	 *  Login to the webjcc.
+	 *  @param platformpass The platform password.
+	 *  @return True if logged in.
+	 * /
+	public IFuture<Boolean> login(String platformpass);*/
 }

@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.net.ssl.TrustManagerFactory;
+import javax.swing.JButton;
+import javax.swing.SwingUtilities;
 
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Object;
@@ -100,6 +102,7 @@ import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 
+import jadex.commons.Base64;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -130,6 +133,15 @@ public class SSecurity
 	
 	/** Enable this to test the seeding fallback, do not change, used by tests only. */
 	protected static boolean TEST_ENTROPY_FALLBACK = false;
+	
+	/** SCrypt work factor / hardness for password strengthening. */
+	protected static final int SCRYPT_N = 131072;
+	
+	/** SCrypt block size. */
+	protected static final int SCRYPT_R = 8;
+	
+	/** SCrypt parallelization. */
+	protected static final int SCRYPT_P = 4;
 	
 	static
 	{
@@ -1318,7 +1330,24 @@ public class SSecurity
 		}
 	}
 	
-//	/**
+	/**
+	 *  Derive a key from a password via scrypt.
+	 *  @param pw The password.
+	 *  @param salt The salt.
+	 *  @return The key.
+	 */
+	public static byte[] deriveKeyFromPassword(String pw, byte[] salt)
+	{
+		if(pw==null)
+			throw new IllegalArgumentException();
+		
+		if(salt==null)
+			salt = pw.getBytes(SUtil.UTF8);
+		final byte[] keydata = SCryptParallel.generate(pw.getBytes(SUtil.UTF8), salt, SCRYPT_N, SCRYPT_R, SCRYPT_P, 32);
+		return keydata;
+	}
+
+	//	/**
 //	 *  Main for testing.
 //	 */
 //	public static void main(String[] args)

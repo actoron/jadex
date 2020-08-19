@@ -248,7 +248,9 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 	@Override
 	public Security	getSecurityLevel(IInternalAccess access)
 	{
-		Security level = null;
+		return getSecurityLevel(access, method, target instanceof IServiceIdentifier? (IServiceIdentifier)target: null);
+		
+		/*Security level = null;
 		Method m0 = method.getMethod(access.getClassLoader());
 		
 //		// Special case for service search -> use security settings of service type, if any (hack???) -> changed IRemoteRegistryService to unrestricted instead
@@ -263,6 +265,91 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 			IServiceIdentifier	sid	= (IServiceIdentifier)target;
 			Object	impl	= access.getFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(sid);
 			Class<?>	implclass	= impl!=null ? impl.getClass() : null;
+			
+			// Precedence: hierarchy before specificity (e.g. class annotation in subclass wins over method annotation in superclass)
+			while(level==null && implclass!=null)
+			{
+				// Todo: cache for speed?
+				Method declmeth = SReflect.getDeclaredMethod0(implclass, m0.getName(), m0.getParameterTypes());
+				if (declmeth != null)
+				{
+					level = declmeth.getAnnotation(Security.class);
+				}
+				
+				if(level==null)
+				{
+					level	= implclass.getAnnotation(Security.class);
+				}
+				
+				implclass	= implclass.getSuperclass();
+			}
+			
+			// Default to interface if not specified in impl.
+			if(level==null)
+			{
+				// Specificity: method before class
+				level = m0.getAnnotation(Security.class);
+				Class<?> type = sid.getServiceType().getType(access.getClassLoader());
+				
+				if(level==null && type != null)
+				{
+					type = SReflect.getDeclaringInterface(type, m0.getName(), m0.getParameterTypes());
+					
+					if (type != null)
+					{
+						Method declmeth = null;
+						try
+						{
+							declmeth = type.getDeclaredMethod(m0.getName(), m0.getParameterTypes());
+						}
+						catch (Exception e)
+						{
+							// Should not happen, we know the method is there...
+						}
+						level = declmeth.getAnnotation(Security.class);
+						if (level == null)
+							level = type.getAnnotation(Security.class);
+					}
+				}
+				
+				if(level==null && access.getDescription().isSystemComponent())
+				{
+					level = DEFAULT_SYSTEM_SECURITY;
+				}
+			}
+		}
+		
+		// Default: use method annotation, if any.
+		else if(level==null)
+		{
+			level = m0.getAnnotation(Security.class);
+		}
+		
+		// level==null -> disallow direct access to components (overridden by TRUSTED platform)
+		
+		return level;*/
+	}
+	
+	/**
+	 *  Method to provide the required security level.
+	 *  Overridden by subclasses.
+	 */
+	public static Security getSecurityLevel(IInternalAccess access, MethodInfo method, IServiceIdentifier sid)
+	{
+		Security level = null;
+		Method m0 = method.getMethod(access.getClassLoader());
+		
+//		// Special case for service search -> use security settings of service type, if any (hack???) -> changed IRemoteRegistryService to unrestricted instead
+//		if(SEARCHMETHOD.equals(m0) && ((ServiceQuery<?>)args[0]).getServiceType()!=null)
+//		{
+//			level	=  ((ServiceQuery<?>)args[0]).getServiceType().getType(access.getClassLoader()).getAnnotation(Security.class);
+//		}
+		
+		// For service call -> look for annotation in impl class hierarchy
+		if(level==null && sid!=null)
+		{
+			Object impl = access.getFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(sid);
+			Class<?> implclass = impl!=null ? impl.getClass() : null;
 			
 			// Precedence: hierarchy before specificity (e.g. class annotation in subclass wins over method annotation in superclass)
 			while(level==null && implclass!=null)

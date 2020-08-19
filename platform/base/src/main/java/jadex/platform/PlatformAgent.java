@@ -302,7 +302,7 @@ public class PlatformAgent
 		Set<File> scanfiles = new HashSet<>(cpfiles);
 		
 		boolean writecache = false;
-		for (Iterator<Map.Entry<File, Set<ClassInfo>>> it = codesources.entrySet().iterator(); it.hasNext(); )
+		for(Iterator<Map.Entry<File, Set<ClassInfo>>> it = codesources.entrySet().iterator(); it.hasNext(); )
 		{
 			Map.Entry<File, Set<ClassInfo>> entry = it.next();
 			if (!cpfiles.contains(entry.getKey()) ||
@@ -318,9 +318,11 @@ public class PlatformAgent
 			}
 		}
 		
+		//System.out.println("scanning: "+scanfiles);
+		
 		//System.out.println("Scan size: " + scanfiles.size());
 		
-		for (File f : scanfiles)
+		for(File f : scanfiles)
 		{
 			writecache = true;
 			Set<ClassInfo> infos = SReflect.scanForClassInfos(new URL[] {SUtil.toURL(f.toURI())}, null, filter);
@@ -329,14 +331,16 @@ public class PlatformAgent
 		
 		Set<ClassInfo> cis = codesources.values().stream().filter(cscis -> cscis != null).flatMap(cscis -> cscis.stream()).collect(Collectors.toSet());
 		
-		if (writecache)
+		//System.out.println("cis: "+cis);
+		
+		if(writecache)
 		{
 			File cache = new File(STARTUP_CACHE_FILE);
-			try (OutputStream os = new BufferedOutputStream(new FileOutputStream(cache)))
+			try(OutputStream os = new BufferedOutputStream(new FileOutputStream(cache)))
 			{
-				for (Map.Entry<File, Set<ClassInfo>> entry : codesources.entrySet())
+				for(Map.Entry<File, Set<ClassInfo>> entry : codesources.entrySet())
 				{
-					if (entry.getValue() != null)
+					if(entry.getValue() != null)
 					{
 						String line = "## " + entry.getKey().getAbsolutePath() + " | " + entry.getKey().lastModified() + "\n";
 						os.write(line.getBytes(SUtil.UTF8));
@@ -366,6 +370,8 @@ public class PlatformAgent
 						vinfo.setBuildTime(ci.getLastModified());
 				}
 			}
+			//if(ci.getClassName().indexOf("BDI")!=-1)
+			//	System.out.println("hhhfhjsdf");
 			isSystemComponent(ci, PlatformAgent.class.getClassLoader());
 			AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
 			EnumInfo ei = (EnumInfo)ai.getValue("autostart");
@@ -373,13 +379,16 @@ public class PlatformAgent
 				System.out.println("No autostart agent: "+ci);
 			boolean ok = ei==null? true: "true".equals(ei.getValue().toLowerCase());
 			String name = ai.getValue("name")==null || ((String)ai.getValue("name")).length()==0? null: (String)ai.getValue("name");
+			
+			Boolean agentstart = null;
 			if(name!=null)
 			{
-				Boolean agentstart = getAgentStart(name);
+				agentstart = getAgentStart(name);
 				if(agentstart!=null)
 					ok = agentstart.booleanValue();
 			}
-			else
+			
+			if(agentstart==null)
 			{
 				name = SReflect.getUnqualifiedTypeName(ci.getClassName());
 				
@@ -412,8 +421,8 @@ public class PlatformAgent
 			}
 		}
 		
-		//for(CreationInfo ci: infos)
-		//	System.out.println("creating: "+ci.getFilename());
+		for(CreationInfo ci: infos)
+			System.out.println("creating: "+ci.getFilename());
 		
 		agent.getFeature(ISubcomponentsFeature.class).createComponents(infos.toArray(new CreationInfo[infos.size()])).addResultListener(new IResultListener<Collection<IExternalAccess>>()
 		{
@@ -509,13 +518,15 @@ public class PlatformAgent
 				
 				String val = ei.getValue();
 				boolean ok = "true".equals(val.toLowerCase()); 
+				Boolean start = null;
 				if(name!=null)
 				{
-					Boolean start = getAgentStart(name);
+					start = getAgentStart(name);
 					if(start!=null)
 						ok = start.booleanValue();
 				}
-				else
+				
+				if(start==null)
 				{
 					// check classname as parameter
 //					name = SReflect.getInnerClassName(cl);

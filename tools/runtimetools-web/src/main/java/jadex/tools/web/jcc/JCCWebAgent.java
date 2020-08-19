@@ -80,6 +80,7 @@ public class JCCWebAgent implements IJCCWebService
 		
 		//System.out.println("publish started: "+pubser);
 		IServiceIdentifier sid = ((IService)agent.getProvidedService(IJCCWebService.class)).getServiceId();
+		wps.setLoginSecurity(true);
 		wps.publishService(sid, new PublishInfo("[http://localhost:8080/]webjcc", IPublishService.PUBLISH_RS, null)).get();
 		
 		wps.publishResources("[http://localhost:8080/]", "META-INF/resources2").get();
@@ -253,8 +254,8 @@ public class JCCWebAgent implements IJCCWebService
 
 		final Future<Object> ret = (Future<Object>)SFuture.getNoTimeoutFuture(rtype, agent);
 
-		if(methodname.indexOf("getSecurityS")!=-1)
-			System.out.println("invokeServiceMethod: "+servicetype+" "+methodname+" "+Arrays.toString(args)+" "+rettype);
+		//if(methodname.indexOf("getSecurityS")!=-1)
+		//	System.out.println("invokeServiceMethod: "+servicetype+" "+methodname+" "+Arrays.toString(args)+" "+rettype);
 		
 		// Search service with startpoint of given platform 
 		agent.searchService(new ServiceQuery<IService>(servicetype).setSearchStart(cid.getRoot()).setScope(ServiceScope.PLATFORM))
@@ -274,7 +275,7 @@ public class JCCWebAgent implements IJCCWebService
 			public void exceptionOccurred(Exception exception)
 			{
 				// Did not find the service, so use it locally with cid
-				System.out.println("locally with cid: "+ methodname + " " + servicetype);
+				//System.out.println("locally with cid: "+ methodname + " " + servicetype);
 				IService ser = (IService)agent.getLocalService(servicetype.getType(agent.getClassLoader()));
 				
 				Object[] args2 = new Object[args!=null? args.length+1: 1];
@@ -297,4 +298,15 @@ public class JCCWebAgent implements IJCCWebService
 		
 		return ret;
 	}
+	
+	/**
+	 *  Login to the webjcc.
+	 *  @param platformpass The platform password.
+	 *  @return True if logged in.
+	 * /
+	public IFuture<Boolean> login(String platformpass)
+	{
+		IWebPublishService wps = agent.getLocalService(IWebPublishService.class);
+		wps.login(platformpass);
+	}*/
 }	

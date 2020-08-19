@@ -54,7 +54,6 @@ public class CatalogAwarenessAgent implements IAwarenessService
 	 */
 	public CatalogAwarenessAgent()
 	{
-		
 	}
 	
 	/**

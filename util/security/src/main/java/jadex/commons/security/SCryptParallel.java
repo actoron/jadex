@@ -1,4 +1,4 @@
-package jadex.platform.service.security.auth;
+package jadex.commons.security;
 
 import java.util.concurrent.CyclicBarrier;
 
