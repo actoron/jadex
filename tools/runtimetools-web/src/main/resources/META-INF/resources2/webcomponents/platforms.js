@@ -71,7 +71,7 @@ class PlatformsElement extends BaseElement
 				console.log("Could not reach Jadex webjcc.");
 				if(err.response.status==401)
 				{
-					self.createErrorMessage("Login required to WebJCC platform");
+					self.createErrorMessage("Login required to WebJCC platform (use platform secret)");
 				}
 				else
 				{

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -528,15 +529,29 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	{
 		if(session==null)
 		{
-			String id = getHeader(HEADER_NANO_SESSIONID);
+			String cookie = getHeader("cookie");
+			String id = null;
 			
-			if(id!=null)
+			if(cookie!=null)
 			{
-				session = NanoHttpSession.sessions.get(id);
-				if(!session.isValid())
+				StringTokenizer stok = new StringTokenizer(cookie, ";");
+				while(stok.hasMoreTokens())
 				{
-					NanoHttpSession.sessions.remove(id);
-					id = null;
+					String c = stok.nextToken();
+	
+					int del = c.indexOf("=");
+					String name = c.substring(0, del).trim();
+					id = c.substring(del+1, c.length()).trim();
+					
+					if(HEADER_NANO_SESSIONID.equals(name))
+					{
+						session = NanoHttpSession.sessions.get(id);
+						if(session==null || !session.isValid())
+						{
+							NanoHttpSession.sessions.remove(id);
+							id = null;
+						}
+					}
 				}
 			}
 			
