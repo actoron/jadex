@@ -1097,7 +1097,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public IFuture<Void> waitFor(long delay)
 	{
-		System.out.println("before wait: "+delay+" "+agent.getId());
+		//System.out.println("before wait: "+delay+" "+agent.getId());
 		
 		final Future<Void> ret = new BDIFuture<Void>();
 		
@@ -1109,7 +1109,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				System.out.println("after wait: "+delay+" "+agent.getId());
+				//System.out.println("after wait: "+delay+" "+agent.getId());
 //				if(rescom.equals(getResumeCommand()))
 				{
 					rescom.execute(null);

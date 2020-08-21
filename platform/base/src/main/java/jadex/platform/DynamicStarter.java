@@ -50,7 +50,7 @@ public class DynamicStarter
 			
 			if(jardir!=null)
 			{
-				//System.out.println(jardir);
+				System.out.println("Using jarpath: "+jardir);
 				
 				List<URL> clurls = new ArrayList<URL>();
 				for(File jarfile : jardir.listFiles())
