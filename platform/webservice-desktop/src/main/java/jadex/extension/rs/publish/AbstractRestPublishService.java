@@ -32,6 +32,7 @@ import javax.servlet.AsyncListener;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -61,17 +62,21 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.remotecommands.RemoteMethodInvocationCommand;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.ParameterInfo;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
+import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.ICommand;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
@@ -131,6 +136,10 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	/** Http header to terminate the call (req). */
 	public static final String HEADER_JADEX_TERMINATE = "x-jadex-terminate";
 
+	/** Http header to login to the platform and gain admin access (req). */
+	public static final String HEADER_JADEX_LOGIN = "x-jadex-login";
+	public static final String HEADER_JADEX_LOGOUT = "x-jadex-logout";
+	public static final String HEADER_JADEX_ISLOGGEDIN = "x-jadex-isloggedin";
 
 	/** Finished result marker. */
 	public static final String FINISHED	= "__finished__";
@@ -141,12 +150,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	/** The component. */
 	@ServiceComponent
 	protected IInternalAccess component;
-
-	// /** The servers per service id. */
-	// protected Map<IServiceIdentifier, Server> sidservers;
-	//
-	// /** The servers per port. */
-	// protected Map<Integer, Server> portservers;
 
 	/**
 	 * The internal request info containing also results per call (coming from
@@ -164,6 +167,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	/** The media type converters. */
 	protected MultiCollection<String, IObjectStringConverter> converters;
 
+	/** Login security of or off. */
+	protected boolean loginsec;
+	
 	/**
 	 * The service init.
 	 */
@@ -171,6 +177,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	@OnStart
 	public IFuture<Void> init()
 	{
+		this.loginsec = false;
+		
 		// Add rs 'Response' converters
 		// todo: support for xml ?!
 		// todo: use preprocessors (would work for all serializers) ?!
@@ -270,6 +278,17 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 		return IFuture.DONE;
 	}
+	
+	/**
+	 *  Turn on or off the login security.
+	 *  If true one has to log in with platform secret before using published services.
+	 *  @param sec On or off.
+	 */
+	public IFuture<Void> setLoginSecurity(boolean sec)
+	{
+		this.loginsec = sec;
+		return IFuture.DONE;
+	}
 
 	/**
 	 * Add a converter for one or multiple types.
@@ -339,12 +358,10 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			return;
 		}
 
-		//System.out.println("handleRequest: "+Thread.currentThread());
+		System.out.println("handleRequest: "+request.getRequestURI());
 
-		// In case the call comes from an internally started server async is not
-		// already set
-		// In case the call comes from an external web server it has to set the
-		// async in oder
+		// In case the call comes from an internally started server async is not already set
+		// In case the call comes from an external web server it has to set the async in oder
 		// to let the call wait for async processing
 		if(request.getAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO) == null)
 		{
@@ -384,331 +401,384 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 		// System.out.println("handler is: "+uri.getPath());
 
-		// check if call is an intermediate result fetch
-		String callid = request.getHeader(HEADER_JADEX_CALLID);
-		String terminate = request.getHeader(HEADER_JADEX_TERMINATE);
-
-		//System.out.println("handleRequest: "+callid+" "+terminate);
-		
-		// request info manages an ongoing conversation
-		if(requestinfos.containsKey(callid))
+		// check if it is a login request
+		String platformsecret = request.getHeader(HEADER_JADEX_LOGIN);
+		String logout = request.getHeader(HEADER_JADEX_LOGOUT);
+		String isloggedin = request.getHeader(HEADER_JADEX_ISLOGGEDIN);
+		if(platformsecret!=null)
 		{
-			RequestInfo rinfo = requestinfos.get(callid);
-
-			// Terminate the future if requested
-			if(terminate!=null && rinfo.getFuture() instanceof ITerminableFuture)
+			login(request, platformsecret).thenAccept((Boolean ok) ->
 			{
-				System.out.println("Terminating call on client request: "+callid);
-				// hmm, immediate response (should normally not be necessary)
-				// otherwise a (termination) exception is returned
-				//writeResponse(FINISHED, callid, rinfo.getMappingInfo(), request, response, false);
-				
-				// save context to answer request after future is set
-				AsyncContext ctx = getAsyncContext(request);
-				saveRequestContext(callid, ctx);
-				if(!"true".equals(terminate))
-					((ITerminableFuture)rinfo.getFuture()).terminate(new RuntimeException(terminate)); 
+				if(ok)
+					writeResponse(Boolean.TRUE, Response.Status.OK.getStatusCode(), null, null, request, response, true);
 				else
-					((ITerminableFuture)rinfo.getFuture()).terminate();
-			}
-			
-			// Result already available?
-			else if(rinfo.checkForResult())
+					writeResponse(Boolean.FALSE, Response.Status.UNAUTHORIZED.getStatusCode(), null, null, request, response, true);
+			}).exceptionally((Exception e) ->
 			{
-				// Normal result (or FINISHED as handled in writeResponse())
-				Object result = rinfo.getNextResult();
-				result = FINISHED.equals(result) ? result : mapResult(rinfo.getMappingInfo().getMethod(), result);
-				writeResponse(result, callid, rinfo.getMappingInfo(), request, response, false);
-			}
-
-			// Exception in mean time?
-			else if(rinfo.getException() != null)
-			{
-				Object result = mapResult(rinfo.getMappingInfo().getMethod(), rinfo.getException());
-				writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), callid, rinfo.getMappingInfo(), request, response, true);
-			}
-
-			// No result yet -> store current request context until next result available
-			else
-			{
-				AsyncContext ctx = getAsyncContext(request);
-				saveRequestContext(callid, ctx);
-			}
-			
-			//System.out.println("received existing call: "+request+" "+callid);
+				writeResponse(new SecurityException("Login failed"), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true);
+			});
 		}
-		else if(callid != null)
+		else if(logout!=null)
 		{
-			// System.out.println("callid not found: "+callid);
-
-			writeResponse(null, Response.Status.NOT_FOUND.getStatusCode(), null, null, request, response, true);
-
-			// if(request.isAsyncStarted())
-			// request.getAsyncContext().complete();
+			logout(request).thenAccept((Boolean ok) ->
+			{
+				writeResponse(ok, Response.Status.OK.getStatusCode(), null, null, request, response, true);
+			}).exceptionally((Exception e) ->
+			{
+				writeResponse(new SecurityException("Logout failed"), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true);
+			});
 		}
-		// handle new call
+		else if(isloggedin!=null)
+		{
+			boolean ret = isLoggedIn(request);
+			writeResponse(ret, Response.Status.OK.getStatusCode(), null, null, request, response, true);
+		}
 		else
 		{
-			//System.out.println("received new call: "+request);
-
-			String methodname = request.getPathInfo();
-
-			if(methodname != null && methodname.startsWith("/"))
-				methodname = methodname.substring(1);
-			if(methodname != null && methodname.endsWith("()"))
-				methodname = methodname.substring(0, methodname.length() - 2);
-
-			final String fmn = methodname;
-			Collection<MappingInfo> mis = pm.getElementsForPath(methodname);
-			List<Map<String, String>> bindings = mis.stream().map(x -> pm.getBindingsForPath(fmn)).collect(Collectors.toList());
+			// check if call is an intermediate result fetch
+			String callid = request.getHeader(HEADER_JADEX_CALLID);
+			String terminate = request.getHeader(HEADER_JADEX_TERMINATE);
+	
+			//System.out.println("handleRequest: "+callid+" "+terminate);
 			
-			if(mis!=null && mis.size()>0)
+			// request info manages an ongoing conversation
+			if(requestinfos.containsKey(callid))
 			{
-				try
+				RequestInfo rinfo = requestinfos.get(callid);
+	
+				// Terminate the future if requested
+				if(terminate!=null && rinfo.getFuture() instanceof ITerminableFuture)
+				{
+					System.out.println("Terminating call on client request: "+callid);
+					// hmm, immediate response (should normally not be necessary)
+					// otherwise a (termination) exception is returned
+					//writeResponse(FINISHED, callid, rinfo.getMappingInfo(), request, response, false);
+					
+					// save context to answer request after future is set
+					AsyncContext ctx = getAsyncContext(request);
+					saveRequestContext(callid, ctx);
+					if(!"true".equals(terminate))
+						((ITerminableFuture)rinfo.getFuture()).terminate(new RuntimeException(terminate)); 
+					else
+						((ITerminableFuture)rinfo.getFuture()).terminate();
+				}
+				
+				// Result already available?
+				else if(rinfo.checkForResult())
+				{
+					// Normal result (or FINISHED as handled in writeResponse())
+					Object result = rinfo.getNextResult();
+					result = FINISHED.equals(result) ? result : mapResult(rinfo.getMappingInfo().getMethod(), result);
+					writeResponse(result, callid, rinfo.getMappingInfo(), request, response, false);
+				}
+	
+				// Exception in mean time?
+				else if(rinfo.getException() != null)
+				{
+					Object result = mapResult(rinfo.getMappingInfo().getMethod(), rinfo.getException());
+					writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), callid, rinfo.getMappingInfo(), request, response, true);
+				}
+	
+				// No result yet -> store current request context until next result available
+				else
+				{
+					AsyncContext ctx = getAsyncContext(request);
+					saveRequestContext(callid, ctx);
+				}
+				
+				//System.out.println("received existing call: "+request+" "+callid);
+			}
+			else if(callid != null)
+			{
+				// System.out.println("callid not found: "+callid);
+	
+				writeResponse(null, Response.Status.NOT_FOUND.getStatusCode(), null, null, request, response, true);
+	
+				// if(request.isAsyncStarted())
+				// request.getAsyncContext().complete();
+			}
+			// handle new call
+			else
+			{
+				//System.out.println("received new call: "+request);
+	
+				String methodname = request.getPathInfo();
+	
+				if(methodname != null && methodname.startsWith("/"))
+					methodname = methodname.substring(1);
+				if(methodname != null && methodname.endsWith("()"))
+					methodname = methodname.substring(0, methodname.length() - 2);
+	
+				final String fmn = methodname;
+				Collection<MappingInfo> mis = pm.getElementsForPath(methodname);
+				List<Map<String, String>> bindings = mis.stream().map(x -> pm.getBindingsForPath(fmn)).collect(Collectors.toList());
+				
+				if(mis!=null && mis.size()>0)
 				{
 					// out.println("<h1>" + "Found method - calling service: " +
 					// mappings.get(methodname).getMethod().getName() +
 					// "</h1>");
-
+	
 					// convert and map parameters
 					Tuple2<MappingInfo, Object[]> tup = mapParameters(request, mis, bindings);
 					final MappingInfo mi = tup.getFirstEntity();
 					Object[] params = tup.getSecondEntity();
-
+	
 					// Inject caller meta info
 					Map<String, String> callerinfos = extractCallerValues(request);
 					ServiceCall.getOrCreateNextInvocation().setProperty("webcallerinfos", callerinfos);
-
-					// invoke the service method
-					final Method method = mi.getMethod();
-					final Object ret = method.invoke(service, params);
-
-					if(ret instanceof IIntermediateFuture)
+	
+					// Check security
+					IComponentIdentifier cid = service.getServiceId().getProviderId();
+					component.getExternalAccess(cid).scheduleStep((IInternalAccess access) -> 
 					{
-						AsyncContext ctx = getAsyncContext(request);
-						final String fcallid = SUtil.createUniqueId(methodname);
-						// System.out.println("sav2");
-						saveRequestContext(fcallid, ctx);
-						final RequestInfo rinfo = new RequestInfo(mi, (IFuture)ret);
-						requestinfos.put(fcallid, rinfo);
-						// System.out.println("added context: "+fcallid+"
-						// "+ctx);
-
-						((IIntermediateFuture<Object>)ret)
-							.addIntermediateResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateFutureCommandResultListener<Object>()
+						Security sec = RemoteMethodInvocationCommand.getSecurityLevel(access, new MethodInfo(mi.getMethod()), service.getServiceId());
+						boolean unres = SUtil.arrayToSet(sec.roles()).contains(Security.UNRESTRICTED);
+						return new Future<Boolean>(unres? Boolean.TRUE: Boolean.FALSE);
+					}).addResultListener((Boolean unres) ->
+					{
+						try
+						{
+							if(loginsec && !unres && !isLoggedIn(request))
 							{
-								public void resultAvailable(Collection<Object> result)
+								writeResponse(new SecurityException("Access not allowed as not logged in"), Response.Status.UNAUTHORIZED.getStatusCode(), null, mi, request, response, true);
+							}
+							else
+							{
+								// invoke the service method
+								
+								final Method method = mi.getMethod();
+								final Object ret = method.invoke(service, params);
+			
+								if(ret instanceof IIntermediateFuture)
 								{
-									// Shouldn't be called?
-									for(Object res : result)
+									AsyncContext ctx = getAsyncContext(request);
+									final String fcallid = SUtil.createUniqueId(fmn);
+									// System.out.println("sav2");
+									saveRequestContext(fcallid, ctx);
+									final RequestInfo rinfo = new RequestInfo(mi, (IFuture)ret);
+									requestinfos.put(fcallid, rinfo);
+									// System.out.println("added context: "+fcallid+"
+									// "+ctx);
+			
+									((IIntermediateFuture<Object>)ret)
+										.addIntermediateResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateFutureCommandResultListener<Object>()
 									{
-										intermediateResultAvailable(res);
-									}
-									finished();
-								}
-
-								public void exceptionOccurred(Exception exception)
-								{
-									handleResult(null, exception, null);
-								}
-
-								public void intermediateResultAvailable(Object result)
-								{
-									handleResult(result, null, null);
-								}
-
-								@Override
-								public void commandAvailable(Object command)
-								{
-									handleResult(null, null, command);
-								}
-
-								public void finished()
-								{
-									// maps will be cleared when processing fin
-									// element in writeResponse
-									handleResult(FINISHED, null, null);
-								}
-
-								/**
-								 * Handle a final or intermediate
-								 * result/exception/command of a service call.
-								 */
-								protected void handleResult(Object result, Throwable exception, Object command)
-								{
-									// System.out.println("handleResult:"+result+", "+exception+", "+command+","+Thread.currentThread());
-
-									if(rinfo.isTerminated())
-									{
-										// nop -> ignore late results (i.e. when
-										// terminated due to browser offline).
-										// System.out.println("ignoring late
-										// result: "+result);
-									}
-
-									// Browser waiting for result -> send immediately
-									else if(requestspercall.containsKey(fcallid) && requestspercall.get(fcallid).size() > 0)
-									{
-										Collection<AsyncContext> cls = requestspercall.get(fcallid);
-										
-										// System.out.println("direct answer to browser request, removed context:"+callid+" "+ctx);
-										if(command != null)
+										public void resultAvailable(Collection<Object> result)
 										{
-											// Timer update (or other command???)
-											// HTTP 102 -> processing (not recognized by angular?)
-											// HTTP 202 -> accepted
-											AsyncContext ctx = cls.iterator().next();
-											cls.remove(ctx);
-											writeResponse(null, 202, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
-										}
-										else if(exception != null)
-										{
-											// Service call (finally) failed.
-											result = mapResult(method, exception);
-											
-											int rescode = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
-											if(exception instanceof FutureTerminatedException)
-												rescode = Response.Status.OK.getStatusCode();
-											
-											//writeResponse(result, rescode, fcallid, mi, (HttpServletRequest)ctx.getRequest(),
-											//	(HttpServletResponse)ctx.getResponse(), true);
-											
-											// Answer ALL pending requests and so also remove waiting longpoll calls (e.g. when terminate arrives)
-											AsyncContext[] acs = cls.toArray(new AsyncContext[cls.size()]);
-											for(AsyncContext ac: acs)
+											// Shouldn't be called?
+											for(Object res : result)
 											{
-												writeResponse(result, rescode, fcallid, mi, (HttpServletRequest)ac.getRequest(),
-													(HttpServletResponse)ac.getResponse(), true);
-												cls.remove(ac);
+												intermediateResultAvailable(res);
 											}
+											finished();
 										}
-										else
+		
+										public void exceptionOccurred(Exception exception)
 										{
-											AsyncContext ctx = cls.iterator().next();
-											cls.remove(ctx);
-											// Normal result (or FINISHED as handled in writeResponse())
-											result = FINISHED.equals(result) ? result : mapResult(method, result);
-											writeResponse(result, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
+											handleResult(null, exception, null);
 										}
-										// ctx.complete();
-									}
-
-									// Browser not waiting -> check for timeout
-									// and store or terminate
-									else
-									{
-										// Only check timeout when future not
-										// yet finished.
-										if(!FINISHED.equals(result) && exception == null)
+		
+										public void intermediateResultAvailable(Object result)
 										{
-											// System.out.println("checking
-											// "+result);
-											// if timeout -> cancel future.
-											// TODO: which timeout? (client vs
-											// server).
-											if(System.currentTimeMillis() - rinfo.getTimestamp() > Starter.getDefaultTimeout(component.getId()))
+											handleResult(result, null, null);
+										}
+		
+										@Override
+										public void commandAvailable(Object command)
+										{
+											handleResult(null, null, command);
+										}
+		
+										public void finished()
+										{
+											// maps will be cleared when processing fin
+											// element in writeResponse
+											handleResult(FINISHED, null, null);
+										}
+		
+										/**
+										 * Handle a final or intermediate
+										 * result/exception/command of a service call.
+										 */
+										protected void handleResult(Object result, Throwable exception, Object command)
+										{
+											// System.out.println("handleResult:"+result+", "+exception+", "+command+","+Thread.currentThread());
+		
+											if(rinfo.isTerminated())
 											{
-												// System.out.println("terminating due to timeout: "+exception);
-												rinfo.setTerminated();
-												if(ret instanceof ITerminableFuture< ? >)
+												// nop -> ignore late results (i.e. when
+												// terminated due to browser offline).
+												// System.out.println("ignoring late
+												// result: "+result);
+											}
+		
+											// Browser waiting for result -> send immediately
+											else if(requestspercall.containsKey(fcallid) && requestspercall.get(fcallid).size() > 0)
+											{
+												Collection<AsyncContext> cls = requestspercall.get(fcallid);
+												
+												// System.out.println("direct answer to browser request, removed context:"+callid+" "+ctx);
+												if(command != null)
 												{
-													((ITerminableFuture< ? >)ret).terminate(new TimeoutException());
+													// Timer update (or other command???)
+													// HTTP 102 -> processing (not recognized by angular?)
+													// HTTP 202 -> accepted
+													AsyncContext ctx = cls.iterator().next();
+													cls.remove(ctx);
+													writeResponse(null, 202, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
+												}
+												else if(exception != null)
+												{
+													// Service call (finally) failed.
+													result = mapResult(method, exception);
+													
+													int rescode = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
+													if(exception instanceof FutureTerminatedException)
+														rescode = Response.Status.OK.getStatusCode();
+													
+													//writeResponse(result, rescode, fcallid, mi, (HttpServletRequest)ctx.getRequest(),
+													//	(HttpServletResponse)ctx.getResponse(), true);
+													
+													// Answer ALL pending requests and so also remove waiting longpoll calls (e.g. when terminate arrives)
+													AsyncContext[] acs = cls.toArray(new AsyncContext[cls.size()]);
+													for(AsyncContext ac: acs)
+													{
+														writeResponse(result, rescode, fcallid, mi, (HttpServletRequest)ac.getRequest(),
+															(HttpServletResponse)ac.getResponse(), true);
+														cls.remove(ac);
+													}
 												}
 												else
 												{
-													// TODO: better handling of
-													// non-terminable futures?
-													throw new TimeoutException();
+													AsyncContext ctx = cls.iterator().next();
+													cls.remove(ctx);
+													// Normal result (or FINISHED as handled in writeResponse())
+													result = FINISHED.equals(result) ? result : mapResult(method, result);
+													writeResponse(result, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
 												}
+												// ctx.complete();
 											}
+		
+											// Browser not waiting -> check for timeout
+											// and store or terminate
+											else
+											{
+												// Only check timeout when future not
+												// yet finished.
+												if(!FINISHED.equals(result) && exception == null)
+												{
+													// System.out.println("checking
+													// "+result);
+													// if timeout -> cancel future.
+													// TODO: which timeout? (client vs
+													// server).
+													if(System.currentTimeMillis() - rinfo.getTimestamp() > Starter.getDefaultTimeout(component.getId()))
+													{
+														// System.out.println("terminating due to timeout: "+exception);
+														rinfo.setTerminated();
+														if(ret instanceof ITerminableFuture< ? >)
+														{
+															((ITerminableFuture< ? >)ret).terminate(new TimeoutException());
+														}
+														else
+														{
+															// TODO: better handling of
+															// non-terminable futures?
+															throw new TimeoutException();
+														}
+													}
+												}
+		
+												// Exception -> store until requested.
+												if(!rinfo.isTerminated() && exception != null)
+												{
+													// System.out.println("storing
+													// exception till browser requests:
+													// "+exception);
+													rinfo.setException(exception);
+												}
+		
+												// Normal result -> store until
+												// requested. (check for command==null
+												// to also store null values as
+												// results).
+												else if(!rinfo.isTerminated() && command == null)
+												{
+													//System.out.println("storing result till browser requests: "+result);
+													rinfo.addResult(result);
+												}
+		
+												// else nop (no need to store timer
+												// updates). what about other commands?
+											}
+											//System.out.println("handleResult exit: "+callid+" "+rinfo.getResults());
 										}
-
-										// Exception -> store until requested.
-										if(!rinfo.isTerminated() && exception != null)
-										{
-											// System.out.println("storing
-											// exception till browser requests:
-											// "+exception);
-											rinfo.setException(exception);
-										}
-
-										// Normal result -> store until
-										// requested. (check for command==null
-										// to also store null values as
-										// results).
-										else if(!rinfo.isTerminated() && command == null)
-										{
-											//System.out.println("storing result till browser requests: "+result);
-											rinfo.addResult(result);
-										}
-
-										// else nop (no need to store timer
-										// updates). what about other commands?
-									}
-									//System.out.println("handleResult exit: "+callid+" "+rinfo.getResults());
+									}));
 								}
-							}));
-					}
-					else if(ret instanceof IFuture)
-					{
-						final AsyncContext ctx = getAsyncContext(request);
-
-						// todo: use timeout listener
-						// TODO: allow also longcalls (requires intermediate
-						// command responses -> use only when requested by
-						// browser?)
-						((IFuture)ret).addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Object>()
+								else if(ret instanceof IFuture)
+								{
+									final AsyncContext ctx = getAsyncContext(request);
+			
+									// todo: use timeout listener
+									// TODO: allow also longcalls (requires intermediate
+									// command responses -> use only when requested by
+									// browser?)
+									((IFuture)ret).addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Object>()
+									{
+										public void resultAvailable(Object ret)
+										{
+											// System.out.println("one-shot call:
+											// "+method.getName()+" paramtypes:
+											// "+SUtil.arrayToString(method.getParameterTypes())+"
+											// on "+service+" "+Arrays.toString(params));
+											ret = mapResult(method, ret);
+											writeResponse(ret, null, mi, request, response, true);
+											// ctx.complete();
+										}
+			
+										public void exceptionOccurred(Exception exception)
+										{
+											Object result = mapResult(method, exception);
+											writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, mi, request, response, true);
+											// ctx.complete();
+										}
+									}));
+									// ret =
+									// ((IFuture<?>)ret).get(Starter.getDefaultTimeout(null));
+								}
+								else
+								{
+									// System.out.println("call finished:
+									// "+method.getName()+" paramtypes:
+									// "+SUtil.arrayToString(method.getParameterTypes())+"
+									// on "+service+" "+Arrays.toString(params));
+									// map the result by user defined mappers
+									Object res = mapResult(method, ret);
+									// convert content and write result to servlet response
+									writeResponse(res, null, mi, request, response, true);
+								}
+							}
+						}
+						catch(Exception e)
 						{
-							public void resultAvailable(Object ret)
-							{
-								// System.out.println("one-shot call:
-								// "+method.getName()+" paramtypes:
-								// "+SUtil.arrayToString(method.getParameterTypes())+"
-								// on "+service+" "+Arrays.toString(params));
-								ret = mapResult(method, ret);
-								writeResponse(ret, null, mi, request, response, true);
-								// ctx.complete();
-							}
-
-							public void exceptionOccurred(Exception exception)
-							{
-								Object result = mapResult(method, exception);
-								writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, mi, request, response, true);
-								// ctx.complete();
-							}
-						}));
-						// ret =
-						// ((IFuture<?>)ret).get(Starter.getDefaultTimeout(null));
-					}
-					else
-					{
-						// System.out.println("call finished:
-						// "+method.getName()+" paramtypes:
-						// "+SUtil.arrayToString(method.getParameterTypes())+"
-						// on "+service+" "+Arrays.toString(params));
-						// map the result by user defined mappers
-						Object res = mapResult(method, ret);
-						// convert content and write result to servlet response
-						writeResponse(res, null, mi, request, response, true);
-					}
+							// System.out.println("call exception: "+e);
+							writeResponse(e, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true);
+						}
+					});
 				}
-				catch(Exception e)
+				else
 				{
-					// System.out.println("call exception: "+e);
-					writeResponse(e, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true);
+					PrintWriter out = response.getWriter();
+	
+					response.setContentType("text/html; charset=utf-8");
+					response.setStatus(HttpServletResponse.SC_OK);
+	
+					String info = getServiceInfo(service, getServletUrl(request), pm);
+					out.write(info);
+	
+					complete(request, response);
 				}
-			}
-			else
-			{
-				PrintWriter out = response.getWriter();
-
-				response.setContentType("text/html; charset=utf-8");
-				response.setStatus(HttpServletResponse.SC_OK);
-
-				String info = getServiceInfo(service, getServletUrl(request), pm);
-				out.write(info);
-
-				complete(request, response);
 			}
 		}
 		// System.out.println("handleRequest exit");
@@ -728,6 +798,53 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 */
 	public abstract Object getHttpServer(URI uri, PublishInfo info);
 
+	/**
+	 *  Log in to the platform.
+	 *  @param request The request.
+	 *  @param secret The platform secret.
+	 *  @return True, if login was successful.
+	 */
+	public IFuture<Boolean> login(HttpServletRequest request, String secret)
+	{
+		Future<Boolean> ret = new Future<Boolean>();
+		ISecurityService ss = component.getLocalService(ISecurityService.class);
+		ss.checkPlatformPassword(secret).thenAccept((Boolean ok) ->
+		{
+			if(ok)
+				request.getSession(true).setAttribute("loggedin", Boolean.TRUE);
+			ret.setResult(ok);
+		}).exceptionally((Exception e) -> 
+		{
+			ret.setResult(Boolean.FALSE);
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Logout from the platform.
+	 *  @param secret The platform secret.
+	 *  @return True, if login was successful.
+	 */
+	public IFuture<Boolean> logout(HttpServletRequest request)
+	{
+		boolean ret = true;
+		if(request.getSession(false)!=null)
+			request.getSession(false).removeAttribute("loggedin");
+		else
+			ret = false;
+		return new Future<Boolean>(ret);
+	}
+	
+	/**
+	 *  Test if a the web user is logged in.
+	 *  @return True, if is logged in.
+	 */
+	public boolean isLoggedIn(HttpServletRequest request)
+	{
+		HttpSession sess = request.getSession(false);
+		return sess!=null && sess.getAttribute("loggedin")==Boolean.TRUE;
+	}
+	
 	// /**
 	// * Unpublish a service.
 	// * @param sid The service identifier.

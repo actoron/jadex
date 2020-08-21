@@ -293,7 +293,7 @@ class SecurityElement extends BaseElement
 					  						</thead>
 					  						<tbody>
 												${this.getRoles().map((roles) => html`
-						    						<tr class="role" @click="${e => this.selectRole()}">
+						    						<tr class="role" @click="${e => this.selectRole(e)}">
 						      							<td>${roles[0]}</td>
 						     							<td>${roles[1]}</td>
 												    </tr>

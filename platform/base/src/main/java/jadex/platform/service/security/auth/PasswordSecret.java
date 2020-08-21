@@ -5,6 +5,7 @@ import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.Pack;
 
 import jadex.commons.SUtil;
+import jadex.commons.security.SCryptParallel;
 import jadex.commons.security.SSecurity;
 
 /**

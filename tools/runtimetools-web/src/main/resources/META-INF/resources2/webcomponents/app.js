@@ -6,6 +6,7 @@ class AppElement extends BaseElement
 {
 	message = {};
 	listener = null;
+	loggedin = false;
 	
 	constructor() 
 	{
@@ -21,6 +22,9 @@ class AppElement extends BaseElement
 	    });
 	    page('/', () => {
 	    	page.redirect("/platforms");
+	    });
+ 		page('/login', () => {
+	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-login></jadex-login>";
 	    });
 	    page('/platforms', () => {
 	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platforms></jadex-platforms>";
@@ -87,7 +91,8 @@ class AppElement extends BaseElement
 			<nav class="navbar navbar-expand-lg navbar-custom navbar-fixed-top">
 				<div class="navbar-brand mr-auto">
 		 			<img src="images/jadex_logo_ac.png" width="200px"/>
-					<a class="navbar-brand pl-2" href="#">WebJCC</a>
+					<a class="p-0 m-0" href="#">WebJCC</a>
+					<img class="p-0 m-0" @click="${this.switchLanguage}" src="${language.lang=='de'? 'images/language_de.png': 'images/language_en.png'}" />
 				</div>
 				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 					<span class="navbar-toggler-icon"></span>
@@ -104,9 +109,9 @@ class AppElement extends BaseElement
 		 			<form class="form-inline my-2 my-lg-0"></form>
 				</div>
 		        
-		        <form class="form-inline my-2 my-lg-0 ml-2">
-					<img class="navbar-nav ml-auto" @click="${this.switchLanguage}" src="${language.lang=='de'? 'images/language_de.png': 'images/language_en.png'}" />
-				</form>
+				<div class="flexcontainerrow">
+					<jadex-login class="flexcellgrow"></jadex-login>
+				</div>
 			</nav>
 		
 			<div class="flex-grow-1" id="content"></div>

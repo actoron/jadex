@@ -14,7 +14,6 @@ export class BaseElement extends LitElement
 	{
 		return { 
 			cid: { type: String },
-			language: { attribute: false }
 		};
 	}
 	
@@ -37,7 +36,6 @@ export class BaseElement extends LitElement
 	constructor() 
 	{
 		super();
-		this.language = language;
 
 		// must load sync to ensure that style.css rules are defined and gain precedence		
 		this.loadStyle("/libs/bootstrap_4.5.0/bootstrap.min.css")
@@ -71,11 +69,13 @@ export class BaseElement extends LitElement
 		//console.log('connected')
 		
 		if(this.langlistener==null)
-		this.langlistener = e => 
 		{
-			//console.log("update: "+self);
-			self.requestUpdate();
-		};
+			this.langlistener = e => 
+			{
+				//console.log("update: "+self);
+				self.requestUpdate();
+			};
+		}
 		
 		language.addListener(this.langlistener);
 	}
@@ -301,8 +301,8 @@ export class BaseElement extends LitElement
 	
 	createErrorMessage(text, data) 
 	{
-		var text = data!=null? data: "No further info";
-		this.dispatchMessageEvent({text: text, type: "error"});
+		var txt = text+(data!=null? ": "+data: "");
+		this.dispatchMessageEvent({text: txt, type: "error"});
 	}
 	
 	createInfoMessage(text) 

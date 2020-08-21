@@ -2585,4 +2585,33 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		
 		return new Future<MethodInfo[]>(ret);
 	}
+	
+	/**
+	 *  Check the platform password.
+	 *  @param secret The platform secret.
+	 *  @return True, if platform password is correct.
+	 */
+	public IFuture<Boolean> checkPlatformPassword(String secret)
+	{
+		boolean ret = false;
+		
+		AbstractAuthenticationSecret sec = AbstractAuthenticationSecret.fromString(secret);
+		
+		if(platformsecret!=null)
+		{
+			if(platformsecret instanceof PasswordSecret && sec instanceof PasswordSecret 
+				|| platformsecret instanceof KeySecret && sec instanceof KeySecret)
+			{
+				ret = platformsecret.equals(sec);
+			}
+			else if(platformsecret instanceof KeySecret && sec instanceof PasswordSecret)
+			{
+				PasswordSecret ps = (PasswordSecret)sec;
+				byte[] kd = SSecurity.deriveKeyFromPassword(ps.getPassword(), null);
+				ret = SUtil.arrayEquals(((KeySecret)platformsecret).getKey(), kd);
+			}
+		}
+		
+		return new Future<Boolean>(ret);
+	}
 }

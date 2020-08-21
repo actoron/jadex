@@ -15,7 +15,13 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.server.session.DefaultSessionCache;
+import org.eclipse.jetty.server.session.NullSessionDataStore;
+import org.eclipse.jetty.server.session.SessionCache;
+import org.eclipse.jetty.server.session.SessionHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
@@ -128,7 +134,8 @@ public class JettyRestPublishService extends AbstractRestPublishService
                     Server server = (Server)getHttpServer(uri, info);
                     System.out.println("Adding http handler to server (jetty): "+uri.getPath());
 
-                    ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
+                    //ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
+                    HandlerCollection collhandler = (HandlerCollection)server.getHandler();
 
                     ContextHandler ch = new ContextHandler()
                     {
@@ -138,7 +145,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
                             throws IOException, ServletException
                         {
                         	if(service==null)
-                        		service = component.getExternalAccess().searchService( new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(serviceid)).get();
+                        		service = component.getExternalAccess().searchService(new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(serviceid)).get();
                         	
                             // Hack to enable multi-part
                             // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg03294.html
@@ -189,7 +196,9 @@ public class JettyRestPublishService extends AbstractRestPublishService
                 server = new Server(uri.getPort());
                 //server.dumpStdErr();
 
-                ContextHandlerCollection collhandler = new ContextHandlerCollection();
+                // https://stackoverflow.com/questions/62199102/sessionhandler-becomes-null-in-jetty-v9-4-5
+                HandlerCollection collhandler = new HandlerCollection(new org.eclipse.jetty.server.session.SessionHandler()); 
+                //ContextHandlerCollection collhandler = new ContextHandlerCollection();
 
 /*                WebSocketHandler wsh = new WebSocketHandler()
                 {
@@ -206,8 +215,8 @@ public class JettyRestPublishService extends AbstractRestPublishService
                 //server.addHandler(context);
                 collhandler.addHandler(wsh);
 */                
-                
-                ContextHandler ch = new ContextHandler("/wswebapi");
+                ServletContextHandler ch = new ServletContextHandler(ServletContextHandler.SESSIONS);
+                ch.setContextPath("/wswebapi");
                 ch.setAllowNullPathInfo(true); // disable redirect from /ws to /ws/
                 final WebSocketCreator wsc = new WebSocketCreator() 
                 {
@@ -228,8 +237,19 @@ public class JettyRestPublishService extends AbstractRestPublishService
                 
                 collhandler.addHandler(ch);
                 
-                server.setHandler(collhandler);
+                // add session support
+                /*ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+                context.setContextPath("/");
+                context.setResourceBase(System.getProperty("java.io.tmpdir"));
+                //server.setHandler(context);
+                SessionHandler sessions = context.getSessionHandler();
+                SessionCache cache = new DefaultSessionCache(sessions);
+                cache.setSessionDataStore(new NullSessionDataStore());
+                sessions.setSessionCache(cache);
+                collhandler.addHandler(context);*/
                 
+                server.setHandler(collhandler);
+
                 server.start();
 //              server.join();
 
@@ -277,7 +297,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
             Server server = (Server)getHttpServer(uri, null);
             System.out.println("Adding http handler to server (jetty): "+uri.getPath());
 
-            ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
+            HandlerCollection collhandler = (HandlerCollection)server.getHandler();
 
             ContextHandler ch = new ContextHandler()
             {
@@ -329,7 +349,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
 			            Server server = (Server)getHttpServer(uri, null);
 			            System.out.println("Adding http handler to server (jetty): "+uri.getPath()+" rootpath: "+rootpath);
 
-			            ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
+			            HandlerCollection collhandler = (HandlerCollection)server.getHandler();
 			            
 			            ResourceHandler	rh	= new ResourceHandler();
 			            ContextHandler	ch	= new ContextHandler()
@@ -361,9 +381,8 @@ public class JettyRestPublishService extends AbstractRestPublishService
 		
 		return ret;
     }
-
 	
-	public IFuture<Void> publishRedirect(URI uri, String html)
+	/*public IFuture<Void> publishRedirect(URI uri, String html)
 	{
         throw new UnsupportedOperationException();
 	}
@@ -384,6 +403,6 @@ public class JettyRestPublishService extends AbstractRestPublishService
 	public IFuture<Void> shutdownHttpServer(URI uri)
 	{
         throw new UnsupportedOperationException();
-	}
+	}*/
 }
 

@@ -55,7 +55,10 @@ public abstract class NanoHttpServer extends NanoWSD//NanoHTTPD
 					ret[0].addHeader(hn, resp.getHeader(hn));
 				HttpSession ses = req.getSession(false);
 				if(ses!=null)
-					ret[0].addHeader(NanoHttpServletRequestWrapper.HEADER_NANO_SESSIONID, ses.getId());
+				{
+					ret[0].addHeader("Set-Cookie", NanoHttpServletRequestWrapper.HEADER_NANO_SESSIONID+"="+ses.getId());
+					//ret[0].addHeader(NanoHttpServletRequestWrapper.HEADER_NANO_SESSIONID, ses.getId());
+				}
 			}
 		};
 		

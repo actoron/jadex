@@ -163,6 +163,16 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	//-------- methods --------
 	
 	/**
+	 *  Turn on or off the login security.
+	 *  If true one has to log in with platform secret before using published services.
+	 *  @param sec On or off.
+	 */
+	public IFuture<Void> setLoginSecurity(boolean sec)
+	{
+		return IFuture.DONE;
+	}
+	
+	/**
 	 *  Test if publishing a specific type is supported (e.g. web service).
 	 *  @param publishtype The type to test.
 	 *  @return True, if can be published.

@@ -7,6 +7,7 @@ class PlatformsElement extends BaseElement
 	platforms = [];
 	connected = false;
 	termcmd = null;
+	comconn = false;
 	
 	static get properties() 
 	{
@@ -31,12 +32,16 @@ class PlatformsElement extends BaseElement
 	
 	connectedCallback() 
 	{
+		this.comconn = true;
+		console.log("connected platforms: "+this.comconn);
 		super.connectedCallback();
 		this.subscribe(5000);
 	}
 	
 	disconnectedCallback()
 	{
+		console.log("disconnected platforms: "+this.comconn);
+		this.comconn = false;
 		this.terminateSubscription();
 	}
 	
@@ -53,17 +58,25 @@ class PlatformsElement extends BaseElement
 		
 		this.terminateSubscription();
 			
-		this.termcmd = jadex.getIntermediate('webjcc/subscribeToPlatforms',
+		var tc = jadex.getIntermediate('webjcc/subscribeToPlatforms',
 			function(resp)
 			{
 				console.log("Set up subscription");
 				self.updatePlatform(resp.data.service.name, resp.data.service.type);
 				self.connected = true;
+				self.termcmd = tc;
 			},
 			function(err)
 			{
 				console.log("Could not reach Jadex webjcc.");
-				self.createErrorMessage("Could not reach Jadex WebJCC platform", err);
+				if(err.response.status==401)
+				{
+					self.createErrorMessage("Login required to WebJCC platform (use platform secret)");
+				}
+				else
+				{
+					self.createErrorMessage("Could not reach Jadex WebJCC platform", err);
+				}
 				//console.log("Err: "+JSON.stringify(err));
 				self.connected = false;
 				self.platforms = [];
@@ -71,8 +84,15 @@ class PlatformsElement extends BaseElement
 				
 				setTimeout(function()
 				{
-					console.log("Retrying Jadex webjcc connection...");
-					self.subscribe();
+					if(self.comconn)
+					{
+						console.log("Retrying Jadex webjcc connection...");
+						self.subscribe(interval);
+					}
+					else
+					{
+						console.log("Subcribe terminated due to component disconnect");
+					}
 				}, interval);
 			}
 		);
@@ -81,7 +101,6 @@ class PlatformsElement extends BaseElement
 	render() 
 	{
 		return html`
-			<link rel="stylesheet" href="css/style.css">
 			<div class="actwtable section">
 				<div>
 					<div class="head">

@@ -2,12 +2,26 @@
     height: 100vh;
 }
 
-.visible {
-	display: block;
+.w100 {
+	width: 100%;
 }
 
-.hidden {
-	display: none;
+.h100 {
+	height: 100%;
+}
+
+.flexcontainerrow {
+	display:flex;
+	flex-direction:row;
+}
+
+.flexcontainercol {
+	display:flex;
+	flex-direction:column;
+}
+
+.flexcellgrow {
+	flex:1;
 }
 
 .navbar-custom {
@@ -227,4 +241,12 @@ z-index: 1;
     0%{background-position:0% 7%}
     50%{background-position:100% 94%}
     100%{background-position:0% 7%}
+}
+
+.visible {
+	display: block;
+}
+
+.hidden {
+	display: none;
 }

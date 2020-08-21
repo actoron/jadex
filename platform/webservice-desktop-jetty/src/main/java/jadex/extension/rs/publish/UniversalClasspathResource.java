@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.eclipse.jetty.util.resource.Resource;
 
@@ -22,6 +22,12 @@ public class UniversalClasspathResource extends Resource
 	
 	/** The path of the resource (relative to classpath, e.g. package directory). */
 	protected String path;
+	
+	/** URL cached for speed. */
+	protected URL	url;
+	
+	/** File cached for speed. */
+	protected File	file;
 		
 	//-------- constructors --------
 	
@@ -45,12 +51,15 @@ public class UniversalClasspathResource extends Resource
 
 	public java.net.URL getURL()
 	{
-		URL ret = getClass().getClassLoader().getResource(path);
-		if(ret==null && path.startsWith("/"))
-			ret = getClass().getClassLoader().getResource(path.substring(1));
-		if(ret==null && "/".equals(path))
-			ret = getClass().getClassLoader().getResource("index.html");
-		return ret;
+		if(url==null)
+		{
+			url = getClass().getClassLoader().getResource(path);
+			if(url==null && path.startsWith("/"))
+				url = getClass().getClassLoader().getResource(path.substring(1));
+			if(url==null && "/".equals(path))
+				url = getClass().getClassLoader().getResource("index.html");
+		}
+		return url;
 	}
 
 	public boolean isContainedIn(Resource r) throws java.net.MalformedURLException
@@ -62,7 +71,7 @@ public class UniversalClasspathResource extends Resource
 	{
 		try
 		{
-			return getFile().isDirectory();
+			return asFile().isDirectory();
 		}
 		catch(Exception e)
 		{
@@ -74,7 +83,7 @@ public class UniversalClasspathResource extends Resource
 	{
 		try
 		{
-			return getFile().lastModified();
+			return asFile().lastModified();
 		}
 		catch(Exception e)
 		{
@@ -86,7 +95,7 @@ public class UniversalClasspathResource extends Resource
 	{
 		try
 		{
-			return getFile().length();
+			return asFile().length();
 		}
 		catch(Exception e)
 		{
@@ -98,7 +107,7 @@ public class UniversalClasspathResource extends Resource
 	{
 		try
 		{
-			return getFile().list();
+			return asFile().list();
 		}
 		catch(Exception e)
 		{
@@ -115,20 +124,22 @@ public class UniversalClasspathResource extends Resource
 	{
 		// this is called! nop?
 		//throw new UnsupportedOperationException();
+		url	= null;
+		file	= null;
 	}
 
 	public boolean delete() throws SecurityException
 	{
 		// nop?
 //		throw new UnsupportedOperationException();
-		return true;
+		return false;
 	}
 
 	public boolean exists()
 	{
 		try
 		{
-			return getFile().exists();
+			return asFile().exists();
 		}
 		catch(Exception e)
 		{
@@ -136,33 +147,51 @@ public class UniversalClasspathResource extends Resource
 		}
 	}
 
-	public java.io.File getFile() throws IOException
+	/**
+	 *  File representation of resource, including entries inside jar files.
+	 */
+	protected java.io.File asFile() throws IOException
 	{
-		if(getURL()!=null)
+		if(file==null)
 		{
-			if("file".equals(getURL().getProtocol()))
+			if(getURL()!=null)
 			{
-				return SUtil.getFile(getURL());
-			}
-			else if("jar".equals(getURL().getProtocol()))
-			{
-				String	jar	= getURL().getPath();
-				String	entry	= null;
-				if(jar.contains("!/"))
+				if("file".equals(getURL().getProtocol()))
 				{
-					entry	= jar.substring(jar.indexOf("!/")+2);
-					jar	= jar.substring(0, jar.indexOf("!/"));
+					file	= SUtil.getFile(getURL());
 				}
-				return new JarAsDirectory(new URL(jar).getPath(), new ZipEntry(entry));
+				else if("jar".equals(getURL().getProtocol()))
+				{
+					String	jar	= getURL().getPath();
+					String	entry	= null;
+					if(jar.contains("!/"))
+					{
+						entry	= jar.substring(jar.indexOf("!/")+2);
+						jar	= jar.substring(0, jar.indexOf("!/"));
+					}
+					String path	= new URL(jar).getPath();
+					try(ZipFile zip	= new ZipFile(path))
+					{
+						file	= new JarAsDirectory(path, zip.getEntry(entry));
+					}
+				}
 			}
 		}
 		
-		throw new UnsupportedOperationException();
+		return file;
+	}
+	
+	@Override
+	public File getFile() throws IOException
+	{
+		// Do not expose entries in jar file as normal files, as jetty tries to access it using NIO File API and fails.
+		return asFile() instanceof JarAsDirectory ? null : asFile();
 	}
 
+	@SuppressWarnings("resource")	// Inputstream gets closed by Jetty, no other resources held by JarFile
 	public java.io.InputStream getInputStream() throws IOException
 	{
-		File	f	= getFile();
+		File	f	= asFile();
 		if(f instanceof JarAsDirectory)
 		{
 			return new JarFile(((JarAsDirectory)f).getJarPath()).getInputStream(((JarAsDirectory)f).getZipEntry());
