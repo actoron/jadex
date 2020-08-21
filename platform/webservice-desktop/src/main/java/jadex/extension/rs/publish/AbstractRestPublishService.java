@@ -533,7 +533,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					component.getExternalAccess(cid).scheduleStep((IInternalAccess access) -> 
 					{
 						Security sec = RemoteMethodInvocationCommand.getSecurityLevel(access, new MethodInfo(mi.getMethod()), service.getServiceId());
-						boolean unres = SUtil.arrayToSet(sec.roles()).contains(Security.UNRESTRICTED);
+						String[] rs = sec.roles()==null? SUtil.EMPTY_STRING_ARRAY: sec.roles();
+						boolean unres = SUtil.arrayToSet(rs).contains(Security.UNRESTRICTED);
 						return new Future<Boolean>(unres? Boolean.TRUE: Boolean.FALSE);
 					}).addResultListener((Boolean unres) ->
 					{

@@ -356,7 +356,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 			{
 				// Todo: cache for speed?
 				Method declmeth = SReflect.getDeclaredMethod0(implclass, m0.getName(), m0.getParameterTypes());
-				if (declmeth != null)
+				if(declmeth != null)
 				{
 					level = declmeth.getAnnotation(Security.class);
 				}
@@ -380,7 +380,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 				{
 					type = SReflect.getDeclaringInterface(type, m0.getName(), m0.getParameterTypes());
 					
-					if (type != null)
+					if(type != null)
 					{
 						Method declmeth = null;
 						try

@@ -50,8 +50,7 @@ import jadex.transformation.jsonserializer.JsonTraverser;
 	publishid="[http://localhost:7000/]myservice"
 )))
 @Results(@Result(name="testresults", clazz=Testcase.class))
-public class PathVarAgent extends JunitAgentTest 
-	implements IMyService
+public class PathVarAgent extends JunitAgentTest implements IMyService
 {
 	@Agent
 	protected IInternalAccess agent;
