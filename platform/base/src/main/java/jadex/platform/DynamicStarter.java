@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,23 +15,45 @@ import java.util.List;
  */
 public class DynamicStarter
 {
-	public static void main(String[] args)
+	public static void main(String[] args) throws Exception
 	{
+		String jarpath = null;
+		File jardir = null;
+		
+		for(int i=0; i<args.length; i++)
+		{
+			if(args[i].toLowerCase().equals("-jarpath") && i<args.length)
+			{
+				jarpath = args[i+1];
+				if(jarpath.startsWith("file:///"))
+					jarpath = jarpath.substring(8);
+				jardir = new File(jarpath);
+				break;
+			}
+		}
+		
 		// Dynamic reload of lib/ folder if possible.
 		Class<?> starter = null;
 		Class<?> platformconf = null;
 		Object cfg = null;
-		URL url = DynamicStarter.class.getProtectionDomain().getCodeSource().getLocation();
+		
 		try
 		{
-			String jarpath = URLDecoder.decode(url.getFile(), "UTF-8");
-			if (jarpath != null && jarpath.toLowerCase().endsWith(".jar"))
+			//String jarpath = URLDecoder.decode(url.getFile(), "UTF-8");
+			if(jarpath==null)
 			{
-				File jardir = (new File(jarpath)).getParentFile();
-				System.out.println(jardir);
+				URL url = DynamicStarter.class.getProtectionDomain().getCodeSource().getLocation();
+				jarpath = url.getFile(); // URLDecode is not ok because it remove special chars like +
+				if(jarpath != null && jarpath.toLowerCase().endsWith(".jar"))
+					jardir = (new File(jarpath)).getParentFile();
+			}
+			
+			if(jardir!=null)
+			{
+				//System.out.println(jardir);
 				
 				List<URL> clurls = new ArrayList<URL>();
-				for (File jarfile : jardir.listFiles())
+				for(File jarfile : jardir.listFiles())
 				{
 					try
 					{
