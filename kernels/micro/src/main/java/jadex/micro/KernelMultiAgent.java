@@ -421,10 +421,35 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 			Tuple2<String, Set<String>> f = it.next();
 			
 			Object k = kernels.get(f.getFirstEntity());
+			//System.out.println("check: "+model+" "+k+" "+kernels);
 			
 			if(kernels.containsKey(f.getFirstEntity()) && k==null)
 			{				
 				check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+			}
+			else if(k instanceof IComponentIdentifier)
+			{
+				IExternalAccess exta = agent.getExternalAccess((IComponentIdentifier)k);
+				ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
+				q.setProvider(exta.getId());
+				final IComponentFactory fac = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(q);
+				
+				fac.isLoadable(model, imports, rid).addResultListener(new IResultListener<Boolean>()
+				{
+					public void resultAvailable(Boolean loadable) 
+					{
+						if(loadable.booleanValue())
+							ret.setResult(fac);
+						else 
+							check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+					}
+
+					public void exceptionOccurred(Exception exception)
+					{
+//						System.out.println("Kernel cannot load: "+exta.getId()+" "+model);
+						check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+					}
+				});
 			}
 			else if(k instanceof IFuture)
 			{
@@ -458,13 +483,14 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 			}
 			else
 			{	
-				final Future<IComponentFactory> fut = new Future<>();
-				kernels.put(f.getFirstEntity(), fut);
-				
 				CreationInfo ci = new CreationInfo();
 				ci.setFilename(f.getFirstEntity()+".class");
 				
-//				System.out.println("create compo start: "+f.getFirstEntity());
+				//System.out.println("create factory: "+f.getFirstEntity()+" "+kernels);
+
+				final Future<IComponentFactory> fut = new Future<>();
+				kernels.put(f.getFirstEntity(), fut);
+				
 				agent.createComponent(ci).addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess exta)
