@@ -944,7 +944,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 							if(rescoms!=null)
 							{
 								ICommand<ResumeCommandArgs>[] tmp = (ICommand<ResumeCommandArgs>[])rescoms.toArray(new ICommand[rescoms.size()]);
-								System.out.println("aborting6: "+this+", "+SUtil.arrayToString(tmp));
+								//System.out.println("aborting6: "+this+", "+SUtil.arrayToString(tmp));
 								for(ICommand<ResumeCommandArgs> rescom: tmp)
 								{
 									rescom.execute(new ResumeCommandArgs(null, null, ex));
