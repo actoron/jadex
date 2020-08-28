@@ -703,20 +703,18 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	    	{
 	    		if(this.listener==null)
 	    		{
-	    			this.listener	= listener;
+	    			this.listener = listener;
 	    		}
 	    		else
 	    		{
 	    			if(listeners==null)
-	    				listeners	= new ArrayList<IResultListener<E>>();
+	    				listeners = new ArrayList<IResultListener<E>>();
 	    			listeners.add(listener);
 	    		}
 	    	}
     	}
     	if(notify)
-    	{
     		notifyListener(listener);
-    	}
     }
     
     /**

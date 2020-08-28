@@ -181,7 +181,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		if(inited)
 			return IFuture.DONE;
 		inited = true;
-		
+			
 		// add data for implicitly started micro factory
 		componenttypes.add(".class");
 		kernels.put("jadex.micro.KernelMicroAgent", null);

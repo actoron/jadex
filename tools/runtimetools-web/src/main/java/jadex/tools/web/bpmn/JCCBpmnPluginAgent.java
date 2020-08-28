@@ -33,9 +33,6 @@ public class JCCBpmnPluginAgent extends JCCPluginAgent implements IJCCBpmnServic
 	@Agent
 	protected IInternalAccess agent;
 	
-	/** The plugin component string. */
-	protected String component;
-	
 	/**
 	 *  Get the plugin name.
 	 *  @return The plugin name.
@@ -62,6 +59,4 @@ public class JCCBpmnPluginAgent extends JCCPluginAgent implements IJCCBpmnServic
 	{
 		return "jadex/tools/web/bpmn/bpmn.js";
 	}
-	
-	
 }

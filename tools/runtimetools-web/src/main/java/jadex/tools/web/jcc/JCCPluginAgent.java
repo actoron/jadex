@@ -40,7 +40,16 @@ public abstract class JCCPluginAgent
 	public IFuture<String> getPluginComponent()
 	{
 		if(component==null)
-			component = internalLoadResource(getPluginUIPath());
+		{
+			try
+			{
+				component = internalLoadResource(getPluginUIPath());
+			}
+			catch(Exception e)
+			{
+				System.out.println("Cannot load plugin component string: "+e);
+			}
+		} 
 		
 		return new Future<String>(component);
 	}
@@ -64,7 +73,7 @@ public abstract class JCCPluginAgent
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 		finally

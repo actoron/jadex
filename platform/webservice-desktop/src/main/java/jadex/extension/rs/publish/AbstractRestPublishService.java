@@ -358,7 +358,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			return;
 		}
 
-		System.out.println("handleRequest: "+request.getRequestURI());
+		//System.out.println("handleRequest: "+request.getRequestURI());
 
 		// In case the call comes from an internally started server async is not already set
 		// In case the call comes from an external web server it has to set the async in oder
@@ -559,8 +559,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 									saveRequestContext(fcallid, ctx);
 									final RequestInfo rinfo = new RequestInfo(mi, (IFuture)ret);
 									requestinfos.put(fcallid, rinfo);
-									// System.out.println("added context: "+fcallid+"
-									// "+ctx);
+									// System.out.println("added context: "+fcallid+""+ctx);
 			
 									((IIntermediateFuture<Object>)ret)
 										.addIntermediateResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateFutureCommandResultListener<Object>()
@@ -582,6 +581,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		
 										public void intermediateResultAvailable(Object result)
 										{
+											//System.out.println("intermediate: "+result);
+											
 											handleResult(result, null, null);
 										}
 		
@@ -1502,8 +1503,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		//if(result!=null && result.getClass().isArray())
 		//	System.out.println("jju");
 		
-		if(result instanceof Exception)
-			System.out.println("result is exception: "+result);
+		//if(result instanceof Exception)
+		//	System.out.println("result is exception: "+result);
 		
 		try
 		{

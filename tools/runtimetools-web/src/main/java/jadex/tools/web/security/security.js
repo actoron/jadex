@@ -190,7 +190,7 @@ class SecurityElement extends BaseElement
 									<div class="col-9">
 									</div>
 									<div class="col-3">
-										<button type="button" class="btn btn-info w100" @click="${e => {this.removeNetwork()}}" ?disabled="${this.selnet == null}">Remove Network</button>
+										<button type="button" class="btn btn-primary w100" @click="${e => {this.removeNetwork()}}" ?disabled="${this.selnet == null}">Remove Network</button>
 									</div>
 								</div>
 								<div class="row m-1">
@@ -223,7 +223,7 @@ class SecurityElement extends BaseElement
 												<input class="w100 h100" type="text" placeholder="Key" id="key" disabled="true">
 											</div>
 											<div class="col-3">
-												<button type="button" class="btn btn-info w100 h100" @click="${e => this.generateRandom()}">Generate Key</button>
+												<button type="button" class="btn btn-primary w100 h100" @click="${e => this.generateRandom()}">Generate Key</button>
 											</div>
 										</div>
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
@@ -236,7 +236,7 @@ class SecurityElement extends BaseElement
 												</div> 
 											</div>
 											<div class="col-3">
-												<button type="button" class="btn btn-info w100 h100" @click="${e => this.generateFromPassword()}">Derive Key</button>
+												<button type="button" class="btn btn-primary w100 h100" @click="${e => this.generateFromPassword()}">Derive Key</button>
 											</div>
 										</div>
 									</div>
@@ -269,7 +269,7 @@ class SecurityElement extends BaseElement
 									<div class="col-9">
 									</div>
 									<div class="col-3">
-										<button type="button" class="btn btn-info w100" @click="${e => this.addNetwork()}" ?disabled="${this.netname==null || this.secret==null}">Add Network</button>
+										<button type="button" class="btn btn-primary w100" @click="${e => this.addNetwork()}" ?disabled="${this.netname==null || this.secret==null}">Add Network</button>
 									</div>
 								</div>
 							</div>
@@ -310,8 +310,8 @@ class SecurityElement extends BaseElement
 										<input type="text" placeholder="Role" id="role" @change="${this.requestUpdate()}" required>
 									</div>
 									<div class="col-4">
-										<button type="button" class="btn btn-info" @click="${e => this.addRole(e)}" disabled="${this.isRoleDisabled()}">Add</button>
-										<button type="button" class="btn btn-info" @click="${e => this.removeRole(e)}" disabled="${this.isRoleDisabled()}">Remove</button>
+										<button type="button" class="btn btn-primary" @click="${e => this.addRole(e)}" disabled="${this.isRoleDisabled()}">Add</button>
+										<button type="button" class="btn btn-primary" @click="${e => this.removeRole(e)}" disabled="${this.isRoleDisabled()}">Remove</button>
 									</div>
 								</div>
 							</div>
@@ -379,8 +379,8 @@ class SecurityElement extends BaseElement
 										<input class="w100 h100" type="text" placeholder="Trusted Platform Name" id="tpn" @change="${this.requestUpdate()}" required>
 									</div>
 									<div class="col-4">
-										<button type="button" class="btn btn-info" @click="${e => this.addTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">Add</button>
-										<button type="button" class="btn btn-info" @click="${e => this.removeTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">Remove</button>
+										<button type="button" class="btn btn-primary" @click="${e => this.addTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">Add</button>
+										<button type="button" class="btn btn-primary" @click="${e => this.removeTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">Remove</button>
 									</div>
 								</div>
 							</div>

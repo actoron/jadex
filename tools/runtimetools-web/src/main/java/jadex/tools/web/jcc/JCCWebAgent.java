@@ -164,10 +164,16 @@ public class JCCWebAgent implements IJCCWebService
 		{
 			String name = ser.getPluginName().get();
 			String tag = ser.getPluginComponent().get();
-			res.put(name, tag);
-			
-			Integer prio = ser.getPriority().get();
-			es.put(name, prio);
+			if(name!=null && tag!=null)
+			{
+				res.put(name, tag);
+				Integer prio = ser.getPriority().get();
+				es.put(name, prio);
+			}
+			else
+			{
+				System.out.println("Plugin problem: "+name);
+			}
 		}
 		
 		List<String> names = es.entrySet().stream().sorted((a, b) -> b.getValue()-a.getValue()).map(e->e.getKey()).collect(Collectors.toList());

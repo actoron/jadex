@@ -730,7 +730,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		rwlock.readLock().lock();
 		try
 		{
-			spec = ((QueryInfoExtractor) queries.getKeyExtractor()).getIndexerSpec(ser);
+			spec = ((QueryInfoExtractor)queries.getKeyExtractor()).getIndexerSpec(ser);
 			
 			sqis = queries.getValuesInverted(spec);
 		}
@@ -749,12 +749,12 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //		
 		if(sqis!=null)
 		{
-			for (ServiceQueryInfo<?> sqi : sqis)
+			for(ServiceQueryInfo<?> sqi : sqis)
 			{
 				ServiceQuery<?> query = sqi.getQuery();
 				
 				//ServiceEvent.CLASSINFO.getTypeName().equals(query.getReturnType().getTypeName()));
-				if (checkRestrictions(query, ser))
+				if(checkRestrictions(query, ser))
 				{
 					dispatchQueryEvent(sqi, ser, eventtype);
 				}
@@ -772,14 +772,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected void dispatchQueryEvent(ServiceQueryInfo<?> queryinfo, IServiceIdentifier ser, int eventtype)
 	{
 		ServiceQuery<?> query = queryinfo.getQuery();
-		if (query.isEventMode())
+		if(query.isEventMode())
 		{
 			ServiceEvent<IServiceIdentifier> event = new ServiceEvent<>(ser, eventtype);
 			((TerminableIntermediateFuture<ServiceEvent<IServiceIdentifier>>) queryinfo.getFuture()).addIntermediateResultIfUndone(event);
 		}
-		else if (ServiceEvent.SERVICE_ADDED==eventtype)
+		else if(ServiceEvent.SERVICE_ADDED==eventtype)
 		{
-			((TerminableIntermediateFuture<IServiceIdentifier>) queryinfo.getFuture()).addIntermediateResultIfUndone(ser);
+			((TerminableIntermediateFuture<IServiceIdentifier>)queryinfo.getFuture()).addIntermediateResultIfUndone(ser);
 		}
 	}
 	

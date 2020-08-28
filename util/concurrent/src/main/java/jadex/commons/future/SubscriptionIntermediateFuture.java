@@ -71,11 +71,15 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	 *  @param result The result.
 	 */
 	@Override
-	protected void storeResult(E result)
+	protected boolean storeResult(E result)
 	{
+		boolean ret = false;
 		// Store results only if necessary for first listener.
 		if(storeforfirst)
+		{
 			super.storeResult(result);
+			ret = true;
+		}
 		
 		if(ownresults!=null)
 		{
@@ -83,9 +87,11 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 			{
 				res.add(result);
 			}
+			ret = true;
 		}
 		
 		resumeIntermediate();
+		return ret;
 	}
 	
 	/**
@@ -125,9 +131,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     	super.addResultListener(listener);
     	
 		if(first)
-		{
 			results = null;
-		}
     }
 	
     /**

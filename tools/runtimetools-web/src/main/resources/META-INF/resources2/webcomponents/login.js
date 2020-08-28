@@ -35,9 +35,9 @@ class LoginElement extends BaseElement
     	return html`
 			<div class="flexcontainerrow ${this.loggedin? 'hidden': ''}">
 				<input class="flexcellgrow mt-1 mb-1" id="pass" name="platformpass" type="text" placeholder="Platform password"></input>
-				<button class="btn btn-info mt-1 mb-1 ml-1" @click="${e => {this.login(this.shadowRoot.getElementById('pass').value)}}">Login</button>
+				<button class="btn btn-primary mt-1 mb-1 ml-1" @click="${e => {this.login(this.shadowRoot.getElementById('pass').value)}}">Login</button>
 			</div>
-			<button class="btn btn-info mt-1 mb-1 ml-1 flow-right ${this.loggedin? '': 'hidden'}" @click="${e => {this.logout()}}">Logout</button>
+			<button class="btn btn-primary mt-1 mb-1 ml-1 flow-right ${this.loggedin? '': 'hidden'}" @click="${e => {this.logout()}}">Logout</button>
     	`;
  	}
 
