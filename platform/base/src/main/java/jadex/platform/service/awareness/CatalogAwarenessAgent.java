@@ -34,7 +34,7 @@ import jadex.micro.annotation.AgentCreated;
 @Agent(autoprovide = Boolean3.TRUE,	autostart=Boolean3.TRUE)
 public class CatalogAwarenessAgent implements IAwarenessService
 {
-	protected static final String DEFAULT_URLS = "ws://ssp1@ngrelay1.actoron.com:80";
+	protected static final String DEFAULT_URLS = "wss://ssp1@relay.activecomponents.org:443";
 	
 	/** Platform URL pattern. */
 	protected static final Pattern URL_PATTERN = Pattern.compile("[a-zA-Z]+://[a-zA-Z0-9]+@.+:[0-9]+");
