@@ -50,7 +50,7 @@ class LoginElement extends BaseElement
 			console.log("logged in: "+resp);
 			self.loggedin = true;
 			//window.location.href = "/#/platforms";
-			self.createInfoMessage("loggged in");
+			self.createInfoMessage("logged in");
 		})
 		.catch(function(err) 
 		{
@@ -68,7 +68,7 @@ class LoginElement extends BaseElement
 		{
 			console.log("logged out: "+resp);
 			self.loggedin = false;
-			self.createInfoMessage("loggged out");
+			self.createInfoMessage("logged out");
 		})
 		.catch(function(err) 
 		{
