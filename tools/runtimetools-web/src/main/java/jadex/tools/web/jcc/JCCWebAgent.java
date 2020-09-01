@@ -34,6 +34,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
@@ -68,6 +69,12 @@ public class JCCWebAgent implements IJCCWebService
 		//return wps.publishResources("[http://localhost:8080/]", "META-INF/resources2");
 	}*/
 	
+	@AgentArgument
+	protected int port;
+	
+	@AgentArgument
+	protected boolean loginsecurity;
+	
 	/**
 	 *  Wait for the IWebPublishService and then publish the resources.
 	 *  @param pubser The publish service.
@@ -76,14 +83,19 @@ public class JCCWebAgent implements IJCCWebService
 	@OnService(requiredservice = @RequiredService(min = 1, max = 1))
 	protected void publish(IWebPublishService wps)
 	{
+		if(port==0)
+			port = 8080;
+		
 		//getPlatforms().get();
 		
 		//System.out.println("publish started: "+pubser);
 		IServiceIdentifier sid = ((IService)agent.getProvidedService(IJCCWebService.class)).getServiceId();
-		wps.setLoginSecurity(true);
-		wps.publishService(sid, new PublishInfo("[http://localhost:8080/]webjcc", IPublishService.PUBLISH_RS, null)).get();
 		
-		wps.publishResources("[http://localhost:8080/]", "META-INF/resources2").get();
+		wps.setLoginSecurity(loginsecurity);
+		
+		wps.publishService(sid, new PublishInfo("[http://localhost:"+port+"/]webjcc", IPublishService.PUBLISH_RS, null)).get();
+		
+		wps.publishResources("[http://localhost:"+port+"/]", "META-INF/resources2").get();
 	}
 	
 	/**
