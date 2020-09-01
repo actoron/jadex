@@ -264,9 +264,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     {
     	if(listener==null)
     		throw new RuntimeException();
-    
-    	super.addResultListener(listener);
-    	
+       	
     	boolean	scheduled = false;
     	
     	synchronized(this)
@@ -296,6 +294,9 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 
     	if(scheduled)
     		startScheduledNotifications();
+    	
+       	super.addResultListener(listener);
+        
     }
     
     protected ICommand<IResultListener<Collection<E>>>	notcommand	= new ICommand<IResultListener<Collection<E>>>()
