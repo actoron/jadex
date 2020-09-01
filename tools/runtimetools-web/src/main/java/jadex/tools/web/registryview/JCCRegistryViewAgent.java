@@ -8,33 +8,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.base.IPlatformConfiguration;
-import jadex.base.PlatformConfigurationHandler;
-import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
-import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
+import jadex.bridge.service.search.QueryEvent;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQueryInfo;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.memstat.IMemstatService;
-import jadex.bridge.service.types.publish.IPublishService;
-import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.bridge.service.types.registry.ISuperpeerService;
 import jadex.bridge.service.types.transport.ITransportInfoService;
 import jadex.bridge.service.types.transport.PlatformData;
 import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
-import jadex.commons.future.IFunctionalExceptionListener;
-import jadex.commons.future.IFunctionalIntermediateFinishedListener;
-import jadex.commons.future.IFunctionalIntermediateResultListener;
-import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -46,12 +37,9 @@ import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.Publish;
 import jadex.tools.web.jcc.JCCPluginAgent;
-import jadex.tools.web.starter.IJCCStarterService;
 
 /**
  *  An agent to provide a platform status view in the web.
@@ -200,7 +188,7 @@ public class JCCRegistryViewAgent extends JCCPluginAgent implements IJCCRegistry
 	{
 		Set<String>	scopes	= scope==null ? null: new HashSet<String>(Arrays.asList(scope));
 		IntermediateFuture<ServiceQuery<?>>	ret	= new IntermediateFuture<ServiceQuery<?>>();
-		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getId());
+		IServiceRegistry reg = ServiceRegistry.getRegistry(agent.getId());
 		for(ServiceQueryInfo<?> sqi: reg.getAllQueries())
 		{
 			if(scopes==null || scopes.contains(sqi.getQuery().getScope().name()))
@@ -211,6 +199,18 @@ public class JCCRegistryViewAgent extends JCCPluginAgent implements IJCCRegistry
 		ret.setFinished();
 
 		return ret;
+	}
+	
+	/**
+	 *  Subscribe to query changes (query added / removed).
+	 *  @return The subscription future.
+	 */
+	public ISubscriptionIntermediateFuture<QueryEvent> subscribeToQueries()
+	{
+		ISubscriptionIntermediateFuture<QueryEvent> ret = ServiceRegistry.getRegistry(agent.getId()).subscribeToQueries();
+		SubscriptionIntermediateDelegationFuture<QueryEvent> fut = new SubscriptionIntermediateDelegationFuture<QueryEvent>(ret);
+		SFuture.avoidCallTimeouts(fut, agent);
+		return fut;
 	}
 	
 //	/**

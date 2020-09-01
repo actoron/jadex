@@ -139,6 +139,11 @@ public interface IServiceRegistry
 	public Set<ServiceQueryInfo<?>> getAllQueries();
 	
 	/**
+	 *  Subscribe for query events.
+	 */
+	public ISubscriptionIntermediateFuture<QueryEvent> subscribeToQueries();
+	
+	/**
 	 *  Returns the lock on the registry.
 	 *  Care must be taken to perform proper unlocking
 	 *  to avoid permanently blocking the registry.

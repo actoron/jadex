@@ -5,6 +5,7 @@ import java.util.Map;
 
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.QueryEvent;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.transport.PlatformData;
@@ -55,4 +56,10 @@ public interface IJCCRegistryViewService extends IJCCPluginService
 	 */
 	// No intermediate for easier REST?
 	public IFuture<Collection<Map<String, Object>>>	getMemInfo();
+	
+	/**
+	 *  Subscribe to query changes (query added / removed).
+	 *  @return The subscription future.
+	 */
+	public ISubscriptionIntermediateFuture<QueryEvent> subscribeToQueries();
 }
