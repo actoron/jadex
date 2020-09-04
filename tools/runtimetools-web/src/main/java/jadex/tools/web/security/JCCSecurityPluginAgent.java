@@ -33,8 +33,8 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	@Agent
 	protected IInternalAccess agent;
 	
-	/** The plugin component string. */
-	protected String component;
+	///** The plugin component string. */
+	//protected String component;
 	
 	
 	/**

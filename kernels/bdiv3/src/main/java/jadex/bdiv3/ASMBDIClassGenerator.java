@@ -227,8 +227,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 
 			    public MethodVisitor visitMethod(int access, final String methodname, String desc, String signature, String[] exceptions)
 				{
-					if(clname.indexOf("ComponentPlanBDI")!=-1)
-						System.out.println(desc+" "+methodname);
+					//if(clname.indexOf("ComponentPlanBDI")!=-1)
+					//	System.out.println(desc+" "+methodname);
 					
 					return new MethodVisitor(api, super.visitMethod(access, methodname, desc, signature, exceptions))
 					{
@@ -395,9 +395,9 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				}
 				
 				ClassLoader found = null;
-				if (ClassLoader.getSystemClassLoader().getResource(fname)!=null)
+				if(ClassLoader.getSystemClassLoader().getResource(fname)!=null)
 				{
-					// If the system classloader has the class, it MUST be enahnced there
+					// If the system classloader has the class, it MUST be enhanced there
 					// because all classloaders use it as parent even if setParent(null) was
 					// called on them.
 					found = ClassLoader.getSystemClassLoader();
@@ -944,7 +944,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //			method.setAccessible(true);
 			try
 			{
-				if (redefine && VmHacks.get().hasIndirectRedefinition())
+				if(redefine && VmHacks.get().hasIndirectRedefinition())
 				{
 					ret = Class.forName(name, true, loader);
 					ret = VmHacks.get().redefineClassIndirect(ret, data);

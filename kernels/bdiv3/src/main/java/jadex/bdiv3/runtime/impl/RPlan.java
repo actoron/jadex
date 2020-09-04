@@ -944,7 +944,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 							if(rescoms!=null)
 							{
 								ICommand<ResumeCommandArgs>[] tmp = (ICommand<ResumeCommandArgs>[])rescoms.toArray(new ICommand[rescoms.size()]);
-								System.out.println("aborting6: "+this+", "+SUtil.arrayToString(tmp));
+								//System.out.println("aborting6: "+this+", "+SUtil.arrayToString(tmp));
 								for(ICommand<ResumeCommandArgs> rescom: tmp)
 								{
 									rescom.execute(new ResumeCommandArgs(null, null, ex));
@@ -1097,7 +1097,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public IFuture<Void> waitFor(long delay)
 	{
-		System.out.println("before wait: "+delay+" "+agent.getId());
+		//System.out.println("before wait: "+delay+" "+agent.getId());
 		
 		final Future<Void> ret = new BDIFuture<Void>();
 		
@@ -1109,7 +1109,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				System.out.println("after wait: "+delay+" "+agent.getId());
+				//System.out.println("after wait: "+delay+" "+agent.getId());
 //				if(rescom.equals(getResumeCommand()))
 				{
 					rescom.execute(null);

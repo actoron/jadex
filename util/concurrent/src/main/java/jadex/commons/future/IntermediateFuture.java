@@ -117,9 +117,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	synchronized(this)
     	{
 	    	if(undone)
-	    	{
 	    		this.undone = true;
-	    	}
 	
 	    	// There is an exception when this is ok.
 	    	// In BDI when belief value is a future.
@@ -146,7 +144,13 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    	}
 	    	else
 	    	{
-	    		storeResult(result);
+	    		//if(this instanceof SubscriptionIntermediateDelegationFuture && result!=null && result.toString().indexOf("ServiceEvent")!=-1)
+	    		//	System.out.println("store event: "+result+" "+listener);
+	    		boolean stored = storeResult(result);
+	    		
+	    		if(!stored && listener==null && listeners==null)
+	    			throw new RuntimeException("lost value");
+	    		
 	    		notify	= true;
 	    		scheduleNotification(new ICommand<IResultListener<Collection<E>>>()
 				{
@@ -163,9 +167,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	}
     	
     	if(notify)
-    	{
     		startScheduledNotifications();
-    	}
     	
     	return ret;
     }
@@ -175,7 +177,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 *  Add a result.
 	 *  @param result The result.
 	 */
-	protected void storeResult(E result)
+	protected boolean storeResult(E result)
 	{
 //		if(result!=null && result.getClass().getName().indexOf("ChangeEvent")!=-1)
 //			System.out.println("ires: "+this+" "+result);
@@ -183,6 +185,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 		if(results==null)
 			results	= new ArrayList<E>();
 		results.add(result);
+		return true;
 	}
 	
 	/**
@@ -261,20 +264,21 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     {
     	if(listener==null)
     		throw new RuntimeException();
-    	
-    	boolean	scheduled	= false;
+       	
+    	boolean	scheduled = false;
     	
     	synchronized(this)
     	{
     		// If results==null its a subscription future and first results are already collected.
     		if(results!=null && !results.isEmpty() && intermediate && listener instanceof IIntermediateResultListener)
     		{
+    			//System.out.println("notify scheduled: "+results);
     			scheduled	= true;
 	    		IIntermediateResultListener<E>	lis	= (IIntermediateResultListener<E>)listener;
 	    		for(final E result: results)
 	    		{
 	    			@SuppressWarnings("unchecked")
-					ICommand<IResultListener<Collection<E>>>	c	= (ICommand<IResultListener<Collection<E>>>) ((Object) new ICommand<IIntermediateResultListener<E>>()
+					ICommand<IResultListener<Collection<E>>> c = (ICommand<IResultListener<Collection<E>>>) ((Object) new ICommand<IIntermediateResultListener<E>>()
 					{
 	    				@Override
 	    				public void execute(IIntermediateResultListener<E> listener)
@@ -289,11 +293,10 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	}
 
     	if(scheduled)
-    	{
     		startScheduledNotifications();
-    	}
     	
-    	super.addResultListener(listener);
+       	super.addResultListener(listener);
+        
     }
     
     protected ICommand<IResultListener<Collection<E>>>	notcommand	= new ICommand<IResultListener<Collection<E>>>()

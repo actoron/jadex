@@ -1,5 +1,6 @@
 package jadex.bridge.service.search;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,6 +55,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	/** Map for looking up local services using the service identifier. */
 	protected Map<IServiceIdentifier, IService> localserviceproxies;
 	
+	/** The query change subscribers. */
+	protected List<ISubscriptionIntermediateFuture<QueryEvent>> querysubs;
+	
 	//-------- methods --------
 	
 	/**
@@ -66,6 +70,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		this.indexer = new Indexer<>(new ServiceKeyExtractor(), false, ServiceKeyExtractor.SERVICE_KEY_TYPES);
 		this.queries = new Indexer<ServiceQueryInfo<?>>(new QueryInfoExtractor(), true, QueryInfoExtractor.QUERY_KEY_TYPES_INDEXABLE);
 		this.localserviceproxies = new HashMap<>();
+		this.querysubs = new ArrayList<>();
 	}
 	
 	/**
@@ -553,6 +558,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			}
 		}
 		
+		notifyQueryListeners(new QueryEvent(query, QueryEvent.QUERY_ADDED));
+		
 		return fut;
 	}
 	
@@ -581,6 +588,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			rwlock.writeLock().unlock();
 		}
+		
+		notifyQueryListeners(new QueryEvent(query, QueryEvent.QUERY_REMOVED));
 	}
 	
 	/**
@@ -730,7 +739,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		rwlock.readLock().lock();
 		try
 		{
-			spec = ((QueryInfoExtractor) queries.getKeyExtractor()).getIndexerSpec(ser);
+			spec = ((QueryInfoExtractor)queries.getKeyExtractor()).getIndexerSpec(ser);
 			
 			sqis = queries.getValuesInverted(spec);
 		}
@@ -749,12 +758,12 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //		
 		if(sqis!=null)
 		{
-			for (ServiceQueryInfo<?> sqi : sqis)
+			for(ServiceQueryInfo<?> sqi : sqis)
 			{
 				ServiceQuery<?> query = sqi.getQuery();
 				
 				//ServiceEvent.CLASSINFO.getTypeName().equals(query.getReturnType().getTypeName()));
-				if (checkRestrictions(query, ser))
+				if(checkRestrictions(query, ser))
 				{
 					dispatchQueryEvent(sqi, ser, eventtype);
 				}
@@ -772,14 +781,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected void dispatchQueryEvent(ServiceQueryInfo<?> queryinfo, IServiceIdentifier ser, int eventtype)
 	{
 		ServiceQuery<?> query = queryinfo.getQuery();
-		if (query.isEventMode())
+		if(query.isEventMode())
 		{
 			ServiceEvent<IServiceIdentifier> event = new ServiceEvent<>(ser, eventtype);
 			((TerminableIntermediateFuture<ServiceEvent<IServiceIdentifier>>) queryinfo.getFuture()).addIntermediateResultIfUndone(event);
 		}
-		else if (ServiceEvent.SERVICE_ADDED==eventtype)
+		else if(ServiceEvent.SERVICE_ADDED==eventtype)
 		{
-			((TerminableIntermediateFuture<IServiceIdentifier>) queryinfo.getFuture()).addIntermediateResultIfUndone(ser);
+			((TerminableIntermediateFuture<IServiceIdentifier>)queryinfo.getFuture()).addIntermediateResultIfUndone(ser);
 		}
 	}
 	
@@ -1015,6 +1024,67 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		if((idx = ret.indexOf('@'))!=-1)
 			ret = ret.substring(idx + 1);
 		return ret;
+	}
+	
+	/**
+	 *  Subscribe for query events.
+	 */
+	public ISubscriptionIntermediateFuture<QueryEvent> subscribeToQueries()
+	{
+		final SubscriptionIntermediateFuture<QueryEvent> fut = new SubscriptionIntermediateFuture<>();
+		
+		fut.setTerminationCommand(new TerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				querysubs.remove(fut);
+			}
+		});
+		
+		rwlock.writeLock().lock();
+		try
+		{
+			querysubs.add(fut);
+			
+		}
+		finally
+		{
+			rwlock.writeLock().unlock();
+		}
+		
+		Set<ServiceQueryInfo<?>> qs = getAllQueries();
+		for(ServiceQueryInfo<?> qi : SUtil.notNull(qs))
+		{
+			QueryEvent event = new QueryEvent(qi.getQuery(), QueryEvent.QUERY_ADDED);
+			fut.addIntermediateResultIfUndone(event);
+		}
+		
+		return fut;
+	}
+	
+	/**
+	 *  Notify all listeners.
+	 *  @param fut
+	 *  @param type
+	 */
+	protected void notifyQueryListeners(QueryEvent event)
+	{
+		List<SubscriptionIntermediateFuture<QueryEvent>> qis;
+		rwlock.writeLock().lock();
+		try
+		{
+			qis = new ArrayList<>();
+			querysubs.addAll(qis);
+		}
+		finally
+		{
+			rwlock.writeLock().unlock();
+		}
+		
+		for(SubscriptionIntermediateFuture<QueryEvent> fut: qis)
+		{
+			fut.addIntermediateResultIfUndone(event);
+		}
 	}
 	
 	/**

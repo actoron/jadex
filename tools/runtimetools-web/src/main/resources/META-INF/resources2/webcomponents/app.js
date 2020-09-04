@@ -116,10 +116,10 @@ class AppElement extends BaseElement
 		
 			<div class="flex-grow-1" id="content"></div>
 		
-			<div class="container-fluid pt-0 pl-3 pr-3 pb-3 ${this.message.text!=null? 'visible': 'hidden'}">
-				<div class="row p-1">
+			<div class="container-fluid pt-0 pl-0 pr-0 pb-0 ${this.message.text!=null? 'visible': 'hidden'}">
+				<div class="row p-0">
 					<div class="col">
-						<div class="alert m-1 p-1 ${(this.message.type=='error'? 'alert-danger': 'alert-info')}">
+						<div class="alert m-0 p-0 ${(this.message.type=='error'? 'alert-danger': 'alert-info')}">
 							<div class="row p-1 m-1">
 								<div class="col-10 p-0 align-self-center">
 									${this.message.text}

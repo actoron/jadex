@@ -41,17 +41,17 @@ export class BaseElement extends LitElement
 		this.loadStyle("/libs/bootstrap_4.5.0/bootstrap.min.css")
 		.then(()=>
 		{
-			console.log("loaded bootstrap css")
+			//console.log("loaded bootstrap css")
 			this.loadScript("libs/jquery_3.4.1/jquery.js")
 			.then(()=>
 			{
-				console.log("loaded jquery")
+				//console.log("loaded jquery")
 				this.loadScript("/libs/bootstrap_4.5.0/bootstrap.bundle.min.js")
 				.then(()=>
 				{
-					console.log("loaded bootstrap")
+					//console.log("loaded bootstrap")
 					this.loadStyle("/css/style.css")
-					.then(()=>{console.log("loaded jadex css")})
+					.then(()=>{/*console.log("loaded jadex css")*/})
 				});
 			});
 		});

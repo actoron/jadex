@@ -137,7 +137,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	protected Map<String, Collection<Tuple2<String, Set<String>>>> kernelfiles;
 
 	/** The started factories (kernel classname -> kernel component). */
-	protected Map<String, IComponentIdentifier> kernels = new HashMap<>();
+	protected Map<String, Object> kernels = new HashMap<>();
 	
 	/** The started flag (because init is invoked twice, service impl for 2 services. */
 	protected boolean inited;
@@ -181,7 +181,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		if(inited)
 			return IFuture.DONE;
 		inited = true;
-		
+			
 		// add data for implicitly started micro factory
 		componenttypes.add(".class");
 		kernels.put("jadex.micro.KernelMicroAgent", null);
@@ -420,38 +420,97 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		{
 			Tuple2<String, Set<String>> f = it.next();
 			
-			if(kernels.containsKey(f.getFirstEntity()))
-			{
+			Object k = kernels.get(f.getFirstEntity());
+			//System.out.println("check: "+model+" "+k+" "+kernels);
+			
+			if(kernels.containsKey(f.getFirstEntity()) && k==null)
+			{				
 				check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+			}
+			else if(k instanceof IComponentIdentifier)
+			{
+				IExternalAccess exta = agent.getExternalAccess((IComponentIdentifier)k);
+				ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
+				q.setProvider(exta.getId());
+				final IComponentFactory fac = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(q);
+				
+				fac.isLoadable(model, imports, rid).addResultListener(new IResultListener<Boolean>()
+				{
+					public void resultAvailable(Boolean loadable) 
+					{
+						if(loadable.booleanValue())
+							ret.setResult(fac);
+						else 
+							check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+					}
+
+					public void exceptionOccurred(Exception exception)
+					{
+//						System.out.println("Kernel cannot load: "+exta.getId()+" "+model);
+						check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+					}
+				});
+			}
+			else if(k instanceof IFuture)
+			{
+				((IFuture<IComponentFactory>)k).addResultListener(new IResultListener<IComponentFactory>() 
+				{
+					public void resultAvailable(IComponentFactory fac) 
+					{
+						fac.isLoadable(model, imports, rid).addResultListener(new IResultListener<Boolean>()
+						{
+							public void resultAvailable(Boolean loadable) 
+							{
+								if(loadable.booleanValue())
+									ret.setResult(fac);
+								else 
+									check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+							}
+
+							public void exceptionOccurred(Exception exception)
+							{
+//								System.out.println("Kernel cannot load: "+exta.getId()+" "+model);
+								check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Exception exception) 
+					{
+						check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+					}
+				});
 			}
 			else
 			{	
-				kernels.put(f.getFirstEntity(), null);
-				
 				CreationInfo ci = new CreationInfo();
 				ci.setFilename(f.getFirstEntity()+".class");
 				
-//				System.out.println("create compo start: "+f.getFirstEntity());
+				//System.out.println("create factory: "+f.getFirstEntity()+" "+kernels);
+
+				final Future<IComponentFactory> fut = new Future<>();
+				kernels.put(f.getFirstEntity(), fut);
+				
 				agent.createComponent(ci).addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess exta)
-					{
+					{						
 						exta.waitForTermination().addResultListener(new IResultListener<Map<String, Object>>()
 						{
 							public void resultAvailable(Map<String, Object> result)
 							{
-		//						System.out.println("Killed kernel: " + f);
+//								System.out.println("Killed kernel: " + f);
 								kernels.remove(f.getFirstEntity());
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
-		//						System.out.println("Killed kernel: " + f+", "+exception);
+//								System.out.println("Killed kernel: " + f+", "+exception);
 								kernels.remove(f.getFirstEntity());
 							}
 						});
 						
-//						System.out.println("Started factory: "+exta);
+						//System.out.println("Started factory: "+exta);
 						kernels.put(f.getFirstEntity(), exta.getId());
 						
 						ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
@@ -484,6 +543,8 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 							}
 						}
 						
+						fut.setResult(fac);
+						
 						fac.isLoadable(model, imports, rid).addResultListener(new IResultListener<Boolean>()
 						{
 							public void resultAvailable(Boolean loadable) 
@@ -493,7 +554,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 								else 
 									check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
 							}
-		
+
 							public void exceptionOccurred(Exception exception)
 							{
 //								System.out.println("Kernel cannot load: "+exta.getId()+" "+model);
@@ -504,6 +565,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 					
 					public void exceptionOccurred(Exception exception) 
 					{
+						fut.setException(exception);
 						System.out.println("error starting factory: "+exception);
 						check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
 					}

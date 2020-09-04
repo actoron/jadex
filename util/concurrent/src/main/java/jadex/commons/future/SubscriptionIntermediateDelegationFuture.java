@@ -20,17 +20,16 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	//-------- attributes --------
 	
 	/** The local results for a single thread. */
-    protected Map<Thread, List<E>>	ownresults;
+    protected Map<Thread, List<E>> ownresults;
 	
     /** Flag if results should be stored till first listener is. */
-    protected boolean storeforfirst;
+    protected boolean storeforfirst = true;
 	
 	/**
 	 *  Create a new future.
 	 */
 	public SubscriptionIntermediateDelegationFuture()
 	{
-		storeforfirst = true;
 	}
 	
 	/**
@@ -38,8 +37,9 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	 */
 	public SubscriptionIntermediateDelegationFuture(ITerminableIntermediateFuture<?> src)
 	{
-		super(src);
-		storeforfirst = true;
+		super();
+		//super(src); does not work as storeforfirst is not yet set :-(
+		src.addResultListener(new TerminableIntermediateDelegationResultListener(this, src));
 	}
 	
 	//-------- methods (hack!!! copied from subscription future) --------
@@ -48,13 +48,18 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	 *  Add a result.
 	 *  @param result The result.
 	 */
-	
-	protected void storeResult(E result)
+	protected boolean storeResult(E result)
 	{
-//		System.out.println("store: "+result);
+		boolean ret = false;
+		
+		//System.out.println("store: "+result+" "+storeforfirst+" "+ownresults);
+		
 		// Store results only if necessary for first listener.
 		if(storeforfirst)
+		{
+			ret = true;
 			super.storeResult(result);
+		}
 		
 		if(ownresults!=null)
 		{
@@ -62,9 +67,11 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 			{
 				res.add(result);
 			}
+			ret = true;
 		}
 		
 		resumeIntermediate();
+		return ret;
 	}
 	
 	/**
@@ -75,9 +82,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	public void	addQuietListener(IResultListener<Collection<E>> listener)
 	{
     	if(!(listener instanceof IIntermediateResultListener))
-    	{
     		throw new IllegalArgumentException("Subscription futures require intermediate listeners.");
-    	}
     	
     	super.addResultListener(listener);		
 	}
@@ -93,28 +98,27 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	if(!(listener instanceof IIntermediateResultListener))
     		throw new IllegalArgumentException("Subscription futures require intermediate listeners.");
     	
-//    	if(storeforfirst)
-//    		e = new RuntimeException();
-//    	
-//    	if(!storeforfirst && listeners!=null && listeners.size()>=0)
-//    	{
-//    		e.printStackTrace();
-//    		System.out.println("adding listener: "+this+" "+listener);
-//    	}
+    	/*if(storeforfirst)
+    		e = new RuntimeException();
+    	
+    	if(!storeforfirst && listeners!=null && listeners.size()>=0)
+    	{
+    		e.printStackTrace();
+    		System.out.println("adding listener: "+this+" "+listener);
+    	}*/
     	
       	boolean first;
     	synchronized(this)
 		{
 			first = storeforfirst;
-			storeforfirst	= false;
+			storeforfirst = false;
 		}
     	super.addResultListener(listener);
     	
 		if(first)
-		{
 			results=null;
-		}
     }
+    
     /**
      *  Get the intermediate results that are available.
      *  Note: The semantics of this method is different to the normal intermediate future
