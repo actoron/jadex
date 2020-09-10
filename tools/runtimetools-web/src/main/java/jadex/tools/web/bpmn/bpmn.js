@@ -68,11 +68,13 @@ class BpmnElement extends BaseElement {
 			self.requestUpdate();
 		});
 		
+		let body = document.querySelector('body');
+		
 	}
 	
 	render() {
 		return html`
-		<div><div style="width:100%; height:100vh" id="bpmnview"/></div>
+		<div style="height:100px" id="bpmnview"/>
 		`;
 	}
 }

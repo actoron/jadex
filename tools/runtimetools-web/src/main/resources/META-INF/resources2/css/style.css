@@ -93,9 +93,9 @@ fieldset, label {
 
 body{ 
     /*padding-top: 100px;*/
-	/*height: 100%;*/
-	margin: 20px; 
-	margin-bottom: 60px;
+	height: 100%;
+	padding: 20px; 
+	padding-bottom: 60px;
 	/*background-color: #cfcfcf!important;*/
 }
 
@@ -107,8 +107,8 @@ h1 {
 html {
 	position: relative;
 	min-height: 100%;
-	/*height: 100%;
-    background-size: cover;
+	height: 100%;
+    /*background-size: cover;
     background-repeat:no-repeat;*/
     /*background-color: #70bg32;*/
     /*background: linear-gradient( to left top, blue, red);*/

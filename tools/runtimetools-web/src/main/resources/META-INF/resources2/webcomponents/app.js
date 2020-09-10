@@ -87,7 +87,7 @@ class AppElement extends BaseElement
 		return html`
 			<link rel="stylesheet" href="css/style.css">
 			<link rel="stylesheet" href="libs/bootstrap_4.3.1/bootstrap.min.css">
-
+			<div style="height:100%" class="d-flex flex-column">
 			<nav class="navbar navbar-expand-lg navbar-custom navbar-fixed-top">
 				<div class="navbar-brand mr-auto">
 		 			<img src="images/jadex_logo_ac.png" width="200px"/>
@@ -114,7 +114,7 @@ class AppElement extends BaseElement
 				</div>
 			</nav>
 		
-			<div id="content"></div>
+			<div class="flex-grow-1" id="content"></div>
 		
 			<div class="container-fluid pt-0 pl-0 pr-0 pb-0 ${this.message.text!=null? 'visible': 'hidden'}">
 				<div class="row p-0">
@@ -135,12 +135,13 @@ class AppElement extends BaseElement
 		
 			<footer class="container-fluid footer navbar-light bg-light">
 		        <span class="text-muted">Copyright by <a href="http://www.actoron.com">Actoron GmbH</a> 2017-${new Date().getFullYear()}</span>
-		    	<div class="pull-right">
+		    	<div class="float-right">
 					<a href="#/about">${language.$t("message.about")}</a>
 		    		<a href="#/privacy">${language.$t("message.privacy")}</a>
 		    		<a href="#/imprint">${language.$t("message.imprint")}</a>
 		    	</div>
 		    </footer>
+		    </div>
 		`;
 	}
 }
