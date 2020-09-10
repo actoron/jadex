@@ -143,7 +143,8 @@ class StarterElement extends BaseElement
 		}
 	}
 		
-	static get styles() {
+	static get styles() 
+	{
 		var ret = [];
 		if(super.styles!=null)
 			ret.push(super.styles);
