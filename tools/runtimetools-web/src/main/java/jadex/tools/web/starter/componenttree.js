@@ -58,7 +58,7 @@ class ComponentTree extends BaseElement
 		    "nfproperty_dynamic" : {"icon": nfprop_dynamic}
 		}
 		
-		console.log("components");
+		//console.log("components");
 		
 		var self = this;
 		

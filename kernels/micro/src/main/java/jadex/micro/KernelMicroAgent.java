@@ -23,4 +23,18 @@ import jadex.micro.annotation.ProvidedServices;
 @Properties({@NameValue(name="system", value="true"), @NameValue(name="kernel.types", value="new String[]{\".class\"}")})
 public class KernelMicroAgent
 {
+	/*@Agent
+	protected IInternalAccess agent;
+	
+	@AgentArgument
+	protected ServiceScope scope;
+	
+	@OnInit
+	public void init()
+	{
+		MicroAgentFactory fac = new MicroAgentFactory(agent, SUtil.createHashMap(new String[]{"debugger.panels"},new Object[]{"jadex.tools.debugger.micro.MicroDebuggerPanel"}));
+		agent.addService(null, IComponentFactory.class, fac, null, s);
+		
+		addServiceType(, str, psi.getWorkermodel(), ci, psi.getPublishInfo()).addResultListener(lis);
+	}*/
 }

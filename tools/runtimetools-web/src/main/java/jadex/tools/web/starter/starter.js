@@ -8,7 +8,7 @@ class StarterElement extends BaseElement
 	
 	init() 
 	{
-		console.log("starter");
+		//console.log("starter");
 		
 		this.model = null; // loaded model
 		this.reversed = false;
@@ -40,7 +40,7 @@ class StarterElement extends BaseElement
 		{
 			this.listener = (e) => 
 			{
-				console.log(e)
+				//console.log(e)
 				self.model = e.detail.model;
 				self.requestUpdate();
 			}
@@ -118,7 +118,7 @@ class StarterElement extends BaseElement
 				{
 					var el = this.shadowRoot.getElementById('arg_'+i);
 					var argval = el.value;
-					console.log('arg_'+i+": "+argval);
+					//console.log('arg_'+i+": "+argval);
 					args[this.model.arguments[i].name] = argval;
 				}
 			}

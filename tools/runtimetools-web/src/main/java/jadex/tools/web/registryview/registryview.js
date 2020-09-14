@@ -161,6 +161,8 @@ class RegistryViewElement extends BaseElement
 	
 	subscribe()
 	{
+		console.log("initready: "+this.initready+", concom: "+this.concom);
+		
 		if(this.initready && this.concom)
 		{
 			this.subscribeToServices();

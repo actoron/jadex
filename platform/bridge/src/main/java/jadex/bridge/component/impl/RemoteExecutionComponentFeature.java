@@ -573,7 +573,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 				if(msg instanceof ISecuredRemoteCommand)
 				{
 					Set<String>	secroles = ServiceIdentifier.getRoles(((ISecuredRemoteCommand)msg).getSecurityLevel(getInternalAccess()), getInternalAccess());
-					System.out.println("secroles " + (secroles != null ? Arrays.toString(secroles.toArray()) : "null") + " " + secinfos);
+					//System.out.println("secroles " + (secroles != null ? Arrays.toString(secroles.toArray()) : "null") + " " + secinfos);
 					// No service roles and trusted role is ok.
 					if (secroles == null && secinfos.getRoles().contains(Security.TRUSTED))
 					{

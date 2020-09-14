@@ -66,6 +66,7 @@ public enum ServiceScope
 		localscopes.add(APPLICATION);
 		localscopes.add(PLATFORM);
 		localscopes.add(PARENT);
+		localscopes.add(DEFAULT);
 		LOCAL_SCOPES = Collections.unmodifiableSet(localscopes);
 	}
 

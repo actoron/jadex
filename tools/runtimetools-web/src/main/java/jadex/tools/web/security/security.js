@@ -24,7 +24,7 @@ class SecurityElement extends BaseElement
 	{
 		super();
 		
-		console.log("security");
+		//console.log("security");
 		
 		this.cid = null;
 		this.myservice = "jadex.tools.web.security.IJCCSecurityService";
@@ -463,7 +463,7 @@ class SecurityElement extends BaseElement
 		
 		axios.get(self.getMethodPrefix()+'&methodname=getSecurityState', self.transform).then(function(resp)
 		{
-			console.log("refresh");
+			//console.log("refresh");
 			self.secstate = resp.data;
 			self.requestUpdate();
 		}).catch(error => 
@@ -479,7 +479,7 @@ class SecurityElement extends BaseElement
 		var en = this.shadowRoot.getElementById("entity").value;
 		var en = this.shadowRoot.getElementById("role").value;
 		
-		console.log("add role: "+en+" "+ro);
+		//console.log("add role: "+en+" "+ro);
 		
 		axios.get(self.getMethodPrefix()+'&methodname=addRole&args_0='+en+'&args_1='+ro, self.transform).then(function(resp)
 		{
@@ -495,7 +495,7 @@ class SecurityElement extends BaseElement
 		var en = this.shadowRoot.getElementById("entity").value;
 		var en = this.shadowRoot.getElementById("role").value;
 		
-		console.log("remove role: "+en+" "+ro);
+		//console.log("remove role: "+en+" "+ro);
 		
 		axios.get(self.getMethodPrefix()+'&methodname=removeRole&args_0='+en+'&args_1='+ro, self.transform).then(function(resp)
 		{
@@ -565,7 +565,7 @@ class SecurityElement extends BaseElement
 	            } 
 	        	else if(key) 
 	        	{
-	        		console.log("key: "+key);
+	        		//console.log("key: "+key);
 	            			
 					var elem = self.shadowRoot.getElementById("key");
 					elem.value = "key:"+btoa(String.fromCharCode.apply(null, key));
@@ -624,7 +624,7 @@ class SecurityElement extends BaseElement
 		var self = this;
 		var network = this.shadowRoot.getElementById("network").value;
 		
-		console.log("add network: "+network+" "+self.secret);
+		//console.log("add network: "+network+" "+self.secret);
 		
 		axios.get(self.getMethodPrefix()+'&methodname=addNetwork&args_0='+network+'&args_1='+self.secret, self.transform).then(function(resp)
 		{
@@ -639,7 +639,7 @@ class SecurityElement extends BaseElement
 		var self = this;
 		if(this.selnet!=null)
 		{
-			console.log("remove network: "+this.selnet);
+			//console.log("remove network: "+this.selnet);
 
 			axios.get(self.getMethodPrefix()+'&methodname=removeNetwork&args_0='+self.selnet[0]+'&args_1='+self.selnet[1], self.transform).then(function(resp)
 			{

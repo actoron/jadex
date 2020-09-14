@@ -141,6 +141,8 @@ public class ModelFileFilter implements IAsyncFilter
 		
 		if(obj instanceof File)
 		{
+			//System.out.println("filter for: "+obj);
+			
 			final File file = (File)obj;
 			if(isAll() || file.isDirectory())
 			{
@@ -167,7 +169,7 @@ public class ModelFileFilter implements IAsyncFilter
 					System.out.println("no rid for url: "+furl+", "+rids);
 				}
 				
-//				ret.setResult(Boolean.TRUE);
+				//ret.setResult(Boolean.TRUE);
 				
 				final long start = System.currentTimeMillis();
 //				SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents(), rid)
@@ -177,9 +179,15 @@ public class ModelFileFilter implements IAsyncFilter
 					public void customResultAvailable(Boolean val)
 					{
 						long dur = System.currentTimeMillis()-start;
-//						if(dur>1000)
-//							System.out.println("Needed isModelType: "+dur);
+						//if(dur>1000)
+							//System.out.println("Needed isModelType: "+dur+" "+val+" "+file.getAbsolutePath());
 						super.customResultAvailable(val);
+					}
+					@Override
+					public void exceptionOccurred(Exception exception) 
+					{
+						//System.out.println("ex: "+exception);
+						super.exceptionOccurred(exception);
 					}
 				});
 			}

@@ -273,7 +273,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		if(results!=null && !results.isEmpty() && intermediate && listener instanceof IIntermediateResultListener)
     		{
     			//System.out.println("notify scheduled: "+results);
-    			scheduled	= true;
+    			scheduled = true;
 	    		IIntermediateResultListener<E>	lis	= (IIntermediateResultListener<E>)listener;
 	    		for(final E result: results)
 	    		{
@@ -296,7 +296,6 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		startScheduledNotifications();
     	
        	super.addResultListener(listener);
-        
     }
     
     protected ICommand<IResultListener<Collection<E>>>	notcommand	= new ICommand<IResultListener<Collection<E>>>()
