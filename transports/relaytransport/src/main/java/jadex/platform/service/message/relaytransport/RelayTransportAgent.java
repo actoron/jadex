@@ -75,7 +75,7 @@ import jadex.platform.service.transport.AbstractTransportAgent;
 @Arguments({
 	// todo: see SuperpeerRegistrySynchronizationAgent
 //	@Argument(name="superpeers", clazz=String.class, defaultvalue="\"platformname1{scheme11://addi11,scheme12://addi12},platformname2{scheme21://addi21,scheme22://addi22}\""),
-//	@Argument(name="addresses", clazz=String.class, defaultvalue="\"ws://ssp1@ngrelay1.actoron.com:80\""),	// TODO: wss, TODO: set in PlatformAgent???
+//	@Argument(name="addresses", clazz=String.class, defaultvalue="\"ws://ssp@ssp.activecomponents.org:80\""),	// TODO: wss, TODO: set in PlatformAgent???
 })
 @ProvidedServices({
 		@ProvidedService(type=ITransportService.class, scope=ServiceScope.PLATFORM)
