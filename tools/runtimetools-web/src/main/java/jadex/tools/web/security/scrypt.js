@@ -1,6 +1,6 @@
 "use strict";
 
-console.log("scrypt..."+this);
+//console.log("scrypt..."+this);
 
 (function(root) {
     var MAX_VALUE = 0x7fffffff;

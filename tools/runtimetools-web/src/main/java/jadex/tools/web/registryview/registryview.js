@@ -2,6 +2,7 @@ import {LitElement} from 'lit-element';
 import {html} from 'lit-element';
 import {css} from 'lit-element';
 import {BaseElement} from '/webcomponents/baseelement.js'
+//import '/libs/lit-datatable/lit-datatable.js'
 
 // Tag name 'jadex-registry'
 class RegistryViewElement extends BaseElement 
@@ -13,7 +14,7 @@ class RegistryViewElement extends BaseElement
 	
 	attributeChangedCallback(name, oldVal, newVal) 
 	{
-	    console.log('attribute change: ', name, newVal, oldVal);
+	    //console.log('attribute change: ', name, newVal, oldVal);
 	    super.attributeChangedCallback(name, oldVal, newVal);
 	}
 	
@@ -26,16 +27,123 @@ class RegistryViewElement extends BaseElement
 		this.services = [];
 		this.platforms = [];
 		this.queries = [];
+		this.initready = false;
 		
 		console.log("relayview");
 		
 		var res = "jadex/tools/web/registryview/conf.css";
 		var ures = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String";
 		
+		var self = this;
+		
 		this.loadStyle(ures)
 		.then(()=>
 		{
-			console.log("loaded conf.css");
+			/*this.loadStyle("https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css")
+			.then(()=>
+			{
+				console.log("loaded datatables.js");
+				
+				this.loadScript("lib/")
+				.then(()=>
+				{
+					console.log("loaded datatables.css");
+					
+				})
+				.catch((err)=>
+				{
+					console.log("b: "+err);
+				});
+			})
+			.catch((err)=>
+			{
+				console.log("a: "+err);
+			});*/
+			
+			var res1 ="jadex/tools/web/registryview/st_styles.css";
+			var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+			var res2 ="jadex/tools/web/registryview/st_min.js";
+			var ures2 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
+
+			
+			//this.loadStyle("https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css")
+			this.loadStyle(ures1)
+			.then(()=>
+			{
+				console.log("loaded datatables.js");
+				
+				//this.loadScript("https://cdn.jsdelivr.net/npm/simple-datatables@latest")
+				this.loadScript(ures2)
+				.then(()=>
+				{
+					console.log("loaded datatables.css");
+					
+					var opts = {perPageSelect: [5,10,15,25,50,100,1000], perPage: 15};
+					
+					self.tableservices = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableservices'), opts);
+					self.tableplatforms = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableplatforms'), opts);
+					self.tablequeries = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tablequeries'), opts);
+					self.initready = true;
+					self.subscribe();
+				})
+				.catch((err)=>
+				{
+					console.log("b: "+err);
+				});
+			})
+			.catch((err)=>
+			{
+				console.log("a: "+err);
+			});
+			
+			/*this.loadSubmodule("https://unpkg.com/@p_mac/datatables.webcomponent/dist/datatables.webcomponent.js")
+			.then(()=>
+			{
+				console.log("loaded datatables.js");
+				//$("#tableservices", this.shadowRoot).DataTable();
+				//$("#tableplatforms", this.shadowRoot).DataTable();
+				//$("#tablequeries", this.shadowRoot).DataTable();
+			})
+			.catch((err)=>
+			{
+				console.log(err);
+			});*/
+			
+			/*this.loadScript("libs/wct/data-tables.js")
+			.then(()=>
+			{
+				console.log("loaded datatables.js");
+				$("#tableservices", this.shadowRoot).DataTable();
+				$("#tableplatforms", this.shadowRoot).DataTable();
+				$("#tablequeries", this.shadowRoot).DataTable();
+			})
+			.catch((err)=>
+			{
+				console.log(err);
+			});*/
+			
+			/*this.loadStyle("https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css")
+			.then(()=>
+			{
+				console.log("loaded datatables.css");
+				this.loadScript("https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js")
+				.then(()=>
+				{
+					console.log("loaded datatables.js");
+					$("#tableservices", this.shadowRoot).DataTable();
+					$("#tableplatforms", this.shadowRoot).DataTable();
+					$("#tablequeries", this.shadowRoot).DataTable();
+				})
+				.catch((err)=>
+				{
+					console.log(err);
+				});
+			})
+			.catch((err)=>
+			{
+				console.log(err);
+			});*/
+			
 		})
 		.catch((err)=>
 		{
@@ -48,9 +156,19 @@ class RegistryViewElement extends BaseElement
 		super.connectedCallback();
 		this.concom = true;	
 	
-		this.subscribeToServices();
-		this.subscribeToPlatforms();
-		this.subscribeToQueries();
+		this.subscribe();
+	}
+	
+	subscribe()
+	{
+		console.log("initready: "+this.initready+", concom: "+this.concom);
+		
+		if(this.initready && this.concom)
+		{
+			this.subscribeToServices();
+			this.subscribeToPlatforms();
+			this.subscribeToQueries();
+		}
 	}
 	
 	disconnectedCallback()
@@ -62,6 +180,10 @@ class RegistryViewElement extends BaseElement
 	render() 
 	{
 		return html`
+		<div id="tab"></div>
+		
+		<!--<lit-datatable .data="${this.services}" .conf="${[{ property: 'type', header: 'Service Type', hidden: false }, { property: 'providerId.name', header: 'Provided By', hidden: false }]}"></lit-datatable>-->
+		
 		<div id="panel" class="container-fluid">
 			<div id="accordion">
 				<div class="card m-2">
@@ -70,58 +192,58 @@ class RegistryViewElement extends BaseElement
 					</div>
 					<div id="collapseOne" class="collapse show" data-parent="#accordion">
 						<div class="card-body">
-							<div class="actwtable section">
-								<table class="${this.sconnected?'': 'down'}">
-									<tbody>
-										<tr>
-											<th>Service Type</th>
-											<th>Provided By</th>
-											<th>Publication Scope</th>
-							 				<th>Networks</th>
-											<th>Security</th>
-										</tr>
-										${this.services.map((x) => 
-										html`
-										<tr class="${x.connected? 'connecting': ''}">
-											<td>${x.type}</td>
-											<td>${this.beautifyCid(x.providerId.name)}</td>
-											<td>${x.scope.toLowerCase()}</td>
-							 				<td>${this.beautifyNetworks(x.networkNames)}</td>
-											<td>${x.unrestricted && 'unrestricted' || 'restricted'}</td>
-										</tr>
-										`)}
-									</tbody>
-								</table>
-							</div>
-      					</div>
+							<table id="tableservices" class="${this.sconnected?'': 'down'}">
+								<thead>
+									<tr>
+										<th>Service Type</th>
+										<th>Provided By</th>
+										<th>Publication Scope</th>
+						 				<th>Networks</th>
+										<th>Security</th>
+									</tr>
+								</thead>
+								<tbody>
+									<!-- ${this.services.map((x) => 
+									html`
+									<tr class="${x.connected? 'connecting': ''}">
+										<td>${x.type}</td>
+										<td>${this.beautifyCid(x.providerId.name)}</td>
+										<td>${x.scope.toLowerCase()}</td>
+						 				<td>${this.beautifyNetworks(x.networkNames)}</td>
+										<td>${x.unrestricted && 'unrestricted' || 'restricted'}</td>
+									</tr>
+									`)} -->
+								</tbody>
+							</table>
+						</div>
     				</div>
   				</div>
 		
 				<div class="card m-2">
 					<div class="card-header">
-						<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">Networks</h4>
+						<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">Platforms</h4>
 					</div>
 					<div id="collapseTwo" class="collapse show" data-parent="#accordion">
 						<div class="card-body">
-							 <div class="actwtable section">
-								<table class="${this.pconnected?'': 'down'}">
-									<tbody>
-										<tr>
-											<th>Name</th>
-											<th>Connected</th>
-											<th>Protocol</th>
-										</tr>
-										${this.platforms.map((x) => 
-										html`
-										<tr class="${x.connected? 'connecting': ''}">
-											<td>${x.platform.name}</td>
-											<td>${x.connected}</td>
-											<td>${x.protocol}</td>
-										</tr>
-										`)}
-									</tbody>
-								</table>
-							</div>
+							<table id="tableplatforms" class="${this.pconnected?'': 'down'}">
+								<thead>
+									<tr>
+										<th>Name</th>
+										<th>Connected</th>
+										<th>Protocol</th>
+									</tr>
+								</thead>
+								<tbody>
+									<!-- ${this.platforms.map((x) => 
+									html`
+									<tr class="${x.connected? 'connecting': ''}">
+										<td>${x.platform.name}</td>
+										<td>${x.connected}</td>
+										<td>${x.protocol}</td>
+									</tr>
+									`)} -->
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</div>
@@ -132,25 +254,25 @@ class RegistryViewElement extends BaseElement
 					</div>
 					<div id="collapseThree" class="collapse show" data-parent="#accordion">
 						<div class="card-body">
-							 <div class="actwtable section">
-								<table class="${this.qconnected?'': 'down'}">
-									<tbody>
-										<tr>
-											<th>Service Type</th>
-											<th>Query Owner</th>
-											<th>Search Scope</th>
-										</tr>
-										${this.queries.map((x) => 
-										html`
-										<tr>
-											<td>${x.serviceType!=null? x.serviceType.value: ''}</td>
-											<td>${this.beautifyCid(x.owner.name)}</td>
-											<td>${x.scope.value}</td>
-										</tr>
-										`)}
-									</tbody>
-								</table>
-							</div>
+							<table id="tablequeries" class="${this.qconnected?'': 'down'}">
+								<thead>
+									<tr>
+										<th>Service Type</th>
+										<th>Query Owner</th>
+										<th>Search Scope</th>
+									</tr>
+								</thead>
+								<tbody>
+									<!-- ${this.queries.map((x) => 
+									html`
+									<tr>
+										<td>${x.serviceType!=null? x.serviceType.value: ''}</td>
+										<td>${this.beautifyCid(x.owner.name)}</td>
+										<td>${x.scope.value}</td>
+									</tr>
+									`)} -->
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</div>
@@ -179,17 +301,28 @@ class RegistryViewElement extends BaseElement
 				if(event.type==1)	// removed
 				{
 					this.services.splice(i,1);
+					
+					this.tableservices.rows().remove(i);
 				}
 				else // added / changed
 				{
-					this.services[i] = event.service.serviceIdentifier;
+					var s = event.service.serviceIdentifier;
+					this.services[i] = s;
+					
+					this.tableservices.rows().remove(i);
+					this.tableservices.rows().add([s.type, this.beautifyCid(s.providerId.name), s.scope.toLowerCase(), this.beautifyNetworks(s.networkNames), s.unrestricted && 'unrestricted' || 'restricted']);
 				}
 				break;
 			}
 		}
 		
 		if(!found)
-			this.services.push(event.service.serviceIdentifier);
+		{
+			var s = event.service.serviceIdentifier;
+			this.services.push(s);
+			
+			this.tableservices.rows().add([s.type, this.beautifyCid(s.providerId.name), s.scope.toLowerCase(), this.beautifyNetworks(s.networkNames), s.unrestricted && 'unrestricted' || 'restricted']);
+		}
 			
 		this.requestUpdate();
 	}
@@ -243,17 +376,26 @@ class RegistryViewElement extends BaseElement
 				if(platform.connected===undefined)
 				{
 					this.platforms.splice(i,1);
+					
+					this.tableplatforms.rows().remove(i);
 				}
 				else
 				{
 					this.platforms[i] = platform;
+
+					this.tableplatforms.rows().remove(i);
+					this.tableplatforms.rows().add([platform.platform.name, platform.connected, platform.protocol]);
 				}
 				break;
 			}
 		}
 		
 		if(!found)
+		{
 			this.platforms.push(platform);
+		
+			this.tableplatforms.rows().add([platform.platform.name, platform.connected, platform.protocol]);
+		}
 			
 		this.requestUpdate();
 	}
@@ -285,7 +427,7 @@ class RegistryViewElement extends BaseElement
 			{
 				if(self.concom)
 				{
-					console.log("Retrying platform connection...");
+					//console.log("Retrying platform connection...");
 					self.subscribeToPlatforms(interval);
 				}
 				else
@@ -322,17 +464,28 @@ class RegistryViewElement extends BaseElement
 				if(event.type==1)	// removed
 				{
 					this.queries[i].splice(i,1);
+					
+					this.tablequeries.rows().remove(i);
 				}
 				else // added / changed
 				{
-					this.queries[i] = event.query;
+					var q = event.query;
+					this.queries[i] = q;
+
+					this.tablequeries.rows().remove(i);
+					this.tablequeries.rows().add([q.serviceType!=null? q.serviceType.value: '', this.beautifyCid(q.owner.name), q.scope.value]);
 				}
 			}
 			break;
 		}
 		
 		if(!found)
-			this.queries.push(event.query);
+		{
+			var q = event.query;
+			this.queries.push(q);
+		
+			this.tablequeries.rows().add([q.serviceType!=null? q.serviceType.value: '', this.beautifyCid(q.owner.name), q.scope.value]);
+		}
 			
 		this.requestUpdate();
 	}
@@ -342,19 +495,19 @@ class RegistryViewElement extends BaseElement
 		if(interval===undefined)
 			interval = 5000;
 		
-		console.log("sub queries");
+		//console.log("sub queries");
 			
 		var self = this;
 		jadex.getIntermediate(this.getMethodPrefix()+'&methodname=subscribeToQueries&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		function(response)
 		{
-			console.log("Set up queries subscription");
+			//console.log("Set up queries subscription");
 			self.qconnected = true;
 			self.updateQuery(response.data);
 		},
 		function(response)
 		{
-			console.log("Could not reach platform.");
+			//console.log("Could not reach platform.");
 			//console.log("Err: "+JSON.stringify(err));
 			self.qconnected = false;
 			self.queries = [];
@@ -364,7 +517,7 @@ class RegistryViewElement extends BaseElement
 			{
 				if(self.concom)
 				{
-					console.log("Retrying connection...");
+					//console.log("Retrying connection...");
 					self.subscribeToQueries(interval);
 				}
 				else
@@ -438,5 +591,6 @@ class RegistryViewElement extends BaseElement
 		el.addEventListener("click", this.collapseOnClick);
 	}
 }
+
 if(customElements.get('jadex-registry') === undefined)
 	customElements.define('jadex-registry', RegistryViewElement);

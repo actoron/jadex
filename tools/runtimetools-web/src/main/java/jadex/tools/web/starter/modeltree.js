@@ -7,7 +7,7 @@ class ModelTree extends BaseElement {
 	
 	init()
 	{
-		console.log("modeltree");
+		//console.log("modeltree");
 		
 		this.models = []; // available component models [filename, classname]
 		this.reversed = false;

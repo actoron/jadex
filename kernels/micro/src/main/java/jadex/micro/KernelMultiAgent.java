@@ -25,12 +25,11 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -57,14 +56,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentServiceQuery;
-import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Component;
-import jadex.micro.annotation.ComponentType;
-import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.Configuration;
-import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
@@ -77,14 +68,14 @@ import jadex.micro.annotation.ProvidedServices;
 	@ProvidedService(type=IComponentFactory.class, scope=ServiceScope.PLATFORM),
 	@ProvidedService(type=IMultiKernelNotifierService.class, scope=ServiceScope.PLATFORM), // implementation=@Implementation(expression="$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(jadex.bridge.service.types.factory.IComponentFactory.class)"))
 })
-@ComponentTypes({
+/*@ComponentTypes({
 	@ComponentType(name="KernelMicro", filename="jadex/micro/KernelMicroAgent.class")
 })
 @Configurations({
 	@Configuration(name="default", components={
 		@Component(name="kernel_micro", type="KernelMicro")
 	})
-})
+})*/
 @Agent(name="kernel_multi",
 	autostart=Boolean3.TRUE)
 @Service
@@ -181,10 +172,12 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		if(inited)
 			return IFuture.DONE;
 		inited = true;
-			
+		
 		// add data for implicitly started micro factory
+		IComponentFactory fac = doStartKernel("jadex/micro/KernelMicroAgent.class").get();
+		kernels.put("jadex.micro.KernelMicroAgent", ((IService)fac).getServiceId().getProviderId());
 		componenttypes.add(".class");
-		kernels.put("jadex.micro.KernelMicroAgent", null);
+		//kernels.put("jadex.micro.KernelMicroAgent", null);
 		
 		// Rescan on any changes in the library service
 		
@@ -252,7 +245,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	}
 	
 	/**
-	 *  Load a  model.
+	 *  Load a model.
 	 *  @param model The model (e.g. file name or resource name).
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
@@ -264,7 +257,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		
 		Future<IModelInfo> ret = new Future<>();
 		
-		getFactoryForModel(model, imports, rid, null).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
+		getFactoryForModel(model, imports, rid).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
 		{
 			public void customResultAvailable(IComponentFactory fac) throws Exception
 			{
@@ -283,21 +276,36 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	 *  
 	 *  @return A factory that can load the model (or null if none was found).
 	 */
-	protected IFuture<IComponentFactory> getFactoryForModel(String model, String[] imports, IResourceIdentifier rid, Iterator<IComponentFactory> it)
+	protected IFuture<IComponentFactory> getFactoryForModel(String model, String[] imports, IResourceIdentifier rid)
 	{
+		//System.out.println("getFacForModelS: "+model);
 		Future<IComponentFactory> ret = new Future<IComponentFactory>();
 		
 		getRunningFactory(model, imports, rid, null).addResultListener(new IResultListener<IComponentFactory>()
 		{
 			public void resultAvailable(IComponentFactory fac)
 			{
+				//System.out.println("getFacForModelE: "+model+" "+fac);
 				ret.setResult(fac);
 			}
 
 			public void exceptionOccurred(Exception exception)
 			{
 //				getnewfac.call(new Object[]{model, imports, rid}).addResultListener(new DelegationResultListener<>(ret));
-				getNewFactory(model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+				getNewFactory(model, imports, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret)
+				{
+					public void customResultAvailable(IComponentFactory result)
+					{
+						//System.out.println("getFacForModelE: "+model+" "+result);
+						super.customResultAvailable(result);
+					}
+					
+					public void exceptionOccurred(Exception exception) 
+					{
+						//System.out.println("getFacForModelEx: "+model+" "+exception);
+						super.exceptionOccurred(exception);
+					}
+				});
 			}
 		});
 		
@@ -324,6 +332,8 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 			}
 		}
 		final Iterator<Tuple2<String, Set<String>>> it = found.iterator();
+		
+		//System.out.println("found: "+found);
 		
 		check(it, model, imports, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret)
 		{
@@ -483,65 +493,16 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 			}
 			else
 			{	
-				CreationInfo ci = new CreationInfo();
-				ci.setFilename(f.getFirstEntity()+".class");
-				
-				//System.out.println("create factory: "+f.getFirstEntity()+" "+kernels);
-
 				final Future<IComponentFactory> fut = new Future<>();
 				kernels.put(f.getFirstEntity(), fut);
 				
-				agent.createComponent(ci).addResultListener(new IResultListener<IExternalAccess>()
+				doStartKernel(f.getFirstEntity()+".class").addResultListener(new IResultListener<IComponentFactory>() 
 				{
-					public void resultAvailable(IExternalAccess exta)
-					{						
-						exta.waitForTermination().addResultListener(new IResultListener<Map<String, Object>>()
-						{
-							public void resultAvailable(Map<String, Object> result)
-							{
-//								System.out.println("Killed kernel: " + f);
-								kernels.remove(f.getFirstEntity());
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-//								System.out.println("Killed kernel: " + f+", "+exception);
-								kernels.remove(f.getFirstEntity());
-							}
-						});
+					public void resultAvailable(IComponentFactory fac) 
+					{
+						kernels.put(f.getFirstEntity(), ((IService)fac).getServiceId().getProviderId());
 						
-						//System.out.println("Started factory: "+exta);
-						kernels.put(f.getFirstEntity(), exta.getId());
-						
-						ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
-						q.setProvider(exta.getId());
-						final IComponentFactory fac = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(q);
-						
-						// If this is a new kernel, gather types and icons
-						final String[] types = fac.getComponentTypes();
-						componenttypes.addAll(Arrays.asList(types));
-							
-						if(SReflect.HAS_GUI)
-						{
-							fireTypesAdded(types);
-							
-							for(int i = 0; i < types.length; ++i)
-							{
-								final int fi = i;
-								fac.getComponentTypeIcon(types[i]).addResultListener(new IResultListener<byte[]>()
-								{
-									public void resultAvailable(byte[] result)
-									{
-//										System.out.println("adding icon: "+types[fi]);
-										iconcache.put(types[fi], result);
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-									}
-								});
-							}
-						}
+						//System.out.println("kernels: "+kernels);
 						
 						fut.setResult(fac);
 						
@@ -562,10 +523,11 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 							}
 						});
 					}
-					
 					public void exceptionOccurred(Exception exception) 
 					{
 						fut.setException(exception);
+						kernels.put(f.getFirstEntity(), null);
+						
 						System.out.println("error starting factory: "+exception);
 						check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
 					}
@@ -576,6 +538,91 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		{
 			ret.setException(new RuntimeException("No factory found"));
 		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 * @param model
+	 * @return
+	 */
+	protected IFuture<IComponentFactory> doStartKernel(String model)
+	{
+		Future<IComponentFactory> ret = new Future<IComponentFactory>();
+		
+		CreationInfo ci = new CreationInfo();
+		ci.setFilename(model);
+		
+		ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{
+			new ProvidedServiceInfo(null, IComponentFactory.class, null, ServiceScope.PARENT, null, null)});
+		
+		//System.out.println("create factory: "+f.getFirstEntity()+" "+kernels);
+
+		final Future<IComponentFactory> fut = new Future<>();
+		kernels.put(model, fut);
+		
+		agent.createComponent(ci).addResultListener(new IResultListener<IExternalAccess>()
+		{
+			public void resultAvailable(IExternalAccess exta)
+			{						
+				exta.waitForTermination().addResultListener(new IResultListener<Map<String, Object>>()
+				{
+					public void resultAvailable(Map<String, Object> result)
+					{
+//						System.out.println("Killed kernel: " + f);
+						kernels.remove(model);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+//						System.out.println("Killed kernel: " + f+", "+exception);
+						kernels.remove(model);
+					}
+				});
+				
+				//System.out.println("Started factory: "+exta);
+				kernels.put(model, exta.getId());
+				
+				ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
+				q.setProvider(exta.getId());
+				final IComponentFactory fac = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(q);
+				
+				// If this is a new kernel, gather types and icons
+				final String[] types = fac.getComponentTypes();
+				componenttypes.addAll(Arrays.asList(types));
+					
+				if(SReflect.HAS_GUI)
+				{
+					fireTypesAdded(types);
+					
+					for(int i = 0; i < types.length; ++i)
+					{
+						final int fi = i;
+						fac.getComponentTypeIcon(types[i]).addResultListener(new IResultListener<byte[]>()
+						{
+							public void resultAvailable(byte[] result)
+							{
+//								System.out.println("adding icon: "+types[fi]);
+								iconcache.put(types[fi], result);
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+							}
+						});
+					}
+				}
+				
+				ret.setResult(fac);
+			}
+			
+			public void exceptionOccurred(Exception exception) 
+			{
+				ret.setException(exception);
+				System.out.println("error starting factory: "+exception);
+			}
+		});
 		
 		return ret;
 	}
@@ -665,7 +712,8 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		if(!isLoadable(model))
 			return new Future<IComponentFactory>(new RuntimeException());
 		
-//		System.out.println("getRunningFactory: "+model);
+		//if(model.indexOf("HelplineAgent")!=-1)
+		//	System.out.println("getRunningFactory: "+model);
 
 		Future<IComponentFactory> ret = new Future<IComponentFactory>();
 		
@@ -678,6 +726,9 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 			{
 				public void resultAvailable(Boolean result)
 				{
+					//if(model.indexOf("HelplineAgent")!=-1)
+					//	System.out.println("getRunningFactoryRes: "+model+" "+result+" "+fac);
+					
 					if(result.booleanValue())
 						ret.setResult(fac);
 					else
@@ -686,6 +737,9 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 				
 				public void exceptionOccurred(Exception exception)
 				{
+					//if(model.indexOf("HelplineAgent")!=-1)
+					//	System.out.println("getRunningFactoryEx: "+model+" "+exception);
+					
 					getRunningFactory(model, imports, rid, facs).addResultListener(new DelegationResultListener<>(ret));
 				}
 			});
@@ -704,34 +758,41 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
+	protected int cnt = 0;
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{		
 		if(!isLoadable(model))
 			return IFuture.FALSE;
 		
-//		System.out.println("isLoadable: "+model);
+		final int fcnt = cnt++;
+		//if(model.indexOf("HelplineAgent")!=-1)
+		//	System.out.println("isLoadable: "+model+" "+fcnt);
 
 		Future<Boolean> ret = new Future<>();
 		
-		getFactoryForModel(model, imports, rid, null).addResultListener(new IResultListener<IComponentFactory>()
+		getFactoryForModel(model, imports, rid).addResultListener(new IResultListener<IComponentFactory>()
 		{
 			public void resultAvailable(IComponentFactory fac)
 			{
-//				System.out.println("facformodel: "+model);
+				//if(model.indexOf("HelplineAgent")!=-1)
+				//	System.out.println("is Loadable middle: "+model+" "+fac+" "+fcnt);
+
 				fac.isLoadable(model, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret)
 				{
-//					public void customResultAvailable(Boolean result)
-//					{
-//						super.customResultAvailable(result);
+					public void customResultAvailable(Boolean result)
+					{
+						super.customResultAvailable(result);
 ////						if(model.indexOf("Block")!=-1)
-//							System.out.println("model: "+model+" "+result);
-//					}
+						//if(model.indexOf("HelplineAgent")!=-1)
+						//	System.out.println("is Loadable end: "+model+" "+result+" "+fcnt);
+					}
 				});
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-//				System.out.println("ex: "+exception);
+				//if(model.indexOf("HelplineAgent")!=-1)
+				//	System.out.println("is Loadable ex: "+exception+" "+model+" "+fcnt);
 				ret.setResult(false);
 			}
 		});
@@ -754,7 +815,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 
 		Future<Boolean> ret = new Future<>();
 		
-		getFactoryForModel(model, imports, rid, null).addResultListener(new IResultListener<IComponentFactory>()
+		getFactoryForModel(model, imports, rid).addResultListener(new IResultListener<IComponentFactory>()
 		{
 			public void resultAvailable(IComponentFactory fac)
 			{
@@ -784,7 +845,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		
 		Future<String> ret = new Future<>();
 		
-		getFactoryForModel(model, imports, rid, null).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, String>(ret)
+		getFactoryForModel(model, imports, rid).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, String>(ret)
 		{
 			public void customResultAvailable(IComponentFactory fac) throws Exception
 			{
@@ -831,7 +892,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		
 		Future<Collection<IComponentFeatureFactory>> ret = new Future<>();
 		
-		getFactoryForModel(model.getFilename(), model.getAllImports(), model.getResourceIdentifier(), null).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, Collection<IComponentFeatureFactory>>(ret)
+		getFactoryForModel(model.getFilename(), model.getAllImports(), model.getResourceIdentifier()).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, Collection<IComponentFeatureFactory>>(ret)
 		{
 			public void customResultAvailable(IComponentFactory fac) throws Exception
 			{
@@ -930,6 +991,8 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	{
 		ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
 		q.setExcludeOwner(true);
-		return SUtil.notNull(agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(q));
+		Collection<IComponentFactory> ret = SUtil.notNull(agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(q));
+		//System.out.println("facts: "+ret);
+		return ret;
 	}
 }

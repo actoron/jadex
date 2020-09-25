@@ -406,17 +406,19 @@ public class SComponentFactory
 //				if(model.endsWith("application.xml"))
 //					System.out.println("model2:"+model);
 		
-//				final long start = System.currentTimeMillis(); 
+				final long start = System.currentTimeMillis(); 
 				final Future<Boolean> ret = new Future<Boolean>();
 				ea.searchServices(new ServiceQuery<>(IComponentFactory.class))
 					.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, Boolean>(ret)
 				{
 					public void customResultAvailable(Collection<IComponentFactory> facs)
 					{
-//						long dur = System.currentTimeMillis()-start; 
-//						System.out.println("needed search: "+dur);
-//						System.out.println("found facs: "+facs.size());
+						long dur = System.currentTimeMillis()-start; 
+						//System.out.println("needed search: "+dur+" "+ea);
+						if(facs.size()==0)
+							System.out.println("found facs: "+facs.size());
 						
+						// todo: refactor to hide inner factories
 						facs = reorderMultiFactory(facs);
 						
 //						if(model.endsWith("application.xml"))
@@ -469,6 +471,7 @@ public class SComponentFactory
 		
 		if(i>=facts.length)
 		{
+			//System.out.println("found no fac: "+model+" "+SUtil.arrayToString(facts));
 			ret.setResult(Boolean.FALSE);
 		}
 		else
@@ -495,9 +498,9 @@ public class SComponentFactory
 			{
 				public void customResultAvailable(Boolean result)
 				{
-					//System.out.println("model: "+model+" "+result+" "+facts[i]);
 					if(result!=null && result.booleanValue())
 					{
+						//System.out.println("found model: "+model+" "+result+" "+facts[i]);
 						ret.setResult(result);
 					}
 					else
