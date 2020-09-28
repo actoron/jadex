@@ -178,11 +178,11 @@ public class ComponentTestBase extends TestCase
 			}
 		
 			checkTestResults(res);	// Do last -> throws exception on failure.
-			System.out.println("FINISHED runBare(): "+System.currentTimeMillis()+" "+filename);
+			//System.out.println("FINISHED runBare(): "+System.currentTimeMillis()+" "+filename);
 		}
 		catch(Throwable t2)
 		{
-			System.out.println("FAILED runBare(): "+System.currentTimeMillis()+" "+filename);
+			//System.out.println("FAILED runBare(): "+System.currentTimeMillis()+" "+filename);
 			t2.printStackTrace();
 			throw SUtil.throwUnchecked(t2);
 		}

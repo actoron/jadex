@@ -62,6 +62,8 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	{
 		super(terminate);
 		this.storeforfirst = storeforfirst;
+		//if(!storeforfirst)
+		//	System.out.println("store ?: "+storeforfirst+" "+this);
 	}
 	
 	//-------- methods --------
@@ -127,6 +129,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 		{
 			first = storeforfirst;
 			storeforfirst = false;
+			//System.out.println("store false: "+this);
 		}
     	super.addResultListener(listener);
     	
@@ -210,6 +213,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 			if(storeforfirst)
 			{
 				storeforfirst	= false;
+				//System.out.println("store false: "+this);
 				ownres	= results;
 				results	= null;
 			}
@@ -282,6 +286,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 			if(storeforfirst)
 			{
 				storeforfirst	= false;
+				//System.out.println("store false: "+this);
 				ownres	= results;
 				results	= null;
 			}
@@ -316,9 +321,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     		{
     			suspend	= true;
 	    	   	if(icallers==null)
-	    	   	{
 	    	   		icallers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
-	    	   	}
 	    	   	icallers.put(caller, CALLER_QUEUED);
     		}
     	}

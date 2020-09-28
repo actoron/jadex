@@ -42,7 +42,6 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.Breakpoint;
 import jadex.bridge.service.component.ComponentSuspendable;
-import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
@@ -64,7 +63,6 @@ import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
-import jadex.commons.MutableObject;
 import jadex.commons.SReflect;
 import jadex.commons.TimeoutException;
 import jadex.commons.Tuple3;
@@ -74,6 +72,7 @@ import jadex.commons.functional.Consumer;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
+import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
@@ -296,7 +295,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
 			if(endagenda.isDone() && prio<STEP_PRIORITY_IMMEDIATE)
 			{
-				ret.setException(new ComponentTerminatedException(getComponent().getId()));
+				System.out.println("step: "+step);
+				ret.setExceptionIfUndone(new ComponentTerminatedException(getComponent().getId()));
 			}
 			else
 			{
@@ -326,24 +326,22 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 
 		if(!ret.isDone())
-		{
 			wakeup();
-		}
 		
 		return ret;
 	}
 	
 	/**
 	 * Repeats a ComponentStep periodically, until terminate() is called on result future or a failure occurs in a step.
-	 * @param initialDelay delay before first execution in milliseconds
+	 * @param initialdelay delay before first execution in milliseconds
 	 * @param delay delay between scheduled executions of the step in milliseconds
 	 * @param step The component step
 	 * @return The intermediate results
 	 */
 	@Override
-	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialDelay, long delay, IComponentStep<T> step)
+	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialdelay, long delay, IComponentStep<T> step)
 	{
-		return repeatStep(initialDelay, delay, step, false);
+		return repeatStep(initialdelay, delay, step, false);
 	}
 	
 	/**
@@ -353,53 +351,65 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 * values, requiring the addition of a listener within the same step the repeat
 	 * step was schedule.
 	 * 
-	 * @param initialDelay delay before first execution in milliseconds
+	 * @param initialdelay delay before first execution in milliseconds
 	 * @param delay delay between scheduled executions of the step in milliseconds
 	 * @param step The component step
 	 * @param ignorefailures Don't terminate repeating after a failed step.
 	 * @return The intermediate results
 	 */
 	@Override
-	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialDelay, final long delay, final IComponentStep<T> step, final boolean ignorefailures)
+	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialdelay, final long delay, final IComponentStep<T> step, final boolean ignorefailures)
 	{
-		final MutableObject<Boolean>	stillRepeating	= new MutableObject<Boolean>(true);
+		final boolean[] stillrepeating	= new boolean[1];
+		stillrepeating[0] = true;
 		
 		final SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<T>(new TerminationCommand()
 		{
 			@Override
 			public void terminated(Exception reason)
 			{
-				stillRepeating.set(Boolean.FALSE);
+				stillrepeating[0] = false;
 			}
-		}, false);
+		}, true);
 		
 		// schedule the initial step
-		waitForDelay(initialDelay, step)
+		waitForDelay(initialdelay, step)
 			.addResultListener(new IResultListener<T>()
 		{
 			@Override
 			public void resultAvailable(T result)
 			{
-				ret.addIntermediateResult(result);
-				proceed();
+				if(!ret.isDone())
+				{
+					ret.addIntermediateResult(result);
+					proceed();
+				}
 			}
 			
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				if(ignorefailures)
+				if(!ret.isDone())
 				{
-					proceed();
-				}
-				else
-				{
-					ret.setException(exception);
+					if(exception instanceof StepInvalidException || exception instanceof FutureTerminatedException)
+					{
+						stillrepeating[0] = false;
+						proceed();
+					}
+					else if(ignorefailures)
+					{
+						proceed();
+					}
+					else
+					{
+						ret.setException(exception);
+					}
 				}
 			}
 			
 			private void proceed()
 			{
-				if (Boolean.TRUE.equals(stillRepeating.get()))
+				if(stillrepeating[0])
 				{
 					// reschedule this step if we're still repeating
 					waitForDelay(delay, step)
