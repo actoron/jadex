@@ -581,7 +581,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					}
 					
 					// Custom role match is ok
-					else if(!Collections.disjoint(secroles, secinfos.getRoles()))
+					else if(!Collections.disjoint(secroles == null ? Collections.emptySet() : secroles, secinfos.getRoles()))
 						trusted	= true;
 					
 					// Always allow 'unrestricted' access
