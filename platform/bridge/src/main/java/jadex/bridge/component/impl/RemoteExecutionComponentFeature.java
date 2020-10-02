@@ -458,7 +458,14 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					else
 					{
 						// Not allowed -> send back exception.
-						RemoteResultCommand<?> rc = new RemoteResultCommand(new SecurityException("Command "+msg.getClass()+" not allowed."), null);
+						String errormsg = "Command "+msg.getClass()+" not allowed.";
+						if (msg instanceof RemoteMethodInvocationCommand)
+						{
+							RemoteMethodInvocationCommand rmic = ((RemoteMethodInvocationCommand) msg);
+							errormsg = "Method invocation command "+rmic.getMethod()+" not allowed.";
+							
+						}
+						RemoteResultCommand<?> rc = new RemoteResultCommand(new SecurityException(errormsg), null);
 						sendRxMessage(remote, rxid, rc);	
 					}
 				}
