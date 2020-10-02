@@ -585,7 +585,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						trusted	= true;
 					
 					// Always allow 'unrestricted' access
-					else if(secroles.contains(Security.UNRESTRICTED))
+					else if(secroles != null && secroles.contains(Security.UNRESTRICTED))
 					{
 						trusted	= true;
 					}
