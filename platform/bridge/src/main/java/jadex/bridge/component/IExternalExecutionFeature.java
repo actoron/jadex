@@ -7,6 +7,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
@@ -91,12 +92,12 @@ public interface IExternalExecutionFeature extends IExternalComponentFeature
 	 * values, requiring the addition of a listener within the same step the repeat
 	 * step was schedule.
 	 * 
-	 * @param initialDelay delay before first execution in milliseconds
+	 * @param initialdelay delay before first execution in milliseconds
 	 * @param delay delay between scheduled executions of the step in milliseconds
 	 * @param step The component step
 	 * @return The intermediate results
 	 */
-	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialDelay, long delay, IComponentStep<T> step);
+	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialdelay, long delay, IComponentStep<T> step);
 	
 	/**
 	 * Repeats a ComponentStep periodically, until terminate() is called on result future.
@@ -105,13 +106,13 @@ public interface IExternalExecutionFeature extends IExternalComponentFeature
 	 * values, requiring the addition of a listener within the same step the repeat
 	 * step was schedule.
 	 * 
-	 * @param initialDelay delay before first execution in milliseconds
+	 * @param initialdelay delay before first execution in milliseconds
 	 * @param delay delay between scheduled executions of the step in milliseconds
 	 * @param step The component step
 	 * @param ignorefailures Don't terminate repeating after a failed step.
 	 * @return The intermediate results
 	 */
-	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialDelay, long delay, IComponentStep<T> step, boolean ignorefailures);
+	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialdelay, long delay, IComponentStep<T> step, boolean ignorefailures);
 	
 	/**
 	 *  Add a component listener for a specific component.
