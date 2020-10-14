@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.QueryEvent;
 import jadex.bridge.service.search.ServiceEvent;
@@ -14,6 +15,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.tools.web.jcc.IJCCPluginService;
 
 @Service(system=true)
+@Security(roles=Security.UNRESTRICTED)
 public interface IJCCRegistryViewService extends IJCCPluginService
 {
 	/**
@@ -21,13 +23,13 @@ public interface IJCCRegistryViewService extends IJCCPluginService
 	 *  @return A list of connections.
 	 */
 	// No intermediate for easier REST -> get all platforms in single response
-	public IFuture<Collection<PlatformData>>	getConnectedPlatforms();
+	public IFuture<Collection<PlatformData>> getConnectedPlatforms();
 
 	/**
 	 *  Get events about established connections.
 	 *  @return Events for connections.
 	 */
-	public ISubscriptionIntermediateFuture<PlatformData>	subscribeToConnections();
+	public ISubscriptionIntermediateFuture<PlatformData> subscribeToPlatforms();
 	
 	/**
 	 *  Get registered queries of a given (set of) scope(s) or no scope for all queries.
@@ -49,7 +51,7 @@ public interface IJCCRegistryViewService extends IJCCPluginService
 	 *  Get the managed services, if this platform is a super peer (i.e. has an ISuperpeerService).
 	 *  @return Service events for a self-updating list of services.
 	 */
-	public ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>>	subscribeToServices();
+	public ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>> subscribeToServices();
 	
 	/**
 	 *  Get all memory stats. cf IMemstatService

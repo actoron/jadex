@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.net.ssl.TrustManagerFactory;
-import javax.swing.JButton;
-import javax.swing.SwingUtilities;
 
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Object;
@@ -102,7 +100,6 @@ import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 
-import jadex.commons.Base64;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -1346,7 +1343,7 @@ public class SSecurity
 		final byte[] keydata = SCryptParallel.generate(pw.getBytes(SUtil.UTF8), salt, SCRYPT_N, SCRYPT_R, SCRYPT_P, 32);
 		return keydata;
 	}
-
+	
 	//	/**
 //	 *  Main for testing.
 //	 */

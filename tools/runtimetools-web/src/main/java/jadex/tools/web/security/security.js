@@ -46,6 +46,8 @@ class SecurityElement extends BaseElement
 	
 	init()
 	{
+		console.log("security: "+this.cid);
+		
 		this.myservice = "jadex.tools.web.security.IJCCSecurityService";
 
 		var res1 ="jadex/tools/web/security/scrypt.js";

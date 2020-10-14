@@ -414,7 +414,27 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		
 		return level;
 	}
-
+	
+	/**
+	 *  todo: move to some security class
+	 *  Check if a service method is unrestricted.
+	 *  Schedules on component to check this.
+	 * @param sid The service id.
+	 * @param component The internal access.
+	 * @param mi The method info.
+	 * @return True, if is unrestricted.
+	 */
+	public static IFuture<Boolean> isUnrestricted(IServiceIdentifier sid, IInternalAccess component, MethodInfo mi)
+	{
+		IComponentIdentifier cid = sid.getProviderId();
+		return component.getExternalAccess(cid).scheduleStep((IInternalAccess access) -> 
+		{
+			Security sec = RemoteMethodInvocationCommand.getSecurityLevel(access, mi, sid);
+			String[] rs = sec==null? SUtil.EMPTY_STRING_ARRAY: sec.roles();
+			boolean unres = SUtil.arrayToSet(rs).contains(Security.UNRESTRICTED);
+			return new Future<Boolean>(unres? Boolean.TRUE: Boolean.FALSE);
+		});
+	}
 	
 	/**
 	 *  Get a string representation.

@@ -2,6 +2,9 @@ package jadex.bridge.service.component;
 
 import java.util.Collection;
 
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -140,5 +143,12 @@ public interface IRequiredServicesFeature extends IExternalRequiredServicesFeatu
 	 *  @return Each service as an intermediate result or a collection of services as final result.
 	 */
 	public <T> ITerminableIntermediateFuture<T> getServices(Class<T> type);
+	
+	/**
+	 *  Create the user-facing object from the received search or query result.
+	 *  Result may be service object, service identifier (local or remote), or event.
+	 *  User object is either event or service (with or without required proxy).
+	 */
+	public IService getServiceProxy(IServiceIdentifier sid, RequiredServiceInfo info);
 	
 }

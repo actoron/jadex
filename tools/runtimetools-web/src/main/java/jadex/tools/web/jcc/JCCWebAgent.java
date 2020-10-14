@@ -1,5 +1,6 @@
 package jadex.tools.web.jcc;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,11 +15,15 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.ServiceCall;
+import jadex.bridge.component.impl.remotecommands.RemoteMethodInvocationCommand;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.FutureReturnType;
+import jadex.bridge.service.component.RemoteMethodInvocationHandler;
+import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
@@ -26,6 +31,8 @@ import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.commons.Boolean3;
 import jadex.commons.IResultCommand;
+import jadex.commons.MethodInfo;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
@@ -226,6 +233,77 @@ public class JCCWebAgent implements IJCCWebService
 	}
 	
 	/**
+	 *  Get the JCC plugin infos.
+	 *  @param cid The id of the platform to be managed.
+	 *  @return The plugin infos.
+	 */
+	public IFuture<JCCWebPluginInfo[]> getPluginInfos(IComponentIdentifier cid)
+	{
+		Future<JCCWebPluginInfo[]> ret = new Future<>();
+		
+		// search local plugin services
+		List<JCCWebPluginInfo> res = new ArrayList<>();
+		
+		Collection<IJCCPluginService> pluginsers = agent.searchLocalServices(new ServiceQuery<IJCCPluginService>(IJCCPluginService.class, ServiceScope.PLATFORM));
+		
+		for(IJCCPluginService service: pluginsers)
+		{
+			String name = service.getPluginName().get();
+			boolean unres = ((IService)service).getServiceId().isUnrestricted();
+			IServiceIdentifier sid = ((IService)service).getServiceId();
+			int prio = service.getPriority().get();
+			byte[] icon = service.getPluginIcon().get();
+			JCCWebPluginInfo pi = new JCCWebPluginInfo(name, icon, prio, unres, sid);
+			res.add(pi);
+		}
+		
+		// If not local platform
+		if(cid!=null && !cid.hasSameRoot(agent.getId().getRoot()))
+		{
+			agent.searchService(new ServiceQuery<IJCCWebService>(IJCCWebService.class).setSearchStart(cid.getRoot()))
+				.addResultListener(new IResultListener<IJCCWebService>()
+			{
+				public void resultAvailable(IJCCWebService jccser)
+				{
+					jccser.getPluginInfos(cid).thenAccept(pis ->
+					{
+						for(JCCWebPluginInfo pi: pis)
+						{
+							res.add(pi);
+						}
+						ret.setResult(res.toArray(new JCCWebPluginInfo[res.size()]));
+					});
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					System.out.println("Ex: "+exception);
+					ret.setResult(res.toArray(new JCCWebPluginInfo[res.size()]));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(res.toArray(new JCCWebPluginInfo[res.size()]));
+		}
+		
+		//System.out.println("fragments: "+ret);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the web component fragment for a plugin.
+	 *  @param name The plugin name.
+	 *  @return The web component fragment.
+	 */
+	public IFuture<String> getPluginFragment(IServiceIdentifier sid)
+	{
+		IJCCPluginService s = (IJCCPluginService)agent.getServiceProxy(sid, null);
+		return s.getPluginComponent();
+	}
+	
+	/**
 	 *  Check if a platform is available.
 	 *  @param cid The platform id.
 	 *  @return True if platform is available.
@@ -268,12 +346,14 @@ public class JCCWebAgent implements IJCCWebService
 		final String methodname, final Object[] args, final ClassInfo[] argtypes, @FutureReturnType final ClassInfo rettype)
 	{
 		//System.out.println("INVOKE: " + methodname + " " + servicetype);
+		// todo: the return type could not be available on this platform :-(
 		Class<?> rtype = rettype!=null? rettype.getType(agent.getClassLoader(), agent.getModel().getAllImports()): null;
-
 		final Future<Object> ret = (Future<Object>)SFuture.getNoTimeoutFuture(rtype, agent);
 
 		//if(methodname.indexOf("getSecurityS")!=-1)
 		//	System.out.println("invokeServiceMethod: "+servicetype+" "+methodname+" "+Arrays.toString(args)+" "+rettype);
+		
+		final String callid = (String)ServiceCall.getCurrentInvocation().getProperty("callid");
 		
 		// Search service with startpoint of given platform 
 		agent.searchService(new ServiceQuery<IService>(servicetype).setSearchStart(cid.getRoot()).setScope(ServiceScope.PLATFORM))
@@ -282,10 +362,7 @@ public class JCCWebAgent implements IJCCWebService
 			@Override
 			public void customResultAvailable(IService ser) throws Exception
 			{
-				// If found on target platform directly invoke on that platform
-				
-				//System.out.println("Invoking service method: "+ser+" "+methodname);
-				IFuture<Object> fut = ser.invokeMethod(methodname, argtypes, args, rettype);
+				IFuture<Object> fut = checkSecurityAndInvoke(ser, servicetype, methodname, args, argtypes, rettype);
 				FutureFunctionality.connectDelegationFuture(ret, fut);
 			}
 			
@@ -293,6 +370,7 @@ public class JCCWebAgent implements IJCCWebService
 			public void exceptionOccurred(Exception exception)
 			{
 				// Did not find the service, so use it locally with cid
+				// (Allows for resusing (having some webjcc plugins only) on the access platform)
 				//System.out.println("locally with cid: "+ methodname + " " + servicetype);
 				IService ser = (IService)agent.getLocalService(servicetype.getType(agent.getClassLoader()));
 				
@@ -309,8 +387,71 @@ public class JCCWebAgent implements IJCCWebService
 					argtypes2[argtypes2.length-1] = new ClassInfo(IComponentIdentifier.class);
 				}
 				
-				IFuture<Object> fut = ser.invokeMethod(methodname, argtypes2, args2, rettype);
+				IFuture<Object> fut = checkSecurityAndInvoke(ser, servicetype, methodname, args2, argtypes2, rettype);
 				FutureFunctionality.connectDelegationFuture(ret, fut);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Check the security level of a service method.
+	 *  Access is granted when:
+	 *  a) method/service is unrestricted
+	 *  b) method/service is restricted and logged in
+	 */
+	protected IFuture<Object> checkSecurityAndInvoke(IService ser, ClassInfo servicetype, final String methodname, final Object[] args, 
+		final ClassInfo[] argtypes, ClassInfo rettype)
+	{
+		Class<?> rtype = rettype!=null? rettype.getType(agent.getClassLoader(), agent.getModel().getAllImports()): null;
+		final Future<Object> ret = (Future<Object>)SFuture.getFuture(rtype);
+		final String callid = ServiceCall.getCurrentInvocation()==null? null: (String)ServiceCall.getCurrentInvocation().getProperty("callid");
+		
+		RemoteMethodInvocationCommand.isUnrestricted(ser.getServiceId(), agent, new MethodInfo(methodname, argtypes, servicetype.getTypeName()))
+			.addResultListener(new ExceptionDelegationResultListener<Boolean, Object>(ret)
+		{
+			@Override
+			public void customResultAvailable(Boolean unres) throws Exception
+			{
+				// if method is restricted -> check if logged in
+				if(!unres.booleanValue())
+				{
+					if(callid==null)
+					{
+						// No callid = no session = not logged in
+						ret.setException(new SecurityException("Service method has restricted access and not logged in: "+methodname+" "+servicetype));
+					}
+					else
+					{
+						IWebPublishService wps = agent.getLocalService(IWebPublishService.class);
+						wps.isLoggedIn(callid).addResultListener(new ExceptionDelegationResultListener<Boolean, Object>(ret)
+						{
+							@Override
+							public void customResultAvailable(Boolean loggedin) throws Exception
+							{
+								if(!loggedin.booleanValue())
+								{
+									ret.setException(new SecurityException("Service method has restricted access and not logged in"+methodname+" "+servicetype));
+								}
+								else
+								{
+									// If found on target platform directly invoke on that platform
+									//System.out.println("Invoking service method: "+ser+" "+methodname);
+									IFuture<Object> fut = ser.invokeMethod(methodname, argtypes, args, rettype);
+									FutureFunctionality.connectDelegationFuture(ret, fut);
+								}
+							}
+						});
+					}
+				}
+				else // method is unrestricted -> can call
+				{
+					// If found on target platform directly invoke on that platform
+					//System.out.println("Invoking service method: "+ser+" "+methodname);
+					IFuture<Object> fut = ser.invokeMethod(methodname, argtypes, args, rettype);
+					FutureFunctionality.connectDelegationFuture(ret, fut);
+				}
 			}
 		});
 		

@@ -93,10 +93,11 @@ public class MethodInfo
 	/**
 	 *  Create a new method info.
 	 */
-	public MethodInfo(String name, ClassInfo[] parametertypes)
+	public MethodInfo(String name, ClassInfo[] parametertypes, String classname)
 	{
 		this.name = name;
-		this.parametertypes = parametertypes.clone();
+		this.parametertypes = parametertypes!=null? parametertypes.clone(): null;
+		this.classname = classname;
 	}
 
 	//-------- methods --------
@@ -239,16 +240,29 @@ public class MethodInfo
 		{
 			if(method==null || classloader != cl)
 			{
-				Class<?>[] types = new Class[parametertypes.length];
-				for(int i=0; i<types.length; i++)
-				{
-					types[i] = parametertypes[i].getType(cl);
-				}
 				Class<?> cla = SReflect.findClass(classname, null, cl);
-				method = cla.getDeclaredMethod(name, types);
+				
+				if(parametertypes!=null)
+				{
+					Class<?>[] types = new Class[parametertypes.length];
+					for(int i=0; i<types.length; i++)
+					{
+						types[i] = parametertypes[i].getType(cl);
+					}
+					method = SReflect.getAnyMethod(cla, name, types);
+				}
+				else
+				{
+					Method[] ms = SReflect.getAllMethods(cla, name);
+					if(ms.length==1)
+					{
+						method = ms[0];
+					}
+				}
+				//method = SReflect.getMethod(cla, name, types); // only return public methods :-(
 				classloader = cl;
+				//method = cla.getDeclaredMethod(name, types); // does not search superclasses
 			}
-			return method;
 		}
 		catch(RuntimeException e)
 		{
@@ -258,6 +272,11 @@ public class MethodInfo
 		{
 			throw new RuntimeException(e);
 		}
+		
+		if(method==null)
+			throw new RuntimeException("Method not found: "+name+" "+classname);
+		
+		return method;
 	}
 	
 	/**

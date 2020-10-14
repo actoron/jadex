@@ -66,6 +66,15 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	}
 	
 	/**
+	 *  Get the plugin icon.
+	 *  @return The plugin icon.
+	 */
+	public IFuture<byte[]> getPluginIcon()
+	{
+		return loadResource("jadex/tools/web/starter/images/starter.png");
+	}
+	
+	/**
 	 *  Get all startable component models.
 	 *  @return The file names of the component models.
 	 */

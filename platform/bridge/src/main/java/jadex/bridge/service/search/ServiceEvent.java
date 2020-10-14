@@ -34,6 +34,10 @@ public class ServiceEvent<T>
 	 */
 	public ServiceEvent(T service, int eventtype)
 	{
+		// todo: refactor to not using a changing type of T (service id and service)
+		// service event is created with service identifier
+		// processServiceEvent in RequiredServiceComponentFeature converts it to a service proxy
+		
 		this.service = service;
 		this.type = eventtype;
 	}

@@ -79,6 +79,15 @@ public class JCCRegistryViewAgent extends JCCPluginAgent implements IJCCRegistry
 		return "jadex/tools/web/registryview/registryview.js";
 	}
 	
+	/**
+	 *  Get the plugin icon.
+	 *  @return The plugin icon.
+	 */
+	public IFuture<byte[]> getPluginIcon()
+	{
+		return loadResource("jadex/tools/web/registryview/registryview.png");
+	}
+	
 	@Override
 	public IIntermediateFuture<PlatformData> getConnectedPlatforms()
 	{
@@ -122,7 +131,7 @@ public class JCCRegistryViewAgent extends JCCPluginAgent implements IJCCRegistry
 	}
 
 	@Override
-	public ISubscriptionIntermediateFuture<PlatformData> subscribeToConnections()
+	public ISubscriptionIntermediateFuture<PlatformData> subscribeToPlatforms()
 	{
 		final List<ISubscriptionIntermediateFuture<PlatformData>>futs = new ArrayList<ISubscriptionIntermediateFuture<PlatformData>>();
 		final SubscriptionIntermediateFuture<PlatformData>	ret	= new SubscriptionIntermediateFuture<PlatformData>(null, true);

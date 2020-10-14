@@ -216,6 +216,17 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
     	return IFuture.DONE;
 	}
 	
+	/**
+	 *  Test if a the web user is logged in.
+	 *  @param callid The callid of the request.
+	 *  @return True, if is logged in.
+	 */
+	public IFuture<Boolean> isLoggedIn(String callid)
+	{
+		// todo: implement me
+		return new Future<>(Boolean.FALSE);
+	}
+	
 //	/**
 //	 * 
 //	 */

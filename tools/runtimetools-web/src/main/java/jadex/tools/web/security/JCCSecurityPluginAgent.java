@@ -66,6 +66,15 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	}
 	
 	/**
+	 *  Get the plugin icon.
+	 *  @return The plugin icon.
+	 */
+	public IFuture<byte[]> getPluginIcon()
+	{
+		return loadResource("jadex/tools/web/security/security.png");
+	}
+	
+	/**
 	 *  Get the security service of the own platform or of cid platform.
 	 *  @param cid The platform id.
 	 *  @return 

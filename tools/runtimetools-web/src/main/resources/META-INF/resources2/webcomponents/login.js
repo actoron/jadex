@@ -47,14 +47,14 @@ class LoginElement extends BaseElement
 		axios.get('webjcc/login?pass='+pass, {headers: {'x-jadex-login': pass}}, self.transform).then(function(resp)
 		//axios.get('webjcc/login?pass='+pass, self.transform).then(function(resp)
 		{
-			console.log("logged in: "+resp);
+			//console.log("logged in: "+resp);
 			self.loggedin = true;
 			//window.location.href = "/#/platforms";
 			self.createInfoMessage("logged in");
 		})
 		.catch(function(err) 
 		{
-			console.log("login failed: "+err);	
+			//console.log("login failed: "+err);	
 			self.createErrorMessage("login failed", err);
 			self.loggedin = false;
 		});
@@ -66,7 +66,7 @@ class LoginElement extends BaseElement
 		axios.get('webjcc/logout', {headers: {'x-jadex-logout': true}}, self.transform).then(function(resp)
 		//axios.get('webjcc/login?pass='+pass, self.transform).then(function(resp)
 		{
-			console.log("logged out: "+resp);
+			//console.log("logged out: "+resp);
 			self.loggedin = false;
 			self.createInfoMessage("logged out");
 		})
@@ -83,7 +83,7 @@ class LoginElement extends BaseElement
 		var self = this;
 		axios.get('webjcc/isLoggedIn', {headers: {'x-jadex-isloggedin': true}}, self.transform).then(function(resp)
 		{
-			console.log("is logged in: "+resp);
+			//console.log("is logged in: "+resp);
 			self.loggedin = resp.data;
 		})
 		.catch(function(err) 

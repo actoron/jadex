@@ -24,8 +24,9 @@ export class BaseElement extends LitElement
 		super.attributeChangedCallback(name, oldval, newval);
 	    
 	    //console.log('checking for init function.... ' + typeof this.init + " " + this.constructor.name);
-	    if(name === 'cid' && typeof this.init === 'function')
+	    if(name === 'cid' && newval!=null && typeof this.init === 'function')
 	    {
+			this.cid = newval;
 	    	//console.log('init found, calling...');
 	    	this.init();
 	    }
@@ -36,7 +37,7 @@ export class BaseElement extends LitElement
 	constructor() 
 	{
 		super();
-
+		
 		// must load sync to ensure that style.css rules are defined and gain precedence		
 		this.loadStyle("/libs/bootstrap_4.5.0/bootstrap.min.css")
 		.then(()=>
@@ -90,23 +91,51 @@ export class BaseElement extends LitElement
 	loadStyle(url)
 	{
 		var self = this;
+		var ret = null;
 		
-		return new Promise(function(resolve, reject) 
+		var sheet = BaseElement.loaded[url];
+		if(sheet!=null)
 		{
-			axios.get(url).then(function(resp)
+			if(sheet instanceof Promise)
 			{
-				var css = resp.data;    
-				//console.log(css);
-				var sheet = new CSSStyleSheet();
-				sheet.replaceSync(css);
-				self.shadowRoot.adoptedStyleSheets = self.shadowRoot.adoptedStyleSheets.concat(sheet);
-				resolve(sheet);
-			})
-			.catch(function(err)
+				ret = sheet;	
+			}
+			else
 			{
-				reject(err);
+				ret = new Promise(function(resolve, reject) 
+				{
+					//var sheet = new CSSStyleSheet();
+					//sheet.replaceSync(css);
+					self.shadowRoot.adoptedStyleSheets = self.shadowRoot.adoptedStyleSheets.concat(sheet);
+					resolve(sheet);
+					//console.log("cached version: "+url+" "+self.shadowRoot.adoptedStyleSheets.length);
+				});
+			}	
+		}
+		else
+		{
+			ret = new Promise(function(resolve, reject) 
+			{
+				axios.get(url).then(function(resp)
+				{
+					//console.log("loaded version: "+url+" "+self.shadowRoot.adoptedStyleSheets.length);
+					var css = resp.data;    
+					//console.log(css);
+					var sheet = new CSSStyleSheet();
+					sheet.replaceSync(css);
+					self.shadowRoot.adoptedStyleSheets = self.shadowRoot.adoptedStyleSheets.concat(sheet);
+					BaseElement.loaded[url] = sheet;
+					resolve(sheet);
+				})
+				.catch(function(err)
+				{
+					reject(err);
+				});
 			});
-		});
+			BaseElement.loaded[url] = ret;
+		}
+		
+		return ret;
 	}
 	
 	loadScript(url)

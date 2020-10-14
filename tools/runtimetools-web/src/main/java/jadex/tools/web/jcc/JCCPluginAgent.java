@@ -133,6 +133,12 @@ public abstract class JCCPluginAgent
 	}
 	
 	/**
+	 *  Get the plugin icon.
+	 *  @return The plugin icon.
+	 */
+	public abstract IFuture<byte[]> getPluginIcon();
+	
+	/**
 	 *  Get the plugin name.
 	 *  @return The plugin name.
 	 */

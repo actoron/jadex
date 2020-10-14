@@ -5,7 +5,6 @@ import {BaseElement} from 'base-element';
 class PlatformElement extends BaseElement 
 {
 	loaded = false;
-	plugin = null;
 
 	static get properties() 
 	{
@@ -15,9 +14,31 @@ class PlatformElement extends BaseElement
 			for (let key in super.properties)
 				ret[key]=super.properties[key];
 		}
-		ret['plugin'] = { type: String }
+		ret['plugin'] = { type: String };
+		ret['loggedin'] = { type: Boolean };
 		return ret;
 	}
+	
+	constructor() 
+	{
+		super();
+		console.log("platform");
+		this.cid = null;
+		this.plugin = null;
+		this.plugins = [];
+		this.loggedin = false;
+		this.no = 0;
+	}
+	
+	/*init() 
+	{
+		console.log("platform");
+		
+		this.cid = null;
+		this.plugin = null;
+		this.plugins = [];
+		this.loggedin = false;
+	}*/
 	
 	attributeChangedCallback(name, oldVal, newVal) 
 	{
@@ -31,13 +52,13 @@ class PlatformElement extends BaseElement
 			// Continously check platform availability
 			this.checkPlatform(10000);
 
-	    	this.loadPlugins().then(function()
+	    	this.loadPluginInfos().then(function()
 	    	{
 	    		self.loaded = true;
 	    		if(self.plugin != null)
 	    			self.showPlugin2({ "name" : self.plugin });
 	    		else if(self.plugins.length > 0)
-	    			self.showPlugin2(self.plugins[0]);
+	    			self.showPlugin2(self.getPlugins()[0].name);
 	    	}).catch(function(err) 
 			{
 				self.createErrorMessage("Could not load plugins", err);
@@ -49,19 +70,8 @@ class PlatformElement extends BaseElement
 		{
 	    	this.plugin = newVal;
 	    	if(this.loaded)
-	    		this.showPlugin2({ "name" : newVal });
+	    		this.showPlugin2(newVal);
 	    }
-	}
-	
-	constructor() 
-	{
-		super();
-
-		console.log("platform");
-		
-		this.cid = null;
-		
-		this.plugins = [];
 	}
 	
 	showPlugin(event)
@@ -73,29 +83,107 @@ class PlatformElement extends BaseElement
 			el[i].classList.remove('active');
 		sel.classList.add("active");
 		
-		this.showPlugin2(event.item);
+		this.showPlugin2(event.item.name);
 		history.pushState(null, "", "/#/platform/"+this.cid+"/"+event.item.name);
 	}
 	
-	showPlugin2(p)
+	showPlugin2(name)
 	{
-		let lcname = p.name.toLowerCase(); 
-		//console.log("plugin: "+lcname+" "+this.cid);
+		console.log("show plugin: "+name+" "+this.cid);
+
+		let self = this;
 		
-		let html = "<jadex-"+lcname+" cid='"+this.cid+"'></jadex-"+lcname+">";
-		//console.log("Insert plugin element: " + p.name);
-		this.shadowRoot.getElementById("plugin").innerHTML = html;
-		//console.log("Req update: " + p.name);
-		this.requestUpdate();
-		//console.log("Updated: " + p.name);
+		if(!this.plugins[name].unrestricted && !this.loggedin)
+		{
+			let html = "<jadex-restricted></jadex-restricted>";
+			self.shadowRoot.getElementById("plugin").innerHTML = html;
+			self.requestUpdate();
+		}
+		else
+		{
+			var pi = this.plugins[name];
+		
+			if(pi.component==null)
+			{
+				this.loadPlugin(pi.name).then(function()
+				{
+					let html = "<jadex-"+name+" cid='"+self.cid+"'></jadex-"+name+">";
+					//console.log("Insert plugin element: " + p.name);
+					self.shadowRoot.getElementById("plugin").innerHTML = html;
+					//console.log("Req update: " + p.name);
+					self.requestUpdate();
+					//console.log("Updated1: " + name);
+				}).catch(function(err)
+				{
+					console.log(err);
+				});
+			}
+			else
+			{
+				let html = "<jadex-"+name+" cid='"+this.cid+"'></jadex-"+name+">";
+				//console.log("Insert plugin element: " + p.name);
+				this.shadowRoot.getElementById("plugin").innerHTML = html;
+				//console.log("Req update: " + p.name);
+				this.requestUpdate();
+				//console.log("Updated2: " + name);
+			}
+		}
 	}
 	
-	checkPlatform(interval) 
+	loadPlugin(name)
 	{
+		var self = this;
+		return new Promise(function(resolve, reject) 
+		{
+			axios.get('webjcc/getPluginFragment?sid='+JSON.stringify(self.plugins[name].sid)+'&contenttype=application/json', self.transform).then(function(resp)
+			{
+				//console.log("received: "+resp);	
+				var component = resp.data;
+				//console.log("plug: "+component);
+				
+				self.plugins[name].component = component;
+				
+				if(!component.startsWith('<'))
+				{
+					importShim.topLevelLoad(importShim.getFakeUrl(), component).then(function()
+					{
+						resolve(component);
+					}).catch(function(err){reject(err)})
+				}
+			}).catch(function(err) 
+			{
+				//console.log("err: "+err);	
+				reject(err);
+			});
+		});		
+	}
+	
+	checkPlatform(interval)
+	{
+		this.internalCheckPlatform(interval, ++this.no);
+	}
+	
+	internalCheckPlatform(interval, no) 
+	{
+		// terminate when another call to checkPlatform() has been performed
+		console.log("check platform: "+no+" "+this.no);
+		if(no!=this.no)
+		{
+			console.log("terminate platform check");
+			return;
+		}
+			
 		var self = this;
 		axios.get('webjcc/isPlatformAvailable?cid='+self.cid, self.transform).then(function(resp)
 		{
-			setTimeout(function(){self.checkPlatform();}, interval!=undefined? interval: 10000)
+			self.isLoggedIn().then(function()
+			{
+				setTimeout(function(){self.internalCheckPlatform(interval, no)}, interval!=undefined? interval: 10000);
+			})
+			.catch(function(err)
+			{
+				setTimeout(function(){self.internalCheckPlatform(interval, no)}, interval!=undefined? interval: 10000);
+			});
 		})
 		.catch(function(err) 
 		{
@@ -105,56 +193,24 @@ class PlatformElement extends BaseElement
 		});
 	}
 	
-	loadPlugins() 
+	loadPluginInfos() 
 	{
 		var self = this;
 		return new Promise(function(resolve, reject) 
 		{
-			axios.get('webjcc/getPluginFragments?cid='+self.cid, self.transform).then(function(resp)
+			axios.get('webjcc/getPluginInfos?cid='+self.cid, self.transform).then(function(resp)
 			{
 				//console.log("received: "+resp);	
 				
-				var map = resp.data;
+				var pis = resp.data;
 				//console.log(map);
 				
-				var i = 0;
-				let promises = [];
-				Object.keys(map).forEach(function(tagname) 
+				for(var i=0; i<pis.length; i++)
 				{
-				    var taghtml = map[tagname];
-					
-				    self.plugins[i] = {name: tagname, html: taghtml};
-				    
-				    //var script = document.createElement('script');
-		            //script.type = 'text/javascript';
-		            //script.src = files[i];
-		            
-			    	//var script = "<script type='module'>"+taghtml+"</script>";
-			    	//document.getElementsByTagName("head")[0].append(script);
-			    	//$('head').append(script);
-			    	/* let script = document.createElement("script");
-			    	script.type='module-shim';
-			    	script.innerHTML=taghtml;
-			    	alert(taghtml);
-			    	document.head.append(script); */
-				    if (!taghtml.startsWith('<'))
-				    {
-					    i++;
-				    	let promise = importShim.topLevelLoad(importShim.getFakeUrl(), taghtml);
-				    	promises.push(promise);
-				    }
-				});
+					self.plugins[pis[i].name] = pis[i];
+				}
 				
-				Promise.all(promises).then(function(x)
-				{
-					if(i>0)
-						self.showPlugin2(self.plugins[0]);
-					else
-						self.requestUpdate();
-					resolve();
-				});
-				
-				//return PROMISE_DONE;
+				self.showPlugin2(self.getPlugins()[0].name);
 				
 			}).catch(function(err) 
 			{
@@ -182,25 +238,68 @@ class PlatformElement extends BaseElement
 	    	.navbar-custom .nav-item:hover .nav-link {
 	    		color: #ffffff;
 	    	}
+			.overlay {
+				background: rgba(0, 0, 0, 0.3); /* Black see-through */
+			}
 	    `;
 	}
 	
-	render() {
+	getPlugins()
+	{
+		var self = this;
+		var ret = Object.values(this.plugins).sort(function(p1, p2) 
+		{
+			var ret = 0;
+			if(!self.loggedin)
+				ret = p2.unrestricted - p1.unrestricted;
+			
+			if(ret===0)
+			{
+				ret = p2.priority-p1.priority;
+    			if(ret===0)
+					ret = p1.name.toLowerCase().localeCompare(p2.name.toLowerCase());
+			}
+			return ret
+		});
+		//console.log("plugins: "+ret);
+		return ret;
+	}
+	
+	render() 
+	{
+		var self = this;
 		return html`
 			<h1>Platform ${this.cid}</h1>
-
-			<nav id="plugins" class="navbar navbar-expand-sm navbar-light bg-light">
-				<ul class="navbar-nav mr-auto">
-					${this.plugins.map((p) => html`
-					<li class="nav-item active">
-						<div class="nav-link" @click="${(e) => {e.item = p; this.showPlugin(e)}}"><h2>${p.name}</h2></div>
-					</li>
-					`)}
-				</ul>
-			</nav>
+			<div class="container-fluid">
+				${this.getPlugins().map((p) => html`
+					${!p.unrestricted && !this.loggedin? "": p.icon!=null? 
+						html`<img class="${self.plugin===p.name? "overlay": ""}" src="data:image/png;base64,${p.icon.__base64}" alt="Red dot" @click="${(e) => {self.showPlugin2(p.name)}}" data-toggle="tooltip" data-placement="top" title="${p.name}"/>`:
+						html`<span @click="${(e) => {self.showPlugin2(p.name)}}">${p.name}</span>`
+					}
+				`)}
+			</div>
 			
 			<div id="plugin"></div>
 		`;
+	}
+	
+	isLoggedIn()
+	{
+		var self = this;
+		return new Promise(function(resolve, reject) 
+		{
+			axios.get('webjcc/isLoggedIn', {headers: {'x-jadex-isloggedin': true}}, self.transform).then(function(resp)
+			{
+				console.log("is logged in: "+resp);
+				self.loggedin = resp.data;
+				resolve(self.loggedin);
+			})
+			.catch(function(err) 
+			{
+				console.log("check failed: "+err);	
+				reject(err);
+			});
+		});
 	}
 }
 

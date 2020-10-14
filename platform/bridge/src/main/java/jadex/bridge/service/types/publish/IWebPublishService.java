@@ -27,6 +27,13 @@ public interface IWebPublishService extends IPublishService
 	public IFuture<Void> setLoginSecurity(boolean sec);
 	
 	/**
+	 *  Test if a the web user is logged in.
+	 *  @param callid The callid of the request.
+	 *  @return True, if is logged in.
+	 */
+	public IFuture<Boolean> isLoggedIn(String callid);
+	
+	/**
 	 *  Log in to the platform.
 	 *  @param request The request.
 	 *  @param secret The platform secret.

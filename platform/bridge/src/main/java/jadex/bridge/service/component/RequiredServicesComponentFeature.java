@@ -737,6 +737,24 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	//-------- impl/raw methods --------
 	
 	/**
+	 * 
+	 * @param result
+	 * @param info
+	 * @return
+	 */
+	protected Object processResult(Object result, RequiredServiceInfo info)
+	{
+		if(result instanceof ServiceEvent)
+			return processServiceEvent((ServiceEvent)result, info);
+		else if(result instanceof IServiceIdentifier)
+			return getServiceProxy((IServiceIdentifier)result, info);
+		else if(result instanceof IService)
+			return addRequiredServiceProxy((IService)result, info);
+		else
+			return result;
+	}
+	
+	/**
 	 *  Search for matching services and provide first result.
 	 *  @param query The search query.
 	 *  @param info Used for required service proxy configuration -> null for no proxy.
@@ -753,7 +771,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		{
 			ret = new TerminableFuture<>();
 			@SuppressWarnings("unchecked")
-			T t = (T)createServiceProxy(sid, info);
+			T t = (T)getServiceProxy(sid, info);
 			ret.setResult(t);
 		}
 		
@@ -773,7 +791,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 				@Override
 				public Object handleResult(Object result) throws Exception
 				{
-					return createServiceProxy(result, info);
+					return processResult(result, info);
 				}
 			});
 			((IInternalExecutionFeature)component.getFeature(IExecutionFeature.class)).addSimulationBlocker(ret);
@@ -818,7 +836,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 				
 		// Fetches service and wraps result in proxy, if required. 
 		@SuppressWarnings("unchecked")
-		T ret = sid!=null ? (T)createServiceProxy(sid, info) : null;
+		T ret = sid!=null ? (T)getServiceProxy(sid, info) : null;
 		return ret;
 	}
 	
@@ -905,7 +923,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 						if(max<0 || ++resultcnt[0]<=max)
 						{
 							scf.insert(result.toString());
-							return createServiceProxy(result, info);
+							return processResult(result, info);
 						}
 						else
 						{
@@ -1029,7 +1047,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		for(IServiceIdentifier result: results)
 		{
 			@SuppressWarnings("unchecked")
-			T service = (T)createServiceProxy(result, info);
+			T service = (T)getServiceProxy(result, info);
 			ret.add(service);
 		}
 		
@@ -1097,7 +1115,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 					if(max<0 || resultcnt[0]<=max)
 					{
 						scf.insert(result.toString());
-						return createServiceProxy(result, info);
+						return processResult(result, info);
 					}
 					else
 					{
@@ -1222,47 +1240,73 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 *  User object is either event or service (with or without required proxy).
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected Object createServiceProxy(Object service, RequiredServiceInfo info)
+	protected ServiceEvent processServiceEvent(ServiceEvent event, RequiredServiceInfo info)
 	{
-		ServiceEvent event = null;
-		if (service instanceof ServiceEvent)
+		if(event.getService() instanceof IService)
 		{
-			event = (ServiceEvent) service;
-			service = event.getService();
+			IService service = addRequiredServiceProxy((IService)event.getService(), info);
+			event.setService(service);
+		}
+		else if(event.getService() instanceof IServiceIdentifier)
+		{
+			IService service = getServiceProxy((IServiceIdentifier)event.getService(), info);
+			event.setService(service);
 		}
 		
+		return event;
+	}
+	
+	/**
+	 *  Create the user-facing object from the received search or query result.
+	 *  Result may be service object, service identifier (local or remote), or event.
+	 *  User object is either event or service (with or without required proxy).
+	 */
+	@SuppressWarnings({"rawtypes", "unchecked" })
+	public IService getServiceProxy(IServiceIdentifier sid, RequiredServiceInfo info)
+	{
+		IService ret = null;
+		
 		// If service identifier -> find/create service object or proxy
-		if(service instanceof IServiceIdentifier)
+			
+		// Local component -> fetch local service object.
+		if(sid.getProviderId().getRoot().equals(getComponent().getId().getRoot()))
 		{
-			IServiceIdentifier sid = (IServiceIdentifier)service;
-			
-			// Local component -> fetch local service object.
-			if(sid.getProviderId().getRoot().equals(getComponent().getId().getRoot()))
-			{
-				service = ServiceRegistry.getRegistry(getInternalAccess()).getLocalService(sid); 			
-			}
-			
-			// Remote component -> create remote proxy
-			else
-			{
-				service = RemoteMethodInvocationHandler.createRemoteServiceProxy(getInternalAccess(), sid);
-			}
+			ret = ServiceRegistry.getRegistry(getInternalAccess()).getLocalService(sid); 			
+		}
+		
+		// Remote component -> create remote proxy
+		else
+		{
+			ret = RemoteMethodInvocationHandler.createRemoteServiceProxy(getInternalAccess(), sid);
 		}
 		
 		// else service event -> just return event, as desired by user (specified in query return type)
 		
+		ret = addRequiredServiceProxy(ret, info);
+		
+		return ret;
+	}
 
+	/**
+	 * 
+	 * @param service
+	 * @param info
+	 */
+	protected IService addRequiredServiceProxy(IService service, RequiredServiceInfo info)
+	{
+		IService ret = service;
+		
 		// Add required service proxy if specified.
-		if(service instanceof IService && info!=null)
+		if(info!=null)
 		{
-			service = BasicServiceInvocationHandler.createRequiredServiceProxy(getInternalAccess(), 
-				(IService)service, null, info, info.getDefaultBinding(), Starter.isRealtimeTimeout(getComponent().getId()));
+			ret = BasicServiceInvocationHandler.createRequiredServiceProxy(getInternalAccess(), 
+				(IService)ret, null, info, info.getDefaultBinding(), Starter.isRealtimeTimeout(getComponent().getId()));
 			
 			// Check if no property provider has been created before and then create and init properties
-			if(!getComponent().getFeature(INFPropertyComponentFeature.class).hasRequiredServicePropertyProvider(((IService)service).getServiceId()))
+			if(!getComponent().getFeature(INFPropertyComponentFeature.class).hasRequiredServicePropertyProvider(ret.getServiceId()))
 			{
 				INFMixedPropertyProvider nfpp = getComponent().getFeature(INFPropertyComponentFeature.class)
-					.getRequiredServicePropertyProvider(((IService)service).getServiceId());
+					.getRequiredServicePropertyProvider(((IService)ret).getServiceId());
 				
 				List<NFRPropertyInfo> nfprops = info.getNFRProperties();
 				if(nfprops!=null && nfprops.size()>0)
@@ -1271,7 +1315,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 					{
 						MethodInfo mi = nfprop.getMethodInfo();
 						Class<?> clazz = nfprop.getClazz().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
-						INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getInternalAccess(), (IService)service, nfprop.getMethodInfo(), nfprop.getParameters());
+						INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getInternalAccess(), (IService)ret, nfprop.getMethodInfo(), nfprop.getParameters());
 						if(mi==null)
 						{
 							nfpp.addNFProperty(nfp);
@@ -1285,13 +1329,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			}
 		}
 		
-		if(event != null)
-		{
-			event.setService(service);
-			service = event;
-		}
-		
-		return service;
+		return ret;
 	}
 	
 

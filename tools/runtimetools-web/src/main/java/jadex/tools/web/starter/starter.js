@@ -8,7 +8,7 @@ class StarterElement extends BaseElement
 	
 	init() 
 	{
-		//console.log("starter");
+		console.log("starter: "+this.cid);
 		
 		this.model = null; // loaded model
 		this.reversed = false;

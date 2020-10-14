@@ -30,7 +30,7 @@ import jadex.tools.web.jcc.IJCCWebService;
 import jadex.tools.web.jcc.JCCPluginAgent;
 
 @ProvidedServices({@ProvidedService(name="cloudviewweb", type=IJCCCloudviewService.class)})
-@Agent(autostart=Boolean3.TRUE)
+@Agent(autostart=Boolean3.FALSE)
 public class JCCCloudviewPluginAgent extends JCCPluginAgent implements IJCCCloudviewService
 {
 	@Agent
@@ -134,5 +134,14 @@ public class JCCCloudviewPluginAgent extends JCCPluginAgent implements IJCCCloud
 	public String getPluginUIPath()
 	{
 		return "jadex/tools/web/cloudview/cloudview.tag";
+	}
+	
+	/**
+	 *  Get the plugin icon.
+	 *  @return The plugin icon.
+	 */
+	public IFuture<byte[]> getPluginIcon()
+	{
+		return new Future<byte[]>((byte[])null);
 	}
 }

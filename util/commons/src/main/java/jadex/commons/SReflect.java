@@ -962,7 +962,7 @@ public class SReflect
 	 *  Get all method(s) of the class by name,
 	 *  including public, protected and private methods.
 	 *  
-	 *  @param clazz	The class to search.
+	 *  @param clazz The class to search.
 	 *  @param name	The name of the method to search for.
 	 *  @return	The method(s).
 	 */
@@ -1012,13 +1012,18 @@ public class SReflect
 	 *  @return Array of all methods starting from the current
 	 *  	class upwards towards Object.class.
 	 */
-	public static Method[]	getAllMethods(Class clazz)
+	public static Method[]	getAllMethods(Class<?> clazz)
 	{
-		List<Method>	ret	= new ArrayList<Method>();
-		Class<?> cls = clazz;
+		// todo: should add methods of interfaces when clazz is a class?
+		// currently adds interface methods only when clazz is interface
 
-		while(cls!=null)
+			List<Method> ret = new ArrayList<Method>();
+		
+		List<Class<?>> todo = new ArrayList<Class<?>>();
+		todo.add(clazz);
+		while(todo.size()>0)
 		{
+			Class<?> cls = todo.remove(0);
 			try
 			{
 				ret.addAll(Arrays.asList(cls.getDeclaredMethods()));
@@ -1027,7 +1032,18 @@ public class SReflect
 			{
 				//e.printStackTrace();
 			}
-			cls	= cls.getSuperclass();
+			if(cls.isInterface())
+			{
+				Class<?>[] ifs = cls.getInterfaces();
+				for(int i=0; i<ifs.length; i++)
+					todo.add(ifs[i]);
+			}
+			else
+			{
+				Class<?> spcl = cls.getSuperclass();
+				if(spcl!=null)
+					todo.add(spcl);
+			}
 		}
 
 		return ret.toArray(new Method[ret.size()]);
