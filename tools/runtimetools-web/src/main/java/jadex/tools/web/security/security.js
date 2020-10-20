@@ -48,24 +48,28 @@ class SecurityElement extends BaseElement
 	{
 		console.log("security: "+this.cid);
 		
-		this.myservice = "jadex.tools.web.security.IJCCSecurityService";
-
-		var res1 ="jadex/tools/web/security/scrypt.js";
-		var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
-
-		//console.log("jstree load files start");
-		
-		this.loadScript(ures1).then((values) => 
+		super.init().then(()=>
 		{
-			console.log("scrypt load ok");
-			if(window.scrypt!=null)
-				this.scrypt = window.scrypt;
-			this.refresh();
+			this.myservice = "jadex.tools.web.security.IJCCSecurityService";
+	
+			var res1 ="jadex/tools/web/security/scrypt.js";
+			var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+	
+			//console.log("jstree load files start");
+			
+			this.loadScript(ures1).then((values) => 
+			{
+				//console.log("scrypt load ok");
+				if(window.scrypt!=null)
+					this.scrypt = window.scrypt;
+				this.refresh();
+			})
+			.catch(err => 
+			{
+				console.log("js tree load files err: "+err);
+			});
 		})
-		.catch(err => 
-		{
-			console.log("js tree load files err: "+err);
-		});
+		.catch((err)=>console.log(err));
 	}
 	
 	getMethodPrefix() 
@@ -135,7 +139,7 @@ class SecurityElement extends BaseElement
 	render() 
 	{
 		return html`
-			<div id="panel" class="container-fluid">
+			<div id="panel" class="container-fluid m-0 p-0">
 				<div id="accordion">
 					<div class="card m-2">
 						<div class="card-header">

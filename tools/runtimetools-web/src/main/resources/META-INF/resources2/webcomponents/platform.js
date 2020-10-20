@@ -15,7 +15,7 @@ class PlatformElement extends BaseElement
 				ret[key]=super.properties[key];
 		}
 		ret['plugin'] = { type: String };
-		ret['loggedin'] = { type: Boolean };
+		//ret['loggedin'] = { type: Boolean };
 		return ret;
 	}
 	
@@ -26,7 +26,7 @@ class PlatformElement extends BaseElement
 		this.cid = null;
 		this.plugin = null;
 		this.plugins = [];
-		this.loggedin = false;
+		//this.loggedin = false;
 		this.no = 0;
 	}
 	
@@ -89,11 +89,15 @@ class PlatformElement extends BaseElement
 	
 	showPlugin2(name)
 	{
-		console.log("show plugin: "+name+" "+this.cid);
+		// Only show if available
+		if(this.plugins[name]==null)
+			return;
+		
+		//console.log("show plugin: "+name+" "+this.cid);
 
 		let self = this;
 		
-		if(!this.plugins[name].unrestricted && !this.loggedin)
+		if(!this.plugins[name].unrestricted && !login.isLoggedIn())
 		{
 			let html = "<jadex-restricted></jadex-restricted>";
 			self.shadowRoot.getElementById("plugin").innerHTML = html;
@@ -101,6 +105,7 @@ class PlatformElement extends BaseElement
 		}
 		else
 		{
+			this.plugin = name;
 			var pi = this.plugins[name];
 		
 			if(pi.component==null)
@@ -158,41 +163,6 @@ class PlatformElement extends BaseElement
 		});		
 	}
 	
-	checkPlatform(interval)
-	{
-		this.internalCheckPlatform(interval, ++this.no);
-	}
-	
-	internalCheckPlatform(interval, no) 
-	{
-		// terminate when another call to checkPlatform() has been performed
-		console.log("check platform: "+no+" "+this.no);
-		if(no!=this.no)
-		{
-			console.log("terminate platform check");
-			return;
-		}
-			
-		var self = this;
-		axios.get('webjcc/isPlatformAvailable?cid='+self.cid, self.transform).then(function(resp)
-		{
-			self.isLoggedIn().then(function()
-			{
-				setTimeout(function(){self.internalCheckPlatform(interval, no)}, interval!=undefined? interval: 10000);
-			})
-			.catch(function(err)
-			{
-				setTimeout(function(){self.internalCheckPlatform(interval, no)}, interval!=undefined? interval: 10000);
-			});
-		})
-		.catch(function(err) 
-		{
-			console.log("platform cannot be reached: "+err);	
-			//history.pushState(null, "", "/#/platforms");
-			window.location.href = "/#/platforms";
-		});
-	}
-	
 	loadPluginInfos() 
 	{
 		var self = this;
@@ -211,12 +181,50 @@ class PlatformElement extends BaseElement
 				}
 				
 				self.showPlugin2(self.getPlugins()[0].name);
+				console.log("loadPlugs show: "+self.getPlugins()[0].name);
 				
 			}).catch(function(err) 
 			{
 				//console.log("err: "+err);	
 				reject(err);
 			});
+		});
+	}
+	
+	checkPlatform(interval)
+	{
+		this.internalCheckPlatform(interval, ++this.no);
+	}
+	
+	internalCheckPlatform(interval, no) 
+	{
+		// terminate when another call to checkPlatform() has been performed
+		//console.log("check platform: "+no+" "+this.no);
+		if(no!=this.no)
+		{
+			console.log("terminate platform check");
+			return;
+		}
+			
+		var self = this;
+		axios.get('webjcc/isPlatformAvailable?cid='+self.cid, self.transform).then(function(resp)
+		{
+			setTimeout(function(){self.internalCheckPlatform(interval, no)}, interval!=undefined? interval: 10000);
+
+			/*self.isLoggedIn().then(function()
+			{
+				setTimeout(function(){self.internalCheckPlatform(interval, no)}, interval!=undefined? interval: 10000);
+			})
+			.catch(function(err)
+			{
+				setTimeout(function(){self.internalCheckPlatform(interval, no)}, interval!=undefined? interval: 10000);
+			});*/
+		})
+		.catch(function(err) 
+		{
+			console.log("platform cannot be reached: "+err);	
+			//history.pushState(null, "", "/#/platforms");
+			window.location.href = "/#/platforms";
 		});
 	}
 	
@@ -246,11 +254,11 @@ class PlatformElement extends BaseElement
 	
 	getPlugins()
 	{
-		var self = this;
+		//var self = this;
 		var ret = Object.values(this.plugins).sort(function(p1, p2) 
 		{
 			var ret = 0;
-			if(!self.loggedin)
+			if(!login.isLoggedIn())
 				ret = p2.unrestricted - p1.unrestricted;
 			
 			if(ret===0)
@@ -265,14 +273,22 @@ class PlatformElement extends BaseElement
 		return ret;
 	}
 	
+	requestUpdate()
+	{
+		if(this.plugin!=null && !login.isLoggedIn() && !this.plugins[this.plugin].unrestricted)
+			this.showPlugin2(this.getPlugins()[0].name);
+		
+		super.requestUpdate();
+	}
+	
 	render() 
 	{
 		var self = this;
 		return html`
-			<h1>Platform ${this.cid}</h1>
-			<div class="container-fluid">
+			<h1 class="m-0 p-0">Platform ${this.cid}</h1>
+			<div class="container-fluid m-0 p-0">
 				${this.getPlugins().map((p) => html`
-					${!p.unrestricted && !this.loggedin? "": p.icon!=null? 
+					${!p.unrestricted && !login.isLoggedIn()? "": p.icon!=null? 
 						html`<img class="${self.plugin===p.name? "overlay": ""}" src="data:image/png;base64,${p.icon.__base64}" alt="Red dot" @click="${(e) => {self.showPlugin2(p.name)}}" data-toggle="tooltip" data-placement="top" title="${p.name}"/>`:
 						html`<span @click="${(e) => {self.showPlugin2(p.name)}}">${p.name}</span>`
 					}
@@ -283,14 +299,14 @@ class PlatformElement extends BaseElement
 		`;
 	}
 	
-	isLoggedIn()
+	/*isLoggedIn()
 	{
 		var self = this;
 		return new Promise(function(resolve, reject) 
 		{
 			axios.get('webjcc/isLoggedIn', {headers: {'x-jadex-isloggedin': true}}, self.transform).then(function(resp)
 			{
-				console.log("is logged in: "+resp);
+				//console.log("is logged in: "+resp);
 				self.loggedin = resp.data;
 				resolve(self.loggedin);
 			})
@@ -300,7 +316,7 @@ class PlatformElement extends BaseElement
 				reject(err);
 			});
 		});
-	}
+	}*/
 }
 
 if(customElements.get('jadex-platform') === undefined)

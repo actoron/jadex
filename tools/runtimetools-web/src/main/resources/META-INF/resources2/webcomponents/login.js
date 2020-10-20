@@ -8,7 +8,8 @@ class LoginElement extends BaseElement
 	constructor() 
 	{
 		super();	
-		this.loggedin = false;
+		//this.loggedin = false;
+		this.no = 0;
 		console.log("login");
 	}
 	
@@ -20,24 +21,75 @@ class LoginElement extends BaseElement
 			for(let key in super.properties)
 				ret[key]=super.properties[key];
 		}
-		ret['loggedin'] = {type: Boolean};
+		//ret['loggedin'] = {type: Boolean};
 		return ret;
 	}
 	
 	connectedCallback() 
 	{
 		super.connectedCallback();
-		this.isLoggedIn();
+		
+		//var self = this;
+		//self.isLoggedIn();
+		
+		// turn on to cintinuously check if we are stll logged in
+		//this.checkLoggedIn();
+		
+		/*super.init().then(()=>
+		{
+			super.connectedCallback();
+			self.isLoggedIn();
+			console.log("connected end");
+		})
+		.catch((err)=>console.log(err));*/
+	}
+	
+	disconnectedCallback()
+	{
+		super.disconnectedCallback();
+	
+		// terminate login check
+		this.no++;
+	}
+	
+	checkLoggedIn(interval)
+	{
+		this.internalCheckPlatform(interval, ++this.no);
+	}
+	
+	internalCheckLoggedIn(interval, no) 
+	{
+		var self = this;
+		
+		// terminate when another call to checkPlatform() has been performed
+		//console.log("check platform: "+no+" "+this.no);
+		if(no!=this.no)
+		{
+			console.log("terminate platform check: "+this.no+" "+no);
+			return;
+		}
+	
+		checkLoggedIn(interval).then(function()
+		{
+			this.isLoggedIn().then(function()
+			{
+				setTimeout(function(){self.internalCheckLoggedIn(interval, no)}, interval!=undefined? interval: 10000);
+			})
+			.catch(function(err)
+			{
+				setTimeout(function(){self.internalCheckLoggedIn(interval, no)}, interval!=undefined? interval: 10000);
+			});
+		});
 	}
 	
 	render() 
 	{
     	return html`
-			<div class="flexcontainerrow ${this.loggedin? 'hidden': ''}">
+			<div class="flexcontainerrow ${login.isLoggedIn()? 'hidden': ''}">
 				<input class="flexcellgrow mt-1 mb-1" id="pass" name="platformpass" type="text" placeholder="Platform password"></input>
 				<button class="btn btn-primary mt-1 mb-1 ml-1" @click="${e => {this.login(this.shadowRoot.getElementById('pass').value)}}">Login</button>
 			</div>
-			<button class="btn btn-primary mt-1 mb-1 ml-1 flow-right ${this.loggedin? '': 'hidden'}" @click="${e => {this.logout()}}">Logout</button>
+			<button class="btn btn-primary mt-1 mb-1 ml-1 flow-right ${login.isLoggedIn()? '': 'hidden'}" @click="${e => {this.logout()}}">Logout</button>
     	`;
  	}
 
@@ -48,7 +100,8 @@ class LoginElement extends BaseElement
 		//axios.get('webjcc/login?pass='+pass, self.transform).then(function(resp)
 		{
 			//console.log("logged in: "+resp);
-			self.loggedin = true;
+			//self.loggedin = true;
+			login.setLogin(true);
 			//window.location.href = "/#/platforms";
 			self.createInfoMessage("logged in");
 		})
@@ -56,7 +109,8 @@ class LoginElement extends BaseElement
 		{
 			//console.log("login failed: "+err);	
 			self.createErrorMessage("login failed", err);
-			self.loggedin = false;
+			//self.loggedin = false;
+			login.setLogin(false);
 		});
 	}
 	
@@ -67,13 +121,15 @@ class LoginElement extends BaseElement
 		//axios.get('webjcc/login?pass='+pass, self.transform).then(function(resp)
 		{
 			//console.log("logged out: "+resp);
-			self.loggedin = false;
+			//self.loggedin = false;
+			login.setLogin(false);
 			self.createInfoMessage("logged out");
 		})
 		.catch(function(err) 
 		{
 			console.log("logout failed: "+err);	
-			self.loggedin = false;
+			//self.loggedin = false;
+			login.setLogin(false);
 			self.createErrorMessage("logout failed", err);
 		});
 	}
@@ -81,18 +137,26 @@ class LoginElement extends BaseElement
 	isLoggedIn()
 	{
 		var self = this;
-		axios.get('webjcc/isLoggedIn', {headers: {'x-jadex-isloggedin': true}}, self.transform).then(function(resp)
+		return new Promise(function(resolve, reject) 
 		{
-			//console.log("is logged in: "+resp);
-			self.loggedin = resp.data;
-		})
-		.catch(function(err) 
-		{
-			console.log("check failed: "+err);	
-			self.createErrorMessage("check failed", err);
+			axios.get('webjcc/isLoggedIn', {headers: {'x-jadex-isloggedin': true}}, self.transform).then(function(resp)
+			{
+				//console.log("is logged in: "+resp);
+				//self.loggedin = resp.data;
+				login.setLogin(self.loggedin);
+				resolve(self.loggedin);
+			})
+			.catch(function(err) 
+			{
+				console.log("check failed: "+err);
+				self.createErrorMessage("check failed", err);
+				//login.setLogin(false);	
+				reject(err);
+			});
 		});
 	}
 }
 
-customElements.define('jadex-login', LoginElement);
+if(customElements.get('jadex-login') === undefined)
+	customElements.define('jadex-login', LoginElement);
 

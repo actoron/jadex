@@ -8,47 +8,57 @@ class AppElement extends BaseElement
 	listener = null;
 	loggedin = false;
 	
-	constructor() 
+	constructor()
 	{
 		super();
-		
-		var self = this; 
-		
+		this.init();
+	} 
+	
+	init() 
+	{
 		console.log("app element");
 		
-		page.base('/#');
-		page('/index.html', () => {
-			page.redirect("/platforms");
-	    });
-	    page('/', () => {
-	    	page.redirect("/platforms");
-	    });
- 		page('/login', () => {
-	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-login></jadex-login>";
-	    });
-	    page('/platforms', () => {
-	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platforms></jadex-platforms>";
-	    });
-	    page('/platform/:cid', (ctx, next) => {
-	    	console.log("router, cid: "+ctx.params.cid);
-	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platform cid='"+ctx.params.cid+"'></jadex-platform>";
-	    });
-	    page('/platform/:cid/:plugin', (ctx, next) => {
-	    	console.log("router, cid: "+ctx.params.cid+ " plugin: " + ctx.params.plugin);
-	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platform cid='"+ctx.params.cid+"' plugin='"+ctx.params.plugin+"'></jadex-platform>";
-	    });
-	    page('/about', () => {
-	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-about></jadex-about>";
-	    });
-	    page('/imprint', () => {
-	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-imprint></jadex-imprint>";
-	    });
-	    page('/privacy', () => {
-	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-privacy></jadex-privacy>";
-	    });
-	    /*page('*', (ctx, next) => {
-	    	console.log("nav not found: "+ctx);
-	    });*/
+		var self = this;
+		
+		super.init().then(()=>
+		{
+			page.base('/#');
+			page('/index.html', () => {
+				page.redirect("/platforms");
+		    });
+		    page('/', () => {
+		    	page.redirect("/platforms");
+		    });
+	 		page('/login', () => {
+		    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-login></jadex-login>";
+		    });
+		    page('/platforms', () => {
+		    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platforms></jadex-platforms>";
+		    });
+		    page('/platform/:cid', (ctx, next) => {
+		    	//console.log("router, cid: "+ctx.params.cid);
+		    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platform cid='"+ctx.params.cid+"'></jadex-platform>";
+		    });
+		    page('/platform/:cid/:plugin', (ctx, next) => {
+		    	//console.log("router, cid: "+ctx.params.cid+ " plugin: " + ctx.params.plugin);
+		    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platform cid='"+ctx.params.cid+"' plugin='"+ctx.params.plugin+"'></jadex-platform>";
+		    });
+		    page('/about', () => {
+		    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-about></jadex-about>";
+		    });
+		    page('/imprint', () => {
+		    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-imprint></jadex-imprint>";
+		    });
+		    page('/privacy', () => {
+		    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-privacy></jadex-privacy>";
+		    });
+		    /*page('*', (ctx, next) => {
+		    	console.log("nav not found: "+ctx);
+		    });*/
+
+			page();
+		})
+		.catch((err)=>console.log(err));
 	}
 	
 	connectedCallback() 
@@ -77,16 +87,14 @@ class AppElement extends BaseElement
 			this.removeEventListener(this.listener);
 	}*/
 	
-	firstUpdated(changedProperties) 
+	/*firstUpdated(props) 
 	{
 		page();
-	}
+	}*/
 		
 	render() 
 	{
 		return html`
-			<link rel="stylesheet" href="css/style.css">
-			<link rel="stylesheet" href="libs/bootstrap_4.3.1/bootstrap.min.css">
 			<div style="height:100%" class="d-flex flex-column">
 			<nav class="navbar navbar-expand-lg navbar-custom navbar-fixed-top">
 				<div class="navbar-brand mr-auto">

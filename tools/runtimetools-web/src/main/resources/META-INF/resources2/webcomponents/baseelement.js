@@ -9,6 +9,8 @@ export class BaseElement extends LitElement
 	cid = null;
 	jadexservice = null;
 	langlistener = null;
+	loginlistener = null;
+	loadedprom = null;
 	
 	static get properties() 
 	{
@@ -37,29 +39,41 @@ export class BaseElement extends LitElement
 	constructor() 
 	{
 		super();
+		var self = this;
 		
-		// must load sync to ensure that style.css rules are defined and gain precedence		
-		this.loadStyle("/libs/bootstrap_4.5.0/bootstrap.min.css")
-		.then(()=>
+		self.loadedprom = new Promise(function(resolve, reject) 
 		{
-			//console.log("loaded bootstrap css")
-			this.loadScript("libs/jquery_3.4.1/jquery.js")
+			// must load sync to ensure that style.css rules are defined and gain precedence		
+			self.loadStyle("/libs/bootstrap_4.5.0/bootstrap.min.css")
 			.then(()=>
 			{
-				//console.log("loaded jquery")
-				this.loadScript("/libs/bootstrap_4.5.0/bootstrap.bundle.min.js")
+				//console.log("loaded bootstrap css")
+				self.loadScript("libs/jquery_3.4.1/jquery.js")
 				.then(()=>
 				{
-					//console.log("loaded bootstrap")
-					this.loadStyle("/css/style.css")
-					.then(()=>{/*console.log("loaded jadex css")*/})
-				});
-			});
+					//console.log("loaded jquery")
+					self.loadScript("/libs/bootstrap_4.5.0/bootstrap.bundle.min.js")
+					.then(()=>
+					{
+						//console.log("loaded bootstrap")
+						self.loadStyle("/css/style.css")
+						.then(()=>{
+							//console.log("loaded all"); 
+							resolve();
+						})
+						.catch((err)=>reject(err));
+					})
+					.catch((err)=>reject(err));
+				})
+				.catch((err)=>reject(err));
+			})
+			.catch((err)=>reject(err));
 		});
 	}
 	
 	init()
 	{
+		return this.loadedprom;
 	}
 	
 	connectedCallback() 
@@ -79,6 +93,16 @@ export class BaseElement extends LitElement
 		}
 		
 		language.addListener(this.langlistener);
+		
+		if(this.loginlistener==null)
+		{
+			this.loginlistener = e => 
+			{
+				console.log("login update: "+self);
+				self.requestUpdate();
+			};
+		}
+		login.addListener(this.loginlistener);
 	}
 	
 	disconnectedCallback()
@@ -86,9 +110,11 @@ export class BaseElement extends LitElement
 		super.disconnectedCallback();
 		if(this.langlistener!=null)
 			language.removeListener(this.langlistener);
+		if(this.loginlistener!=null)
+			login.removeListener(this.loginlistener);
 	}
 	
-	loadStyle(url)
+	/*loadStyle(url)
 	{
 		var self = this;
 		var ret = null;
@@ -134,6 +160,86 @@ export class BaseElement extends LitElement
 			});
 			BaseElement.loaded[url] = ret;
 		}
+		
+		return ret;
+	}*/
+	
+	/*loadStyle(url)
+	{
+		var self = this;
+		var ret = null;
+		
+		var css = BaseElement.loaded[url];
+		if(css!=null)
+		{
+			if(css instanceof Promise)
+			{
+				ret = css;	
+			}
+			else
+			{
+				ret = new Promise(function(resolve, reject) 
+				{
+					var sheet = new CSSStyleSheet();
+					sheet.replaceSync(css);
+					self.shadowRoot.adoptedStyleSheets = self.shadowRoot.adoptedStyleSheets.concat(sheet);
+					resolve(css);
+					console.log("cached version: "+url+" "+self.shadowRoot.adoptedStyleSheets.length);
+					console.log("cache: "+css);
+				});
+			}	
+		}
+		else
+		{
+			ret = new Promise(function(resolve, reject) 
+			{
+				axios.get(url).then(function(resp)
+				{
+					console.log("loaded version: "+url+" "+self.shadowRoot.adoptedStyleSheets.length);
+					var css = resp.data;    
+					console.log(css);
+					var sheet = new CSSStyleSheet();
+					sheet.replaceSync(css);
+					self.shadowRoot.adoptedStyleSheets = self.shadowRoot.adoptedStyleSheets.concat(sheet);
+					BaseElement.loaded[url] = css;
+					resolve(css);
+				})
+				.catch(function(err)
+				{
+					reject(err);
+				});
+			});
+			BaseElement.loaded[url] = ret;
+		}
+		
+		return ret;
+	}*/
+	
+	// todo: why does caching (above) not work :-(
+	loadStyle(url)
+	{
+		var self = this;
+		var ret = null;
+		
+		ret = new Promise(function(resolve, reject) 
+		{
+			axios.get(url).then(function(resp)
+			{
+				//console.log("loaded version: "+url+" "+self.shadowRoot.adoptedStyleSheets.length);
+				//console.log(resp.data);
+				var css = resp.data;    
+				//console.log(css);
+				var sheet = new CSSStyleSheet();
+				sheet.replaceSync(css);
+				self.shadowRoot.adoptedStyleSheets = self.shadowRoot.adoptedStyleSheets.concat(sheet);
+				BaseElement.loaded[url] = css;
+				resolve(sheet);
+			})
+			.catch(function(err)
+			{
+				reject(err);
+			});
+		});
 		
 		return ret;
 	}

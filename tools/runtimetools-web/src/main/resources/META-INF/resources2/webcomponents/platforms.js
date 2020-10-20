@@ -27,7 +27,6 @@ class PlatformsElement extends BaseElement
 	{
 		super();	
 		console.log("platforms");
-		
 	}
 	
 	connectedCallback() 
@@ -104,7 +103,7 @@ class PlatformsElement extends BaseElement
 			<div class="actwtable section">
 				<div>
 					<div class="head">
-						<h3 class="fl" id="HConnectedPlatforms">Connected Platforms</h3>
+						<h1 class="m-0 p-0 inline" id="HConnectedPlatforms">Connected Platforms</h1>
 						<span id="connected" class="dot fl ${this.connected? "green": "red"}"></span>
 					</div>
 					<p>This page shows a self-updating list of remote platforms known to this Jadex platform.</p>
@@ -168,7 +167,7 @@ class PlatformsElement extends BaseElement
 	static get styles() 
 	{
 	    return css`
-			h3 {
+			.inline {
 				display:inline
 			}
 	    	.dot {

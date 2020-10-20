@@ -10,25 +10,30 @@ class StarterElement extends BaseElement
 	{
 		console.log("starter: "+this.cid);
 		
-		this.model = null; // loaded model
-		this.reversed = false;
-		this.myservice = "jadex.tools.web.starter.IJCCStarterService";
-		
-		var self = this;
-		
-		var res1 = "jadex/tools/web/starter/modeltree.js";
-		var res2 = "jadex/tools/web/starter/componenttree.js";
-		var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
-		var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
-
-		// load subcomponents
-		var p1 = this.loadSubmodule(ures1);
-		var p2 = this.loadSubmodule(ures2);
-		
-		Promise.all([p1, p2]).then((values) => 
+		super.init().then(()=>
 		{
-			//console.log("starter load files ok");
-		});
+			this.model = null; // loaded model
+			this.reversed = false;
+			this.myservice = "jadex.tools.web.starter.IJCCStarterService";
+			
+			var self = this;
+			
+			var res1 = "jadex/tools/web/starter/modeltree.js";
+			var res2 = "jadex/tools/web/starter/componenttree.js";
+			var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+			var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
+	
+			// load subcomponents
+			var p1 = this.loadSubmodule(ures1);
+			var p2 = this.loadSubmodule(ures2);
+			
+			Promise.all([p1, p2]).then((values) => 
+			{
+				//console.log("starter load files ok");
+			});
+			
+		})
+		.catch((err)=>console.log(err))
 	}
 	
 	connectedCallback() 
@@ -193,22 +198,22 @@ class StarterElement extends BaseElement
 	render() {
 		return html`
 			<div class="container-fluid">
-				<div class="row m-1">
-					<div class="col-12 m-1">
+				<div class="row m-0 p-0">
+					<div class="col-12 m-0 p-0">
 						<h3>Components</h3>
 						<jadex-componenttree cid='${this.cid}'></jadex-componenttree>
 					</div>
 				</div>
 				
-				<div class="row m-1">
-					<div class="col-12 m-1">
+				<div class="row m-0 p-0">
+					<div class="col-12 m-0 p-0">
 						<h3>Available Models</h3>
 						<jadex-modeltree cid='${this.cid}'></jadex-modeltree>
 					</div>
 				</div>
 				
 				${this.model!=null? html`
-				<div class="bgwhitealpha m-2 p-2"> <!-- sticky-top  -->
+				<div class="bgwhitealpha m-0 p-0"> <!-- sticky-top  -->
 					<div class="row m-1">
 						<div class="col-12">
 							<h3>Settings</h3>

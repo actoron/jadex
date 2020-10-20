@@ -3,73 +3,80 @@ import {css} from 'lit-element';
 import {BaseElement} from '/webcomponents/baseelement.js'
 
 // Tag name 'jadex-modeltree'
-class ModelTree extends BaseElement {
-	
-	init()
+class ModelTree extends BaseElement 
+{
+	constructor()
 	{
-		//console.log("modeltree");
+		super();
 		
 		this.models = []; // available component models [filename, classname]
 		this.reversed = false;
 		//this.myservice = "jadex.tools.web.starter.IJCCStarterService";
 		this.treeid = "modeltree";
-		
+	}
+	
+	init()
+	{
 		var self = this;
-		
-		this.loadJSTree().then(function()
+		super.init().then(()=>
 		{
-			//console.log("jstree");
-			
-			// init tree
-			$(function() 
-			{ 
-				self.getTree(self.treeid).jstree(
-				{
-					"core" : {"check_callback" : true},
-					"plugins" : ["sort"],
-					'sort': function(a, b) 
-					{
-				        var a1 = this.get_node(a);
-				        var b1 = this.get_node(b);
-				        if(a1.icon == b1.icon)
-				        {
-				            return (a1.text > b1.text) ? 1 : -1;
-				        } 
-				        else 
-				        {
-				            return (a1.icon > b1.icon) ? 1 : -1;
-				        }
-					}
-				});
+			//console.log("modeltree");
+			this.loadJSTree().then(function()
+			{
+				//console.log("jstree");
 				
-				// no args here
-				//console.log("getComponentModels start");
-				axios.get(self.getMethodPrefix()+'&methodname=getComponentModels', self.transform).then(function(resp)
-				{
-					//console.log("getComponentModels"+resp.data);
-					
-					self.models = resp.data;
-					
-					self.createModelTree(self.treeid);
-					//$('#'+treeid).jstree('open_all');
-					var childs = self.getTree(self.treeid).jstree('get_node', '#').children;
-					for(var i=0; i<childs.length; i++)
+				// init tree
+				$(function() 
+				{ 
+					self.getTree(self.treeid).jstree(
 					{
-						self.getTree(self.treeid).jstree("open_node", childs[i]);
-					}
+						"core" : {"check_callback" : true},
+						"plugins" : ["sort"],
+						'sort': function(a, b) 
+						{
+					        var a1 = this.get_node(a);
+					        var b1 = this.get_node(b);
+					        if(a1.icon == b1.icon)
+					        {
+					            return (a1.text > b1.text) ? 1 : -1;
+					        } 
+					        else 
+					        {
+					            return (a1.icon > b1.icon) ? 1 : -1;
+					        }
+						}
+					});
 					
-					//console.log("models loaded");
-					
-					//$("#"+treeid).jstree("open_node", '#');
-					self.requestUpdate();
-					
-					self.getTree(self.treeid).on('select_node.jstree', function (e, data) 
+					// no args here
+					//console.log("getComponentModels start");
+					axios.get(self.getMethodPrefix()+'&methodname=getComponentModels', self.transform).then(function(resp)
 					{
-						self.select(data.instance.get_path(data.node, '.'));
+						//console.log("getComponentModels"+resp.data);
+						
+						self.models = resp.data;
+						
+						self.createModelTree(self.treeid);
+						//$('#'+treeid).jstree('open_all');
+						var childs = self.getTree(self.treeid).jstree('get_node', '#').children;
+						for(var i=0; i<childs.length; i++)
+						{
+							self.getTree(self.treeid).jstree("open_node", childs[i]);
+						}
+						
+						//console.log("models loaded");
+						
+						//$("#"+treeid).jstree("open_node", '#');
+						self.requestUpdate();
+						
+						self.getTree(self.treeid).on('select_node.jstree', function (e, data) 
+						{
+							self.select(data.instance.get_path(data.node, '.'));
+						});
 					});
 				});
 			});
-		});
+		})
+		.catch((err)=>console.log(err));
 	}
 	
 	loadJSTree()

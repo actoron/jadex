@@ -8,73 +8,89 @@ import {BaseElement} from '/webcomponents/baseelement.js'
 class RegistryViewElement extends BaseElement 
 {
 	static get properties() 
-	{ 
-		return { cid: { type: String }};
+	{
+		var ret = {};
+		if(super.properties!=null)
+		{
+			for (let key in super.properties)
+				ret[key]=super.properties[key];
+		}
+		ret['global'] = {type: Boolean, attribute: false};
+		return ret;
 	}
 	
-	attributeChangedCallback(name, oldVal, newVal) 
+	/*attributeChangedCallback(name, oldval, newval) 
 	{
-	    //console.log('attribute change: ', name, newVal, oldVal);
-	    super.attributeChangedCallback(name, oldVal, newVal);
+	    console.log('attribute change: ', name, newval, oldval);
+	    super.attributeChangedCallback(name, oldval, newval);
+	}*/
+	
+	constructor()
+	{
+		super();
+		
+		this.subscriptions = {};
+		this.concom = false;
+		this.initready = false;
+		this.global = true;
 	}
 	
 	init() 
 	{
-		this.subscriptions = {};
-		
-		this.concom = false;
-		this.initready = false;
-		
-		console.log("relayview");
-		
-		var res = "jadex/tools/web/registryview/conf.css";
-		var ures = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String";
-		
-		var self = this;
-		
-		//console.log("load style start");
-		this.loadStyle(ures)
-		.then(()=>
+		super.init().then(()=>
 		{
-			var res1 ="jadex/tools/web/registryview/st_styles.css";
-			var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
-			var res2 ="jadex/tools/web/registryview/st_min.js";
-			var ures2 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
+			console.log("relayview");
 			
-			//console.log("load datatables start");
-			this.loadStyle(ures1)
+			var res = "jadex/tools/web/registryview/conf.css";
+			var ures = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String";
+			
+			var self = this;
+			
+			//console.log("load style start");
+			this.loadStyle(ures)
 			.then(()=>
 			{
-				//console.log("loaded datatables.js");
+				var res1 ="jadex/tools/web/registryview/st_styles.css";
+				var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+				var res2 ="jadex/tools/web/registryview/st_min.js";
+				var ures2 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 				
-				this.loadScript(ures2)
+				//console.log("load datatables start");
+				this.loadStyle(ures1)
 				.then(()=>
 				{
-					//console.log("loaded datatables.css");
+					//console.log("loaded datatables.js");
 					
-					var opts = {perPageSelect: [5,10,15,25,50,100,1000], perPage: 15};
-					
-					self.getSubscription("Services").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableservices'), opts);
-					self.getSubscription("Platforms").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableplatforms'), opts);
-					self.getSubscription("Queries").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tablequeries'), opts);
-					self.initready = true;
-					self.subscribe();
+					this.loadScript(ures2)
+					.then(()=>
+					{
+						//console.log("loaded datatables.css");
+						
+						var opts = {perPageSelect: [5,10,15,25,50,100,1000], perPage: 15};
+						
+						self.getSubscription("Services").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableservices'), opts);
+						self.getSubscription("Platforms").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableplatforms'), opts);
+						self.getSubscription("Queries").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tablequeries'), opts);
+						self.initready = true;
+						self.subscribe();
+					})
+					.catch((err)=>
+					{
+						console.log("b: "+err);
+					});
 				})
 				.catch((err)=>
 				{
-					console.log("b: "+err);
+					console.log("a: "+err);
 				});
+				
 			})
 			.catch((err)=>
 			{
-				console.log("a: "+err);
+				console.log(err);
 			});
-			
 		})
-		.catch((err)=>
-		{
-			console.log(err);
-		});
+		.catch((err)=>console.log(err));
 	}
 	
 	connectedCallback()
@@ -103,7 +119,8 @@ class RegistryViewElement extends BaseElement
 				{
 					var elem = event.service.serviceIdentifier;
 					self.getSubscription("Services").elements.push(elem);
-					table.rows().add([elem.type, self.beautifyCid(elem.providerId.name), elem.scope.toLowerCase(), self.beautifyNetworks(elem.networkNames), elem.unrestricted && 'unrestricted' || 'restricted']);
+					if(self.global? elem.scope.toLowerCase()==="global": true)
+						table.rows().add([elem.type, self.beautifyCid(elem.providerId.name), elem.scope.toLowerCase(), self.beautifyNetworks(elem.networkNames), elem.unrestricted && 'unrestricted' || 'restricted']);
 				}
 			);
 			this.subscribeToX("Platforms", wait, 
@@ -126,9 +143,38 @@ class RegistryViewElement extends BaseElement
 				{
 					var elem = event.query;
 					self.getSubscription("Queries").elements.push(elem);
-					table.rows().add([elem.serviceType!=null? elem.serviceType.value: '', self.beautifyCid(elem.owner.name), elem.scope.value]);
+					if(self.global? elem.scope.value.toLowerCase()==="global": true)
+						table.rows().add([elem.serviceType!=null? elem.serviceType.value: '', self.beautifyCid(elem.owner.name), elem.scope.value]);
 				}
 			);
+		}
+	}
+	
+	updated(props) 
+	{
+    	//console.log(props); 
+
+		if(props.get("global")!=null)
+		{
+			this.syncTableDataX("Services", 
+				(x) => this.global? x.scope.toLowerCase()==="global": true, 
+				(x) => [x.type, this.beautifyCid(x.providerId.name), x.scope.toLowerCase(), this.beautifyNetworks(x.networkNames), x.unrestricted && 'unrestricted' || 'restricted']
+			);
+			
+			this.syncTableDataX("Queries", 
+				(x) => this.global? x.scope.value.toLowerCase()==="global": true, 
+				(x) => [x.serviceType!=null? x.serviceType.value: '', this.beautifyCid(x.owner.name), x.scope.value]
+			);
+		}
+  	}
+	
+	syncTableDataX(x, filter, convert)
+	{
+		var elems = this.getSubscription(x).elements.filter(filter);
+		this.getSubscription(x).table.rows().remove("all");
+		for(var e of elems)
+		{
+			this.getSubscription(x).table.rows().add(convert(e));
 		}
 	}
 	
@@ -304,6 +350,12 @@ class RegistryViewElement extends BaseElement
 		el.addEventListener("click", this.collapseOnClick);
 	}
 	
+	/*getFilteredElements()
+	{
+		var ret = this.getSubscription("Services").elements.filter(x => this.global? x.scope.toLowerCase()==="global": true)
+		return ret;
+	}*/
+	
 	render() 
 	{
 		return html`
@@ -311,9 +363,13 @@ class RegistryViewElement extends BaseElement
 		
 		<!--<lit-datatable .data="${this.services}" .conf="${[{ property: 'type', header: 'Service Type', hidden: false }, { property: 'providerId.name', header: 'Provided By', hidden: false }]}"></lit-datatable>-->
 		
-		<div id="panel" class="container-fluid">
+		<div id="panel" class="container-fluid m-0 p-0">
+			<div>
+    			<input type="checkbox" id="global" .checked="${this.global}" @click="${(e) => {this.global = e.target.checked;}}">
+				<label for="global">Show only global services and queries</label>
+  			</div>
 			<div id="accordion">
-				<div class="card m-2">
+				<div class="card m-0">
 					<div class="card-header">
     					<h4 class="card-link" data-toggle="collapse" href="#collapseOne">Services</h4>
 					</div>
@@ -329,28 +385,16 @@ class RegistryViewElement extends BaseElement
 										<th>Security</th>
 									</tr>
 								</thead>
-								<tbody>
-									<!-- ${this.getSubscription("Services").elements.map((x) => 
-									html`
-									<tr class="${x.connected? 'connecting': ''}">
-										<td>${x.type}</td>
-										<td>${this.beautifyCid(x.providerId.name)}</td>
-										<td>${x.scope.toLowerCase()}</td>
-						 				<td>${this.beautifyNetworks(x.networkNames)}</td>
-										<td>${x.unrestricted && 'unrestricted' || 'restricted'}</td>
-									</tr>
-									`)} -->
-								</tbody>
 							</table>
 						</div>
     				</div>
   				</div>
 		
-				<div class="card m-2">
+				<div class="card m-0">
 					<div class="card-header">
 						<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">Platforms</h4>
 					</div>
-					<div id="collapseTwo" class="collapse show" data-parent="#accordion">
+					<div id="collapseTwo" class="collapse" data-parent="#accordion">
 						<div class="card-body">
 							<table id="tableplatforms" class="${this.getSubscription("Platforms").connected?'': 'down'}">
 								<thead>
@@ -360,26 +404,16 @@ class RegistryViewElement extends BaseElement
 										<th>Protocol</th>
 									</tr>
 								</thead>
-								<tbody>
-									<!-- ${this.getSubscription("Platforms").elements.map((x) => 
-									html`
-									<tr class="${x.connected? 'connecting': ''}">
-										<td>${x.platform.name}</td>
-										<td>${x.connected}</td>
-										<td>${x.protocol}</td>
-									</tr>
-									`)} -->
-								</tbody>
 							</table>
 						</div>
 					</div>
 				</div>
 				
-				<div class="card m-2">
+				<div class="card m-0">
 					<div class="card-header">
 						<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseThree">Queries</h4>
 					</div>
-					<div id="collapseThree" class="collapse show" data-parent="#accordion">
+					<div id="collapseThree" class="collapse" data-parent="#accordion">
 						<div class="card-body">
 							<table id="tablequeries" class="${this.getSubscription("Queries")?'': 'down'}">
 								<thead>
@@ -389,16 +423,6 @@ class RegistryViewElement extends BaseElement
 										<th>Search Scope</th>
 									</tr>
 								</thead>
-								<tbody>
-									<!-- ${this.getSubscription("Queries").elements.map((x) => 
-									html`
-									<tr>
-										<td>${x.serviceType!=null? x.serviceType.value: ''}</td>
-										<td>${this.beautifyCid(x.owner.name)}</td>
-										<td>${x.scope.value}</td>
-									</tr>
-									`)} -->
-								</tbody>
 							</table>
 						</div>
 					</div>

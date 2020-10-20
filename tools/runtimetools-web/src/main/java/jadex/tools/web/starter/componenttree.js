@@ -12,398 +12,149 @@ class ComponentTree extends BaseElement
 		return { cid: { type: String }};
 	}
 	
-	attributeChangedCallback(name, oldVal, newVal) 
+	constructor()
 	{
-	    //console.log('attribute change: ', name, newVal, oldVal);
-	    super.attributeChangedCallback(name, oldVal, newVal);
-	    
-		//console.log("components cid: "+this.cid);
-		if(name=="cid")
-			this.init();
-	}
-	
-	init() 
-	{
+		super();
+		
 		this.components = []; // component descriptions
 		this.typemap = null;
 		this.treedata = {};
 		this.treeid = "componenttree";
-		
-		// fixed types
-		var cloud = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/cloud.png';
-		var applications = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/applications.png';
-		var platform = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/platform.png';
-		var system = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/system.png';
-		var services = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/services.png';
-		var provided = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/provided.png';
-		var required = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/required.png';
-		var required_mult = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/required_multiple.png';
-		var nonfunc = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/nonfunc.png';
-		var nfprop = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/nfprop.png';
-		var nfprop_dynamic = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/nfprop_dynamic.png';
-		
-		this.types =
-		{
-			//"default" : {"icon": b},
-		    "cloud" : {"icon": cloud},
-		    "applications" : {"icon": applications},
-		    "platform" : {"icon": platform},
-		    "system" : {"icon": system},
-		    "services" : {"icon": services},
-		    "provided" : {"icon": provided},
-		    "required" : {"icon": required},
-		    "required_multiple" : {"icon": required_mult},
-		    "nfproperties" : {"icon": nonfunc},
-		    "nfproperty" : {"icon": nfprop},
-		    "nfproperty_dynamic" : {"icon": nfprop_dynamic}
-		}
-		
-		//console.log("components");
-		
-		var self = this;
-		
-		this.loadJSTree().then(function()
-		{
-			//console.log("jstree");
+	}
 	
-			//var myservice = "jadex.tools.web.starter.IJCCStarterService";
-			//var extservice = "jadex.jadex.bridge.IExternalAccess";
+	init() 
+	{
+		super.init().then(()=>
+		{
+			// fixed types
+			var cloud = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/cloud.png';
+			var applications = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/applications.png';
+			var platform = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/platform.png';
+			var system = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/system.png';
+			var services = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/services.png';
+			var provided = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/provided.png';
+			var required = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/required.png';
+			var required_mult = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/required_multiple.png';
+			var nonfunc = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/nonfunc.png';
+			var nfprop = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/nfprop.png';
+			var nfprop_dynamic = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/nfprop_dynamic.png';
 			
-			/*getMethodPrefix()
+			this.types =
 			{
-				return 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
-			}*/
+				//"default" : {"icon": b},
+			    "cloud" : {"icon": cloud},
+			    "applications" : {"icon": applications},
+			    "platform" : {"icon": platform},
+			    "system" : {"icon": system},
+			    "services" : {"icon": services},
+			    "provided" : {"icon": provided},
+			    "required" : {"icon": required},
+			    "required_multiple" : {"icon": required_mult},
+			    "nfproperties" : {"icon": nonfunc},
+			    "nfproperty" : {"icon": nfprop},
+			    "nfproperty_dynamic" : {"icon": nfprop_dynamic}
+			}
 			
-			//var prefix = 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
-			//self.prefix_ext = 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+extservice;
+			//console.log("components");
 			
-			// init tree
-			var types = self.types;
-			$(function() { self.getTree(self.treeid).jstree(
+			var self = this;
+			
+			this.loadJSTree().then(function()
 			{
-				"plugins": ["sort", "types", "contextmenu"],
-				"core": 
-				{
-					"check_callback" : true,
-					"data": function(node, cb) 
-					{
-						function getChildData(id)
-						{
-							//console.log("loading node: "+id);
-							
-							var children = self.treedata[id+"_children"];
-							var data = [];
-							if(children!=null)
-							{
-								for(var i=0; i<children.length; i++)
-								{
-									var node = self.treedata[children[i]];
-									data.push(node);
-								}
-							}
-							return data;
-						}
-						
-						// load initial state via component descriptions
-						if("#"===node.id)
-						{
-							axios.get(self.getMethodPrefix()+'&methodname=getComponentDescriptions', self.transform).then(function(resp)
-							{
-								//console.log("descs are: "+resp.data);
-								self.components = resp.data;
-								
-								self.typemap = {};
-								for(var i=0; i<self.components.length; i++)
-									self.typemap[self.components[i].name.name] = self.components[i].type;
-
-								self.createTree(self.treeid);
-								self.refreshCMSSubscription();
-								self.requestUpdate();
-								
-								var data = getChildData(node.id);
-								cb.call(this, data);
-							});
-						}
-						// when loading other nodes, component desriptions are availble via treedata
-						// nodeid = {nodevalues} for tree
-						// nodeid_children = [ids] for children ids
-						else
-						{
-							//console.log("loading node: "+node.id);
-						
-							// cont() fetches the child data and calls the jstree callback that fetching is finished for this node 
-							function cont()
-							{
-								var data = getChildData(node.id);
-								cb.call(this, data);
-							}
-							
-							// create nfproperty container nodes with nfproperty children
-							function createNFChildren(node, res, vals, refreshcmd)
-							{
-								if(res!=null && Object.keys(res).length>0)
-								{
-									var nfid = node.id+"_nfprops";
-									var ch = [];
-									
-									for(var nfname in res)
-									{
-										var nfprop = res[nfname];
-										var val = vals!=null? vals[nfname]: null;
-										var txt = val!=null? nfprop.name+": "+val: nfprop.name;
-										var nfnode = {"id": nfid+"_"+nfprop.name, "text": txt, 
-											"type": nfprop.dynamic? "nfproperty_dynamic": "nfproperty", "children": false,
-											"refreshcmd": nfprop.dynamic? refreshcmd: null, "propname": nfprop.name};
-										ch.push(nfnode);
-									}
-									
-									self.treedata[nfid] = {"id": nfid, "text": "Non-functional Properties", "type": "nfproperties", "children": ch};
-									
-									var key = node.id+"_children";
-									var children = self.treedata[key];
-									if(children==null)
-									{
-										children = [];
-										self.treedata[key] = children;
-									}
-									children.push(nfid);
-								}
-							}
-							
-							// provided service node
-							if(node.type==="provided")
-							{
-								// look for nf props (only possible children)
-								// sid is saved in node data 
-								
-								// args IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req
-								var sid = encodeURIComponent(JSON.stringify(node.original.sid));
-								//console.log("SID: "+sid);
-								axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0=null&args_1='+sid, self.transform)
-								.then(function(resp)
-								{
-									//console.log("nf prov props:"+resp.data);		
-								
-									var res = resp.data;
-									
-									if(res!=null && Object.keys(res).length>0)
-									{
-										axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0=null&args_1='+JSON.stringify(node.original.sid), self.transform)
-										.then(function(resp)
-										{
-											function refresh(node) 
-											{
-												axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0=null'
-													+"&args_1="+JSON.stringify(node.original.sid)+"&args_2=null&args_3=null&args_4="+node.original.propname, self.transform)
-												.then(function(resp)
-												{
-													//console.log("refresh nfnode: "+node);
-													var res = resp.data;
-													var val = res[node.original.propname];
-													var txt = node.original.propname+": "+val;
-													self.getTree(self.treeid).jstree('rename_node', node, txt);
-												})
-												.catch(function(e)
-												{
-													console.log("err in refresh nfnode: "+node);
-												});
-											}
-											
-											var vals = resp.data;
-											createNFChildren(node, res, vals, refresh);	
-											cont();
-										})
-										.catch(function(e)
-										{
-											createNFChildren(node, res);	
-											cont();
-										});
-									}
-									else
-									{
-										cont();
-									}
-								})
-								.catch(function(e)
-								{
-									console.log("getNF exception: "+e);
-									cont();
-								});
-							}
-							// required service node
-							else if(node.type==="required")
-							{
-								// look for nf props (only possible children)
-								// cid is saved in node data 
-								
-								// args IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req
-								axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
-								.then(function(resp)
-								{
-									//console.log("nf req props:"+resp.data);		
-									
-									var res = resp.data;
-									
-									if(res!=null && Object.keys(res).length>0)
-									{
-										axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
-										.then(function(resp)
-										{
-											function refresh(node) 
-											{
-												axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.original.cid
-													+"&args_1=null&args_2=null&args_3=true&args_4="+node.original.propname, self.transform)
-												.then(function(resp)
-												{
-													//console.log("refresh nfnode: "+node);
-													var res = resp.data;
-													var val = res[node.original.propname];
-													var txt = node.original.propname+": "+val;
-													self.getTree(self.treeid).jstree('rename_node', node, txt);
-												})
-												.catch(function(e)
-												{
-													console.log("err in refresh nfnode: "+node);
-												});
-											}
-											
-											var vals = resp.data;
-											createNFChildren(node, res, vals, refresh);	
-											cont();
-										})
-										.catch(function(e)
-										{
-											createNFChildren(node, res);	
-											cont();
-										});
-									}
-									else
-									{
-										cont();
-									}
-								})
-								.catch(function(e)
-								{
-									console.log("getNF exception: "+e);
-									cont();
-								});
-							}
-							// component nodes 
-							else if(node.type!=="system" && node.type!=="applications" && node.type!=="cloud")
-							{
-								// possible children are
-								// a) nfprops
-								// b) services
-								// searches parallel and waits for barrier via Promise.all()
-								
-								// https://stackoverflow.com/questions/31069453/creating-a-es6-promise-without-starting-to-resolve-it
-								var nfresolve = null;
-								var promnf = new Promise(function(r, e)
-								{
-									nfresolve = r;
-								});
-								
-								var serresolve = null;
-								var promser = new Promise(function(r, e)
-								{
-									serresolve = r;
-								});
-								
-								Promise.all([promnf, promser]).then(function(res)
-								{
-									cont();
-								});
-								
-								axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.id, self.transform)
-								.then(function(resp)
-								{
-									//console.log("nf props:"+resp.data);	
-
-									var res = resp.data;
-									
-									if(res!=null && Object.keys(res).length>0)
-									{
-										var cid = node.id;
-										axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.id, self.transform)
-										.then(function(resp)
-										{
-											var vals = resp.data;
-											
-											function refresh(node) 
-											{
-												axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+cid
-													+"&args_1=null&args_2=null&args_3=null&args_4="+node.original.propname, self.transform)
-												.then(function(resp)
-												{
-													//console.log("refresh nfnode: "+node);
-													var res = resp.data;
-													var val = res[node.original.propname];
-													var txt = node.original.propname+": "+val;
-													self.getTree(self.treeid).jstree('rename_node', node, txt);
-												})
-												.catch(function(e)
-												{
-													console.log("err in refresh nfnode: "+node);
-												});
-											}
-											
-											createNFChildren(node, res, vals, refresh);	
-											nfresolve(null);
-										})
-										.catch(function(e)
-										{
-											createNFChildren(node, res);	
-											nfresolve(null);
-										});
-									}
-									else
-									{
-										nfresolve(null);
-									}
-								})
-								.catch(function(e)
-								{
-									console.log("getNF exception: "+e);
-									//promnf.resolve(null);
-									nfresolve(null);
-								});
-								
-								axios.get(self.getMethodPrefix()+'&methodname=getServiceInfos&args_0='+node.id, self.transform)
-								.then(function(resp)
-								{
-									//console.log("service infos: "+resp.data);
-									
-									var res = resp.data;
-									
-									if(res[0].length>0 || res[1].length>0)
-									{
-										var serid = node.id+"_services";
+				//console.log("jstree");
 		
+				//var myservice = "jadex.tools.web.starter.IJCCStarterService";
+				//var extservice = "jadex.jadex.bridge.IExternalAccess";
+				
+				/*getMethodPrefix()
+				{
+					return 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
+				}*/
+				
+				//var prefix = 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
+				//self.prefix_ext = 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+extservice;
+				
+				// init tree
+				var types = self.types;
+				$(function() { self.getTree(self.treeid).jstree(
+				{
+					"plugins": ["sort", "types", "contextmenu"],
+					"core": 
+					{
+						"check_callback" : true,
+						"data": function(node, cb) 
+						{
+							function getChildData(id)
+							{
+								//console.log("loading node: "+id);
+								
+								var children = self.treedata[id+"_children"];
+								var data = [];
+								if(children!=null)
+								{
+									for(var i=0; i<children.length; i++)
+									{
+										var node = self.treedata[children[i]];
+										data.push(node);
+									}
+								}
+								return data;
+							}
+							
+							// load initial state via component descriptions
+							if("#"===node.id)
+							{
+								axios.get(self.getMethodPrefix()+'&methodname=getComponentDescriptions', self.transform).then(function(resp)
+								{
+									//console.log("descs are: "+resp.data);
+									self.components = resp.data;
+									
+									self.typemap = {};
+									for(var i=0; i<self.components.length; i++)
+										self.typemap[self.components[i].name.name] = self.components[i].type;
+	
+									self.createTree(self.treeid);
+									self.refreshCMSSubscription();
+									self.requestUpdate();
+									
+									var data = getChildData(node.id);
+									cb.call(this, data);
+								});
+							}
+							// when loading other nodes, component desriptions are availble via treedata
+							// nodeid = {nodevalues} for tree
+							// nodeid_children = [ids] for children ids
+							else
+							{
+								//console.log("loading node: "+node.id);
+							
+								// cont() fetches the child data and calls the jstree callback that fetching is finished for this node 
+								function cont()
+								{
+									var data = getChildData(node.id);
+									cb.call(this, data);
+								}
+								
+								// create nfproperty container nodes with nfproperty children
+								function createNFChildren(node, res, vals, refreshcmd)
+								{
+									if(res!=null && Object.keys(res).length>0)
+									{
+										var nfid = node.id+"_nfprops";
 										var ch = [];
 										
-										// provided
-										for(var i=0; i<res[0].length; i++)
+										for(var nfname in res)
 										{
-											var psid = serid+"_"+res[0][i].name;
-											var txt = res[0][i].type.value.split(".");
-											txt = txt[txt.length-1];
-											//console.log("sid: "+res[2][i]);
-											var psnode = {"id": psid, "text": txt, "type": "provided", "children": true, "sid": res[2][i]};
-											ch.push(psnode);
+											var nfprop = res[nfname];
+											var val = vals!=null? vals[nfname]: null;
+											var txt = val!=null? nfprop.name+": "+val: nfprop.name;
+											var nfnode = {"id": nfid+"_"+nfprop.name, "text": txt, 
+												"type": nfprop.dynamic? "nfproperty_dynamic": "nfproperty", "children": false,
+												"refreshcmd": nfprop.dynamic? refreshcmd: null, "propname": nfprop.name};
+											ch.push(nfnode);
 										}
 										
-										// required
-										for(var i=0; i<res[1].length; i++)
-										{
-											var rsid = serid+"_"+res[1].name;
-											var txt = res[1][i].type.value.split(".");
-											var mult = res[1][i].multiple;
-											txt = txt[txt.length-1];
-											var rsnode = {"id": rsid, "text": txt, "type": mult? "required_multiple": "required", "children": true, "cid": node.id};
-											ch.push(rsnode);
-										}
-										
-										self.treedata[serid] = {"id": serid, "text": "Services", "type": "services", "children": ch};
+										self.treedata[nfid] = {"id": nfid, "text": "Non-functional Properties", "type": "nfproperties", "children": ch};
 										
 										var key = node.id+"_children";
 										var children = self.treedata[key];
@@ -412,99 +163,347 @@ class ComponentTree extends BaseElement
 											children = [];
 											self.treedata[key] = children;
 										}
-										children.push(serid);
+										children.push(nfid);
 									}
-									
-									serresolve(null);
-									//promser.resolve(null);
-								})
-								.catch(function(e)
+								}
+								
+								// provided service node
+								if(node.type==="provided")
 								{
-									console.log("Err loading services for: "+node.id);
-									serresolve(null);
-									//promser.resolve(null);
-								});
+									// look for nf props (only possible children)
+									// sid is saved in node data 
+									
+									// args IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req
+									var sid = encodeURIComponent(JSON.stringify(node.original.sid));
+									//console.log("SID: "+sid);
+									axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0=null&args_1='+sid, self.transform)
+									.then(function(resp)
+									{
+										//console.log("nf prov props:"+resp.data);		
+									
+										var res = resp.data;
+										
+										if(res!=null && Object.keys(res).length>0)
+										{
+											axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0=null&args_1='+JSON.stringify(node.original.sid), self.transform)
+											.then(function(resp)
+											{
+												function refresh(node) 
+												{
+													axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0=null'
+														+"&args_1="+JSON.stringify(node.original.sid)+"&args_2=null&args_3=null&args_4="+node.original.propname, self.transform)
+													.then(function(resp)
+													{
+														//console.log("refresh nfnode: "+node);
+														var res = resp.data;
+														var val = res[node.original.propname];
+														var txt = node.original.propname+": "+val;
+														self.getTree(self.treeid).jstree('rename_node', node, txt);
+													})
+													.catch(function(e)
+													{
+														console.log("err in refresh nfnode: "+node);
+													});
+												}
+												
+												var vals = resp.data;
+												createNFChildren(node, res, vals, refresh);	
+												cont();
+											})
+											.catch(function(e)
+											{
+												createNFChildren(node, res);	
+												cont();
+											});
+										}
+										else
+										{
+											cont();
+										}
+									})
+									.catch(function(e)
+									{
+										console.log("getNF exception: "+e);
+										cont();
+									});
+								}
+								// required service node
+								else if(node.type==="required")
+								{
+									// look for nf props (only possible children)
+									// cid is saved in node data 
+									
+									// args IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req
+									axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
+									.then(function(resp)
+									{
+										//console.log("nf req props:"+resp.data);		
+										
+										var res = resp.data;
+										
+										if(res!=null && Object.keys(res).length>0)
+										{
+											axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
+											.then(function(resp)
+											{
+												function refresh(node) 
+												{
+													axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.original.cid
+														+"&args_1=null&args_2=null&args_3=true&args_4="+node.original.propname, self.transform)
+													.then(function(resp)
+													{
+														//console.log("refresh nfnode: "+node);
+														var res = resp.data;
+														var val = res[node.original.propname];
+														var txt = node.original.propname+": "+val;
+														self.getTree(self.treeid).jstree('rename_node', node, txt);
+													})
+													.catch(function(e)
+													{
+														console.log("err in refresh nfnode: "+node);
+													});
+												}
+												
+												var vals = resp.data;
+												createNFChildren(node, res, vals, refresh);	
+												cont();
+											})
+											.catch(function(e)
+											{
+												createNFChildren(node, res);	
+												cont();
+											});
+										}
+										else
+										{
+											cont();
+										}
+									})
+									.catch(function(e)
+									{
+										console.log("getNF exception: "+e);
+										cont();
+									});
+								}
+								// component nodes 
+								else if(node.type!=="system" && node.type!=="applications" && node.type!=="cloud")
+								{
+									// possible children are
+									// a) nfprops
+									// b) services
+									// searches parallel and waits for barrier via Promise.all()
+									
+									// https://stackoverflow.com/questions/31069453/creating-a-es6-promise-without-starting-to-resolve-it
+									var nfresolve = null;
+									var promnf = new Promise(function(r, e)
+									{
+										nfresolve = r;
+									});
+									
+									var serresolve = null;
+									var promser = new Promise(function(r, e)
+									{
+										serresolve = r;
+									});
+									
+									Promise.all([promnf, promser]).then(function(res)
+									{
+										cont();
+									});
+									
+									axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.id, self.transform)
+									.then(function(resp)
+									{
+										//console.log("nf props:"+resp.data);	
+	
+										var res = resp.data;
+										
+										if(res!=null && Object.keys(res).length>0)
+										{
+											var cid = node.id;
+											axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.id, self.transform)
+											.then(function(resp)
+											{
+												var vals = resp.data;
+												
+												function refresh(node) 
+												{
+													axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+cid
+														+"&args_1=null&args_2=null&args_3=null&args_4="+node.original.propname, self.transform)
+													.then(function(resp)
+													{
+														//console.log("refresh nfnode: "+node);
+														var res = resp.data;
+														var val = res[node.original.propname];
+														var txt = node.original.propname+": "+val;
+														self.getTree(self.treeid).jstree('rename_node', node, txt);
+													})
+													.catch(function(e)
+													{
+														console.log("err in refresh nfnode: "+node);
+													});
+												}
+												
+												createNFChildren(node, res, vals, refresh);	
+												nfresolve(null);
+											})
+											.catch(function(e)
+											{
+												createNFChildren(node, res);	
+												nfresolve(null);
+											});
+										}
+										else
+										{
+											nfresolve(null);
+										}
+									})
+									.catch(function(e)
+									{
+										console.log("getNF exception: "+e);
+										//promnf.resolve(null);
+										nfresolve(null);
+									});
+									
+									axios.get(self.getMethodPrefix()+'&methodname=getServiceInfos&args_0='+node.id, self.transform)
+									.then(function(resp)
+									{
+										//console.log("service infos: "+resp.data);
+										
+										var res = resp.data;
+										
+										if(res[0].length>0 || res[1].length>0)
+										{
+											var serid = node.id+"_services";
+			
+											var ch = [];
+											
+											// provided
+											for(var i=0; i<res[0].length; i++)
+											{
+												var psid = serid+"_"+res[0][i].name;
+												var txt = res[0][i].type.value.split(".");
+												txt = txt[txt.length-1];
+												//console.log("sid: "+res[2][i]);
+												var psnode = {"id": psid, "text": txt, "type": "provided", "children": true, "sid": res[2][i]};
+												ch.push(psnode);
+											}
+											
+											// required
+											for(var i=0; i<res[1].length; i++)
+											{
+												var rsid = serid+"_"+res[1].name;
+												var txt = res[1][i].type.value.split(".");
+												var mult = res[1][i].multiple;
+												txt = txt[txt.length-1];
+												var rsnode = {"id": rsid, "text": txt, "type": mult? "required_multiple": "required", "children": true, "cid": node.id};
+												ch.push(rsnode);
+											}
+											
+											self.treedata[serid] = {"id": serid, "text": "Services", "type": "services", "children": ch};
+											
+											var key = node.id+"_children";
+											var children = self.treedata[key];
+											if(children==null)
+											{
+												children = [];
+												self.treedata[key] = children;
+											}
+											children.push(serid);
+										}
+										
+										serresolve(null);
+										//promser.resolve(null);
+									})
+									.catch(function(e)
+									{
+										console.log("Err loading services for: "+node.id);
+										serresolve(null);
+										//promser.resolve(null);
+									});
+								}
+								else
+								{
+									cont();									
+								}
 							}
-							else
-							{
-								cont();									
-							}
+					    }
+					},
+					'sort': function(a, b) 
+					{
+				        var a1 = this.get_node(a);
+				        var b1 = this.get_node(b);
+				        if(a1.icon == b1.icon)
+				        {
+				            return (a1.text > b1.text) ? 1 : -1;
+				        } 
+				        else 
+				        {
+				            return (a1.icon > b1.icon) ? 1 : -1;
+				        }
+					},
+					types,
+					'contextmenu' : 
+					{
+				        'items': function menu(node) 
+						{
+				        	if(node.original.refreshcmd!=null)
+				        	{
+				        		return { 'Refresh': 
+				        			{
+		                                'label': "Refresh",
+		                                'action': function() 
+		                                {
+		                                	// todo: fix subscription refresh!
+		                                	
+		                                	// self.refreshCMSSubscription();
+		                                	if(node.original.refreshcmd!=null)
+		                                	{
+		                                		//console.log("refresh cmd for: "+node.id);
+		                                		node.original.refreshcmd(node);
+		                                	}
+		                                },
+		                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/refresh.png'
+				        			} 
+				        		};
+				        	}
+				        	else
+				        	{
+				        		return null;
+				        	}
 						}
 				    }
-				},
-				'sort': function(a, b) 
+				})});
+				
+			    //console.log("adding listener");
+				/*$('#'+treeid).on('select_node.jstree', function (e, data) 
 				{
-			        var a1 = this.get_node(a);
-			        var b1 = this.get_node(b);
-			        if(a1.icon == b1.icon)
-			        {
-			            return (a1.text > b1.text) ? 1 : -1;
-			        } 
-			        else 
-			        {
-			            return (a1.icon > b1.icon) ? 1 : -1;
-			        }
-				},
-				types,
-				'contextmenu' : 
+					console.log("select: "+data.node.id);
+					//self.selectModel(data.instance.get_path(data.node,'/'));
+				});
+				
+				$('#'+treeid).on('open_node.jstree', function (e, data) 
 				{
-			        'items': function menu(node) 
-					{
-			        	if(node.original.refreshcmd!=null)
-			        	{
-			        		return { 'Refresh': 
-			        			{
-	                                'label': "Refresh",
-	                                'action': function() 
-	                                {
-	                                	// todo: fix subscription refresh!
-	                                	
-	                                	// self.refreshCMSSubscription();
-	                                	if(node.original.refreshcmd!=null)
-	                                	{
-	                                		//console.log("refresh cmd for: "+node.id);
-	                                		node.original.refreshcmd(node);
-	                                	}
-	                                },
-	                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/refresh.png'
-			        			} 
-			        		};
-			        	}
-			        	else
-			        	{
-			        		return null;
-			        	}
-					}
-			    }
-			})});
-			
-		    //console.log("adding listener");
-			/*$('#'+treeid).on('select_node.jstree', function (e, data) 
-			{
-				console.log("select: "+data.node.id);
-				//self.selectModel(data.instance.get_path(data.node,'/'));
+					console.log("open: "+data.node.id);
+					//self.selectModel(data.instance.get_path(data.node,'/'));
+				});*/
+				
+				/*$('#'+treeid).on('load_node.jstree', function(event, data) 
+				{
+					console.log("load node: "+data.node.id);
+				    var treeNode = data.node;
+				    if(treeNode.type === NODE_TYPE_FOLDER) 
+				    {
+				        domNode = fileTree.get_node(treeNode.id, true);
+				        domNode.addClass('jstree-open').removeClass('jstree-leaf');
+				        //data.node.state.loaded = false;
+				    }
+				});*/ 
+				
+				//self.refresh();
 			});
-			
-			$('#'+treeid).on('open_node.jstree', function (e, data) 
-			{
-				console.log("open: "+data.node.id);
-				//self.selectModel(data.instance.get_path(data.node,'/'));
-			});*/
-			
-			/*$('#'+treeid).on('load_node.jstree', function(event, data) 
-			{
-				console.log("load node: "+data.node.id);
-			    var treeNode = data.node;
-			    if(treeNode.type === NODE_TYPE_FOLDER) 
-			    {
-			        domNode = fileTree.get_node(treeNode.id, true);
-			        domNode.addClass('jstree-open').removeClass('jstree-leaf');
-			        //data.node.state.loaded = false;
-			    }
-			});*/ 
-			
-			//self.refresh();
-		});
+		})
+		.catch((err)=>console.log(err));
 	}
 		
 	loadJSTree()
@@ -586,6 +585,7 @@ class ComponentTree extends BaseElement
 						}
 						catch(ex)
 						{
+							console.log("Err: "+ex);
 							console.log("Could not remove node: "+event.componentDescription.name.name);
 						}
 					}
@@ -742,10 +742,11 @@ class ComponentTree extends BaseElement
 	deleteNode(treeid, nodeid)
 	{
 		//console.log("remove node: "+nodeid);
-		this.getTree(self.treeid).jstree("delete_node", nodeid);
-		var apps = this.getTree(self.treeid).jstree().get_node('Applications');
-		if(apps!=null && apps.children.length==0)
-			this.getTree(self.treeid).jstree("delete_node", "Applications");
+		this.getTree(treeid).jstree("delete_node", nodeid);
+		//var apps4 = this.getTree(treeid).jstree().get_node(this.cid+'_Services');
+		var apps = this.getTree(treeid).jstree().get_node(this.cid+'_Applications');
+		if(apps!=false && apps.children.length==0)
+			this.getTree(treeid).jstree("delete_node", this.cid+"_Applications");
 	}
 
 	static get styles() {
@@ -809,7 +810,8 @@ class ComponentTree extends BaseElement
 		`;
 	}
 	
-	switchLanguage() {
+	switchLanguage() 
+	{
 	    language.switchLanguage(); 
 	    this.requestUpdate(); // needs manual update as language.lang is not mapped to an attribute 
 	}

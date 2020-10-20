@@ -384,6 +384,61 @@
             });
         },
 	};
+	
+	var login = 
+	{
+		loggedin: false,
+		listeners: [],
+		setLogin: function(loggedin)
+		{
+			if(this.loggedin!=loggedin)
+			{
+				this.loggedin = loggedin;
+				for(var i=0; i<this.listeners.length; i++)
+				{
+					this.listeners[i](this.loggedin);
+				}
+			}
+			console.log("loggedin is: "+this.loggedin);
+		},
+		isLoggedIn: function()
+		{
+			return this.loggedin;
+		},
+		addListener: function(listener)
+		{
+			this.listeners.push(listener);
+		},
+		removeListener: function(listener)
+		{
+			for(var i=0; i < this.listeners.length; i++) 
+			{
+				if(this.listeners[i] === listener) 
+				{
+					this.listeners.splice(i, 1);
+					break;
+			    } 
+			}
+		},
+		updateLogin()
+		{
+			var self = this;
+			return new Promise(function(resolve, reject) 
+			{
+				axios.get('webjcc/isLoggedIn', {headers: {'x-jadex-isloggedin': true}}, self.transform).then(function(resp)
+				{
+					//console.log("is logged in: "+resp);
+					self.setLogin(resp.data);
+					resolve(self.loggedin);
+				})
+				.catch(function(err) 
+				{
+					console.log("check failed: "+err);	
+					reject(err);
+				});
+			});
+		}
+	}
 </script>
 
 <jadex-app></jadex-app>
