@@ -557,7 +557,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					final MappingInfo mi = tup.getFirstEntity();
 					Object[] params = tup.getSecondEntity();
 					
-					//if(mi.getMethod().toString().indexOf("getPluginFragment")!=-1)
+					//if(mi.getMethod().toString().indexOf("invokeServiceMe")!=-1)
 					//	System.out.println("heeereeee");
 	
 					// Inject caller meta info

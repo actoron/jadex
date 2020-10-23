@@ -107,6 +107,8 @@ class StarterElement extends BaseElement
 	{
 		if(this.model!=null)
 		{
+			var self = this;
+			
 			var conf = this.shadowRoot.getElementById("config").value;
 			var sync = this.shadowRoot.getElementById("synchronous").checked;
 			var sus = this.shadowRoot.getElementById("suspended").checked;
@@ -143,7 +145,8 @@ class StarterElement extends BaseElement
 			axios.get(this.getMethodPrefix()+'&methodname=createComponent&args_0='+JSON.stringify(ci)+"&argtypes_0=jadex.bridge.service.types.cms.CreationInfo", this.transform).then(function(resp)
 			{
 				// todo: show running components?!
-				console.log("started: "+resp.data);
+				//console.log("started: "+resp.data);
+				self.createInfoMessage("Started component "+resp.data.name+" ["+self.model.filename+"]"); 
 			});
 		}
 	}
@@ -200,14 +203,14 @@ class StarterElement extends BaseElement
 			<div class="container-fluid">
 				<div class="row m-0 p-0">
 					<div class="col-12 m-0 p-0">
-						<h3>Components</h3>
+						<h3>${language.getLanguage()? 'Components': 'Komponenten'}</h3>
 						<jadex-componenttree cid='${this.cid}'></jadex-componenttree>
 					</div>
 				</div>
 				
 				<div class="row m-0 p-0">
 					<div class="col-12 m-0 p-0">
-						<h3>Available Models</h3>
+						<h3>${language.getLanguage()? 'Available Models': 'Verfügbare Modelle'}</h3>
 						<jadex-modeltree cid='${this.cid}'></jadex-modeltree>
 					</div>
 				</div>
@@ -216,12 +219,12 @@ class StarterElement extends BaseElement
 				<div class="bgwhitealpha m-0 p-0"> <!-- sticky-top  -->
 					<div class="row m-1">
 						<div class="col-12">
-							<h3>Settings</h3>
+							<h3>${language.getLanguage()? 'Settings': 'Einstellungen'}</h3>
 						</div>
 					</div>
 					<div class="row m-1">
 						<div class="col-2">
-							Filename
+							${language.getLanguage()? 'Filename': 'Dateiname'}
 						</div>
 						<div class="col-10" id="filename">
 							<input type="text" ref="filename" class="w100" value="${this.model!=null? this.model.filename: ''}">
@@ -229,7 +232,7 @@ class StarterElement extends BaseElement
 					</div>
 					<div class="row m-1">
 						<div class="col-2">
-							Configuration
+							${language.getLanguage()? 'Configuration': 'Konfiguration'}
 						</div>
 						<div class="col-10">
 							<select id="config" class="w100">
@@ -239,13 +242,13 @@ class StarterElement extends BaseElement
 					</div>
 					<div class="row m-1">
 						<div class="col-2">
-							Comp. name
+							${language.getLanguage()? 'Comp. name': 'Komp.name'}
 						</div>
 						<div class="col-5">
 							<input type="text" class="w100" value="${this.model!=null && this.model.instancename!=null? this.model.instancename: ''}" id="name"></input>
 						</div>
 						<div class="col-3">
-							<input type="checkbox" id="autogen">Auto generate</input>
+							<input type="checkbox" id="autogen">${language.getLanguage()? 'Auto generate': 'Autogenerieren'}</input>
 						</div>
 						<div class="col-2">
 							<input class="w100" type="number" value="1" id="gencnt"></input>
@@ -253,17 +256,18 @@ class StarterElement extends BaseElement
 					</div>
 					<div class="row m-1">
 						<div class="col-4">
-							<input type="checkbox" id="suspended">Suspended</input>
+							<input type="checkbox" id="suspended">${language.getLanguage()? 'Suspended': 'Angehalten'}</input>
 						</div>
 						<div class="col-4">
-							<input type="checkbox" id="synchronous">Synchronous</input>
+							<input type="checkbox" id="synchronous">${language.getLanguage()? 'Synchronous': 'Synchron'}</input>
 						</div>
 						<div class="col-4">
+							${language.getLanguage()? 'Monitoring':'Überwachung'}
 							<select id="monitoring" class="w100">
 		   						<option value="OFF">OFF</option> 
-		   						<option value="COARSE">COARSE</option> 
-		   						<option value="MEDIUM">MEDIUM</option> 
-		   						<option value="FINE">FINE</option> 
+		   						<option value="COARSE">${language.getLanguage()? 'COARSE': 'Grob'}</option> 
+		   						<option value="MEDIUM">${language.getLanguage()? 'MEDIUM': 'Mittel'}</option> 
+		   						<option value="FINE">${language.getLanguage()? 'FINE': 'Fein'}</option> 
 		 					</select>
 		 				</div>
 					</div>

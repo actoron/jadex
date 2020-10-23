@@ -102,6 +102,7 @@ class AppElement extends BaseElement
 					<a class="p-0 m-0" href="#">WebJCC</a>
 					<img class="p-0 m-0" @click="${this.switchLanguage}" src="${language.lang=='de'? 'images/language_de.png': 'images/language_en.png'}" />
 				</div>
+				<!--
 				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 					<span class="navbar-toggler-icon"></span>
 				</button>
@@ -116,7 +117,8 @@ class AppElement extends BaseElement
 		 			</ul>
 		 			<form class="form-inline my-2 my-lg-0"></form>
 				</div>
-		        
+				-->		        
+
 				<div class="flexcontainerrow">
 					<jadex-login class="flexcellgrow"></jadex-login>
 				</div>

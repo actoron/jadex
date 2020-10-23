@@ -86,7 +86,7 @@ class ComponentTree extends BaseElement
 						{
 							function getChildData(id)
 							{
-								//console.log("loading node: "+id);
+								console.log("loading node: "+id);
 								
 								var children = self.treedata[id+"_children"];
 								var data = [];
@@ -571,11 +571,12 @@ class ComponentTree extends BaseElement
 				function(resp)
 				{
 					var event = resp.data;
-					//console.log("cms status event: "+event);
+					console.log("cms status event: "+event);
+					
 					if(event.type.toLowerCase().indexOf("created")!=-1)
 					{
 						self.typemap[event.componentDescription.name.name] = event.componentDescription.type;
-						self.createNodes(self.treeid, event.componentDescription, true);
+						self.createNodes(self.treeid, event.componentDescription, false);
 					}
 					else if(event.type.toLowerCase().indexOf("terminated")!=-1)
 					{
@@ -589,6 +590,8 @@ class ComponentTree extends BaseElement
 							console.log("Could not remove node: "+event.componentDescription.name.name);
 						}
 					}
+					
+					self.getTree(self.treeid).jstree("refresh");
 				},
 				function(err)
 				{
@@ -716,8 +719,8 @@ class ComponentTree extends BaseElement
 	// createNode(parent, id, text, position), position 'first' or 'last'
 	createNode(treeid, parent_node_id, new_node_id, new_node_text, position, type, icon)//, donefunc) 
 	{
-		//console.log("parent="+parent_node_id+" child="+new_node_id+" childtext="+new_node_text);
-		//console.log("create node: "+new_node_id);
+		console.log("parent="+parent_node_id+" child="+new_node_id+" childtext="+new_node_text);
+		console.log("create node: "+new_node_id);
 		var n = {"text": new_node_text, "id": new_node_id}; //"children": true  "state": {"opened": false}
 		if(type!=null)
 			n.type = type;
@@ -741,7 +744,7 @@ class ComponentTree extends BaseElement
 		
 	deleteNode(treeid, nodeid)
 	{
-		//console.log("remove node: "+nodeid);
+		console.log("remove node: "+nodeid);
 		this.getTree(treeid).jstree("delete_node", nodeid);
 		//var apps4 = this.getTree(treeid).jstree().get_node(this.cid+'_Services');
 		var apps = this.getTree(treeid).jstree().get_node(this.cid+'_Applications');

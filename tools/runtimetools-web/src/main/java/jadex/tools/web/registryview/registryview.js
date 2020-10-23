@@ -67,10 +67,14 @@ class RegistryViewElement extends BaseElement
 						//console.log("loaded datatables.css");
 						
 						var opts = {perPageSelect: [5,10,15,25,50,100,1000], perPage: 15};
-						
 						self.getSubscription("Services").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableservices'), opts);
 						self.getSubscription("Platforms").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableplatforms'), opts);
 						self.getSubscription("Queries").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tablequeries'), opts);
+						
+						self.getSubscription("Services").table.insert({headings: ["","","","",""]});
+						self.getSubscription("Platforms").table.insert({headings: ["","",""]})
+						self.getSubscription("Queries").table.insert({headings: ["","",""]})
+						
 						self.initready = true;
 						self.subscribe();
 					})
@@ -356,6 +360,30 @@ class RegistryViewElement extends BaseElement
 		return ret;
 	}*/
 	
+	requestUpdate()
+	{
+		// Update table headers according to language 
+		// not possible in HTML as texts are read only once
+		
+		if(this.getSubscription("Services")!=null && this.getSubscription("Services").table!=null)
+		{
+			this.getSubscription("Services").table.headings[0].innerText=language.getLanguage()? 'Service Type': 'Diensttyp';
+			this.getSubscription("Services").table.headings[1].innerText=language.getLanguage()? 'Provided By': 'Angeboten von';
+			this.getSubscription("Services").table.headings[2].innerText=language.getLanguage()? 'Publication Scope': 'Sichtbarkeit des Dienstes';
+			this.getSubscription("Services").table.headings[3].innerText=language.getLanguage()? 'Networks': 'Netzwerke';
+			this.getSubscription("Services").table.headings[4].innerText=language.getLanguage()? 'Security': 'Absicherung';
+			
+			this.getSubscription("Platforms").table.headings[1].innerText=language.getLanguage()? 'Connected': 'Verbunden';
+			this.getSubscription("Platforms").table.headings[2].innerText=language.getLanguage()? 'Protocol': 'Protokoll';
+			
+			this.getSubscription("Queries").table.headings[0].innerText=language.getLanguage()? 'Service Type': 'Diensttyp';
+			this.getSubscription("Queries").table.headings[1].innerText=language.getLanguage()? 'Query Owner': 'Query-Besitzer';
+			this.getSubscription("Queries").table.headings[2].innerText=language.getLanguage()? 'Search Scope': 'Sichtbarkeit der Suche';
+		}
+		
+		super.requestUpdate();
+	}
+	
 	render() 
 	{
 		return html`
@@ -366,25 +394,16 @@ class RegistryViewElement extends BaseElement
 		<div id="panel" class="container-fluid m-0 p-0">
 			<div>
     			<input type="checkbox" id="global" .checked="${this.global}" @click="${(e) => {this.global = e.target.checked;}}">
-				<label for="global">Show only global services and queries</label>
+				<label for="global">${language.getLanguage()? 'Show only global services and queries': 'Nur globale Dienste und Queries anzeigen'}</label>
   			</div>
 			<div id="accordion">
 				<div class="card m-0">
 					<div class="card-header">
-    					<h4 class="card-link" data-toggle="collapse" href="#collapseOne">Services</h4>
+    					<h4 class="card-link" data-toggle="collapse" href="#collapseOne">${language.getLanguage()? 'Services': 'Dienste'}</h4>
 					</div>
 					<div id="collapseOne" class="collapse show" data-parent="#accordion">
 						<div class="card-body">
 							<table id="tableservices" class="${this.getSubscription("Services")?'': 'down'}">
-								<thead>
-									<tr>
-										<th>Service Type</th>
-										<th>Provided By</th>
-										<th>Publication Scope</th>
-						 				<th>Networks</th>
-										<th>Security</th>
-									</tr>
-								</thead>
 							</table>
 						</div>
     				</div>
@@ -392,18 +411,11 @@ class RegistryViewElement extends BaseElement
 		
 				<div class="card m-0">
 					<div class="card-header">
-						<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">Platforms</h4>
+						<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">${language.getLanguage()? 'Platforms': 'Plattformen'}</h4>
 					</div>
 					<div id="collapseTwo" class="collapse" data-parent="#accordion">
 						<div class="card-body">
 							<table id="tableplatforms" class="${this.getSubscription("Platforms").connected?'': 'down'}">
-								<thead>
-									<tr>
-										<th>Name</th>
-										<th>Connected</th>
-										<th>Protocol</th>
-									</tr>
-								</thead>
 							</table>
 						</div>
 					</div>
@@ -416,13 +428,6 @@ class RegistryViewElement extends BaseElement
 					<div id="collapseThree" class="collapse" data-parent="#accordion">
 						<div class="card-body">
 							<table id="tablequeries" class="${this.getSubscription("Queries")?'': 'down'}">
-								<thead>
-									<tr>
-										<th>Service Type</th>
-										<th>Query Owner</th>
-										<th>Search Scope</th>
-									</tr>
-								</thead>
 							</table>
 						</div>
 					</div>

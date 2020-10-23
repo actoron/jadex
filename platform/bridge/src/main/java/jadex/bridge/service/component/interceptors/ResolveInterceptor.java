@@ -120,7 +120,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 				
-		Object service = sic.getObject();
+		final Object service = sic.getObject();
 		if(service instanceof ServiceInfo)
 		{
 			final ServiceInfo si = (ServiceInfo)service;

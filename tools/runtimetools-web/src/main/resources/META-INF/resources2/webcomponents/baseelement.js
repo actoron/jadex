@@ -98,7 +98,7 @@ export class BaseElement extends LitElement
 		{
 			this.loginlistener = e => 
 			{
-				console.log("login update: "+self);
+				//console.log("login update: "+self);
 				self.requestUpdate();
 			};
 		}

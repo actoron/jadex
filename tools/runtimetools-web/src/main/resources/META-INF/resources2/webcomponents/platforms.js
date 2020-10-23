@@ -32,14 +32,14 @@ class PlatformsElement extends BaseElement
 	connectedCallback() 
 	{
 		this.comconn = true;
-		console.log("connected platforms: "+this.comconn);
+		//console.log("connected platforms: "+this.comconn);
 		super.connectedCallback();
 		this.subscribe(5000);
 	}
 	
 	disconnectedCallback()
 	{
-		console.log("disconnected platforms: "+this.comconn);
+		//console.log("disconnected platforms: "+this.comconn);
 		this.comconn = false;
 		this.terminateSubscription();
 	}
@@ -60,7 +60,7 @@ class PlatformsElement extends BaseElement
 		var tc = jadex.getIntermediate('webjcc/subscribeToPlatforms',
 			function(resp)
 			{
-				console.log("Set up subscription");
+				//console.log("Set up subscription");
 				self.updatePlatform(resp.data.service.name, resp.data.service.type);
 				self.connected = true;
 				self.termcmd = tc;
@@ -103,22 +103,30 @@ class PlatformsElement extends BaseElement
 			<div class="actwtable section">
 				<div>
 					<div class="head">
-						<h1 class="m-0 p-0 inline" id="HConnectedPlatforms">Connected Platforms</h1>
+						<h1 class="m-0 p-0 inline" id="HConnectedPlatforms">${language.getLanguage()? 'Connected Platforms': 'Verbundene Plattformen'}</h1>
 						<span id="connected" class="dot fl ${this.connected? "green": "red"}"></span>
 					</div>
-					<p>This page shows a self-updating list of remote platforms known to this Jadex platform.</p>
+					<p>
+						${language.getLanguage()? 'This page shows a self-updating list of remote platforms known to this Jadex platform.'
+						:'Diese Seite zeigt eine sich selbst aktualisierende Plattformliste an.'}
+					</p>
 				</div>
-				<table>
-					<tbody>
-						<tr>
-							<th>Name</th>
-							<!-- <th>Connected</th> 
-							<th>Protocol</th>-->
-						</tr>
-						
-						${this.platforms.map((p) => html`<tr><td><a href="#/platform/${p}">${p}</a></td></tr>`)}
-					</tbody>
-				</table>
+
+				<div class="jumbotron jumbotron-fluid m-0 p-3">
+					<div class="row">
+						<div class="col-12" >
+					<table>
+						<tbody>
+							<tr>
+								<th>Name</th>
+								<!-- <th>${!language.getLanguage()? "Connected": "Verbunden"}</th> 
+								<th>Protocol</th>-->
+							</tr>
+							
+							${this.platforms.map((p) => html`<tr><td><a href="#/platform/${p}">${p}</a></td></tr>`)}
+						</tbody>
+					</table>
+				</div>
 			</div>
 		`;
 	}

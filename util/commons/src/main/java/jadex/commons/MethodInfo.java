@@ -242,7 +242,12 @@ public class MethodInfo
 			{
 				Class<?> cla = SReflect.findClass(classname, null, cl);
 				
-				if(parametertypes!=null)
+				
+				Method[] ms = SReflect.getAllMethods(cla, name);
+				if(ms.length==1)
+					method = ms[0];
+				
+				if(method==null && parametertypes!=null)
 				{
 					Class<?>[] types = new Class[parametertypes.length];
 					for(int i=0; i<types.length; i++)
@@ -250,14 +255,6 @@ public class MethodInfo
 						types[i] = parametertypes[i].getType(cl);
 					}
 					method = SReflect.getAnyMethod(cla, name, types);
-				}
-				else
-				{
-					Method[] ms = SReflect.getAllMethods(cla, name);
-					if(ms.length==1)
-					{
-						method = ms[0];
-					}
 				}
 				//method = SReflect.getMethod(cla, name, types); // only return public methods :-(
 				classloader = cl;
