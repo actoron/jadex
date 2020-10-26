@@ -200,7 +200,7 @@ class StarterElement extends BaseElement
 	
 	render() {
 		return html`
-			<div class="container-fluid">
+			<div class="container-fluid m-0 p-0">
 				<div class="row m-0 p-0">
 					<div class="col-12 m-0 p-0">
 						<h3>${language.getLanguage()? 'Components': 'Komponenten'}</h3>

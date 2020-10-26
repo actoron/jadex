@@ -28,9 +28,8 @@ class LoginElement extends BaseElement
 	connectedCallback() 
 	{
 		super.connectedCallback();
-		
-		//var self = this;
-		//self.isLoggedIn();
+		var self = this;
+		this.isLoggedIn().then(()=>{self.requestUpdate();});
 		
 		// turn on to cintinuously check if we are stll logged in
 		//this.checkLoggedIn();
@@ -143,7 +142,7 @@ class LoginElement extends BaseElement
 			{
 				//console.log("is logged in: "+resp);
 				//self.loggedin = resp.data;
-				login.setLogin(self.loggedin);
+				login.setLogin(resp.data);
 				resolve(self.loggedin);
 			})
 			.catch(function(err) 

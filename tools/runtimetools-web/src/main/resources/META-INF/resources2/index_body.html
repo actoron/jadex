@@ -391,7 +391,7 @@
 		listeners: [],
 		setLogin: function(loggedin)
 		{
-			if(this.loggedin!=loggedin)
+			if(this.loggedin!=loggedin && loggedin!=null)
 			{
 				this.loggedin = loggedin;
 				for(var i=0; i<this.listeners.length; i++)
@@ -399,7 +399,7 @@
 					this.listeners[i](this.loggedin);
 				}
 			}
-			//console.log("loggedin is: "+this.loggedin);
+			console.log("loggedin is: "+this.loggedin);
 		},
 		isLoggedIn: function()
 		{

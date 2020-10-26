@@ -28,6 +28,25 @@ class PlatformElement extends BaseElement
 		this.plugins = [];
 		//this.loggedin = false;
 		this.no = 0;
+		var self = this;
+		this.listener = function refresh()
+		{
+			var w = self.getScaledWidth();
+			for(var i=0; ; i++)
+			{
+				var elem = self.shadowRoot.getElementById("plugin"+i);
+				if(elem!=null)
+				{
+					elem.style.width= w+"px";
+					elem.style.height= w+"px"
+				}
+				else
+				{
+					break;
+				}
+			}	
+			self.requestUpdate();
+		};
 	}
 	
 	/*init() 
@@ -39,6 +58,18 @@ class PlatformElement extends BaseElement
 		this.plugins = [];
 		this.loggedin = false;
 	}*/
+	
+	connectedCallback()
+	{
+		super.connectedCallback();
+		window.addEventListener("resize", this.listener);
+	}
+	
+	disconnectedCallback()
+	{
+		super.disconnectedCallback();
+		window.removeEventListener("resize", this.listener);
+	}
 	
 	attributeChangedCallback(name, oldVal, newVal) 
 	{
@@ -93,6 +124,7 @@ class PlatformElement extends BaseElement
 		if(this.plugins[name]==null)
 			return;
 		
+		//console.log("login is: "+login.isLoggedIn());
 		//console.log("show plugin: "+name+" "+this.cid);
 
 		let self = this;
@@ -175,13 +207,22 @@ class PlatformElement extends BaseElement
 				var pis = resp.data;
 				//console.log(map);
 				
+				var cnt = 0;
 				for(var i=0; i<pis.length; i++)
 				{
 					self.plugins[pis[i].name] = pis[i];
+					pis[i].image = new Image();
+					pis[i].image.src = 'data:image/png;base64,'+pis[i].icon.__base64;
+					pis[i].image.onload = function()
+					{
+						cnt++;
+						if(cnt==pis.length)
+						{
+							self.showPlugin2(self.getPlugins()[0].name);
+							console.log("loadPlugs show: "+self.getPlugins()[0].name);
+						}
+					}
 				}
-				
-				self.showPlugin2(self.getPlugins()[0].name);
-				console.log("loadPlugs show: "+self.getPlugins()[0].name);
 				
 			}).catch(function(err) 
 			{
@@ -247,7 +288,7 @@ class PlatformElement extends BaseElement
 	    		color: #ffffff;
 	    	}
 			.overlay {
-				background: rgba(0, 0, 0, 0.3); /* Black see-through */
+				background: rgba(0, 0, 0, 0.1); /* Black see-through */
 			}
 	    `;
 	}
@@ -281,15 +322,36 @@ class PlatformElement extends BaseElement
 		super.requestUpdate();
 	}
 	
+	/*getScaledImage(img, width, height)
+	{
+		if(height===undefined)
+			var height = width; 
+    	var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+		canvas.width = width;
+		canvas.height = height;
+    	ctx.drawImage(img, 0, 0, width, height);
+    	return canvas.toDataURL();
+	}*/
+	
+	getScaledWidth()
+	{
+		var num = Object.values(this.plugins).length;
+		var maxw = this.shadowRoot.getElementById('plugincont').offsetWidth; 
+		var w = Math.max(Math.min(80, maxw/num), 24);
+		//console.log("width: "+w);
+		return w;
+	}
+	
 	render() 
 	{
 		var self = this;
 		return html`
 			<h1 class="m-0 p-0">Platform ${this.cid}</h1>
-			<div class="container-fluid m-0 p-0">
-				${this.getPlugins().map((p) => html`
+			<div class="container-fluid m-0 p-0" id="plugincont">
+				${this.getPlugins().map((p, index) => html`
 					${!p.unrestricted && !login.isLoggedIn()? "": p.icon!=null? 
-						html`<img class="${self.plugin===p.name? "overlay": ""}" src="data:image/png;base64,${p.icon.__base64}" alt="Red dot" @click="${(e) => {self.showPlugin2(p.name)}}" data-toggle="tooltip" data-placement="top" title="${p.name}"/>`:
+						html`<img id="${'plugin'+index}" class="${self.plugin===p.name? "overlay": ""}" src="data:image/png;base64,${p.icon.__base64}" alt="Red dot" @click="${(e) => {self.showPlugin2(p.name)}}" data-toggle="tooltip" data-placement="top" title="${p.name}"/>`:
 						html`<span @click="${(e) => {self.showPlugin2(p.name)}}">${p.name}</span>`
 					}
 				`)}
