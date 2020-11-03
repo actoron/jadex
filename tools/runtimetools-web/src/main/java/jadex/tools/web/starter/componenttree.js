@@ -16,7 +16,7 @@ class ComponentTree extends BaseElement
 	{
 		super();
 		
-		this.components = []; // component descriptions
+		//this.components = []; // component descriptions
 		this.typemap = null;
 		this.treedata = {};
 		this.treeid = "componenttree";
@@ -54,7 +54,7 @@ class ComponentTree extends BaseElement
 			    "nfproperty" : {"icon": nfprop},
 			    "nfproperty_dynamic" : {"icon": nfprop_dynamic}
 			}
-			
+
 			//console.log("components");
 			
 			var self = this;
@@ -62,17 +62,6 @@ class ComponentTree extends BaseElement
 			this.loadJSTree().then(function()
 			{
 				//console.log("jstree");
-		
-				//var myservice = "jadex.tools.web.starter.IJCCStarterService";
-				//var extservice = "jadex.jadex.bridge.IExternalAccess";
-				
-				/*getMethodPrefix()
-				{
-					return 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
-				}*/
-				
-				//var prefix = 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
-				//self.prefix_ext = 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+extservice;
 				
 				// init tree
 				var types = self.types;
@@ -85,41 +74,64 @@ class ComponentTree extends BaseElement
 						"data": function(node, cb) 
 						{
 							function getChildData(id)
-							{
-								console.log("loading node: "+id);
-								
+							{					
+								// get child ids			
 								var children = self.treedata[id+"_children"];
+								
+								// create array with child data
 								var data = [];
 								if(children!=null)
 								{
 									for(var i=0; i<children.length; i++)
 									{
 										var node = self.treedata[children[i]];
-										data.push(node);
+										//if(node.children===undefined)
+										//	node.children=true;
+										if(node!=null)
+											data.push(node);
+										else
+											console.log("ERR: not found: "+children[i]);
 									}
 								}
-								return data;
+								
+								console.log("loading node: "+id);
+								
+								// problem: js tree changes data structures :-( give jstree only a clone?
+								//return Object.assign({}, data)
+								return JSON.parse(JSON.stringify(data));
+								//return data;
+							}
+							
+							function loadComponentChildData(cid)
+							{
+								return new Promise(function(r, e)
+								{
+									axios.get(self.getMethodPrefix()+'&methodname=getChildComponentDescriptions&arg0='+cid, self.transform).then(function(resp)
+									{
+										//console.log("descs are: "+resp.data);
+										var components = resp.data;
+										
+										self.typemap = {};
+										for(var i=0; i<components.length; i++)
+											self.typemap[components[i].name.name] = components[i].type;
+		
+										self.createTree(self.treeid, components);
+										r();
+									}).catch(err => e(err));
+								});
 							}
 							
 							// load initial state via component descriptions
 							if("#"===node.id)
 							{
-								axios.get(self.getMethodPrefix()+'&methodname=getComponentDescriptions', self.transform).then(function(resp)
+								loadComponentChildData(self.cid).then(()=>
 								{
-									//console.log("descs are: "+resp.data);
-									self.components = resp.data;
-									
-									self.typemap = {};
-									for(var i=0; i<self.components.length; i++)
-										self.typemap[self.components[i].name.name] = self.components[i].type;
-	
-									self.createTree(self.treeid);
 									self.refreshCMSSubscription();
 									self.requestUpdate();
 									
 									var data = getChildData(node.id);
 									cb.call(this, data);
-								});
+								}).catch(err=>console.log(err));
 							}
 							// when loading other nodes, component desriptions are availble via treedata
 							// nodeid = {nodevalues} for tree
@@ -163,9 +175,11 @@ class ComponentTree extends BaseElement
 											children = [];
 											self.treedata[key] = children;
 										}
-										children.push(nfid);
+										if(children.indexOf(nfid)===-1)
+											children.push(nfid);
 									}
 								}
+
 								
 								// provided service node
 								if(node.type==="provided")
@@ -291,9 +305,12 @@ class ComponentTree extends BaseElement
 									// possible children are
 									// a) nfprops
 									// b) services
+									// c) subcomponents
 									// searches parallel and waits for barrier via Promise.all()
 									
 									// https://stackoverflow.com/questions/31069453/creating-a-es6-promise-without-starting-to-resolve-it
+									var promc = loadComponentChildData(node.id);
+
 									var nfresolve = null;
 									var promnf = new Promise(function(r, e)
 									{
@@ -306,7 +323,7 @@ class ComponentTree extends BaseElement
 										serresolve = r;
 									});
 									
-									Promise.all([promnf, promser]).then(function(res)
+									Promise.all([promnf, promser, promc]).then(function(res)
 									{
 										cont();
 									});
@@ -409,7 +426,8 @@ class ComponentTree extends BaseElement
 												children = [];
 												self.treedata[key] = children;
 											}
-											children.push(serid);
+											if(children.indexOf(serid)===-1)
+												children.push(serid);
 										}
 										
 										serresolve(null);
@@ -545,70 +563,15 @@ class ComponentTree extends BaseElement
 		return $("#"+treeid, this.shadowRoot);
 	}
 	
-	refreshCMSSubscription()
-	{
-		//console.log("refreshCMSSubscription");
-		
-		var self = this;
-		
-		var path = self.getMethodPrefix()+'&methodname=subscribeToComponentChanges&returntype=jadex.commons.future.ISubscriptionIntermediateFuture';
-
-		if(self.termcom!=null)
-			self.termcom().then(done).catch(err);
-			//self.termcom("refreshing").then(done).catch(err);
-		else
-			done();
-		
-		function err(err)
-		{
-			console.log(err);
-			done();
-		}
-		
-		function done()
-		{
-			self.termcom = jadex.getIntermediate(path,
-				function(resp)
-				{
-					var event = resp.data;
-					console.log("cms status event: "+event);
-					
-					if(event.type.toLowerCase().indexOf("created")!=-1)
-					{
-						self.typemap[event.componentDescription.name.name] = event.componentDescription.type;
-						self.createNodes(self.treeid, event.componentDescription, false);
-					}
-					else if(event.type.toLowerCase().indexOf("terminated")!=-1)
-					{
-						try
-						{
-							self.deleteNode(self.treeid, event.componentDescription.name.name);
-						}
-						catch(ex)
-						{
-							console.log("Err: "+ex);
-							console.log("Could not remove node: "+event.componentDescription.name.name);
-						}
-					}
-					
-					self.getTree(self.treeid).jstree("refresh");
-				},
-				function(err)
-				{
-					console.log("error occurred: "+err);
-				}
-			);
-		}
-	}
 	
-	createTree(treeid)
+	
+	createTree(treeid, components)
 	{
-		this.empty(treeid);
-					
-		for(var i=0; i<this.components.length; i++)
+		//this.empty(treeid);
+		for(var i=0; i<components.length; i++)
 		{
 			//console.log(self.models[i]);
-			this.createNodes(treeid, this.components[i], false);
+			this.createNodes(treeid, components[i], false);
 		}
 	}
 	
@@ -685,9 +648,6 @@ class ComponentTree extends BaseElement
 				var type = self.typemap[names[i]];
 				var icon = null;
 				
-				if(type!=null && parts.length==1)
-					type = "platform";
-				
 				if(type==null)
 				{
 					if("Cloud"==name)
@@ -696,11 +656,13 @@ class ComponentTree extends BaseElement
 						type = "applications";
 					else if("System"==name) 
 						type = "system";
+					//else if(type!=null && parts.length==1)
+					else if(name===parts[parts.length-1])
+						type = "platform";
 				}
 				
 				if(self.types[type]==null)
 					icon = self.getMethodPrefix()+'&methodname=loadComponentIcon&args_0='+type;
-				//types[type] = self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/language_de.png';
 
 				//console.log(cid+" "+type+" "+icon);
 				
@@ -731,6 +693,7 @@ class ComponentTree extends BaseElement
 		
 	createNodeData(id, name, type, icon, parent)
 	{
+		console.log("create node data: "+id+" "+name+" "+type+" "+parent);
 		this.treedata[id] = {"id": id, "text": name, "type": type, "icon": icon, "children": true};
 		var key = parent==null || parent.length==0? "#_children": parent+"_children";
 		var children = this.treedata[key];
@@ -739,7 +702,8 @@ class ComponentTree extends BaseElement
 			children = [];
 			this.treedata[key] = children;
 		}
-		children.push(id);
+		if(children.indexOf(id)===-1)
+			children.push(id);
 	}
 		
 	deleteNode(treeid, nodeid)
@@ -747,12 +711,121 @@ class ComponentTree extends BaseElement
 		console.log("remove node: "+nodeid);
 		this.getTree(treeid).jstree("delete_node", nodeid);
 		//var apps4 = this.getTree(treeid).jstree().get_node(this.cid+'_Services');
-		var apps = this.getTree(treeid).jstree().get_node(this.cid+'_Applications');
+		var apps = this.getTree(treeid).jstree().get_node('Applications');
 		if(apps!=false && apps.children.length==0)
-			this.getTree(treeid).jstree("delete_node", this.cid+"_Applications");
+			this.getTree(treeid).jstree("delete_node", "Applications");
+			
+		// todo: remove node from parents children
+	}
+	
+	deleteNodeData(treeid, nodeid)
+	{
+		console.log("remove node data: "+nodeid);
+		delete this.treedata[nodeid];
+		delete this.treedata[nodeid+"_children"];
+		//this.treedata[nodeid] = null;
+		//this.treedata[nodeid+"_children"] = null;
+		
+		var paid = this.getTree(treeid).jstree().get_parent(nodeid);
+		if(paid!=null)
+		{
+			var pachilds = this.treedata[paid+"_children"];
+			if(pachilds!=null)
+			{
+				var i = pachilds.indexOf(nodeid);
+  				if(i!=-1)
+				{
+    				pachilds.splice(i, 1);
+					console.log("removed: "+nodeid);
+				}
+			}
+		}
+		
+		var ac = this.treedata["Applications_children"];
+		if(ac==null || ac.length==0)
+		{
+			delete this.treedata["Applications"];
+			delete this.treedata["Applications_children"]
+			//this.treedata["Applications"] = null;
+			//this.treedata["Applications_children"] = null;
+		}
+	}
+	
+	refreshCMSSubscription()
+	{
+		//console.log("refreshCMSSubscription");
+		
+		var self = this;
+		
+		var path = self.getMethodPrefix()+'&methodname=subscribeToComponentChanges&returntype=jadex.commons.future.ISubscriptionIntermediateFuture';
+
+		if(self.termcom!=null)
+			self.termcom().then(done).catch(err);
+			//self.termcom("refreshing").then(done).catch(err);
+		else
+			done();
+		
+		function err(err)
+		{
+			console.log(err);
+			done();
+		}
+		
+		function done()
+		{
+			self.termcom = jadex.getIntermediate(path,
+				function(resp)
+				{
+					var event = resp.data;
+					console.log("cms status event: "+event);
+					
+					if(event.type.toLowerCase().indexOf("created")!=-1)
+					{
+						self.typemap[event.componentDescription.name.name] = event.componentDescription.type;
+						self.createNodes(self.treeid, event.componentDescription, false);
+					}
+					else if(event.type.toLowerCase().indexOf("terminated")!=-1)
+					{
+						try
+						{
+							self.deleteNodeData(self.treeid, event.componentDescription.name.name);
+						}
+						catch(ex)
+						{
+							console.log("Err: "+ex);
+							console.log("Could not remove node: "+event.componentDescription.name.name);
+						}
+					}
+					
+					// determine what is to be refreshed
+					// normally 'Applications' node
+					// when last app has been deleted or first app has been created -> root refresh 
+					var hasapp = self.getTree(self.treeid).jstree().get_node("Applications")!=false;
+					var ac = self.treedata["Applications_children"];
+					var shouldhaveapp = ac!=null && ac.length>0;
+					
+					if(hasapp!=shouldhaveapp)
+					{
+						console.log("refresh all: "+hasapp+" "+shouldhaveapp);
+						self.getTree(self.treeid).jstree("refresh");
+					}
+					else
+					{
+						console.log("refresh app: "+hasapp+" "+shouldhaveapp);
+						self.getTree(self.treeid).jstree().refresh_node("Applications");
+						self.getTree(self.treeid).jstree().refresh_node("System");
+					}
+				},
+				function(err)
+				{
+					console.log("error occurred: "+err);
+				}
+			);
+		}
 	}
 
-	static get styles() {
+	static get styles() 
+	{
 	    return css`
 	    	/* Navbar styling. */
 	    	/* background color. */
@@ -801,14 +874,6 @@ class ComponentTree extends BaseElement
 						<div id="componenttree"></div>
 					</div>
 				</div>
-				
-				${this.components.length==0? html`
-				<div class="row m-0 p-0">
-					<div class="col-12 m-0 p-0">
-				 		<div class="loader"></div> 
-				 	</div>
-				 </div>
-				 ` : ''}
 			</div>
 		`;
 	}

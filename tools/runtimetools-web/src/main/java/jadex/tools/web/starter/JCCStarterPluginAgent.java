@@ -1,5 +1,6 @@
 package jadex.tools.web.starter;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.Map;
 import jadex.base.SRemoteGui;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IServiceIdentifier;
@@ -17,6 +19,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.Boolean3;
 import jadex.commons.ICommand;
 import jadex.commons.MethodInfo;
@@ -141,6 +144,30 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
 		return ea.getDescriptions();
 	}
+	
+	/**
+	 *  Get the child component descriptions.
+	 *  @param parent The component id of the parent.
+	 *  @return The component descriptions.
+	 */
+	public IFuture<IComponentDescription[]> getChildComponentDescriptions(IComponentIdentifier cid, IComponentIdentifier parent)
+	{
+		final Future<IComponentDescription[]> ret = new Future<IComponentDescription[]>();
+		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
+		ea.getChildren(null, parent).thenAccept(cids -> 
+		{
+			FutureBarrier<IComponentDescription> barrier = new FutureBarrier<IComponentDescription>();
+			for(int i=0; i<cids.length; i++)
+			{
+				IFuture<IComponentDescription>fut = ea.getDescription(cids[i]);
+				barrier.addFuture(fut);
+			}
+			barrier.waitForResults().thenAccept(descs -> ret.setResult(descs==null? null: descs.toArray(new IComponentDescription[cids.length])))
+				.exceptionally(ex -> ret.setException(ex));
+		});
+		return ret;
+	}
+
 	
 	/**
 	 * Get a default icon for a file type.

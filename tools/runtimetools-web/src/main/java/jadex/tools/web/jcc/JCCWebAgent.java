@@ -353,7 +353,7 @@ public class JCCWebAgent implements IJCCWebService
 		//if(methodname.indexOf("getSecurityS")!=-1)
 		//	System.out.println("invokeServiceMethod: "+servicetype+" "+methodname+" "+Arrays.toString(args)+" "+rettype);
 		
-		final String callid = (String)ServiceCall.getCurrentInvocation().getProperty("callid");
+		//final String callid = (String)ServiceCall.getCurrentInvocation().getProperty("callid");
 		
 		// Search service with startpoint of given platform 
 		agent.searchService(new ServiceQuery<IService>(servicetype).setSearchStart(cid.getRoot()).setScope(ServiceScope.PLATFORM))

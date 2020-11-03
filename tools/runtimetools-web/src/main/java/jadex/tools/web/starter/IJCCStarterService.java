@@ -56,6 +56,13 @@ public interface IJCCStarterService extends IJCCPluginService
 	public IFuture<IComponentDescription[]> getComponentDescriptions(IComponentIdentifier cid);
 	
 	/**
+	 *  Get the child component descriptions.
+	 *  @param parent The component id of the parent.
+	 *  @return The component descriptions.
+	 */
+	public IFuture<IComponentDescription[]> getChildComponentDescriptions(IComponentIdentifier cid, IComponentIdentifier parent);
+	
+	/**
 	 * Get a default icon for a file type.
 	 */
 	public IFuture<byte[]> loadComponentIcon(String type, IComponentIdentifier cid);
