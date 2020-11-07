@@ -1,5 +1,5 @@
-import { LitElement, html, css } from 'lit-element';
-import { BaseElement } from 'base-element';
+let { LitElement, html, css } = modLoad('lit-element');
+let { BaseElement } = modLoad('base-element');
 
 class PlatformsElement extends BaseElement 
 {
@@ -103,11 +103,11 @@ class PlatformsElement extends BaseElement
 			<div class="actwtable section">
 				<div>
 					<div class="head">
-						<h1 class="m-0 p-0 inline" id="HConnectedPlatforms">${language.getLanguage()? 'Connected Platforms': 'Verbundene Plattformen'}</h1>
+						<h1 class="m-0 p-0 inline" id="HConnectedPlatforms">${BaseElement.language.getLanguage()? 'Connected Platforms': 'Verbundene Plattformen'}</h1>
 						<span id="connected" class="dot fl ${this.connected? "green": "red"}"></span>
 					</div>
 					<p>
-						${language.getLanguage()? 'This page shows a self-updating list of remote platforms known to this Jadex platform.'
+						${BaseElement.language.getLanguage()? 'This page shows a self-updating list of remote platforms known to this Jadex platform.'
 						:'Diese Seite zeigt eine sich selbst aktualisierende Plattformliste an.'}
 					</p>
 				</div>
@@ -119,7 +119,7 @@ class PlatformsElement extends BaseElement
 						<tbody>
 							<tr>
 								<th>Name</th>
-								<!-- <th>${!language.getLanguage()? "Connected": "Verbunden"}</th> 
+								<!-- <th>${!BaseElement.language.getLanguage()? "Connected": "Verbunden"}</th> 
 								<th>Protocol</th>-->
 							</tr>
 							

@@ -1,5 +1,5 @@
-import { LitElement, html, css } from 'lit-element';
-import { BaseElement } from 'base-element';
+let { LitElement, html, css } = modLoad('lit-element');
+let { BaseElement } = modLoad('base-element');
 
 // Defined as <jadex-about> tag
 class AboutElement extends BaseElement 

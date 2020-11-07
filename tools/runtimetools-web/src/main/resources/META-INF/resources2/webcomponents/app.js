@@ -1,5 +1,5 @@
-import { LitElement, html, css } from 'lit-element';
-import { BaseElement } from 'base-element';
+let { LitElement, html, css } = modLoad('lit-element');
+let { BaseElement } = modLoad('base-element');
 
 // Defined as <jadex-app> tag
 class AppElement extends BaseElement 
@@ -100,7 +100,7 @@ class AppElement extends BaseElement
 				<div class="navbar-brand mr-auto">
 		 			<img src="images/jadex_logo_ac.png" width="200px"/>
 					<a class="p-0 m-0" href="#">WebJCC</a>
-					<img class="p-0 m-0" @click="${this.switchLanguage}" src="${language.lang=='de'? 'images/language_de.png': 'images/language_en.png'}" />
+					<img class="p-0 m-0" @click="${this.switchLanguage}" src="${BaseElement.language.lang=='de'? 'images/language_de.png': 'images/language_en.png'}" />
 				</div>
 				<!--
 				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -109,10 +109,10 @@ class AppElement extends BaseElement
 				<div class="collapse navbar-collapse" id="navbarSupportedContent" ref="navcol">
 					<ul class="navbar-nav mr-auto">
 		   				<li class="nav-item">
-		      				<a class="nav-link" href="">${language.$t("message.home")}</a>
+		      				<a class="nav-link" href="">${BaseElement.language.$t("message.home")}</a>
 		    			</li>
 		    			<li class="nav-item">
-		      				<a class="nav-link" href="#about">${language.$t("message.about")}</a>
+		      				<a class="nav-link" href="#about">${BaseElement.language.$t("message.about")}</a>
 		    			</li>
 		 			</ul>
 		 			<form class="form-inline my-2 my-lg-0"></form>
@@ -146,9 +146,9 @@ class AppElement extends BaseElement
 			<footer class="container-fluid footer navbar-light bg-light">
 		        <span class="text-muted">Copyright by <a href="http://www.actoron.com">Actoron GmbH</a> 2017-${new Date().getFullYear()}</span>
 		    	<div class="float-right">
-					<a href="#/about">${language.$t("message.about")}</a>
-		    		<a href="#/privacy">${language.$t("message.privacy")}</a>
-		    		<a href="#/imprint">${language.$t("message.imprint")}</a>
+					<a href="#/about">${BaseElement.language.$t("message.about")}</a>
+		    		<a href="#/privacy">${BaseElement.language.$t("message.privacy")}</a>
+		    		<a href="#/imprint">${BaseElement.language.$t("message.imprint")}</a>
 		    	</div>
 		    </footer>
 		    </div>

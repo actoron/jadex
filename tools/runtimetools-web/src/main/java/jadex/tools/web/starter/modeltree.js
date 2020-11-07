@@ -1,6 +1,5 @@
-import {html} from 'lit-element';
-import {css} from 'lit-element';
-import {BaseElement} from '/webcomponents/baseelement.js'
+let { html, css } = modLoad('lit-element');
+let { BaseElement } = modLoad('base-element');
 
 // Tag name 'jadex-modeltree'
 class ModelTree extends BaseElement 
@@ -300,7 +299,7 @@ class ModelTree extends BaseElement
 			<div class="container-fluid m-0 p-0">
 				<div class="row m-0 p-0">
 					<div class="col-12 m-0 p-0">
-						<input id="model" list="models" placeholder="${language.getLanguage()? 'Search models...': 'Suche Modelle'}" class="w100" type="text" @change="${(e) => this.select(e)}"></input>
+						<input id="model" list="models" placeholder="${BaseElement.language.getLanguage()? 'Search models...': 'Suche Modelle'}" class="w100" type="text" @change="${(e) => this.select(e)}"></input>
 						<datalist id="models">
 							${this.getModelNames().map((model) => html`<option class="w100" value="${model.name+' ['+model.pck+']'}"></option>`)}
 						</datalist>

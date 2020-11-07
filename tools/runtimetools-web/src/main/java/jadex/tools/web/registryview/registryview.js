@@ -1,7 +1,5 @@
-import {LitElement} from 'lit-element';
-import {html} from 'lit-element';
-import {css} from 'lit-element';
-import {BaseElement} from '/webcomponents/baseelement.js'
+let { LitElement, html, css } = modLoad('lit-element');
+let { BaseElement } = modLoad('base-element');
 //import '/libs/lit-datatable/lit-datatable.js'
 
 // Tag name 'jadex-registry'
@@ -367,18 +365,18 @@ class RegistryViewElement extends BaseElement
 		
 		if(this.getSubscription("Services")!=null && this.getSubscription("Services").table!=null)
 		{
-			this.getSubscription("Services").table.headings[0].innerText=language.getLanguage()? 'Service Type': 'Diensttyp';
-			this.getSubscription("Services").table.headings[1].innerText=language.getLanguage()? 'Provided By': 'Angeboten von';
-			this.getSubscription("Services").table.headings[2].innerText=language.getLanguage()? 'Publication Scope': 'Sichtbarkeit des Dienstes';
-			this.getSubscription("Services").table.headings[3].innerText=language.getLanguage()? 'Networks': 'Netzwerke';
-			this.getSubscription("Services").table.headings[4].innerText=language.getLanguage()? 'Security': 'Absicherung';
+			this.getSubscription("Services").table.headings[0].innerText=BaseElement.language.getLanguage()? 'Service Type': 'Diensttyp';
+			this.getSubscription("Services").table.headings[1].innerText=BaseElement.language.getLanguage()? 'Provided By': 'Angeboten von';
+			this.getSubscription("Services").table.headings[2].innerText=BaseElement.language.getLanguage()? 'Publication Scope': 'Sichtbarkeit des Dienstes';
+			this.getSubscription("Services").table.headings[3].innerText=BaseElement.language.getLanguage()? 'Networks': 'Netzwerke';
+			this.getSubscription("Services").table.headings[4].innerText=BaseElement.language.getLanguage()? 'Security': 'Absicherung';
 			
-			this.getSubscription("Platforms").table.headings[1].innerText=language.getLanguage()? 'Connected': 'Verbunden';
-			this.getSubscription("Platforms").table.headings[2].innerText=language.getLanguage()? 'Protocol': 'Protokoll';
+			this.getSubscription("Platforms").table.headings[1].innerText=BaseElement.language.getLanguage()? 'Connected': 'Verbunden';
+			this.getSubscription("Platforms").table.headings[2].innerText=BaseElement.language.getLanguage()? 'Protocol': 'Protokoll';
 			
-			this.getSubscription("Queries").table.headings[0].innerText=language.getLanguage()? 'Service Type': 'Diensttyp';
-			this.getSubscription("Queries").table.headings[1].innerText=language.getLanguage()? 'Query Owner': 'Query-Besitzer';
-			this.getSubscription("Queries").table.headings[2].innerText=language.getLanguage()? 'Search Scope': 'Sichtbarkeit der Suche';
+			this.getSubscription("Queries").table.headings[0].innerText=BaseElement.language.getLanguage()? 'Service Type': 'Diensttyp';
+			this.getSubscription("Queries").table.headings[1].innerText=BaseElement.language.getLanguage()? 'Query Owner': 'Query-Besitzer';
+			this.getSubscription("Queries").table.headings[2].innerText=BaseElement.language.getLanguage()? 'Search Scope': 'Sichtbarkeit der Suche';
 		}
 		
 		super.requestUpdate();
@@ -394,12 +392,12 @@ class RegistryViewElement extends BaseElement
 		<div id="panel" class="container-fluid m-0 p-0">
 			<div>
     			<input type="checkbox" id="global" .checked="${this.global}" @click="${(e) => {this.global = e.target.checked;}}">
-				<label for="global">${language.getLanguage()? 'Show only global services and queries': 'Nur globale Dienste und Queries anzeigen'}</label>
+				<label for="global">${BaseElement.language.getLanguage()? 'Show only global services and queries': 'Nur globale Dienste und Queries anzeigen'}</label>
   			</div>
 			<div id="accordion">
 				<div class="card m-0">
 					<div class="card-header">
-    					<h4 class="card-link" data-toggle="collapse" href="#collapseOne">${language.getLanguage()? 'Services': 'Dienste'}</h4>
+    					<h4 class="card-link" data-toggle="collapse" href="#collapseOne">${BaseElement.language.getLanguage()? 'Services': 'Dienste'}</h4>
 					</div>
 					<div id="collapseOne" class="collapse show" data-parent="#accordion">
 						<div class="card-body">
@@ -411,7 +409,7 @@ class RegistryViewElement extends BaseElement
 		
 				<div class="card m-0">
 					<div class="card-header">
-						<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">${language.getLanguage()? 'Platforms': 'Plattformen'}</h4>
+						<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">${BaseElement.language.getLanguage()? 'Platforms': 'Plattformen'}</h4>
 					</div>
 					<div id="collapseTwo" class="collapse" data-parent="#accordion">
 						<div class="card-body">

@@ -1,9 +1,135 @@
-import {LitElement} from 'lit-element';
-import {html} from 'lit-element';
-import {css} from 'lit-element';
+import {LitElement, html, css} from '../libs/lit/lit-element.js';
 
 export class BaseElement extends LitElement 
 {
+	static language = {
+		lang: "en",
+		listeners: [],
+		messages: {
+    		en: {
+   				message: {
+   					home: "Home",
+   					privacy: "Privacy", 
+   					imprint: "Imprint",
+   					about: "About"
+    			}
+  			},
+	    	de: {
+				message: {
+					home: "Home",
+					privacy: "Datenschutz",
+   					imprint: "Impressum",
+					about: "Über"
+				}
+  			}
+		}, 
+		translate: function(text) {
+			var msg = this.messages[this.lang];
+			if(msg) 
+			{
+				var toks = text.split('.');
+				var tmp = msg;
+				for(var i=0; tmp!=null && i<toks.length; i++) 
+				{
+					tmp = tmp[toks[i]];
+				}
+				//console.log("text: "+text+" "+tmp);
+				return tmp;
+			}
+			else 
+			{
+				return null;
+			}
+		},
+		$t: function(text) 
+		{
+			return this.translate(text);
+		},
+		getLanguage: function() 
+		{
+			return this.lang=='de'? 0: 1;
+		},
+		switchLanguage: function()
+		{
+			this.lang=='de'? this.lang='en': this.lang='de';
+			for(var i=0; i<this.listeners.length; i++)
+			{
+				this.listeners[i]({lang: this.lang});
+			}
+			//console.log("language is: "+this.lang);
+		},
+		addListener: function(listener)
+		{
+			this.listeners.push(listener);
+		},
+		removeListener: function(listener)
+		{
+			for(var i=0; i < this.listeners.length; i++) 
+			{
+				if(this.listeners[i] === listener) 
+				{
+					this.listeners.splice(i, 1);
+					break;
+			    } 
+			}
+		}
+	};
+	
+	static login = 
+	{
+		loggedin: false,
+		listeners: [],
+		setLogin: function(loggedin)
+		{
+			if(this.loggedin!=loggedin && loggedin!=null)
+			{
+				this.loggedin = loggedin;
+				for(var i=0; i<this.listeners.length; i++)
+				{
+					this.listeners[i](this.loggedin);
+				}
+			}
+			console.log("loggedin is: "+this.loggedin);
+		},
+		isLoggedIn: function()
+		{
+			return this.loggedin;
+		},
+		addListener: function(listener)
+		{
+			this.listeners.push(listener);
+		},
+		removeListener: function(listener)
+		{
+			for(var i=0; i < this.listeners.length; i++) 
+			{
+				if(this.listeners[i] === listener) 
+				{
+					this.listeners.splice(i, 1);
+					break;
+			    } 
+			}
+		},
+		updateLogin()
+		{
+			var self = this;
+			return new Promise(function(resolve, reject) 
+			{
+				axios.get('webjcc/isLoggedIn', {headers: {'x-jadex-isloggedin': true}}, self.transform).then(function(resp)
+				{
+					//console.log("is logged in: "+resp);
+					self.setLogin(resp.data);
+					resolve(self.loggedin);
+				})
+				.catch(function(err) 
+				{
+					console.log("check failed: "+err);	
+					reject(err);
+				});
+			});
+		}
+	}
+	
 	static loaded = {};
 	
 	cid = null;
@@ -92,7 +218,7 @@ export class BaseElement extends LitElement
 			};
 		}
 		
-		language.addListener(this.langlistener);
+		BaseElement.language.addListener(this.langlistener);
 		
 		if(this.loginlistener==null)
 		{
@@ -102,16 +228,16 @@ export class BaseElement extends LitElement
 				self.requestUpdate();
 			};
 		}
-		login.addListener(this.loginlistener);
+		BaseElement.login.addListener(this.loginlistener);
 	}
 	
 	disconnectedCallback()
 	{
 		super.disconnectedCallback();
 		if(this.langlistener!=null)
-			language.removeListener(this.langlistener);
+			BaseElement.language.removeListener(this.langlistener);
 		if(this.loginlistener!=null)
-			login.removeListener(this.loginlistener);
+			BaseElement.login.removeListener(this.loginlistener);
 	}
 	
 	/*loadStyle(url)
@@ -356,7 +482,15 @@ export class BaseElement extends LitElement
    		            window.calls[url] = resolve;
    		            // https://stackoverflow.com/questions/40663150/script-injected-with-innerhtml-doesnt-trigger-onload-and-onerror
    		            // append child returns BEFORE script is executed :-( In contrast to text
-   		            importShim.topLevelLoad(importShim.getFakeUrl(), js+"\n window.loadedScript('"+url+"')");
+   		            let funname = "Submodule_" + url;
+					try {
+						let componentfunc = new Function(js + "\n window.loadedScript('"+url+"')\n//# sourceURL=" + funname + "\n");
+						componentfunc();
+					}
+					catch (error) {
+						console.log("Script " + url + " failed to start " + error);
+					}
+   		            //importShim.topLevelLoad(importShim.getFakeUrl(), js+"\n window.loadedScript('"+url+"')");
    		            
    		            //console.log('APPENDED: '+url);
    		            //setInterval(function(){ resolve(); }, 1000);
@@ -430,7 +564,7 @@ export class BaseElement extends LitElement
 	
 	switchLanguage() 
 	{
-	    language.switchLanguage(); 
+	    BaseElement.language.switchLanguage(); 
 	    //this.requestUpdate(); // update is done via event listeners on the language object
 	}
 	

@@ -1,5 +1,5 @@
-import { LitElement, html, css } from 'lit-element';
-import { BaseElement } from 'base-element';
+let { LitElement, html, css } = modLoad('lit-element');
+let { BaseElement } = modLoad('base-element');
 
 class LoginElement extends BaseElement 
 {
@@ -84,11 +84,11 @@ class LoginElement extends BaseElement
 	render() 
 	{
     	return html`
-			<div class="flexcontainerrow ${login.isLoggedIn()? 'hidden': ''}">
-				<input class="flexcellgrow mt-1 mb-1" id="pass" name="platformpass" type="text" placeholder="${language.getLanguage()? 'Platform password': 'Plattformpasswort'}"></input>
+			<div class="flexcontainerrow ${BaseElement.login.isLoggedIn()? 'hidden': ''}">
+				<input class="flexcellgrow mt-1 mb-1" id="pass" name="platformpass" type="text" placeholder="${BaseElement.language.getLanguage()? 'Platform password': 'Plattformpasswort'}"></input>
 				<button class="btn btn-primary mt-1 mb-1 ml-1" @click="${e => {this.login(this.shadowRoot.getElementById('pass').value)}}">Login</button>
 			</div>
-			<button class="btn btn-primary mt-1 mb-1 ml-1 flow-right ${login.isLoggedIn()? '': 'hidden'}" @click="${e => {this.logout()}}">Logout</button>
+			<button class="btn btn-primary mt-1 mb-1 ml-1 flow-right ${BaseElement.login.isLoggedIn()? '': 'hidden'}" @click="${e => {this.logout()}}">Logout</button>
     	`;
  	}
 
@@ -100,7 +100,7 @@ class LoginElement extends BaseElement
 		{
 			//console.log("logged in: "+resp);
 			//self.loggedin = true;
-			login.setLogin(true);
+			BaseElement.login.setLogin(true);
 			//window.location.href = "/#/platforms";
 			self.createInfoMessage("logged in");
 		})
@@ -109,7 +109,7 @@ class LoginElement extends BaseElement
 			//console.log("login failed: "+err);	
 			self.createErrorMessage("login failed", err);
 			//self.loggedin = false;
-			login.setLogin(false);
+			BaseElement.loginsetLogin(false);
 		});
 	}
 	
@@ -121,14 +121,14 @@ class LoginElement extends BaseElement
 		{
 			//console.log("logged out: "+resp);
 			//self.loggedin = false;
-			login.setLogin(false);
+			BaseElement.loginsetLogin(false);
 			self.createInfoMessage("logged out");
 		})
 		.catch(function(err) 
 		{
 			console.log("logout failed: "+err);	
 			//self.loggedin = false;
-			login.setLogin(false);
+			BaseElement.loginsetLogin(false);
 			self.createErrorMessage("logout failed", err);
 		});
 	}
@@ -142,14 +142,14 @@ class LoginElement extends BaseElement
 			{
 				//console.log("is logged in: "+resp);
 				//self.loggedin = resp.data;
-				login.setLogin(resp.data);
+				BaseElement.login.setLogin(resp.data);
 				resolve(self.loggedin);
 			})
 			.catch(function(err) 
 			{
 				console.log("check failed: "+err);
 				self.createErrorMessage("check failed", err);
-				//login.setLogin(false);	
+				//BaseElement.loginsetLogin(false);	
 				reject(err);
 			});
 		});

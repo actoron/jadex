@@ -1,7 +1,5 @@
-import {LitElement} from 'lit-element';
-import {html} from 'lit-element';
-import {css} from 'lit-element';
-import {BaseElement} from '/webcomponents/baseelement.js'
+let { LitElement, html, css } = modLoad('lit-element');
+let { BaseElement } = modLoad('base-element');
 
 // Tag name 'jadex-starter'
 class BpmnElement extends BaseElement {
