@@ -1,8 +1,5 @@
-import {html} from 'lit-element';
-import {css} from 'lit-element';
-import {BaseElement} from '/webcomponents/baseelement.js'
-
-//import { LitElement, html, css} from 'lit-element';
+let { LitElement, html, css } = modLoad('lit-element');
+let { BaseElement } = modLoad('base-element');
 
 // Tag name 'jadex-componenttree'
 class ComponentTree extends BaseElement 
