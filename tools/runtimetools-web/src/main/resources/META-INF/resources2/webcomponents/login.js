@@ -109,7 +109,7 @@ class LoginElement extends BaseElement
 			//console.log("login failed: "+err);	
 			self.createErrorMessage("login failed", err);
 			//self.loggedin = false;
-			BaseElement.loginsetLogin(false);
+			BaseElement.login.setLogin(false);
 		});
 	}
 	
@@ -121,14 +121,14 @@ class LoginElement extends BaseElement
 		{
 			//console.log("logged out: "+resp);
 			//self.loggedin = false;
-			BaseElement.loginsetLogin(false);
+			BaseElement.login.setLogin(false);
 			self.createInfoMessage("logged out");
 		})
 		.catch(function(err) 
 		{
 			console.log("logout failed: "+err);	
 			//self.loggedin = false;
-			BaseElement.loginsetLogin(false);
+			BaseElement.login.setLogin(false);
 			self.createErrorMessage("logout failed", err);
 		});
 	}
@@ -149,7 +149,7 @@ class LoginElement extends BaseElement
 			{
 				console.log("check failed: "+err);
 				self.createErrorMessage("check failed", err);
-				//BaseElement.loginsetLogin(false);	
+				//BaseElement.login.setLogin(false);	
 				reject(err);
 			});
 		});
