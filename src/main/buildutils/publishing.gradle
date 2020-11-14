@@ -1,4 +1,4 @@
-//apply plugin: 'maven-publish'
+apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: 'de.marcphilipp.nexus-publish'
 
@@ -268,6 +268,17 @@ publishing {
         	}
 		}
 	}
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
 }
 
 if(canSign) {

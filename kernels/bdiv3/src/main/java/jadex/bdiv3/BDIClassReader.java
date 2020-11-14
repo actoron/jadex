@@ -324,6 +324,51 @@ public class BDIClassReader extends MicroClassReader
 //					beliefnames.add(fields[i].getName());
 				}
 			}
+
+			// Find method beliefs
+			Method[] methods = clazz.getDeclaredMethods();
+			for(int i=0; i<methods.length; i++)
+			{
+				if(isAnnotationPresent(methods[i], Belief.class, cl))
+				{
+					Belief bel = getAnnotation(methods[i], Belief.class, cl);
+
+					String name = methods[i].getName().substring(methods[i].getName().startsWith("is") ? 2 : 3);
+					name = name.substring(0, 1).toLowerCase()+name.substring(1);
+
+					MBelief mbel = bdimodel.getCapability().getBelief(name);
+					if(mbel!=null)
+					{
+						if(methods[i].getName().startsWith("get") || methods[i].getName().startsWith("is"))
+						{
+							mbel.setGetter(new MethodInfo(methods[i]));
+						}
+						else
+						{
+							mbel.setSetter(new MethodInfo(methods[i]));
+						}
+					}
+					else
+					{
+						Set<EventType> rawevents = null;
+						if(bel.rawevents().length>0)
+						{
+							rawevents = new HashSet<EventType>();
+							RawEvent[] rawevs = bel.rawevents();
+							for(RawEvent rawev: rawevs)
+							{
+								rawevents.add(BDIAgentFeature.createEventType(rawev));
+							}
+						}
+
+						boolean	dynamic	= bel.dynamic() || bel.updaterate()>0;// || rawevents!=null || bel.beliefs().length>0;
+						bdimodel.getCapability().addBelief(new MBelief(new MethodInfo(methods[i]),
+							bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName(),
+							dynamic, bel.updaterate(), bel.beliefs().length==0? null: bel.beliefs(), rawevents));
+					}
+				}
+			}
+
 			
 			// Find external goals
 			if(isAnnotationPresent(clazz, Goals.class, cl))
@@ -353,8 +398,7 @@ public class BDIClassReader extends MicroClassReader
 				}
 			}
 			
-			// Find method plans or beliefs
-			Method[] methods = clazz.getDeclaredMethods();
+			// Find method plans
 			for(int i=0; i<methods.length; i++)
 			{
 				if(isAnnotationPresent(methods[i], Plan.class, cl))
@@ -362,44 +406,6 @@ public class BDIClassReader extends MicroClassReader
 //					System.out.println("found plan: "+methods[i].getName());
 					Plan p = getAnnotation(methods[i], Plan.class, cl);
 					getMPlan(bdimodel, p, new MethodInfo(methods[i]), null, cl, pubs);
-				}
-				else if(isAnnotationPresent(methods[i], Belief.class, cl))
-				{
-					Belief bel = getAnnotation(methods[i], Belief.class, cl);
-					
-					String name = methods[i].getName().substring(methods[i].getName().startsWith("is") ? 2 : 3);
-					name = name.substring(0, 1).toLowerCase()+name.substring(1);
-					
-					MBelief mbel = bdimodel.getCapability().getBelief(name);
-					if(mbel!=null)
-					{
-						if(methods[i].getName().startsWith("get") || methods[i].getName().startsWith("is"))
-						{
-							mbel.setGetter(new MethodInfo(methods[i]));
-						}
-						else
-						{
-							mbel.setSetter(new MethodInfo(methods[i]));
-						}
-					}
-					else
-					{
-						Set<EventType> rawevents = null;
-						if(bel.rawevents().length>0)
-						{
-							rawevents = new HashSet<EventType>();
-							RawEvent[] rawevs = bel.rawevents();
-							for(RawEvent rawev: rawevs)
-							{
-								rawevents.add(BDIAgentFeature.createEventType(rawev)); 
-							}
-						}
-						
-						boolean	dynamic	= bel.dynamic() || bel.updaterate()>0;// || rawevents!=null || bel.beliefs().length>0;
-						bdimodel.getCapability().addBelief(new MBelief(new MethodInfo(methods[i]), 
-							bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName(),
-							dynamic, bel.updaterate(), bel.beliefs().length==0? null: bel.beliefs(), rawevents));
-					}
 				}
 			}
 			
