@@ -242,14 +242,14 @@ public class SComponentFactory
 						{
 							public void customResultAvailable(IComponentFactory fac)
 							{
-								fac.loadModel(model, null, rid)
-									.addResultListener(new DelegationResultListener<IModelInfo>(ret));
+								fac.loadModel(model, null, rid).addResultListener(new DelegationResultListener<IModelInfo>(ret));
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
 								if(exception instanceof ServiceNotFoundException)
 								{
+									System.out.println("No factory found: "+model+" "+rid);
 									ret.setResult(null);
 								}
 								else
@@ -733,6 +733,7 @@ public class SComponentFactory
 	public static IFuture<IComponentFactory> getFactory(final FactoryFilter filter, IInternalAccess ia)
 	{
 		Collection<IComponentFactory> facs = ia.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
+		//System.out.println("getFactory: "+facs);
 		if(facs!=null && facs.size()>0)
 		{
 			return doFindFactory(reorderMultiFactory(facs).iterator(), filter);
@@ -750,8 +751,8 @@ public class SComponentFactory
 	{
 		if(facs.hasNext())
 		{
-			IComponentFactory	fac	= facs.next();
-			IFuture<Boolean>	match	= filter.filter(fac);
+			IComponentFactory fac = facs.next();
+			IFuture<Boolean> match = filter.filter(fac);
 			if(match.isDone())
 			{
 				// Synchronous version
@@ -779,8 +780,7 @@ public class SComponentFactory
 						}
 						else
 						{
-							doFindFactory(facs, filter)
-								.addResultListener(new DelegationResultListener<>(ret));
+							doFindFactory(facs, filter).addResultListener(new DelegationResultListener<>(ret));
 						}
 					}
 				});

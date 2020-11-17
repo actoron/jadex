@@ -325,6 +325,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 		}
 		
 		ServiceRegistry.getRegistry(component.getId()).addLocalService(service);
+		//System.out.println("added service: "+component.getId()+" "+service.getServiceId());
 //		return bar.waitFor();
 	}
 	

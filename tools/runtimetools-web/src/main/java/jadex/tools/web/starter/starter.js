@@ -45,7 +45,7 @@ class StarterElement extends BaseElement
 		{
 			this.listener = (e) => 
 			{
-				//console.log(e)
+				console.log("jadex model event: "+e)
 				self.model = e.detail.model;
 				self.requestUpdate();
 			}

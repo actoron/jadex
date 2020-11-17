@@ -144,11 +144,11 @@ class ModelTree extends BaseElement
 	{
 		var self = this;
 		
-		//console.log("selected: "+filename);
+		console.log("selected: "+filename);
 		
 		axios.get(this.getMethodPrefix()+'&methodname=loadComponentModel&args_0='+filename+"&argtypes_0=java.lang.String", this.transform).then(function(resp)
 		{
-			//console.log("selected model is: "+resp.data);
+			console.log("selected model is: "+resp.data);
 			
 			var event = new CustomEvent("jadex-model-selected", 
 			{ 
@@ -252,7 +252,8 @@ class ModelTree extends BaseElement
 		this.getTree(treeid).jstree('create_node', '#'+parent_node_id, {"text": new_node_text, "id": new_node_id }, 'last');	
 	}
 		
-	static get styles() {
+	static get styles() 
+	{
 	    return css`
 	    	/* Navbar styling. */
 	    	/* background color. */

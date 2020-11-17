@@ -90,8 +90,10 @@ class ComponentTree extends BaseElement
 											console.log("ERR: not found: "+children[i]);
 									}
 								}
+								if(data.length==0)
+									data = null;
 								
-								console.log("loading node: "+id);
+								console.log("loading node: "+id+" "+JSON.stringify(data));
 								
 								// problem: js tree changes data structures :-( give jstree only a clone?
 								//return Object.assign({}, data)
@@ -448,14 +450,17 @@ class ComponentTree extends BaseElement
 					{
 				        var a1 = this.get_node(a);
 				        var b1 = this.get_node(b);
-				        if(a1.icon == b1.icon)
+				  		var ret = 0;   
+						if(a1.icon == b1.icon)
 				        {
-				            return (a1.text > b1.text) ? 1 : -1;
+				            ret = (a1.text > b1.text) ? 1 : -1;
 				        } 
 				        else 
 				        {
-				            return (a1.icon > b1.icon) ? 1 : -1;
+				            ret = (a1.icon > b1.icon) ? 1 : -1;
 				        }
+						console.log("sort: "+a+" "+b+" "+ret);
+						return ret;
 					},
 					types,
 					'contextmenu' : 
