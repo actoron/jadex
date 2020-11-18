@@ -1380,7 +1380,11 @@ public class SUtil
 
 					try
 					{
-						file = new File(URLDecoder.decode(url.getFile(), encoding)); // does only work since 1.4.
+						file = new File(url.getFile());
+						if (!file.exists()) {
+							file = new File(URLDecoder.decode(url.getFile(), encoding)); // does only work since 1.4.
+						}
+
 						// file = new File(URLDecoder.decode(url.getFile())); //
 						// problem decode is deprecated.
 						if(file.exists())
