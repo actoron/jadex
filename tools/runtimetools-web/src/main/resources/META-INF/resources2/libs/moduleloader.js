@@ -1,5 +1,6 @@
 import * as litelement from "./lit/lit-element.js"
 import * as baseelement from "../webcomponents/baseelement.js"
+import * as loginelement from "../webcomponents/login.js"
 
 console.log("Executing modloader " + Object.keys(litelement));
 
@@ -7,6 +8,7 @@ window.modLoad = (function () {
 	let resolvemap = {};
 	resolvemap["lit-element"] = litelement;
 	resolvemap["base-element"] = baseelement;
+	resolvemap["login-element"] = loginelement;
 	
 	document.querySelectorAll("script[data-name]").forEach( (mappedmodule) => {
 		console.log("Adding module mapping " +mappedmodule.dataset.name + " to " + mappedmodule.src);
@@ -31,7 +33,9 @@ window.modLoad = (function () {
 	return function(name, url) {
 		if (arguments.length === 1) {
 			let ret = resolvemap[name];
-			console.log("Statically loaded " );//+ ret);
+			//console.log("Statically loaded " +name);//+ ret);
+			if (!ret)
+				throw "Module not found: " + name;
 			return ret;
 		}
 		else

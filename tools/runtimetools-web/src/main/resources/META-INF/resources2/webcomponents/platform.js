@@ -1,5 +1,6 @@
 let { LitElement, html, css } = modLoad('lit-element');
 let { BaseElement } = modLoad('base-element');
+let { LoginElement } = modLoad('login-element');
 
 // Tag name 'jadex-platform'
 class PlatformElement extends BaseElement 
@@ -124,12 +125,12 @@ class PlatformElement extends BaseElement
 		if(this.plugins[name]==null)
 			return;
 		
-		//console.log("login is: "+BaseElement.login.isLoggedIn());
+		//console.log("login is: "+LoginElement.loginhandler.isLoggedIn());
 		//console.log("show plugin: "+name+" "+this.cid);
 
 		let self = this;
 		
-		if(!this.plugins[name].unrestricted && !BaseElement.login.isLoggedIn())
+		if(!this.plugins[name].unrestricted && !LoginElement.loginhandler.isLoggedIn())
 		{
 			let html = "<jadex-restricted></jadex-restricted>";
 			self.shadowRoot.getElementById("plugin").innerHTML = html;
@@ -305,7 +306,7 @@ class PlatformElement extends BaseElement
 		var ret = Object.values(this.plugins).sort(function(p1, p2) 
 		{
 			var ret = 0;
-			if(!BaseElement.login.isLoggedIn())
+			if(!LoginElement.loginhandler.isLoggedIn())
 				ret = p2.unrestricted - p1.unrestricted;
 			
 			if(ret===0)
@@ -322,7 +323,7 @@ class PlatformElement extends BaseElement
 	
 	requestUpdate()
 	{
-		if(this.plugin!=null && !BaseElement.login.isLoggedIn() && !this.plugins[this.plugin].unrestricted)
+		if(this.plugin!=null && !LoginElement.loginhandler.isLoggedIn() && !this.plugins[this.plugin].unrestricted)
 			this.showPlugin2(this.getPlugins()[0].name);
 		
 		super.requestUpdate();
@@ -356,7 +357,7 @@ class PlatformElement extends BaseElement
 			<h1 class="m-0 p-0">Platform ${this.cid}</h1>
 			<div class="container-fluid m-0 p-0" id="plugincont">
 				${this.getPlugins().map((p, index) => html`
-					${!p.unrestricted && !BaseElement.login.isLoggedIn()? "": p.icon!=null? 
+					${!p.unrestricted && !LoginElement.loginhandler.isLoggedIn()? "": p.icon!=null? 
 						html`<img id="${'plugin'+index}" class="${self.plugin===p.name? "overlay": ""}" src="data:image/png;base64,${p.icon.__base64}" alt="Red dot" @click="${(e) => {self.showPlugin2(p.name)}}" data-toggle="tooltip" data-placement="top" title="${p.name}"/>`:
 						html`<span @click="${(e) => {self.showPlugin2(p.name)}}">${p.name}</span>`
 					}

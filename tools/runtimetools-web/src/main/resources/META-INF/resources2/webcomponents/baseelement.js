@@ -2,6 +2,8 @@ import {LitElement, html, css} from '../libs/lit/lit-element.js';
 
 export class BaseElement extends LitElement 
 {
+	static loadedelements = [];
+	
 	static language = {
 		lang: "en",
 		listeners: [],
@@ -22,7 +24,12 @@ export class BaseElement extends LitElement
 					about: "Über"
 				}
   			}
-		}, 
+		},
+		translationtable: {
+			"Remember password": {
+				de: "Passwort merken"
+			}
+		},
 		translate: function(text) {
 			var msg = this.messages[this.lang];
 			if(msg) 
@@ -44,6 +51,18 @@ export class BaseElement extends LitElement
 		$t: function(text) 
 		{
 			return this.translate(text);
+		},
+		tl: function(text) {
+			let ret;
+			if (this.lang !== "en")
+			{
+				let langtl = this.translationtable[text];
+				if (langtl)
+					ret = langtl[this.lang];
+			}
+			if (!ret)
+				ret = text;
+			return ret;
 		},
 		getLanguage: function() 
 		{
@@ -75,67 +94,11 @@ export class BaseElement extends LitElement
 		}
 	};
 	
-	static login = 
-	{
-		loggedin: false,
-		listeners: [],
-		setLogin: function(loggedin)
-		{
-			if(this.loggedin!=loggedin && loggedin!=null)
-			{
-				this.loggedin = loggedin;
-				for(var i=0; i<this.listeners.length; i++)
-				{
-					this.listeners[i](this.loggedin);
-				}
-			}
-			console.log("loggedin is: "+this.loggedin);
-		},
-		isLoggedIn: function()
-		{
-			return this.loggedin;
-		},
-		addListener: function(listener)
-		{
-			this.listeners.push(listener);
-		},
-		removeListener: function(listener)
-		{
-			for(var i=0; i < this.listeners.length; i++) 
-			{
-				if(this.listeners[i] === listener) 
-				{
-					this.listeners.splice(i, 1);
-					break;
-			    } 
-			}
-		},
-		updateLogin()
-		{
-			var self = this;
-			return new Promise(function(resolve, reject) 
-			{
-				axios.get('webjcc/isLoggedIn', {headers: {'x-jadex-isloggedin': true}}, self.transform).then(function(resp)
-				{
-					//console.log("is logged in: "+resp);
-					self.setLogin(resp.data);
-					resolve(self.loggedin);
-				})
-				.catch(function(err) 
-				{
-					console.log("check failed: "+err);	
-					reject(err);
-				});
-			});
-		}
-	}
-	
 	static loaded = {};
 	
 	cid = null;
 	jadexservice = null;
 	langlistener = null;
-	loginlistener = null;
 	loadedprom = null;
 	
 	static get properties() 
@@ -195,6 +158,10 @@ export class BaseElement extends LitElement
 			})
 			.catch((err)=>reject(err));
 		});
+		
+		self.loadedprom.then( function() {
+			BaseElement.loadedelements.push(self);
+		});
 	}
 	
 	init()
@@ -220,7 +187,7 @@ export class BaseElement extends LitElement
 		
 		BaseElement.language.addListener(this.langlistener);
 		
-		if(this.loginlistener==null)
+		/*if(this.loginlistener==null)
 		{
 			this.loginlistener = e => 
 			{
@@ -228,7 +195,7 @@ export class BaseElement extends LitElement
 				self.requestUpdate();
 			};
 		}
-		BaseElement.login.addListener(this.loginlistener);
+		BaseElement.login.addListener(this.loginlistener);*/
 	}
 	
 	disconnectedCallback()
