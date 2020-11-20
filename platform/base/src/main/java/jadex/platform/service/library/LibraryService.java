@@ -1740,6 +1740,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			{
 				return ea.scheduleStep(ia ->
 				{
+					//long start = System.currentTimeMillis();
+					
 					ILibraryService ls = ia.getLocalService(ILibraryService.class);
 					URL[] urls = ls.getAllURLs().get().toArray(new URL[0]);
 					
@@ -1748,6 +1750,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 					// Remove JVM jars
 					urls = SUtil.removeSystemUrls(urls);
 					
+					// scanning is time expensive
 					Set<SClassReader.ClassFileInfo> cis = SReflect.scanForClassFileInfos(urls, null, new IFilter<SClassReader.ClassFileInfo>()
 					{
 						public boolean filter(SClassReader.ClassFileInfo ci)
@@ -1759,10 +1762,14 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 							return ret;
 						}
 					});
+					//long scan = System.currentTimeMillis();
+					//System.out.println("scan time: "+(scan-start));
 					
 					// Collect filenames of models to load the models without knowing the rid (can then be extracted)
 					List<String[]> res = cis.stream().map(a -> new String[]{a.getFilename(), a.getClassInfo().getClassName()}).collect(Collectors.toList());
-							
+					
+					//long collect = System.currentTimeMillis();
+					//System.out.println("collect time: "+(collect-scan));
 					//System.out.println("Models found: "+res);
 					
 					ia.killComponent();

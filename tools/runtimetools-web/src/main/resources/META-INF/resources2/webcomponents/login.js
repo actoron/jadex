@@ -126,7 +126,7 @@ class LoginElement extends BaseElement
 		})
 		.catch(function(err) 
 		{
-			console.log("logout failed: "+err);	
+			//console.log("logout failed: "+err);	
 			//self.loggedin = false;
 			BaseElement.login.setLogin(false);
 			self.createErrorMessage("logout failed", err);
@@ -147,7 +147,7 @@ class LoginElement extends BaseElement
 			})
 			.catch(function(err) 
 			{
-				console.log("check failed: "+err);
+				//console.log("check failed: "+err);
 				self.createErrorMessage("check failed", err);
 				//BaseElement.login.setLogin(false);	
 				reject(err);
