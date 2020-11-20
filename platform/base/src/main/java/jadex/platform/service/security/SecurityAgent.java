@@ -491,11 +491,11 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					}
 				}
 				
-				if (addglobalnetwork && !networks.containsKey(GLOBAL_NETWORK_NAME))
+				if(addglobalnetwork && !networks.containsKey(GLOBAL_NETWORK_NAME))
 					networks.add(GLOBAL_NETWORK_NAME, AbstractAuthenticationSecret.fromString(DEFAULT_GLOBAL_ROOT_CERTIFICATE, true));
 				
-				if ((networks.isEmpty() || (networks.size() == 1 && networks.containsKey(GLOBAL_NETWORK_NAME))) &&
-					createdefaultnetwork)
+				if((networks.isEmpty() || (networks.size() == 1 
+					&& networks.containsKey(GLOBAL_NETWORK_NAME))) && createdefaultnetwork)
 				{
 					networks.add(SUtil.createPlainRandomId("default_network", 6), KeySecret.createRandom());
 					savesettings = true;
@@ -552,6 +552,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						}
 					}
 				}
+				// Update networknames in indexer
+				ServiceRegistry.getRegistry(agent.getId().getRoot()).updateService(null);
 				
 				// TODO: Make configurable
 				String[] cryptsuites = new String[] { NHCurve448ChaCha20Poly1305Suite.class.getCanonicalName() };
@@ -987,6 +989,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			return new Future<>(new IllegalArgumentException("Networkname is null."));
 		if(secret==null || secret.length()==0)
 			return new Future<>(new IllegalArgumentException("Secret is null."));
+		
+		//System.out.println("setNetwork: "+networkname);
 		
 		return agent.scheduleStep(new IComponentStep<Void>()
 		{

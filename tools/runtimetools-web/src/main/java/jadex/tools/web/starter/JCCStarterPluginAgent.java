@@ -130,7 +130,8 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	{
 		IFuture<IModelInfo> ret =  SComponentFactory.loadModel(cid!=null? agent.getExternalAccess(cid): agent, filename, null);
 		IModelInfo m = ret.get();
-		System.out.println("Loading: "+filename+" "+m);
+		if(m==null)
+			System.out.println("Loading: "+filename+" "+m);
 		return ret;
 	}
 	

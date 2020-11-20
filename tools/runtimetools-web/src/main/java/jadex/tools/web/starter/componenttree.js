@@ -61,6 +61,7 @@ class ComponentTree extends BaseElement
 				//console.log("jstree");
 				
 				// init tree
+				var cnt = 0;
 				var types = self.types;
 				$(function() { self.getTree(self.treeid).jstree(
 				{
@@ -70,6 +71,9 @@ class ComponentTree extends BaseElement
 						"check_callback" : true,
 						"data": function(node, cb) 
 						{
+							var mycnt = cnt++;
+							//console.log("in: "+node+" "+mycnt);
+							
 							function getChildData(id)
 							{					
 								// get child ids			
@@ -90,8 +94,10 @@ class ComponentTree extends BaseElement
 											console.log("ERR: not found: "+children[i]);
 									}
 								}
+								//if(data.length==0)
+								//	data = null;
 								
-								console.log("loading node: "+id);
+								console.log("loading node: "+id);//+" "+JSON.stringify(data));
 								
 								// problem: js tree changes data structures :-( give jstree only a clone?
 								//return Object.assign({}, data)
@@ -127,8 +133,15 @@ class ComponentTree extends BaseElement
 									self.requestUpdate();
 									
 									var data = getChildData(node.id);
+									//console.log("out1: "+node+" "+mycnt);
 									cb.call(this, data);
-								}).catch(err=>console.log(err));
+								}).catch(err=>
+								{
+									//console.log(err);
+									var data = getChildData(node.id);
+									//console.log("out2: "+node+" "+mycnt);
+									cb.call(this, data);
+								});
 							}
 							// when loading other nodes, component desriptions are availble via treedata
 							// nodeid = {nodevalues} for tree
@@ -141,6 +154,7 @@ class ComponentTree extends BaseElement
 								function cont()
 								{
 									var data = getChildData(node.id);
+									//console.log("out3: "+node+" "+mycnt);
 									cb.call(this, data);
 								}
 								
@@ -223,12 +237,14 @@ class ComponentTree extends BaseElement
 											})
 											.catch(function(e)
 											{
+												console.log("getNFProps err: "+e);
 												createNFChildren(node, res);	
 												cont();
 											});
 										}
 										else
 										{
+											console.log("nonfprops");
 											cont();
 										}
 									})
@@ -306,8 +322,10 @@ class ComponentTree extends BaseElement
 									// searches parallel and waits for barrier via Promise.all()
 									
 									// https://stackoverflow.com/questions/31069453/creating-a-es6-promise-without-starting-to-resolve-it
+									// can fail
 									var promc = loadComponentChildData(node.id);
 
+									// nfresolve and serresolve are always called (also on err)
 									var nfresolve = null;
 									var promnf = new Promise(function(r, e)
 									{
@@ -323,6 +341,11 @@ class ComponentTree extends BaseElement
 									Promise.all([promnf, promser, promc]).then(function(res)
 									{
 										cont();
+									})
+									.catch(e => 
+									{
+										console.log("err: "+e);
+										cont();	
 									});
 									
 									axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.id, self.transform)
@@ -448,14 +471,18 @@ class ComponentTree extends BaseElement
 					{
 				        var a1 = this.get_node(a);
 				        var b1 = this.get_node(b);
-				        if(a1.icon == b1.icon)
+				  		var ret = 0;   
+						if(a1.icon == b1.icon)
 				        {
-				            return (a1.text > b1.text) ? 1 : -1;
+				            ret = (a1.text > b1.text) ? 1 : -1;
 				        } 
 				        else 
 				        {
-				            return (a1.icon > b1.icon) ? 1 : -1;
+				            ret = (a1.icon > b1.icon) ? 1 : -1;
 				        }
+						if((a.text!=null && a.text.indexOf("App")!=-1) || (b.text!=null && b.text.indexOf("App")!=-1))
+							console.log("sort: "+a+" "+b+" "+ret);
+						return ret;
 					},
 					types,
 					'contextmenu' : 
@@ -717,12 +744,30 @@ class ComponentTree extends BaseElement
 	
 	deleteNodeData(treeid, nodeid)
 	{
+		// delete a component node:
+		// a) delete the node data itself delete this.treedata[nodeid];
+		// b) delete the child data of that node delete this.treedata[nodeid+"_children"];
+		// c) delete the node from the children of its parent
+		// d) delete Applications if it was the last child
+		// e) delete Applications children
+		// f) delete Applications from Applications parent 
+		
 		console.log("remove node data: "+nodeid);
 		delete this.treedata[nodeid];
 		delete this.treedata[nodeid+"_children"];
-		//this.treedata[nodeid] = null;
-		//this.treedata[nodeid+"_children"] = null;
-		
+		this.removeChildDataFromParent(treeid, nodeid);
+
+		var ac = this.treedata["Applications_children"];
+		if(ac==null || ac.length==0)
+		{
+			delete this.treedata["Applications"];
+			delete this.treedata["Applications_children"]
+			this.removeChildDataFromParent(treeid, "Applications");
+		}
+	}
+	
+	removeChildDataFromParent(treeid, nodeid)
+	{
 		var paid = this.getTree(treeid).jstree().get_parent(nodeid);
 		if(paid!=null)
 		{
@@ -736,15 +781,6 @@ class ComponentTree extends BaseElement
 					console.log("removed: "+nodeid);
 				}
 			}
-		}
-		
-		var ac = this.treedata["Applications_children"];
-		if(ac==null || ac.length==0)
-		{
-			delete this.treedata["Applications"];
-			delete this.treedata["Applications_children"]
-			//this.treedata["Applications"] = null;
-			//this.treedata["Applications_children"] = null;
 		}
 	}
 	

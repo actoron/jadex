@@ -18,6 +18,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
@@ -87,6 +88,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		if(!ServiceScope.NONE.equals(query.getScope()))
 		{
 			Set<IServiceIdentifier> sers = getServices(query);
+			
+			if(query.toString().indexOf("IComponentFac")!=-1 && sers.size()==0)
+				System.out.println("found: "+sers);
 			
 //			Set<IServiceIdentifier> ownerservices = null;
 //			rwlock.readLock().lock();
@@ -960,13 +964,34 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		rwlock.readLock().lock();
 		try
 		{
-			Set<IServiceIdentifier> ret = indexer.getValues(query.getIndexerSearchSpec());
+			Tuple2<Set<IServiceIdentifier>, Object> res = indexer.getValues(query.getIndexerSearchSpec());
+			Set<IServiceIdentifier> ret = res==null? null: res.getFirstEntity();
+			//if(res!=null && res.getFirstEntity()!=null && res.getFirstEntity().size()>0 && query.getServiceType()!=null && query.getServiceType().toString().indexOf("IComponentF")!=-1)
+			//	System.out.println("micro kernel start bug: "+res.getSecondEntity());
+			
 			return ret;
 		}
 		finally
 		{
 			rwlock.readLock().unlock();
 		}
+		
+		/*try
+		{
+			rwlock.readLock().tryLock(5, TimeUnit.SECONDS);
+			Set<IServiceIdentifier> ret = indexer.getValues(query.getIndexerSearchSpec());
+			return ret;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		finally
+		{
+			//System.out.println("getServices end: "+query);
+			rwlock.readLock().unlock();
+		}*/
 	}
 	
 	/**

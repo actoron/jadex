@@ -174,7 +174,12 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		inited = true;
 		
 		// add data for implicitly started micro factory
+		// problem is that the mirco agent kernel hangs sometimes
+		// reason is the the service search failed due to networknames updates during security agent init
+		// the sec agent did not refresh the indexed services 
+		//System.out.println("KM_startService1");
 		IComponentFactory fac = doStartKernel("jadex/micro/KernelMicroAgent.class").get();
+		//System.out.println("KM_startService2");
 		kernels.put("jadex.micro.KernelMicroAgent", ((IService)fac).getServiceId().getProviderId());
 		componenttypes.add(".class");
 		//kernels.put("jadex.micro.KernelMicroAgent", null);
@@ -212,6 +217,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		};
 		libservice.addLibraryServiceListener(liblistener);
 		
+		//System.out.println("KM_startService3");
 		return IFuture.DONE;
 	}
 	
@@ -557,7 +563,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{
 			new ProvidedServiceInfo(null, IComponentFactory.class, null, ServiceScope.PARENT, null, null)});
 		
-		//System.out.println("create factory: "+f.getFirstEntity()+" "+kernels);
+		//System.out.println("create factory: "+model+" "+kernels);
 
 		final Future<IComponentFactory> fut = new Future<>();
 		kernels.put(model, fut);
@@ -565,7 +571,9 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		agent.createComponent(ci).addResultListener(new IResultListener<IExternalAccess>()
 		{
 			public void resultAvailable(IExternalAccess exta)
-			{						
+			{		
+				//System.out.println("created factory: "+model+" "+kernels);
+				
 				exta.waitForTermination().addResultListener(new IResultListener<Map<String, Object>>()
 				{
 					public void resultAvailable(Map<String, Object> result)
@@ -581,17 +589,40 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 					}
 				});
 				
+				//System.out.println("created factory1.3");
+				
 				//System.out.println("Started factory: "+exta);
 				kernels.put(model, exta.getId());
+				//System.out.println("created factory1.4");
 				
+				// this service failed when networknets are updated in between by sec agent
+				// now reindexes
 				ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
+				//System.out.println("created factory1.5");
+
 				q.setProvider(exta.getId());
-				final IComponentFactory fac = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(q);
+				//System.out.println("created factory1.6");
+
+				IRequiredServicesFeature rf = agent.getFeature(IRequiredServicesFeature.class);
+				//System.out.println("created factory1.7");
+
+				IComponentFactory fac = null;
+				try
+				{
+					fac = rf.searchLocalService(q);
+					//System.out.println("created factory1.8");
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
 				
 				// If this is a new kernel, gather types and icons
 				final String[] types = fac.getComponentTypes();
 				componenttypes.addAll(Arrays.asList(types));
 					
+				//System.out.println("created factory2");
 				if(SReflect.HAS_GUI)
 				{
 					fireTypesAdded(types);
@@ -614,6 +645,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 					}
 				}
 				
+				//System.out.println("created factory3");
 				ret.setResult(fac);
 			}
 			
@@ -967,7 +999,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	 */
 	public void fireTypesAdded(String[] types)
 	{
-		IMultiKernelListener[] ls = (IMultiKernelListener[]) listeners.toArray(new IMultiKernelListener[listeners.size()]);
+		IMultiKernelListener[] ls = (IMultiKernelListener[])listeners.toArray(new IMultiKernelListener[listeners.size()]);
 		for(int i = 0; i < ls.length; ++i)
 			ls[i].componentTypesAdded(types);
 	}

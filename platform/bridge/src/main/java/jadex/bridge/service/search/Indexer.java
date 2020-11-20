@@ -69,9 +69,10 @@ public class Indexer<T>
 	 *  @param spec The key values (first element is key name and array are values)
 	 *  @return The values matching the spec.
 	 */
-	public Set<T> getValues(List<Tuple3<String, String[], Boolean>> spec)
+	public Tuple2<Set<T>, Object> getValues(List<Tuple3<String, String[], Boolean>> spec)
 	{
 		//System.out.println("spec: "+spec);
+		List<Set<T>> valuesets = null;
 		
 		Set<T> ret = null;
 		if(spec == null || spec.size() == 0)
@@ -80,7 +81,6 @@ public class Indexer<T>
 		}
 		else
 		{
-			List<Set<T>> valuesets = null;
 			int speccount = 0;
 			for(Iterator<Tuple3<String, String[], Boolean>> it = spec.iterator(); it.hasNext();)
 			{
@@ -114,7 +114,7 @@ public class Indexer<T>
 								iset.addAll(always);
 							
 							if(iset == null || iset.isEmpty())
-								return null;
+								return new Tuple2(ret, valuesets);
 							
 							valuesets.add(iset);
 						}						
@@ -154,6 +154,7 @@ public class Indexer<T>
 						}
 					});
 				}
+				//System.out.println("indexer.getValues(): "+valuesets);
 				
 				int i = 0;
 				for(i = 0; i < valuesets.size() && (ret == null || ret.size() < INTERSECT_CUTOFF); ++i)
@@ -176,7 +177,7 @@ public class Indexer<T>
 				
 				// If all were used directly return intersection result
 				if(ret != null && i == speccount)
-					return ret;
+					return new Tuple2(ret, valuesets);
 			}
 			
 			if(ret == null)
@@ -191,7 +192,7 @@ public class Indexer<T>
 			}
 		}
 		
-		return ret;
+		return new Tuple2(ret, valuesets);
 	}
 	
 	/**

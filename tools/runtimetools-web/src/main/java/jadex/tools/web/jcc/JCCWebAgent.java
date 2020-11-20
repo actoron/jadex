@@ -1,7 +1,6 @@
 package jadex.tools.web.jcc;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,8 +21,6 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.FutureReturnType;
-import jadex.bridge.service.component.RemoteMethodInvocationHandler;
-import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
@@ -32,7 +29,6 @@ import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.commons.Boolean3;
 import jadex.commons.IResultCommand;
 import jadex.commons.MethodInfo;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
@@ -42,7 +38,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -133,7 +128,7 @@ public class JCCWebAgent implements IJCCWebService
 				for(IExternalAccess ex: col2)
 					col.add(ex.getId());
 				
-				System.out.println("found platforms: "+col);
+				//System.out.println("found platforms: "+col);
 				
 				ret.setResult(col);
 			}
