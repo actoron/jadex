@@ -272,7 +272,7 @@ public class JCCWebAgent implements IJCCWebService
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("Ex: "+exception);
+					System.out.println("Ex: "+exception+" "+cid);
 					ret.setResult(res.toArray(new JCCWebPluginInfo[res.size()]));
 				}
 			});

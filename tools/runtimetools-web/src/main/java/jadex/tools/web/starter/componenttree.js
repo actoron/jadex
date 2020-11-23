@@ -61,7 +61,6 @@ class ComponentTree extends BaseElement
 				//console.log("jstree");
 				
 				// init tree
-				var cnt = 0;
 				var types = self.types;
 				$(function() { self.getTree(self.treeid).jstree(
 				{
@@ -71,7 +70,6 @@ class ComponentTree extends BaseElement
 						"check_callback" : true,
 						"data": function(node, cb) 
 						{
-							var mycnt = cnt++;
 							//console.log("in: "+node+" "+mycnt);
 							
 							function getChildData(id)
@@ -190,7 +188,6 @@ class ComponentTree extends BaseElement
 											children.push(nfid);
 									}
 								}
-
 								
 								// provided service node
 								if(node.type==="provided")
@@ -377,7 +374,7 @@ class ComponentTree extends BaseElement
 													})
 													.catch(function(e)
 													{
-														console.log("err in refresh nfnode: "+node);
+														console.log("err in refresh nfnode: "+e);
 													});
 												}
 												
@@ -386,6 +383,7 @@ class ComponentTree extends BaseElement
 											})
 											.catch(function(e)
 											{
+												console.log("err is: "+e);
 												createNFChildren(node, res);	
 												nfresolve(null);
 											});
@@ -489,30 +487,31 @@ class ComponentTree extends BaseElement
 					{
 				        'items': function menu(node) 
 						{
+							var menu = null;
+							
 				        	if(node.original.refreshcmd!=null)
 				        	{
-				        		return { 'Refresh': 
-				        			{
-		                                'label': "Refresh",
-		                                'action': function() 
-		                                {
-		                                	// todo: fix subscription refresh!
-		                                	
-		                                	// self.refreshCMSSubscription();
-		                                	if(node.original.refreshcmd!=null)
-		                                	{
-		                                		//console.log("refresh cmd for: "+node.id);
-		                                		node.original.refreshcmd(node);
-		                                	}
-		                                },
-		                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/refresh.png'
-				        			} 
-				        		};
+								if(menu==null)
+									menu = {};
+				        		menu.Refresh = 
+			        			{
+	                                'label': "Refresh",
+	                                'action': function() 
+	                                {
+	                                	// todo: fix subscription refresh!
+	                                	
+	                                	// self.refreshCMSSubscription();
+	                                	if(node.original.refreshcmd!=null)
+	                                	{
+	                                		//console.log("refresh cmd for: "+node.id);
+	                                		node.original.refreshcmd(node);
+	                                	}
+	                                },
+	                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/refresh.png'
+			        			};
 				        	}
-				        	else
-				        	{
-				        		return null;
-				        	}
+
+				        	return menu;
 						}
 				    }
 				})});
@@ -595,7 +594,7 @@ class ComponentTree extends BaseElement
 		for(var i=0; i<components.length; i++)
 		{
 			//console.log(self.models[i]);
-			this.createNodes(treeid, components[i], false);
+			this.createNodes(treeid, components[i]);//, false);
 		}
 	}
 	
@@ -611,7 +610,7 @@ class ComponentTree extends BaseElement
 	}
 	
 	// create node(s) for a component description
-	createNodes(treeid, component, createnode)
+	createNodes(treeid, component)//, createnode)
 	{
 		var self = this;
 		var cid = component.name.name; // todo: better json format?!
@@ -690,9 +689,9 @@ class ComponentTree extends BaseElement
 
 				//console.log(cid+" "+type+" "+icon);
 				
-				if(createnode)
-					self.createNode(treeid, lastname, names[i], name, 'last', type, icon);
-				else
+				//if(createnode)
+				//	self.createNode(treeid, lastname, names[i], name, 'last', type, icon);
+				//else
 					self.createNodeData(names[i], name, type, icon, lastname);
 			}
 			//else
@@ -703,7 +702,7 @@ class ComponentTree extends BaseElement
 	}
 	
 	// createNode(parent, id, text, position), position 'first' or 'last'
-	createNode(treeid, parent_node_id, new_node_id, new_node_text, position, type, icon)//, donefunc) 
+	/*createNode(treeid, parent_node_id, new_node_id, new_node_text, position, type, icon)//, donefunc) 
 	{
 		console.log("parent="+parent_node_id+" child="+new_node_id+" childtext="+new_node_text);
 		console.log("create node: "+new_node_id);
@@ -713,12 +712,13 @@ class ComponentTree extends BaseElement
 		if(icon!=null)
 			n.icon = icon;
 		this.getTree(self.treeid).jstree('create_node', '#'+parent_node_id, n, 'last');	
-	}
+	}*/
 		
 	createNodeData(id, name, type, icon, parent)
 	{
 		console.log("create node data: "+id+" "+name+" "+type+" "+parent);
-		this.treedata[id] = {"id": id, "text": name, "type": type, "icon": icon, "children": true};
+		var paid = parent==null || parent.length==0? "#": parent;
+		this.treedata[id] = {"id": id, "text": name, "type": type, "icon": icon, "children": true, "_parent": paid}; // "original": {'hello': true}
 		var key = parent==null || parent.length==0? "#_children": parent+"_children";
 		var children = this.treedata[key];
 		if(children==null)
@@ -727,10 +727,17 @@ class ComponentTree extends BaseElement
 			this.treedata[key] = children;
 		}
 		if(children.indexOf(id)===-1)
+		{
 			children.push(id);
+			console.log("added to parent: "+id+" "+parent);
+		}
+		else
+		{
+			console.log("not added to parent: "+id+" "+parent);
+		}
 	}
 		
-	deleteNode(treeid, nodeid)
+	/*deleteNode(treeid, nodeid)
 	{
 		console.log("remove node: "+nodeid);
 		this.getTree(treeid).jstree("delete_node", nodeid);
@@ -740,7 +747,7 @@ class ComponentTree extends BaseElement
 			this.getTree(treeid).jstree("delete_node", "Applications");
 			
 		// todo: remove node from parents children
-	}
+	}*/
 	
 	deleteNodeData(treeid, nodeid)
 	{
@@ -753,22 +760,24 @@ class ComponentTree extends BaseElement
 		// f) delete Applications from Applications parent 
 		
 		console.log("remove node data: "+nodeid);
+		this.removeChildDataFromParent(treeid, nodeid);
 		delete this.treedata[nodeid];
 		delete this.treedata[nodeid+"_children"];
-		this.removeChildDataFromParent(treeid, nodeid);
 
 		var ac = this.treedata["Applications_children"];
 		if(ac==null || ac.length==0)
 		{
+			this.removeChildDataFromParent(treeid, "Applications");
 			delete this.treedata["Applications"];
 			delete this.treedata["Applications_children"]
-			this.removeChildDataFromParent(treeid, "Applications");
 		}
 	}
 	
 	removeChildDataFromParent(treeid, nodeid)
 	{
-		var paid = this.getTree(treeid).jstree().get_parent(nodeid);
+		var removed = false;
+		var paid = this.treedata[nodeid]._parent;
+		//this.getTree(treeid).jstree().get_parent(nodeid);
 		if(paid!=null)
 		{
 			var pachilds = this.treedata[paid+"_children"];
@@ -778,10 +787,14 @@ class ComponentTree extends BaseElement
   				if(i!=-1)
 				{
     				pachilds.splice(i, 1);
+					removed = true;
 					console.log("removed: "+nodeid);
 				}
 			}
 		}
+		
+		if(!removed)
+			console.log("not removed from parent: "+nodeid);
 	}
 	
 	refreshCMSSubscription()
@@ -815,7 +828,7 @@ class ComponentTree extends BaseElement
 					if(event.type.toLowerCase().indexOf("created")!=-1)
 					{
 						self.typemap[event.componentDescription.name.name] = event.componentDescription.type;
-						self.createNodes(self.treeid, event.componentDescription, false);
+						self.createNodes(self.treeid, event.componentDescription);//, false);
 					}
 					else if(event.type.toLowerCase().indexOf("terminated")!=-1)
 					{
@@ -833,6 +846,7 @@ class ComponentTree extends BaseElement
 					// determine what is to be refreshed
 					// normally 'Applications' node
 					// when last app has been deleted or first app has been created -> root refresh 
+					
 					var hasapp = self.getTree(self.treeid).jstree().get_node("Applications")!=false;
 					var ac = self.treedata["Applications_children"];
 					var shouldhaveapp = ac!=null && ac.length>0;
