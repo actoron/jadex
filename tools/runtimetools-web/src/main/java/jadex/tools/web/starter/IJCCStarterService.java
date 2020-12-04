@@ -50,6 +50,13 @@ public interface IJCCStarterService extends IJCCPluginService
 	public IFuture<IComponentIdentifier> createComponent(CreationInfo ci, IComponentIdentifier cid);
 	
 	/**
+	 *  Kill a component.
+	 *  @param id The component id.
+	 *  @return The component id.
+	 */
+	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier id, IComponentIdentifier cid);
+		
+	/**
 	 *  Get the component descriptions.
 	 *  @return The component descriptions.
 	 */

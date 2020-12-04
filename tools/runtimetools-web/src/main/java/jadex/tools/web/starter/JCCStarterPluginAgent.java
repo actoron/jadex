@@ -122,6 +122,17 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	}
 	
 	/**
+	 *  Kill a component.
+	 *  @param cid The component id.
+	 *  @return The component id.
+	 */
+	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier id, IComponentIdentifier cid)
+	{
+		return agent.getExternalAccess(id).killComponent();
+	}
+
+	
+	/**
 	 *  Load a component model.
 	 *  @param filename The filename.
 	 *  @return The component model.
