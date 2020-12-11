@@ -1,6 +1,5 @@
 package jadex.tools.web.starter;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +7,6 @@ import java.util.Map;
 import jadex.base.SRemoteGui;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IServiceIdentifier;
@@ -19,15 +17,15 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.Boolean3;
 import jadex.commons.ICommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -98,6 +96,54 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		
 		return ret;
 	}
+	
+	/**
+	 * 
+	 */
+	public ISubscriptionIntermediateFuture<String[]> getComponentModelsAsStream(IComponentIdentifier cid)
+	{
+		final SubscriptionIntermediateFuture<String[]> ret = new SubscriptionIntermediateFuture<>();
+		//if(cid==null || cid.hasSameRoot(cid))
+		//{
+			ILibraryService ls = agent.getLocalService(ILibraryService.class);
+			ls.getComponentModelsAsStream().addResultListener(new IIntermediateResultListener<Collection<String[]>>()
+			{
+				public void intermediateResultAvailable(Collection<String[]> result)
+				{
+					for(String[] res: result)
+					{
+						ret.addIntermediateResult(res);
+					}
+				}
+				
+				public void resultAvailable(Collection<Collection<String[]>> result)
+				{
+					for(Collection<String[]> res: result)
+					{
+						intermediateResultAvailable(res);
+					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setException(exception);
+				}
+				
+			    public void finished()
+			    {
+			    	ret.setFinished();
+			    }
+			});
+		/*}
+		else
+		{
+			agent.searchService(new ServiceQuery<ILibraryService>(ILibraryService.class).setPlatform(cid).setScope(ServiceScope.PLATFORM))
+				.thenAccept(libs -> {libs.getComponentModels().delegate(ret);}).exceptionally(ret);
+		}*/
+			
+		return ret;
+	}
+
 	
 	/**
 	 *  Create a component for a model.

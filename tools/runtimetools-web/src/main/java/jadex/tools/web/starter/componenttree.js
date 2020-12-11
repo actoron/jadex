@@ -21,6 +21,8 @@ class ComponentTree extends BaseElement
 	
 	init() 
 	{
+		console.log("component tree");
+		
 		super.init().then(()=>
 		{
 			// fixed types
@@ -140,6 +142,7 @@ class ComponentTree extends BaseElement
 									
 									var data = getChildData(node.id);
 									//console.log("out1: "+node+" "+mycnt);
+									
 									cb.call(this, data);
 								}).catch(err=>
 								{
@@ -539,7 +542,7 @@ class ComponentTree extends BaseElement
 	                                	//console.log("kill me: "+node.id);
 	                                	self.killComponent(node.id);
 	                                },
-	                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/refresh.png'
+	                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/kill.png'
 			        			};
 							}
 
@@ -547,6 +550,26 @@ class ComponentTree extends BaseElement
 						}
 				    }
 				})});
+				
+				/*self.getTree(self.treeid).on('refresh.jstree', function (event) 
+				{
+					console.log("refreshed tree: "+event);
+				});*/
+				
+				// Open root node after node has been loaded asyncronously
+				self.getTree(self.treeid).on('load_node.jstree', function (event, args) 
+				{
+					//console.log("loaded node: "+event+" "+args);
+					
+					if(args.node.id==="#")
+					{
+						var childs = self.getTree(self.treeid).jstree('get_node', '#').children;
+						for(var i=0; i<childs.length; i++)
+						{
+							self.getTree(self.treeid).jstree("open_node", childs[i]);
+						}
+					}
+				});
 				
 			    //console.log("adding listener");
 				/*$('#'+treeid).on('select_node.jstree', function (e, data) 
@@ -782,7 +805,7 @@ class ComponentTree extends BaseElement
 		
 	createNodeData(id, name, type, icon, parent)
 	{
-		console.log("create node data: "+id+" "+name+" "+type+" "+parent);
+		//console.log("create node data: "+id+" "+name+" "+type+" "+parent);
 		var paid = parent==null || parent.length==0? "#": parent;
 		// must use _parent as parent is already used by jstree
 		this.treedata[id] = {"id": id, "text": name, "type": type, "icon": icon, "children": true, "_parent": paid}; // "original": {'hello': true}
@@ -796,11 +819,11 @@ class ComponentTree extends BaseElement
 		if(children.indexOf(id)===-1)
 		{
 			children.push(id);
-			console.log("added to parent: "+id+" "+parent);
+			//console.log("added to parent: "+id+" "+parent);
 		}
 		else
 		{
-			console.log("not added to parent: "+id+" "+parent);
+			//console.log("not added to parent: "+id+" "+parent);
 		}
 	}
 		
@@ -826,7 +849,7 @@ class ComponentTree extends BaseElement
 		// e) delete Applications children
 		// f) delete Applications from Applications parent 
 		
-		console.log("remove node data: "+nodeid);
+		//console.log("remove node data: "+nodeid);
 		this.removeChildDataFromParent(treeid, nodeid);
 		delete this.treedata[nodeid];
 		delete this.treedata[nodeid+"_children"];
@@ -855,7 +878,7 @@ class ComponentTree extends BaseElement
 				{
     				pachilds.splice(i, 1);
 					removed = true;
-					console.log("removed: "+nodeid);
+					//console.log("removed: "+nodeid);
 				}
 			}
 		}
@@ -920,12 +943,12 @@ class ComponentTree extends BaseElement
 					
 					if(hasapp!=shouldhaveapp)
 					{
-						console.log("refresh all: "+hasapp+" "+shouldhaveapp);
+						//console.log("refresh all: "+hasapp+" "+shouldhaveapp);
 						self.getTree(self.treeid).jstree("refresh");
 					}
 					else
 					{
-						console.log("refresh app: "+hasapp+" "+shouldhaveapp);
+						//console.log("refresh app: "+hasapp+" "+shouldhaveapp);
 						self.getTree(self.treeid).jstree().refresh_node("Applications");
 						self.getTree(self.treeid).jstree().refresh_node("System");
 					}

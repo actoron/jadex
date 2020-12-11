@@ -18,6 +18,8 @@ import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 
 /**
  *  Library service for loading classpath elements.
@@ -243,6 +245,13 @@ public class LibraryService extends BaseService implements ILibraryService
 	public IFuture<Collection<String[]>> getComponentModels()
 	{
 		return new Future<>(null);
+	}
+	
+	public ISubscriptionIntermediateFuture<Collection<String[]>> getComponentModelsAsStream()
+	{
+		SubscriptionIntermediateFuture<Collection<String[]>> ret = new SubscriptionIntermediateFuture<Collection<String[]>>();
+		ret.setResult(null);
+		return ret;
 	}
 	
 	//-------- listener methods --------

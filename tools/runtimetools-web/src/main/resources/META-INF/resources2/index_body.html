@@ -99,15 +99,28 @@
 					return;
 				}
 				
+				var fini = resp.headers["x-jadex-callidfin"];
+				var callid = resp.headers["x-jadex-callid"];
+				
 				if(resp.status!=202)	// ignore updatetimer commands
 					handler(resp);
-
+				
 				call = axios.CancelToken.source();
-				var callid = resp.headers["x-jadex-callid"];
-				if(callid!=null)
+
+				
+				//console.log("call headers: "+resp.headers["x-jadex-callid"]+" "+resp.headers["x-jadex-callidfin"]);
+				
+				if(fini)
 				{
-					//console.log("long-poll request sent: "+path);
-					axios.get(path, {cancelToken: call.token, headers: {'x-jadex-callid': callid, 'cache-control': 'no-store'}}, this.transform).then(func).catch(erfunc); 
+					//console.log("call finished: "+fini);
+				}
+				else
+				{
+					if(callid!=null)
+					{
+						//console.log("long-poll request sent: "+path);
+						axios.get(path, {cancelToken: call.token, headers: {'x-jadex-callid': callid, 'cache-control': 'no-store'}}, this.transform).then(func).catch(erfunc); 
+					}
 				}
 				
 				return callid;

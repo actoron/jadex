@@ -3,7 +3,6 @@ package jadex.tools.web.starter;
 import java.util.Collection;
 import java.util.Map;
 
-import jadex.base.SRemoteGui;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
@@ -14,9 +13,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.gui.future.SwingResultListener;
 import jadex.tools.web.jcc.IJCCPluginService;
 
 /**
@@ -34,6 +31,8 @@ public interface IJCCStarterService extends IJCCPluginService
 	 */
 	//public IFuture<Collection<String[]>> getComponentModels();
 	public IFuture<Collection<String[]>> getComponentModels(IComponentIdentifier cid);
+	
+	public ISubscriptionIntermediateFuture<String[]> getComponentModelsAsStream(IComponentIdentifier cid);
 	
 	/**
 	 *  Load a component model.
