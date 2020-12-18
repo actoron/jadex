@@ -1,0 +1,5 @@
+Home|Home
+Privacy|Datenschutz
+Imprint|Impressum
+About|Über
+Remember password|Passwort merken

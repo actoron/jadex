@@ -2,57 +2,31 @@ import {LitElement, html, css} from '../libs/lit/lit-element.js';
 
 export class BaseElement extends LitElement 
 {
+	static apppromise = new Promise((resolve,reject) => {
+		axios.get('app.js').then(function(resp) {
+			let fun = new Function(resp.data + "\n//# sourceURL=app.js\n");
+			try {
+				fun().then(theapp => {
+					resolve(theapp);
+				}).catch(err) {
+					reject(err);
+				}
+			}
+			catch (err) {
+				reject(err);
+			}
+		}).catch(err => {
+			reject(err);
+		});
+	});
+	
 	static loadedelements = [];
 	
 	static language = {
 		lang: "en",
 		listeners: [],
-		messages: {
-    		en: {
-   				message: {
-   					home: "Home",
-   					privacy: "Privacy", 
-   					imprint: "Imprint",
-   					about: "About"
-    			}
-  			},
-	    	de: {
-				message: {
-					home: "Home",
-					privacy: "Datenschutz",
-   					imprint: "Impressum",
-					about: "Über"
-				}
-  			}
-		},
-		translationtable: {
-			"Remember password": {
-				de: "Passwort merken"
-			}
-		},
+		translationtable: {},
 		translate: function(text) {
-			var msg = this.messages[this.lang];
-			if(msg) 
-			{
-				var toks = text.split('.');
-				var tmp = msg;
-				for(var i=0; tmp!=null && i<toks.length; i++) 
-				{
-					tmp = tmp[toks[i]];
-				}
-				//console.log("text: "+text+" "+tmp);
-				return tmp;
-			}
-			else 
-			{
-				return null;
-			}
-		},
-		$t: function(text) 
-		{
-			return this.translate(text);
-		},
-		tl: function(text) {
 			let ret;
 			if (this.lang !== "en")
 			{
@@ -63,6 +37,10 @@ export class BaseElement extends LitElement
 			if (!ret)
 				ret = text;
 			return ret;
+		},
+		$t: function(text) 
+		{
+			return this.translate(text);
 		},
 		getLanguage: function() 
 		{
