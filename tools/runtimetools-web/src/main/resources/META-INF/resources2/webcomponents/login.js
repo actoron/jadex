@@ -90,7 +90,7 @@ export class LoginElement extends BaseElement
 	{
 		super.connectedCallback();
 		var self = this;
-		console.log("connnnn")
+		//console.log("connnnn")
 		this.isLoggedIn().then((res)=>{
 			self.requestUpdate();
 			if (!res)

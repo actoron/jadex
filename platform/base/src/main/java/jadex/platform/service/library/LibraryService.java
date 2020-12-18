@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
@@ -73,7 +74,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.MinimalAgent;
 import jadex.micro.annotation.Agent;
 
@@ -110,7 +113,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	
 	/** The component. */
 	@ServiceComponent
-	protected IInternalAccess	component;
+	protected IInternalAccess component;
 	
 	/** LibraryService listeners. */
 	protected Set<ILibraryServiceListener> listeners;
@@ -1785,6 +1788,68 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			ret = new Future<Collection<String[]>>(componentmodels);
 		}
 			
+		return ret;
+	}
+	
+	public ISubscriptionIntermediateFuture<Collection<String[]>> getComponentModelsAsStream()
+	{
+		SubscriptionIntermediateFuture<Collection<String[]>> ret = new SubscriptionIntermediateFuture<>();
+		URL[] urls = getAllURLs().get().toArray(new URL[0]);			
+		urls = SUtil.removeSystemUrls(urls);
+					
+		// scanning is time expensive
+		
+		final List<URL> l = SUtil.arrayToList(urls);
+		final Iterator<URL> it = (Iterator<URL>)l.iterator();
+		System.out.println("getComponentModelsAsStream: "+l.size());
+		final int cnt[] = new int[1];
+		
+		IComponentStep<List<String[]>> step = new IComponentStep<List<String[]>>()
+		{
+			public IFuture<List<String[]>> execute(IInternalAccess ia)
+			{
+				Set<SClassReader.ClassFileInfo> cis = SReflect.scanForClassFileInfos(new URL[]{it.next()}, null, new IFilter<SClassReader.ClassFileInfo>()
+				{
+					public boolean filter(SClassReader.ClassFileInfo ci)
+					{
+						boolean ret = false;
+						AnnotationInfo ai = ci.getClassInfo().getAnnotation(Agent.class.getName());
+						if(ai!=null)
+							ret = true;
+						return ret;
+					}
+				});
+				
+				List<String[]> res = cis.stream().map(a -> new String[]{a.getFilename(), a.getClassInfo().getClassName()}).collect(Collectors.toList());
+				
+				return new Future<List<String[]>>(res);
+			}
+		};
+		
+		component.scheduleStep(step).addResultListener(new IResultListener<List<String[]>>()
+		{
+			public void resultAvailable(List<String[]> res)
+			{
+				ret.addIntermediateResult(res);
+				if(it.hasNext())
+				{
+					cnt[0]++;
+					//System.out.println("cnt: "+cnt[0]+"/"+l.size()+" "+res.size());
+					component.scheduleStep(step).addResultListener(this);
+				}
+				else
+				{
+					//System.out.println("getComponentModelsAsStream finished");
+					ret.setFinished();
+				}
+			}
+		
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setExceptionIfUndone(exception);
+			}
+		});
+		
 		return ret;
 	}
 }

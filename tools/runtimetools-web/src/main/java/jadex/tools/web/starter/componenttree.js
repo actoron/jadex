@@ -21,6 +21,8 @@ class ComponentTree extends BaseElement
 	
 	init() 
 	{
+		console.log("component tree");
+		
 		super.init().then(()=>
 		{
 			// fixed types
@@ -95,7 +97,7 @@ class ComponentTree extends BaseElement
 								//if(data.length==0)
 								//	data = null;
 								
-								console.log("loading node: "+id);//+" "+JSON.stringify(data));
+								//console.log("loading node: "+id);//+" "+JSON.stringify(data));
 								
 								// problem: js tree changes data structures :-( give jstree only a clone?
 								//return Object.assign({}, data)
@@ -122,6 +124,14 @@ class ComponentTree extends BaseElement
 								});
 							}
 							
+							// cont() fetches the child data and calls the jstree callback that fetching is finished for this node 
+							function cont()
+							{
+								var data = getChildData(node.id);
+								//console.log("out3: "+node+" "+mycnt);
+								cb.call(this, data);
+							}
+							
 							// load initial state via component descriptions
 							if("#"===node.id)
 							{
@@ -132,6 +142,7 @@ class ComponentTree extends BaseElement
 									
 									var data = getChildData(node.id);
 									//console.log("out1: "+node+" "+mycnt);
+									
 									cb.call(this, data);
 								}).catch(err=>
 								{
@@ -144,25 +155,23 @@ class ComponentTree extends BaseElement
 							// when loading other nodes, component desriptions are availble via treedata
 							// nodeid = {nodevalues} for tree
 							// nodeid_children = [ids] for children ids
+							else if(node.type==="nfproperties")
+							{
+								cont();
+							}
 							else
 							{
 								//console.log("loading node: "+node.id);
-							
-								// cont() fetches the child data and calls the jstree callback that fetching is finished for this node 
-								function cont()
-								{
-									var data = getChildData(node.id);
-									//console.log("out3: "+node+" "+mycnt);
-									cb.call(this, data);
-								}
-								
 								// create nfproperty container nodes with nfproperty children
 								function createNFChildren(node, res, vals, refreshcmd)
 								{
+									//console.log("createNFChildren: "+node.id+" "+(refreshcmd!=null));
+									
 									if(res!=null && Object.keys(res).length>0)
 									{
 										var nfid = node.id+"_nfprops";
-										var ch = [];
+										//var ch = [];
+										var chids = [];
 										
 										for(var nfname in res)
 										{
@@ -172,11 +181,17 @@ class ComponentTree extends BaseElement
 											var nfnode = {"id": nfid+"_"+nfprop.name, "text": txt, 
 												"type": nfprop.dynamic? "nfproperty_dynamic": "nfproperty", "children": false,
 												"refreshcmd": nfprop.dynamic? refreshcmd: null, "propname": nfprop.name};
-											ch.push(nfnode);
+											//ch.push(nfnode);
+											self.treedata[nfnode.id] = nfnode;
+											chids.push(nfnode.id);
+											//console.log("nfprop: "+nfname+" "+nfprop.dynamic+" "+nfnode.refreshcmd);
 										}
 										
-										self.treedata[nfid] = {"id": nfid, "text": "Non-functional Properties", "type": "nfproperties", "children": ch};
+										// parent node nfprops
+										self.treedata[nfid] = {"id": nfid, "text": "Non-functional Properties", "type": "nfproperties", "children": true};//, "children": ch};
+										self.treedata[nfid+"_children"] = chids;
 										
+										// Add the nfprops node to the parent as child
 										var key = node.id+"_children";
 										var children = self.treedata[key];
 										if(children==null)
@@ -478,8 +493,8 @@ class ComponentTree extends BaseElement
 				        {
 				            ret = (a1.icon > b1.icon) ? 1 : -1;
 				        }
-						if((a.text!=null && a.text.indexOf("App")!=-1) || (b.text!=null && b.text.indexOf("App")!=-1))
-							console.log("sort: "+a+" "+b+" "+ret);
+						//if((a.text!=null && a.text.indexOf("App")!=-1) || (b.text!=null && b.text.indexOf("App")!=-1))
+						//	console.log("sort: "+a+" "+b+" "+ret);
 						return ret;
 					},
 					types,
@@ -489,10 +504,12 @@ class ComponentTree extends BaseElement
 						{
 							var menu = null;
 							
-				        	if(node.original.refreshcmd!=null)
+							if(self.treedata[node.id].refreshcmd!=null)
+				        	//if(node.original.refreshcmd!=null)
 				        	{
 								if(menu==null)
 									menu = {};
+								
 				        		menu.Refresh = 
 			        			{
 	                                'label': "Refresh",
@@ -501,20 +518,58 @@ class ComponentTree extends BaseElement
 	                                	// todo: fix subscription refresh!
 	                                	
 	                                	// self.refreshCMSSubscription();
-	                                	if(node.original.refreshcmd!=null)
-	                                	{
+										self.treedata[node.id].refreshcmd(node);
+	                                	//if(node.original.refreshcmd!=null)
+	                                	//{
 	                                		//console.log("refresh cmd for: "+node.id);
-	                                		node.original.refreshcmd(node);
-	                                	}
+	                                	//	node.original.refreshcmd(node);
+	                                	//}
 	                                },
 	                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/refresh.png'
 			        			};
 				        	}
 
+							if(self.isComponentNode(node.type))
+							{
+								if(menu==null)
+									menu = {};
+								
+				        		menu.Kill = 
+			        			{
+	                                'label': "Kill",
+	                                'action': function() 
+	                                {
+	                                	//console.log("kill me: "+node.id);
+	                                	self.killComponent(node.id);
+	                                },
+	                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/kill.png'
+			        			};
+							}
+
 				        	return menu;
 						}
 				    }
 				})});
+				
+				/*self.getTree(self.treeid).on('refresh.jstree', function (event) 
+				{
+					console.log("refreshed tree: "+event);
+				});*/
+				
+				// Open root node after node has been loaded asyncronously
+				self.getTree(self.treeid).on('load_node.jstree', function (event, args) 
+				{
+					//console.log("loaded node: "+event+" "+args);
+					
+					if(args.node.id==="#")
+					{
+						var childs = self.getTree(self.treeid).jstree('get_node', '#').children;
+						for(var i=0; i<childs.length; i++)
+						{
+							self.getTree(self.treeid).jstree("open_node", childs[i]);
+						}
+					}
+				});
 				
 			    //console.log("adding listener");
 				/*$('#'+treeid).on('select_node.jstree', function (e, data) 
@@ -546,7 +601,32 @@ class ComponentTree extends BaseElement
 		})
 		.catch((err)=>console.log(err));
 	}
+	
+	killComponent(cid)
+	{
+		var self = this;
 		
+		var paid = self.treedata[cid]._parent;
+		
+		return new Promise(function(r, e)
+		{
+			axios.get(self.getMethodPrefix()+'&methodname=killComponent&arg0='+cid, self.transform).then(function(resp)
+			{
+				//console.log("killed: "+cid);
+				self.createInfoMessage("Killed component "+cid); 
+				if(paid!=null)
+				{
+					self.getTree(self.treeid).jstree().refresh_node(paid);
+				}
+				else
+				{
+					self.getTree(self.treeid).jstree("refresh");
+				}
+				r();
+			}).catch(err => {console.log("err kill: "+cid); e(err);});
+		});
+	}
+	
 	loadJSTree()
 	{
 		var self = this;
@@ -585,8 +665,6 @@ class ComponentTree extends BaseElement
 	{
 		return $("#"+treeid, this.shadowRoot);
 	}
-	
-	
 	
 	createTree(treeid, components)
 	{
@@ -701,6 +779,17 @@ class ComponentTree extends BaseElement
 		}
 	}
 	
+	isComponentNode(type)
+	{
+		return type!=="nfproperties" 
+			&& type!=="provided"
+			&& type!=="required"
+			&& type!=="system"
+			&& type!=="applications"
+			&& type!=="cloud"
+			&& type!=="services";
+	}
+	
 	// createNode(parent, id, text, position), position 'first' or 'last'
 	/*createNode(treeid, parent_node_id, new_node_id, new_node_text, position, type, icon)//, donefunc) 
 	{
@@ -716,8 +805,9 @@ class ComponentTree extends BaseElement
 		
 	createNodeData(id, name, type, icon, parent)
 	{
-		console.log("create node data: "+id+" "+name+" "+type+" "+parent);
+		//console.log("create node data: "+id+" "+name+" "+type+" "+parent);
 		var paid = parent==null || parent.length==0? "#": parent;
+		// must use _parent as parent is already used by jstree
 		this.treedata[id] = {"id": id, "text": name, "type": type, "icon": icon, "children": true, "_parent": paid}; // "original": {'hello': true}
 		var key = parent==null || parent.length==0? "#_children": parent+"_children";
 		var children = this.treedata[key];
@@ -729,11 +819,11 @@ class ComponentTree extends BaseElement
 		if(children.indexOf(id)===-1)
 		{
 			children.push(id);
-			console.log("added to parent: "+id+" "+parent);
+			//console.log("added to parent: "+id+" "+parent);
 		}
 		else
 		{
-			console.log("not added to parent: "+id+" "+parent);
+			//console.log("not added to parent: "+id+" "+parent);
 		}
 	}
 		
@@ -759,7 +849,7 @@ class ComponentTree extends BaseElement
 		// e) delete Applications children
 		// f) delete Applications from Applications parent 
 		
-		console.log("remove node data: "+nodeid);
+		//console.log("remove node data: "+nodeid);
 		this.removeChildDataFromParent(treeid, nodeid);
 		delete this.treedata[nodeid];
 		delete this.treedata[nodeid+"_children"];
@@ -788,7 +878,7 @@ class ComponentTree extends BaseElement
 				{
     				pachilds.splice(i, 1);
 					removed = true;
-					console.log("removed: "+nodeid);
+					//console.log("removed: "+nodeid);
 				}
 			}
 		}
@@ -823,7 +913,7 @@ class ComponentTree extends BaseElement
 				function(resp)
 				{
 					var event = resp.data;
-					console.log("cms status event: "+event);
+					//console.log("cms status event: "+event);
 					
 					if(event.type.toLowerCase().indexOf("created")!=-1)
 					{
@@ -853,12 +943,12 @@ class ComponentTree extends BaseElement
 					
 					if(hasapp!=shouldhaveapp)
 					{
-						console.log("refresh all: "+hasapp+" "+shouldhaveapp);
+						//console.log("refresh all: "+hasapp+" "+shouldhaveapp);
 						self.getTree(self.treeid).jstree("refresh");
 					}
 					else
 					{
-						console.log("refresh app: "+hasapp+" "+shouldhaveapp);
+						//console.log("refresh app: "+hasapp+" "+shouldhaveapp);
 						self.getTree(self.treeid).jstree().refresh_node("Applications");
 						self.getTree(self.treeid).jstree().refresh_node("System");
 					}

@@ -16,6 +16,8 @@ class ModelTree extends BaseElement
 	
 	init()
 	{
+		console.log("modetree init: "+this.models);
+	
 		var self = this;
 		super.init().then(()=>
 		{
@@ -48,7 +50,47 @@ class ModelTree extends BaseElement
 					
 					// no args here
 					//console.log("getComponentModels start");
-					axios.get(self.getMethodPrefix()+'&methodname=getComponentModels', self.transform).then(function(resp)
+					
+					var t = jadex.getIntermediate(self.getMethodPrefix()+'&methodname=getComponentModelsAsStream'+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
+					function(response)
+					{
+						if(!response.data)
+						{
+							console.log("received: "+response.data);
+							return;
+						}
+						
+						if(self.addModel(response.data))
+						{
+							//self.createModelTree(self.treeid);
+							self.createNodes(self.treeid, response.data[1]);
+							
+							//self.addToModelTree(self.treeid);
+							//$('#'+treeid).jstree('open_all');
+							var childs = self.getTree(self.treeid).jstree('get_node', '#').children;
+							for(var i=0; i<childs.length; i++)
+							{
+								self.getTree(self.treeid).jstree("open_node", childs[i]);
+							}
+							
+							//console.log("models loaded");
+							
+							//$("#"+treeid).jstree("open_node", '#');
+							self.requestUpdate();
+							
+							/*self.getTree(self.treeid).on('select_node.jstree', function (e, data) 
+							{
+								self.select(data.instance.get_path(data.node, '.'));
+							});*/
+						}
+					},
+					function(response)
+					{
+						console.log("Could not load models.");
+						console.log("Err: "+JSON.stringify(response));
+					});
+					
+					/*axios.get(self.getMethodPrefix()+'&methodname=getComponentModels', self.transform).then(function(resp)
 					{
 						//console.log("getComponentModels"+resp.data);
 						
@@ -71,7 +113,7 @@ class ModelTree extends BaseElement
 						{
 							self.select(data.instance.get_path(data.node, '.'));
 						});
-					});
+					});*/
 				});
 			});
 		})
@@ -115,6 +157,7 @@ class ModelTree extends BaseElement
 	getModelNames()
 	{
 		var ret = [];
+		
 		if(this.models.length>0)
 		{
 			for(var i=0; i<this.models.length; i++)
@@ -122,6 +165,30 @@ class ModelTree extends BaseElement
 				ret.push(this.getModelName(this.models[i][1]));
 			}
 		}
+		
+		return ret;
+	}
+	
+	addModel(model)
+	{
+		var ret = true;
+		// only add model if not contained
+		for(var i=0; i<this.models.length; i++)
+		{
+			if(this.models[i][0]===model[0] && this.models[i][1]===model[1])
+			{
+				//console.log("found duplicate: "+this.models[i][0]);
+				ret = false;
+				break;
+			}
+		}
+		
+		if(ret)
+		{
+			//console.log("adding: "+model[0]);
+			this.models.push(model);
+		}
+		
 		return ret;
 	}
 	
@@ -205,6 +272,15 @@ class ModelTree extends BaseElement
 	{
 		this.empty(treeid);
 		
+		for(var i=0; i<this.models.length; i++)
+		{
+			//console.log(self.models[i]);
+			this.createNodes(treeid, this.models[i][1]);
+		}
+	}
+	
+	addToModelTree(treeid)
+	{
 		for(var i=0; i<this.models.length; i++)
 		{
 			//console.log(self.models[i]);
