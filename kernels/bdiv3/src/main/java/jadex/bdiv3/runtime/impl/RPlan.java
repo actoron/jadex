@@ -937,7 +937,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 							ICommand<ResumeCommandArgs> resc = getResumeCommand();
 							if(resc!=null)
 							{
-								System.out.println("aborting5: "+this+", "+resc);
+								//System.out.println("aborting5: "+this+", "+resc);
 								resc.execute(new ResumeCommandArgs(null, null, ex));
 							}
 							List<ICommand<ResumeCommandArgs>> rescoms = getResumeCommands();

@@ -226,8 +226,8 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     public void setFinished()
     {
-    	if(done.contains(this.toString()))
-    		System.out.println("setFini: "+this);
+    	//if(done.contains(this.toString()))
+    	//	System.out.println("setFini: "+this);
     	done.add(this.toString());
     	//Thread.currentThread().dumpStack();
     	doSetFinished(false);
@@ -235,7 +235,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	resume();
     }
     
-    protected static Set<String> done = new HashSet<>();
+    //protected static Set<String> done = new HashSet<>();
     
     /**
      *  Declare that the future is finished.
