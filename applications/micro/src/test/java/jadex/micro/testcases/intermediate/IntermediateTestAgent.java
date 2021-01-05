@@ -27,10 +27,9 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
@@ -240,7 +239,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 						final Long[] start = new Long[1];
 						IClockService	clock	= agent.getFeature(IRequiredServicesFeature.class).getLocalService(IClockService.class);
 						IIntermediateFuture<String> fut = service.getResults(delay, max);
-						fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
+						fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<String>()
 						{
 							public void intermediateResultAvailable(String result)
 							{

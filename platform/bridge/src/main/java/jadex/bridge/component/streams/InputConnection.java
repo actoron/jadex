@@ -469,6 +469,11 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 						{
 							ret.setExceptionIfUndone(exception);
 						}
+						
+						public void maxResultCountAvailable(int max) 
+						{
+							ret.setMaxResultCount(max);
+						}
 					}));
 					
 					return IFuture.DONE;

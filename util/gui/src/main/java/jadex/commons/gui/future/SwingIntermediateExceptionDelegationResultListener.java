@@ -98,6 +98,28 @@ public abstract class SwingIntermediateExceptionDelegationResultListener<E, T> i
 			}
 		});
     }
+    
+    /**
+   	 *  Declare that the future result count is available.
+   	 *  This method is only called for intermediate futures,
+   	 *  i.e. when this method is called it is guaranteed that the
+   	 *  intermediateResultAvailable method will be called as
+   	 *  often as the result count indicates except an exception occurs.
+   	 */
+    public void maxResultCountAvailable(int max) 
+    {
+    	SGUI.invokeLaterSimBlock(new Runnable()
+		{
+			public void run()
+			{
+				customMaxResultCountAvailable(max);
+			}
+		});
+    }
+    
+    public void customMaxResultCountAvailable(int max)
+    {
+    }
 	
 	/**
 	 *  Called when the result is available.

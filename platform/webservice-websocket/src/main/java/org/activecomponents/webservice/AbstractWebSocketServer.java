@@ -51,11 +51,11 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IPullIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IStringConverter;
@@ -153,7 +153,7 @@ public abstract class AbstractWebSocketServer
 			if("session".equals(scope))
 			{
 //				IService service = (IService)session.getUserProperties().get(type.getName());
-				findModelName(ssc.getType().getTypeName()).thenAccept(filename ->
+				findModelName(ssc.getType().getTypeName()).then(filename ->
 				{
 					if(filename==null)
 					{
@@ -177,7 +177,7 @@ public abstract class AbstractWebSocketServer
 							}
 						});
 					}
-				}).exceptionally(ret);
+				}).catchErr(ret);
 				//}).exceptionally(e -> {ret.setException(e); return IFuture.DONE;});
 			}
 			else
@@ -198,7 +198,7 @@ public abstract class AbstractWebSocketServer
 		else
 		{
 			ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)getPlatform().searchServices(new ServiceQuery<IService>(ssc.getType()).setScope(ServiceScope.getEnum(scope)));
-			res.addResultListener(new IIntermediateResultListener<IService>()
+			res.addResultListener(new IntermediateEmptyResultListener<IService>()
 			{
 				public void intermediateResultAvailable(IService service)
 				{
@@ -283,7 +283,7 @@ public abstract class AbstractWebSocketServer
 
 				if(res instanceof IIntermediateFuture)
 				{
-					((IIntermediateFuture<Object>)res).addResultListener(new IIntermediateResultListener<Object>()
+					((IIntermediateFuture<Object>)res).addResultListener(new IntermediateEmptyResultListener<Object>()
 					{
 						public void intermediateResultAvailable(Object result)
 						{
@@ -347,7 +347,7 @@ public abstract class AbstractWebSocketServer
 	{	
 		Future<String> ret = new Future<>();
 		
-		getMappings().thenAccept(c -> 
+		getMappings().then(c -> 
 		{
 			Collection<String> filenames = mappings.getCollection(typename);
 			
@@ -357,7 +357,7 @@ public abstract class AbstractWebSocketServer
 				ret.setResult(filenames.iterator().next());
 			else
 				ret.setException(new RuntimeException("No mapping found for: "+typename));
-		}).exceptionally(ret);
+		}).catchErr(ret);
 		
 		return ret;
 	}
@@ -701,12 +701,12 @@ public abstract class AbstractWebSocketServer
 			jadex.bridge.ClassInfo iface = ser.getServiceId().getServiceType();
 			if(!serviceinfos.containsKey(iface))
 			{
-				ser.getMethodInfos().thenAccept(mis -> 
+				ser.getMethodInfos().then(mis -> 
 				{
 					serviceinfos.put(iface, mis);
 					ServiceInfo si = new ServiceInfo(((IService)res).getServiceId(), getMethodNames(mis));
 					sendMessage(new ResultMessage(si, callid, finished), session).delegate(ret);
-				}).exceptionally(ret);
+				}).catchErr(ret);
 			}
 			else
 			{

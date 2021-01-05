@@ -17,7 +17,6 @@ import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -26,8 +25,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.TupleResult;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Properties;
@@ -184,7 +183,7 @@ public class InitiatorAgent extends TestAgent
 //		awa.addAwarenessInfo(info).get();
 		
 		IIntermediateFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).getServices("aser");
-		fut.addResultListener(new IIntermediateResultListener<ITestService>()
+		fut.addResultListener(new IntermediateEmptyResultListener<ITestService>()
 		{
 			boolean called;
 			public void intermediateResultAvailable(ITestService result)

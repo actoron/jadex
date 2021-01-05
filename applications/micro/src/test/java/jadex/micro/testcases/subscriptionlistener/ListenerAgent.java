@@ -96,6 +96,10 @@ public class ListenerAgent
 				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(reports.size(), reports.toArray(new TestReport[reports.size()])));
 				ret.setResult(null);				
 			}
+			
+			public void maxResultCountAvailable(int max) 
+			{
+			}
 		});
 		
 		return ret;

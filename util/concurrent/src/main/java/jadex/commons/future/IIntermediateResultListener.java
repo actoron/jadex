@@ -7,7 +7,10 @@ import java.util.Collection;
  *  Result listener with additional notifications in case of intermediate results.
  */
 //@Reference
-public interface IIntermediateResultListener<E> extends IResultListener<Collection<E>>, IFunctionalIntermediateFinishedListener<E>, IFunctionalIntermediateResultListener<E>
+public interface IIntermediateResultListener<E> extends IResultListener<Collection<E>>, 
+	IFunctionalIntermediateFinishedListener<E>, 
+	IFunctionalIntermediateResultListener<E>, 
+	IFunctionalIntermediateResultCountListener
 {
 	/**
 	 *  Called when the result is available.
@@ -38,4 +41,13 @@ public interface IIntermediateResultListener<E> extends IResultListener<Collecti
 	 *  intermediate results before.
      */
     public void finished();
+    
+    /**
+	 *  Declare that the future result count is available.
+	 *  This method is only called for intermediate futures,
+	 *  i.e. when this method is called it is guaranteed that the
+	 *  intermediateResultAvailable method will be called as
+	 *  often as the result count indicates except an exception occurs.
+	 */
+	public void maxResultCountAvailable(int max);
 }

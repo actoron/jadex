@@ -43,7 +43,6 @@ import jadex.micro.annotation.RequiredServices;
 @RequiredServices({
 	@RequiredService(name="generateservice", type=IGenerateService.class),
 	@RequiredService(name="progressservice", type=IProgressService.class),
-	@RequiredService(name="mandelservice", type=IMandelbrotService.class)
 })
 @Agent
 public class DisplayAgent
@@ -64,52 +63,45 @@ public class DisplayAgent
 	 */
 	//@AgentCreated
 	@OnInit
-	public IFuture<Void>	agentCreated()
+	public void agentCreated()
 	{
-		final Future<Void>	ret	= new Future<Void>();
+		DisplayAgent.this.panel	= new DisplayPanel(agent.getExternalAccess());
+
+//		addService(new DisplayService(this));
+				
+		final IExternalAccess	access	= agent.getExternalAccess();
+		final JFrame	frame	= new JFrame(agent.getId().getName());
+		JScrollPane	scroll	= new JScrollPane(panel);
+
+		JTextPane helptext = new JTextPane();
+		helptext.setText(DisplayPanel.HELPTEXT);
+		helptext.setEditable(false);
+		JPanel	right	= new JPanel(new BorderLayout());
+		right.add(new ColorChooserPanel(panel), BorderLayout.CENTER);
+		right.add(helptext, BorderLayout.NORTH);
+
+		JSplitPane	split	= new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scroll, right);
+		split.setResizeWeight(1);
+		split.setOneTouchExpandable(true);
+		split.setDividerLocation(375);
+		frame.getContentPane().add(BorderLayout.CENTER, split);
+		frame.setSize(500, 400);
+		frame.setLocation(SGUI.calculateMiddlePosition(frame));
+		frame.setVisible(true);
 		
-		IFuture<IMandelbrotService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("mandelservice");
-		fut.addResultListener(new SwingExceptionDelegationResultListener<IMandelbrotService, Void>(ret)
+		frame.addWindowListener(new WindowAdapter()
 		{
-			public void customResultAvailable(IMandelbrotService result)
+			public void windowClosing(WindowEvent e)
 			{
-				DisplayAgent.this.panel	= new DisplayPanel(agent.getExternalAccess(), result);
-
-//				addService(new DisplayService(this));
-				
-				final IExternalAccess	access	= agent.getExternalAccess();
-				final JFrame	frame	= new JFrame(agent.getId().getName());
-				JScrollPane	scroll	= new JScrollPane(panel);
-
-				JTextPane helptext = new JTextPane();
-				helptext.setText(DisplayPanel.HELPTEXT);
-				helptext.setEditable(false);
-				JPanel	right	= new JPanel(new BorderLayout());
-				right.add(new ColorChooserPanel(panel), BorderLayout.CENTER);
-				right.add(helptext, BorderLayout.NORTH);
-
-				JSplitPane	split	= new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scroll, right);
-				split.setResizeWeight(1);
-				split.setOneTouchExpandable(true);
-				split.setDividerLocation(375);
-				frame.getContentPane().add(BorderLayout.CENTER, split);
-				frame.setSize(500, 400);
-				frame.setLocation(SGUI.calculateMiddlePosition(frame));
-				frame.setVisible(true);
-				
-				frame.addWindowListener(new WindowAdapter()
-				{
-					public void windowClosing(WindowEvent e)
-					{
-						access.killComponent();
-					}
-				});
-				
-				access.scheduleStep(new IComponentStep<Void>()
-				{
-					@Classname("dispose")
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
+				access.killComponent();
+			}
+		});
+		
+		access.scheduleStep(new IComponentStep<Void>()
+		{
+			@Classname("dispose")
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
 //						ia.addComponentListener(new TerminationAdapter()
 //						{
 //							public void componentTerminated()
@@ -123,25 +115,19 @@ public class DisplayAgent
 //								});
 //							}
 //						});
-						
-						ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
-							.addResultListener(/*new SwingIntermediateResultListener<IMonitoringEvent>(*/new IntermediateDefaultResultListener<IMonitoringEvent>()
-						{
-							public void intermediateResultAvailable(IMonitoringEvent result)
-							{
-								frame.dispose();
-							}
-						}/*)*/);
-						
-						return IFuture.DONE;
-					}
-				});
 				
-				ret.setResult(null);
+				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+					.addResultListener(/*new SwingIntermediateResultListener<IMonitoringEvent>(*/new IntermediateDefaultResultListener<IMonitoringEvent>()
+				{
+					public void intermediateResultAvailable(IMonitoringEvent result)
+					{
+						frame.dispose();
+					}
+				}/*)*/);
+				
+				return IFuture.DONE;
 			}
 		});
-		
-		return ret;
 	}
 	
 	//-------- methods --------

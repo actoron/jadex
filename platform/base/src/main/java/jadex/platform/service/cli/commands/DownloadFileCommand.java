@@ -25,6 +25,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
@@ -100,7 +101,7 @@ public class DownloadFileCommand extends ACliCommand
 							ServiceInputConnection sic = new ServiceInputConnection();
 							
 							ITerminableIntermediateFuture<Long> fut = ds.downloadFile(sic.getOutputConnection(), s);
-							fut.addResultListener(new IIntermediateResultListener<Long>()
+							fut.addResultListener(new IntermediateEmptyResultListener<Long>()
 							{
 								long last = 0;
 								long size = -1;
@@ -144,7 +145,9 @@ public class DownloadFileCommand extends ACliCommand
 								}
 							});
 							
-							sic.writeToOutputStream(fos, comp).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<Long>()
+							sic.writeToOutputStream(fos, comp).addResultListener(
+								ia.getFeature(IExecutionFeature.class).createResultListener(
+									new IntermediateEmptyResultListener<Long>()
 							{
 								public void intermediateResultAvailable(Long result) 
 								{
@@ -189,7 +192,7 @@ public class DownloadFileCommand extends ACliCommand
 		{
 			// global search not a good idea due to long timeout but what to do else?
 			ia.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IFileTransferService.class, ServiceScope.GLOBAL))
-				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<IFileTransferService>()
+				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<IFileTransferService>()
 			{
 				public void intermediateResultAvailable(IFileTransferService result)
 				{

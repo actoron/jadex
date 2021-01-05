@@ -104,7 +104,7 @@ public class LazyInjectTestAgent extends JunitAgentTest
 		final TestReport tr2 = new TestReport("#2", "Test if functional listener works.");
 		reports.add(tr2);
 
-		fut.addIntermediateResultListener(new IFunctionalIntermediateResultListener<String>() 
+		/*fut.addIntermediateResultListener(new IFunctionalIntermediateResultListener<String>() 
 		{
 			@Override
 			public void intermediateResultAvailable(String result) 
@@ -137,6 +137,30 @@ public class LazyInjectTestAgent extends JunitAgentTest
 				tr2.setFailed(exception);
 				checkFinished();
 			}
+		});*/
+		
+		fut.next(result ->
+		{
+			System.out.println("first: " + result);
+			if ("hello".equals(result)) 
+			{
+				tr2.setSucceeded(true);
+			} 
+			else 
+			{
+				tr2.setFailed("Received wrong results.");
+			}
+			checkFinished();
+		}).finished(Void ->
+		{
+			// should not happen as finish is never called
+			tr2.setFailed(new Exception("finish unexpected"));
+			checkFinished();
+		}).catchErr(exception -> 
+		{
+			System.out.println("ex: "+exception);
+			tr2.setFailed(exception);
+			checkFinished();
 		});
 
 	}

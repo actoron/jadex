@@ -19,8 +19,8 @@ import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 
 /**
@@ -200,7 +200,7 @@ public class ServicePoolManager
 			
 //			System.out.println("wurksn0");
 			component.getFeature(IRequiredServicesFeature.class).getServices(name).addResultListener(
-				new IIntermediateResultListener<Object>()
+				new IntermediateEmptyResultListener<Object>()
 			{
 				/**
 				 *  A service has been found.

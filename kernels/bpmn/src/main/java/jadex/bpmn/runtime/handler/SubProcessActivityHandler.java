@@ -27,7 +27,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 
@@ -219,7 +219,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 //					System.out.println("parent is: "+parent.getAddresses());	
 
 			creator.createComponentWithEvents(info)
-				.addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+				.addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 			{
 				protected SubprocessResultHandler handler = new SubprocessResultHandler(thread, activity);	
 					

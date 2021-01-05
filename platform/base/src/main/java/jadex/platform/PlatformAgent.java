@@ -54,9 +54,9 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
@@ -460,7 +460,7 @@ public class PlatformAgent
 		ISubscriptionIntermediateFuture<IExternalAccess> query = agent.addQuery(new ServiceQuery<>(IExternalAccess.class)
 			.setScope(ServiceScope.NETWORK));
 //			.setScope(ServiceScope.GLOBAL));
-		query.addResultListener(new IIntermediateResultListener<IExternalAccess>()
+		query.addResultListener(new IntermediateEmptyResultListener<IExternalAccess>()
 		{
 			public void intermediateResultAvailable(IExternalAccess result)
 			{
@@ -481,17 +481,9 @@ public class PlatformAgent
 				}
 			}
 
-			public void finished()
-			{
-			}
-			
 			public void exceptionOccurred(Exception exception)
 			{
 				exception.printStackTrace();
-			}
-			
-			public void resultAvailable(Collection<IExternalAccess> result)
-			{
 			}
 		});
 	}

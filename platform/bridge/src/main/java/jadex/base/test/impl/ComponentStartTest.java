@@ -69,7 +69,7 @@ public class ComponentStartTest extends ComponentTest
 	{
 		// For start-test kill component after some delay. Let base test collect the result (start exception vs. finished vs. timeout)
 		System.out.println("component start test 0: "+filename);
-		fut.addResultListener(exta ->
+		fut.then(exta ->
 		{
 			IComponentIdentifier	cid = exta.getId();
 			System.out.println("component start test 1: "+filename+", "+cid);

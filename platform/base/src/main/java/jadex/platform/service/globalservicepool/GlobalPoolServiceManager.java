@@ -239,6 +239,11 @@ public class GlobalPoolServiceManager
 				{
 					ret.setException(exception);
 				}
+				
+				public void maxResultCountAvailable(int max) 
+				{
+					ret.setMaxResultCount(max);
+				}
 			});
 		}
 		
@@ -381,6 +386,11 @@ public class GlobalPoolServiceManager
 				{
 					ret.setException(exception);
 				}
+				
+				public void maxResultCountAvailable(int max) 
+				{
+					ret.setMaxResultCount(max);
+				}
 			});
 		}
 		
@@ -505,6 +515,11 @@ public class GlobalPoolServiceManager
 			{
 		//		ret.setException(exception);
 				ret.setFinished();
+			}
+			
+			public void maxResultCountAvailable(int max) 
+			{
+				ret.setMaxResultCount(max);
 			}
 		});
 		

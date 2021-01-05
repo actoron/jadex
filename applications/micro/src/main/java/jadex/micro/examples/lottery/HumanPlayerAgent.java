@@ -7,10 +7,9 @@ import jadex.bridge.SFuture;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -33,7 +32,7 @@ public class HumanPlayerAgent
 		
 		final PlayerPanel pp = PlayerPanel.createGui(ls).get();
 		
-		sub.addResultListener(new IIntermediateResultListener<String>()
+		sub.addResultListener(new IntermediateEmptyResultListener<String>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{

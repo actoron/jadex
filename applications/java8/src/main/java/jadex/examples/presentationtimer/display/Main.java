@@ -74,11 +74,11 @@ public class Main
 
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
 
-		fut.addResultListener(access -> {
+		fut.then(access -> {
 			IFuture<IExternalAccess> fut2 = access.createComponent(new CreationInfo().setName("CDDisplay").setFilename(CountdownAgent.class.getName() + ".class"));
-			fut2.addResultListener((IExternalAccess created) -> {
+			fut2.then((IExternalAccess created) -> {
 				System.out.println("CDDisplay Component created.");
-				created.waitForTermination().addResultListener((Map<String, Object> terminated) -> {
+				created.waitForTermination().then((Map<String, Object> terminated) -> {
 					System.out.println("CDDisplay Component terminated!");
 				});
 			});

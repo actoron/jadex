@@ -17,9 +17,9 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 
 /**
  * The plan tries to purchase a book.
@@ -52,8 +52,8 @@ public class PurchaseBookPlan extends Plan
 		ServiceCall.getOrCreateNextInvocation().setTimeout(1000);
 		IRequiredServicesFeature rsf = getAgent().getFeature(IRequiredServicesFeature.class);
 		ITerminableIntermediateFuture<IBuyBookService>  fut = rsf.getServices("buyservice");
-		fut.addIntermediateResultListener(new TimeoutIntermediateResultListener<IBuyBookService>(5000, getExternalAccess(),
-			new IIntermediateResultListener<IBuyBookService>()
+		fut.addResultListener(new TimeoutIntermediateResultListener<IBuyBookService>(5000, getExternalAccess(),
+			new IntermediateEmptyResultListener<IBuyBookService>()
 		{
 			int cnt;
 			public void exceptionOccurred(Exception exception)

@@ -184,6 +184,13 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 									((IInternalServiceMonitoringFeature)feat).postServiceEvent(
 										new ServiceCallEvent(ServiceCallEvent.Type.FINISHED, sic.getServiceIdentifier(), new MethodInfo(sic.getMethod()), sic.getCaller(), null));
 								}
+								
+								@Override
+								public void maxResultCountAvailable(int max) 
+								{
+									((IInternalServiceMonitoringFeature)feat).postServiceEvent(
+										new ServiceCallEvent(ServiceCallEvent.Type.MAX, sic.getServiceIdentifier(), new MethodInfo(sic.getMethod()), sic.getCaller(), max));
+								}
 	
 //								Not necessary?
 //								@Override

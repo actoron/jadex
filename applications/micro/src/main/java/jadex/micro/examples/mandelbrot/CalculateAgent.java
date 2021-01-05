@@ -5,6 +5,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
@@ -46,7 +47,7 @@ public class CalculateAgent
 	protected boolean hadjob;
 	
 	/** Id of the current job. */
-	protected Object	taskid;
+	protected Object taskid;
 	
 	/** Progress of the current job. */
 	protected int progress;
@@ -83,6 +84,12 @@ public class CalculateAgent
 		
 		return ret;
 	}
+	
+	/*@OnEnd
+	public void terminate()
+	{
+		System.out.println("killed: "+agent.getId());
+	}*/
 	
 	/**
 	 *  Set the hadjob.

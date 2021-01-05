@@ -498,10 +498,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 								{
 									// Ignore if result is normally set.
 								}
-								public void resultAvailable(Collection result)
+								/*public void resultAvailable(Collection result)
 								{
 									// Ignore if result is normally set.
-								}
+								}*/
 								public void exceptionOccurred(Exception exception)
 								{
 									// Forward timeout exception to future.
@@ -521,6 +521,9 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 								{
 								}
 								public void commandAvailable(Object command)
+								{
+								}
+								public void maxResultCountAvailable(int max) 
 								{
 								}
 							});

@@ -22,6 +22,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 
 /**
@@ -111,7 +112,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 					
 					if(res instanceof IIntermediateFuture)
 					{
-						IIntermediateResultListener<Object> lis = new IIntermediateResultListener<Object>()
+						IIntermediateResultListener<Object> lis = new IntermediateEmptyResultListener<Object>()
 						{
 							boolean done;
 							public void intermediateResultAvailable(Object result)
@@ -320,7 +321,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 					final Object res = sic.getMethod().invoke(ser, sic.getArgumentArray());
 					if(res instanceof IIntermediateFuture)
 					{
-						IIntermediateResultListener<Object> lis = new IIntermediateResultListener<Object>()
+						IIntermediateResultListener<Object> lis = new IntermediateEmptyResultListener<Object>()
 						{
 							public void intermediateResultAvailable(Object result)
 							{

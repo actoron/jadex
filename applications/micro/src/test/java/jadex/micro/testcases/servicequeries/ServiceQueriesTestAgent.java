@@ -1,7 +1,6 @@
 package jadex.micro.testcases.servicequeries;
 
 import java.util.Collection;
-import java.util.Map;
 
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
@@ -20,12 +19,10 @@ import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Properties;
-import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.TestAgent;
@@ -67,7 +64,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 		{
 			ISubscriptionIntermediateFuture<IExampleService> queryfut = rsf.addQuery(
 				new ServiceQuery<>(IExampleService.class, local? ServiceScope.APPLICATION: ServiceScope.GLOBAL));
-			queryfut.addResultListener(new IIntermediateResultListener<IExampleService>()
+			queryfut.addResultListener(new IntermediateEmptyResultListener<IExampleService>()
 			{
 				int num = 0;
 				public void exceptionOccurred(Exception exception)

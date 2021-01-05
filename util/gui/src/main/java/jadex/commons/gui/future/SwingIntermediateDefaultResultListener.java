@@ -61,6 +61,11 @@ public abstract class SwingIntermediateDefaultResultListener<E> extends SwingDef
     {
     	// Empty default implementation.
     }
+    
+    public void customMaxResultCountAvailable(int max)
+    {
+    	// Empty default implementation.
+    }
 
     //-------- methods --------
 	/**
@@ -87,6 +92,17 @@ public abstract class SwingIntermediateDefaultResultListener<E> extends SwingDef
 			public void run()
 			{
 				customFinished();
+			}
+		});
+	}
+	
+	public void maxResultCountAvailable(int max) 
+	{
+		SGUI.invokeLaterSimBlock(new Runnable()
+		{
+			public void run()
+			{
+				customMaxResultCountAvailable(max);
 			}
 		});
 	}

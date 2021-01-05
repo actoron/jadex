@@ -52,6 +52,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -106,16 +107,8 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			delayedremotequeries = new ArrayList<>();
 			
 			ISubscriptionIntermediateFuture<ISearchQueryManagerService> sqmsfut = addQuery(query);
-			sqmsfut.addResultListener(new IIntermediateResultListener<ISearchQueryManagerService>()
+			sqmsfut.addResultListener(new IntermediateEmptyResultListener<ISearchQueryManagerService>()
 			{
-				public void resultAvailable(Collection<ISearchQueryManagerService> result)
-				{
-				}
-
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-
 				public void intermediateResultAvailable(ISearchQueryManagerService result)
 				{
 					//System.out.println("ISearchQueryManagerService "+result);
@@ -130,10 +123,6 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 						}
 						delayedremotequeries = null;
 					}
-				}
-
-				public void finished()
-				{
 				}
 			});
 		}
@@ -478,12 +467,8 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		
 		ISubscriptionIntermediateFuture<T> queryfut = addQuery(query);
 		
-		queryfut.addResultListener(new IIntermediateResultListener<T>()
+		queryfut.addResultListener(new IntermediateEmptyResultListener<T>()
 		{
-			public void resultAvailable(Collection<T> result)
-			{
-			}
-
 			public void exceptionOccurred(Exception exception)
 			{
 				ret.setExceptionIfUndone(exception);
@@ -494,10 +479,6 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 				ret.setResultIfUndone(result);
 				queryfut.terminate();
 			}
-
-			public void finished()
-			{
-			}
 		});
 		
 		long to = timeout;
@@ -505,7 +486,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		
 		if(to>0)
 		{
-			component.waitForDelay(timeout, true).thenAccept(done -> 
+			component.waitForDelay(timeout, true).then(done -> 
 			{
 				Multiplicity m = query.getMultiplicity();
 				if(m.getFrom()>0)
@@ -563,6 +544,11 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			{
 				ret.setFinishedIfUndone();
 			}
+			
+			public void maxResultCountAvailable(int max) 
+			{
+				ret.setMaxResultCount(max);
+			}
 		});
 		
 		long to = timeout;
@@ -570,7 +556,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		
 		if(to>0)
 		{
-			component.waitForDelay(timeout, true).thenAccept(done -> 
+			component.waitForDelay(timeout, true).then(done -> 
 			{
 				Exception e;
 				Multiplicity m = query.getMultiplicity();
@@ -1184,14 +1170,14 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		// Add remote results to future (functionality handles wrapping)
 		if(remotes!=null)
 		{
-			remotes.addIntermediateResultListener(
+			remotes.next(
 				result->
 				{
 					@SuppressWarnings("unchecked")
 					IntermediateFuture<T> fut = (IntermediateFuture<T>)ret[0];
 					fut.addIntermediateResultIfUndone(result);
-				},
-				exception -> {}); // Ignore exception (printed when no listener supplied)
+				})
+			.catchErr(exception -> {}); // Ignore exception (printed when no listener supplied)
 		}
 		
 		return ret[0];

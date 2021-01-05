@@ -25,6 +25,9 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     /** Flag if results should be stored till first listener is. */
     protected boolean storeforfirst = true;
 	
+    /** The number of results. */
+    protected int resultssize;
+    
 	/**
 	 *  Create a new future.
 	 */
@@ -54,6 +57,8 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 		
 		//System.out.println("store: "+result+" "+storeforfirst+" "+ownresults);
 		
+		resultssize++;
+		
 		// Store results only if necessary for first listener.
 		if(storeforfirst)
 		{
@@ -73,6 +78,15 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 		resumeIntermediate();
 		return ret;
 	}
+	
+    /** 
+     *  Get the number of results already collected.
+     *  @return The number of results.
+     */
+    protected int getResultCount()
+    {
+    	return resultssize;
+    }
 	
 	/**
 	 *  Add a listener which is only informed about new results,

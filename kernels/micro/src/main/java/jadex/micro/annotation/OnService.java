@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 import jadex.commons.Boolean3;
 
 /**
- * 
+ *  Annotate fields and methods that will be called when the corresponding services are available.
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

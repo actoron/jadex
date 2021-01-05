@@ -84,7 +84,7 @@ public class CallSequentializer<T>
 		if(currentcall==null)
 		{
 			currentcall = call.execute(args);
-			currentcall.addResultListener(res -> {proceed();}, ex -> {proceed();});
+			currentcall.then(res -> proceed()).catchErr(ex -> {proceed();});
 			return currentcall;
 		}
 		else
@@ -108,7 +108,7 @@ public class CallSequentializer<T>
 			IResultCommand<IFuture<T>, Object[]> call = commands.get(next.getFirstEntity()); 
 			IFuture<T> fut = call.execute(next.getSecondEntity());
 			fut.addResultListener(new DelegationResultListener<T>(next.getThirdEntity()));
-			fut.addResultListener(res -> {proceed();}, ex -> {proceed();});
+			fut.then(res -> proceed()).catchErr(ex -> {proceed();});
 		}
 		else
 		{

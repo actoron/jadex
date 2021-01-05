@@ -32,8 +32,8 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IPullIntermediateFuture;
 import jadex.commons.future.IPullSubscriptionIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.Result;
@@ -262,7 +262,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 						System.out.println("Invoking");
 						IPullIntermediateFuture<String> fut = service.getResultsA(max);
 						
-						fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
+						fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<String>()
 						{
 							protected List<String> res = new ArrayList<String>();
 							
@@ -361,7 +361,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 						System.out.println("Invoking B");
 						IPullSubscriptionIntermediateFuture<String> fut2 = service.getResultsB(max);
 						
-						fut2.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
+						fut2.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<String>()
 						{
 							protected List<String> res = new ArrayList<String>();
 							

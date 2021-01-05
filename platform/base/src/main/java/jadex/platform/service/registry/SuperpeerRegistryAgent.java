@@ -34,6 +34,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
@@ -210,25 +211,12 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 		Set<IServiceRegistry> peercaches = getApplicablePeers(query);
 		for (IServiceRegistry peercache : peercaches)
 		{
-			peercache.addQuery(query).addResultListener(new IIntermediateResultListener<T>()
+			peercache.addQuery(query).addResultListener(new IntermediateEmptyResultListener<T>()
 			{
-				public void resultAvailable(Collection<T> result)
-				{
-				}
-
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-
 				public void intermediateResultAvailable(T result)
 				{
 					ret.addIntermediateResultIfUndone(result);
 				}
-
-				public void finished()
-				{
-				}
-				
 			});
 		}
 		
@@ -240,13 +228,8 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			}
 		});
 		
-		serviceregistry.addQuery(query).addResultListener(new IIntermediateResultListener<T>()
+		serviceregistry.addQuery(query).addResultListener(new IntermediateEmptyResultListener<T>()
 		{
-
-			public void resultAvailable(Collection<T> result)
-			{
-			}
-
 			public void exceptionOccurred(Exception exception)
 			{
 				finished();
@@ -347,36 +330,20 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			{
 				if (query.getNetworkNames() == null || !Collections.disjoint(nwnames, Arrays.asList(queryinfo.getQuery().getNetworkNames())))
 				{
-					regcache.addQuery(queryinfo.getQuery()).addResultListener(new IIntermediateResultListener()
+					regcache.addQuery(queryinfo.getQuery()).addResultListener(new IntermediateEmptyResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
 							TerminableIntermediateFuture fut = queryinfo.getFuture();
 							fut.addIntermediateResultIfUndone(result);
 						}
-
-						public void exceptionOccurred(Exception exception)
-						{
-						}
-
-						public void intermediateResultAvailable(Object result)
-						{
-						}
-
-						public void finished()
-						{
-						}
 					});
 				}
 			}
 		}
 		
-		sub.addResultListener(new IIntermediateResultListener<ServiceEvent<IServiceIdentifier>>()
+		sub.addResultListener(new IntermediateEmptyResultListener<ServiceEvent<IServiceIdentifier>>()
 		{
-			public void resultAvailable(Collection<ServiceEvent<IServiceIdentifier>> result)
-			{
-			}
-			
 			public void exceptionOccurred(Exception exception)
 			{
 				finished();
@@ -389,7 +356,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			
 			public void finished()
 			{
-				for (String nwname : nwnames)
+				for(String nwname : nwnames)
 					peercaches.removeObject(nwname, regcache);
 				regcache.removeServices(null);
 			}

@@ -60,6 +60,7 @@ import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
@@ -1228,9 +1229,7 @@ public class ChatService implements IChatService, IChatGuiService
 		{
 			// Enable sending
 			if(ret!=null)
-			{
 				ret.addIntermediateResult(Long.valueOf(0));
-			}
 			
 			final FileOutputStream fos = new FileOutputStream(ti.getFilePath());
 			final ITerminableIntermediateFuture<Long> fut = con.writeToOutputStream(fos, agent.getExternalAccess());
@@ -1286,6 +1285,11 @@ public class ChatService implements IChatService, IChatGuiService
 					transfers2.remove(ti.getId());
 					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 				}
+				
+				public void maxResultCountAvailable(int max) 
+				{
+					ret.setMaxResultCount(max);
+				}
 			});
 		}
 		catch(Exception e)
@@ -1323,7 +1327,7 @@ public class ChatService implements IChatService, IChatGuiService
 			
 			final ISubscriptionIntermediateFuture<Long> fut = ocon.writeFromInputStream(is, agent.getExternalAccess());
 
-			fut.addResultListener(new IIntermediateResultListener<Long>()
+			fut.addResultListener(new IntermediateEmptyResultListener<Long>()
 			{
 				public void resultAvailable(Collection<Long> result)
 				{

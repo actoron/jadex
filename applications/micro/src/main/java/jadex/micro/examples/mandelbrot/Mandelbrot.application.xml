@@ -26,30 +26,30 @@
 	</componenttypes>
 	
 	<services>
-		<providedservice class="IGenerateService">
+		<!-- <providedservice class="IGenerateService">
 			<implementation>
 				<binding create="true">
 					<creationinfo type="Generator"/>
 				</binding>
-			</implementation>
-		</providedservice>
+			</implementation> 
+		</providedservice> -->
 		<!-- <providedservice class="ICalculateService">
 			<binding componenttype="Calculator"/>
 		</providedservice> -->
-		<providedservice class="IDisplayService">
+		<!-- <providedservice class="IDisplayService">
 			<implementation>
 				<binding create="true">
 					<creationinfo type="Display"/>
 				</binding>
 			</implementation>
-		</providedservice>
+		</providedservice> -->
 		
-		<providedservice class="IMandelbrotService">
+		<!-- <providedservice class="IMandelbrotService">
 			<implementation class="MandelbrotService"/>
-		</providedservice>
-		<providedservice class="IAppProviderService">
+		</providedservice> -->
+		<!-- <providedservice class="IAppProviderService">
 			<implementation class="AppProviderService"/>
-		</providedservice>
+		</providedservice> -->
 	</services>
 	
 	<configurations>
@@ -64,7 +64,7 @@
 				<component type="Display"/>
 			</components>
 		</configuration>
-		<configuration name="Only Generator">
+		<!-- <configuration name="Only Generator">
 			<components>
 				<component type="Generator">
 					<arguments>
@@ -72,8 +72,8 @@
 					</arguments>
 				</component>
 			</components>
-		</configuration>
-		<configuration name="Only Calculators">
+		</configuration>  --> 
+		<!-- <configuration name="Only Calculators">
 			<components>
 				<component type="Calculator" number="10">
 					<arguments>
@@ -81,7 +81,7 @@
 					</arguments>
 				</component>
 			</components>
-		</configuration>
+		</configuration>-->
 		<!-- <configuration name="Test Config 1">
 			<arguments>
 				<argument name="delay">1000L</argument>

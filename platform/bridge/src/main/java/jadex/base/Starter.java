@@ -1502,7 +1502,7 @@ public class Starter
 		});
 		
 		component.create(cci, features);
-		component.init().thenAccept(x ->
+		component.init().then(x ->
 		{
 			//long end = System.currentTimeMillis();
 			//System.out.println("init took "+(end-start)+" ms, thread: "+Thread.currentThread());
@@ -1513,7 +1513,7 @@ public class Starter
 			
 			// Shutdown is called via killComponent()
 			//component.shutdown().get();
-		}).exceptionally(ret);
+		}).catchErr(ret);
 		
 		return ret;
 	}

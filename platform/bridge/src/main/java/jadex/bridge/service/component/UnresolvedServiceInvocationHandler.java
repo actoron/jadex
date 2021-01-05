@@ -49,11 +49,11 @@ public class UnresolvedServiceInvocationHandler implements InvocationHandler
 			{
 				@SuppressWarnings("unchecked")
 				IFuture<IService> fut = (IFuture<IService>) ia.searchService(query, 0);
-				fut.thenAccept(serv ->
+				fut.then(serv ->
 				{
 					delegate = serv;
 					delegatefut = null;
-				}).exceptionally(e -> delegatefut = null);
+				}).catchErr(e -> delegatefut = null);
 				delegatefut = (IFuture<IService>) fut;
 			}
 			if (!SReflect.isSupertype(IFuture.class, method.getReturnType()))

@@ -57,7 +57,8 @@ public class ClientAgent
 		clientFrame.setVisible(true);
 		CDListModel listmodel = clientFrame.getListmodel();
 		
-		searchCdServices().addIntermediateResultListener(cdService -> {
+		//searchCdServices().addIntermediateResultListener(cdService -> {
+		searchCdServices().next(cdService -> {
 			System.out.println("Service found: " + cdService + " of class: " + cdService.getClass().getName());
 			CDListItem item = new CDListItem(cdService);
 			item.setStatus(cdService.getState().get());
@@ -71,9 +72,12 @@ public class ClientAgent
 	private ISubscriptionIntermediateFuture<ICountdownService> searchCdServices()
 	{
 		IIntermediateFuture<ICountdownService> searchServices = access.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ICountdownService.class, ServiceScope.GLOBAL));
-		searchServices.addIntermediateResultListener(cdService -> {
+		//searchServices.addIntermediateResultListener(cdService -> {
+		searchServices.next(cdService -> 
+		{
 			subscription.addIntermediateResult(cdService);
-		}, () -> {
+		}).finished(Void -> 
+		{
 			System.out.println("Search finished. Re-scheduling search.");
 
 			access.getFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()

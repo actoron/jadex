@@ -28,10 +28,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -153,9 +153,9 @@ public class JCCRegistryViewAgent extends JCCPluginAgent implements IJCCRegistry
 		for(final ITransportInfoService tis: agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITransportInfoService.class)))
 		{
 			ISubscriptionIntermediateFuture<PlatformData>	fut	= tis.subscribeToConnections();
-			fut.addResultListener(new IIntermediateResultListener<PlatformData>()	// Do not use delegation listener (ignore forward commands like update timer)
+			fut.addResultListener(new IntermediateEmptyResultListener<PlatformData>()	// Do not use delegation listener (ignore forward commands like update timer)
 			{
-				@Override
+				/*@Override
 				public void exceptionOccurred(Exception exception)
 				{
 //					System.out.println("status ex: "+exception);
@@ -167,7 +167,7 @@ public class JCCRegistryViewAgent extends JCCPluginAgent implements IJCCRegistry
 				{
 //					System.out.println("status fini: "+tis);
 					//ignore
-				}
+				}*/
 				
 				@Override
 				public void intermediateResultAvailable(PlatformData result)

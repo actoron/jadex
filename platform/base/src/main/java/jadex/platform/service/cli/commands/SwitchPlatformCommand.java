@@ -13,7 +13,7 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
@@ -81,8 +81,8 @@ public class SwitchPlatformCommand extends ACliCommand
 		{
 			final IComponentIdentifier cid = new ComponentIdentifier((String)args.get(null));
 			
-			comp.searchServices( new ServiceQuery<>(IInternalCliService.class, ServiceScope.GLOBAL))
-				.addResultListener(new IIntermediateResultListener<IInternalCliService>()
+			comp.searchServices(new ServiceQuery<>(IInternalCliService.class, ServiceScope.GLOBAL))
+				.addResultListener(new IntermediateEmptyResultListener<IInternalCliService>()
 			{
 				boolean found = false;
 				public void intermediateResultAvailable(final IInternalCliService cliser)

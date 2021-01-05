@@ -703,7 +703,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						if(SSimulation.addBlocker(ret))
 						{
 							ia.waitForDelay(Starter.getScaledDefaultTimeout(ia.getId(), 0.5), true)
-								.addResultListener(v ->
+								.then(v ->
 							{
 								if(!ret.isDone())
 								{

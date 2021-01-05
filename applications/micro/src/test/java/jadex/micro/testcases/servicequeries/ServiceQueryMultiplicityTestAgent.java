@@ -13,15 +13,14 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.MultiplicityException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.Result;
@@ -66,7 +65,7 @@ public class ServiceQueryMultiplicityTestAgent extends TestAgent
 			
 			Future<Void> waitfut = new Future<>();
 			
-			queryfut.addResultListener(new IIntermediateResultListener<IExampleService>()
+			queryfut.addResultListener(new IntermediateEmptyResultListener<IExampleService>()
 			{
 				int num = 0;
 				public void exceptionOccurred(Exception exception)
@@ -140,7 +139,7 @@ public class ServiceQueryMultiplicityTestAgent extends TestAgent
 
 			long start = System.currentTimeMillis();
 			if(!queryfut.isDone())
-				agent.getFeature(IExecutionFeature.class).waitForDelay(local? 1000: 11000, true).thenAccept(v -> waitfut.setResultIfUndone(null));
+				agent.getFeature(IExecutionFeature.class).waitForDelay(local? 1000: 11000, true).then(v -> waitfut.setResultIfUndone(null));
 			
 			waitfut.get();
 			queryfut.terminate();

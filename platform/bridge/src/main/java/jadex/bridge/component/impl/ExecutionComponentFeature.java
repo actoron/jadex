@@ -79,6 +79,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.ThreadLocalTransferHelper;
@@ -295,7 +296,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
 			if(endagenda.isDone() && prio<STEP_PRIORITY_IMMEDIATE)
 			{
-				System.out.println("step: "+step);
+				//System.out.println("step: "+step);
 				ret.setExceptionIfUndone(new ComponentTerminatedException(getComponent().getId()));
 			}
 			else
@@ -1480,7 +1481,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getFeature0(IMonitoringComponentFeature.class)!=null && 
 						getComponent().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 					{
-						stepfut.thenAccept(new Consumer<Object>()
+						stepfut.then(new Consumer<Object>()
 						{
 							@Override
 							public void accept(Object t)
@@ -2242,7 +2243,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 								public void resultAvailable(Void result)
 								{
 									@SuppressWarnings({ "rawtypes" })
-									IIntermediateResultListener rs = new IIntermediateResultListener()
+									IIntermediateResultListener rs = new IntermediateEmptyResultListener()
 									{
 										public void resultAvailable(Object result)
 										{
@@ -2251,9 +2252,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 										public void exceptionOccurred(Exception exception)
 										{
 											resultAvailable(null);
-										}
-										public void intermediateResultAvailable(Object result)
-										{
 										}
 										public void finished()
 										{

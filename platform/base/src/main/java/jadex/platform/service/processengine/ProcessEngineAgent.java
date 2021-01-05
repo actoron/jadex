@@ -47,10 +47,10 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -60,7 +60,6 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -523,7 +522,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		ISubscriptionIntermediateFuture<CMSStatusEvent> fut = agent.createComponentWithEvents(info);
 		fut.addResultListener(new ConversionListener(new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid()), det.getFuture())); // Add converion listener for addmodel() future 
 		
-		fut.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+		fut.addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 		{
 			public void intermediateResultAvailable(CMSStatusEvent result)
 			{
@@ -534,18 +533,10 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 				}
 			}
 			
-			public void resultAvailable(Collection<CMSStatusEvent> result)
-			{
-			}
-			
 			public void exceptionOccurred(Exception exception)
 			{
 				exception.printStackTrace();
 				cont();
-			}
-			
-			public void finished()
-			{
 			}
 			
 			protected void cont()

@@ -54,7 +54,8 @@ public class STest
 		
         config.getExtendedPlatformConfiguration().setSimul(true); // start simulation component
         config.getExtendedPlatformConfiguration().setSimulation(true);
-        //config.setDefaultTimeout(-1);
+        
+		//config.setDefaultTimeout(-1);
 //        config.setValue("bisimulation", true);
         
         config.setValue("settings.readonly", true);

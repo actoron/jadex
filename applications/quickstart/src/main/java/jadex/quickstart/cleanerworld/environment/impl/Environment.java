@@ -13,7 +13,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CMSStatusEvent.CMSTerminatedEvent;
 import jadex.bridge.service.types.cms.SComponentManagementService;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.quickstart.cleanerworld.environment.ILocationObject;
 
 /**
@@ -110,7 +110,7 @@ public class Environment
 		{
 			// Remove on agent kill.
 			SComponentManagementService.listenToComponent(cid, agent)
-				.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+				.addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 			{
 				@Override
 				public void intermediateResultAvailable(CMSStatusEvent cse)
@@ -122,21 +122,6 @@ public class Environment
 							cleaners.remove(cid);
 						}
 					}
-				}
-				
-				@Override
-				public void finished()
-				{
-				}
-				
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-				
-				@Override
-				public void resultAvailable(Collection<CMSStatusEvent> result)
-				{
 				}
 			});
 		}

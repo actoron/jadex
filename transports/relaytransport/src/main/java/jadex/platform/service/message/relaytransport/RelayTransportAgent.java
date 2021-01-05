@@ -49,21 +49,19 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentFeature;
-import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
 import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
 import jadex.platform.service.transport.AbstractTransportAgent;
 
 /**
@@ -204,7 +202,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		
 		ServiceQuery<IRoutingService> query = new ServiceQuery<>(IRoutingService.class);
 		query.setScope(ServiceScope.GLOBAL).setExcludeOwner(true);//.setServiceTags("forwarding=true");
-		agent.getFeature(IRequiredServicesFeature.class).addQuery(query).addResultListener(new IIntermediateResultListener<IRoutingService>()
+		agent.getFeature(IRequiredServicesFeature.class).addQuery(query).addResultListener(new IntermediateEmptyResultListener<IRoutingService>()
 		{
 			public void intermediateResultAvailable(IRoutingService result)
 			{
@@ -215,20 +213,12 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				relayupdatefuture = new Future<>();
 			}
 
-			public void resultAvailable(Collection<IRoutingService> result)
-			{
-			}
-
 			public void exceptionOccurred(Exception exception)
 			{
 				if(!ret.setExceptionIfUndone(exception))
 				{
 					agent.killComponent(exception);
 				}
-			}
-
-			public void finished()
-			{
 			}
 		});
 		
@@ -376,17 +366,9 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		}
 		
 		final IComponentIdentifier ffwdest = fwdest;
-		discoverRoute(fwdest, new LinkedHashSet<IComponentIdentifier>()).addResultListener(new IIntermediateResultListener<Integer>()
+		discoverRoute(fwdest, new LinkedHashSet<IComponentIdentifier>()).addResultListener(new IntermediateEmptyResultListener<Integer>()
 		{
 			boolean notsent = true;
-			
-			public void exceptionOccurred(Exception exception)
-			{
-			}
-			
-			public void resultAvailable(Collection<Integer> result)
-			{
-			}
 			
 			public void intermediateResultAvailable(Integer result)
 			{
@@ -528,7 +510,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 						if (!hops.contains(relplat))
 						{
 							hops.add(relplat);
-							getRoutingService(getRtComponent(relplat)).discoverRoute(destination, hops).addResultListener(new IIntermediateResultListener<Integer>()
+							getRoutingService(getRtComponent(relplat)).discoverRoute(destination, hops).addResultListener(new IntermediateEmptyResultListener<Integer>()
 							{
 								public void intermediateResultAvailable(Integer result)
 								{
@@ -872,7 +854,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				{
 					if (debug)
 						System.out.println(agent + " forwarding: " + header);
-					forwardMessage(header, (byte[]) msg).exceptionally(e ->
+					forwardMessage(header, (byte[]) msg).catchErr(e ->
 					{
 						// Failed to forward on intermediary node (prob. lost route), nothing can be done to salvage the situation...
 						// TODO: Inform sender transmission has failed if possible.

@@ -1,7 +1,6 @@
 package jadex.platform;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +19,7 @@ import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CMSStatusEvent.CMSTerminatedEvent;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.javaparser.SJavaParser;
 
 /**
@@ -125,18 +124,8 @@ public class PlatformsTest //extends TestCase
 			
 			final Future<Void>	fut	= new Future<Void>();
 			
-			platform.listenToComponent().addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+			platform.listenToComponent().addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 			{
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-				
-				@Override
-				public void resultAvailable(Collection<CMSStatusEvent> result)
-				{
-				}
-				
 				@Override
 				public void intermediateResultAvailable(CMSStatusEvent result)
 				{
@@ -144,11 +133,6 @@ public class PlatformsTest //extends TestCase
 					{
 						fut.setResult(null);
 					}
-				}
-				
-				@Override
-				public void finished()
-				{
 				}
 			});
 			

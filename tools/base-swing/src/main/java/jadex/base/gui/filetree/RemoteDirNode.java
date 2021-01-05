@@ -19,9 +19,9 @@ import jadex.bridge.service.types.filetransfer.BunchFileData;
 import jadex.bridge.service.types.filetransfer.FileData;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.SortedList;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 
@@ -60,7 +60,7 @@ public class RemoteDirNode extends RemoteFileNode
 //		System.out.println("searchChildren: "+file.getFilename());
 		
 		final List nodes = new SortedList(DirNode.FILENODE_COMPARATOR, true);
-		listFiles().addResultListener(new SwingIntermediateResultListener<FileData>(new IIntermediateResultListener<FileData>()
+		listFiles().addResultListener(new SwingIntermediateResultListener<FileData>(new IntermediateEmptyResultListener<FileData>()
 		{
 			Map<String, Collection<FileData>> rjfentries = new LinkedHashMap<String, Collection<FileData>>();
 			List<FileData> entries = new ArrayList<FileData>();

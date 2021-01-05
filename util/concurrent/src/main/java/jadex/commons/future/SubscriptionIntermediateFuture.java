@@ -25,6 +25,9 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	
     /** Flag if results should be stored till first listener is added. */
     protected boolean storeforfirst;
+    
+    /** The number of results. */
+    protected int resultssize;
 	
 	//-------- constructors --------
 
@@ -76,6 +79,9 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	protected boolean storeResult(E result)
 	{
 		boolean ret = false;
+		
+		resultssize++;
+		
 		// Store results only if necessary for first listener.
 		if(storeforfirst)
 		{
@@ -95,6 +101,15 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 		resumeIntermediate();
 		return ret;
 	}
+	
+	/** 
+     *  Get the number of results already collected.
+     *  @return The number of results.
+     */
+    protected int getResultCount()
+    {
+    	return resultssize;
+    }
 	
 	/**
 	 *  Add a listener which is only informed about new results,

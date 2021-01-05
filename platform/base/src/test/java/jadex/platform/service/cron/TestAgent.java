@@ -24,6 +24,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
@@ -98,7 +99,7 @@ public class TestAgent
 			"0 0 1 1 *"
 		};
 		
-		testPatterns(patterns).addResultListener(new IIntermediateResultListener<TestReport>()
+		testPatterns(patterns).addResultListener(new IntermediateEmptyResultListener<TestReport>()
 		{
 			protected List<TestReport> trs = new ArrayList<TestReport>();
 			
@@ -347,6 +348,13 @@ public class TestAgent
 		public void exceptionOccurred(Exception exception)
 		{
 			exception.printStackTrace();
+		}
+		
+		/**
+		 * 
+		 */
+		public void maxResultCountAvailable(int max) 
+		{
 		}
 	};
 }

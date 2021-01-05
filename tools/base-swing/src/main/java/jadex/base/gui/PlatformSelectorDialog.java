@@ -31,6 +31,7 @@ import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 
@@ -102,17 +103,12 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 		});
 		
 		cmslistener	= cmshandler.addCMSListener(access.getId().getRoot());
-		cmslistener.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+		cmslistener.addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 		{
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
 				System.out.println("Exception occurred: "+exception);
-			}
-
-			@Override
-			public void resultAvailable(Collection<CMSStatusEvent> result)
-			{
 			}
 
 			@Override
@@ -167,11 +163,6 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 					});
 				}
 			}
-
-			@Override
-			public void finished()
-			{
-			}
 		});
 		
 		final Runnable action = new Runnable()
@@ -185,7 +176,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 				((DefaultListModel)pllist.getModel()).add(0, self);
 				
 				access.searchServices( new ServiceQuery<>(IProxyAgentService.class, ServiceScope.PLATFORM))
-					.addResultListener(new SwingIntermediateResultListener<IProxyAgentService>(new IIntermediateResultListener<IProxyAgentService>()
+					.addResultListener(new SwingIntermediateResultListener<IProxyAgentService>(new IntermediateEmptyResultListener<IProxyAgentService>()
 				{
 					public void intermediateResultAvailable(final IProxyAgentService ser)
 					{
@@ -193,10 +184,10 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 						addPlatform(ser);
 					}
 					
-					public void finished()
-					{
-//						System.out.println("fini");
-					}
+//					public void finished()
+//					{
+////						System.out.println("fini");
+//					}
 					
 					public void resultAvailable(Collection<IProxyAgentService> result)
 					{

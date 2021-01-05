@@ -193,6 +193,10 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 			muldis.serviceSearchFinished(); // todo: propagate ex?
 //			setException(exception);
 		}
+		
+		public void maxResultCountAvailable(int max) 
+		{
+		}
 	}
 	
 	/**

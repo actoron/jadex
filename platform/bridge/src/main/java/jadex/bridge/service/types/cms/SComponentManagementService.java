@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.base.Starter;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentCreationException;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.FactoryFilter;
@@ -83,6 +83,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.Tuple2Future;
@@ -1855,7 +1856,7 @@ public class SComponentManagementService
 			IComponentIdentifier cid = component.getInternalAccess().getId();
 			
 			IArgumentsResultsFeature af = component.getInternalAccess().getFeature0(IArgumentsResultsFeature.class);
-			IResultListener<Collection<Tuple2<String, Object>>>	rl = new IIntermediateResultListener<Tuple2<String, Object>>()
+			IResultListener<Collection<Tuple2<String, Object>>>	rl = new IntermediateEmptyResultListener<Tuple2<String, Object>>()
 			{
 				public void exceptionOccurred(final Exception exception)
 				{
@@ -2378,6 +2379,11 @@ public class SComponentManagementService
 			{
 				ret.addIntermediateResultIfUndone(new CMSTerminatedEvent(SComponentManagementService.getDescription(mycid[0]), results, exception));
 				ret.setExceptionIfUndone(exception);
+			}
+			
+			public void maxResultCountAvailable(int max) 
+			{
+				ret.setMaxResultCount(max);
 			}
 		}, agent).addResultListener(new IResultListener<IComponentIdentifier>()
 		{

@@ -81,6 +81,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
@@ -583,18 +584,13 @@ public class VisualProcessViewPanel extends JPanel
 			});
 			
 			cmshandler.addCMSListener(access.getId())
-				.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+				.addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 			{
 
 				@Override
 				public void exceptionOccurred(Exception exception)
 				{
 					System.out.println("Exception occurred: "+exception);
-				}
-
-				@Override
-				public void resultAvailable(Collection<CMSStatusEvent> result)
-				{
 				}
 
 				@Override
@@ -690,14 +686,6 @@ public class VisualProcessViewPanel extends JPanel
 						// nop, component can be terminated
 					}
 				}
-
-				@Override
-				public void finished()
-				{
-					// TODO Auto-generated method stub
-					
-				}
-				
 			});
 		}
 		catch(Exception e)

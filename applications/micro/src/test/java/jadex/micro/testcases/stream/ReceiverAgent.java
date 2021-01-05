@@ -10,8 +10,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.context.IContextService;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentServiceSearch;
@@ -72,7 +72,7 @@ public class ReceiverAgent
 			final FileOutputStream fos = new FileOutputStream(f);
 			
 			ISubscriptionIntermediateFuture<byte[]> fut = ((IInputConnection)con).aread();
-			fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<byte[]>()
+			fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<byte[]>()
 			{
 				public void resultAvailable(Collection<byte[]> result)
 				{

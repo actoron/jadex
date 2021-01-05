@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.jar.JarEntry;
 
 import jadex.commons.IFilter;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.SDirScan;
 
 /**
@@ -49,7 +49,7 @@ public class ScanTest
 //		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
 		
 		SDirScan.asyncScanForClasses(ScanTest.class.getClassLoader(), filefilter, classfilter, -1, true)
-			.addResultListener(new IIntermediateResultListener<Class<?>>()
+			.addResultListener(new IntermediateEmptyResultListener<Class<?>>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
