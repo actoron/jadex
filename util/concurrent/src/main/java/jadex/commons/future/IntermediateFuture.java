@@ -5,12 +5,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
@@ -228,7 +226,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     {
     	//if(done.contains(this.toString()))
     	//	System.out.println("setFini: "+this);
-    	done.add(this.toString());
+    	//done.add(this.toString());
     	//Thread.currentThread().dumpStack();
     	doSetFinished(false);
     	
