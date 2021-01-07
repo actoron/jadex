@@ -297,9 +297,14 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		}
 		ISubscriptionIntermediateFuture<IMarkerService>	sub	= client.addQuery(new ServiceQuery<>(IMarkerService.class, global ? ServiceScope.GLOBAL : ServiceScope.NETWORK));
 		IExternalAccess	agent	= marker.addComponent(global ? new GlobalMarkerAgent() : new NetworkMarkerAgent()).get();
-		while(!agent.getId().equals(((IService)sub.getNextIntermediateResult()).getServiceId().getProviderId()))
+		IComponentIdentifier	found;
+		do
 		{
+			found	= ((IService)sub.getNextIntermediateResult()).getServiceId().getProviderId();
+			System.out.println("Found marker: "+found+"; expecting: "+agent.getId());
 		}
+		while(!agent.getId().equals(found));
+			
 		agent.killComponent().get();
 	}
 	
