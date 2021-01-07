@@ -261,7 +261,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			Assert.assertEquals(""+result, 2, result.size());
 			
 			// 7) kill one provider platform, search for service -> test if remote disconnection and service removal works
-			System.out.println("7) kill one provider platform, search for service");
+			System.out.println("7) kill provider platform"+pro1.getId()+", search for service");
 			removePlatform(pro1);
 			waitForRegistryClient(client, false);
 			waitALittle(client);	// Hack for timeout in CI Pipeline!?
