@@ -17,6 +17,7 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.Boolean3;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -70,7 +71,7 @@ public class ServiceQueryMultiplicityTestAgent extends TestAgent
 				int num = 0;
 				public void exceptionOccurred(Exception exception)
 				{
-					tr.setFailed("Exception: "+exception);
+					tr.setFailed(SUtil.getExceptionStacktrace(exception));
 //					if(exception instanceof MultiplicityException)
 //					{
 //						if(num==max)
@@ -136,10 +137,10 @@ public class ServiceQueryMultiplicityTestAgent extends TestAgent
 			}
 			
 			// Wait for completion of query fut (or some timeout)
-
+			
 			long start = System.currentTimeMillis();
 			if(!queryfut.isDone())
-				agent.getFeature(IExecutionFeature.class).waitForDelay(local? 1000: 11000, true).then(v -> waitfut.setResultIfUndone(null));
+				agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledDefaultTimeout(agent.getId().getRoot(), 0.9), true).then(v -> waitfut.setResultIfUndone(null));
 			
 			waitfut.get();
 			queryfut.terminate();

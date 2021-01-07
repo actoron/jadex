@@ -16,7 +16,6 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITuple2Future;
 
 /**
  *  Test if a component can be started.
