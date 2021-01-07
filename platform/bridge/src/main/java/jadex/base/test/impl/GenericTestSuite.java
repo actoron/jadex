@@ -23,9 +23,8 @@ public abstract class GenericTestSuite extends TestSuite implements IAbortableTe
 
 	private IPlatformConfiguration		config;
 
-	private String[]					components;
 
-	public GenericTestSuite(Class... clazzes)
+	public GenericTestSuite(Class<?>... clazzes)
 	{
 		this(false, clazzes);
 	}
@@ -35,7 +34,7 @@ public abstract class GenericTestSuite extends TestSuite implements IAbortableTe
 		this(false, components);
 	}
 
-	public GenericTestSuite(boolean justStartComponents, Class... clazzes)
+	public GenericTestSuite(boolean justStartComponents, Class<?>... clazzes)
 	{
 		this(justStartComponents, toName(clazzes));
 	}
@@ -43,7 +42,6 @@ public abstract class GenericTestSuite extends TestSuite implements IAbortableTe
 
 	public GenericTestSuite(boolean justStartComponents, String... components)
 	{
-		this.components = components;
 		this.config = STest.getLocalTestConfig(getClass());
 		for(String component : components)
 		{
@@ -70,7 +68,7 @@ public abstract class GenericTestSuite extends TestSuite implements IAbortableTe
 		this.config = config;
 	}
 
-	private static String[] toName(Class[] clazzes)
+	private static String[] toName(Class<?>[] clazzes)
 	{
 		String[] components = new String[clazzes.length];
 		for(int i = 0; i < clazzes.length; i++)

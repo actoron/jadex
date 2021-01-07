@@ -1,4 +1,4 @@
-apply plugin: 'maven-publish'
+//apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: 'de.marcphilipp.nexus-publish'
 
@@ -212,26 +212,28 @@ def createSignTask(origtask, classi, exten) {
 publishing {
 
     publications {
-        if(canSign)
-        { 
-        	// publish plugin requires each subproject having mavenJava
-        
-        	mavenJava(MavenPublication)
-        	{
-        		// Sign archives and pom in separate tasks as archive signing can be cached while pom signing cannot, when jadex version changes.
-        		createSignTask(generatePomFileForMavenJavaPublication, null, 'pom')
-        		
-        		// Disable generation of module.json
-        		tasks.matching { it.name == "generateMetadataFileFor${name.capitalize()}Publication" }.all {
-        			onlyIf { false }
-        		}
-        		
-	        	if(gradle.ext.webprojects.contains(project.getPath()))
-	            {
-        			from components.web
+    	// publish plugin requires each subproject having mavenJava
+    
+    	mavenJava(MavenPublication)
+    	{
+	        if(canSign)
+    		{ 
+    			// Sign archives and pom in separate tasks as archive signing can be cached while pom signing cannot, when jadex version changes.
+    			createSignTask(generatePomFileForMavenJavaPublication, null, 'pom')
+    		}
+    		
+    		// Disable generation of module.json
+    		tasks.matching { it.name == "generateMetadataFileFor${name.capitalize()}Publication" }.all {
+    			onlyIf { false }
+    		}
+    		
+        	if(gradle.ext.webprojects.contains(project.getPath()))
+            {
+    			from components.web
+		        if(canSign)
+		        { 
         			createSignTask(war, null, 'war')
-        			
-        			
+    			
                   	// default artifact is xyz.war so add xyz.jar xyz-sources.jar and xyz-javadoc.jar for maven central to be happy
         			project.tasks.withType(Jar) 
                     {
@@ -241,10 +243,13 @@ publishing {
                             createSignTask(it, arti.classifier, arti.extension)
                         }
                     }
-        		}
-        		else
-        		{
-        			from components.java
+                }
+    		}
+    		else
+    		{
+    			from components.java
+		        if(canSign)
+		        { 
         			createSignTask(jar, null, 'jar')
         			
                    	// add xyz-sources.jar and xyz-javadoc.jar for maven central to be happy
@@ -256,26 +261,26 @@ publishing {
                             createSignTask(it, arti.classifier, arti.extension)
                         }
                     }
-        		}
-        		
-        		//groupId group
-				groupId isCommercial(project) ? 'com.actoron.jadex' : 'org.activecomponents.jadex'
-				//artifactId project.name
-				artifactId getArtifactName(project)
-				//println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
-				version project.version
-				configurePom(pom)
-        	}
-		}
+                }
+    		}
+    		
+    		//groupId group
+			groupId isCommercial(project) ? 'com.actoron.jadex' : 'org.activecomponents.jadex'
+			//artifactId project.name
+			artifactId getArtifactName(project)
+			//println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
+			version project.version
+			configurePom(pom)
+    	}
 	}
-}
+//}
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
+//publishing {
+    //publications {
+    //    mavenJava(MavenPublication) {
+    //        from components.java
+    //    }
+    //}
     repositories {
         mavenLocal()
     }
