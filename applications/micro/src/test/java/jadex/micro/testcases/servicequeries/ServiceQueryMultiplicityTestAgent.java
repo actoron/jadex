@@ -28,6 +28,9 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.TestAgent;
 
+/**
+ *	Test a query with multiplicity to limit the number of results even when more services would be available. 
+ */
 @Agent(keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 // Todo: long timeouts really necessary?
