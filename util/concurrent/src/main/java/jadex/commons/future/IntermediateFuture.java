@@ -228,7 +228,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     {
     	//if(done.contains(this.toString()))
     	//	System.out.println("setFini: "+this);
-    	done.add(this.toString());
+    	//done.add(this.toString());
     	//Thread.currentThread().dumpStack();
     	doSetFinished(false);
     	
