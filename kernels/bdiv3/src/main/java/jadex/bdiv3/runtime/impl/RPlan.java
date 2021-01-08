@@ -896,7 +896,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public IFuture<Void> abort()
 	{
 		//if(agent.getId().toString().indexOf("Sokrates")!=-1)
-		//	System.out.println("aborting: "+this+" "+IComponentIdentifier.LOCAL.get()+" "+agent.getId());
+		//System.out.println("aborting: "+this+" "+IComponentIdentifier.LOCAL.get()+" "+agent.getId());
 		
 		if(!isFinishing())
 		{
