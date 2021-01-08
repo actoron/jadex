@@ -258,10 +258,10 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitForSuperpeerConnections(sp, pro1);
 			waitForRegistryClient(client, false);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals(""+result, 2, result.size());
+			Assert.assertEquals("found: "+result+", new platform: "+pro1.getId(), 2, result.size());
 			
 			// 7) kill one provider platform, search for service -> test if remote disconnection and service removal works
-			System.out.println("7) kill one provider platform, search for service");
+			System.out.println("7) kill provider platform"+pro1.getId()+", search for service");
 			removePlatform(pro1);
 			waitForRegistryClient(client, false);
 			waitALittle(client);	// Hack for timeout in CI Pipeline!?
@@ -297,9 +297,14 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		}
 		ISubscriptionIntermediateFuture<IMarkerService>	sub	= client.addQuery(new ServiceQuery<>(IMarkerService.class, global ? ServiceScope.GLOBAL : ServiceScope.NETWORK));
 		IExternalAccess	agent	= marker.addComponent(global ? new GlobalMarkerAgent() : new NetworkMarkerAgent()).get();
-		while(!agent.getId().equals(((IService)sub.getNextIntermediateResult()).getServiceId().getProviderId()))
+		IComponentIdentifier	found;
+		do
 		{
+			found	= ((IService)sub.getNextIntermediateResult()).getServiceId().getProviderId();
+			System.out.println("Found marker: "+found+"; expecting: "+agent.getId());
 		}
+		while(!agent.getId().equals(found));
+			
 		agent.killComponent().get();
 	}
 	
