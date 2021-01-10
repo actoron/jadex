@@ -711,7 +711,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			// Find parameter mappings for xml agents
 			// todo: goal-goal mappings
 			// Todo: unify mapping code with RPlan.createPlan()
-			if(rplan instanceof RPlan)// && rplan.isPassed()) -> also copy results from failed plan, if any (e.g. used for negotiation rounds in booktrading)
+			//if(rplan instanceof RPlan)// && rplan.isPassed()) -> also copy results from failed plan, if any (e.g. used for negotiation rounds in booktrading)
+			if(rplan instanceof RPlan && (rplan.isPassed() || rplan.isFailed())) 
 			{
 				MPlan mplan = (MPlan)((RPlan)rplan).getModelElement();
 				if(mplan.getParameters()!=null && mplan.getParameters().size()>0)
