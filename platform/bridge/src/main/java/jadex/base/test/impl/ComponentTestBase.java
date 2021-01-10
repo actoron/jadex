@@ -161,21 +161,21 @@ public class ComponentTestBase extends TestCase
 				}
 			});
 			Map<String, Object>	res	= null;
-			try
-			{
+//			try
+//			{
 				//System.out.println("WAIT FOR TESTCASE: "+cid[0]);
 				res	= finished.get();	// Timeout set by timer above -> no get timeout needed.
 				//System.out.println("TESTCASE FINISHED: "+cid[0]);
-			}
-			catch(TimeoutException te)
-			{
-				//System.out.println("TESTCASE TIMEOUT: "+cid[0]);
-				// Hack!! Allow timeout exception for start tests when not from test execution, e.g. termination timeout in EndStateAbort.
-				if(triggered[0])
-				{
-					throw te;
-				}
-			}
+//			}
+//			catch(TimeoutException te)
+//			{
+//				//System.out.println("TESTCASE TIMEOUT: "+cid[0]);
+//				// Hack!! Allow timeout exception for start tests when not from test execution, e.g. termination timeout in EndStateAbort.
+//				if(triggered[0])
+//				{
+//					throw te;
+//				}
+//			}
 		
 			checkTestResults(res);	// Do last -> throws exception on failure.
 			//System.out.println("FINISHED runBare(): "+System.currentTimeMillis()+" "+filename);
