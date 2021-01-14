@@ -315,11 +315,11 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
 //      // default:
 //      // emptyvalue
 //
-//      /** Flag if the platform password should be printed to the console. **/
-//      public static final String	PRINTPASS			= "printpass";								// class:
-//      // boolean
-//      // default:
-//      // true
+      /** Flag if the platform password/secret(s) should be printed to the console. **/
+      public static final String	PRINTSECRET			= "printsecret";								// class:
+      // boolean
+      // default:
+      // true
 //
 //      /** Flag if trusted lan should be used. **/
 //      public static final String	TRUSTEDLAN			= "trustedlan";								// class:
@@ -568,7 +568,8 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
               WELCOME, GUI, CLI, CLICONSOLE, SAVEONEXIT, LOGGING, SIMULATION, ASYNCEXECUTION,
 //              PERSIST,
               UNIQUEIDS, THREADPOOLDEFER, CHAT, AWARENESS, BINARYMESSAGES, STRICTCOM,
-//              USEPASS, PRINTPASS, TRUSTEDLAN,
+//              USEPASS, TRUSTEDLAN,
+              PRINTSECRET,
               LOCALTRANSPORT, TCPTRANSPORT,
               RELAYTRANSPORT,
 //              RELAYSECURITY, RELAYAWAONLY,

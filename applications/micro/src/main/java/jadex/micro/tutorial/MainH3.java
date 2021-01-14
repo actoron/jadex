@@ -23,7 +23,7 @@ public class MainH3
 			"-gui", "false",
 			"-welcome", "false",
 			"-cli", "false",
-			"-printpass", "false"
+			"-printsecret", "false"
 		};
 		String[]	newargs	= new String[defargs.length+args.length];
 		System.arraycopy(defargs, 0, newargs, 0, defargs.length);

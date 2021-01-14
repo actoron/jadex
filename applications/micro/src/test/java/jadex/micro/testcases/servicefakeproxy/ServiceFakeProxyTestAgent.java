@@ -78,7 +78,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 //			IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 //				"-saveonexit", "false", "-welcome", "false", //"-awareness", "false",
 //			//	"-logging_level", "java.util.logging.Level.INFO",
-//				"-gui", "false", "-simulation", "false", "-printpass", "false", "-wstransport", "false",
+//				"-gui", "false", "-simulation", "false", "-printsecret", "false", "-wstransport", "false",
 //				"-superpeerclient", "false",
 //			}).get();
 			

@@ -83,7 +83,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //		"-cli", "false",
 ////		"-persist", "true", // for testing persistence
 ////		"-deftimeout", "-1",
-//		"-printpass", "false",
+//		"-printsecret", "false",
 //		"-superpeerclient", "false",
 //		"-wstransport", "false",
 //		"-relaytransport", "false",

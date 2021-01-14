@@ -183,7 +183,7 @@ public abstract class TestAgent
 //			"-binarymessages", "false",
 			"-gui", "false",
 			"-cli", "false",
-			"-simulation", "false", "-printpass", "false"};
+			"-simulation", "false", "-printsecret", "false"};
 		
 		if(args!=null && args.length>0)
 		{

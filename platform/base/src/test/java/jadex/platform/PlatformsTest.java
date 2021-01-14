@@ -45,7 +45,7 @@ public class PlatformsTest //extends TestCase
 		"-gui", "false",
 		"-saveonexit", "false",
 		"-welcome", "false",
-		"-printpass", "false",
+		"-printsecret", "false",
 		"-multicastawareness", "false", // avoid interference with other tests
 		"-broadcastawareness", "false", // avoid interference with other tests
 		"-catalogawareness", "false", // avoid interference outside world
@@ -103,7 +103,7 @@ public class PlatformsTest //extends TestCase
 				args	= (String[])SUtil.joinArrays(args, new String[]
 				{
 					"-componentfactory", PLATFORMS[(i-1)*2],
-					"-conf", PLATFORMS[(i-1)*2+1],
+					"-conf", PLATFORMS[(i-1)*2+1]
 				});
 			}
 			

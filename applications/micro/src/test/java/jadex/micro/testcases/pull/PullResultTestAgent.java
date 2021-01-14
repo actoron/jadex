@@ -165,7 +165,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 //			Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
 //				"-saveonexit", "false", "-welcome", "false", "-awareness", "false",
 //	//			"-logging_level", "java.util.logging.Level.INFO",
-//				"-gui", "false", "-simulation", "false", "-simul", "false", "-printpass", "false",
+//				"-gui", "false", "-simulation", "false", "-simul", "false", "-printsecret", "false",
 //				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
 //			}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			IPlatformConfiguration conf = STest.getDefaultTestConfig(getClass());

@@ -67,7 +67,7 @@ platformConfig.setDebugFutures(true); // enables stacktraces of exceptions
 
 ```java
 platformConfig.setWelcome(false);
-platformConfig.setPrintPass(false);
+platformConfig.setPrintSecret(false);
 ```
 
 **Set platform name:**
