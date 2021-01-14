@@ -1535,7 +1535,23 @@ public class SComponentManagementService
 							}
 						};
 						IResultListener<Void> lis = cid.getParent()==null? cc: createResultListener(agent, cc);
-						comp.shutdown().addResultListener(lis);
+						
+						// Debug hang on component termination:
+						IResultListener<Void> dummy	= new IResultListener<Void>() {
+							@Override
+							public void resultAvailable(Void result) {
+								agent.getLogger().info("Terminating component (result): "+cid.getName());
+								lis.resultAvailable(result);
+							}
+							@Override
+							public void exceptionOccurred(Exception exception) {
+								agent.getLogger().info("Terminating component (exception): "+cid.getName()
+									+ "\n"+SUtil.getExceptionStacktrace(exception));
+								lis.exceptionOccurred(exception);
+							}
+						};
+						
+						comp.shutdown().addResultListener(dummy);
 					}
 				}
 			};
