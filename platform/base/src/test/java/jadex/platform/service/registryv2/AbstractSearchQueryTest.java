@@ -271,9 +271,13 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			// 8) kill SP, search for service -> test if re-fallback to awa works
 			System.out.println("8) kill SP, search for service");
 			removePlatform(sp);
+			System.out.println("8a");
 			waitALittle(client);
+			System.out.println("8b");
 			waitALittle(client);	// two waits for disconnection, because contimeout = 2* WAITFACTOR
+			System.out.println("8c");
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
+			System.out.println("8d");
 			Assert.assertEquals(""+result, awa?1:0, result.size());
 		}
 	}
