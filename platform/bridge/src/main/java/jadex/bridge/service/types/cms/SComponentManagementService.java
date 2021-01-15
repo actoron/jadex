@@ -1590,8 +1590,8 @@ public class SComponentManagementService
 	 */
 	public static IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid, IInternalAccess agent)
 	{
-		if(cid.toString().indexOf("Sokrates")!=-1)
-			System.out.println("destroy: "+cid);
+		if(cid.toString().indexOf("SellerAgent")!=-1)
+			agent.getLogger().info("destroy0: "+cid);
 //		if(cid.getParent()==null)
 //			System.out.println("---- !!!! ----- Killing platform ---- !!!! ----- "+cid.getName());
 //		System.out.println("Terminating component: "+cid.getName());
@@ -1608,8 +1608,12 @@ public class SComponentManagementService
 		Future<Map<String, Object>> tmp;
 		
 		CmsState state = getState(agent.getId());
+		if(cid.toString().indexOf("SellerAgent")!=-1)
+			agent.getLogger().info("destroy1: "+cid);
 		try(IAutoLock l = state.writeLock())
 		{
+			if(cid.toString().indexOf("SellerAgent")!=-1)
+				agent.getLogger().info("destroy2: "+cid);
 			CmsComponentState compstate = state.getComponent(cid);
 			contains = compstate.getCleanupFuture() != null;
 			tmp = contains? (Future<Map<String, Object>>)compstate.getCleanupFuture(): new Future<Map<String, Object>>();
@@ -1635,7 +1639,13 @@ public class SComponentManagementService
 		final Future<Map<String, Object>> ret = tmp;
 		
 		if(!contains && !locked && inited)
+		{
+			if(cid.toString().indexOf("SellerAgent")!=-1)
+				agent.getLogger().info("destroy3: "+cid);
 			destroyComponent(cid, ret, agent);
+		}
+		if(cid.toString().indexOf("SellerAgent")!=-1)
+			agent.getLogger().info("destroy4 (contains, locked, inited): "+cid+" ("+contains+", "+locked+", "+inited+")");
 
 		if(cid.toString().indexOf("Sokrates")!=-1)
 		{
