@@ -1647,18 +1647,18 @@ public class SComponentManagementService
 		if(cid.toString().indexOf("SellerAgent")!=-1)
 			agent.getLogger().info("destroy4 (contains, locked, inited): "+cid+" ("+contains+", "+locked+", "+inited+")");
 
-		if(cid.toString().indexOf("Sokrates")!=-1)
+		if(cid.toString().indexOf("SellerAgent")!=-1)
 		{
 			ret.addResultListener(new IResultListener<Map<String,Object>>()
 			{
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("destryCompo finished with ex: "+cid+" "+exception);
+					agent.getLogger().info("destryCompo finished with ex: "+cid+" "+exception);
 				}
 				
 				public void resultAvailable(Map<String, Object> result)
 				{
-					System.out.println("destryCompo finished: "+cid);
+					agent.getLogger().info("destryCompo finished: "+cid);
 				}
 			});
 		}
