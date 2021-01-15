@@ -542,6 +542,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			
 			fut	= features.get(features.size()-1).shutdown();
 			sync = fut.isDone();
+			if(getId().toString().indexOf("SellerAgent")!=-1)
+				getLogger().info("feature shutdown called: "+getId()+" "+features.get(features.size()-1)+" done(sync)="+sync);
 			if(sync)
 			{
 				features.remove(features.size()-1);
@@ -551,20 +553,23 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		// Recurse once for current async feature
 		if(!sync)
 		{
+			if(getId().toString().indexOf("SellerAgent")!=-1)
+				getLogger().info("async waiting for feature shutdown: "+getId()+" "+features.get(features.size()-1));
 			final Future<Void>	ret	= new Future<Void>();
 			fut.addResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{
+					if(getId().toString().indexOf("SellerAgent")!=-1)
+						getLogger().info("done waiting for feature shutdown: "+getId()+" "+features.get(features.size()-1));
 					proceed();
 				}
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					StringWriter	sw	= new StringWriter();
-					exception.printStackTrace(new PrintWriter(sw));
-					getLogger().warning("Exception during component cleanup of "+getId()+": "+exception);
-					getLogger().info(sw.toString());
+					if(getId().toString().indexOf("SellerAgent")!=-1)
+						getLogger().info("exception when waiting for feature shutdown: "+getId()+" "+features.get(features.size()-1));
+					getLogger().warning("Exception during component cleanup of "+getId()+", "+features.get(features.size()-1)+": "+SUtil.getExceptionStacktrace(exception));
 
 					proceed();
 				}
