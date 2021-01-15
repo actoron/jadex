@@ -170,12 +170,20 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //			System.out.println("shut platform");
 		
 //		System.out.println("shutdown start: "+getComponent().getComponentIdentifier());
+		if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
+			getComponent().getLogger().info("shutdown0: "+this);
 		
 		endagenda.addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
+				if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
+					getComponent().getLogger().info("shutdown1: "+this);
+				
 				doCleanup(new StepAborted());
+				
+				if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
+					getComponent().getLogger().info("shutdown2: "+this);
 				
 				super.customResultAvailable(result);
 			}
@@ -749,12 +757,18 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
+			if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
+				getComponent().getLogger().info("wakeup0: "+this);
+
 			IExecutionService exe = getExecutionService();
 			//IExecutionService exe = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
 			
 			// Do not use rescue thread for bisimulation of platform init/shutdown/zombie agents to avoid clock running out.
 			if(exe==null && SSimulation.isBisimulating(getInternalAccess()))
 			{
+				if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
+					getComponent().getLogger().info("wakeup1: "+this);
+				
 				try
 				{
 					Field f = Class.forName("jadex.platform.service.execution.BisimExecutionService")
@@ -769,21 +783,30 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				System.err.println(getInternalAccess()+" bisim exe is"+exe);
 			}
 
+			if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
+				getComponent().getLogger().info("wakeup2: "+this+", "+exe);
+
 			// Hack!!! service is found before it is started, grrr.
 			if(exe!=null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
 				if(bootstrap)
 				{
+					if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
+						getComponent().getLogger().info("wakeup3: "+this);
 					// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
 					available	= true;
 				}
 				else
 				{
+					if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
+						getComponent().getLogger().info("wakeup4: "+this);
 					exe.execute(ExecutionComponentFeature.this);
 				}
 			}
 			else
 			{
+				if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
+					getComponent().getLogger().info("wakeup5: "+this);
 //				System.err.println(getInternalAccess()+" rescue "+SSimulation.isBisimulating(getInternalAccess())+", "+Starter.getPlatformValue(getInternalAccess().getId().getRoot(), IClockService.BISIMULATION_CLOCK_FLAG));
 				available = false;
 				// Happens during platform bootstrapping -> execute on platform rescue thread.
