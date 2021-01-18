@@ -1643,6 +1643,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 						
 						IFuture<Void>	doExecute(IInternalAccess ia)
 						{
+							if(cid.toString().indexOf("SellerAgent")!=-1)
+								PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doExecute1: "+cid+", "+method+", "+SUtil.arrayToString(args));
 //							if(method.getName().indexOf("searchService")!=-1 && ((ServiceQuery)args[0]).getServiceType().getTypeName().indexOf("Proxy")!=-1)
 //								System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 							
@@ -1675,6 +1677,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 
 		public IFuture<Object> doInvoke(IInternalAccess ia, Method method, Object[] args)
 		{
+			if(cid.toString().indexOf("SellerAgent")!=-1)
+				PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doInvoke1: "+cid+", "+method+", "+SUtil.arrayToString(args));
 //				if(method.getName().indexOf("createCompo")!=-1)
 //					System.out.println("call");
 			
@@ -1694,15 +1698,21 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				Object res;
 				if(feat==null)
 				{
+					if(cid.toString().indexOf("SellerAgent")!=-1)
+						PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doInvoke2: "+cid+", "+method+", "+SUtil.arrayToString(args));
 					String mname = method.getName();
 //						int idx = mname.lastIndexOf("Async");
 //						if(idx>0)
 //							mname = mname.substring(0, idx);
 					Method m = IInternalAccess.class.getMethod(mname, method.getParameterTypes());
 					res = m.invoke(ia, args);
+					if(cid.toString().indexOf("SellerAgent")!=-1)
+						PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doInvoke3: "+cid+", "+method+", "+SUtil.arrayToString(args));
 				}
 				else
 				{
+					if(cid.toString().indexOf("SellerAgent")!=-1)
+						PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doInvoke4: "+cid+", "+method+", "+SUtil.arrayToString(args));
 					// todo: create generic (double) hook (also in RMI proxy) mechanism
 					
 					if(feat instanceof IRequiredServicesFeature)
@@ -1725,6 +1735,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					}
 					
 					res = method.invoke(feat, args);
+					if(cid.toString().indexOf("SellerAgent")!=-1)
+						PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doInvoke5: "+cid+", "+method+", "+SUtil.arrayToString(args));
 				}
 				
 				if(res instanceof IFuture)
@@ -1738,6 +1750,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			}
 			catch(Exception e)
 			{
+				if(cid.toString().indexOf("SellerAgent")!=-1)
+					PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doInvoke6: "+cid+", "+method+", "+SUtil.arrayToString(args)+"\n"+SUtil.getExceptionStacktrace(e));
 				ret = new Future<Object>();
 				((Future)ret).setException(e);
 			}
