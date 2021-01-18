@@ -742,6 +742,7 @@ public class BpmnXMLReader
 								{
 									exp = parser.parseExpression(val, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
 								}
+								System.out.println("setpropreader: "+name+" "+exp);
 								act.setPropertyValue(name, exp);
 							}
 							

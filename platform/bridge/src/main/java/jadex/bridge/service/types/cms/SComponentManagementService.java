@@ -1462,6 +1462,8 @@ public class SComponentManagementService
 	 */
 	protected static void destroyComponent(final IComponentIdentifier cid,	final Future<Map<String, Object>> ret, IInternalAccess agent)
 	{
+		//System.out.println("destroy: "+cid);
+		
 		CmsState state = getState(cid);
 		InitInfo infos = state.getInitInfo(cid);
 		IPlatformComponentAccess comp = infos!=null ? infos.getComponent() : state.getAccess(cid);
@@ -1590,8 +1592,10 @@ public class SComponentManagementService
 	 */
 	public static IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid, IInternalAccess agent)
 	{
-		if(cid.toString().indexOf("SellerAgent")!=-1)
-			agent.getLogger().info("destroy0: "+cid);
+		//if(cid.toString().indexOf("Sokrates")!=-1)
+		//	System.out.println("destroy: "+cid);
+		//if(cid.toString().indexOf("SellerAgent")!=-1)
+		//	agent.getLogger().info("destroy0: "+cid);
 //		if(cid.getParent()==null)
 //			System.out.println("---- !!!! ----- Killing platform ---- !!!! ----- "+cid.getName());
 //		System.out.println("Terminating component: "+cid.getName());

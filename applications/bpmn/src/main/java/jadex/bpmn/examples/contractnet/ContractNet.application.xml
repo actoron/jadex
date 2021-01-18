@@ -59,7 +59,6 @@
 				</component>
 			</components>
 		</configuration>
-		
 		<configuration name="One Initiator and One Participant">
 			<components>
 				<component name="Participant_1"	type="CNPProtocol" configuration="Participant">

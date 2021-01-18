@@ -1,4 +1,4 @@
-package jadex.bdi.examples.spaceworld3d;
+package jadex.bpmn.examples.message;
 
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
@@ -18,8 +18,8 @@ public class Main
 	 */
 	public static void main(String[] args) 
 	{
-		IExternalAccess platform = Starter.createPlatform(PlatformConfigurationHandler.getDefault()).get();
-		CreationInfo ci = new CreationInfo().setFilename("jadex/bdi/examples/spaceworld3d/SpaceWorld3d.application.xml").addArgument("opengl", false);
+		IExternalAccess platform = Starter.createPlatform(PlatformConfigurationHandler.getDefaultNoGui()).get();
+		CreationInfo ci = new CreationInfo().setFilename("jadex/bpmn/examples/message/Message.application.xml");
 		platform.createComponent(ci).get();
 	}
 }

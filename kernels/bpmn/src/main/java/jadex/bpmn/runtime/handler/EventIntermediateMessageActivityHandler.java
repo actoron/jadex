@@ -1,12 +1,20 @@
 package jadex.bpmn.runtime.handler;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMessageFeature;
+import jadex.bridge.fipa.SFipa;
 import jadex.commons.IFilter;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.IResultListener;
 
 /**
@@ -48,6 +56,56 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 	}
 	
 	/**
+	 *  Convert a string to component identifier
+	 *  @param cid The component identifier.
+	 *  @return parent The parent.
+	 */
+	public IComponentIdentifier getCid(Object cid, IComponentIdentifier parent)
+	{
+		IComponentIdentifier ret = null;
+		if(cid instanceof String)
+		{
+			// Special case -> string converted to sibling cid.
+			ret = new ComponentIdentifier((String)cid, parent);
+		}
+		else
+		{
+			ret = (IComponentIdentifier)ret;
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	protected Object assembleMessage(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
+	{
+		// read complete message
+		Object message	= thread.getPropertyValue(PROPERTY_MESSAGE);
+		
+		// or assemble from parts
+		if(message==null)
+			message = new HashMap<>();
+
+		if(message instanceof Map)
+		{
+			String[] props = activity.getPropertyNames();
+			for(String prop: props)
+			{
+				if(!(PROPERTY_MESSAGE.equals(prop)))
+					((Map<String, Object>)message).put(prop, thread.getPropertyValue(prop));
+			}
+			
+			// HACK!!! remove FIPA specific code
+			if(((Map<String, Object>)message).get(SFipa.SENDER)==null)
+				((Map<String, Object>)message).put(SFipa.SENDER, instance.getId());
+		}
+		
+		return message;
+	}
+	
+	/**
 	 *  Send a message.
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
@@ -55,23 +113,46 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 	 */
 	protected void sendMessage(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
-		Object message	= thread.getPropertyValue(PROPERTY_MESSAGE);
-		IComponentIdentifier receiver;
+		Object message	= assembleMessage(activity, instance, thread);
+		IComponentIdentifier[] receivers = null;
 		Object rec	= thread.getPropertyValue(PROPERTY_RECEIVER);
-		if(rec instanceof String)
+
+		if(SReflect.isIterable(rec))
 		{
-			// Special case -> string converted to sibling cid.
-			receiver = new ComponentIdentifier((String)rec, instance.getId().getParent());
+			List<IComponentIdentifier> tmp = new ArrayList<>();
+			for(Object r: SReflect.getIterable(rec))
+			{
+				tmp.add(getCid(r, instance.getId().getParent()));
+			}
+			receivers = tmp.toArray(new IComponentIdentifier[tmp.size()]);
 		}
-		else
+		else if(rec!=null)
 		{
-			receiver = (IComponentIdentifier)rec;
+			receivers = new IComponentIdentifier[]{getCid(rec, instance.getId().getParent())};
+		}
+		
+		// HACK! fix receivers, could be set only in message (fipa) when createReply was used
+		if(message instanceof Map)
+		{
+			if(receivers!=null)
+			{
+				((Map)message).put(PROPERTY_RECEIVER, receivers);
+			}
+			else 
+			{
+				Object r = ((Map)message).get(SFipa.RECEIVERS);
+				if(r instanceof IComponentIdentifier)
+					receivers = new IComponentIdentifier[]{(IComponentIdentifier)r};
+			}
+			
+			//if("refuse".equals(((Map)message).get(SFipa.PERFORMATIVE)))
+			//	System.out.println("sdg");
 		}
 
 		thread.setWaiting(true);
-//		System.out.println("sending message: "+msg.get(ri));
+		System.out.println("sending message: "+message);
 		
-		instance.getFeature(IMessageFeature.class).sendMessage(message, receiver)
+		instance.getFeature(IMessageFeature.class).sendMessage(message, receivers)
 			.addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
@@ -100,8 +181,56 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 		IFilter<Object> filter = (IFilter<Object>)thread.getPropertyValue(PROPERTY_FILTER, activity);
 		if(filter==null)
 		{
+			// read out before because matching could be done in multiple event
+			/*Map<String, Object> targetvals = new HashMap<String, Object>();
+			String[] props = activity.getPropertyNames();
+			for(String prop: props)
+			{
+				if(!(PROPERTY_MESSAGE.equals(prop)) && !(PROPERTY_FILTER.equals(prop))
+					&& !(PROPERTY_RECEIVER.equals(prop)))
+				{
+					Object propval = thread.getPropertyValue(prop, activity);
+					targetvals.put(prop, propval);
+				}
+			}*/
+			
+			// todo: hack for message maps?!
+			filter = new IFilter<Object>() 
+			{
+				public boolean filter(Object obj) 
+				{
+					boolean ret = true;
+					// only map filter supported currently
+					if(obj instanceof Map)
+					{
+						Map<String, Object> msg = (Map<String, Object>)obj;
+						
+						String[] props = activity.getPropertyNames();
+						for(String prop: props)
+						{
+							if(!(PROPERTY_MESSAGE.equals(prop)) && !(PROPERTY_FILTER.equals(prop))
+								&& !(PROPERTY_RECEIVER.equals(prop)))
+							{
+								Object propval = thread.getPropertyValue(prop, activity);
+								ret = SUtil.equals(msg.get(prop), propval);
+								if(!ret)
+									break;
+							}
+						}
+						
+						/*for(String prop: targetvals.keySet())
+						{
+							ret = SUtil.equals(msg.get(prop), targetvals.get(prop));
+							if(!ret)
+								break;
+						}*/
+					}
+					return ret;
+				}
+			};
+		
 			// TODO: distinguish between messages and other objects?
-			filter	= IFilter.ALWAYS;
+			//filter	= IFilter.ALWAYS;
 //			throw new NullPointerException("Message receiving event needs "+PROPERTY_FILTER+" property: "+thread);
 		}
 		thread.setWaitFilter(filter);

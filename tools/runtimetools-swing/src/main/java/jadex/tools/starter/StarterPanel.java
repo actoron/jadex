@@ -1703,7 +1703,8 @@ public class StarterPanel extends JLayeredPane
 		{
 			public void resultAvailable(IExternalAccess result)
 			{
-				result.waitForTermination().addResultListener(killlistener);
+				if(killlistener!=null)
+					result.waitForTermination().addResultListener(killlistener);
 				ret.setResult(result.getId());
 				jcc.setStatusText("Created component: " + result.getId().getLocalName());
 			}

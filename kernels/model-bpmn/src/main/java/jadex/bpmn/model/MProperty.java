@@ -34,6 +34,7 @@ public class MProperty extends MAnnotationElement
 	public MProperty(ClassInfo clazz, String name, 
 		UnparsedExpression initialval)
 	{
+		//System.out.println("mprop: "+name+" "+initialval);
 		this.clazz = clazz;
 		this.name = name;
 		this.initialval = initialval;
@@ -102,7 +103,7 @@ public class MProperty extends MAnnotationElement
 	 */
 	public void setInitialValue(UnparsedExpression initialval)
 	{
-//		System.out.println("setting: "+initialval.getValue());
+		System.out.println("setting: "+initialval.getValue());
 		this.initialval = initialval;
 	}
 	
@@ -132,7 +133,7 @@ public class MProperty extends MAnnotationElement
 	 */
 	public String toString()
 	{
-		return "MParameter(clazz=" + this.clazz + ", initialval=" + this.initialval
+		return "MProperty(clazz=" + this.clazz + ", initialval=" + this.initialval
 			+ ", name=" + this.name + ")";
 	}	
 }
