@@ -88,7 +88,7 @@ public class CustomLogRecord extends LogRecord
 		{
 			StackTraceElement frame = stack[ix];
 			String cname = frame.getClassName();
-			if(cname.equals("java.util.logging.Logger") || cname.equals("jadex.platform.service.cms.LoggerWrapper"))
+			if(cname.equals("java.util.logging.Logger") || cname.equals("jadex.bridge.service.types.cms.LoggerWrapper"))
 			{
 				break;
 			}
@@ -99,7 +99,7 @@ public class CustomLogRecord extends LogRecord
 		{
 			StackTraceElement frame = stack[ix];
 			String cname = frame.getClassName();
-			if(!cname.equals("java.util.logging.Logger") && !cname.equals("jadex.platform.service.cms.LoggerWrapper"))
+			if(!cname.equals("java.util.logging.Logger") && !cname.equals("jadex.bridge.service.types.cms.LoggerWrapper"))
 			{
 				// We've found the relevant frame.
 				setSourceClassName(cname);
