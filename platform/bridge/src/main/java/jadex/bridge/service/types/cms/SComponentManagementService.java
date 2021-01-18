@@ -1537,7 +1537,23 @@ public class SComponentManagementService
 							}
 						};
 						IResultListener<Void> lis = cid.getParent()==null? cc: createResultListener(agent, cc);
-						comp.shutdown().addResultListener(lis);
+						
+						// Debug hang on component termination:
+						IResultListener<Void> dummy	= new IResultListener<Void>() {
+							@Override
+							public void resultAvailable(Void result) {
+								agent.getLogger().info("Terminating component (result): "+cid.getName());
+								lis.resultAvailable(result);
+							}
+							@Override
+							public void exceptionOccurred(Exception exception) {
+								agent.getLogger().info("Terminating component (exception): "+cid.getName()
+									+ "\n"+SUtil.getExceptionStacktrace(exception));
+								lis.exceptionOccurred(exception);
+							}
+						};
+						
+						comp.shutdown().addResultListener(dummy);
 					}
 				}
 			};
@@ -1578,6 +1594,8 @@ public class SComponentManagementService
 	{
 		//if(cid.toString().indexOf("Sokrates")!=-1)
 		//	System.out.println("destroy: "+cid);
+		//if(cid.toString().indexOf("SellerAgent")!=-1)
+		//	agent.getLogger().info("destroy0: "+cid);
 //		if(cid.getParent()==null)
 //			System.out.println("---- !!!! ----- Killing platform ---- !!!! ----- "+cid.getName());
 //		System.out.println("Terminating component: "+cid.getName());
@@ -1594,8 +1612,12 @@ public class SComponentManagementService
 		Future<Map<String, Object>> tmp;
 		
 		CmsState state = getState(agent.getId());
+		if(cid.toString().indexOf("SellerAgent")!=-1)
+			agent.getLogger().info("destroy1: "+cid);
 		try(IAutoLock l = state.writeLock())
 		{
+			if(cid.toString().indexOf("SellerAgent")!=-1)
+				agent.getLogger().info("destroy2: "+cid);
 			CmsComponentState compstate = state.getComponent(cid);
 			contains = compstate.getCleanupFuture() != null;
 			tmp = contains? (Future<Map<String, Object>>)compstate.getCleanupFuture(): new Future<Map<String, Object>>();
@@ -1621,20 +1643,26 @@ public class SComponentManagementService
 		final Future<Map<String, Object>> ret = tmp;
 		
 		if(!contains && !locked && inited)
+		{
+			if(cid.toString().indexOf("SellerAgent")!=-1)
+				agent.getLogger().info("destroy3: "+cid);
 			destroyComponent(cid, ret, agent);
+		}
+		if(cid.toString().indexOf("SellerAgent")!=-1)
+			agent.getLogger().info("destroy4 (contains, locked, inited): "+cid+" ("+contains+", "+locked+", "+inited+")");
 
-		if(cid.toString().indexOf("Sokrates")!=-1)
+		if(cid.toString().indexOf("SellerAgent")!=-1)
 		{
 			ret.addResultListener(new IResultListener<Map<String,Object>>()
 			{
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("destryCompo finished with ex: "+cid+" "+exception);
+					agent.getLogger().info("destryCompo finished with ex: "+cid+" "+exception);
 				}
 				
 				public void resultAvailable(Map<String, Object> result)
 				{
-					System.out.println("destryCompo finished: "+cid);
+					agent.getLogger().info("destryCompo finished: "+cid);
 				}
 			});
 		}

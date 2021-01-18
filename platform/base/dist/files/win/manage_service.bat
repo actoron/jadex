@@ -8,7 +8,7 @@ FOR /F "usebackq" %%i IN (`hostname`) DO SET HOSTNAME=%%i
 	cd ..
 	java -jar "%CD%\lib\jadex-platform-standalone-launch-3.0-SNAPSHOT.jar" ^
 		-ssltcptransport true ^
-		-printpass false ^
+		-printsecret false ^
 		-welcome false ^
 		-cli false ^
 		-logging true ^

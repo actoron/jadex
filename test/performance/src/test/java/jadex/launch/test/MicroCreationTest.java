@@ -49,7 +49,7 @@ public class MicroCreationTest //extends TestCase
 ////			"-componentfactory", "jadex.component.ComponentComponentFactory",
 ////			"-conf", "jadex.standalone.Platform.component.xml",
 ////			"-deftimeout", "-1",
-//			"-printpass", "false"}).get(timeout);
+//			"-printsecret", "false"}).get(timeout);
 		IExternalAccess	platform	= Starter.createPlatform(STest.getLocalTestConfig(getClass())).get(timeout);
 		timeout	= Starter.getDefaultTimeout(platform.getId());
 		
