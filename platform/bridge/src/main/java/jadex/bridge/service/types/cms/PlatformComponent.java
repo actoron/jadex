@@ -84,6 +84,7 @@ import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.Tuple2Future;
+import jadex.commons.future.TupleResult;
 
 /**
  *  Standalone platform component implementation.
@@ -1737,15 +1738,18 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					
 					res = method.invoke(feat, args);
 					if(cid.toString().indexOf("SellerAgent")!=-1)
-						PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doInvoke5: "+cid+", "+method+", "+SUtil.arrayToString(args));
+						PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doInvoke5: "+cid+", "+method+", "+SUtil.arrayToString(args)+": "+res);
 				}
 				
 				if(res instanceof IFuture)
 				{
+					if(cid.toString().indexOf("SellerAgent")!=-1)
+						PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doInvoke5: "+cid+", "+method+", "+SUtil.arrayToString(args)+": "+res+", done="+((IFuture) res).isDone());
 					ret = (IFuture<Object>)res;
 				}
 				else
 				{
+					ret = new Future<Object>();
 					((Future)ret).setResult(res);
 				}
 			}
