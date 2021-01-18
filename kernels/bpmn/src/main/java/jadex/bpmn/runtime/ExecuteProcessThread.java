@@ -95,7 +95,7 @@ public class ExecuteProcessThread implements IConditionalComponentStep<Void>
 				{
 					processed = true;
 					messages.remove(i);
-					System.out.println("Dispatched from waitqueue: "+messages.size()+" "+System.identityHashCode(message)+", "+message);
+					//System.out.println("Dispatched from waitqueue: "+messages.size()+" "+System.identityHashCode(message)+", "+message);
 					bcf.notify(thread.getActivity(), thread, message);
 				}
 			}

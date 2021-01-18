@@ -34,7 +34,7 @@ public class DefaultStepHandler implements IStepHandler
 	{
 		assert instance.getFeature(IExecutionFeature.class).isComponentThread();
 		
-//		System.out.println("stephandler: "+thread.getId()+" "+instance.getComponentIdentifier().getLocalName()+": step "+activity+", data "+thread.getData());
+		//System.out.println("stephandler: "+thread.getId()+" "+instance.getId().getLocalName()+": step "+activity+", data "+thread.getData());
 		
 //		if("Participant_1".equals(instance.getComponentIdentifier().getLocalName()))
 //		{

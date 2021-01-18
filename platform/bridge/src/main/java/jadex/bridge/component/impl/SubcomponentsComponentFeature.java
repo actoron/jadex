@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -37,6 +38,7 @@ import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.PlatformComponent;
 import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
@@ -58,6 +60,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
@@ -188,10 +191,10 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	 *  
 	 *  @param infos Start information.
 	 *  @return Status events.
-	 */
+	 * /
 	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithEvents(CreationInfo info)
 	{
-		final SubscriptionIntermediateFuture<CMSStatusEvent> ret = new SubscriptionIntermediateFuture<>();
+		final SubscriptionIntermediateDelegationFuture<CMSStatusEvent> ret = new SubscriptionIntermediateDelegationFuture<>();
 		
 		final boolean keepsusp = Boolean.TRUE.equals(info.getSuspend());
 		info.setSuspend(true);
@@ -215,6 +218,20 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		});
 		
 		SFuture.avoidCallTimeouts(ret, component);
+		return ret;
+	}*/
+	
+	
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithEvents(CreationInfo info)
+	{
+		Object component = info!=null? info.getPojo(): null;
+		if(component==null && (info==null || info.getFilename()==null))
+			return new SubscriptionIntermediateFuture<>(new RuntimeException("Component must not null."));
+		
+		info = PlatformComponent.prepare(info);
+		
+		ISubscriptionIntermediateFuture<CMSStatusEvent> ret = SComponentManagementService.createComponent(info, info.getName(), info.getFilename(), getInternalAccess());
+		
 		return ret;
 	}
 	

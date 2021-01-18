@@ -1358,7 +1358,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 *  @param info The creation info. 
 	 *  @return The creation info.
 	 */
-	public CreationInfo prepare(CreationInfo info)
+	public static CreationInfo prepare(CreationInfo info)
 	{
 		if(info==null)
 			info = new CreationInfo();

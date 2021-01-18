@@ -135,6 +135,7 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 					}
 					catch(Exception e)
 					{
+						e.printStackTrace();
 						// always return null to ensure that listener is not invoked twice
 					}
 					return IFuture.DONE;

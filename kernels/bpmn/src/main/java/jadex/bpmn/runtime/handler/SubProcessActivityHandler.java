@@ -225,6 +225,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 					
 				public void intermediateResultAvailable(CMSStatusEvent cse)
 				{
+					//System.out.println("cmsevent: "+cse);
 					if(cse instanceof CMSIntermediateResultEvent)
 					{
 						String	param	= ((CMSIntermediateResultEvent)cse).getName();
@@ -246,7 +247,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				
 				public void finished()
 				{
-//							System.out.println("end0: "+instance.getComponentIdentifier()+" "+file+" "+thread.getParameterValue("$results"));
+					//System.out.println("end0: "+instance.getId()+" "+file+" "+thread.getParameterValue("$results"));
 					handler.updateParameters(thread, activity);
 					
 					thread.setNonWaiting();
@@ -264,12 +265,13 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				
 				public void exceptionOccurred(final Exception exception)
 				{
+					//System.out.println("ex: "+exception);
 					// Hack!!! Ignore exception, when component already terminated.
 					if(!(exception instanceof ComponentTerminatedException)
 						|| !instance.getId().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
 					{
-//								System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
-//								exception.printStackTrace();
+//						System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
+//						exception.printStackTrace();
 						thread.setNonWaiting();
 						thread.setException(exception);
 						getBpmnFeature(instance).step(activity, instance, thread, null);
