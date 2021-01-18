@@ -1648,11 +1648,12 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 //							if(method.getName().indexOf("searchService")!=-1 && ((ServiceQuery)args[0]).getServiceType().getTypeName().indexOf("Proxy")!=-1)
 //								System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 							
-							boolean intermediate = SReflect.isSupertype(IIntermediateFuture.class, method.getReturnType());
+							IFuture<Object>	fut	= doInvoke(ia, method, args);
+							boolean intermediate = SReflect.isSupertype(IIntermediateFuture.class, fut.getClass());
 							if(!intermediate)
-								doInvoke(ia, method, args).addResultListener(new DelegationResultListener<>(ret));
+								fut.addResultListener(new DelegationResultListener<>(ret));
 							else
-								doInvoke(ia, method, args).addResultListener(new IntermediateDelegationResultListener<>((IntermediateFuture)ret));
+								fut.addResultListener(new IntermediateDelegationResultListener<>((IntermediateFuture)ret));
 							return IFuture.DONE;
 						}
 					}).addResultListener(new ExceptionResultListener<Void>()
