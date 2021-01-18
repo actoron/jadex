@@ -1621,6 +1621,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 						@Override
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
+							if(cid.toString().indexOf("SellerAgent")!=-1)
+								PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.step1: "+cid+", "+method+", "+SUtil.arrayToString(args));
 							if(ex!=null)
 							{
 								try
@@ -1655,6 +1657,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					{
 						public void exceptionOccurred(Exception exception)
 						{
+							if(cid.toString().indexOf("SellerAgent")!=-1)
+								PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.ex1: "+cid+", "+method+", "+SUtil.arrayToString(args)+"\n"+SUtil.getExceptionStacktrace(exception));
 							ret.setException(exception);
 						}
 					});
