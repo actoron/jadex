@@ -538,7 +538,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				getLogger().info(sw.toString());
 			}
 			if(getId().toString().indexOf("SellerAgent")!=-1)
-				getLogger().info("feature shutdown start: "+getId()+" "+features);
+				getLogger().info("feature shutdown start: "+getId()+", "+IComponentIdentifier.LOCAL.get()+", "+features);
 			
 			fut	= features.get(features.size()-1).shutdown();
 			sync = fut.isDone();
