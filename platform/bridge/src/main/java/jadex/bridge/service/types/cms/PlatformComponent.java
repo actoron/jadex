@@ -1491,6 +1491,9 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
+			if(cid.toString().indexOf("SellerAgent")!=-1)
+				PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.invoke(): "+cid+", "+method+", "+SUtil.arrayToString(args));
+
 //			if(method.getName().indexOf("searchService")!=-1)
 //				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 			
