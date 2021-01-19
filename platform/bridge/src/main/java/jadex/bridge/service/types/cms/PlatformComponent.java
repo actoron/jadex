@@ -1652,9 +1652,50 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 							IFuture<Object>	fut	= doInvoke(ia, method, args);
 							boolean intermediate = SReflect.isSupertype(IIntermediateFuture.class, fut.getClass());
 							if(!intermediate)
-								fut.addResultListener(new DelegationResultListener<>(ret));
+							{
+								fut.addResultListener(new DelegationResultListener<Object>(ret)
+								{
+									public void	customResultAvailable(Object result)
+									{
+										if(cid.toString().indexOf("SellerAgent")!=-1)
+											PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doExecute2: "+cid+", "+method+", "+SUtil.arrayToString(args)+", "+result);
+										super.customResultAvailable(result);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										if(cid.toString().indexOf("SellerAgent")!=-1)
+											PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doExecute3: "+cid+", "+method+", "+SUtil.arrayToString(args)+"\n"+SUtil.getExceptionStacktrace(exception));
+										super.exceptionOccurred(exception);
+									}
+								});
+							}
 							else
-								fut.addResultListener(new IntermediateDelegationResultListener<>((IntermediateFuture)ret));
+							{
+								fut.addResultListener(new IntermediateDelegationResultListener((IntermediateFuture)ret)
+								{
+									public void	finished()
+									{
+										if(cid.toString().indexOf("SellerAgent")!=-1)
+											PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doExecute4: "+cid+", "+method+", "+SUtil.arrayToString(args));
+										super.finished();
+									}
+									
+									public void	customResultAvailable(Collection result)
+									{
+										if(cid.toString().indexOf("SellerAgent")!=-1)
+											PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doExecute5: "+cid+", "+method+", "+SUtil.arrayToString(args)+", "+result);
+										super.customResultAvailable(result);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										if(cid.toString().indexOf("SellerAgent")!=-1)
+											PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doExecute6: "+cid+", "+method+", "+SUtil.arrayToString(args)+"\n"+SUtil.getExceptionStacktrace(exception));
+										super.exceptionOccurred(exception);
+									}							
+								});
+							}
 							return IFuture.DONE;
 						}
 					}).addResultListener(new ExceptionResultListener<Void>()
