@@ -64,7 +64,6 @@ import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.Tuple3;
 import jadex.commons.concurrent.Executor;
@@ -1406,21 +1405,10 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					if(endstepcnt!=-1 && getComponent().getId().toString().indexOf("SellerAgent")!=-1)
 						getComponent().getLogger().info("execute()4: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState());
 					
-					try
-					{
-						stepfut	= step.getStep().execute(component);
-
-						
-						if(endstepcnt!=-1 && getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-							getComponent().getLogger().info("execute()5: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState());
-					}
-					catch(Throwable dummy)
-					{
-						if(endstepcnt!=-1 && getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-							getComponent().getLogger().info("execute()6: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+"\n"+SUtil.getExceptionStacktrace(dummy));
-						
-						throw dummy;
-					}
+					stepfut	= step.getStep().execute(component);
+					
+					if(endstepcnt!=-1 && getComponent().getId().toString().indexOf("SellerAgent")!=-1)
+						getComponent().getLogger().info("execute()5: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState());
 				}
 				else
 				{
