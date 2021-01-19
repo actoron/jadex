@@ -29,6 +29,8 @@ public class ThreadSuspendable extends ThreadLocalTransferHelper implements ISus
 		if(timeout==Future.UNSET)
 			timeout = getDefaultTimeout();
 		
+		long	endtime	= timeout>0 ? System.currentTimeMillis()+timeout : -1;
+		
 		synchronized(this)
 		{
 			this.future	= future;
@@ -37,13 +39,18 @@ public class ThreadSuspendable extends ThreadLocalTransferHelper implements ISus
 			ThreadPool.WAITING_THREADS.put(Thread.currentThread(), future);
 			try
 			{
-				if(timeout>0)
+				// Loop to catch "spurious wake-ups"
+				timeout	= endtime-System.currentTimeMillis();
+				while(!resumed && (endtime==-1 || timeout>0))
 				{
-					this.wait(timeout);
-				}
-				else
-				{
-					this.wait();
+					if(endtime==-1)
+					{
+						this.wait();
+					}
+					else
+					{
+						this.wait(timeout);
+					}
 				}
 			}
 			catch(InterruptedException e)

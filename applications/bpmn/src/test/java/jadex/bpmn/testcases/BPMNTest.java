@@ -21,6 +21,7 @@ public class BPMNTest	extends ComponentTestSuite
 		
 			"AgentCreation",	// Sometimes doesn't stop.
 			"WaitForTick",	// Doesn't work in simulation?
+			"MessageSending",	// Broken as start test since receiver not found
 			"Result",
 			"_diagram",
 			"load",
