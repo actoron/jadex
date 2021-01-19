@@ -11,9 +11,8 @@ import jadex.micro.examples.lottery.LotteryAgent;
 import jadex.micro.examples.lottery.PlayerAgent;
 
 @ComponentTypes({
-	@ComponentType(name="LotteryAgent", clazz=LotteryAgent.class),
-	@ComponentType(name="Player", clazz=PlayerAgent.class),
-	@ComponentType(name="Human", clazz=HumanPlayerAgent.class)
+	@ComponentType(name="Generator", clazz=GenerateAgent.class),
+	@ComponentType(name="Display", clazz=DisplayAgent.class),
 	//@ComponentType(name="CalculatorPool", clazz=ServicePoolAgent.class)
 })
 @Configurations({
