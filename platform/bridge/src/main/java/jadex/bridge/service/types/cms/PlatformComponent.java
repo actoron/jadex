@@ -1639,25 +1639,45 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					getInternalAccess().scheduleStep(prio, new IComponentStep<Void>()
 					{
 						@Override
+						public String toString()
+						{
+							return getClass().getDeclaringClass().getName()+":AnonymousHeisenbuggyStep@"+hashCode();
+						}
+						
+						@Override
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							if(shutdown && debug)
-								PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.step1: "+cid+", "+method+", "+SUtil.arrayToString(args));
-							if(ex!=null)
+							try
 							{
-								try
+								if(shutdown && debug)
+									PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.step1: "+cid+", "+method+", "+SUtil.arrayToString(args));
+								if(ex!=null)
 								{
-									DebugException.ADDITIONAL.set(ex);
+									try
+									{
+										DebugException.ADDITIONAL.set(ex);
+										return doExecute(ia);
+									}
+									finally
+									{
+										DebugException.ADDITIONAL.set(null);									
+									}
+								}
+								else
+								{
 									return doExecute(ia);
 								}
-								finally
-								{
-									DebugException.ADDITIONAL.set(null);									
-								}
 							}
-							else
+							catch(Throwable e)
 							{
-								return doExecute(ia);
+								if(shutdown && debug)
+									PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.step1 error: "+cid+", "+method+", "+SUtil.arrayToString(args)+"\n"+SUtil.getExceptionStacktrace(e));
+								throw SUtil.throwUnchecked(e);
+							}
+							finally
+							{
+								if(shutdown && debug)
+									PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.step1 end: "+cid+", "+method+", "+SUtil.arrayToString(args));
 							}
 						}
 						
