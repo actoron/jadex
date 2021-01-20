@@ -1639,12 +1639,6 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					getInternalAccess().scheduleStep(prio, new IComponentStep<Void>()
 					{
 						@Override
-						public String toString()
-						{
-							return getClass().getDeclaringClass().getName()+":AnonymousHeisenbuggyStep@"+hashCode();
-						}
-						
-						@Override
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							try
