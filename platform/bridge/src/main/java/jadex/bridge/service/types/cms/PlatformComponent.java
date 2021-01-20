@@ -1720,7 +1720,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					if(shutdown && debug)
 						PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute5: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+myret.isDone());
 					
-					return ret;
+					return myret;
 				}
 				else
 				{
