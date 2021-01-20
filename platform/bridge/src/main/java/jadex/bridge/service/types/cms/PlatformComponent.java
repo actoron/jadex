@@ -1783,7 +1783,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				if(res instanceof IFuture)
 				{
 					if(shutdown && debug)
-						PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doInvoke5: "+cid+", "+method+", "+SUtil.arrayToString(args)+": "+res+", done="+((IFuture) res).isDone());
+						PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doInvoke6: "+cid+", "+method+", "+SUtil.arrayToString(args)+": "+res+", done="+((IFuture)res).isDone());
 					ret = (IFuture<Object>)res;
 				}
 				else
