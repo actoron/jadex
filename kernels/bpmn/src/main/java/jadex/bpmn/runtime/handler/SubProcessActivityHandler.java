@@ -44,15 +44,13 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 	 */
 	public void execute(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
-//		System.out.println(instance.getComponentIdentifier().getLocalName()+": sub "+activity);
+		System.out.println(instance.getId().getLocalName()+": sub "+activity);
 
 		MSubProcess	proc = (MSubProcess)activity;
 		final List<MActivity> start = proc.getStartActivities();
 		String tmpfile = (String)thread.getPropertyValue("file");
 		if(tmpfile == null)
-		{
 			tmpfile = (String)thread.getPropertyValue("filename");
-		}
 		final String	file	= tmpfile;
 	
 		// Internal subprocess (when no file is given and has start activities).
