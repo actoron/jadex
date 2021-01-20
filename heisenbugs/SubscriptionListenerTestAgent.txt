@@ -1,0 +1,127 @@
+
+jadex.micro.testcases.subscriptionlistener.SubscriptionListenerTestAgent > jadex.micro.testcases.subscriptionlistener.SubscriptionListenerTestAgent STANDARD_OUT
+    Using test timeout: 30000 1611133790083 /builds/jadex/jadex/applications/micro/build/classes/java/test/jadex/micro/testcases/subscriptionlistener/SubscriptionListenerTestAgent.class
+
+jadex.micro.testcases.subscriptionlistener.SubscriptionListenerTestAgent > jadex.micro.testcases.subscriptionlistener.SubscriptionListenerTestAgent STANDARD_ERROR
+    Jan 20, 2021 9:09:50 AM test-6 jadex.bridge.service.types.cms.PlatformComponent create
+    SEVERE: Enabled PlatformComponent debugging for SubscriptionListenerTestAgent@test-6
+    Jan 20, 2021 9:09:50 AM test-6 jadex.bridge.component.impl.ExecutionComponentFeature <init>
+    SEVERE: Enabled ExecutionComponentFeature debugging for SubscriptionListenerTestAgent@test-6
+    Jan 20, 2021 9:09:50 AM jadex.base.test.impl.ComponentTestBase <init>
+    SEVERE: Empty ComponentTest Constructor called
+
+jadex.micro.testcases.subscriptionlistener.SubscriptionListenerTestAgent > jadex.micro.testcases.subscriptionlistener.SubscriptionListenerTestAgent STANDARD_ERROR
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+    SEVERE: destroy1: SubscriptionListenerTestAgent@test-6
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+    SEVERE: destroy2: SubscriptionListenerTestAgent@test-6
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+    SEVERE: destroy3: SubscriptionListenerTestAgent@test-6
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent shutdown
+    SEVERE: shutdown component features start: SubscriptionListenerTestAgent@test-6
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+    SEVERE: destroy4 (contains, locked, inited): SubscriptionListenerTestAgent@test-6 (false, false, true)
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent$3 execute
+    SEVERE: shutdown component features start: SubscriptionListenerTestAgent@test-6, null, [jadex.bridge.component.impl.MonitoringComponentFeature@b7bd6f8, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@24978d42, jadex.bridge.component.impl.PropertiesComponentFeature@70a39a4f, jadex.bridge.service.component.RequiredServicesComponentFeature@39ce9449, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6c57499e, ExecutionFeature(SubscriptionListenerTestAgent@test-6), jadex.micro.features.impl.MicroPojoComponentFeature@743224cb, jadex.micro.features.impl.MicroMessageComponentFeature@18afa9e0, jadex.micro.features.impl.MicroInjectionComponentFeature@558e1a60, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@343b2f6, jadex.bridge.component.impl.SubcomponentsComponentFeature@6632ca29, jadex.bridge.component.impl.NFPropertyComponentFeature@3b79fa6, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@26cfc8aa, jadex.micro.features.impl.MicroLifecycleComponentFeature@38850a87]
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SubscriptionListenerTestAgent@test-6, SubscriptionListenerTestAgent@test-6, [jadex.bridge.component.impl.MonitoringComponentFeature@b7bd6f8, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@24978d42, jadex.bridge.component.impl.PropertiesComponentFeature@70a39a4f, jadex.bridge.service.component.RequiredServicesComponentFeature@39ce9449, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6c57499e, ExecutionFeature(SubscriptionListenerTestAgent@test-6), jadex.micro.features.impl.MicroPojoComponentFeature@743224cb, jadex.micro.features.impl.MicroMessageComponentFeature@18afa9e0, jadex.micro.features.impl.MicroInjectionComponentFeature@558e1a60, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@343b2f6, jadex.bridge.component.impl.SubcomponentsComponentFeature@6632ca29, jadex.bridge.component.impl.NFPropertyComponentFeature@3b79fa6, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@26cfc8aa, jadex.micro.features.impl.MicroLifecycleComponentFeature@38850a87]
+
+jadex.micro.testcases.subscriptionlistener.SubscriptionListenerTestAgent > jadex.micro.testcases.subscriptionlistener.SubscriptionListenerTestAgent STANDARD_ERROR
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SubscriptionListenerTestAgent@test-6 jadex.micro.features.impl.MicroLifecycleComponentFeature@38850a87 done(sync)=false
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: async waiting for feature shutdown: SubscriptionListenerTestAgent@test-6 jadex.micro.features.impl.MicroLifecycleComponentFeature@38850a87
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent$8 resultAvailable
+    SEVERE: done waiting for feature shutdown: SubscriptionListenerTestAgent@test-6 jadex.micro.features.impl.MicroLifecycleComponentFeature@38850a87
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SubscriptionListenerTestAgent@test-6, SubscriptionListenerTestAgent@test-6, [jadex.bridge.component.impl.MonitoringComponentFeature@b7bd6f8, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@24978d42, jadex.bridge.component.impl.PropertiesComponentFeature@70a39a4f, jadex.bridge.service.component.RequiredServicesComponentFeature@39ce9449, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6c57499e, ExecutionFeature(SubscriptionListenerTestAgent@test-6), jadex.micro.features.impl.MicroPojoComponentFeature@743224cb, jadex.micro.features.impl.MicroMessageComponentFeature@18afa9e0, jadex.micro.features.impl.MicroInjectionComponentFeature@558e1a60, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@343b2f6, jadex.bridge.component.impl.SubcomponentsComponentFeature@6632ca29, jadex.bridge.component.impl.NFPropertyComponentFeature@3b79fa6, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@26cfc8aa]
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SubscriptionListenerTestAgent@test-6 jadex.micro.features.impl.MicroServiceInjectionComponentFeature@26cfc8aa done(sync)=true
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SubscriptionListenerTestAgent@test-6, SubscriptionListenerTestAgent@test-6, [jadex.bridge.component.impl.MonitoringComponentFeature@b7bd6f8, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@24978d42, jadex.bridge.component.impl.PropertiesComponentFeature@70a39a4f, jadex.bridge.service.component.RequiredServicesComponentFeature@39ce9449, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6c57499e, ExecutionFeature(SubscriptionListenerTestAgent@test-6), jadex.micro.features.impl.MicroPojoComponentFeature@743224cb, jadex.micro.features.impl.MicroMessageComponentFeature@18afa9e0, jadex.micro.features.impl.MicroInjectionComponentFeature@558e1a60, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@343b2f6, jadex.bridge.component.impl.SubcomponentsComponentFeature@6632ca29, jadex.bridge.component.impl.NFPropertyComponentFeature@3b79fa6]
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SubscriptionListenerTestAgent@test-6 jadex.bridge.component.impl.NFPropertyComponentFeature@3b79fa6 done(sync)=true
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SubscriptionListenerTestAgent@test-6, SubscriptionListenerTestAgent@test-6, [jadex.bridge.component.impl.MonitoringComponentFeature@b7bd6f8, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@24978d42, jadex.bridge.component.impl.PropertiesComponentFeature@70a39a4f, jadex.bridge.service.component.RequiredServicesComponentFeature@39ce9449, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6c57499e, ExecutionFeature(SubscriptionListenerTestAgent@test-6), jadex.micro.features.impl.MicroPojoComponentFeature@743224cb, jadex.micro.features.impl.MicroMessageComponentFeature@18afa9e0, jadex.micro.features.impl.MicroInjectionComponentFeature@558e1a60, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@343b2f6, jadex.bridge.component.impl.SubcomponentsComponentFeature@6632ca29]
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SubscriptionListenerTestAgent@test-6 jadex.bridge.component.impl.SubcomponentsComponentFeature@6632ca29 done(sync)=true
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SubscriptionListenerTestAgent@test-6, SubscriptionListenerTestAgent@test-6, [jadex.bridge.component.impl.MonitoringComponentFeature@b7bd6f8, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@24978d42, jadex.bridge.component.impl.PropertiesComponentFeature@70a39a4f, jadex.bridge.service.component.RequiredServicesComponentFeature@39ce9449, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6c57499e, ExecutionFeature(SubscriptionListenerTestAgent@test-6), jadex.micro.features.impl.MicroPojoComponentFeature@743224cb, jadex.micro.features.impl.MicroMessageComponentFeature@18afa9e0, jadex.micro.features.impl.MicroInjectionComponentFeature@558e1a60, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@343b2f6]
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SubscriptionListenerTestAgent@test-6 jadex.micro.features.impl.MicroProvidedServicesComponentFeature@343b2f6 done(sync)=false
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: async waiting for feature shutdown: SubscriptionListenerTestAgent@test-6 jadex.micro.features.impl.MicroProvidedServicesComponentFeature@343b2f6
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent$8 resultAvailable
+    SEVERE: done waiting for feature shutdown: SubscriptionListenerTestAgent@test-6 jadex.micro.features.impl.MicroProvidedServicesComponentFeature@343b2f6
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SubscriptionListenerTestAgent@test-6, SubscriptionListenerTestAgent@test-6, [jadex.bridge.component.impl.MonitoringComponentFeature@b7bd6f8, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@24978d42, jadex.bridge.component.impl.PropertiesComponentFeature@70a39a4f, jadex.bridge.service.component.RequiredServicesComponentFeature@39ce9449, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6c57499e, ExecutionFeature(SubscriptionListenerTestAgent@test-6), jadex.micro.features.impl.MicroPojoComponentFeature@743224cb, jadex.micro.features.impl.MicroMessageComponentFeature@18afa9e0, jadex.micro.features.impl.MicroInjectionComponentFeature@558e1a60]
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SubscriptionListenerTestAgent@test-6 jadex.micro.features.impl.MicroInjectionComponentFeature@558e1a60 done(sync)=true
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SubscriptionListenerTestAgent@test-6, SubscriptionListenerTestAgent@test-6, [jadex.bridge.component.impl.MonitoringComponentFeature@b7bd6f8, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@24978d42, jadex.bridge.component.impl.PropertiesComponentFeature@70a39a4f, jadex.bridge.service.component.RequiredServicesComponentFeature@39ce9449, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6c57499e, ExecutionFeature(SubscriptionListenerTestAgent@test-6), jadex.micro.features.impl.MicroPojoComponentFeature@743224cb, jadex.micro.features.impl.MicroMessageComponentFeature@18afa9e0]
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SubscriptionListenerTestAgent@test-6 jadex.micro.features.impl.MicroMessageComponentFeature@18afa9e0 done(sync)=true
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SubscriptionListenerTestAgent@test-6, SubscriptionListenerTestAgent@test-6, [jadex.bridge.component.impl.MonitoringComponentFeature@b7bd6f8, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@24978d42, jadex.bridge.component.impl.PropertiesComponentFeature@70a39a4f, jadex.bridge.service.component.RequiredServicesComponentFeature@39ce9449, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6c57499e, ExecutionFeature(SubscriptionListenerTestAgent@test-6), jadex.micro.features.impl.MicroPojoComponentFeature@743224cb]
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SubscriptionListenerTestAgent@test-6 jadex.micro.features.impl.MicroPojoComponentFeature@743224cb done(sync)=true
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SubscriptionListenerTestAgent@test-6, SubscriptionListenerTestAgent@test-6, [jadex.bridge.component.impl.MonitoringComponentFeature@b7bd6f8, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@24978d42, jadex.bridge.component.impl.PropertiesComponentFeature@70a39a4f, jadex.bridge.service.component.RequiredServicesComponentFeature@39ce9449, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6c57499e, ExecutionFeature(SubscriptionListenerTestAgent@test-6)]
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.component.impl.ExecutionComponentFeature shutdown
+    SEVERE: shutdown0: ExecutionFeature(SubscriptionListenerTestAgent@test-6)
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
+    SEVERE: wakeup0: ExecutionFeature(SubscriptionListenerTestAgent@test-6)
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
+    SEVERE: wakeup2: ExecutionFeature(SubscriptionListenerTestAgent@test-6), SyncExecutionService(IExecutionService_#63@test-6)
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
+    SEVERE: wakeup4: ExecutionFeature(SubscriptionListenerTestAgent@test-6)
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SubscriptionListenerTestAgent@test-6 ExecutionFeature(SubscriptionListenerTestAgent@test-6) done(sync)=false
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: async waiting for feature shutdown: SubscriptionListenerTestAgent@test-6 ExecutionFeature(SubscriptionListenerTestAgent@test-6)
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.component.impl.ExecutionComponentFeature execute
+    SEVERE: execute()5: jadex.bridge.service.component.ComponentFutureFunctionality$2@1fb6e280 0 active
+    Jan 20, 2021 9:09:54 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
+    SEVERE: execute()6: endstepcnt=54, ret=false, endagenda.isDone()=false
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.component.impl.ExecutionComponentFeature$1 customResultAvailable
+    SEVERE: shutdown1: jadex.bridge.component.impl.ExecutionComponentFeature$1@65bc6424
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.component.impl.ExecutionComponentFeature$1 customResultAvailable
+    SEVERE: shutdown2: jadex.bridge.component.impl.ExecutionComponentFeature$1@65bc6424
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent$8 resultAvailable
+    SEVERE: done waiting for feature shutdown: SubscriptionListenerTestAgent@test-6 ExecutionFeature(SubscriptionListenerTestAgent@test-6)
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SubscriptionListenerTestAgent@test-6, SubscriptionListenerTestAgent@test-6, [jadex.bridge.component.impl.MonitoringComponentFeature@b7bd6f8, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@24978d42, jadex.bridge.component.impl.PropertiesComponentFeature@70a39a4f, jadex.bridge.service.component.RequiredServicesComponentFeature@39ce9449, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6c57499e]
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SubscriptionListenerTestAgent@test-6 jadex.bridge.component.impl.RemoteExecutionComponentFeature@6c57499e done(sync)=true
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SubscriptionListenerTestAgent@test-6, SubscriptionListenerTestAgent@test-6, [jadex.bridge.component.impl.MonitoringComponentFeature@b7bd6f8, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@24978d42, jadex.bridge.component.impl.PropertiesComponentFeature@70a39a4f, jadex.bridge.service.component.RequiredServicesComponentFeature@39ce9449]
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SubscriptionListenerTestAgent@test-6 jadex.bridge.service.component.RequiredServicesComponentFeature@39ce9449 done(sync)=true
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SubscriptionListenerTestAgent@test-6, SubscriptionListenerTestAgent@test-6, [jadex.bridge.component.impl.MonitoringComponentFeature@b7bd6f8, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@24978d42, jadex.bridge.component.impl.PropertiesComponentFeature@70a39a4f]
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SubscriptionListenerTestAgent@test-6 jadex.bridge.component.impl.PropertiesComponentFeature@70a39a4f done(sync)=true
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SubscriptionListenerTestAgent@test-6, SubscriptionListenerTestAgent@test-6, [jadex.bridge.component.impl.MonitoringComponentFeature@b7bd6f8, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@24978d42]
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SubscriptionListenerTestAgent@test-6 jadex.bridge.component.impl.ArgumentsResultsComponentFeature@24978d42 done(sync)=true
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SubscriptionListenerTestAgent@test-6, SubscriptionListenerTestAgent@test-6, [jadex.bridge.component.impl.MonitoringComponentFeature@b7bd6f8]
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SubscriptionListenerTestAgent@test-6 jadex.bridge.component.impl.MonitoringComponentFeature@b7bd6f8 done(sync)=true
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent$3$1 proceed
+    SEVERE: shutdown component features end: SubscriptionListenerTestAgent@test-6, null
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.PlatformComponent$3$1 proceed
+    SEVERE: shutdown component features end4: SubscriptionListenerTestAgent@test-6, null
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.service.types.cms.SComponentManagementService$14 resultAvailable
+    SEVERE: destryCompo finished: SubscriptionListenerTestAgent@test-6
+    Jan 20, 2021 9:09:54 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
+    SEVERE: execute()0: SubscriptionListenerTestAgent@test-6, null, endstepcnt=54, stepcnt=54
+    Jan 20, 2021 9:09:54 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
+    SEVERE: execute()1: SubscriptionListenerTestAgent@test-6, null, endstepcnt=54, stepcnt=54
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.component.impl.ExecutionComponentFeature execute
+    SEVERE: execute()2: SubscriptionListenerTestAgent@test-6, SubscriptionListenerTestAgent@test-6, endstepcnt=54, stepcnt=54
+    Jan 20, 2021 9:09:54 AM SubscriptionListenerTestAgent@test-6 jadex.bridge.component.impl.ExecutionComponentFeature execute
+    SEVERE: execute()3: SubscriptionListenerTestAgent@test-6, SubscriptionListenerTestAgent@test-6, endstepcnt=54, stepcnt=54, null
+    Jan 20, 2021 9:09:54 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
+    SEVERE: execute()7: endstepcnt=54, ret=false, endagenda.isDone()=true

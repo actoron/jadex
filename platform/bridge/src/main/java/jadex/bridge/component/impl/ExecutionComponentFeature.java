@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -1734,7 +1733,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		
 		if(endstepcnt!=-1 && debug)
-			getComponent().getLogger().severe("execute()6: endstepcnt="+endstepcnt+", ret="+ret+", endagenda.isDone()="+endagenda.isDone());
+			getComponent().getLogger().severe("execute()7: endstepcnt="+endstepcnt+", ret="+ret+", endagenda.isDone()="+endagenda.isDone());
 		
 		if(endstepcnt!=-1 && !ret && !endagenda.isDone())
 		{

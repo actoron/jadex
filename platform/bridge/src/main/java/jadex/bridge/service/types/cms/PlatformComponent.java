@@ -121,6 +121,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		_BROKEN.add("jadex.micro.testcases.nfcallreturn.NFCallReturnTestAgent");
 		_BROKEN.add("jadex.micro.testcases.nfmethodprop.NFMethodPropTestAgent");
 		_BROKEN.add("jadex.bdiv3.testcases.servicereflection.NotVisibleProviderAgent");
+		_BROKEN.add("jadex.micro.testcases.servicequeries.ServiceQueriesTestAgent");
 	}
 	
 	//-------- attributes --------
@@ -595,7 +596,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				
 				protected void proceed()
 				{
-					if(!features.isEmpty())	// Happens, when killed due to termination timeput
+					if(!features.isEmpty())	// Happens, when killed due to termination timeout
 					{
 						features.remove(features.size()-1);
 						executeShutdownOnFeatures(features).addResultListener(new DelegationResultListener<Void>(ret));

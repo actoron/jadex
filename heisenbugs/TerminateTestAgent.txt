@@ -1,0 +1,142 @@
+
+jadex.micro.testcases.terminate.TerminateTestAgent > jadex.micro.testcases.terminate.TerminateTestAgent STANDARD_ERROR
+    Jan 20, 2021 9:09:20 AM jadex.base.test.impl.ComponentTestLazyPlatform setPlatform
+    INFO: using timeout: 120000
+
+jadex.micro.testcases.terminate.TerminateTestAgent > jadex.micro.testcases.terminate.TerminateTestAgent STANDARD_OUT
+    Using test timeout: 120000 1611133761006 /builds/jadex/jadex/applications/micro/build/classes/java/test/jadex/micro/testcases/terminate/TerminateTestAgent.class
+
+jadex.micro.testcases.terminate.TerminateTestAgent > jadex.micro.testcases.terminate.TerminateTestAgent STANDARD_ERROR
+    Jan 20, 2021 9:09:21 AM test-0 jadex.bridge.service.types.cms.PlatformComponent create
+    SEVERE: Enabled PlatformComponent debugging for TerminateTestAgent@test-0
+    Jan 20, 2021 9:09:21 AM test-0 jadex.bridge.component.impl.ExecutionComponentFeature <init>
+    SEVERE: Enabled ExecutionComponentFeature debugging for TerminateTestAgent@test-0
+    Jan 20, 2021 9:09:21 AM jadex.base.test.impl.ComponentTestBase <init>
+    SEVERE: Empty ComponentTest Constructor called
+
+jadex.micro.testcases.LoggerAgent STANDARD_ERROR
+    Jan 20, 2021 9:09:21 AM jadex.base.test.impl.ComponentTestBase <init>
+    SEVERE: Empty ComponentTest Constructor called
+
+jadex.micro.testcases.terminate.TerminateTestAgent > jadex.micro.testcases.terminate.TerminateTestAgent STANDARD_OUT
+    TerminateTestAgent@test-0: testTerminate1
+    TerminableProviderAgent@test-0: getResult1 100
+    TerminableProviderAgent@test-0: getResult2 null
+    TerminateTestAgent@test-0: testTerminate3
+    TerminateTestAgent@test-0: testTerminate4
+    TerminateTestAgent@test-0: testTerminateAction1
+    TerminableProviderAgent@test-0: getResult1 100
+    TerminableProviderAgent@test-0: getResult2 jadex.commons.future.IntermediateFuture@191c63ab
+    TerminateTestAgent@test-0: testTerminateAction3
+    TerminateTestAgent@test-0: testTerminateAction4
+Starting process 'Gradle Test Executor 51'. Working directory: /builds/jadex/jadex/applications/micro Command: /usr/local/openjdk-11/bin/java -Dorg.gradle.native=false @/tmp/gradle-worker-classpath9343800070482846102txt -Xmx512m -Dfile.encoding=UTF-8 -Duser.country -Duser.language=en -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Test Executor 51'
+Starting process 'Gradle Test Executor 52'. Working directory: /builds/jadex/jadex/applications/micro Command: /usr/local/openjdk-11/bin/java -Dorg.gradle.native=false @/tmp/gradle-worker-classpath3791608844076218956txt -Xmx512m -Dfile.encoding=UTF-8 -Duser.country -Duser.language=en -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Test Executor 52'
+Successfully started process 'Gradle Test Executor 51'
+Successfully started process 'Gradle Test Executor 52'
+Starting process 'Gradle Test Executor 54'. Working directory: /builds/jadex/jadex/applications/micro Command: /usr/local/openjdk-11/bin/java -Dorg.gradle.native=false @/tmp/gradle-worker-classpath3434736408403752955txt -Xmx512m -Dfile.encoding=UTF-8 -Duser.country -Duser.language=en -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Test Executor 54'
+Successfully started process 'Gradle Test Executor 54'
+
+
+jadex.micro.testcases.terminate.TerminateTestAgent > jadex.micro.testcases.terminate.TerminateTestAgent STANDARD_OUT
+    TerminateTestAgent@test-0: testTerminate1
+    TerminableProviderAgent@test-2: getResult1 1000
+    TerminableProviderAgent@test-2: getResult2 null
+    TerminateTestAgent@test-0: testTerminate3
+    TerminateTestAgent@test-0: testTerminate4
+    TerminateTestAgent@test-0: testTerminateAction1
+    TerminableProviderAgent@test-2: getResult1 1000
+    TerminableProviderAgent@test-2: getResult2 jadex.commons.future.IntermediateFuture@56c32fa
+    TerminateTestAgent@test-0: testTerminateAction3
+    TerminateTestAgent@test-0: testTerminateAction4
+
+jadex.micro.testcases.terminate.TerminateTestAgent > jadex.micro.testcases.terminate.TerminateTestAgent STANDARD_ERROR
+    Jan 20, 2021 9:09:27 AM TerminateTestAgent@test-0 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+    SEVERE: destroy1: TerminateTestAgent@test-0
+    Jan 20, 2021 9:09:27 AM TerminateTestAgent@test-0 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+    SEVERE: destroy2: TerminateTestAgent@test-0
+    Jan 20, 2021 9:09:27 AM TerminateTestAgent@test-0 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+    SEVERE: destroy3: TerminateTestAgent@test-0
+    Jan 20, 2021 9:09:27 AM TerminateTestAgent@test-0 jadex.bridge.service.types.cms.PlatformComponent shutdown
+    SEVERE: shutdown component features start: TerminateTestAgent@test-0
+    Jan 20, 2021 9:09:27 AM TerminateTestAgent@test-0 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+    SEVERE: destroy4 (contains, locked, inited): TerminateTestAgent@test-0 (false, false, true)
+    Jan 20, 2021 9:09:27 AM TerminateTestAgent@test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
+    SEVERE: ExternalAccessInvocationHandler.invoke(): TerminateTestAgent@test-0, public abstract jadex.bridge.IComponentIdentifier jadex.bridge.IExternalAccess.getId(), null
+    Jan 20, 2021 9:09:27 AM TerminateTestAgent@test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
+    SEVERE: ExternalAccessInvocationHandler.invoke(): TerminateTestAgent@test-0, public abstract jadex.bridge.IComponentIdentifier jadex.bridge.IExternalAccess.getId(), null
+    Jan 20, 2021 9:09:27 AM TerminateTestAgent@test-0 jadex.bridge.service.types.cms.PlatformComponent$3 execute
+    SEVERE: shutdown component features start: TerminateTestAgent@test-0, null, [jadex.bridge.component.impl.MonitoringComponentFeature@2fecb48a, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@dced956, jadex.bridge.component.impl.PropertiesComponentFeature@3a9a7b6f, jadex.bridge.service.component.RequiredServicesComponentFeature@8c37386, jadex.bridge.component.impl.RemoteExecutionComponentFeature@42c1cef0, ExecutionFeature(TerminateTestAgent@test-0), jadex.micro.features.impl.MicroPojoComponentFeature@393ebb97, jadex.micro.features.impl.MicroMessageComponentFeature@5016fedc, jadex.micro.features.impl.MicroInjectionComponentFeature@43dae81b, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@fa008de, jadex.bridge.component.impl.SubcomponentsComponentFeature@438ee8be, jadex.bridge.component.impl.NFPropertyComponentFeature@24890e0d, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@3007a0b7, jadex.micro.features.impl.MicroLifecycleComponentFeature@3feeb891]
+    Jan 20, 2021 9:09:27 AM TerminateTestAgent@test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: TerminateTestAgent@test-0, TerminateTestAgent@test-0, [jadex.bridge.component.impl.MonitoringComponentFeature@2fecb48a, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@dced956, jadex.bridge.component.impl.PropertiesComponentFeature@3a9a7b6f, jadex.bridge.service.component.RequiredServicesComponentFeature@8c37386, jadex.bridge.component.impl.RemoteExecutionComponentFeature@42c1cef0, ExecutionFeature(TerminateTestAgent@test-0), jadex.micro.features.impl.MicroPojoComponentFeature@393ebb97, jadex.micro.features.impl.MicroMessageComponentFeature@5016fedc, jadex.micro.features.impl.MicroInjectionComponentFeature@43dae81b, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@fa008de, jadex.bridge.component.impl.SubcomponentsComponentFeature@438ee8be, jadex.bridge.component.impl.NFPropertyComponentFeature@24890e0d, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@3007a0b7, jadex.micro.features.impl.MicroLifecycleComponentFeature@3feeb891]
+    Jan 20, 2021 9:09:27 AM TerminateTestAgent@test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: TerminateTestAgent@test-0 jadex.micro.features.impl.MicroLifecycleComponentFeature@3feeb891 done(sync)=false
+    Jan 20, 2021 9:09:27 AM TerminateTestAgent@test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: async waiting for feature shutdown: TerminateTestAgent@test-0 jadex.micro.features.impl.MicroLifecycleComponentFeature@3feeb891
+
+jadex.micro.testcases.terminate.TerminateTestAgent > jadex.micro.testcases.terminate.TerminateTestAgent STANDARD_ERROR
+    Jan 20, 2021 9:09:57 AM TerminateTestAgent@test-0 jadex.bridge.service.types.cms.PlatformComponent$3$2 resultAvailable
+    SEVERE: shutdown component features timeout: TerminateTestAgent@test-0
+
+jadex.micro.testcases.terminate.TerminateTestAgent > jadex.micro.testcases.terminate.TerminateTestAgent STANDARD_OUT
+    Fatal error, component 'TerminateTestAgent@test-0' will be removed.
+    jadex.commons.TimeoutException: Timeout during component cleanup: 30000
+    	at jadex.bridge.service.types.cms.PlatformComponent$3$2.resultAvailable(PlatformComponent.java:350)
+    	at jadex.bridge.service.types.cms.PlatformComponent$3$2.resultAvailable(PlatformComponent.java:343)
+    	at jadex.commons.future.Future$1.execute(Future.java:756)
+    	at jadex.commons.future.Future$1.execute(Future.java:733)
+    	at jadex.commons.future.Future.executeNotification(Future.java:651)
+    	at jadex.commons.future.Future.startScheduledNotifications(Future.java:633)
+    	at jadex.commons.future.Future.notifyListener(Future.java:719)
+    	at jadex.commons.future.Future.resume(Future.java:477)
+    	at jadex.commons.future.Future.setResult(Future.java:385)
+    	at jadex.bridge.component.impl.ExecutionComponentFeature$5$2.execute(ExecutionComponentFeature.java:558)
+    	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1421)
+    	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+    	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+    	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+    	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+    	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+    	at java.base/java.lang.Thread.run(Thread.java:834)
+
+
+jadex.micro.testcases.terminate.TerminateTestAgent > jadex.micro.testcases.terminate.TerminateTestAgent STANDARD_ERROR
+    Jan 20, 2021 9:09:57 AM TerminateTestAgent@test-0 jadex.bridge.service.types.cms.SComponentManagementService$14 exceptionOccurred
+    SEVERE: destryCompo finished with ex: TerminateTestAgent@test-0 jadex.commons.TimeoutException: Timeout during component cleanup: 30000
+    jadex.commons.TimeoutException: Timeout during component cleanup: 30000
+    	at jadex.bridge.service.types.cms.PlatformComponent$3$2.resultAvailable(PlatformComponent.java:350)
+    	at jadex.bridge.service.types.cms.PlatformComponent$3$2.resultAvailable(PlatformComponent.java:343)
+    	at jadex.commons.future.Future$1.execute(Future.java:756)
+    	at jadex.commons.future.Future$1.execute(Future.java:733)
+    	at jadex.commons.future.Future.executeNotification(Future.java:651)
+    	at jadex.commons.future.Future.startScheduledNotifications(Future.java:633)
+    	at jadex.commons.future.Future.notifyListener(Future.java:719)
+    	at jadex.commons.future.Future.resume(Future.java:477)
+    	at jadex.commons.future.Future.setResult(Future.java:385)
+    	at jadex.bridge.component.impl.ExecutionComponentFeature$5$2.execute(ExecutionComponentFeature.java:558)
+    	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1421)
+    	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+    	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+    	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+    	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+    	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+    	at java.base/java.lang.Thread.run(Thread.java:834)
+
+jadex.micro.testcases.terminate.TerminateTestAgent > jadex.micro.testcases.terminate.TerminateTestAgent FAILED
+    jadex.commons.TimeoutException: Timeout during component cleanup: 30000
+        at jadex.bridge.service.types.cms.PlatformComponent$3$2.resultAvailable(PlatformComponent.java:350)
+        at jadex.bridge.service.types.cms.PlatformComponent$3$2.resultAvailable(PlatformComponent.java:343)
+        at jadex.commons.future.Future$1.execute(Future.java:756)
+        at jadex.commons.future.Future$1.execute(Future.java:733)
+        at jadex.commons.future.Future.executeNotification(Future.java:651)
+        at jadex.commons.future.Future.startScheduledNotifications(Future.java:633)
+        at jadex.commons.future.Future.notifyListener(Future.java:719)
+        at jadex.commons.future.Future.resume(Future.java:477)
+        at jadex.commons.future.Future.setResult(Future.java:385)
+        at jadex.bridge.component.impl.ExecutionComponentFeature$5$2.execute(ExecutionComponentFeature.java:558)
+        at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1421)
+        at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+        at jadex.commons.concurrent.Executor.code(Executor.java:299)
+        at jadex.commons.concurrent.Executor.run(Executor.java:126)
+        at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+        at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+        at java.base/java.lang.Thread.run(Thread.java:834)

@@ -9,6 +9,9 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
+import jadex.base.Starter;
 import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
@@ -28,6 +31,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.annotation.OnEnd;
@@ -35,6 +39,7 @@ import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -449,5 +454,46 @@ public class SellerAgent implements IBuyBookService, INegotiationAgent
 			}
 		}
 		return ret;
+	}
+
+	/**
+	 *  Main for reproducing termination heisenbug.
+	 */
+	public static void main(String[] args)
+	{
+		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimal();
+		CreationInfo ci = new CreationInfo().setFilename("jadex/bdiv3/examples/booktrading/seller/SellerAgent.class");
+		
+		IExternalAccess	platform	= Starter.createPlatform(config).get();
+		
+		while(true)
+		{
+			List<IFuture<IExternalAccess>>	sellers	= new ArrayList<>();
+			
+			// Start many agents
+			for(int i=0; i<10; i++)
+			{
+				sellers.add(platform.createComponent(ci));				
+			}
+			
+			// Wait for all agents started
+			sellers.stream().forEach(seller -> seller.get());
+			
+			// Kill all agents
+			sellers.stream().forEach(seller -> seller.get().killComponent());
+			
+			// Wait for all agents killed
+			sellers.stream().forEach(seller ->
+			{
+				try
+				{
+					seller.get().killComponent().get();
+				}
+				catch(ComponentTerminatedException e)
+				{
+					// Only interested in timeout exception
+				}
+			});
+		}
 	}
 }
