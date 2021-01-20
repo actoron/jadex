@@ -117,7 +117,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		_BROKEN.add("jadex.bdiv3.examples.booktrading.seller.SellerAgent");
 		_BROKEN.add("jadex.micro.testcases.terminate.TerminateTestAgent");
 		_BROKEN.add("jadex.micro.testcases.terminate.TerminateIntermediateTestAgent");
-		_BROKEN.add("jadex.micro.testcases.subscriptionlistener.SubscriptionListenerTestAgent");
+//		_BROKEN.add("jadex.micro.testcases.subscriptionlistener.SubscriptionListenerTestAgent");
 		_BROKEN.add("jadex.micro.testcases.nfcallreturn.NFCallReturnTestAgent");
 		_BROKEN.add("jadex.micro.testcases.nfmethodprop.NFMethodPropTestAgent");
 		_BROKEN.add("jadex.bdiv3.testcases.servicereflection.NotVisibleProviderAgent");
@@ -1690,10 +1690,25 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 							try
 							{
 								boolean intermediate = SReflect.isSupertype(IIntermediateFuture.class, fut.getClass());
+								if(shutdown && debug)
+									PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute2a: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+fut.isDone());
 								if(!intermediate)
+								{
+									if(shutdown && debug)
+										PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute2b: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+fut.isDone());
 									fut.addResultListener(new DelegationResultListener<>(ret));
+									if(shutdown && debug)
+										PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute2c: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+fut.isDone());
+
+								}
 								else
+								{
+									if(shutdown && debug)
+										PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute2d: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+fut.isDone());
 									fut.addResultListener(new IntermediateDelegationResultListener<>((IntermediateFuture)ret));
+									if(shutdown && debug)
+										PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute2e: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+fut.isDone());
+								}
 								return IFuture.DONE;
 							}
 							finally

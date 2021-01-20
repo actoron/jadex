@@ -1,189 +1,221 @@
+
 jadex.bdiv3.testcases.BDIV3Test > jadex.base.test.impl.ComponentStartTest.start: jadex.bdiv3.examples.booktrading.BookTradingServices (Application) STANDARD_OUT
-    Using test timeout: 30000 1611148525975 /builds/jadex/jadex/applications/bdiv3/build/resources/main/jadex/bdiv3/examples/booktrading/BookTradingServices.application.xml
-    component start test 0: /builds/jadex/jadex/applications/bdiv3/build/resources/main/jadex/bdiv3/examples/booktrading/BookTradingServices.application.xml
+    Using test timeout: 90000 1611181365598 C:\Users\Alex\Checkouts\jadex\applications\bdiv3\build\resources\main\jadex\bdiv3\examples\booktrading\BookTradingServices.application.xml
+    component start test 0: C:\Users\Alex\Checkouts\jadex\applications\bdiv3\build\resources\main\jadex\bdiv3\examples\booktrading\BookTradingServices.application.xml
 
 jadex.bdiv3.testcases.BDIV3Test > jadex.base.test.impl.ComponentStartTest.start: jadex.bdiv3.examples.booktrading.BookTradingServices (Application) STANDARD_ERROR
-    Jan 20, 2021 1:15:26 PM BookTradingServices@test-0 jadex.bridge.service.types.cms.PlatformComponent create
+    Jan. 20, 2021 11:22:46 NACHM. BookTradingServices@test-0 jadex.bridge.service.types.cms.PlatformComponent create
     SEVERE: Enabled PlatformComponent debugging for SellerAgent@BookTradingServices:test-0
-    Jan 20, 2021 1:15:26 PM BookTradingServices@test-0 jadex.bridge.component.impl.ExecutionComponentFeature <init>
+    Jan. 20, 2021 11:22:46 NACHM. BookTradingServices@test-0 jadex.bridge.component.impl.ExecutionComponentFeature <init>
     SEVERE: Enabled ExecutionComponentFeature debugging for SellerAgent@BookTradingServices:test-0
 
 jadex.bdiv3.testcases.BDIV3Test > jadex.base.test.impl.ComponentStartTest.start: jadex.bdiv3.examples.booktrading.BookTradingServices (Application) STANDARD_OUT
-    component start test 1: /builds/jadex/jadex/applications/bdiv3/build/resources/main/jadex/bdiv3/examples/booktrading/BookTradingServices.application.xml, BookTradingServices@test-0
+    component start test 1: C:\Users\Alex\Checkouts\jadex\applications\bdiv3\build\resources\main\jadex\bdiv3\examples\booktrading\BookTradingServices.application.xml, BookTradingServices@test-0
     component start test 2: BookTradingServices@test-0
 
 jadex.bdiv3.testcases.BDIV3Test > jadex.base.test.impl.ComponentStartTest.start: jadex.bdiv3.examples.booktrading.BookTradingServices (Application) STANDARD_ERROR
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.SComponentManagementService destroyComponen
     SEVERE: destroy1: SellerAgent@BookTradingServices:test-0
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.SComponentManagementService destroyComponen
     SEVERE: destroy2: SellerAgent@BookTradingServices:test-0
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
     SEVERE: destroy3: SellerAgent@BookTradingServices:test-0
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent shutdown
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent shutdown
     SEVERE: shutdown component features start: SellerAgent@BookTradingServices:test-0
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
     SEVERE: destroy4 (contains, locked, inited): SellerAgent@BookTradingServices:test-0 (false, false, true)
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke5: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null: jadex.commons.future.Future@1a1a62b3
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke6: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null: jadex.commons.future.Future@1a1a62b3, done=false
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke5: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null: jadex.commons.future.Future@3af6ee11
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke6: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null: jadex.commons.future.Future@3af6ee11, done=false
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
     SEVERE: ExternalAccessInvocationHandler.doExecute2: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null done=false
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
     SEVERE: ExternalAccessInvocationHandler.doExecute3: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null done=false
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 execute
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 execute
     SEVERE: ExternalAccessInvocationHandler.step1 end: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$3 execute
-    SEVERE: shutdown component features start: SellerAgent@BookTradingServices:test-0, null, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@684de352, jadex.bridge.component.impl.PropertiesComponentFeature@3aece75e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@254e7c55, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@6c088db5, jadex.micro.features.impl.MicroPojoComponentFeature@6b58a415, jadex.micro.features.impl.MicroMessageComponentFeature@36536837, jadex.bdiv3.features.impl.BDIAgentFeature@60a9067c, ExecutionFeature(SellerAgent@BookTradingServices:test-0), jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@48e45af9, jadex.micro.features.impl.MicroInjectionComponentFeature@663237fc, jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@4b0df9dd, jadex.bridge.component.impl.NFPropertyComponentFeature@633f8c26, jadex.bridge.component.impl.SubcomponentsComponentFeature@9e6312a, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@7e9c6a3d, jadex.bdiv3.features.impl.BDILifecycleAgentFeature@5a7ba722]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: feature shutdown start: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@684de352, jadex.bridge.component.impl.PropertiesComponentFeature@3aece75e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@254e7c55, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@6c088db5, jadex.micro.features.impl.MicroPojoComponentFeature@6b58a415, jadex.micro.features.impl.MicroMessageComponentFeature@36536837, jadex.bdiv3.features.impl.BDIAgentFeature@60a9067c, ExecutionFeature(SellerAgent@BookTradingServices:test-0), jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@48e45af9, jadex.micro.features.impl.MicroInjectionComponentFeature@663237fc, jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@4b0df9dd, jadex.bridge.component.impl.NFPropertyComponentFeature@633f8c26, jadex.bridge.component.impl.SubcomponentsComponentFeature@9e6312a, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@7e9c6a3d, jadex.bdiv3.features.impl.BDILifecycleAgentFeature@5a7ba722]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: feature shutdown called: SellerAgent@BookTradingServices:test-0 jadex.bdiv3.features.impl.BDILifecycleAgentFeature@5a7ba722 done(sync)=false
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: async waiting for feature shutdown: SellerAgent@BookTradingServices:test-0 jadex.bdiv3.features.impl.BDILifecycleAgentFeature@5a7ba722
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
-    SEVERE: ExternalAccessInvocationHandler.invoke(): SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@453a5ef7]
-    Jan 20, 2021 1:15:26 PM jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
-    SEVERE: ExternalAccessInvocationHandler.invoke(): SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@2d923f66]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke1: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@453a5ef7]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke4: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@453a5ef7]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke5: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@453a5ef7]: jadex.bridge.service.component.interceptors.DelegatingFuture@7d6d481b
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke6: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@453a5ef7]: jadex.bridge.service.component.interceptors.DelegatingFuture@7d6d481b, done=false
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
-    SEVERE: ExternalAccessInvocationHandler.invoke(): SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@60bd1809]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke1: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@60bd1809]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke4: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@60bd1809]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke5: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@60bd1809]: jadex.bridge.service.component.interceptors.DelegatingFuture@67f8f18b
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke6: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@60bd1809]: jadex.bridge.service.component.interceptors.DelegatingFuture@67f8f18b, done=false
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
-    SEVERE: ExternalAccessInvocationHandler.invoke(): SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@6fed4440]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke1: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@6fed4440]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke4: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@6fed4440]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke5: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@6fed4440]: jadex.bridge.service.component.interceptors.DelegatingFuture@4fb9949f
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke6: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@6fed4440]: jadex.bridge.service.component.interceptors.DelegatingFuture@4fb9949f, done=false
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
-    SEVERE: ExternalAccessInvocationHandler.invoke(): SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@294e62e3]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke1: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@294e62e3]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke4: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@294e62e3]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke5: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@294e62e3]: jadex.bridge.service.component.interceptors.DelegatingFuture@d5df515
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke6: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@294e62e3]: jadex.bridge.service.component.interceptors.DelegatingFuture@d5df515, done=false
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$3 execute
+    SEVERE: shutdown component features start: SellerAgent@BookTradingServices:test-0, null, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@3f8f3602, jadex.bridge.component.impl.PropertiesComponentFeature@73a08636, jadex.bridge.component.impl.RemoteExecutionComponentFeature@502a93c, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@80959eb, jadex.micro.features.impl.MicroPojoComponentFeature@4e7041ce, jadex.micro.features.impl.MicroMessageComponentFeature@3996ef00, jadex.bdiv3.features.impl.BDIAgentFeature@294dea47, ExecutionFeature(SellerAgent@BookTradingServices:test-0), jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@6bc93884, jadex.micro.features.impl.MicroInjectionComponentFeature@277b6a02, jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@291b6f02, jadex.bridge.component.impl.NFPropertyComponentFeature@6fc2b7b4, jadex.bridge.component.impl.SubcomponentsComponentFeature@4d6dafd0, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@31bae705, jadex.bdiv3.features.impl.BDILifecycleAgentFeature@43abfd4f]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@3f8f3602, jadex.bridge.component.impl.PropertiesComponentFeature@73a08636, jadex.bridge.component.impl.RemoteExecutionComponentFeature@502a93c, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@80959eb, jadex.micro.features.impl.MicroPojoComponentFeature@4e7041ce, jadex.micro.features.impl.MicroMessageComponentFeature@3996ef00, jadex.bdiv3.features.impl.BDIAgentFeature@294dea47, ExecutionFeature(SellerAgent@BookTradingServices:test-0), jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@6bc93884, jadex.micro.features.impl.MicroInjectionComponentFeature@277b6a02, jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@291b6f02, jadex.bridge.component.impl.NFPropertyComponentFeature@6fc2b7b4, jadex.bridge.component.impl.SubcomponentsComponentFeature@4d6dafd0, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@31bae705, jadex.bdiv3.features.impl.BDILifecycleAgentFeature@43abfd4f]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SellerAgent@BookTradingServices:test-0 jadex.bdiv3.features.impl.BDILifecycleAgentFeature@43abfd4f done(sync)=false
+    Jan. 20, 2021 11:22:46 NACHM. jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
+    SEVERE: ExternalAccessInvocationHandler.invoke(): SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@6189152f]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: async waiting for feature shutdown: SellerAgent@BookTradingServices:test-0 jadex.bdiv3.features.impl.BDILifecycleAgentFeature@43abfd4f
+    Jan. 20, 2021 11:22:46 NACHM. jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
+    SEVERE: ExternalAccessInvocationHandler.doExecute4: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@6189152f] done=false
+    Jan. 20, 2021 11:22:46 NACHM. jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
+    SEVERE: ExternalAccessInvocationHandler.doExecute5: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@6189152f] done=false
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
+    SEVERE: ExternalAccessInvocationHandler.invoke(): SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@39ae9d99]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke1: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@39ae9d99]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke4: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@39ae9d99]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke5: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@39ae9d99]: jadex.bridge.service.component.interceptors.DelegatingFuture@191da653
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke6: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@39ae9d99]: jadex.bridge.service.component.interceptors.DelegatingFuture@191da653, done=false
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
+    SEVERE: ExternalAccessInvocationHandler.invoke(): SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@7f79f8ba]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke1: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@7f79f8ba]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke4: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@7f79f8ba]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke5: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@7f79f8ba]: jadex.bridge.service.component.interceptors.DelegatingFuture@6324339f
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke6: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@7f79f8ba]: jadex.bridge.service.component.interceptors.DelegatingFuture@6324339f, done=false
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
+    SEVERE: ExternalAccessInvocationHandler.invoke(): SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@6a7ca343]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke1: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@6a7ca343]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke4: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@6a7ca343]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke5: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@6a7ca343]: jadex.bridge.service.component.interceptors.DelegatingFuture@2886cd58
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke6: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@6a7ca343]: jadex.bridge.service.component.interceptors.DelegatingFuture@2886cd58, done=false
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
+    SEVERE: ExternalAccessInvocationHandler.invoke(): SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@5f9b22ef]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke1: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@5f9b22ef]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke4: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@5f9b22ef]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke5: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@5f9b22ef]: jadex.bridge.service.component.interceptors.DelegatingFuture@4d46947
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke6: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.GuiPanel$10@5f9b22ef]: jadex.bridge.service.component.interceptors.DelegatingFuture@4d46947, done=false
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
     SEVERE: lifecycle feature shutdown start: SellerAgent@BookTradingServices:test-0
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
     SEVERE: lifecycle feature shutdown method invoked: SellerAgent@BookTradingServices:test-0 done=true
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.micro.features.impl.MicroLifecycleComponentFeature$1 resultAvailable
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.micro.features.impl.MicroLifecycleComponentFeature$1 resultAvailable
     SEVERE: lifecycle feature shutdown end result: SellerAgent@BookTradingServices:test-0
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$8 resultAvailable
-    SEVERE: done waiting for feature shutdown: SellerAgent@BookTradingServices:test-0 jadex.bdiv3.features.impl.BDILifecycleAgentFeature@5a7ba722
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: feature shutdown start: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@684de352, jadex.bridge.component.impl.PropertiesComponentFeature@3aece75e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@254e7c55, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@6c088db5, jadex.micro.features.impl.MicroPojoComponentFeature@6b58a415, jadex.micro.features.impl.MicroMessageComponentFeature@36536837, jadex.bdiv3.features.impl.BDIAgentFeature@60a9067c, ExecutionFeature(SellerAgent@BookTradingServices:test-0), jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@48e45af9, jadex.micro.features.impl.MicroInjectionComponentFeature@663237fc, jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@4b0df9dd, jadex.bridge.component.impl.NFPropertyComponentFeature@633f8c26, jadex.bridge.component.impl.SubcomponentsComponentFeature@9e6312a, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@7e9c6a3d]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: feature shutdown called: SellerAgent@BookTradingServices:test-0 jadex.micro.features.impl.MicroServiceInjectionComponentFeature@7e9c6a3d done(sync)=true
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: feature shutdown start: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@684de352, jadex.bridge.component.impl.PropertiesComponentFeature@3aece75e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@254e7c55, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@6c088db5, jadex.micro.features.impl.MicroPojoComponentFeature@6b58a415, jadex.micro.features.impl.MicroMessageComponentFeature@36536837, jadex.bdiv3.features.impl.BDIAgentFeature@60a9067c, ExecutionFeature(SellerAgent@BookTradingServices:test-0), jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@48e45af9, jadex.micro.features.impl.MicroInjectionComponentFeature@663237fc, jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@4b0df9dd, jadex.bridge.component.impl.NFPropertyComponentFeature@633f8c26, jadex.bridge.component.impl.SubcomponentsComponentFeature@9e6312a]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: feature shutdown called: SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.SubcomponentsComponentFeature@9e6312a done(sync)=true
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: feature shutdown start: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@684de352, jadex.bridge.component.impl.PropertiesComponentFeature@3aece75e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@254e7c55, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@6c088db5, jadex.micro.features.impl.MicroPojoComponentFeature@6b58a415, jadex.micro.features.impl.MicroMessageComponentFeature@36536837, jadex.bdiv3.features.impl.BDIAgentFeature@60a9067c, ExecutionFeature(SellerAgent@BookTradingServices:test-0), jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@48e45af9, jadex.micro.features.impl.MicroInjectionComponentFeature@663237fc, jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@4b0df9dd, jadex.bridge.component.impl.NFPropertyComponentFeature@633f8c26]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: feature shutdown called: SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.NFPropertyComponentFeature@633f8c26 done(sync)=true
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: feature shutdown start: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@684de352, jadex.bridge.component.impl.PropertiesComponentFeature@3aece75e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@254e7c55, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@6c088db5, jadex.micro.features.impl.MicroPojoComponentFeature@6b58a415, jadex.micro.features.impl.MicroMessageComponentFeature@36536837, jadex.bdiv3.features.impl.BDIAgentFeature@60a9067c, ExecutionFeature(SellerAgent@BookTradingServices:test-0), jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@48e45af9, jadex.micro.features.impl.MicroInjectionComponentFeature@663237fc, jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@4b0df9dd]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: feature shutdown called: SellerAgent@BookTradingServices:test-0 jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@4b0df9dd done(sync)=false
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: async waiting for feature shutdown: SellerAgent@BookTradingServices:test-0 jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@4b0df9dd
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$8 resultAvailable
-    SEVERE: done waiting for feature shutdown: SellerAgent@BookTradingServices:test-0 jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@4b0df9dd
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: feature shutdown start: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@684de352, jadex.bridge.component.impl.PropertiesComponentFeature@3aece75e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@254e7c55, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@6c088db5, jadex.micro.features.impl.MicroPojoComponentFeature@6b58a415, jadex.micro.features.impl.MicroMessageComponentFeature@36536837, jadex.bdiv3.features.impl.BDIAgentFeature@60a9067c, ExecutionFeature(SellerAgent@BookTradingServices:test-0), jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@48e45af9, jadex.micro.features.impl.MicroInjectionComponentFeature@663237fc]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: feature shutdown called: SellerAgent@BookTradingServices:test-0 jadex.micro.features.impl.MicroInjectionComponentFeature@663237fc done(sync)=true
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: feature shutdown start: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@684de352, jadex.bridge.component.impl.PropertiesComponentFeature@3aece75e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@254e7c55, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@6c088db5, jadex.micro.features.impl.MicroPojoComponentFeature@6b58a415, jadex.micro.features.impl.MicroMessageComponentFeature@36536837, jadex.bdiv3.features.impl.BDIAgentFeature@60a9067c, ExecutionFeature(SellerAgent@BookTradingServices:test-0), jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@48e45af9]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: feature shutdown called: SellerAgent@BookTradingServices:test-0 jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@48e45af9 done(sync)=true
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-    SEVERE: feature shutdown start: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@684de352, jadex.bridge.component.impl.PropertiesComponentFeature@3aece75e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@254e7c55, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@6c088db5, jadex.micro.features.impl.MicroPojoComponentFeature@6b58a415, jadex.micro.features.impl.MicroMessageComponentFeature@36536837, jadex.bdiv3.features.impl.BDIAgentFeature@60a9067c, ExecutionFeature(SellerAgent@BookTradingServices:test-0)]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.ExecutionComponentFeature shutdown
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$8 resultAvailable
+    SEVERE: done waiting for feature shutdown: SellerAgent@BookTradingServices:test-0 jadex.bdiv3.features.impl.BDILifecycleAgentFeature@43abfd4f
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@3f8f3602, jadex.bridge.component.impl.PropertiesComponentFeature@73a08636, jadex.bridge.component.impl.RemoteExecutionComponentFeature@502a93c, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@80959eb, jadex.micro.features.impl.MicroPojoComponentFeature@4e7041ce, jadex.micro.features.impl.MicroMessageComponentFeature@3996ef00, jadex.bdiv3.features.impl.BDIAgentFeature@294dea47, ExecutionFeature(SellerAgent@BookTradingServices:test-0), jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@6bc93884, jadex.micro.features.impl.MicroInjectionComponentFeature@277b6a02, jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@291b6f02, jadex.bridge.component.impl.NFPropertyComponentFeature@6fc2b7b4, jadex.bridge.component.impl.SubcomponentsComponentFeature@4d6dafd0, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@31bae705]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SellerAgent@BookTradingServices:test-0 jadex.micro.features.impl.MicroServiceInjectionComponentFeature@31bae705 done(sync)=true
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@3f8f3602, jadex.bridge.component.impl.PropertiesComponentFeature@73a08636, jadex.bridge.component.impl.RemoteExecutionComponentFeature@502a93c, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@80959eb, jadex.micro.features.impl.MicroPojoComponentFeature@4e7041ce, jadex.micro.features.impl.MicroMessageComponentFeature@3996ef00, jadex.bdiv3.features.impl.BDIAgentFeature@294dea47, ExecutionFeature(SellerAgent@BookTradingServices:test-0), jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@6bc93884, jadex.micro.features.impl.MicroInjectionComponentFeature@277b6a02, jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@291b6f02, jadex.bridge.component.impl.NFPropertyComponentFeature@6fc2b7b4, jadex.bridge.component.impl.SubcomponentsComponentFeature@4d6dafd0]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.SubcomponentsComponentFeature@4d6dafd0 done(sync)=true
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@3f8f3602, jadex.bridge.component.impl.PropertiesComponentFeature@73a08636, jadex.bridge.component.impl.RemoteExecutionComponentFeature@502a93c, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@80959eb, jadex.micro.features.impl.MicroPojoComponentFeature@4e7041ce, jadex.micro.features.impl.MicroMessageComponentFeature@3996ef00, jadex.bdiv3.features.impl.BDIAgentFeature@294dea47, ExecutionFeature(SellerAgent@BookTradingServices:test-0), jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@6bc93884, jadex.micro.features.impl.MicroInjectionComponentFeature@277b6a02, jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@291b6f02, jadex.bridge.component.impl.NFPropertyComponentFeature@6fc2b7b4]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.NFPropertyComponentFeature@6fc2b7b4 done(sync)=true
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@3f8f3602, jadex.bridge.component.impl.PropertiesComponentFeature@73a08636, jadex.bridge.component.impl.RemoteExecutionComponentFeature@502a93c, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@80959eb, jadex.micro.features.impl.MicroPojoComponentFeature@4e7041ce, jadex.micro.features.impl.MicroMessageComponentFeature@3996ef00, jadex.bdiv3.features.impl.BDIAgentFeature@294dea47, ExecutionFeature(SellerAgent@BookTradingServices:test-0), jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@6bc93884, jadex.micro.features.impl.MicroInjectionComponentFeature@277b6a02, jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@291b6f02]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SellerAgent@BookTradingServices:test-0 jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@291b6f02 done(sync)=false
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: async waiting for feature shutdown: SellerAgent@BookTradingServices:test-0 jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@291b6f02
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$8 resultAvailable
+    SEVERE: done waiting for feature shutdown: SellerAgent@BookTradingServices:test-0 jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature@291b6f02
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@3f8f3602, jadex.bridge.component.impl.PropertiesComponentFeature@73a08636, jadex.bridge.component.impl.RemoteExecutionComponentFeature@502a93c, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@80959eb, jadex.micro.features.impl.MicroPojoComponentFeature@4e7041ce, jadex.micro.features.impl.MicroMessageComponentFeature@3996ef00, jadex.bdiv3.features.impl.BDIAgentFeature@294dea47, ExecutionFeature(SellerAgent@BookTradingServices:test-0), jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@6bc93884, jadex.micro.features.impl.MicroInjectionComponentFeature@277b6a02]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SellerAgent@BookTradingServices:test-0 jadex.micro.features.impl.MicroInjectionComponentFeature@277b6a02 done(sync)=true
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@3f8f3602, jadex.bridge.component.impl.PropertiesComponentFeature@73a08636, jadex.bridge.component.impl.RemoteExecutionComponentFeature@502a93c, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@80959eb, jadex.micro.features.impl.MicroPojoComponentFeature@4e7041ce, jadex.micro.features.impl.MicroMessageComponentFeature@3996ef00, jadex.bdiv3.features.impl.BDIAgentFeature@294dea47, ExecutionFeature(SellerAgent@BookTradingServices:test-0), jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@6bc93884]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown called: SellerAgent@BookTradingServices:test-0 jadex.bdiv3.features.impl.BDIMonitoringComponentFeature@6bc93884 done(sync)=true
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    SEVERE: feature shutdown start: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, [jadex.bridge.component.impl.ArgumentsResultsComponentFeature@3f8f3602, jadex.bridge.component.impl.PropertiesComponentFeature@73a08636, jadex.bridge.component.impl.RemoteExecutionComponentFeature@502a93c, jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature@80959eb, jadex.micro.features.impl.MicroPojoComponentFeature@4e7041ce, jadex.micro.features.impl.MicroMessageComponentFeature@3996ef00, jadex.bdiv3.features.impl.BDIAgentFeature@294dea47, ExecutionFeature(SellerAgent@BookTradingServices:test-0)]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.ExecutionComponentFeature shutdown
     SEVERE: shutdown0: ExecutionFeature(SellerAgent@BookTradingServices:test-0)
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
     SEVERE: wakeup0: ExecutionFeature(SellerAgent@BookTradingServices:test-0)
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
     SEVERE: wakeup2: ExecutionFeature(SellerAgent@BookTradingServices:test-0), SyncExecutionService(IExecutionService_#2@test-0)
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
     SEVERE: wakeup4: ExecutionFeature(SellerAgent@BookTradingServices:test-0)
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
     SEVERE: feature shutdown called: SellerAgent@BookTradingServices:test-0 ExecutionFeature(SellerAgent@BookTradingServices:test-0) done(sync)=false
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
     SEVERE: async waiting for feature shutdown: SellerAgent@BookTradingServices:test-0 ExecutionFeature(SellerAgent@BookTradingServices:test-0)
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.ExecutionComponentFeature execute
-    SEVERE: execute()5: jadex.bdiv3.actions.DropGoalAction@8977fba 0 active
-    Jan 20, 2021 1:15:26 PM jadex.bridge.component.impl.ExecutionComponentFeature execute
-    SEVERE: execute()7: endstepcnt=75, ret=true, endagenda.isDone()=false
-    Jan 20, 2021 1:15:26 PM jadex.bridge.component.impl.ExecutionComponentFeature execute
-    SEVERE: execute()0: SellerAgent@BookTradingServices:test-0, null, endstepcnt=75, stepcnt=75
-    Jan 20, 2021 1:15:26 PM jadex.bridge.component.impl.ExecutionComponentFeature execute
-    SEVERE: execute()1: SellerAgent@BookTradingServices:test-0, null, endstepcnt=75, stepcnt=75
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.ExecutionComponentFeature execute
-    SEVERE: execute()2: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, endstepcnt=75, stepcnt=75
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.ExecutionComponentFeature execute
-    SEVERE: execute()3: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, endstepcnt=75, stepcnt=75, StepInfo(priority=0, step=jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2@b090f5b)
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.ExecutionComponentFeature execute
-    SEVERE: execute()4: jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2@b090f5b 0 active
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 execute
-    SEVERE: ExternalAccessInvocationHandler.step1: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@2d923f66]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
-    SEVERE: ExternalAccessInvocationHandler.doExecute1: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@2d923f66]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke1: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@2d923f66]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke4: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@2d923f66]
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke5: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@2d923f66]: jadex.bridge.service.component.interceptors.DelegatingFuture@518a3da3
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-    SEVERE: ExternalAccessInvocationHandler.doInvoke6: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@2d923f66]: jadex.bridge.service.component.interceptors.DelegatingFuture@518a3da3, done=true
-    Jan 20, 2021 1:15:26 PM SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
-    SEVERE: ExternalAccessInvocationHandler.doExecute2: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@2d923f66] done=true
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.ExecutionComponentFeature execute
+    SEVERE: execute()5: jadex.bdiv3.actions.DropGoalAction@bbdb425 0 active
+    Jan. 20, 2021 11:22:46 NACHM. jadex.bridge.component.impl.ExecutionComponentFeature execute
+    SEVERE: execute()7: endstepcnt=73, ret=true, endagenda.isDone()=false
+    Jan. 20, 2021 11:22:46 NACHM. jadex.bridge.component.impl.ExecutionComponentFeature execute
+    SEVERE: execute()0: SellerAgent@BookTradingServices:test-0, null, endstepcnt=73, stepcnt=73
+    Jan. 20, 2021 11:22:46 NACHM. jadex.bridge.component.impl.ExecutionComponentFeature execute
+    SEVERE: execute()1: SellerAgent@BookTradingServices:test-0, null, endstepcnt=73, stepcnt=73
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.ExecutionComponentFeature execute
+    SEVERE: execute()2: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, endstepcnt=73, stepcnt=73
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.ExecutionComponentFeature execute
+    SEVERE: execute()3: SellerAgent@BookTradingServices:test-0, SellerAgent@BookTradingServices:test-0, endstepcnt=73, stepcnt=73, StepInfo(priority=0, step=jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2@15cf5407)
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.component.impl.ExecutionComponentFeature execute
+    SEVERE: execute()4: jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2@15cf5407 0 active
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 execute
+    SEVERE: ExternalAccessInvocationHandler.step1: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@6189152f]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
+    SEVERE: ExternalAccessInvocationHandler.doExecute1: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@6189152f]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke1: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@6189152f]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke4: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@6189152f]
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke5: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@6189152f]: jadex.bridge.service.component.interceptors.DelegatingFuture@1345900b
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+    SEVERE: ExternalAccessInvocationHandler.doInvoke6: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@6189152f]: jadex.bridge.service.component.interceptors.DelegatingFuture@1345900b, done=true
+    Jan. 20, 2021 11:22:46 NACHM. SellerAgent@BookTradingServices:test-0 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
+    SEVERE: ExternalAccessInvocationHandler.doExecute2: SellerAgent@BookTradingServices:test-0, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.scheduleStep(jadex.bridge.IComponentStep), [jadex.bdiv3.examples.booktrading.common.Gui$3@6189152f] done=true
 
 jadex.bdiv3.testcases.BDIV3Test > jadex.base.test.impl.ComponentStartTest.start: jadex.bdiv3.examples.booktrading.BookTradingServices (Application) STANDARD_OUT
-    Memory: free=237 MB, max=512 MB, total=512 MB
+    Memory: free=299 MB, max=512 MB, total=508 MB
 
 > Task :applications:bdiv3:test
+    Memory: free=299 MB, max=512 MB, total=508 MB
 
-jadex.bdiv3.testcases.BDIV3Test > jadex.base.test.impl.ComponentStartTest.start: jadex.bdiv3.examples.booktrading.BookTradingServices (Application) STANDARD_ERROR
-    Jan 20, 2021 1:15:54 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-    SEVERE: step aborted after termination: waitForDelay(SellerAgent@test-0)
+    Memory: free=295 MB, max=512 MB, total=508 MB.impl.ComponentStartTest.start: jadex.bdiv3.examples.booktrading.BookTradingServices (Application)
+    SUITE FAILED KILLING PLATFORM: C:\Users\Alex\Checkouts\jadex\applications\bdiv3\build\classes\java\main, jadex.commons.TimeoutException: Timeout: 90000, realtime=true
 
-jadex.bdiv3.testcases.BDIV3Test > jadex.base.test.impl.ComponentStartTest.start: jadex.bdiv3.examples.booktrading.BookTradingServices (Application) STANDARD_OUT
-    TIMEOUT: 1611148555975 /builds/jadex/jadex/applications/bdiv3/build/resources/main/jadex/bdiv3/examples/booktrading/BookTradingServices.application.xml
-    KILLING: 1611148555976 /builds/jadex/jadex/applications/bdiv3/build/resources/main/jadex/bdiv3/examples/booktrading/BookTradingServices.application.xml
-    KILLED: 1611148555976 /builds/jadex/jadex/applications/bdiv3/build/resources/main/jadex/bdiv3/examples/booktrading/BookTradingServices.application.xml
+jadex.bdiv3.testcases.BDIV3Test STANDARD_ERROR
+    jadex.commons.TimeoutException: Timeout: 90000, realtime=true
+        at jadex.commons.future.ThreadSuspendable.suspend(ThreadSuspendable.java:75)
+        at jadex.commons.future.Future.get(Future.java:267)plications\bdiv3\build\resources\main\jadex\bdiv3\examples\booktrading\BookTradingService
+        at jadex.base.test.ComponentTestSuite.cleanup(ComponentTestSuite.java:591)
+        at jadex.base.test.ComponentTestSuite.run(ComponentTestSuite.java:580)ild\resources\main\jadex\bdiv3\examples\booktrading\BookTradingService
+        at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:84)
+        at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecutor.runTestClass(JUnitTestClassExecutor.java:110)
+        at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecutor.execute(JUnitTestClassExecutor.java:58)kTradingServices (Application)
+        at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecutor.execute(JUnitTestClassExecutor.java:38)
+        at org.gradle.api.internal.tasks.testing.junit.AbstractJUnitTestClassProcessor.processTestClass(AbstractJUnitTestClassProcessor.java:62)
+        at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:51)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:566)Test.start: jadex.bdiv3.examples.booktrading.BookTradingServices (Application)
+        at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+        at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+        at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+        at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:94)
+        at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)tartTest.start: jadex.bdiv3.examples.booktrading.BookTradingServices (Application)
+        at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:119)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)CleanerWorld (Application) STANDA
+        at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+        at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)ild\resources\main\jadex\bdiv3\examples\cleanerworld\
+        at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+        at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:182)ation.xml
+        at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:164)
+        at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:414)
+        at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+        at org.gradle.internal.concurrent.ManagedExecutorImpl$1.run(ManagedExecutorImpl.java:48)
+        at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+        at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)_OUT
+        at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:56)
+        at java.base/java.lang.Thread.run(Thread.java:834)-11, 1611181446120, 1467622404
+    Test name: #3, description: Test passInputStream(), result: succeeded.
+jadex.bdiv3.testcases.BDIV3Test > C:\Users\Alex\Checkouts\jadex\applications\bdiv3\build\classes\java\main FAILED
+    jadex.commons.TimeoutException at ThreadSuspendable.java:7513, 1611181467685, -841054915
 
-jadex.bdiv3.testcases.BDIV3Test > jadex.base.test.impl.ComponentStartTest.start: jadex.bdiv3.examples.booktrading.BookTradingServices (Application) STANDARD_ERROR
-    jadex.commons.TimeoutException: start: jadex.bdiv3.examples.booktrading.BookTradingServices (Application) did not finish in 30000 ms.
-    	at jadex.base.test.impl.ComponentTestBase$1.run(ComponentTestBase.java:112)
-    	at java.base/java.util.TimerThread.mainLoop(Timer.java:556)
-    	at java.base/java.util.TimerThread.run(Timer.java:506)
-
-jadex.bdiv3.testcases.BDIV3Test > jadex.base.test.impl.ComponentStartTest.start: jadex.bdiv3.examples.booktrading.BookTradingServices (Application) FAILED
-    jadex.commons.TimeoutException: start: jadex.bdiv3.examples.booktrading.BookTradingServices (Application) did not finish in 30000 ms.
-        at jadex.base.test.impl.ComponentTestBase$1.run(ComponentTestBase.java:112)
-        at java.base/java.util.TimerThread.mainLoop(Timer.java:556)
-        at java.base/java.util.TimerThread.run(Timer.java:506)
+jadex.bdiv3.testcases.BDIV3Test STANDARD_OUTeTestAgent STANDARD_ERROR
+    SUITE CLEARING AWT: C:\Users\Alex\Checkouts\jadex\applications\bdiv3\build\classes\java\main
