@@ -40,8 +40,8 @@ public class ThreadSuspendable extends ThreadLocalTransferHelper implements ISus
 			try
 			{
 				// Loop to catch "spurious wake-ups"
-				timeout	= endtime-System.currentTimeMillis();
-				while(!resumed && (endtime==-1 || timeout>0))
+				long waittime	= endtime-System.currentTimeMillis();
+				while(!resumed && (endtime==-1 || waittime>0))
 				{
 					if(endtime==-1)
 					{
@@ -49,8 +49,9 @@ public class ThreadSuspendable extends ThreadLocalTransferHelper implements ISus
 					}
 					else
 					{
-						this.wait(timeout);
+						this.wait(waittime);
 					}
+					waittime	= endtime-System.currentTimeMillis();
 				}
 			}
 			catch(InterruptedException e)
