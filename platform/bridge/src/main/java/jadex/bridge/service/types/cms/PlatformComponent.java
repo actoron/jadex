@@ -1683,12 +1683,24 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 //								System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 							
 							IFuture<Object>	fut	= doInvoke(ia, method, args);
-							boolean intermediate = SReflect.isSupertype(IIntermediateFuture.class, fut.getClass());
-							if(!intermediate)
-								fut.addResultListener(new DelegationResultListener<>(ret));
-							else
-								fut.addResultListener(new IntermediateDelegationResultListener<>((IntermediateFuture)ret));
-							return IFuture.DONE;
+							
+							if(shutdown && debug)
+								PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute2: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+fut.isDone());
+							
+							try
+							{
+								boolean intermediate = SReflect.isSupertype(IIntermediateFuture.class, fut.getClass());
+								if(!intermediate)
+									fut.addResultListener(new DelegationResultListener<>(ret));
+								else
+									fut.addResultListener(new IntermediateDelegationResultListener<>((IntermediateFuture)ret));
+								return IFuture.DONE;
+							}
+							finally
+							{
+								if(shutdown && debug)
+									PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute3: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+fut.isDone());								
+							}
 						}
 					}).addResultListener(new ExceptionResultListener<Void>()
 					{
@@ -1789,7 +1801,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			catch(Exception e)
 			{
 				if(shutdown && debug)
-					PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doInvoke6: "+cid+", "+method+", "+SUtil.arrayToString(args)+"\n"+SUtil.getExceptionStacktrace(e));
+					PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doInvoke7: "+cid+", "+method+", "+SUtil.arrayToString(args)+"\n"+SUtil.getExceptionStacktrace(e));
 				ret = new Future<Object>();
 				((Future)ret).setException(e);
 			}
