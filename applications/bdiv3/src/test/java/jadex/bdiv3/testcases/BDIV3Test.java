@@ -45,11 +45,11 @@ public class BDIV3Test	extends	ComponentTestSuite
 	 *  Constructor called by Maven JUnit runner.
 	 */
 	public BDIV3Test()	throws Exception {
-		super(new String[]
-		{
-			"-logging", "true"	// For finding heisenbugs in pipeline builds
-		}, new File[][]{SUtil.findOutputDirs("applications"+File.separator+"bdiv3", true)}, null, EXCLUDES, true, true, true);
-//		super("applications"+File.separator+"bdiv3", EXCLUDES, true);
+//		super(new String[]
+//		{
+//			"-logging", "true"	// For finding heisenbugs in pipeline builds
+//		}, new File[][]{SUtil.findOutputDirs("applications"+File.separator+"bdiv3", true)}, null, EXCLUDES, true, true, true);
+		super("applications"+File.separator+"bdiv3", EXCLUDES, true);
 	}
 
 //	/**

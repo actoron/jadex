@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,7 +85,6 @@ import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.Tuple2Future;
-import jadex.commons.future.TupleResult;
 
 /**
  *  Standalone platform component implementation.
@@ -109,6 +109,17 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		tmp.add("killComponents");
 		tmp.add("stepComponent");
 		SUSPEND_METHOD_EXEMPTIONS = Collections.unmodifiableSet(tmp);
+	}
+	
+	// Agents with more debug output for catching heisenbugs causing hangs on component termination
+	private static final Set<String>	_BROKEN	= new LinkedHashSet<String>();
+	{
+		_BROKEN.add("jadex.bdiv3.examples.booktrading.seller.SellerAgent");
+		_BROKEN.add("jadex.micro.testcases.terminate.TerminateTestAgent");
+		_BROKEN.add("jadex.micro.testcases.terminate.TerminateIntermediateTestAgent");
+		_BROKEN.add("jadex.micro.testcases.nfcallreturn.NFCallReturnTestAgent");
+		_BROKEN.add("jadex.micro.testcases.nfmethodprop.NFMethodPropTestAgent");
+		_BROKEN.add("jadex.bdiv3.testcases.servicereflection.NotVisibleProviderAgent");
 	}
 	
 	//-------- attributes --------
@@ -140,6 +151,9 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	/** The shutdown flag (set on start of shutdown). */
 	protected boolean shutdown;
 	
+	/** Heisenbug debug flag cached for speed. */
+	public boolean debug;
+	
 	//-------- IPlatformComponentAccess interface --------
 	
 	/**
@@ -152,12 +166,17 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 */
 	public void	create(ComponentCreationInfo info, Collection<IComponentFeatureFactory> facs)
 	{
-//		state = ComponentLifecycleState.CREATE;
-		
 		this.info = info;
+//		state = ComponentLifecycleState.CREATE;
+
+		this.debug	= _BROKEN.contains(getDescription().getModelName());
+		if(debug)
+		{
+			getLogger().severe("Enabled PlatformComponent debugging for "+this);
+		}
+
 		this.features = new LinkedHashMap<Class<?>, IComponentFeature>();
 		this.lfeatures = new ArrayList<IComponentFeature>();
-
 		for(IComponentFeatureFactory fac: facs)
 		{
 //			System.out.println("feature: "+fac);
@@ -166,7 +185,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			for(Class<?> ltype: fac.getLookupTypes())
 				features.put(ltype, instance);
 			lfeatures.add(instance);
-		}
+		}		
 	}
 	
 	/**
@@ -239,8 +258,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		shutdown	= true;
 //		state = ComponentLifecycleState.END;
 		
-		if(getId().toString().indexOf("SellerAgent")!=-1)
-			getLogger().info("shutdown component features start: "+getId());
+		if(shutdown && debug)
+			getLogger().severe("shutdown component features start: "+getId());
 		IExecutionFeature exe	= getFeature(IExecutionFeature.class);
 		return exe.scheduleStep(new ImmediateComponentStep<Void>()
 		{
@@ -248,8 +267,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			{
 				final Future<Void> ret = new Future<Void>();
 				
-				if(getId().toString().indexOf("SellerAgent")!=-1)
-					getLogger().info("shutdown component features start: "+getId()+", "+ifeatures +", "+ lfeatures);
+				if(shutdown && debug)
+					getLogger().severe("shutdown component features start: "+getId()+", "+ifeatures +", "+ lfeatures);
 				executeShutdownOnFeatures(ifeatures!=null ? ifeatures : lfeatures)
 					.addResultListener(new IResultListener<Void>()
 				{
@@ -265,13 +284,13 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					
 					public void proceed(final Exception ex)
 					{
-						if(getId().toString().indexOf("SellerAgent")!=-1)
-							getLogger().info("shutdown component features end: "+getId()+", "+ex);
+						if(shutdown && debug)
+							getLogger().severe("shutdown component features end: "+getId()+", "+ex);
 						if(getFeature0(IMonitoringComponentFeature.class)!=null 
 							&& getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 						{
-							if(getId().toString().indexOf("SellerAgent")!=-1)
-								getLogger().info("shutdown component features end1: "+getId()+", "+ex);
+							if(shutdown && debug)
+								getLogger().severe("shutdown component features end1: "+getId()+", "+ex);
 							MonitoringEvent event = new MonitoringEvent(getDescription().getName(), getDescription().getCreationTime(),
 //								IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getDescription().getCause(), System.currentTimeMillis(), PublishEventLevel.COARSE);
 								IMonitoringEvent.TYPE_COMPONENT_DISPOSED, System.currentTimeMillis(), PublishEventLevel.COARSE);
@@ -301,8 +320,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 						// Do not wait for monitoring event but directly terminate to avoid having all return steps being scheduled immediately (see DecouplingReturnInterceptor) 
 //						else
 						{
-							if(getId().toString().indexOf("SellerAgent")!=-1)
-								getLogger().info("shutdown component features end4: "+getId()+", "+ex);
+							if(shutdown && debug)
+								getLogger().severe("shutdown component features end4: "+getId()+", "+ex);
 							if(ex!=null)
 								ret.setExceptionIfUndone(ex);
 							else
@@ -324,8 +343,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 							@Override
 							public void resultAvailable(Void result)
 							{
-								if(getId().toString().indexOf("SellerAgent")!=-1)
-									getLogger().info("shutdown component features timeout: "+getId());
+								if(shutdown && debug)
+									getLogger().severe("shutdown component features timeout: "+getId());
 								executeKillOnFeatures(ifeatures!=null ? ifeatures : lfeatures);
 								ret.setExceptionIfUndone(new TimeoutException("Timeout during component cleanup: "+timeout));
 							}
@@ -538,13 +557,13 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				getLogger().warning("Exception during component cleanup of "+getId()+": "+fut.getException());
 				getLogger().info(sw.toString());
 			}
-			if(getId().toString().indexOf("SellerAgent")!=-1)
-				getLogger().info("feature shutdown start: "+getId()+", "+IComponentIdentifier.LOCAL.get()+", "+features);
+			if(shutdown && debug)
+				getLogger().severe("feature shutdown start: "+getId()+", "+IComponentIdentifier.LOCAL.get()+", "+features);
 			
 			fut	= features.get(features.size()-1).shutdown();
 			sync = fut.isDone();
-			if(getId().toString().indexOf("SellerAgent")!=-1)
-				getLogger().info("feature shutdown called: "+getId()+" "+features.get(features.size()-1)+" done(sync)="+sync);
+			if(shutdown && debug)
+				getLogger().severe("feature shutdown called: "+getId()+" "+features.get(features.size()-1)+" done(sync)="+sync);
 			if(sync)
 			{
 				features.remove(features.size()-1);
@@ -554,22 +573,20 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		// Recurse once for current async feature
 		if(!sync)
 		{
-			if(getId().toString().indexOf("SellerAgent")!=-1)
-				getLogger().info("async waiting for feature shutdown: "+getId()+" "+features.get(features.size()-1));
+			if(shutdown && debug)
+				getLogger().severe("async waiting for feature shutdown: "+getId()+" "+features.get(features.size()-1));
 			final Future<Void>	ret	= new Future<Void>();
 			fut.addResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{
-					if(getId().toString().indexOf("SellerAgent")!=-1)
-						getLogger().info("done waiting for feature shutdown: "+getId()+" "+features.get(features.size()-1));
+					if(shutdown && debug)
+						getLogger().severe("done waiting for feature shutdown: "+getId()+" "+features.get(features.size()-1));
 					proceed();
 				}
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					if(getId().toString().indexOf("SellerAgent")!=-1)
-						getLogger().info("exception when waiting for feature shutdown: "+getId()+" "+features.get(features.size()-1));
 					getLogger().warning("Exception during component cleanup of "+getId()+", "+features.get(features.size()-1)+": "+SUtil.getExceptionStacktrace(exception));
 
 					proceed();
@@ -1492,8 +1509,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
-			if(cid.toString().indexOf("SellerAgent")!=-1)
-				PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.invoke(): "+cid+", "+method+", "+SUtil.arrayToString(args));
+			if(shutdown && debug)
+				PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.invoke(): "+cid+", "+method+", "+SUtil.arrayToString(args));
 
 //			if(method.getName().indexOf("searchService")!=-1)
 //				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
@@ -1622,8 +1639,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 						@Override
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							if(cid.toString().indexOf("SellerAgent")!=-1)
-								PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.step1: "+cid+", "+method+", "+SUtil.arrayToString(args));
+							if(shutdown && debug)
+								PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.step1: "+cid+", "+method+", "+SUtil.arrayToString(args));
 							if(ex!=null)
 							{
 								try
@@ -1644,8 +1661,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 						
 						IFuture<Void>	doExecute(IInternalAccess ia)
 						{
-							if(cid.toString().indexOf("SellerAgent")!=-1)
-								PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doExecute1: "+cid+", "+method+", "+SUtil.arrayToString(args));
+							if(shutdown && debug)
+								PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute1: "+cid+", "+method+", "+SUtil.arrayToString(args));
 //							if(method.getName().indexOf("searchService")!=-1 && ((ServiceQuery)args[0]).getServiceType().getTypeName().indexOf("Proxy")!=-1)
 //								System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 							
@@ -1661,8 +1678,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					{
 						public void exceptionOccurred(Exception exception)
 						{
-							if(cid.toString().indexOf("SellerAgent")!=-1)
-								PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.ex1: "+cid+", "+method+", "+SUtil.arrayToString(args)+"\n"+SUtil.getExceptionStacktrace(exception));
+							if(shutdown && debug)
+								PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.ex1: "+cid+", "+method+", "+SUtil.arrayToString(args)+"\n"+SUtil.getExceptionStacktrace(exception));
 							ret.setException(exception);
 						}
 					});
@@ -1679,8 +1696,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 
 		public IFuture<Object> doInvoke(IInternalAccess ia, Method method, Object[] args)
 		{
-			if(cid.toString().indexOf("SellerAgent")!=-1)
-				PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doInvoke1: "+cid+", "+method+", "+SUtil.arrayToString(args));
+			if(shutdown && debug)
+				PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doInvoke1: "+cid+", "+method+", "+SUtil.arrayToString(args));
 //				if(method.getName().indexOf("createCompo")!=-1)
 //					System.out.println("call");
 			
@@ -1700,21 +1717,21 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				Object res;
 				if(feat==null)
 				{
-					if(cid.toString().indexOf("SellerAgent")!=-1)
-						PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doInvoke2: "+cid+", "+method+", "+SUtil.arrayToString(args));
+					if(shutdown && debug)
+						PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doInvoke2: "+cid+", "+method+", "+SUtil.arrayToString(args));
 					String mname = method.getName();
 //						int idx = mname.lastIndexOf("Async");
 //						if(idx>0)
 //							mname = mname.substring(0, idx);
 					Method m = IInternalAccess.class.getMethod(mname, method.getParameterTypes());
 					res = m.invoke(ia, args);
-					if(cid.toString().indexOf("SellerAgent")!=-1)
-						PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doInvoke3: "+cid+", "+method+", "+SUtil.arrayToString(args));
+					if(shutdown && debug)
+						PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doInvoke3: "+cid+", "+method+", "+SUtil.arrayToString(args));
 				}
 				else
 				{
-					if(cid.toString().indexOf("SellerAgent")!=-1)
-						PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doInvoke4: "+cid+", "+method+", "+SUtil.arrayToString(args));
+					if(shutdown && debug)
+						PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doInvoke4: "+cid+", "+method+", "+SUtil.arrayToString(args));
 					// todo: create generic (double) hook (also in RMI proxy) mechanism
 					
 					if(feat instanceof IRequiredServicesFeature)
@@ -1737,14 +1754,14 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					}
 					
 					res = method.invoke(feat, args);
-					if(cid.toString().indexOf("SellerAgent")!=-1)
-						PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doInvoke5: "+cid+", "+method+", "+SUtil.arrayToString(args)+": "+res);
+					if(shutdown && debug)
+						PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doInvoke5: "+cid+", "+method+", "+SUtil.arrayToString(args)+": "+res);
 				}
 				
 				if(res instanceof IFuture)
 				{
-					if(cid.toString().indexOf("SellerAgent")!=-1)
-						PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doInvoke5: "+cid+", "+method+", "+SUtil.arrayToString(args)+": "+res+", done="+((IFuture) res).isDone());
+					if(shutdown && debug)
+						PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doInvoke5: "+cid+", "+method+", "+SUtil.arrayToString(args)+": "+res+", done="+((IFuture) res).isDone());
 					ret = (IFuture<Object>)res;
 				}
 				else
@@ -1755,8 +1772,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			}
 			catch(Exception e)
 			{
-				if(cid.toString().indexOf("SellerAgent")!=-1)
-					PlatformComponent.this.getLogger().info("ExternalAccessInvocationHandler.doInvoke6: "+cid+", "+method+", "+SUtil.arrayToString(args)+"\n"+SUtil.getExceptionStacktrace(e));
+				if(shutdown && debug)
+					PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doInvoke6: "+cid+", "+method+", "+SUtil.arrayToString(args)+"\n"+SUtil.getExceptionStacktrace(e));
 				ret = new Future<Object>();
 				((Future)ret).setException(e);
 			}

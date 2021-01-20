@@ -1592,10 +1592,6 @@ public class SComponentManagementService
 	 */
 	public static IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid, IInternalAccess agent)
 	{
-		//if(cid.toString().indexOf("Sokrates")!=-1)
-		//	System.out.println("destroy: "+cid);
-		//if(cid.toString().indexOf("SellerAgent")!=-1)
-		//	agent.getLogger().info("destroy0: "+cid);
 //		if(cid.getParent()==null)
 //			System.out.println("---- !!!! ----- Killing platform ---- !!!! ----- "+cid.getName());
 //		System.out.println("Terminating component: "+cid.getName());
@@ -1612,12 +1608,12 @@ public class SComponentManagementService
 		Future<Map<String, Object>> tmp;
 		
 		CmsState state = getState(agent.getId());
-		if(cid.toString().indexOf("SellerAgent")!=-1)
-			agent.getLogger().info("destroy1: "+cid);
+		if(debug(agent))
+			agent.getLogger().severe("destroy1: "+cid);
 		try(IAutoLock l = state.writeLock())
 		{
-			if(cid.toString().indexOf("SellerAgent")!=-1)
-				agent.getLogger().info("destroy2: "+cid);
+			if(debug(agent))
+				agent.getLogger().severe("destroy2: "+cid);
 			CmsComponentState compstate = state.getComponent(cid);
 			contains = compstate.getCleanupFuture() != null;
 			tmp = contains? (Future<Map<String, Object>>)compstate.getCleanupFuture(): new Future<Map<String, Object>>();
@@ -1644,25 +1640,25 @@ public class SComponentManagementService
 		
 		if(!contains && !locked && inited)
 		{
-			if(cid.toString().indexOf("SellerAgent")!=-1)
-				agent.getLogger().info("destroy3: "+cid);
+			if(debug(agent))
+				agent.getLogger().severe("destroy3: "+cid);
 			destroyComponent(cid, ret, agent);
 		}
-		if(cid.toString().indexOf("SellerAgent")!=-1)
-			agent.getLogger().info("destroy4 (contains, locked, inited): "+cid+" ("+contains+", "+locked+", "+inited+")");
+		if(debug(agent))
+			agent.getLogger().severe("destroy4 (contains, locked, inited): "+cid+" ("+contains+", "+locked+", "+inited+")");
 
-		if(cid.toString().indexOf("SellerAgent")!=-1)
+		if(debug(agent))
 		{
 			ret.addResultListener(new IResultListener<Map<String,Object>>()
 			{
 				public void exceptionOccurred(Exception exception)
 				{
-					agent.getLogger().info("destryCompo finished with ex: "+cid+" "+exception);
+					agent.getLogger().severe("destryCompo finished with ex: "+cid+" "+exception);
 				}
 				
 				public void resultAvailable(Map<String, Object> result)
 				{
-					agent.getLogger().info("destryCompo finished: "+cid);
+					agent.getLogger().severe("destryCompo finished: "+cid);
 				}
 			});
 		}
@@ -2721,5 +2717,13 @@ public class SComponentManagementService
 		{
 			return new Future<T>(new RuntimeException("Component not found to schedule: "+cid));
 		}
+	}
+	
+	/**
+	 *  Check if heisenbug debugging is requested for the agent.
+	 */
+	protected static boolean	debug(IInternalAccess agent)
+	{
+		return agent instanceof IPlatformComponentAccess && ((IPlatformComponentAccess) agent).getPlatformComponent().debug;
 	}
 }
