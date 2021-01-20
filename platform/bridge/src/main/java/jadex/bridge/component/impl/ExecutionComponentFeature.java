@@ -2093,7 +2093,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/**
 	 *  Execute a step of a suspended component.
 	 *  @param componentid The component identifier.
-	 *  @param listener Called when the step is finished (result will be the component description).
 	 */
 	public IFuture<Void> stepComponent(String stepinfo)
 	{

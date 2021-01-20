@@ -475,8 +475,10 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		}
 		
 		notifyListener();
-		listener	= null; // avoid memory leaks
-		listeners	= null; // avoid memory leaks
+		
+		// Maybe heisenbug in SubscriptionListenerTestAgent caused by missing listener for intermediate result !????
+//		listener	= null; // avoid memory leaks
+//		listeners	= null; // avoid memory leaks
 	}
 	
 	/**

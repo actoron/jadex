@@ -1380,7 +1380,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/** 
 	 *  Shutdown the service.
 	 *  Releases all cached resources and shuts down the library service.
-	 *  @param listener The listener.
 	 */
 	//@ServiceShutdown
 	@OnEnd

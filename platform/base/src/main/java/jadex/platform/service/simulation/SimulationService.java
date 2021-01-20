@@ -99,7 +99,6 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 
 	/**
 	 *  Shutdown the service.
-	 *  @param listener The listener.
 	 */
 	//@ServiceShutdown
 	@OnEnd

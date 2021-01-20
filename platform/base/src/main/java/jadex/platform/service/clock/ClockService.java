@@ -377,7 +377,6 @@ public class ClockService extends BasicService implements IClockService
 	
 	/**
 	 *  Shutdown the service.
-	 *  @param listener The listener.
 	 */
 	public IFuture<Void> shutdownService()
 	{

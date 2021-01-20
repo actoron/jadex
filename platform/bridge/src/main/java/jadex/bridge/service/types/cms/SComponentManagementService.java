@@ -1089,7 +1089,6 @@ public class SComponentManagementService
 	/**
 	 *  Get the external access of a component.
 	 *  @param cid The component identifier.
-	 *  @param listener The result listener.
 	 */
 	public static IExternalAccess getExternalAccess(final IComponentIdentifier cid, IInternalAccess agent)
 	{
@@ -1970,7 +1969,6 @@ public class SComponentManagementService
 	 *  @param name The component name.
 	 *  @param model The model identifier (e.g. file name).
 	 *  @param info	The creation info, if any.
-	 *  @param listener The result listener (if any). Will receive the id of the component as result, when the component has been created.
 	 *  @param resultlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
 	// rw: cleanup futures, (loadModel), lock entries, init infos, components
