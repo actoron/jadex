@@ -1066,7 +1066,14 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
 				if(endagenda.isDone())
 				{
-					throw new ThreadDeath();
+					throw new ThreadDeath()
+					{
+						@Override
+						public String toString()
+						{
+							return "java.lang.ThreadDeath("+component+")";
+						}
+					};
 				}
 			}
 			catch(ThreadDeath e)
@@ -1482,6 +1489,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				}
 				else if(ex instanceof ThreadDeath)
 				{
+					System.err.println("Thread death on component: "+component);
+					ex.printStackTrace();
+					
 					// Hard cleanup during kill.
 					resetExecutionState(cl);
 					throw (ThreadDeath)ex;

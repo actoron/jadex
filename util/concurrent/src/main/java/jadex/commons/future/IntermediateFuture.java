@@ -146,13 +146,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    	}
 	    	else
 	    	{
-	    		//if(this instanceof SubscriptionIntermediateDelegationFuture && result!=null && result instanceof String)//result.toString().indexOf("ServiceEvent")!=-1)
-	    		//	System.out.println("store event: "+result+" "+listener);
-	    		boolean stored = storeResult(result);
-	    		
-	    		if(!stored && listener==null && listeners==null)
-	    			throw new RuntimeException("lost value");
-
+	    		storeResult(result);
 	    		notify	= true;
 
 	    		//if(listener!=null && getResultCount()==1)
@@ -183,7 +177,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 *  Add a result.
 	 *  @param result The result.
 	 */
-	protected boolean storeResult(E result)
+	protected void	storeResult(E result)
 	{
 //		if(result!=null && result.getClass().getName().indexOf("ChangeEvent")!=-1)
 //			System.out.println("ires: "+this+" "+result);
@@ -193,7 +187,6 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 		results.add(result);
 		if(maxresultcnt==getResultCount())
 			setFinishedIfUndone();
-		return true;
 	}
 	
 	/**

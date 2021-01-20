@@ -1236,6 +1236,10 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							public void intermediateResultAvailable(T result)
 							{
 								// Forward result to user query
+//								if((""+result).indexOf("ITestService")!=-1)
+//								{
+//									System.out.println("Received result: "+agent+", "+result+", "+query);
+//								}
 								retfut.addIntermediateResultIfUndone(result);
 							}
 							

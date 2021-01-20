@@ -51,32 +51,34 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	 *  Add a result.
 	 *  @param result The result.
 	 */
-	protected boolean storeResult(E result)
+	protected void	storeResult(E result)
 	{
-		boolean ret = false;
-		
 		//System.out.println("store: "+result+" "+storeforfirst+" "+ownresults);
 		
 		resultssize++;
 		
-		// Store results only if necessary for first listener.
-		if(storeforfirst)
+		// Store results only if not yet any listener added or thread waiting
+		if(listener==null && ownresults==null)
 		{
-			ret = true;
-			super.storeResult(result);
+			if(storeforfirst)
+			{
+				super.storeResult(result);
+			}
+			else
+			{
+				throw new RuntimeException("lost value: "+result);
+			}
 		}
-		
+
 		if(ownresults!=null)
 		{
 			for(List<E> res: ownresults.values())
 			{
 				res.add(result);
 			}
-			ret = true;
 		}
 		
 		resumeIntermediate();
-		return ret;
 	}
 	
     /** 
@@ -112,22 +114,15 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	if(!(listener instanceof IIntermediateResultListener))
     		throw new IllegalArgumentException("Subscription futures require intermediate listeners.");
     	
-    	/*if(storeforfirst)
-    		e = new RuntimeException();
-    	
-    	if(!storeforfirst && listeners!=null && listeners.size()>=0)
-    	{
-    		e.printStackTrace();
-    		System.out.println("adding listener: "+this+" "+listener);
-    	}*/
+    	super.addResultListener(listener);
     	
       	boolean first;
     	synchronized(this)
 		{
 			first = storeforfirst;
 			storeforfirst = false;
+//    		System.out.println("adding first listener: "+this+" "+listener);
 		}
-    	super.addResultListener(listener);
     	
 		if(first)
 			results=null;

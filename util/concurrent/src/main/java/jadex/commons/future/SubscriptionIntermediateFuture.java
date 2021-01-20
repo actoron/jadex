@@ -76,17 +76,21 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	 *  @param result The result.
 	 */
 	@Override
-	protected boolean storeResult(E result)
+	protected void	storeResult(E result)
 	{
-		boolean ret = false;
-		
 		resultssize++;
 		
-		// Store results only if necessary for first listener.
-		if(storeforfirst)
+		// Store results only if not yet any listener added or thread waiting
+		if(listener==null && ownresults==null)
 		{
-			super.storeResult(result);
-			ret = true;
+			if(storeforfirst)
+			{
+				super.storeResult(result);
+			}
+			else
+			{
+				throw new RuntimeException("lost value: "+result);
+			}
 		}
 		
 		if(ownresults!=null)
@@ -95,11 +99,9 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 			{
 				res.add(result);
 			}
-			ret = true;
 		}
 		
 		resumeIntermediate();
-		return ret;
 	}
 	
 	/** 
@@ -139,6 +141,8 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     	
 //    	System.out.println("adding listener: "+this+" "+listener);
     	
+    	super.addResultListener(listener);
+    	
     	boolean first;
     	synchronized(this)
 		{
@@ -146,7 +150,6 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 			storeforfirst = false;
 			//System.out.println("store false: "+this);
 		}
-    	super.addResultListener(listener);
     	
 		if(first)
 			results = null;

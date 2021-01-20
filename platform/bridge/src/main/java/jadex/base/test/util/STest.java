@@ -101,7 +101,8 @@ public class STest
 		// Avoid problems due to old platform config files
 		config.setValue("rescan", true);
 
-		//config.setLogging(true);
+//		config.setLogging(true);
+//		config.setDefaultTimeout(300000);
 		
         return config;
     }
