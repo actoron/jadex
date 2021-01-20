@@ -1711,8 +1711,16 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 							ret.setException(exception);
 						}
 					});
+
+					if(shutdown && debug)
+						PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute4: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+ret.isDone());
 					
-					return getDecoupledFuture(ret);						
+					IFuture<Object>	myret	= getDecoupledFuture(ret);
+					
+					if(shutdown && debug)
+						PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute5: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+myret.isDone());
+					
+					return ret;
 				}
 				else
 				{
@@ -1834,12 +1842,17 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				{
 					public void scheduleBackward(ICommand<Void> command)
 					{
+						if(shutdown && debug)
+							PlatformComponent.this.getLogger().severe("getDecoupledFuture.scheduleBackward1: "+cid+", "+command);
+						
 						if(!getInternalAccess().getFeature(IExecutionFeature.class).isComponentThread())
 						{
 							getInternalAccess().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 							{
 								public IFuture<Void> execute(IInternalAccess intaccess)
 								{
+									if(shutdown && debug)
+										PlatformComponent.this.getLogger().severe("getDecoupledFuture.scheduleBackward2: "+cid+", "+command);
 									command.execute(null);
 									return IFuture.DONE;
 								}
@@ -1858,6 +1871,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 						}
 						else
 						{
+							if(shutdown && debug)
+								PlatformComponent.this.getLogger().severe("getDecoupledFuture.scheduleBackward3: "+cid+", "+command);
 							command.execute(null);
 						}
 					}
@@ -1872,12 +1887,16 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				{
 					public void scheduleBackward(ICommand<Void> command)
 					{
+						if(shutdown && debug)
+							PlatformComponent.this.getLogger().severe("getDecoupledFuture.scheduleBackwardB1: "+cid+", "+command);
 						if(!getInternalAccess().getFeature(IExecutionFeature.class).isComponentThread())
 						{
 							getInternalAccess().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 							{
 								public IFuture<Void> execute(IInternalAccess intaccess)
 								{
+									if(shutdown && debug)
+										PlatformComponent.this.getLogger().severe("getDecoupledFuture.scheduleBackwardB2: "+cid+", "+command);
 									command.execute(null);
 									return IFuture.DONE;
 								}
@@ -1896,6 +1915,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 						}
 						else
 						{
+							if(shutdown && debug)
+								PlatformComponent.this.getLogger().severe("getDecoupledFuture.scheduleBackwardB3: "+cid+", "+command);
 							command.execute(null);
 						}
 					}
