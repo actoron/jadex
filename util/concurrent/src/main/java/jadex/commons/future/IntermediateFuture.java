@@ -146,9 +146,6 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    	}
 	    	else
 	    	{
-	    		storeResult(result);
-	    		notify	= true;
-
 	    		//if(listener!=null && getResultCount()==1)
 	    		//	scheduleMaxNotification(null);
 	    		
@@ -163,6 +160,9 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 		        		}
 	    			}
 				});
+	    		
+	    		storeResult(result);
+	    		notify	= true;
 	    	}
     	}
     	
@@ -186,7 +186,11 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 			results	= new ArrayList<E>();
 		results.add(result);
 		if(maxresultcnt==getResultCount())
+		{
+//			boolean	fini	= setFinishedIfUndone();
+//			System.out.println("Finished due to max cnt: "+this+", "+maxresultcnt+", "+fini);
 			setFinishedIfUndone();
+		}
 	}
 	
 	/**
