@@ -1,6 +1,8 @@
 package jadex.bridge.service.component.interceptors;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Logger;
 
 import jadex.commons.DebugException;
@@ -667,6 +669,16 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 {
 	/** The future functionality. */
 	protected FutureFunctionality func;
+	
+	// For debugging
+	ISubscriptionIntermediateFuture<?> src;
+	List<Object>	myresults	= new ArrayList<>();
+		
+	@Override
+	public String toString()
+	{
+		return "DelegatingSubscriptionIntermediateDelegationFuture(src="+src+", results="+results+", myresults="+myresults+")";
+	}
 	
 	/**
 	 * 
