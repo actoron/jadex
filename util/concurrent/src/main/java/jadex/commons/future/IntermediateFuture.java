@@ -606,6 +606,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    	{
 	        	//System.out.println("max set: "+max);
 	        	this.maxresultcnt = max;
+	        	intermediate = intermediate | max!=-1;
 	        	
 	        	if(listener!=null)
 	        	{
