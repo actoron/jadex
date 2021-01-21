@@ -734,6 +734,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	@Override
 	protected boolean	doAddIntermediateResult(Object result, boolean undone)
 	{
+		System.err.println("add: "+this+", "+result);
 		myresults.add(result);
 		try
 		{
