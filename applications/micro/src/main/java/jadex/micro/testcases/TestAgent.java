@@ -21,7 +21,9 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.security.ISecurityService;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -60,16 +62,60 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	@OnEnd
 	public IFuture<Void>	cleanup()
 	{
+		if(((IPlatformComponentAccess)agent).getPlatformComponent().debug)
+		{
+			agent.getLogger().severe("cleanup0");
+		}
+		
 		FutureBarrier<Void>	outer	= new FutureBarrier<Void>();
 		outer.addFuture(super.cleanup());
 		
+		if(((IPlatformComponentAccess)agent).getPlatformComponent().debug)
+		{
+			agent.getLogger().severe("cleanup1 killing platforms"+platforms);
+		}
 		FutureBarrier<Map<String, Object>>	inner	= new FutureBarrier<Map<String,Object>>();
 		for(final IExternalAccess platform: platforms)
 		{
 			inner.addFuture(platform.killComponent());
 		}
 		platforms	= null;
+		if(((IPlatformComponentAccess)agent).getPlatformComponent().debug)
+		{
+			inner.waitFor().addResultListener(new IResultListener<Void>()
+			{
+				@Override
+				public void resultAvailable(Void result)
+				{
+					agent.getLogger().severe("cleanup2 killed platforms");
+				}
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					agent.getLogger().severe("cleanup3 failed killing platforms\n"+SUtil.getExceptionStacktrace(exception));
+				}
+			});
+			agent.getLogger().severe("cleanup4 started killing platforms");
+		}
+
 		outer.addFuture(inner.waitFor());
+
+		if(((IPlatformComponentAccess)agent).getPlatformComponent().debug)
+		{
+			outer.waitFor().addResultListener(new IResultListener<Void>()
+			{
+				@Override
+				public void resultAvailable(Void result)
+				{
+					agent.getLogger().severe("cleanup5 finished");
+				}
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					agent.getLogger().severe("cleanup6 failed\n"+SUtil.getExceptionStacktrace(exception));
+				}
+			});
+		}
 
 		return outer.waitFor();
 	}
