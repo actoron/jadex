@@ -5,8 +5,10 @@ import java.util.Random;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IPullIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.PullIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
@@ -29,7 +31,7 @@ public class ProviderAgent implements ITestService
 		IntermediateFuture<String> ret = new IntermediateFuture<String>();
 		
 		Random rn = new Random();
-		int max = Math.abs(rn.nextInt() % 100);
+		int max = Math.abs(rn.nextInt() % 100) + 1;
 
 		ret.setMaxResultCount(max);
 		
@@ -40,12 +42,25 @@ public class ProviderAgent implements ITestService
 	}
 	
 	@Override
+	public IPullIntermediateFuture<String> pullInfos() 
+	{
+		PullIntermediateFuture<String> ret = new PullIntermediateFuture<String>(pull -> pull.addIntermediateResult("A"));
+		
+		Random rn = new Random();
+		int max = Math.abs(rn.nextInt() % 100) + 1;
+
+		ret.setMaxResultCount(max);
+		
+		return ret;
+	}
+	
+	@Override
 	public ISubscriptionIntermediateFuture<String> subscribeToInfos() 
 	{
 		SubscriptionIntermediateFuture<String> ret = new SubscriptionIntermediateFuture<String>();
 		
 		Random rn = new Random();
-		int max = Math.abs(rn.nextInt() % 100);
+		int max = Math.abs(rn.nextInt() % 100) + 1;
 
 		ret.setMaxResultCount(max);
 		

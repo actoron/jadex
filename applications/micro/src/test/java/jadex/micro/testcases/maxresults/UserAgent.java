@@ -193,6 +193,7 @@ public class UserAgent extends TestAgent
 		
 		Future<Void> barrier = new Future<>();
 		int[] cnt = new int[1];
+		int expected	= 2;
 		
 		IIntermediateFuture<String> fut1 = ser.getInfos();
 		fut1.addResultListener(new IIntermediateResultListener<String>() 
@@ -200,6 +201,7 @@ public class UserAgent extends TestAgent
 			final TestReport tr = new TestReport("#"+testno, "Test if intermediate future max works");
 			int max = -1;
 			int maxcnt;
+			int rescnt;
 			
 			public void exceptionOccurred(Exception exception) 
 			{
@@ -221,13 +223,14 @@ public class UserAgent extends TestAgent
 			public void intermediateResultAvailable(String result) 
 			{
 				//System.out.println("ires: "+result);
+				this.rescnt++;
 			}
 			
 			public void finished() 
 			{
 				System.out.println("fini 1");
 				
-				if(this.max!=-1 && this.maxcnt==1)
+				if(this.max!=-1 && this.rescnt==this.max && this.maxcnt==1)
 				{
 					tr.setSucceeded(true);
 				}
@@ -235,65 +238,132 @@ public class UserAgent extends TestAgent
 				{
 					tr.setFailed("No max value received.");
 				}
+				else if(this.rescnt!=this.max)
+				{
+					tr.setFailed("Wrong number of results received: "+rescnt+", expecting: "+max);
+				}
 				else
 				{
 					tr.setFailed("Received max value n times: "+this.maxcnt);
 				}
 				ret.addIntermediateResult(tr);
 			
-				if(++cnt[0]==2)
+				if(++cnt[0]==expected)
 					barrier.setResult(null);
 			}
 		});
 		
-		IIntermediateFuture<String> fut2 = ser.subscribeToInfos();
-		fut2.addResultListener(new IIntermediateResultListener<String>() 
+//		IPullIntermediateFuture<String> fut2 = ser.pullInfos();
+//		fut2.pullIntermediateResult();
+//		fut2.addResultListener(new IIntermediateResultListener<String>() 
+//		{
+//			final TestReport tr = new TestReport("#"+testno+1, "Test if pull intermediate future max works");
+//			int max = -1;
+//			int maxcnt;
+//			int rescnt;
+//			
+//			public void exceptionOccurred(Exception exception) 
+//			{
+//				System.out.println("ex: "+exception);
+//			}
+//			
+//			public void resultAvailable(Collection<String> result) 
+//			{
+//				System.out.println("result: "+result);
+//			}
+//			
+//			public void maxResultCountAvailable(int max) 
+//			{
+//				System.out.println("max rec: "+max);
+//				this.max = max;
+//				this.maxcnt++;
+//			}
+//			
+//			public void intermediateResultAvailable(String result) 
+//			{
+////				System.out.println("ires: "+result);
+//				this.rescnt++;
+//
+//				// Todo: how to signal to stop pulling when future is done?
+//				if(!fut2.isDone())
+//					fut2.pullIntermediateResult();
+//			}
+//			
+//			public void finished() 
+//			{
+//				System.out.println("fini 2");
+//				
+//				if(this.max!=-1 && this.rescnt==this.max && this.maxcnt==1)
+//				{
+//					tr.setSucceeded(true);
+//				}
+//				else if(this.max==-1)
+//				{
+//					tr.setFailed("No max value received.");
+//				}
+//				else if(this.rescnt!=this.max)
+//				{
+//					tr.setFailed("Wrong number of results received: "+rescnt+", expecting: "+max);
+//				}
+//				else
+//				{
+//					tr.setFailed("Received max value n times: "+this.maxcnt);
+//				}
+//				ret.addIntermediateResult(tr);
+//				
+//				if(++cnt[0]==expected)
+//					barrier.setResult(null);
+//			}
+//		});
+		
+		IIntermediateFuture<String> fut3 = ser.subscribeToInfos();
+		fut3.addResultListener(new IIntermediateResultListener<String>() 
 		{
-			final TestReport tr = new TestReport("#"+testno+1, "Test if subscription future max works");
-			int max = -1;
-			int maxcnt;
+			final TestReport tr = new TestReport("#"+testno+1, "Test if subscription future max fails");
 			
 			public void exceptionOccurred(Exception exception) 
 			{
-				System.out.println("ex: "+exception);
+				if(exception instanceof UnsupportedOperationException)
+				{
+					System.out.println("fini 3: "+exception);
+					
+					tr.setSucceeded(true);
+				}
+				else
+				{
+					tr.setFailed(exception);
+				}
+				
+				cont();
 			}
 			
 			public void resultAvailable(Collection<String> result) 
 			{
-				System.out.println("result: "+result);
+				tr.setFailed("No exception: "+result);
+				
+				cont();
 			}
 			
 			public void maxResultCountAvailable(int max) 
 			{
-				System.out.println("max rec: "+max);
-				this.max = max;
-				this.maxcnt++;
 			}
 			
 			public void intermediateResultAvailable(String result) 
 			{
-				//System.out.println("ires: "+result);
 			}
 			
 			public void finished() 
 			{
-				System.out.println("fini 2");
+				tr.setFailed("No exception");
 				
-				if(this.max!=-1 && this.maxcnt==1)
-				{
-					tr.setSucceeded(true);
-				}
-				else if(this.max==-1)
-				{
-					tr.setFailed("No max value received.");
-				}
-				else
-				{
-					tr.setFailed("Received max value n times: "+this.maxcnt);
-				}
+				cont();
+			}
+			
+			void cont()
+			{
 				ret.addIntermediateResult(tr);
 				
-				if(++cnt[0]==2)
+				if(++cnt[0]==expected)
 					barrier.setResult(null);
 			}
 		});

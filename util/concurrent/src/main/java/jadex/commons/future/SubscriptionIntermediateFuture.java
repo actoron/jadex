@@ -72,6 +72,15 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	//-------- methods --------
 	
 	/**
+	 *  Unsupported for subscriptions.
+	 */
+	@Override
+	public void setMaxResultCount(int max)
+	{
+		throw new UnsupportedOperationException("Subscription futures do not allow max result setting.");
+	}
+	
+	/**
 	 *  Store a result.
 	 *  @param result The result.
 	 */

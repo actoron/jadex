@@ -48,6 +48,15 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	//-------- methods (hack!!! copied from subscription future) --------
 	
 	/**
+	 *  Unsupported for subscriptions.
+	 */
+	@Override
+	public void setMaxResultCount(int max)
+	{
+		throw new UnsupportedOperationException("Subscription futures do not allow max result setting.");
+	}
+
+	/**
 	 *  Add a result.
 	 *  @param result The result.
 	 */
