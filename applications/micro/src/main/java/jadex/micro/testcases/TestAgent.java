@@ -333,6 +333,11 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 		
 //		agent.getLogger().severe("Testagent setup remote platform: "+agent.getComponentDescription());
 		IPlatformConfiguration conf = STest.getDefaultTestConfig(getClass());
+		if(((IPlatformComponentAccess)agent).getPlatformComponent().debug)
+		{
+			conf.setLogging(true);
+		}
+
 		conf.getExtendedPlatformConfiguration().setSimul(false);
 		conf.getExtendedPlatformConfiguration().setSimulation(false);
 		//conf.getExtendedPlatformConfiguration().setDebugFutures(true);
