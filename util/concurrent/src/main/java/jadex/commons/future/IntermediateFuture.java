@@ -587,14 +587,31 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     public void setMaxResultCount(int max)
     {
-    	//System.out.println("max set: "+max);
-    	this.maxresultcnt = max;
-    	
-    	if(listener!=null)
-    	{
-    		scheduleMaxNotification(null);
-    		startScheduledNotifications();
+       	boolean	notify	= false;
+    	synchronized(this)
+    	{	    	
+	    	if(isDone())
+	    	{
+	    		throw new IllegalStateException("Future already finished.");
+	    	}
+	    	else if(maxresultcnt!=-1)
+	    	{
+	    		throw new IllegalStateException("Max result count must only be set once.");	    		
+	    	}
+	    	else
+	    	{
+	        	//System.out.println("max set: "+max);
+	        	this.maxresultcnt = max;
+	        	
+	        	if(listener!=null)
+	        	{
+		    		notify	= scheduleMaxNotification(null);
+	        	}
+	    	}
     	}
+    	
+    	if(notify)
+    		startScheduledNotifications();
     	
     	if(getResultCount()==max)
     		setFinishedIfUndone();
