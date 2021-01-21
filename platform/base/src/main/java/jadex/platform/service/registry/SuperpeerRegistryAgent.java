@@ -103,6 +103,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 //				System.out.println(agent+": Initiated super peer connection with client "+client+" for network "+networkname);
 				for(SubscriptionIntermediateFuture<IComponentIdentifier> reglis: reglisteners)
 				{
+					agent.getLogger().info("new connection: "+client);
 					reglis.addIntermediateResult(client);
 				}
 				return IFuture.DONE;
@@ -442,6 +443,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 		
 		for(IComponentIdentifier client: clients)
 		{
+			agent.getLogger().info("new connection: "+client);
 			reglis.addIntermediateResult(client);
 		}
 		

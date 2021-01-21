@@ -128,6 +128,7 @@ public abstract class AbstractInfrastructureTest
 	{
 		ISuperpeerStatusService	status	= sp.searchService(new ServiceQuery<>(ISuperpeerStatusService.class, ServiceScope.PLATFORM)).get();
 		ISubscriptionIntermediateFuture<IComponentIdentifier>	connected	= status.getRegisteredClients();
+		
 		Set<IComponentIdentifier>	platformids	= new LinkedHashSet<>();
 		for(IExternalAccess ea: clients)
 		{
@@ -139,10 +140,10 @@ public abstract class AbstractInfrastructureTest
 			long timeout = Starter.getDefaultTimeout(sp.getId().getRoot());
 			if (timeout <= 0)
 				timeout = 30000;
-			System.err.println("waitForSuperpeerConnections0: Waiting for next cid, remaining: " + Arrays.toString(platformids.toArray()));
+			System.err.println("waitForSuperpeerConnections0: Waiting for next cid, remaining: " +this+", "+connected.getClass()+", "+ Arrays.toString(platformids.toArray()));
 			IComponentIdentifier	cid	= connected.getNextIntermediateResult(timeout, true);
 			platformids.remove(cid.getRoot());
-			System.err.println("waitForSuperpeerConnections1:"+sp.getId()+" got connection from "+cid.getRoot());
+			System.err.println("waitForSuperpeerConnections1:"+this+", "+sp.getId()+" got connection from "+cid.getRoot());
 		}
 	}
 }
