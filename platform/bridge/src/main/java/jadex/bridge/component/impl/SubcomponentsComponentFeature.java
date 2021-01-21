@@ -362,6 +362,14 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		boolean suicide = false;
 		Set<IComponentIdentifier> killset = new HashSet<>(Arrays.asList(cids));
 		Map<IComponentIdentifier, Set<IComponentIdentifier>> killparents = new HashMap<>();
+		
+		debug	= debug | killset.stream().anyMatch(id -> PlatformComponent._BROKEN.contains(
+				SComponentManagementService.internalGetComponentDescription(id).getModelName()));
+		if(debug)
+		{
+			component.getLogger().severe("Killing subcomponents0: "+component+", "+killset);
+		}
+		
 		idloop:
 		for(IComponentIdentifier cid : cids)
 		{
@@ -403,10 +411,20 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 				IExternalAccess exta = component.getExternalAccess(entry.getKey());
 				Future<Void> donefut = new Future<>();
 				compkillbar.addFuture(donefut);
+				
+				if(debug)
+				{
+					component.getLogger().severe("Killing subcomponents1: "+component+", "+entry.getValue());
+				}
+
 				exta.killComponents(entry.getValue().toArray(new IComponentIdentifier[entry.getValue().size()])).addResultListener(new IntermediateDefaultResultListener<Tuple2<IComponentIdentifier, Map<String, Object>>>()
 				{
 					public void exceptionOccurred(Exception exception)
 					{
+						if(debug)
+						{
+							component.getLogger().severe("Killing subcomponents2 failed: "+component+", "+entry.getValue()+"\n"+SUtil.getExceptionStacktrace(exception));
+						}
 						if (exception instanceof MultiException)
 							exceptions.addAll(Arrays.asList(((MultiException)exception).getCauses()));
 						else
@@ -416,11 +434,19 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 					
 					public void intermediateResultAvailable(Tuple2<IComponentIdentifier, Map<String, Object>> result)
 					{
+						if(debug)
+						{
+							component.getLogger().severe("Killing subcomponents3: "+component+", "+entry.getValue()+", killed: "+result.getFirstEntity());
+						}
 						ret.addIntermediateResult(result);
 					}
 					
 					public void finished()
 					{
+						if(debug)
+						{
+							component.getLogger().severe("Killing subcomponents4 finished: "+component+", "+entry.getValue());
+						}
 						donefut.setResult(null);
 					}
 				});
@@ -684,6 +710,14 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	
 	protected IIntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> doKillComponents(List<IComponentIdentifier> cids)
 	{
+		debug	= debug | cids.stream().anyMatch(id -> PlatformComponent._BROKEN.contains(
+				SComponentManagementService.internalGetComponentDescription(id).getModelName()));
+		if(debug)
+		{
+			component.getLogger().severe("doKillComponents0: "+component+", "+cids);
+		}
+
+		
 		final IntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> ret = new IntermediateFuture<>();
 		
 		final MultiCollection<String, IComponentIdentifier> instances = new MultiCollection<>();
@@ -705,7 +739,11 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 					public void resultAvailable(Void result)
 					{
 						++levelnum[0];
-//						System.out.println("LEVEL " + levelnum[0] + " " + levels.size() + " " + component);
+						if(debug)
+						{
+							component.getLogger().severe("doKillComponents0: LEVEL " + levelnum[0] + " " + levels + " " + component);
+						}
+
 						final List<Throwable> exceptions = new ArrayList<>();
 						if (levelnum[0] < levels.size())
 						{
