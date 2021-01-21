@@ -1695,11 +1695,29 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 								if(!intermediate)
 								{
 									if(shutdown && debug)
-										PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute2b: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+fut.isDone());
-									fut.addResultListener(new DelegationResultListener<>(ret));
-									if(shutdown && debug)
-										PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute2c: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+fut.isDone());
-
+									{
+										PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute2b: "+cid+", "+method+", "+SUtil.arrayToString(args)+" fut="+fut);
+										
+										try
+										{
+											fut.addResultListener(new DelegationResultListener<Object>(ret)
+											{
+												public String	toString()
+												{
+													return "Heisenbug"+super.toString();
+												}
+											});
+										}
+										finally
+										{
+											if(shutdown && debug)
+												PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute2c: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+fut.isDone());
+										}
+									}
+									else
+									{
+										fut.addResultListener(new DelegationResultListener<>(ret));
+									}
 								}
 								else
 								{

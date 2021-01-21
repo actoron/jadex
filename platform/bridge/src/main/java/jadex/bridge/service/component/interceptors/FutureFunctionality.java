@@ -1174,7 +1174,21 @@ class DelegatingFuture extends Future<Object>
 	@Override
     protected void	executeNotification(IResultListener<Object> listener, ICommand<IResultListener<Object>> command)
     {
-		func.scheduleForward(command, listener);
+		if((""+listener).indexOf("Heisenbug")!=-1)
+			System.err.println("exe0: "+this+", "+command+", "+listener+", "+func.getClass());
+		try
+		{
+			func.scheduleForward(command, listener);
+		}
+		finally
+		{
+			if((""+listener).indexOf("Heisenbug")!=-1)
+			{
+				System.err.println("exe1: "+this+", "+command+", "+listener);
+				Thread.dumpStack();
+			}
+		}
+
     }
 };
 
