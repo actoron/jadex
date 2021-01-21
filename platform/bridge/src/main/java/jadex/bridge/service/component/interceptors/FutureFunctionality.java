@@ -677,7 +677,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	@Override
 	public String toString()
 	{
-		return "DelegatingSubscriptionIntermediateDelegationFuture(src="+src+", results="+results+", myresults="+myresults+")";
+		return super.toString() + "(src="+src+", results="+results+", myresults="+myresults+")";
 	}
 	
 	/**
@@ -734,6 +734,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	@Override
 	protected boolean	doAddIntermediateResult(Object result, boolean undone)
 	{
+		myresults.add(result);
 		try
 		{
 			result = func.handleIntermediateResult(result);
