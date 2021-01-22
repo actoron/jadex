@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
@@ -670,15 +671,36 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	/** The future functionality. */
 	protected FutureFunctionality func;
 	
-	// For debugging
-	ISubscriptionIntermediateFuture<?> src;
-	List<Object>	myresults	= new ArrayList<>();
-		
-	@Override
-	public String toString()
-	{
-		return super.toString() + "(src="+src+", results="+results+", myresults="+myresults+")";
-	}
+//	//-------- debugging --------
+//	ISubscriptionIntermediateFuture<?> mysrc;
+//	List<Object>	myresults	= new ArrayList<>();
+//	@Override
+//	public String toString()
+//	{
+//		return super.toString() + "(storeforfirst="+storeforfirst+", listener="+(listener!=null)+", src="+mysrc+", results="+results+", ownresults="+ownresults+", myresults="+myresults+")";
+//	}
+//	@Override
+//	protected void	storeResult(Object result)
+//	{
+//		if(result instanceof IComponentIdentifier)
+//		{
+//			try
+//			{
+//				myresults.add(result);
+//				super.storeResult(result);
+//			}
+//			finally
+//			{
+////				System.err.println("storeResult: "+this+", "+result);
+//			}
+//		}
+//		else
+//		{
+//			super.storeResult(result);
+//		}
+//	}
+//	//-------- debugging end --------
+
 	
 	/**
 	 * 
@@ -695,6 +717,8 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	 */
 	public DelegatingSubscriptionIntermediateDelegationFuture(ISubscriptionIntermediateFuture<?> src, FutureFunctionality func)
 	{
+//		this.mysrc	= src;	// for debugging only
+		
 		if(func==null)
 			throw new IllegalArgumentException("Func must not null.");
 		this.func = func;
@@ -734,8 +758,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	@Override
 	protected boolean	doAddIntermediateResult(Object result, boolean undone)
 	{
-		System.err.println("add: "+this+", "+result);
-		myresults.add(result);
+//		System.err.println("add: "+this+", "+result);
 		try
 		{
 			result = func.handleIntermediateResult(result);
@@ -747,7 +770,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		catch(Exception e)
 		{
 			return doSetException(e, func.isUndone(undone));
-		}		
+		}
 	}
 
 	/**

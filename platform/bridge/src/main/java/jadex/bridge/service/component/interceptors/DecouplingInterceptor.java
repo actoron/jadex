@@ -394,6 +394,13 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			if(res instanceof IFuture)
 			{
 				Method method = sic.getMethod();
+				
+//				if(method.getName().equals("getRegisteredClients"))
+//				{
+//					System.err.println("Copy return value of getRegisteredClients call: "+res+", "+IComponentIdentifier.LOCAL.get());
+//					Thread.dumpStack();
+//				}
+				
 				Reference ref = method.getAnnotation(Reference.class);
 				final boolean copy = DecouplingInterceptor.this.copy && !sic.isRemoteCall() && !getSerializationServices().isRemoteObject(sic.getProxy()) && (ref!=null? !ref.local(): true);
 				final IFilter	deffilter = new IFilter()
@@ -414,6 +421,12 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					@Override
 					public Object handleIntermediateResult(Object result) throws Exception
 					{
+//						if(method.getName().equals("getRegisteredClients"))
+//						{
+//							System.err.println("Copy return value handleIntermediateResult of getRegisteredClients call: "+res+", "+result+", "+IComponentIdentifier.LOCAL.get());
+//							Thread.dumpStack();
+//						}
+						
 						if(ex!=null)
 							throw ex;
 						return doCopy(copy, deffilter, result);
@@ -480,7 +493,15 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					}
 				};
 				
+//				String resstring	= sic.getMethod().getName().equals("getRegisteredClients") ? res.toString() : null;	// string before connect to see storeforfirst results
+				
 				final Future<?> fut = FutureFunctionality.getDelegationFuture((IFuture<?>)res, func);
+
+//				if(method.getName().equals("getRegisteredClients"))
+//				{
+//					System.err.println("Copy return value getDelegationFuture of getRegisteredClients call: "+resstring+", "+fut+", "+IComponentIdentifier.LOCAL.get());
+//					Thread.dumpStack();
+//				}
 				
 				// Add timeout handling for local case.
 				if(!((IFuture<?>)res).isDone() && !sic.isRemoteCall())

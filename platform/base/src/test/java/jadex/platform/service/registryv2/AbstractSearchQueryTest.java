@@ -254,23 +254,11 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			
 			// 6) start provider platform, wait for connection, search for service -> test if search works for new platform and existing SP
 			System.out.println("6) start provider platform, search for service");
-			try
-			{
-				System.err.println("6) start provider platform, search for service");
-				pro1	= createPlatform(proconf);
-				System.err.println("6a) start provider platform, search for service");
-				waitForSuperpeerConnections(sp, pro1);
-				System.err.println("6b) start provider platform, search for service");
-				waitForRegistryClient(client, false);
-				System.err.println("6c) start provider platform, search for service");
-				result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-				System.err.println("6d) start provider platform, search for service");
-				Assert.assertEquals("found: "+result+", new platform: "+pro1.getId(), 2, result.size());
-			}
-			finally
-			{
-				System.err.println("6e) start provider platform, search for service");
-			}
+			pro1	= createPlatform(proconf);
+			waitForSuperpeerConnections(sp, pro1);
+			waitForRegistryClient(client, false);
+			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
+			Assert.assertEquals("found: "+result+", new platform: "+pro1.getId(), 2, result.size());
 			
 			// 7) kill one provider platform, search for service -> test if remote disconnection and service removal works
 			System.out.println("7) kill provider platform"+pro1.getId()+", search for service");
@@ -283,13 +271,9 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			// 8) kill SP, search for service -> test if re-fallback to awa works
 			System.out.println("8) kill SP, search for service");
 			removePlatform(sp);
-			System.out.println("8a");
 			waitALittle(client);
-			System.out.println("8b");
 			waitALittle(client);	// two waits for disconnection, because contimeout = 2* WAITFACTOR
-			System.out.println("8c");
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			System.out.println("8d");
 			Assert.assertEquals(""+result, awa?1:0, result.size());
 		}
 	}

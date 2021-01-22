@@ -334,10 +334,10 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 							}
 							else
 							{
-								if(method.getName().equals("getRegisteredClients"))
-								{
-									System.err.println("connect getRegisteredClients future: "+fret+", "+sic.getResult());
-								}
+//								if(method.getName().equals("getRegisteredClients"))
+//								{
+//									System.err.println("connect getRegisteredClients future: "+fret+", "+sic.getResult());
+//								}
 
 								FutureFunctionality.connectDelegationFuture((Future<?>)fret, (IFuture<?>)sic.getResult());
 							}

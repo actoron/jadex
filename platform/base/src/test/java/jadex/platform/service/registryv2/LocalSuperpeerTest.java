@@ -31,7 +31,7 @@ public class LocalSuperpeerTest	extends AbstractSearchQueryTest
 		// Remote only -> no simulation please
 		baseconf.getExtendedPlatformConfiguration().setSimul(false);
 		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
-		baseconf.setLogging(true);
+//		baseconf.setLogging(true);
 //		baseconf.setValue("rt.debug", true);
 		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
 

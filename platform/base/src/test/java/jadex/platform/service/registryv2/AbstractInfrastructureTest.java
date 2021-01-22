@@ -2,7 +2,6 @@ package jadex.platform.service.registryv2;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -140,10 +139,10 @@ public abstract class AbstractInfrastructureTest
 			long timeout = Starter.getDefaultTimeout(sp.getId().getRoot());
 			if (timeout <= 0)
 				timeout = 30000;
-			System.err.println("waitForSuperpeerConnections0: Waiting for next cid, remaining: " +this+", "+connected+", "+ Arrays.toString(platformids.toArray()));
+//			System.err.println("waitForSuperpeerConnections0: Waiting for next cid, remaining: " +this+", "+connected+", "+ Arrays.toString(platformids.toArray())+", "+Thread.currentThread());
 			IComponentIdentifier	cid	= connected.getNextIntermediateResult(timeout, true);
 			platformids.remove(cid.getRoot());
-			System.err.println("waitForSuperpeerConnections1:"+this+", "+sp.getId()+" got connection from "+cid.getRoot());
+//			System.err.println("waitForSuperpeerConnections1:"+this+", "+sp.getId()+" got connection from "+cid.getRoot());
 		}
 	}
 }
