@@ -212,9 +212,13 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		{
 			// 2) start provider platform, search for service -> test if awa fallback works with one platform 
 			System.out.println("2) start provider platform, search for service");
+			System.err.println("2a) start provider platform, search for service");
 			pro1	= createPlatform(proconf);
+			System.err.println("2a) start provider platform, search for service");
 			waitForRegistryWithProvider(client, pro1, true);
+			System.err.println("2a) start provider platform, search for service");
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
+			System.err.println("2a) start provider platform, search for service");
 			Assert.assertEquals(""+result, 1, result.size());
 			
 			// 3) start provider platform, search for service -> test if awa fallback works with two platforms 
@@ -282,8 +286,6 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		}
 	}
 
-	IExternalAccess	marker;
-	
 	/**
 	 *  Wait to allow remote platform/registry interaction.
 	 *  The idea is that the registry is roughly FCFS so
@@ -295,21 +297,19 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		// Can only use global when ssp available. Otherwise uses awa fallback via network.
 		global	= global && sspconf!=null;
 		
-		if(marker==null)
-		{
-			marker	= Starter.createPlatform(clientconf).get();
-		}
+		IExternalAccess	marker	= Starter.createPlatform(clientconf).get();
 		ISubscriptionIntermediateFuture<IMarkerService>	sub	= client.addQuery(new ServiceQuery<>(IMarkerService.class, global ? ServiceScope.GLOBAL : ServiceScope.NETWORK));
 		IExternalAccess	agent	= marker.addComponent(global ? new GlobalMarkerAgent() : new NetworkMarkerAgent()).get();
 		IComponentIdentifier	found;
 		do
 		{
 			found	= ((IService)sub.getNextIntermediateResult()).getServiceId().getProviderId();
-			System.out.println("Found marker: "+found+"; expecting: "+agent.getId());
+			System.out.println("Found marker: "+found+"; expecting: "+agent.getId()+", "+agent.getId().equals(found));
 		}
 		while(!agent.getId().equals(found));
 			
-		agent.killComponent().get();
+		marker.killComponent().get();
+		marker	= null;
 	}
 	
 	/**
