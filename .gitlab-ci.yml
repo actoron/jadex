@@ -55,7 +55,7 @@ build:
     - ./gradlew -Pdist=publishdists -Production clean build testClasses -x test -x javadoc $GRADLE_EXTRA
   rules:
     # omit unless explicitly set in env until artifacts are reusable
-    - if: '$BUILD=="true"'
+    - if: '$BUILD=="true"' && $HEISENTEST!="true"
       when: on_success
     
 ### Run sonarqube 
@@ -66,6 +66,7 @@ quality:
   allow_failure: true
   rules:
     #- if: $QUALITY=="true" || $QUALITY!="false" && $CI_COMMIT_REF_SLUG=~$QUALITY_BRANCHES
+    - if: $HEISENTEST!="true"
     - when: manual
 
 test:
@@ -99,7 +100,7 @@ checkDists:
   script:
     - ./gradlew -Pdist=publishdists -Production checkDists $GRADLE_EXTRA
   rules:
-    - if: $CHECKDISTS=="true" || $CHECKDISTS!="false" && $CI_COMMIT_REF_SLUG=~$CHECKDISTS_BRANCHES
+    - if: $HEISENTEST!="true" && ($CHECKDISTS=="true" || $CHECKDISTS!="false" && $CI_COMMIT_REF_SLUG=~$CHECKDISTS_BRANCHES)
 
 checkDocs:
   stage: testandquality
@@ -111,14 +112,14 @@ checkDocs:
     paths:
       - "*/build/reports/markdownlint/"
   rules:
-    - if: $CHECKDOCS=="true" || $CHECKDOCS!="false" && $CI_COMMIT_REF_SLUG=~$CHECKDOCS_BRANCHES
+    - if: $HEISENTEST!="true" && ($CHECKDOCS=="true" || $CHECKDOCS!="false" && $CI_COMMIT_REF_SLUG=~$CHECKDOCS_BRANCHES)
 
 publishCentral:
   stage: deployandpublish
   script: 
     - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -P repos=central --max-workers=32 $GRADLE_EXTRA
   rules:
-    - if: $PUBLISHCENTRAL=="true" || $PUBLISHCENTRAL!="false" && $CI_COMMIT_REF_SLUG=~$PUBLISHCENTRAL_BRANCHES
+    - if: $HEISENTEST!="true" && ($PUBLISHCENTRAL=="true" || $PUBLISHCENTRAL!="false" && $CI_COMMIT_REF_SLUG=~$PUBLISHCENTRAL_BRANCHES)
       when: on_success
     
 publishActoron:
@@ -126,7 +127,7 @@ publishActoron:
   script: 
     - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -P repos=actoron --max-workers=32 $GRADLE_EXTRA
   rules:
-    - if: $PUBLISHACTORON=="true" || $PUBLISHACTORON!="false" && $CI_COMMIT_REF_SLUG=~$PUBLISHACTORON_BRANCHES
+    - if: $HEISENTEST!="true" && ($PUBLISHACTORON=="true" || $PUBLISHACTORON!="false" && $CI_COMMIT_REF_SLUG=~$PUBLISHACTORON_BRANCHES)
       when: on_success
     
 deployZips:
@@ -134,7 +135,7 @@ deployZips:
   script:
     - ./gradlew -Pdist=publishdists -Production deployZips $GRADLE_EXTRA
   rules:
-    - if: $DEPLOYZIPS=="true" || $DEPLOYZIPS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYZIPS_BRANCHES
+    - if: $HEISENTEST!="true" && ($DEPLOYZIPS=="true" || $DEPLOYZIPS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYZIPS_BRANCHES)
       when: on_success
 
 deployJavadocs:
@@ -142,7 +143,7 @@ deployJavadocs:
   script:
     - ./gradlew -Pdist=addonjavadoc -Production deployJavadocs $GRADLE_EXTRA
   rules:
-    - if: $DEPLOYJAVADOCS=="true" || $DEPLOYJAVADOCS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYJAVADOCS_BRANCHES
+    - if: $HEISENTEST!="true" && ($DEPLOYJAVADOCS=="true" || $DEPLOYJAVADOCS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYJAVADOCS_BRANCHES)
       when: on_success
 
 deploySchemas:
@@ -150,7 +151,7 @@ deploySchemas:
   script:
     - ./gradlew -Pdist=publishdists -Production deploySchemas $GRADLE_EXTRA
   rules:
-    - if: $DEPLOYSCHEMAS=="true" || $DEPLOYSCHEMAS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYSCHEMAS_BRANCHES
+    - if: $HEISENTEST!="true" && ($DEPLOYSCHEMAS=="true" || $DEPLOYSCHEMAS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYSCHEMAS_BRANCHES)
       when: on_success
 
 deploySchemadocs:
@@ -158,7 +159,7 @@ deploySchemadocs:
   script:
     - ./gradlew -Pdist=publishdists -Production deploySchemadocs $GRADLE_EXTRA
   rules:
-    - if: $DEPLOYSCHEMADOCS=="true" || $DEPLOYSCHEMADOCS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYSCHEMADOCS_BRANCHES
+    - if: $HEISENTEST!="true" && ($DEPLOYSCHEMADOCS=="true" || $DEPLOYSCHEMADOCS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYSCHEMADOCS_BRANCHES)
       when: on_success
 
 # cleanuprepo:    
@@ -184,7 +185,7 @@ tag:
   script:
     -  ./gradlew -Production updateTag $GRADLE_EXTRA
   rules:
-    - if: $TAG=="true" || $TAG!="false" && $CI_COMMIT_REF_SLUG=~$TAG_BRANCHES
+    - if: $HEISENTEST!="true" && ($TAG=="true" || $TAG!="false" && $CI_COMMIT_REF_SLUG=~$TAG_BRANCHES)
       when: on_success
 
 # Rules for the whole workflow / pipeline
