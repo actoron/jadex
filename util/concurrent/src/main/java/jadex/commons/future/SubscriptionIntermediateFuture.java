@@ -90,16 +90,13 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 		resultssize++;
 		
 		// Store results only if not yet any listener added or thread waiting
-		if(listener==null && ownresults==null)
+		if(storeforfirst)
 		{
-			if(storeforfirst)
-			{
-				super.storeResult(result);
-			}
-			else
-			{
-				throw new RuntimeException("lost value: "+result);
-			}
+			super.storeResult(result);
+		}
+		else if(listener==null && ownresults==null)
+		{
+			throw new RuntimeException("lost value: "+result);
 		}
 		
 		if(ownresults!=null)
