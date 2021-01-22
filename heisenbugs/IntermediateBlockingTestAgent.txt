@@ -1,0 +1,25 @@
+Jan 22, 2021 1:35:27 PM jadex.base.test.impl.ComponentTestBase <init>
+SEVERE: Empty ComponentTest Constructor called
+Exception in thread "Timer-2" java.lang.NullPointerException
+	at jadex.bridge.service.component.RequiredServicesComponentFeature.resolveLocalService(RequiredServicesComponentFeature.java:818)
+	at jadex.bridge.service.component.RequiredServicesComponentFeature.getRawService(RequiredServicesComponentFeature.java:704)
+	at jadex.bridge.component.impl.AbstractComponentFeature.getExecutionService(AbstractComponentFeature.java:193)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.wakeup(ExecutionComponentFeature.java:774)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.scheduleStep(ExecutionComponentFeature.java:349)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.scheduleStep(ExecutionComponentFeature.java:298)
+	at jadex.bridge.component.impl.ExecutionComponentFeature$4.timeEventOccurred(ExecutionComponentFeature.java:479)
+	at jadex.platform.service.clock.ClockService$1.run(ClockService.java:220)
+	at java.base/java.util.TimerThread.mainLoop(Timer.java:556)
+	at java.base/java.util.TimerThread.run(Timer.java:506)
+Jan 22, 2021 1:35:30 PM jadex.base.test.impl.ComponentTestBase <init>
+SEVERE: Empty ComponentTest Constructor called
+Jan 22, 2021 1:35:59 PM simulation@test-5 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 22, 2021 1:35:59 PM simulation@test-5 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 22, 2021 1:35:59 PM simulation@test-5 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+jadex.commons.TimeoutException: jadex.micro.testcases.blocking.IntermediateBlockingTestAgent(jadex.micro.testcases.blocking.IntermediateBlockingTestAgent) did not finish in 30000 ms.
+	at jadex.base.test.impl.ComponentTestBase$1.run(ComponentTestBase.java:112)
+	at java.base/java.util.TimerThread.mainLoop(Timer.java:556)
+	at java.base/java.util.TimerThread.run(Timer.java:506)
