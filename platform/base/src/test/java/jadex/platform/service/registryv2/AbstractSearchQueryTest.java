@@ -198,9 +198,13 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		
 		// 1) start client platform and search for service -> not found (test if works with no super peers and no other platforms)
 		System.out.println("1) start client platform and search for service");
+		System.err.println("1a) start client platform and search for service");
 		IExternalAccess	client	= createPlatform(clientconf);
+		System.err.println("1b) start client platform and search for service");
 		waitForRegistryClient(client, true);
+		System.err.println("1c) start client platform and search for service");
 		Collection<ITestService>	result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
+		System.err.println("1d) start client platform and search for service");
 		Assert.assertTrue(""+result, result.isEmpty());
 		
 		IExternalAccess	pro1, pro2;
