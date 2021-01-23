@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.cms;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
@@ -1644,7 +1645,9 @@ public class SComponentManagementService
 			destroyComponent(cid, ret, agent);
 		}
 		if(debug(agent))
-			agent.getLogger().severe("destroy4 (contains, locked, inited): "+cid+" ("+contains+", "+locked+", "+inited+")");
+		{
+			agent.getLogger().severe("destroy4 (contains, locked, inited): "+cid+" ("+contains+", "+locked+", "+inited+") "+IComponentIdentifier.LOCAL.get());
+		}
 
 		if(debug(agent))
 		{
@@ -2314,16 +2317,34 @@ public class SComponentManagementService
 						ret = method.invoke(feat, args);
 					}
 				}
-				catch(Exception e)
+				catch(Throwable e)
 				{
-					if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
+					if(e instanceof InvocationTargetException)
+					{
+						e	= ((InvocationTargetException) e).getTargetException();
+					}
+					
+					if(SReflect.isSupertype(Exception.class, e.getClass()) && SReflect.isSupertype(IFuture.class, method.getReturnType()))
 					{
 						ret = SFuture.getFuture(method.getReturnType());
-						((Future)ret).setException(e);
+						((Future)ret).setException((Exception) e);
 					}
 					else
 					{
-						throw e;
+						boolean found	= false;
+						Class<?>[]	extypes	= method.getExceptionTypes();
+						for(int i=0; !found && i<extypes.length; i++)
+						{
+							found	= SReflect.isSupertype(extypes[i], e.getClass());
+						}
+						if(found)
+						{
+							throw e;
+						}
+						else
+						{
+							throw SUtil.throwUnchecked(e);
+						}
 					}
 				}
 				return ret;
