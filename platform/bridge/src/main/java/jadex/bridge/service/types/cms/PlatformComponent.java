@@ -117,7 +117,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 //		_BROKEN.add("jadex.bdiv3.examples.booktrading.seller.SellerAgent");
 //		_BROKEN.add("jadex.micro.testcases.terminate.TerminableProviderAgent");
 //		_BROKEN.add("jadex.micro.testcases.terminate.TerminateTestAgent");
-//		_BROKEN.add("jadex.micro.testcases.terminate.TerminateIntermediateTestAgent");
+		_BROKEN.add("jadex.micro.testcases.terminate.TerminateIntermediateTestAgent");
 //		_BROKEN.add("jadex.micro.testcases.subscriptionlistener.SubscriptionListenerTestAgent");
 		
 		// Todo: are these still broken?
