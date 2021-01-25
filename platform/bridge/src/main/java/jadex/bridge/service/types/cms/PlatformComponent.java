@@ -115,8 +115,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	public static final Set<String>	_BROKEN	= new LinkedHashSet<String>();
 	{
 //		_BROKEN.add("jadex.bdiv3.examples.booktrading.seller.SellerAgent");
-//		_BROKEN.add("jadex.micro.testcases.terminate.TerminableProviderAgent");
-//		_BROKEN.add("jadex.micro.testcases.terminate.TerminateTestAgent");
+		_BROKEN.add("jadex.micro.testcases.terminate.TerminableProviderAgent");
+		_BROKEN.add("jadex.micro.testcases.terminate.TerminateTestAgent");
 		_BROKEN.add("jadex.micro.testcases.terminate.TerminateIntermediateTestAgent");
 //		_BROKEN.add("jadex.micro.testcases.subscriptionlistener.SubscriptionListenerTestAgent");
 		
