@@ -1,0 +1,121 @@
+
+Class jadex.micro.testcases.stream.StreamUserAgent
+all > jadex.micro.testcases.stream > StreamUserAgent
+1
+
+tests
+	
+1
+
+failures
+	
+0
+
+ignored
+	
+1m31.74s
+
+duration
+	
+0%
+
+successful
+
+    Failed tests
+    Tests
+    Standard output
+    Standard error
+
+Jan. 25, 2021 1:43:32 NACHM. jadex.base.test.impl.ComponentTestBase <init>
+SEVERE: Empty ComponentTest Constructor called
+Jan. 25, 2021 1:43:37 NACHM. jadex.base.test.impl.ComponentTestLazyPlatform setPlatform
+INFO: using timeout: 360000
+Jan. 25, 2021 1:43:37 NACHM. jadex.base.test.impl.ComponentTestBase <init>
+SEVERE: Empty ComponentTest Constructor called
+java.lang.RuntimeException: No message transport available: security@test-13 MsgHeader(properties={receiver=security@test-11, sender=security@test-13, __securitymessage__=true})
+	at jadex.bridge.component.impl.MessageComponentFeature.sendToAllTransports(MessageComponentFeature.java:486)
+	at jadex.bridge.component.impl.MessageComponentFeature.sendToTransports(MessageComponentFeature.java:319)
+	at jadex.bridge.component.impl.MessageComponentFeature$8$1.customResultAvailable(MessageComponentFeature.java:702)
+	at jadex.bridge.component.impl.MessageComponentFeature$8$1.customResultAvailable(MessageComponentFeature.java:699)
+	at jadex.commons.future.ExceptionDelegationResultListener.resultAvailable(ExceptionDelegationResultListener.java:55)
+	at jadex.commons.future.Future$1.execute(Future.java:769)
+	at jadex.commons.future.Future$1.execute(Future.java:746)
+	at jadex.bridge.service.component.interceptors.FutureFunctionality.scheduleForward(FutureFunctionality.java:116)
+	at jadex.bridge.service.component.interceptors.DelegatingFuture.executeNotification(FutureFunctionality.java:1218)
+	at jadex.commons.future.Future.startScheduledNotifications(Future.java:641)
+	at jadex.commons.future.Future.notifyListener(Future.java:742)
+	at jadex.commons.future.Future.addResultListener(Future.java:722)
+	at jadex.bridge.service.component.interceptors.FutureFunctionality.connectDelegationFuture(FutureFunctionality.java:351)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1543)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at jadex.platform.service.execution.AsyncExecutionService$1.run(AsyncExecutionService.java:109)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+java.util.concurrent.TimeoutException: Handshake timed out with platform: test-13
+	at jadex.platform.service.security.SecurityAgent.doCleanup(SecurityAgent.java:1655)
+	at jadex.platform.service.security.SecurityAgent$4.execute(SecurityAgent.java:761)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1427)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at jadex.platform.service.execution.AsyncExecutionService$1.run(AsyncExecutionService.java:109)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+java.util.concurrent.TimeoutException: Handshake timed out with platform: test-13
+	at jadex.platform.service.security.SecurityAgent.doCleanup(SecurityAgent.java:1655)
+	at jadex.platform.service.security.SecurityAgent$4.execute(SecurityAgent.java:761)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1427)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at jadex.platform.service.execution.AsyncExecutionService$1.run(AsyncExecutionService.java:109)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+junit.framework.AssertionFailedError: Number of testcases do not match. Expected 8 but was 4.
+	at jadex.base.test.impl.ComponentTestBase.checkTestResults(ComponentTestBase.java:259)
+	at jadex.base.test.impl.ComponentTestBase.runBare(ComponentTestBase.java:180)
+	at jadex.base.test.impl.ComponentTestLazyPlatform.runBare(ComponentTestLazyPlatform.java:98)
+	at jadex.base.test.impl.JunitAgentTest.runBare(JunitAgentTest.java:73)
+	at junit.framework.TestResult$1.protect(TestResult.java:122)
+	at junit.framework.TestResult.runProtected(TestResult.java:142)
+	at junit.framework.TestResult.run(TestResult.java:125)
+	at junit.framework.TestCase.run(TestCase.java:129)
+	at junit.framework.TestSuite.runTest(TestSuite.java:255)
+	at junit.framework.TestSuite.run(TestSuite.java:250)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:84)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecutor.runTestClass(JUnitTestClassExecutor.java:110)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecutor.execute(JUnitTestClassExecutor.java:58)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecutor.execute(JUnitTestClassExecutor.java:38)
+	at org.gradle.api.internal.tasks.testing.junit.AbstractJUnitTestClassProcessor.processTestClass(AbstractJUnitTestClassProcessor.java:62)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:51)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:94)
+	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:119)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:182)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:164)
+	at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:414)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.ManagedExecutorImpl$1.run(ManagedExecutorImpl.java:48)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:56)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Wrap lines
+Generated by Gradle 6.5 at 25.01.2021, 13:49:49
+
