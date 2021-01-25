@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -819,30 +820,44 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 												component.getLogger().severe("doKillComponents2: start kill: " + inst+", "+IComponentIdentifier.LOCAL.get());
 											}
 											
-											killfut = exta.killComponent();
+											try
+											{
+												killfut = exta.killComponent();
+											}
+											catch(ComponentTerminatedException e)
+											{
+												// ignore
+												if(debug)
+												{
+													component.getLogger().severe("doKillComponents2a: kill failed: " + inst+"\n"+SUtil.getExceptionStacktrace(e));
+												}
+											}
 										}
 										
-										levelbar.addFuture(killfut);
-										killfut.addResultListener(new IResultListener<Map<String, Object>>()
+										if(killfut!=null)
 										{
-											public void exceptionOccurred(Exception exception)
+											levelbar.addFuture(killfut);
+											killfut.addResultListener(new IResultListener<Map<String, Object>>()
 											{
-												if(debug)
+												public void exceptionOccurred(Exception exception)
 												{
-													component.getLogger().severe("doKillComponents3: kill failed: " + inst+"\n"+SUtil.getExceptionStacktrace(exception));
+													if(debug)
+													{
+														component.getLogger().severe("doKillComponents3: kill failed: " + inst+"\n"+SUtil.getExceptionStacktrace(exception));
+													}
+													exceptions.add(exception);
 												}
-												exceptions.add(exception);
-											}
-											
-											public void resultAvailable(Map<String, Object> result)
-											{
-												if(debug)
+												
+												public void resultAvailable(Map<String, Object> result)
 												{
-													component.getLogger().severe("doKillComponents4: kill succeedeed: " + inst);
-												}
-												ret.addIntermediateResultIfUndone(new Tuple2<IComponentIdentifier, Map<String,Object>>(inst, result));
-											};
-										});
+													if(debug)
+													{
+														component.getLogger().severe("doKillComponents4: kill succeedeed: " + inst);
+													}
+													ret.addIntermediateResultIfUndone(new Tuple2<IComponentIdentifier, Map<String,Object>>(inst, result));
+												};
+											});
+										}
 									}
 								}
 							}
