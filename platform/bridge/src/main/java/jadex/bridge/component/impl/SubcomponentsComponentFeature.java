@@ -11,13 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.ImmediateComponentStep;
-import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -31,7 +29,6 @@ import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
@@ -60,7 +57,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
-import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
@@ -368,6 +364,19 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		if(debug)
 		{
 			component.getLogger().severe("Killing subcomponents0: "+component+", "+killset);
+			ret.addResultListener(new IResultListener<Collection<Tuple2<IComponentIdentifier,Map<String,Object>>>>()
+			{
+				@Override
+				public void resultAvailable(Collection<Tuple2<IComponentIdentifier, Map<String, Object>>> result)
+				{
+					component.getLogger().severe("Killing subcomponents0a done: "+component);
+				}
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					component.getLogger().severe("Killing subcomponents0b failed: "+component+"\n"+SUtil.getExceptionStacktrace(exception));
+				}
+			});
 		}
 		
 		idloop:
@@ -457,6 +466,25 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		{
 			Future<Void> donefut = new Future<>();
 			compkillbar.addFuture(donefut);
+			
+			if(debug)
+			{
+				component.getLogger().severe("Killing subcomponents5 locals: "+component+", "+locals);
+				donefut.addResultListener(new IResultListener<Void>()
+				{
+					@Override
+					public void resultAvailable(Void result)
+					{
+						component.getLogger().severe("Killing subcomponents5a locals done: "+component);
+					}
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						component.getLogger().severe("Killing subcomponents5b locals failed: "+component+"\n"+SUtil.getExceptionStacktrace(exception));
+					}
+				});
+			}
+
 			killLocalComponents(locals.toArray(new IComponentIdentifier[locals.size()])).addResultListener(new IntermediateDefaultResultListener<Tuple2<IComponentIdentifier, Map<String, Object>>>()
 			{
 				public void exceptionOccurred(Exception exception)
@@ -672,6 +700,11 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		
 		if (userinfos.size() > 0)
 		{
+			if(debug)
+			{
+				component.getLogger().severe("killLocalComponents0 user " + component+ ", " + userinfos);						
+			}
+			
 			doKillComponents(userinfos).addResultListener(new IntermediateDefaultResultListener<Tuple2<IComponentIdentifier, Map<String, Object>>>()
 			{
 				public void intermediateResultAvailable(Tuple2<IComponentIdentifier, Map<String, Object>> result)
@@ -686,7 +719,10 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 				
 				public void finished()
 				{
-//					System.out.println("User kill done, killing sysagents..." + sysinfos.size());
+					if(debug)
+					{
+						component.getLogger().severe("User kill done, killing sysagents..." + sysinfos.size());						
+					}
 					if (!ret.isDone())
 					{
 						if (sysinfos.size() > 0)
@@ -710,22 +746,39 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	
 	protected IIntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> doKillComponents(List<IComponentIdentifier> cids)
 	{
+		final IntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> ret = new IntermediateFuture<>();
+		
 		debug	= debug | cids.stream().anyMatch(id -> PlatformComponent._BROKEN.contains(
 				SComponentManagementService.internalGetComponentDescription(id).getModelName()));
 		if(debug)
 		{
 			component.getLogger().severe("doKillComponents0: "+component+", "+cids);
+			ret.addResultListener(new IResultListener<Collection<Tuple2<IComponentIdentifier, Map<String, Object>>>>()
+			{
+				@Override
+				public void resultAvailable(Collection<Tuple2<IComponentIdentifier, Map<String, Object>>> result)
+				{
+					component.getLogger().severe("doKillComponents0a done: "+component);
+				}
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					component.getLogger().severe("doKillComponents0b failed: "+component+"\n"+SUtil.getExceptionStacktrace(exception));
+				}
+			});
 		}
 
-		
-		final IntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> ret = new IntermediateFuture<>();
-		
 		final MultiCollection<String, IComponentIdentifier> instances = new MultiCollection<>();
 		
 		getShutdownLevels(instances, cids).addResultListener(new IResultListener<List<Set<String>>>()
 		{
 			public void resultAvailable(List<Set<String>> levels)
 			{
+				if(debug)
+				{
+					component.getLogger().severe("doKillComponents11: " + levels + " " + component);
+				}
+				
 				int[] levelnum = new int[1];
 				levelnum[0] = -1;
 				
@@ -741,7 +794,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 						++levelnum[0];
 						if(debug)
 						{
-							component.getLogger().severe("doKillComponents0: LEVEL " + levelnum[0] + " " + levels + " " + component);
+							component.getLogger().severe("doKillComponents1: LEVEL " + levelnum[0] + " " + levels + " " + component);
 						}
 
 						final List<Throwable> exceptions = new ArrayList<>();
@@ -770,18 +823,33 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 										}
 										final IExternalAccess exta = tmpexta;
 										if (exta != null)
+										{
+											if(debug)
+											{
+												component.getLogger().severe("doKillComponents2: start kill: " + inst+", "+IComponentIdentifier.LOCAL.get());
+											}
+											
 											killfut = exta.killComponent();
+										}
 										
 										levelbar.addFuture(killfut);
 										killfut.addResultListener(new IResultListener<Map<String, Object>>()
 										{
 											public void exceptionOccurred(Exception exception)
 											{
+												if(debug)
+												{
+													component.getLogger().severe("doKillComponents3: kill failed: " + inst+"\n"+SUtil.getExceptionStacktrace(exception));
+												}
 												exceptions.add(exception);
 											}
 											
 											public void resultAvailable(Map<String, Object> result)
 											{
+												if(debug)
+												{
+													component.getLogger().severe("doKillComponents4: kill succeedeed: " + inst);
+												}
 												ret.addIntermediateResultIfUndone(new Tuple2<IComponentIdentifier, Map<String,Object>>(inst, result));
 											};
 										});
@@ -822,6 +890,12 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	 */
 	protected IFuture<List<Set<String>>> getShutdownLevels(final MultiCollection<String, IComponentIdentifier> instances, List<IComponentIdentifier> cids)
 	{
+		try		{
+			
+		if(debug)
+		{
+			component.getLogger().severe("getShutdownLevels0: "+instances+", "+cids);
+		}
 		
 		if (cids == null || cids.size() == 0)
 			return new Future<List<Set<String>>>(new IllegalArgumentException("Component identifiers must not be null or empty."));
@@ -833,16 +907,28 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		final Map<Integer, IFuture<IModelInfo>> modelmap = new HashMap<>();
 		for (int i = 0; i < cids.size(); ++i)
 		{
+			if(debug)
+			{
+				component.getLogger().severe("getShutdownLevels1: getModelAsync0 "+component+", "+i);
+			}
 			IExternalAccess exta = component.getExternalAccess(cids.get(i));
 			IFuture<IModelInfo> fut = exta.getModelAsync();
 			modelmap.put(i, fut);
 			modelbar.addFuture(fut);
+			if(debug)
+			{
+				component.getLogger().severe("getShutdownLevels1: getModelAsync1 "+component+", "+exta);
+			}
 		}
 		
 		modelbar.waitFor().addResultListener(new ExceptionDelegationResultListener<Void, List<Set<String>>>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
+				if(debug)
+				{
+					component.getLogger().severe("getShutdownLevels2: getModelAsync done "+component);
+				}
 //				boolean lineardeps = true;
 //				for (Map.Entry<Integer, IFuture<IModelInfo>> entry : modelmap.entrySet())
 //				{
@@ -880,6 +966,16 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			}
 		});
 		return ret;
+		
+		}
+		catch(Throwable t)
+		{
+			if(debug)
+			{
+				component.getLogger().severe("getShutdownLevelsO: failed "+component+"\n"+SUtil.getExceptionStacktrace(t));
+			}
+			throw SUtil.throwUnchecked(t);
+		}
 	}
 	
 	/**
@@ -1302,7 +1398,10 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	protected <T> void addComponentToLevels(DependencyResolver<String> dr, T instanceinfo, IModelInfo minfo, MultiCollection<String, T> instances, String... addpredecessors)
 	{
 		if (debug)
-			System.out.println("addcomptolevel: " + minfo.getFullName());
+		{
+			System.err.println("addcomptolevel: " + minfo.getFullName());
+			Thread.dumpStack();
+		}
 		try
 		{
 			String cname = minfo.getFullName();
