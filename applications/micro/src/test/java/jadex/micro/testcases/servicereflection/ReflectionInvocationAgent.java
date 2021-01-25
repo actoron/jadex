@@ -23,7 +23,6 @@ import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -62,7 +61,8 @@ public class ReflectionInvocationAgent extends JunitAgentTest
 		catch(Exception e)
 		{
 //			System.out.println("Problem: could not find service");
-			tr.setFailed("Problem: could not find service: "+e);
+//			tr.setFailed("Problem: could not find service: "+e);
+			tr.setFailed(e);
 //			e.printStackTrace();
 		}
 		finally
@@ -83,7 +83,7 @@ public class ReflectionInvocationAgent extends JunitAgentTest
 		tr = new TestReport("#2", "Test if reflective remote call works");
 		try
 		{
-			IExternalAccess platform = Starter.createPlatform().get();
+			IExternalAccess platform = Starter.createPlatform(STest.getDefaultTestConfig(ReflectionInvocationAgent.class)).get();
 			IFuture<IExternalAccess> fut = platform.createComponent(new CreationInfo().setFilename(ProviderAgent.class.getName()+".class"));
 			cid = fut.get().getId();
 			IService ser = (IService)platform.searchService(new ServiceQuery<>(new ClassInfo("jadex.micro.testcases.servicereflection.IExampleService")).setScope(ServiceScope.PLATFORM)).get();
@@ -94,7 +94,8 @@ public class ReflectionInvocationAgent extends JunitAgentTest
 		catch(Exception e)
 		{
 //			System.out.println("Problem: could not find service");
-			tr.setFailed("Problem: could not find service: "+e);
+//			tr.setFailed("Problem: could not find service: "+e);
+			tr.setFailed(e);
 //			e.printStackTrace();
 		}
 		finally
