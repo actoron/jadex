@@ -115,9 +115,9 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	public static final Set<String>	_BROKEN	= new LinkedHashSet<String>();
 	{
 //		_BROKEN.add("jadex.bdiv3.examples.booktrading.seller.SellerAgent");
-		_BROKEN.add("jadex.micro.testcases.terminate.TerminableProviderAgent");
-		_BROKEN.add("jadex.micro.testcases.terminate.TerminateTestAgent");
-		_BROKEN.add("jadex.micro.testcases.terminate.TerminateIntermediateTestAgent");
+//		_BROKEN.add("jadex.micro.testcases.terminate.TerminableProviderAgent");
+//		_BROKEN.add("jadex.micro.testcases.terminate.TerminateTestAgent");
+//		_BROKEN.add("jadex.micro.testcases.terminate.TerminateIntermediateTestAgent");
 //		_BROKEN.add("jadex.micro.testcases.subscriptionlistener.SubscriptionListenerTestAgent");
 		_BROKEN.add("jadex.micro.testcases.nfcallreturn.NFCallReturnTestAgent");
 		_BROKEN.add("jadex.micro.testcases.nfmethodprop.NFMethodPropTestAgent");
@@ -552,24 +552,31 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		boolean sync	= true;
 		while(sync && !features.isEmpty())
 		{
-			// On exception -> print but continue shutdown with next feature
-			if(fut.getException()!=null)
-			{
-				StringWriter	sw	= new StringWriter();
-				fut.getException().printStackTrace(new PrintWriter(sw));
-				getLogger().warning("Exception during component cleanup of "+getId()+": "+fut.getException());
-				getLogger().info(sw.toString());
-			}
 			if(shutdown && debug)
 				getLogger().severe("feature shutdown start: "+getId()+", "+IComponentIdentifier.LOCAL.get()+", "+features);
 			
-			fut	= features.get(features.size()-1).shutdown();
+			try
+			{
+				fut	= features.get(features.size()-1).shutdown();
+			}
+			catch(Exception e)
+			{
+				fut	= new Future<Void>(e);
+			}
 			sync = fut.isDone();
 			if(shutdown && debug)
 				getLogger().severe("feature shutdown called: "+getId()+" "+features.get(features.size()-1)+" done(sync)="+sync);
 			if(sync)
 			{
 				features.remove(features.size()-1);
+				// On exception -> print but continue shutdown with next feature
+				if(fut.getException()!=null)
+				{
+					StringWriter	sw	= new StringWriter();
+					fut.getException().printStackTrace(new PrintWriter(sw));
+					getLogger().warning("Exception during component cleanup of "+getId()+": "+fut.getException());
+					getLogger().info(sw.toString());
+				}
 			}
 		}
 		
