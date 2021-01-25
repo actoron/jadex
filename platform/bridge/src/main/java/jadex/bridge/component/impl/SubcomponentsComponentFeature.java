@@ -767,35 +767,12 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	{
 		final IntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> ret = new IntermediateFuture<>();
 		
-		if(debug)
-		{
-			component.getLogger().severe("doKillComponents0: "+component+", "+cids);
-			ret.addResultListener(new IResultListener<Collection<Tuple2<IComponentIdentifier, Map<String, Object>>>>()
-			{
-				@Override
-				public void resultAvailable(Collection<Tuple2<IComponentIdentifier, Map<String, Object>>> result)
-				{
-					component.getLogger().severe("doKillComponents0a done: "+component);
-				}
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-					component.getLogger().severe("doKillComponents0b failed: "+component+"\n"+SUtil.getExceptionStacktrace(exception));
-				}
-			});
-		}
-
 		final MultiCollection<String, IComponentIdentifier> instances = new MultiCollection<>();
 		
 		getShutdownLevels(instances, cids).addResultListener(new IResultListener<List<Set<String>>>()
 		{
 			public void resultAvailable(List<Set<String>> levels)
 			{
-				if(debug)
-				{
-					component.getLogger().severe("doKillComponents11: " + levels + " " + component);
-				}
-				
 				int[] levelnum = new int[1];
 				levelnum[0] = -1;
 				
@@ -809,10 +786,6 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 					public void resultAvailable(Void result)
 					{
 						++levelnum[0];
-						if(debug)
-						{
-							component.getLogger().severe("doKillComponents1: LEVEL " + levelnum[0] + " " + levels + " " + component);
-						}
 
 						final List<Throwable> exceptions = new ArrayList<>();
 						if (levelnum[0] < levels.size())
@@ -1425,11 +1398,6 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	 */
 	protected <T> void addComponentToLevels(DependencyResolver<String> dr, T instanceinfo, IModelInfo minfo, MultiCollection<String, T> instances, String... addpredecessors)
 	{
-		if (debug)
-		{
-			System.err.println("addcomptolevel: " + minfo.getFullName());
-			Thread.dumpStack();
-		}
 		try
 		{
 			String cname = minfo.getFullName();

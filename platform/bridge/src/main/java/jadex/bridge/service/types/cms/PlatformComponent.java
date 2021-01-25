@@ -119,6 +119,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 //		_BROKEN.add("jadex.micro.testcases.terminate.TerminateTestAgent");
 //		_BROKEN.add("jadex.micro.testcases.terminate.TerminateIntermediateTestAgent");
 //		_BROKEN.add("jadex.micro.testcases.subscriptionlistener.SubscriptionListenerTestAgent");
+		
+		// Todo: are these still broken?
 		_BROKEN.add("jadex.micro.testcases.nfcallreturn.NFCallReturnTestAgent");
 		_BROKEN.add("jadex.micro.testcases.nfmethodprop.NFMethodPropTestAgent");
 		_BROKEN.add("jadex.bdiv3.testcases.servicereflection.NotVisibleProviderAgent");
