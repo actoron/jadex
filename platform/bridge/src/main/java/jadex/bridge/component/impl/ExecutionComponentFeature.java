@@ -345,8 +345,16 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			}
 		}
 
-		if(!ret.isDone())
-			wakeup();
+		try
+		{
+			if(!ret.isDone())
+				wakeup();
+		}
+		catch(Exception e)
+		{
+			// rare racecondition that component is terminated after synchronized block but before wakeup() call.
+			ret.setExceptionIfUndone(e);
+		}
 		
 		return ret;
 	}
