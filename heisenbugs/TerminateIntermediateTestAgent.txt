@@ -13,7 +13,7 @@ failures
 
 ignored
 	
-35.363s
+34.360s
 
 duration
 	
@@ -26,523 +26,545 @@ successful
     Standard output
     Standard error
 
-Jan 26, 2021 8:03:32 AM jadex.base.test.impl.ComponentTestBase <init>
+Jan 26, 2021 9:30:55 AM jadex.base.test.impl.ComponentTestBase <init>
 SEVERE: Empty ComponentTest Constructor called
-Jan 26, 2021 8:03:33 AM jadex.base.test.impl.ComponentTestLazyPlatform setPlatform
+Jan 26, 2021 9:30:56 AM jadex.base.test.impl.ComponentTestLazyPlatform setPlatform
 INFO: using timeout: 120000
-Jan 26, 2021 8:03:33 AM test-22 jadex.bridge.service.types.cms.PlatformComponent create
+Jan 26, 2021 9:30:56 AM test-22 jadex.bridge.service.types.cms.PlatformComponent create
 SEVERE: Enabled PlatformComponent debugging for TerminateIntermediateTestAgent@test-22
-Jan 26, 2021 8:03:33 AM test-22 jadex.bridge.component.impl.ExecutionComponentFeature <init>
+Jan 26, 2021 9:30:56 AM test-22 jadex.bridge.component.impl.ExecutionComponentFeature <init>
 SEVERE: Enabled ExecutionComponentFeature debugging for TerminateIntermediateTestAgent@test-22
-Jan 26, 2021 8:03:33 AM jadex.base.test.impl.ComponentTestBase <init>
+Jan 26, 2021 9:30:56 AM jadex.base.test.impl.ComponentTestBase <init>
 SEVERE: Empty ComponentTest Constructor called
-Jan 26, 2021 8:03:33 AM test-22 jadex.bridge.service.types.cms.PlatformComponent create
+Jan 26, 2021 9:30:56 AM test-22 jadex.bridge.service.types.cms.PlatformComponent create
 SEVERE: Enabled PlatformComponent debugging for TerminableProviderAgent@test-22
-Jan 26, 2021 8:03:33 AM test-22 jadex.bridge.component.impl.ExecutionComponentFeature <init>
+Jan 26, 2021 9:30:56 AM test-22 jadex.bridge.component.impl.ExecutionComponentFeature <init>
 SEVERE: Enabled ExecutionComponentFeature debugging for TerminableProviderAgent@test-22
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
 SEVERE: destroy1: TerminableProviderAgent@test-22
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
 SEVERE: destroy2: TerminableProviderAgent@test-22
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
 SEVERE: destroy3: TerminableProviderAgent@test-22
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent shutdown
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent shutdown
 SEVERE: shutdown component features start: TerminableProviderAgent@test-22
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
 SEVERE: destroy4 (contains, locked, inited): TerminableProviderAgent@test-22 (false, false, true) TerminableProviderAgent@test-22
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-SEVERE: ExternalAccessInvocationHandler.doInvoke5: TerminableProviderAgent@test-22, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null: jadex.commons.future.Future@fbf6e3b
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-SEVERE: ExternalAccessInvocationHandler.doInvoke6: TerminableProviderAgent@test-22, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null: jadex.commons.future.Future@fbf6e3b, done=false
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+SEVERE: ExternalAccessInvocationHandler.doInvoke5: TerminableProviderAgent@test-22, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null: jadex.commons.future.Future@56735e07
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+SEVERE: ExternalAccessInvocationHandler.doInvoke6: TerminableProviderAgent@test-22, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null: jadex.commons.future.Future@56735e07, done=false
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
 SEVERE: ExternalAccessInvocationHandler.doExecute2: TerminableProviderAgent@test-22, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null done=false
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
 SEVERE: ExternalAccessInvocationHandler.doExecute2a: TerminableProviderAgent@test-22, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null done=false
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
-SEVERE: ExternalAccessInvocationHandler.doExecute2b: TerminableProviderAgent@test-22, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null fut=jadex.commons.future.Future@fbf6e3b
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
+SEVERE: ExternalAccessInvocationHandler.doExecute2b: TerminableProviderAgent@test-22, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null fut=jadex.commons.future.Future@56735e07
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
 SEVERE: ExternalAccessInvocationHandler.doExecute2c: TerminableProviderAgent@test-22, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null done=false
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
 SEVERE: ExternalAccessInvocationHandler.doExecute3: TerminableProviderAgent@test-22, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null done=false
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 execute
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 execute
 SEVERE: ExternalAccessInvocationHandler.step1 end: TerminableProviderAgent@test-22, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$3 execute
-SEVERE: shutdown component features start: TerminableProviderAgent@test-22, null, [jadex.bridge.component.impl.MonitoringComponentFeature@d21ef51, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@206833de, jadex.bridge.component.impl.PropertiesComponentFeature@4411ac71, jadex.bridge.service.component.RequiredServicesComponentFeature@d1c72fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@fc54f6e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@6e526b8b, jadex.micro.features.impl.MicroMessageComponentFeature@27e92014, jadex.micro.features.impl.MicroInjectionComponentFeature@498c05b8, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@6c979dd8, jadex.bridge.component.impl.NFPropertyComponentFeature@11e4adf2, jadex.bridge.component.impl.SubcomponentsComponentFeature@7f63c65a, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@566badcb, jadex.micro.features.impl.MicroLifecycleComponentFeature@6c29383]
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@d21ef51, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@206833de, jadex.bridge.component.impl.PropertiesComponentFeature@4411ac71, jadex.bridge.service.component.RequiredServicesComponentFeature@d1c72fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@fc54f6e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@6e526b8b, jadex.micro.features.impl.MicroMessageComponentFeature@27e92014, jadex.micro.features.impl.MicroInjectionComponentFeature@498c05b8, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@6c979dd8, jadex.bridge.component.impl.NFPropertyComponentFeature@11e4adf2, jadex.bridge.component.impl.SubcomponentsComponentFeature@7f63c65a, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@566badcb, jadex.micro.features.impl.MicroLifecycleComponentFeature@6c29383]
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$3 execute
+SEVERE: shutdown component features start: TerminableProviderAgent@test-22, null, [jadex.bridge.component.impl.MonitoringComponentFeature@65ed01ca, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7e1b7907, jadex.bridge.component.impl.PropertiesComponentFeature@68cfbb4d, jadex.bridge.service.component.RequiredServicesComponentFeature@1877b9ab, jadex.bridge.component.impl.RemoteExecutionComponentFeature@1599083e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@30ef98cb, jadex.micro.features.impl.MicroMessageComponentFeature@25ef4848, jadex.micro.features.impl.MicroInjectionComponentFeature@f007bf, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@5df52767, jadex.bridge.component.impl.SubcomponentsComponentFeature@1110d5d2, jadex.bridge.component.impl.NFPropertyComponentFeature@4e6272b0, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@4e2f593c, jadex.micro.features.impl.MicroLifecycleComponentFeature@3a958181]
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@65ed01ca, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7e1b7907, jadex.bridge.component.impl.PropertiesComponentFeature@68cfbb4d, jadex.bridge.service.component.RequiredServicesComponentFeature@1877b9ab, jadex.bridge.component.impl.RemoteExecutionComponentFeature@1599083e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@30ef98cb, jadex.micro.features.impl.MicroMessageComponentFeature@25ef4848, jadex.micro.features.impl.MicroInjectionComponentFeature@f007bf, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@5df52767, jadex.bridge.component.impl.SubcomponentsComponentFeature@1110d5d2, jadex.bridge.component.impl.NFPropertyComponentFeature@4e6272b0, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@4e2f593c, jadex.micro.features.impl.MicroLifecycleComponentFeature@3a958181]
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
 SEVERE: lifecycle feature shutdown start: TerminableProviderAgent@test-22
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
 SEVERE: lifecycle feature shutdown agent killed invoked: TerminableProviderAgent@test-22 done=true
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroLifecycleComponentFeature$1 resultAvailable
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroLifecycleComponentFeature$1 resultAvailable
 SEVERE: lifecycle feature shutdown end result: TerminableProviderAgent@test-22
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroLifecycleComponentFeature@6c29383 done(sync)=true
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@d21ef51, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@206833de, jadex.bridge.component.impl.PropertiesComponentFeature@4411ac71, jadex.bridge.service.component.RequiredServicesComponentFeature@d1c72fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@fc54f6e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@6e526b8b, jadex.micro.features.impl.MicroMessageComponentFeature@27e92014, jadex.micro.features.impl.MicroInjectionComponentFeature@498c05b8, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@6c979dd8, jadex.bridge.component.impl.NFPropertyComponentFeature@11e4adf2, jadex.bridge.component.impl.SubcomponentsComponentFeature@7f63c65a, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@566badcb]
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroServiceInjectionComponentFeature@566badcb done(sync)=true
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@d21ef51, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@206833de, jadex.bridge.component.impl.PropertiesComponentFeature@4411ac71, jadex.bridge.service.component.RequiredServicesComponentFeature@d1c72fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@fc54f6e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@6e526b8b, jadex.micro.features.impl.MicroMessageComponentFeature@27e92014, jadex.micro.features.impl.MicroInjectionComponentFeature@498c05b8, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@6c979dd8, jadex.bridge.component.impl.NFPropertyComponentFeature@11e4adf2, jadex.bridge.component.impl.SubcomponentsComponentFeature@7f63c65a]
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.bridge.component.impl.SubcomponentsComponentFeature@7f63c65a done(sync)=true
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@d21ef51, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@206833de, jadex.bridge.component.impl.PropertiesComponentFeature@4411ac71, jadex.bridge.service.component.RequiredServicesComponentFeature@d1c72fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@fc54f6e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@6e526b8b, jadex.micro.features.impl.MicroMessageComponentFeature@27e92014, jadex.micro.features.impl.MicroInjectionComponentFeature@498c05b8, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@6c979dd8, jadex.bridge.component.impl.NFPropertyComponentFeature@11e4adf2]
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.bridge.component.impl.NFPropertyComponentFeature@11e4adf2 done(sync)=true
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@d21ef51, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@206833de, jadex.bridge.component.impl.PropertiesComponentFeature@4411ac71, jadex.bridge.service.component.RequiredServicesComponentFeature@d1c72fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@fc54f6e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@6e526b8b, jadex.micro.features.impl.MicroMessageComponentFeature@27e92014, jadex.micro.features.impl.MicroInjectionComponentFeature@498c05b8, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@6c979dd8]
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroProvidedServicesComponentFeature@6c979dd8 done(sync)=true
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@d21ef51, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@206833de, jadex.bridge.component.impl.PropertiesComponentFeature@4411ac71, jadex.bridge.service.component.RequiredServicesComponentFeature@d1c72fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@fc54f6e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@6e526b8b, jadex.micro.features.impl.MicroMessageComponentFeature@27e92014, jadex.micro.features.impl.MicroInjectionComponentFeature@498c05b8]
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroInjectionComponentFeature@498c05b8 done(sync)=true
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@d21ef51, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@206833de, jadex.bridge.component.impl.PropertiesComponentFeature@4411ac71, jadex.bridge.service.component.RequiredServicesComponentFeature@d1c72fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@fc54f6e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@6e526b8b, jadex.micro.features.impl.MicroMessageComponentFeature@27e92014]
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroMessageComponentFeature@27e92014 done(sync)=true
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@d21ef51, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@206833de, jadex.bridge.component.impl.PropertiesComponentFeature@4411ac71, jadex.bridge.service.component.RequiredServicesComponentFeature@d1c72fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@fc54f6e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@6e526b8b]
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroPojoComponentFeature@6e526b8b done(sync)=true
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@d21ef51, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@206833de, jadex.bridge.component.impl.PropertiesComponentFeature@4411ac71, jadex.bridge.service.component.RequiredServicesComponentFeature@d1c72fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@fc54f6e, ExecutionFeature(TerminableProviderAgent@test-22)]
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature shutdown
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroLifecycleComponentFeature@3a958181 done(sync)=true
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@65ed01ca, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7e1b7907, jadex.bridge.component.impl.PropertiesComponentFeature@68cfbb4d, jadex.bridge.service.component.RequiredServicesComponentFeature@1877b9ab, jadex.bridge.component.impl.RemoteExecutionComponentFeature@1599083e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@30ef98cb, jadex.micro.features.impl.MicroMessageComponentFeature@25ef4848, jadex.micro.features.impl.MicroInjectionComponentFeature@f007bf, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@5df52767, jadex.bridge.component.impl.SubcomponentsComponentFeature@1110d5d2, jadex.bridge.component.impl.NFPropertyComponentFeature@4e6272b0, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@4e2f593c]
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroServiceInjectionComponentFeature@4e2f593c done(sync)=true
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@65ed01ca, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7e1b7907, jadex.bridge.component.impl.PropertiesComponentFeature@68cfbb4d, jadex.bridge.service.component.RequiredServicesComponentFeature@1877b9ab, jadex.bridge.component.impl.RemoteExecutionComponentFeature@1599083e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@30ef98cb, jadex.micro.features.impl.MicroMessageComponentFeature@25ef4848, jadex.micro.features.impl.MicroInjectionComponentFeature@f007bf, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@5df52767, jadex.bridge.component.impl.SubcomponentsComponentFeature@1110d5d2, jadex.bridge.component.impl.NFPropertyComponentFeature@4e6272b0]
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.bridge.component.impl.NFPropertyComponentFeature@4e6272b0 done(sync)=true
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@65ed01ca, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7e1b7907, jadex.bridge.component.impl.PropertiesComponentFeature@68cfbb4d, jadex.bridge.service.component.RequiredServicesComponentFeature@1877b9ab, jadex.bridge.component.impl.RemoteExecutionComponentFeature@1599083e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@30ef98cb, jadex.micro.features.impl.MicroMessageComponentFeature@25ef4848, jadex.micro.features.impl.MicroInjectionComponentFeature@f007bf, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@5df52767, jadex.bridge.component.impl.SubcomponentsComponentFeature@1110d5d2]
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.bridge.component.impl.SubcomponentsComponentFeature@1110d5d2 done(sync)=true
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@65ed01ca, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7e1b7907, jadex.bridge.component.impl.PropertiesComponentFeature@68cfbb4d, jadex.bridge.service.component.RequiredServicesComponentFeature@1877b9ab, jadex.bridge.component.impl.RemoteExecutionComponentFeature@1599083e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@30ef98cb, jadex.micro.features.impl.MicroMessageComponentFeature@25ef4848, jadex.micro.features.impl.MicroInjectionComponentFeature@f007bf, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@5df52767]
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroProvidedServicesComponentFeature@5df52767 done(sync)=true
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@65ed01ca, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7e1b7907, jadex.bridge.component.impl.PropertiesComponentFeature@68cfbb4d, jadex.bridge.service.component.RequiredServicesComponentFeature@1877b9ab, jadex.bridge.component.impl.RemoteExecutionComponentFeature@1599083e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@30ef98cb, jadex.micro.features.impl.MicroMessageComponentFeature@25ef4848, jadex.micro.features.impl.MicroInjectionComponentFeature@f007bf]
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroInjectionComponentFeature@f007bf done(sync)=true
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@65ed01ca, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7e1b7907, jadex.bridge.component.impl.PropertiesComponentFeature@68cfbb4d, jadex.bridge.service.component.RequiredServicesComponentFeature@1877b9ab, jadex.bridge.component.impl.RemoteExecutionComponentFeature@1599083e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@30ef98cb, jadex.micro.features.impl.MicroMessageComponentFeature@25ef4848]
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroMessageComponentFeature@25ef4848 done(sync)=true
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@65ed01ca, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7e1b7907, jadex.bridge.component.impl.PropertiesComponentFeature@68cfbb4d, jadex.bridge.service.component.RequiredServicesComponentFeature@1877b9ab, jadex.bridge.component.impl.RemoteExecutionComponentFeature@1599083e, ExecutionFeature(TerminableProviderAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@30ef98cb]
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.micro.features.impl.MicroPojoComponentFeature@30ef98cb done(sync)=true
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@65ed01ca, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7e1b7907, jadex.bridge.component.impl.PropertiesComponentFeature@68cfbb4d, jadex.bridge.service.component.RequiredServicesComponentFeature@1877b9ab, jadex.bridge.component.impl.RemoteExecutionComponentFeature@1599083e, ExecutionFeature(TerminableProviderAgent@test-22)]
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature shutdown
 SEVERE: shutdown0: ExecutionFeature(TerminableProviderAgent@test-22)
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
 SEVERE: wakeup0: ExecutionFeature(TerminableProviderAgent@test-22)
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
 SEVERE: wakeup2: ExecutionFeature(TerminableProviderAgent@test-22), SyncExecutionService(IExecutionService_#242@test-22)
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
 SEVERE: wakeup4: ExecutionFeature(TerminableProviderAgent@test-22)
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
 SEVERE: feature shutdown called: TerminableProviderAgent@test-22 ExecutionFeature(TerminableProviderAgent@test-22) done(sync)=false
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
 SEVERE: async waiting for feature shutdown: TerminableProviderAgent@test-22 ExecutionFeature(TerminableProviderAgent@test-22)
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature execute
-SEVERE: execute()5: jadex.bridge.service.types.cms.PlatformComponent$3@51d8f94 100 active
-Jan 26, 2021 8:03:33 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature execute
+SEVERE: execute()5: jadex.bridge.service.types.cms.PlatformComponent$3@21f5586a 100 active
+Jan 26, 2021 9:30:56 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
 SEVERE: execute()7: endstepcnt=27, ret=false, endagenda.isDone()=false
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature$1 customResultAvailable
-SEVERE: shutdown1: jadex.bridge.component.impl.ExecutionComponentFeature$1@4259eb83
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature$1 customResultAvailable
-SEVERE: shutdown2: jadex.bridge.component.impl.ExecutionComponentFeature$1@4259eb83
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$8 resultAvailable
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature$1 customResultAvailable
+SEVERE: shutdown1: jadex.bridge.component.impl.ExecutionComponentFeature$1@3e87beb4
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature$1 customResultAvailable
+SEVERE: shutdown2: jadex.bridge.component.impl.ExecutionComponentFeature$1@3e87beb4
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$8 resultAvailable
 SEVERE: done waiting for feature shutdown: TerminableProviderAgent@test-22 ExecutionFeature(TerminableProviderAgent@test-22)
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@d21ef51, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@206833de, jadex.bridge.component.impl.PropertiesComponentFeature@4411ac71, jadex.bridge.service.component.RequiredServicesComponentFeature@d1c72fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@fc54f6e]
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.bridge.component.impl.RemoteExecutionComponentFeature@fc54f6e done(sync)=true
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@d21ef51, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@206833de, jadex.bridge.component.impl.PropertiesComponentFeature@4411ac71, jadex.bridge.service.component.RequiredServicesComponentFeature@d1c72fb]
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.bridge.service.component.RequiredServicesComponentFeature@d1c72fb done(sync)=true
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@d21ef51, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@206833de, jadex.bridge.component.impl.PropertiesComponentFeature@4411ac71]
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.bridge.component.impl.PropertiesComponentFeature@4411ac71 done(sync)=true
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@d21ef51, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@206833de]
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.bridge.component.impl.ArgumentsResultsComponentFeature@206833de done(sync)=true
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@d21ef51]
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.bridge.component.impl.MonitoringComponentFeature@d21ef51 done(sync)=true
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$3$1 proceed
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@65ed01ca, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7e1b7907, jadex.bridge.component.impl.PropertiesComponentFeature@68cfbb4d, jadex.bridge.service.component.RequiredServicesComponentFeature@1877b9ab, jadex.bridge.component.impl.RemoteExecutionComponentFeature@1599083e]
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.bridge.component.impl.RemoteExecutionComponentFeature@1599083e done(sync)=true
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@65ed01ca, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7e1b7907, jadex.bridge.component.impl.PropertiesComponentFeature@68cfbb4d, jadex.bridge.service.component.RequiredServicesComponentFeature@1877b9ab]
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.bridge.service.component.RequiredServicesComponentFeature@1877b9ab done(sync)=true
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@65ed01ca, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7e1b7907, jadex.bridge.component.impl.PropertiesComponentFeature@68cfbb4d]
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.bridge.component.impl.PropertiesComponentFeature@68cfbb4d done(sync)=true
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@65ed01ca, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7e1b7907]
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7e1b7907 done(sync)=true
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@65ed01ca]
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-22 jadex.bridge.component.impl.MonitoringComponentFeature@65ed01ca done(sync)=true
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$3$1 proceed
 SEVERE: shutdown component features end: TerminableProviderAgent@test-22, null
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$3$1 proceed
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$3$1 proceed
 SEVERE: shutdown component features end4: TerminableProviderAgent@test-22, null
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService$14 resultAvailable
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService$14 resultAvailable
 SEVERE: destryCompo finished: TerminableProviderAgent@test-22
-startScheduledNotifications0: Tuple[jadex.commons.future.Future@fbf6e3b, Heisenbugjadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2$1@174cfa23, jadex.commons.future.Future$1@55dc56f8]
-startScheduledNotifications1: Tuple[jadex.commons.future.Future@fbf6e3b, Heisenbugjadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2$1@174cfa23, jadex.commons.future.Future$1@55dc56f8]
-startScheduledNotifications0: Tuple[jadex.commons.future.Future@d04736b, jadex.commons.future.DelegationResultListener@54b296a, jadex.commons.future.Future$1@75a65602]
-startScheduledNotifications1: Tuple[jadex.commons.future.Future@d04736b, jadex.commons.future.DelegationResultListener@54b296a, jadex.commons.future.Future$1@75a65602]
-Jan 26, 2021 8:03:33 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
+startScheduledNotifications0: Tuple[jadex.commons.future.Future@56735e07, Heisenbugjadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2$1@1035083d, jadex.commons.future.Future$1@35f45ff2]
+startScheduledNotifications1: Tuple[jadex.commons.future.Future@56735e07, Heisenbugjadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2$1@1035083d, jadex.commons.future.Future$1@35f45ff2]
+startScheduledNotifications0: Tuple[jadex.commons.future.Future@3a5f6421, jadex.commons.future.DelegationResultListener@2f9809a6, jadex.commons.future.Future$1@17d49888]
+startScheduledNotifications1: Tuple[jadex.commons.future.Future@3a5f6421, jadex.commons.future.DelegationResultListener@2f9809a6, jadex.commons.future.Future$1@17d49888]
+Jan 26, 2021 9:30:56 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
 SEVERE: execute()0: TerminableProviderAgent@test-22, null, endstepcnt=27, stepcnt=27
-Jan 26, 2021 8:03:33 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
+Jan 26, 2021 9:30:56 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
 SEVERE: execute()1: TerminableProviderAgent@test-22, null, endstepcnt=27, stepcnt=27
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature execute
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature execute
 SEVERE: execute()2: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, endstepcnt=27, stepcnt=27
-Jan 26, 2021 8:03:33 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature execute
+Jan 26, 2021 9:30:56 AM TerminableProviderAgent@test-22 jadex.bridge.component.impl.ExecutionComponentFeature execute
 SEVERE: execute()3: TerminableProviderAgent@test-22, TerminableProviderAgent@test-22, endstepcnt=27, stepcnt=27, null
-Jan 26, 2021 8:03:33 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
+Jan 26, 2021 9:30:56 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
 SEVERE: execute()7: endstepcnt=27, ret=false, endagenda.isDone()=true
-Jan 26, 2021 8:03:33 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+Jan 26, 2021 9:30:56 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
 INFO: Starting service: IThreadPoolService_#260@test-24 true
-Jan 26, 2021 8:03:33 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+Jan 26, 2021 9:30:56 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
 INFO: Started service: IThreadPoolService_#260@test-24
-Jan 26, 2021 8:03:33 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+Jan 26, 2021 9:30:56 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
 INFO: Starting service: IDaemonThreadPoolService_#261@test-24 true
-Jan 26, 2021 8:03:33 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+Jan 26, 2021 9:30:56 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
 INFO: Started service: IDaemonThreadPoolService_#261@test-24
-Jan 26, 2021 8:03:33 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+Jan 26, 2021 9:30:56 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
 INFO: Starting service: IExecutionService_#262@test-24 true
-Jan 26, 2021 8:03:33 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+Jan 26, 2021 9:30:56 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
 INFO: Started service: IExecutionService_#262@test-24
-Jan 26, 2021 8:03:33 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+Jan 26, 2021 9:30:56 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
 INFO: Starting service: IClockService_#263@test-24 true
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+Jan 26, 2021 9:30:56 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
 INFO: Started service: IClockService_#263@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+Jan 26, 2021 9:30:56 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
 INFO: Starting service: ILibraryService_#264@test-24 true
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+Jan 26, 2021 9:30:56 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
 INFO: Started service: ILibraryService_#264@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+Jan 26, 2021 9:30:56 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
 INFO: Starting service: IDependencyService_#265@test-24 true
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+Jan 26, 2021 9:30:56 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
 INFO: Started service: IDependencyService_#265@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+Jan 26, 2021 9:30:56 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
 INFO: Starting service: externalaccessservice@test-24 true
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+Jan 26, 2021 9:30:56 AM test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
 INFO: Started service: externalaccessservice@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
 INFO: Starting component: kernel_bpmn@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
 INFO: Starting component: security@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
 INFO: Starting component: settings@test-24
-Jan 26, 2021 8:03:34 AM kernel_bpmn@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: IComponentFactory_#266@kernel_bpmn@test-24 true
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
 INFO: Starting component: intravmawareness@test-24
-Jan 26, 2021 8:03:34 AM security@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: ISecurityService_#268@security@test-24 true
-Jan 26, 2021 8:03:34 AM settings@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: ISettingsService_#267@settings@test-24 true
-Jan 26, 2021 8:03:34 AM security@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: ISecurityService_#268@security@test-24
-Jan 26, 2021 8:03:34 AM security@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: externalaccessservice@security@test-24 true
-Jan 26, 2021 8:03:34 AM settings@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: ISettingsService_#267@settings@test-24
-Jan 26, 2021 8:03:34 AM settings@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: externalaccessservice@settings@test-24 true
-Jan 26, 2021 8:03:34 AM security@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: externalaccessservice@security@test-24
-Jan 26, 2021 8:03:34 AM settings@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: externalaccessservice@settings@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
 INFO: Starting component: remoteregistry@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
+Jan 26, 2021 9:30:57 AM kernel_bpmn@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: IComponentFactory_#266@kernel_bpmn@test-24 true
+Jan 26, 2021 9:30:57 AM settings@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: ISettingsService_#267@settings@test-24 true
+Jan 26, 2021 9:30:57 AM settings@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: ISettingsService_#267@settings@test-24
+Jan 26, 2021 9:30:57 AM settings@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: externalaccessservice@settings@test-24 true
+Jan 26, 2021 9:30:57 AM settings@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: externalaccessservice@settings@test-24
+Jan 26, 2021 9:30:57 AM security@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: ISecurityService_#268@security@test-24 true
+Jan 26, 2021 9:30:57 AM intravmawareness@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: IAwarenessService_#269@intravmawareness@test-24 true
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
 INFO: Starting component: transportaddress@test-24
-Jan 26, 2021 8:03:34 AM kernel_bpmn@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+Jan 26, 2021 9:30:57 AM kernel_bpmn@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
 INFO: Started service: IComponentFactory_#266@kernel_bpmn@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
-INFO: Starting component: context@test-24
-Jan 26, 2021 8:03:34 AM remoteregistry@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: remoteregistry@remoteregistry@test-24 true
-Jan 26, 2021 8:03:34 AM kernel_bpmn@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+Jan 26, 2021 9:30:57 AM kernel_bpmn@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
 INFO: Starting service: externalaccessservice@kernel_bpmn@test-24 true
-Jan 26, 2021 8:03:34 AM remoteregistry@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: remoteregistry@remoteregistry@test-24
-Jan 26, 2021 8:03:34 AM kernel_bpmn@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+Jan 26, 2021 9:30:57 AM kernel_bpmn@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
 INFO: Started service: externalaccessservice@kernel_bpmn@test-24
-Jan 26, 2021 8:03:34 AM transportaddress@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: ITransportAddressService_#269@transportaddress@test-24 true
-Jan 26, 2021 8:03:34 AM remoteregistry@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: externalaccessservice@remoteregistry@test-24 true
-Jan 26, 2021 8:03:34 AM transportaddress@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: ITransportAddressService_#269@transportaddress@test-24
-Jan 26, 2021 8:03:34 AM transportaddress@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: externalaccessservice@transportaddress@test-24 true
-Jan 26, 2021 8:03:34 AM remoteregistry@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: externalaccessservice@remoteregistry@test-24
-Jan 26, 2021 8:03:34 AM transportaddress@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: externalaccessservice@transportaddress@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
-INFO: Starting component: kernel_application@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
-INFO: Starting component: kernel_component@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
-INFO: Starting component: kernel_micro@test-24
-Jan 26, 2021 8:03:34 AM context@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: IContextService_#270@context@test-24 true
-Jan 26, 2021 8:03:34 AM kernel_component@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: IComponentFactory_#271@kernel_component@test-24 true
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
-INFO: Starting component: intravm@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
-INFO: Starting component: superpeerclient@test-24
-Jan 26, 2021 8:03:34 AM intravmawareness@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: IAwarenessService_#272@intravmawareness@test-24 true
-Jan 26, 2021 8:03:34 AM intravmawareness@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: IAwarenessService_#272@intravmawareness@test-24
-Jan 26, 2021 8:03:34 AM intravmawareness@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+Jan 26, 2021 9:30:57 AM security@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: ISecurityService_#268@security@test-24
+Jan 26, 2021 9:30:57 AM security@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: externalaccessservice@security@test-24 true
+Jan 26, 2021 9:30:57 AM security@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: externalaccessservice@security@test-24
+Jan 26, 2021 9:30:57 AM intravmawareness@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: IAwarenessService_#269@intravmawareness@test-24
+Jan 26, 2021 9:30:57 AM intravmawareness@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
 INFO: Starting service: externalaccessservice@intravmawareness@test-24 true
-Jan 26, 2021 8:03:34 AM intravmawareness@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+Jan 26, 2021 9:30:57 AM intravmawareness@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
 INFO: Started service: externalaccessservice@intravmawareness@test-24
-Jan 26, 2021 8:03:34 AM superpeerclient@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: ISearchQueryManagerService_#273@superpeerclient@test-24 true
-Jan 26, 2021 8:03:34 AM superpeerclient@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: ISearchQueryManagerService_#273@superpeerclient@test-24
-Jan 26, 2021 8:03:34 AM superpeerclient@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: externalaccessservice@superpeerclient@test-24 true
-Jan 26, 2021 8:03:34 AM superpeerclient@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: externalaccessservice@superpeerclient@test-24
-Jan 26, 2021 8:03:34 AM kernel_component@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: IComponentFactory_#271@kernel_component@test-24
-Jan 26, 2021 8:03:34 AM kernel_component@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: externalaccessservice@kernel_component@test-24 true
-Jan 26, 2021 8:03:34 AM context@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: IContextService_#270@context@test-24
-Jan 26, 2021 8:03:34 AM kernel_micro@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: IComponentFactory_#274@kernel_micro@test-24 true
-Jan 26, 2021 8:03:34 AM kernel_application@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: IComponentFactory_#277@kernel_application@test-24 true
-Jan 26, 2021 8:03:34 AM kernel_application@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: IComponentFactory_#277@kernel_application@test-24
-Jan 26, 2021 8:03:34 AM kernel_application@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: externalaccessservice@kernel_application@test-24 true
-Jan 26, 2021 8:03:34 AM intravm@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: ITransportInfoService_#276@intravm@test-24 true
-Jan 26, 2021 8:03:34 AM intravm@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: ITransportInfoService_#276@intravm@test-24
-Jan 26, 2021 8:03:34 AM intravm@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: ITransportInfoService_#276@intravm@test-24 true
-Jan 26, 2021 8:03:34 AM context@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: externalaccessservice@context@test-24 true
-Jan 26, 2021 8:03:34 AM kernel_micro@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: IComponentFactory_#274@kernel_micro@test-24
-Jan 26, 2021 8:03:34 AM kernel_application@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: externalaccessservice@kernel_application@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
-INFO: Started component: settings@test-24
-Jan 26, 2021 8:03:34 AM kernel_component@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: externalaccessservice@kernel_component@test-24
-Jan 26, 2021 8:03:34 AM context@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: externalaccessservice@context@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
-INFO: Started component: security@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
-INFO: Started component: kernel_bpmn@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
-INFO: Started component: remoteregistry@test-24
-Jan 26, 2021 8:03:34 AM kernel_micro@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
-INFO: Starting service: externalaccessservice@kernel_micro@test-24 true
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
-INFO: Started component: transportaddress@test-24
-Jan 26, 2021 8:03:34 AM intravm@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: ITransportInfoService_#276@intravm@test-24
-Jan 26, 2021 8:03:34 AM intravm@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
+INFO: Starting component: context@test-24
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
+INFO: Starting component: kernel_application@test-24
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
+INFO: Starting component: kernel_component@test-24
+Jan 26, 2021 9:30:57 AM remoteregistry@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: remoteregistry@remoteregistry@test-24 true
+Jan 26, 2021 9:30:57 AM context@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: IContextService_#270@context@test-24 true
+Jan 26, 2021 9:30:57 AM remoteregistry@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: remoteregistry@remoteregistry@test-24
+Jan 26, 2021 9:30:57 AM remoteregistry@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: externalaccessservice@remoteregistry@test-24 true
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
+INFO: Starting component: kernel_micro@test-24
+Jan 26, 2021 9:30:57 AM remoteregistry@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: externalaccessservice@remoteregistry@test-24
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
+INFO: Starting component: intravm@test-24
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
+INFO: Starting component: superpeerclient@test-24
+Jan 26, 2021 9:30:57 AM intravm@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: ITransportInfoService_#272@intravm@test-24 true
+Jan 26, 2021 9:30:57 AM intravm@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: ITransportInfoService_#272@intravm@test-24
+Jan 26, 2021 9:30:57 AM intravm@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: ITransportInfoService_#272@intravm@test-24 true
+Jan 26, 2021 9:30:57 AM intravm@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: ITransportInfoService_#272@intravm@test-24
+Jan 26, 2021 9:30:57 AM intravm@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
 INFO: Starting service: externalaccessservice@intravm@test-24 true
-Jan 26, 2021 8:03:34 AM kernel_micro@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
-INFO: Started service: externalaccessservice@kernel_micro@test-24
-Jan 26, 2021 8:03:34 AM intravm@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+Jan 26, 2021 9:30:57 AM intravm@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
 INFO: Started service: externalaccessservice@intravm@test-24
-Jan 26, 2021 8:03:34 AM intravm@test-24 jadex.platform.service.transport.AbstractTransportAgent$2 customResultAvailable
-INFO: Platform test-24 listening to port 2 for intravm transport.
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
-INFO: Started component: intravmawareness@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
-INFO: Started component: kernel_application@test-24
-Jan 26, 2021 8:03:34 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
-INFO: Started component: context@test-24
-Jan 26, 2021 8:03:35 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
-INFO: Started component: kernel_component@test-24
-Jan 26, 2021 8:03:35 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
-INFO: Started component: kernel_micro@test-24
-Jan 26, 2021 8:03:35 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager startSuperpeerSearch
+Jan 26, 2021 9:30:57 AM transportaddress@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: ITransportAddressService_#273@transportaddress@test-24 true
+Jan 26, 2021 9:30:57 AM superpeerclient@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: ISearchQueryManagerService_#274@superpeerclient@test-24 true
+Jan 26, 2021 9:30:57 AM transportaddress@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: ITransportAddressService_#273@transportaddress@test-24
+Jan 26, 2021 9:30:57 AM transportaddress@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: externalaccessservice@transportaddress@test-24 true
+Jan 26, 2021 9:30:57 AM kernel_micro@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: IComponentFactory_#275@kernel_micro@test-24 true
+Jan 26, 2021 9:30:57 AM kernel_application@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: IComponentFactory_#276@kernel_application@test-24 true
+Jan 26, 2021 9:30:57 AM kernel_micro@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: IComponentFactory_#275@kernel_micro@test-24
+Jan 26, 2021 9:30:57 AM kernel_micro@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: externalaccessservice@kernel_micro@test-24 true
+Jan 26, 2021 9:30:57 AM transportaddress@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: externalaccessservice@transportaddress@test-24
+Jan 26, 2021 9:30:57 AM kernel_micro@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: externalaccessservice@kernel_micro@test-24
+Jan 26, 2021 9:30:57 AM kernel_application@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: IComponentFactory_#276@kernel_application@test-24
+Jan 26, 2021 9:30:57 AM kernel_application@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: externalaccessservice@kernel_application@test-24 true
+Jan 26, 2021 9:30:57 AM superpeerclient@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: ISearchQueryManagerService_#274@superpeerclient@test-24
+Jan 26, 2021 9:30:57 AM superpeerclient@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: externalaccessservice@superpeerclient@test-24 true
+Jan 26, 2021 9:30:57 AM kernel_application@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: externalaccessservice@kernel_application@test-24
+Jan 26, 2021 9:30:57 AM superpeerclient@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: externalaccessservice@superpeerclient@test-24
+Jan 26, 2021 9:30:57 AM kernel_component@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: IComponentFactory_#277@kernel_component@test-24 true
+Jan 26, 2021 9:30:57 AM kernel_component@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: IComponentFactory_#277@kernel_component@test-24
+Jan 26, 2021 9:30:57 AM kernel_component@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: externalaccessservice@kernel_component@test-24 true
+Jan 26, 2021 9:30:57 AM kernel_component@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: externalaccessservice@kernel_component@test-24
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
+INFO: Started component: settings@test-24
+Jan 26, 2021 9:30:57 AM context@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: IContextService_#270@context@test-24
+Jan 26, 2021 9:30:57 AM context@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+INFO: Starting service: externalaccessservice@context@test-24 true
+Jan 26, 2021 9:30:57 AM context@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+INFO: Started service: externalaccessservice@context@test-24
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
+INFO: Started component: kernel_bpmn@test-24
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
+INFO: Started component: security@test-24
+Jan 26, 2021 9:30:57 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager startSuperpeerSearch
 INFO: superpeerclient@test-24 searching for super peers for network test
-Jan 26, 2021 8:03:35 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager startSuperpeerSearch
+Jan 26, 2021 9:30:57 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager startSuperpeerSearch
 INFO: superpeerclient@test-24 searching for super peers for network ___GLOBAL___
-Jan 26, 2021 8:03:35 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
+INFO: Started component: intravmawareness@test-24
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
+INFO: Started component: remoteregistry@test-24
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
+INFO: Started component: transportaddress@test-24
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
+INFO: Started component: kernel_micro@test-24
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
+INFO: Started component: kernel_application@test-24
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
+INFO: Started component: kernel_component@test-24
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
+INFO: Started component: context@test-24
+Jan 26, 2021 9:30:57 AM intravm@test-24 jadex.platform.service.transport.AbstractTransportAgent$2 customResultAvailable
+INFO: Platform test-24 listening to port 2 for intravm transport.
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
 INFO: Started component: superpeerclient@test-24
-Jan 26, 2021 8:03:35 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
+Jan 26, 2021 9:30:57 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
 INFO: Waiting query for network: test, ServiceQuery(servicetype=jadex.bridge.service.types.registry.ISuperpeerService, multiplicity=0..*, networknames=[test], scope=GLOBAL, owner=superpeerclient@test-24)
-Jan 26, 2021 8:03:35 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
+Jan 26, 2021 9:30:57 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
 INFO: Waiting query for network: ___GLOBAL___, ServiceQuery(servicetype=jadex.bridge.service.types.registry.ISuperpeerService, multiplicity=0..*, networknames=[test], scope=GLOBAL, owner=superpeerclient@test-24)
-Jan 26, 2021 8:03:35 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
-INFO: Started component: intravm@test-24
-Jan 26, 2021 8:03:35 AM security@test-24 jadex.platform.service.security.SecurityAgent$SecurityMessageHandler handleMessage
-INFO: Suite: class jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite
-Jan 26, 2021 8:03:35 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
+Jan 26, 2021 9:30:57 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
 INFO: Waiting query for network: ___GLOBAL___, ServiceQuery(servicetype=jadex.bridge.service.types.registry.ISuperpeerService, multiplicity=0..*, networknames=[___GLOBAL___], scope=GLOBAL, owner=superpeerclient@test-24)
-Jan 26, 2021 8:03:35 AM test-24 jadex.bridge.service.types.cms.PlatformComponent create
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
+INFO: Started component: intravm@test-24
+Jan 26, 2021 9:30:57 AM security@test-24 jadex.platform.service.security.SecurityAgent$3 execute
+INFO: Handshake state null, starting new handhake: security@test-24 test-22 MsgHeader(properties={receiver=remoteregistry@test-22, sender=superpeerclient@test-24, __rx_id__=_OLoxTeNloP7lo46iKECAT0rpLJ!2YZ?J0CFohWOcLUNf})
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.PlatformComponent create
 SEVERE: Enabled PlatformComponent debugging for TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:35 AM test-24 jadex.bridge.component.impl.ExecutionComponentFeature <init>
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.component.impl.ExecutionComponentFeature <init>
 SEVERE: Enabled ExecutionComponentFeature debugging for TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:35 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19 customResultAvailable
 INFO: Starting component: TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:35 AM TerminableProviderAgent@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+Jan 26, 2021 9:30:57 AM TerminableProviderAgent@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
 INFO: Starting service: ITerminableService_#278@TerminableProviderAgent@test-24 true
-Jan 26, 2021 8:03:35 AM TerminableProviderAgent@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+Jan 26, 2021 9:30:57 AM TerminableProviderAgent@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
 INFO: Started service: ITerminableService_#278@TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:35 AM TerminableProviderAgent@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
+Jan 26, 2021 9:30:57 AM TerminableProviderAgent@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature initService
 INFO: Starting service: externalaccessservice@TerminableProviderAgent@test-24 true
-Jan 26, 2021 8:03:35 AM TerminableProviderAgent@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
+Jan 26, 2021 9:30:57 AM TerminableProviderAgent@test-24 jadex.bridge.service.component.ProvidedServicesComponentFeature$2$1 customResultAvailable
 INFO: Started service: externalaccessservice@TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:35 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
+Jan 26, 2021 9:30:57 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$19$1 resultAvailable
 INFO: Started component: TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
-INFO: Terminating component structure: test-24
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature killComponents
-SEVERE: Killing subcomponents0: test-24, [kernel_component@test-24, kernel_micro@test-24, TerminableProviderAgent@test-24, intravmawareness@test-24, context@test-24, transportaddress@test-24, security@test-24, remoteregistry@test-24, kernel_bpmn@test-24, kernel_application@test-24, settings@test-24, superpeerclient@test-24, intravm@test-24]
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature killComponents
-SEVERE: Killing subcomponents5 locals: test-24, [settings@test-24, security@test-24, kernel_bpmn@test-24, remoteregistry@test-24, transportaddress@test-24, intravmawareness@test-24, kernel_application@test-24, context@test-24, kernel_component@test-24, kernel_micro@test-24, superpeerclient@test-24, intravm@test-24, TerminableProviderAgent@test-24]
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature killLocalComponents
-SEVERE: killLocalComponents00: test-24, [Ljadex.bridge.IComponentIdentifier;@2657c37e
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature killLocalComponents
-SEVERE: killLocalComponents0 user test-24, [TerminableProviderAgent@test-24]
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature getShutdownLevels
-SEVERE: getShutdownLevels0: MultiCollection(map={}), [TerminableProviderAgent@test-24]
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature getShutdownLevels
-SEVERE: getShutdownLevels1: getModelAsync0 test-24, 0
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature getShutdownLevels
-SEVERE: getShutdownLevels1: getModelAsync1 test-24, TerminableProviderAgent
-Jan 26, 2021 8:03:37 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+Jan 26, 2021 9:30:59 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
 SEVERE: destroy1: TerminateIntermediateTestAgent@test-22
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
 SEVERE: destroy1: TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
 SEVERE: destroy2: TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
 SEVERE: destroy3: TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
 INFO: Terminating component structure: TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService$12 run
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService$12 run
 INFO: Terminating component: TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent shutdown
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent shutdown
 SEVERE: shutdown component features start: TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
 SEVERE: destroy4 (contains, locked, inited): TerminableProviderAgent@test-24 (false, false, true) TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-SEVERE: ExternalAccessInvocationHandler.doInvoke5: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null: jadex.commons.future.Future@1e3393f5
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-SEVERE: ExternalAccessInvocationHandler.doInvoke6: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null: jadex.commons.future.Future@1e3393f5, done=false
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 execute
-SEVERE: ExternalAccessInvocationHandler.step1: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.IExternalAccess.getModelAsync(), null
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
-SEVERE: ExternalAccessInvocationHandler.doExecute1: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.IExternalAccess.getModelAsync(), null
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-SEVERE: ExternalAccessInvocationHandler.doInvoke1: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.IExternalAccess.getModelAsync(), null
-Jan 26, 2021 8:03:37 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
-SEVERE: destroy2: TerminateIntermediateTestAgent@test-22
-Jan 26, 2021 8:03:37 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
-SEVERE: destroy3: TerminateIntermediateTestAgent@test-22
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-SEVERE: ExternalAccessInvocationHandler.doInvoke2: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.IExternalAccess.getModelAsync(), null
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-SEVERE: ExternalAccessInvocationHandler.doInvoke3: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.IExternalAccess.getModelAsync(), null
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-SEVERE: ExternalAccessInvocationHandler.doInvoke6: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.IExternalAccess.getModelAsync(), null: jadex.commons.future.Future@5f3aa667, done=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
-SEVERE: ExternalAccessInvocationHandler.doExecute2: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.IExternalAccess.getModelAsync(), null done=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
-SEVERE: ExternalAccessInvocationHandler.doExecute2a: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.IExternalAccess.getModelAsync(), null done=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
-SEVERE: ExternalAccessInvocationHandler.doExecute2b: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.IExternalAccess.getModelAsync(), null fut=jadex.commons.future.Future@5f3aa667
-startScheduledNotifications0: Tuple[jadex.commons.future.Future@5f3aa667, Heisenbugjadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2$1@5d943a4e, jadex.commons.future.Future$1@734c4b53]
-startScheduledNotifications1: Tuple[jadex.commons.future.Future@5f3aa667, Heisenbugjadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2$1@5d943a4e, jadex.commons.future.Future$1@734c4b53]
-startScheduledNotifications0: Tuple[jadex.commons.future.Future@3fb5a439, jadex.commons.future.DelegationResultListener@35363436, jadex.commons.future.Future$1@498c2e94]
-startScheduledNotifications1: Tuple[jadex.commons.future.Future@3fb5a439, jadex.commons.future.DelegationResultListener@35363436, jadex.commons.future.Future$1@498c2e94]
-startScheduledNotifications0: Tuple[jadex.bridge.service.component.interceptors.DelegatingFuture@580be225, jadex.commons.future.CounterResultListener@4a0d0171, jadex.commons.future.Future$1@4e9e1b82]
-startScheduledNotifications1: Tuple[jadex.bridge.service.component.interceptors.DelegatingFuture@580be225, jadex.commons.future.CounterResultListener@4a0d0171, jadex.commons.future.Future$1@4e9e1b82]
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
-SEVERE: ExternalAccessInvocationHandler.doExecute2c: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.IExternalAccess.getModelAsync(), null done=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
-SEVERE: ExternalAccessInvocationHandler.doExecute3: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.IExternalAccess.getModelAsync(), null done=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 execute
-SEVERE: ExternalAccessInvocationHandler.step1 end: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.IExternalAccess.getModelAsync(), null
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$3 execute
-SEVERE: shutdown component features start: TerminableProviderAgent@test-24, null, [jadex.bridge.component.impl.MonitoringComponentFeature@43f72baf, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7d0b7a58, jadex.bridge.component.impl.PropertiesComponentFeature@6872258e, jadex.bridge.service.component.RequiredServicesComponentFeature@141ee83d, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6ece1342, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@48317d79, jadex.micro.features.impl.MicroMessageComponentFeature@31967fa4, jadex.micro.features.impl.MicroInjectionComponentFeature@522a36ab, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@4c606baf, jadex.bridge.component.impl.NFPropertyComponentFeature@f790def, jadex.bridge.component.impl.SubcomponentsComponentFeature@d1028fb, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@e8cc89c, jadex.micro.features.impl.MicroLifecycleComponentFeature@41fef7f1]
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@43f72baf, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7d0b7a58, jadex.bridge.component.impl.PropertiesComponentFeature@6872258e, jadex.bridge.service.component.RequiredServicesComponentFeature@141ee83d, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6ece1342, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@48317d79, jadex.micro.features.impl.MicroMessageComponentFeature@31967fa4, jadex.micro.features.impl.MicroInjectionComponentFeature@522a36ab, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@4c606baf, jadex.bridge.component.impl.NFPropertyComponentFeature@f790def, jadex.bridge.component.impl.SubcomponentsComponentFeature@d1028fb, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@e8cc89c, jadex.micro.features.impl.MicroLifecycleComponentFeature@41fef7f1]
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+SEVERE: ExternalAccessInvocationHandler.doInvoke5: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null: jadex.commons.future.Future@70b5897d
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+SEVERE: ExternalAccessInvocationHandler.doInvoke6: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null: jadex.commons.future.Future@70b5897d, done=false
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$3 execute
+SEVERE: shutdown component features start: TerminableProviderAgent@test-24, null, [jadex.bridge.component.impl.MonitoringComponentFeature@3051588b, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@6cf3c19d, jadex.bridge.component.impl.PropertiesComponentFeature@5cc81b11, jadex.bridge.service.component.RequiredServicesComponentFeature@8a769e4, jadex.bridge.component.impl.RemoteExecutionComponentFeature@3288fd7b, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@40853d9e, jadex.micro.features.impl.MicroMessageComponentFeature@5c89b60c, jadex.micro.features.impl.MicroInjectionComponentFeature@6f521c30, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@1ac45784, jadex.bridge.component.impl.SubcomponentsComponentFeature@73c4e08f, jadex.bridge.component.impl.NFPropertyComponentFeature@62ec112d, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@1da022dc, jadex.micro.features.impl.MicroLifecycleComponentFeature@25602e9b]
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@3051588b, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@6cf3c19d, jadex.bridge.component.impl.PropertiesComponentFeature@5cc81b11, jadex.bridge.service.component.RequiredServicesComponentFeature@8a769e4, jadex.bridge.component.impl.RemoteExecutionComponentFeature@3288fd7b, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@40853d9e, jadex.micro.features.impl.MicroMessageComponentFeature@5c89b60c, jadex.micro.features.impl.MicroInjectionComponentFeature@6f521c30, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@1ac45784, jadex.bridge.component.impl.SubcomponentsComponentFeature@73c4e08f, jadex.bridge.component.impl.NFPropertyComponentFeature@62ec112d, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@1da022dc, jadex.micro.features.impl.MicroLifecycleComponentFeature@25602e9b]
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
 SEVERE: lifecycle feature shutdown start: TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
 SEVERE: lifecycle feature shutdown agent killed invoked: TerminableProviderAgent@test-24 done=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroLifecycleComponentFeature$1 resultAvailable
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroLifecycleComponentFeature$1 resultAvailable
 SEVERE: lifecycle feature shutdown end result: TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroLifecycleComponentFeature@41fef7f1 done(sync)=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@43f72baf, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7d0b7a58, jadex.bridge.component.impl.PropertiesComponentFeature@6872258e, jadex.bridge.service.component.RequiredServicesComponentFeature@141ee83d, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6ece1342, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@48317d79, jadex.micro.features.impl.MicroMessageComponentFeature@31967fa4, jadex.micro.features.impl.MicroInjectionComponentFeature@522a36ab, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@4c606baf, jadex.bridge.component.impl.NFPropertyComponentFeature@f790def, jadex.bridge.component.impl.SubcomponentsComponentFeature@d1028fb, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@e8cc89c]
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroServiceInjectionComponentFeature@e8cc89c done(sync)=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@43f72baf, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7d0b7a58, jadex.bridge.component.impl.PropertiesComponentFeature@6872258e, jadex.bridge.service.component.RequiredServicesComponentFeature@141ee83d, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6ece1342, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@48317d79, jadex.micro.features.impl.MicroMessageComponentFeature@31967fa4, jadex.micro.features.impl.MicroInjectionComponentFeature@522a36ab, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@4c606baf, jadex.bridge.component.impl.NFPropertyComponentFeature@f790def, jadex.bridge.component.impl.SubcomponentsComponentFeature@d1028fb]
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature@d1028fb done(sync)=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@43f72baf, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7d0b7a58, jadex.bridge.component.impl.PropertiesComponentFeature@6872258e, jadex.bridge.service.component.RequiredServicesComponentFeature@141ee83d, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6ece1342, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@48317d79, jadex.micro.features.impl.MicroMessageComponentFeature@31967fa4, jadex.micro.features.impl.MicroInjectionComponentFeature@522a36ab, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@4c606baf, jadex.bridge.component.impl.NFPropertyComponentFeature@f790def]
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.bridge.component.impl.NFPropertyComponentFeature@f790def done(sync)=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@43f72baf, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7d0b7a58, jadex.bridge.component.impl.PropertiesComponentFeature@6872258e, jadex.bridge.service.component.RequiredServicesComponentFeature@141ee83d, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6ece1342, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@48317d79, jadex.micro.features.impl.MicroMessageComponentFeature@31967fa4, jadex.micro.features.impl.MicroInjectionComponentFeature@522a36ab, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@4c606baf]
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroProvidedServicesComponentFeature@4c606baf done(sync)=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@43f72baf, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7d0b7a58, jadex.bridge.component.impl.PropertiesComponentFeature@6872258e, jadex.bridge.service.component.RequiredServicesComponentFeature@141ee83d, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6ece1342, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@48317d79, jadex.micro.features.impl.MicroMessageComponentFeature@31967fa4, jadex.micro.features.impl.MicroInjectionComponentFeature@522a36ab]
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroInjectionComponentFeature@522a36ab done(sync)=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@43f72baf, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7d0b7a58, jadex.bridge.component.impl.PropertiesComponentFeature@6872258e, jadex.bridge.service.component.RequiredServicesComponentFeature@141ee83d, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6ece1342, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@48317d79, jadex.micro.features.impl.MicroMessageComponentFeature@31967fa4]
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroMessageComponentFeature@31967fa4 done(sync)=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@43f72baf, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7d0b7a58, jadex.bridge.component.impl.PropertiesComponentFeature@6872258e, jadex.bridge.service.component.RequiredServicesComponentFeature@141ee83d, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6ece1342, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@48317d79]
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroPojoComponentFeature@48317d79 done(sync)=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@43f72baf, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7d0b7a58, jadex.bridge.component.impl.PropertiesComponentFeature@6872258e, jadex.bridge.service.component.RequiredServicesComponentFeature@141ee83d, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6ece1342, ExecutionFeature(TerminableProviderAgent@test-24)]
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature shutdown
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroLifecycleComponentFeature@25602e9b done(sync)=true
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@3051588b, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@6cf3c19d, jadex.bridge.component.impl.PropertiesComponentFeature@5cc81b11, jadex.bridge.service.component.RequiredServicesComponentFeature@8a769e4, jadex.bridge.component.impl.RemoteExecutionComponentFeature@3288fd7b, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@40853d9e, jadex.micro.features.impl.MicroMessageComponentFeature@5c89b60c, jadex.micro.features.impl.MicroInjectionComponentFeature@6f521c30, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@1ac45784, jadex.bridge.component.impl.SubcomponentsComponentFeature@73c4e08f, jadex.bridge.component.impl.NFPropertyComponentFeature@62ec112d, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@1da022dc]
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroServiceInjectionComponentFeature@1da022dc done(sync)=true
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@3051588b, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@6cf3c19d, jadex.bridge.component.impl.PropertiesComponentFeature@5cc81b11, jadex.bridge.service.component.RequiredServicesComponentFeature@8a769e4, jadex.bridge.component.impl.RemoteExecutionComponentFeature@3288fd7b, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@40853d9e, jadex.micro.features.impl.MicroMessageComponentFeature@5c89b60c, jadex.micro.features.impl.MicroInjectionComponentFeature@6f521c30, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@1ac45784, jadex.bridge.component.impl.SubcomponentsComponentFeature@73c4e08f, jadex.bridge.component.impl.NFPropertyComponentFeature@62ec112d]
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.bridge.component.impl.NFPropertyComponentFeature@62ec112d done(sync)=true
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@3051588b, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@6cf3c19d, jadex.bridge.component.impl.PropertiesComponentFeature@5cc81b11, jadex.bridge.service.component.RequiredServicesComponentFeature@8a769e4, jadex.bridge.component.impl.RemoteExecutionComponentFeature@3288fd7b, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@40853d9e, jadex.micro.features.impl.MicroMessageComponentFeature@5c89b60c, jadex.micro.features.impl.MicroInjectionComponentFeature@6f521c30, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@1ac45784, jadex.bridge.component.impl.SubcomponentsComponentFeature@73c4e08f]
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature@73c4e08f done(sync)=true
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@3051588b, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@6cf3c19d, jadex.bridge.component.impl.PropertiesComponentFeature@5cc81b11, jadex.bridge.service.component.RequiredServicesComponentFeature@8a769e4, jadex.bridge.component.impl.RemoteExecutionComponentFeature@3288fd7b, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@40853d9e, jadex.micro.features.impl.MicroMessageComponentFeature@5c89b60c, jadex.micro.features.impl.MicroInjectionComponentFeature@6f521c30, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@1ac45784]
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroProvidedServicesComponentFeature@1ac45784 done(sync)=true
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@3051588b, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@6cf3c19d, jadex.bridge.component.impl.PropertiesComponentFeature@5cc81b11, jadex.bridge.service.component.RequiredServicesComponentFeature@8a769e4, jadex.bridge.component.impl.RemoteExecutionComponentFeature@3288fd7b, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@40853d9e, jadex.micro.features.impl.MicroMessageComponentFeature@5c89b60c, jadex.micro.features.impl.MicroInjectionComponentFeature@6f521c30]
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroInjectionComponentFeature@6f521c30 done(sync)=true
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@3051588b, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@6cf3c19d, jadex.bridge.component.impl.PropertiesComponentFeature@5cc81b11, jadex.bridge.service.component.RequiredServicesComponentFeature@8a769e4, jadex.bridge.component.impl.RemoteExecutionComponentFeature@3288fd7b, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@40853d9e, jadex.micro.features.impl.MicroMessageComponentFeature@5c89b60c]
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroMessageComponentFeature@5c89b60c done(sync)=true
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@3051588b, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@6cf3c19d, jadex.bridge.component.impl.PropertiesComponentFeature@5cc81b11, jadex.bridge.service.component.RequiredServicesComponentFeature@8a769e4, jadex.bridge.component.impl.RemoteExecutionComponentFeature@3288fd7b, ExecutionFeature(TerminableProviderAgent@test-24), jadex.micro.features.impl.MicroPojoComponentFeature@40853d9e]
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.micro.features.impl.MicroPojoComponentFeature@40853d9e done(sync)=true
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@3051588b, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@6cf3c19d, jadex.bridge.component.impl.PropertiesComponentFeature@5cc81b11, jadex.bridge.service.component.RequiredServicesComponentFeature@8a769e4, jadex.bridge.component.impl.RemoteExecutionComponentFeature@3288fd7b, ExecutionFeature(TerminableProviderAgent@test-24)]
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature shutdown
 SEVERE: shutdown0: ExecutionFeature(TerminableProviderAgent@test-24)
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
 SEVERE: wakeup0: ExecutionFeature(TerminableProviderAgent@test-24)
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature$12 customResultAvailable
-SEVERE: getShutdownLevels2: getModelAsync done test-24
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
 SEVERE: wakeup2: ExecutionFeature(TerminableProviderAgent@test-24), AsyncExecutionService(IExecutionService_#262@test-24)
-NO PREDECESSORS: jadex.micro.testcases.terminate.TerminableProviderAgent []
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
 SEVERE: wakeup4: ExecutionFeature(TerminableProviderAgent@test-24)
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
 SEVERE: feature shutdown called: TerminableProviderAgent@test-24 ExecutionFeature(TerminableProviderAgent@test-24) done(sync)=false
-Jan 26, 2021 8:03:37 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent shutdown
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: async waiting for feature shutdown: TerminableProviderAgent@test-24 ExecutionFeature(TerminableProviderAgent@test-24)
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature execute
+SEVERE: execute()5: jadex.bridge.service.types.cms.PlatformComponent$3@fcf740 100 active
+Jan 26, 2021 9:30:59 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
+SEVERE: execute()7: endstepcnt=12, ret=false, endagenda.isDone()=false
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature$1 customResultAvailable
+SEVERE: shutdown1: jadex.bridge.component.impl.ExecutionComponentFeature$1@2c2a0540
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature$1 customResultAvailable
+SEVERE: shutdown2: jadex.bridge.component.impl.ExecutionComponentFeature$1@2c2a0540
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$8 resultAvailable
+SEVERE: done waiting for feature shutdown: TerminableProviderAgent@test-24 ExecutionFeature(TerminableProviderAgent@test-24)
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@3051588b, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@6cf3c19d, jadex.bridge.component.impl.PropertiesComponentFeature@5cc81b11, jadex.bridge.service.component.RequiredServicesComponentFeature@8a769e4, jadex.bridge.component.impl.RemoteExecutionComponentFeature@3288fd7b]
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.bridge.component.impl.RemoteExecutionComponentFeature@3288fd7b done(sync)=true
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@3051588b, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@6cf3c19d, jadex.bridge.component.impl.PropertiesComponentFeature@5cc81b11, jadex.bridge.service.component.RequiredServicesComponentFeature@8a769e4]
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.bridge.service.component.RequiredServicesComponentFeature@8a769e4 done(sync)=true
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@3051588b, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@6cf3c19d, jadex.bridge.component.impl.PropertiesComponentFeature@5cc81b11]
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.bridge.component.impl.PropertiesComponentFeature@5cc81b11 done(sync)=true
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@3051588b, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@6cf3c19d]
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.bridge.component.impl.ArgumentsResultsComponentFeature@6cf3c19d done(sync)=true
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@3051588b]
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.bridge.component.impl.MonitoringComponentFeature@3051588b done(sync)=true
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$3$1 proceed
+SEVERE: shutdown component features end: TerminableProviderAgent@test-24, null
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$3$1 proceed
+SEVERE: shutdown component features end4: TerminableProviderAgent@test-24, null
+Jan 26, 2021 9:30:59 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+SEVERE: destroy2: TerminateIntermediateTestAgent@test-22
+Jan 26, 2021 9:30:59 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+SEVERE: destroy3: TerminateIntermediateTestAgent@test-22
+Jan 26, 2021 9:30:59 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent shutdown
 SEVERE: shutdown component features start: TerminateIntermediateTestAgent@test-22
-Jan 26, 2021 8:03:37 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+Jan 26, 2021 9:30:59 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
 SEVERE: destroy4 (contains, locked, inited): TerminateIntermediateTestAgent@test-22 (false, false, true) TerminateIntermediateTestAgent@test-22
-Jan 26, 2021 8:03:37 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
+Jan 26, 2021 9:30:59 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
 SEVERE: ExternalAccessInvocationHandler.invoke(): TerminateIntermediateTestAgent@test-22, public abstract jadex.bridge.IComponentIdentifier jadex.bridge.IExternalAccess.getId(), null
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature$11$1 resultAvailable
+Jan 26, 2021 9:30:59 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
+SEVERE: ExternalAccessInvocationHandler.invoke(): TerminateIntermediateTestAgent@test-22, public abstract jadex.bridge.IComponentIdentifier jadex.bridge.IExternalAccess.getId(), null
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+INFO: Terminating component structure: test-24
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature killComponents
+SEVERE: Killing subcomponents0: test-24, [kernel_component@test-24, kernel_micro@test-24, TerminableProviderAgent@test-24, intravmawareness@test-24, context@test-24, transportaddress@test-24, security@test-24, remoteregistry@test-24, kernel_bpmn@test-24, kernel_application@test-24, settings@test-24, superpeerclient@test-24, intravm@test-24]
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature killComponents
+SEVERE: Killing subcomponents5 locals: test-24, [settings@test-24, kernel_bpmn@test-24, security@test-24, intravmawareness@test-24, remoteregistry@test-24, transportaddress@test-24, kernel_micro@test-24, kernel_application@test-24, kernel_component@test-24, context@test-24, superpeerclient@test-24, intravm@test-24, TerminableProviderAgent@test-24]
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature killLocalComponents
+SEVERE: killLocalComponents00: test-24, [settings@test-24, kernel_bpmn@test-24, security@test-24, intravmawareness@test-24, remoteregistry@test-24, transportaddress@test-24, kernel_micro@test-24, kernel_application@test-24, kernel_component@test-24, context@test-24, superpeerclient@test-24, intravm@test-24, TerminableProviderAgent@test-24]
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature killLocalComponents
+SEVERE: killLocalComponents0 user test-24, [TerminableProviderAgent@test-24]
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature getShutdownLevels
+SEVERE: getShutdownLevels0: MultiCollection(map={}), [TerminableProviderAgent@test-24]
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature getShutdownLevels
+SEVERE: getShutdownLevels1: getModelAsync0 test-24, 0
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
+SEVERE: ExternalAccessInvocationHandler.invoke(): TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.IExternalAccess.getModelAsync(), null
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
+SEVERE: ExternalAccessInvocationHandler.invoke(): TerminableProviderAgent@test-24, public java.lang.String java.lang.Object.toString(), null
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature getShutdownLevels
+SEVERE: getShutdownLevels1: getModelAsync1 test-24, TerminableProviderAgent
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature$12 customResultAvailable
+SEVERE: getShutdownLevels2: getModelAsync done test-24
+NO PREDECESSORS: jadex.micro.testcases.terminate.TerminableProviderAgent []
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature$11$1 resultAvailable
 SEVERE: doKillComponents2: start kill: TerminableProviderAgent@test-24, test-24
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
 SEVERE: ExternalAccessInvocationHandler.invoke(): TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2@44c012f
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
 SEVERE: ExternalAccessInvocationHandler.doExecute4: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null done=false
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
 SEVERE: ExternalAccessInvocationHandler.doExecute5: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null done=false
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$1 exceptionOccurred
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$1 exceptionOccurred
 SEVERE: ExternalAccessInvocationHandler.ex1: TerminableProviderAgent@test-24, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null
 jadex.bridge.ComponentTerminatedException: TerminableProviderAgent@test-24
-	at jadex.bridge.component.impl.ExecutionComponentFeature.scheduleStep(ExecutionComponentFeature.java:332)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.scheduleStep(ExecutionComponentFeature.java:319)
 	at jdk.internal.reflect.GeneratedMethodAccessor21.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
 	at jadex.bridge.service.types.cms.SComponentManagementService$20.invoke(SComponentManagementService.java:2317)
-	at com.sun.proxy.$Proxy199.scheduleStep(Unknown Source)
+	at com.sun.proxy.$Proxy201.scheduleStep(Unknown Source)
 	at jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler.invoke(PlatformComponent.java:1654)
-	at com.sun.proxy.$Proxy200.killComponent(Unknown Source)
-	at jadex.bridge.component.impl.SubcomponentsComponentFeature$11$1.resultAvailable(SubcomponentsComponentFeature.java:825)
-	at jadex.bridge.component.impl.SubcomponentsComponentFeature$11$1.resultAvailable(SubcomponentsComponentFeature.java:781)
-	at jadex.bridge.component.impl.SubcomponentsComponentFeature$11.resultAvailable(SubcomponentsComponentFeature.java:882)
-	at jadex.bridge.component.impl.SubcomponentsComponentFeature$11.resultAvailable(SubcomponentsComponentFeature.java:774)
+	at com.sun.proxy.$Proxy202.killComponent(Unknown Source)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature$11$1.resultAvailable(SubcomponentsComponentFeature.java:834)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature$11$1.resultAvailable(SubcomponentsComponentFeature.java:790)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature$11.resultAvailable(SubcomponentsComponentFeature.java:891)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature$11.resultAvailable(SubcomponentsComponentFeature.java:783)
 	at jadex.commons.future.Future$1.execute(Future.java:769)
 	at jadex.commons.future.Future$1.execute(Future.java:746)
 	at jadex.commons.future.Future.executeNotification(Future.java:664)
 	at jadex.commons.future.Future.startScheduledNotifications(Future.java:641)
-	at jadex.commons.future.Future.notifyListener(Future.java:732)
-	at jadex.commons.future.Future.resume(Future.java:477)
-	at jadex.commons.future.Future.setResult(Future.java:385)
-	at jadex.commons.future.DelegationResultListener.customResultAvailable(DelegationResultListener.java:132)
-	at jadex.commons.future.DelegationResultListener.resultAvailable(DelegationResultListener.java:77)
-	at jadex.commons.future.CounterResultListener.resultAvailable(CounterResultListener.java:179)
-	at jadex.commons.future.Future$1.execute(Future.java:769)
-	at jadex.commons.future.Future$1.execute(Future.java:746)
-	at jadex.bridge.service.component.ComponentFutureFunctionality$2.execute(ComponentFutureFunctionality.java:55)
+	at jadex.commons.future.Future.notifyListener(Future.java:742)
+	at jadex.commons.future.Future.addResultListener(Future.java:722)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature.doKillComponents(SubcomponentsComponentFeature.java:782)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature.killLocalComponents(SubcomponentsComponentFeature.java:733)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature.killComponents(SubcomponentsComponentFeature.java:489)
+	at jadex.bridge.service.types.cms.SComponentManagementService.destroyComponent(SComponentManagementService.java:1563)
+	at jadex.bridge.service.types.cms.SComponentManagementService.destroyComponent(SComponentManagementService.java:1645)
+	at jadex.bridge.service.types.cms.PlatformComponent.killComponent(PlatformComponent.java:858)
+	at jadex.bridge.service.types.cms.PlatformComponent.killComponent(PlatformComponent.java:833)
+	at jadex.bridge.service.types.cms.PlatformComponent.killComponent(PlatformComponent.java:820)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.killComponent(ExecutionComponentFeature.java:2187)
+	at jdk.internal.reflect.GeneratedMethodAccessor38.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler.doInvoke(PlatformComponent.java:1840)
+	at jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2.doExecute(PlatformComponent.java:1700)
+	at jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2.execute(PlatformComponent.java:1677)
 	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
 	at jadex.commons.concurrent.Executor.code(Executor.java:299)
 	at jadex.commons.concurrent.Executor.run(Executor.java:126)
@@ -551,26 +573,120 @@ jadex.bridge.ComponentTerminatedException: TerminableProviderAgent@test-24
 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
 	at java.base/java.lang.Thread.run(Thread.java:834)
 
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature$5 resultAvailable
-SEVERE: Killing subcomponents5a locals done: test-24
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature$3 exceptionOccurred
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature$10 exceptionOccurred
+SEVERE: User kill failed: test-24
+jadex.bridge.ComponentTerminatedException: TerminableProviderAgent@test-24
+	at jadex.bridge.component.impl.ExecutionComponentFeature.scheduleStep(ExecutionComponentFeature.java:319)
+	at jdk.internal.reflect.GeneratedMethodAccessor21.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.types.cms.SComponentManagementService$20.invoke(SComponentManagementService.java:2317)
+	at com.sun.proxy.$Proxy201.scheduleStep(Unknown Source)
+	at jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler.invoke(PlatformComponent.java:1654)
+	at com.sun.proxy.$Proxy202.killComponent(Unknown Source)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature$11$1.resultAvailable(SubcomponentsComponentFeature.java:834)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature$11$1.resultAvailable(SubcomponentsComponentFeature.java:790)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature$11.resultAvailable(SubcomponentsComponentFeature.java:891)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature$11.resultAvailable(SubcomponentsComponentFeature.java:783)
+	at jadex.commons.future.Future$1.execute(Future.java:769)
+	at jadex.commons.future.Future$1.execute(Future.java:746)
+	at jadex.commons.future.Future.executeNotification(Future.java:664)
+	at jadex.commons.future.Future.startScheduledNotifications(Future.java:641)
+	at jadex.commons.future.Future.notifyListener(Future.java:742)
+	at jadex.commons.future.Future.addResultListener(Future.java:722)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature.doKillComponents(SubcomponentsComponentFeature.java:782)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature.killLocalComponents(SubcomponentsComponentFeature.java:733)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature.killComponents(SubcomponentsComponentFeature.java:489)
+	at jadex.bridge.service.types.cms.SComponentManagementService.destroyComponent(SComponentManagementService.java:1563)
+	at jadex.bridge.service.types.cms.SComponentManagementService.destroyComponent(SComponentManagementService.java:1645)
+	at jadex.bridge.service.types.cms.PlatformComponent.killComponent(PlatformComponent.java:858)
+	at jadex.bridge.service.types.cms.PlatformComponent.killComponent(PlatformComponent.java:833)
+	at jadex.bridge.service.types.cms.PlatformComponent.killComponent(PlatformComponent.java:820)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.killComponent(ExecutionComponentFeature.java:2187)
+	at jdk.internal.reflect.GeneratedMethodAccessor38.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler.doInvoke(PlatformComponent.java:1840)
+	at jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2.doExecute(PlatformComponent.java:1700)
+	at jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2.execute(PlatformComponent.java:1677)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at jadex.platform.service.execution.AsyncExecutionService$1.run(AsyncExecutionService.java:109)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature$6 exceptionOccurred
+SEVERE: Killing subcomponents5c locals failed: test-24
+jadex.bridge.ComponentTerminatedException: TerminableProviderAgent@test-24
+	at jadex.bridge.component.impl.ExecutionComponentFeature.scheduleStep(ExecutionComponentFeature.java:319)
+	at jdk.internal.reflect.GeneratedMethodAccessor21.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.types.cms.SComponentManagementService$20.invoke(SComponentManagementService.java:2317)
+	at com.sun.proxy.$Proxy201.scheduleStep(Unknown Source)
+	at jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler.invoke(PlatformComponent.java:1654)
+	at com.sun.proxy.$Proxy202.killComponent(Unknown Source)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature$11$1.resultAvailable(SubcomponentsComponentFeature.java:834)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature$11$1.resultAvailable(SubcomponentsComponentFeature.java:790)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature$11.resultAvailable(SubcomponentsComponentFeature.java:891)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature$11.resultAvailable(SubcomponentsComponentFeature.java:783)
+	at jadex.commons.future.Future$1.execute(Future.java:769)
+	at jadex.commons.future.Future$1.execute(Future.java:746)
+	at jadex.commons.future.Future.executeNotification(Future.java:664)
+	at jadex.commons.future.Future.startScheduledNotifications(Future.java:641)
+	at jadex.commons.future.Future.notifyListener(Future.java:742)
+	at jadex.commons.future.Future.addResultListener(Future.java:722)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature.doKillComponents(SubcomponentsComponentFeature.java:782)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature.killLocalComponents(SubcomponentsComponentFeature.java:733)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature.killComponents(SubcomponentsComponentFeature.java:489)
+	at jadex.bridge.service.types.cms.SComponentManagementService.destroyComponent(SComponentManagementService.java:1563)
+	at jadex.bridge.service.types.cms.SComponentManagementService.destroyComponent(SComponentManagementService.java:1645)
+	at jadex.bridge.service.types.cms.PlatformComponent.killComponent(PlatformComponent.java:858)
+	at jadex.bridge.service.types.cms.PlatformComponent.killComponent(PlatformComponent.java:833)
+	at jadex.bridge.service.types.cms.PlatformComponent.killComponent(PlatformComponent.java:820)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.killComponent(ExecutionComponentFeature.java:2187)
+	at jdk.internal.reflect.GeneratedMethodAccessor38.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler.doInvoke(PlatformComponent.java:1840)
+	at jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2.doExecute(PlatformComponent.java:1700)
+	at jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2.execute(PlatformComponent.java:1677)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at jadex.platform.service.execution.AsyncExecutionService$1.run(AsyncExecutionService.java:109)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature$5 resultAvailable
+SEVERE: Killing subcomponents5a locals done: test-24, [jadex.bridge.ComponentTerminatedException: TerminableProviderAgent@test-24]
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.component.impl.SubcomponentsComponentFeature$3 exceptionOccurred
 SEVERE: Killing subcomponents0b failed: test-24
 jadex.commons.MultiException: caused by: TerminableProviderAgent@test-24
-	at jadex.bridge.component.impl.SubcomponentsComponentFeature$8.resultAvailable(SubcomponentsComponentFeature.java:539)
-	at jadex.bridge.component.impl.SubcomponentsComponentFeature$8.resultAvailable(SubcomponentsComponentFeature.java:535)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature$8.resultAvailable(SubcomponentsComponentFeature.java:544)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature$8.resultAvailable(SubcomponentsComponentFeature.java:540)
 	at jadex.commons.future.Future$1.execute(Future.java:769)
 	at jadex.commons.future.Future$1.execute(Future.java:746)
 	at jadex.commons.future.Future.executeNotification(Future.java:664)
 	at jadex.commons.future.Future.startScheduledNotifications(Future.java:641)
-	at jadex.commons.future.Future.notifyListener(Future.java:732)
-	at jadex.commons.future.Future.resume(Future.java:477)
-	at jadex.commons.future.Future.setResult(Future.java:385)
-	at jadex.commons.future.DelegationResultListener.customResultAvailable(DelegationResultListener.java:132)
-	at jadex.commons.future.DelegationResultListener.resultAvailable(DelegationResultListener.java:77)
-	at jadex.commons.future.CounterResultListener.resultAvailable(CounterResultListener.java:179)
-	at jadex.commons.future.Future$1.execute(Future.java:769)
-	at jadex.commons.future.Future$1.execute(Future.java:746)
-	at jadex.bridge.service.component.ComponentFutureFunctionality$2.execute(ComponentFutureFunctionality.java:55)
+	at jadex.commons.future.Future.notifyListener(Future.java:742)
+	at jadex.commons.future.Future.addResultListener(Future.java:722)
+	at jadex.bridge.component.impl.SubcomponentsComponentFeature.killComponents(SubcomponentsComponentFeature.java:539)
+	at jadex.bridge.service.types.cms.SComponentManagementService.destroyComponent(SComponentManagementService.java:1563)
+	at jadex.bridge.service.types.cms.SComponentManagementService.destroyComponent(SComponentManagementService.java:1645)
+	at jadex.bridge.service.types.cms.PlatformComponent.killComponent(PlatformComponent.java:858)
+	at jadex.bridge.service.types.cms.PlatformComponent.killComponent(PlatformComponent.java:833)
+	at jadex.bridge.service.types.cms.PlatformComponent.killComponent(PlatformComponent.java:820)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.killComponent(ExecutionComponentFeature.java:2187)
+	at jdk.internal.reflect.GeneratedMethodAccessor38.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler.doInvoke(PlatformComponent.java:1840)
+	at jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2.doExecute(PlatformComponent.java:1700)
+	at jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2.execute(PlatformComponent.java:1677)
 	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
 	at jadex.commons.concurrent.Executor.code(Executor.java:299)
 	at jadex.commons.concurrent.Executor.run(Executor.java:126)
@@ -579,152 +695,114 @@ jadex.commons.MultiException: caused by: TerminableProviderAgent@test-24
 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
 	at java.base/java.lang.Thread.run(Thread.java:834)
 
-Jan 26, 2021 8:03:37 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$12 run
+Jan 26, 2021 9:30:59 AM test-24 jadex.bridge.service.types.cms.SComponentManagementService$12 run
 INFO: Terminating component: test-24
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: async waiting for feature shutdown: TerminableProviderAgent@test-24 ExecutionFeature(TerminableProviderAgent@test-24)
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature execute
-SEVERE: execute()5: jadex.bridge.service.types.cms.PlatformComponent$3@22a68f77 100 active
-Jan 26, 2021 8:03:37 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
-SEVERE: execute()7: endstepcnt=13, ret=false, endagenda.isDone()=false
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature$1 customResultAvailable
-SEVERE: shutdown1: jadex.bridge.component.impl.ExecutionComponentFeature$1@6549c74e
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature$1 customResultAvailable
-SEVERE: shutdown2: jadex.bridge.component.impl.ExecutionComponentFeature$1@6549c74e
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$8 resultAvailable
-SEVERE: done waiting for feature shutdown: TerminableProviderAgent@test-24 ExecutionFeature(TerminableProviderAgent@test-24)
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@43f72baf, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7d0b7a58, jadex.bridge.component.impl.PropertiesComponentFeature@6872258e, jadex.bridge.service.component.RequiredServicesComponentFeature@141ee83d, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6ece1342]
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.bridge.component.impl.RemoteExecutionComponentFeature@6ece1342 done(sync)=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@43f72baf, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7d0b7a58, jadex.bridge.component.impl.PropertiesComponentFeature@6872258e, jadex.bridge.service.component.RequiredServicesComponentFeature@141ee83d]
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.bridge.service.component.RequiredServicesComponentFeature@141ee83d done(sync)=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@43f72baf, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7d0b7a58, jadex.bridge.component.impl.PropertiesComponentFeature@6872258e]
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.bridge.component.impl.PropertiesComponentFeature@6872258e done(sync)=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@43f72baf, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7d0b7a58]
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.bridge.component.impl.ArgumentsResultsComponentFeature@7d0b7a58 done(sync)=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, [jadex.bridge.component.impl.MonitoringComponentFeature@43f72baf]
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminableProviderAgent@test-24 jadex.bridge.component.impl.MonitoringComponentFeature@43f72baf done(sync)=true
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$3$1 proceed
-SEVERE: shutdown component features end: TerminableProviderAgent@test-24, null
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.PlatformComponent$3$1 proceed
-SEVERE: shutdown component features end4: TerminableProviderAgent@test-24, null
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService$12$2 resultAvailable
-INFO: Terminating component (result): TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService cleanup
-INFO: Terminated component: TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService$14 resultAvailable
-SEVERE: destryCompo finished: TerminableProviderAgent@test-24
-Jan 26, 2021 8:03:37 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
-SEVERE: execute()0: TerminableProviderAgent@test-24, null, endstepcnt=13, stepcnt=13
-Jan 26, 2021 8:03:37 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
-SEVERE: execute()1: TerminableProviderAgent@test-24, null, endstepcnt=13, stepcnt=13
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature execute
-SEVERE: execute()2: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, endstepcnt=13, stepcnt=13
-Jan 26, 2021 8:03:37 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature execute
-SEVERE: execute()3: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, endstepcnt=13, stepcnt=13, null
-Jan 26, 2021 8:03:37 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
-SEVERE: execute()7: endstepcnt=13, ret=false, endagenda.isDone()=true
-Jan 26, 2021 8:03:37 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler invoke
-SEVERE: ExternalAccessInvocationHandler.invoke(): TerminateIntermediateTestAgent@test-22, public abstract jadex.bridge.IComponentIdentifier jadex.bridge.IExternalAccess.getId(), null
-Jan 26, 2021 8:03:37 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$3 execute
-SEVERE: shutdown component features start: TerminateIntermediateTestAgent@test-22, null, [jadex.bridge.component.impl.MonitoringComponentFeature@19e3a25, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@2532225f, jadex.bridge.component.impl.PropertiesComponentFeature@4e4b770b, jadex.bridge.service.component.RequiredServicesComponentFeature@4bc34869, jadex.bridge.component.impl.RemoteExecutionComponentFeature@3b7c0c26, ExecutionFeature(TerminateIntermediateTestAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@f68f1cc, jadex.micro.features.impl.MicroMessageComponentFeature@1a8e2c05, jadex.micro.features.impl.MicroInjectionComponentFeature@4bdfaf3d, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@1019975c, jadex.bridge.component.impl.NFPropertyComponentFeature@58b7e202, jadex.bridge.component.impl.SubcomponentsComponentFeature@33320315, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@5a2e409, jadex.micro.features.impl.MicroLifecycleComponentFeature@59dd3096]
-Jan 26, 2021 8:03:37 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: TerminateIntermediateTestAgent@test-22, TerminateIntermediateTestAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@19e3a25, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@2532225f, jadex.bridge.component.impl.PropertiesComponentFeature@4e4b770b, jadex.bridge.service.component.RequiredServicesComponentFeature@4bc34869, jadex.bridge.component.impl.RemoteExecutionComponentFeature@3b7c0c26, ExecutionFeature(TerminateIntermediateTestAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@f68f1cc, jadex.micro.features.impl.MicroMessageComponentFeature@1a8e2c05, jadex.micro.features.impl.MicroInjectionComponentFeature@4bdfaf3d, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@1019975c, jadex.bridge.component.impl.NFPropertyComponentFeature@58b7e202, jadex.bridge.component.impl.SubcomponentsComponentFeature@33320315, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@5a2e409, jadex.micro.features.impl.MicroLifecycleComponentFeature@59dd3096]
-Jan 26, 2021 8:03:37 AM TerminateIntermediateTestAgent@test-22 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
+Jan 26, 2021 9:30:59 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$3 execute
+SEVERE: shutdown component features start: TerminateIntermediateTestAgent@test-22, null, [jadex.bridge.component.impl.MonitoringComponentFeature@7a87c08c, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@71bf69e3, jadex.bridge.component.impl.PropertiesComponentFeature@7d377955, jadex.bridge.service.component.RequiredServicesComponentFeature@bfd3fc3, jadex.bridge.component.impl.RemoteExecutionComponentFeature@4f3a0d90, ExecutionFeature(TerminateIntermediateTestAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@454095e5, jadex.micro.features.impl.MicroMessageComponentFeature@37bb1c9, jadex.micro.features.impl.MicroInjectionComponentFeature@611a8542, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@7e53427c, jadex.bridge.component.impl.SubcomponentsComponentFeature@3ffd0fee, jadex.bridge.component.impl.NFPropertyComponentFeature@61561421, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@5453addc, jadex.micro.features.impl.MicroLifecycleComponentFeature@30775588]
+Jan 26, 2021 9:30:59 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: TerminateIntermediateTestAgent@test-22, TerminateIntermediateTestAgent@test-22, [jadex.bridge.component.impl.MonitoringComponentFeature@7a87c08c, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@71bf69e3, jadex.bridge.component.impl.PropertiesComponentFeature@7d377955, jadex.bridge.service.component.RequiredServicesComponentFeature@bfd3fc3, jadex.bridge.component.impl.RemoteExecutionComponentFeature@4f3a0d90, ExecutionFeature(TerminateIntermediateTestAgent@test-22), jadex.micro.features.impl.MicroPojoComponentFeature@454095e5, jadex.micro.features.impl.MicroMessageComponentFeature@37bb1c9, jadex.micro.features.impl.MicroInjectionComponentFeature@611a8542, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@7e53427c, jadex.bridge.component.impl.SubcomponentsComponentFeature@3ffd0fee, jadex.bridge.component.impl.NFPropertyComponentFeature@61561421, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@5453addc, jadex.micro.features.impl.MicroLifecycleComponentFeature@30775588]
+Jan 26, 2021 9:30:59 AM TerminateIntermediateTestAgent@test-22 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
 SEVERE: lifecycle feature shutdown start: TerminateIntermediateTestAgent@test-22
-Jan 26, 2021 8:03:37 AM TerminateIntermediateTestAgent@test-22 jadex.micro.testcases.TestAgent cleanup
+Jan 26, 2021 9:30:59 AM TerminateIntermediateTestAgent@test-22 jadex.micro.testcases.TestAgent cleanup
 SEVERE: cleanup0
-Jan 26, 2021 8:03:37 AM TerminateIntermediateTestAgent@test-22 jadex.micro.testcases.TestAgent cleanup
+Jan 26, 2021 9:30:59 AM TerminateIntermediateTestAgent@test-22 jadex.micro.testcases.TestAgent cleanup
 SEVERE: cleanup1 killing platforms[test-24]
-Jan 26, 2021 8:03:37 AM TerminateIntermediateTestAgent@test-22 jadex.micro.testcases.TestAgent cleanup
+Jan 26, 2021 9:30:59 AM TerminateIntermediateTestAgent@test-22 jadex.micro.testcases.TestAgent cleanup
 SEVERE: cleanup4 started killing platforms
-Jan 26, 2021 8:03:37 AM TerminateIntermediateTestAgent@test-22 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
+Jan 26, 2021 9:30:59 AM TerminateIntermediateTestAgent@test-22 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
 SEVERE: lifecycle feature shutdown method invoked: TerminateIntermediateTestAgent@test-22 done=false
-Jan 26, 2021 8:03:37 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: TerminateIntermediateTestAgent@test-22 jadex.micro.features.impl.MicroLifecycleComponentFeature@59dd3096 done(sync)=false
-Jan 26, 2021 8:03:37 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: async waiting for feature shutdown: TerminateIntermediateTestAgent@test-22 jadex.micro.features.impl.MicroLifecycleComponentFeature@59dd3096
-Jan 26, 2021 8:03:38 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.micro.testcases.terminate.TerminableProviderAgent$4@30726fb0
-Jan 26, 2021 8:03:38 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@6328bc78
-Jan 26, 2021 8:03:38 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.micro.testcases.terminate.TerminableProviderAgent$4@72928ea1
-Jan 26, 2021 8:03:38 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@490eaedd
-Jan 26, 2021 8:03:45 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
+Jan 26, 2021 9:30:59 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: TerminateIntermediateTestAgent@test-22 jadex.micro.features.impl.MicroLifecycleComponentFeature@30775588 done(sync)=false
+Jan 26, 2021 9:30:59 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: async waiting for feature shutdown: TerminateIntermediateTestAgent@test-22 jadex.micro.features.impl.MicroLifecycleComponentFeature@30775588
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService$12$2 resultAvailable
+INFO: Terminating component (result): TerminableProviderAgent@test-24
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService cleanup
+INFO: Terminated component: TerminableProviderAgent@test-24
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.service.types.cms.SComponentManagementService$14 resultAvailable
+SEVERE: destryCompo finished: TerminableProviderAgent@test-24
+Jan 26, 2021 9:30:59 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
+SEVERE: execute()0: TerminableProviderAgent@test-24, null, endstepcnt=12, stepcnt=12
+Jan 26, 2021 9:30:59 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
+SEVERE: execute()1: TerminableProviderAgent@test-24, null, endstepcnt=12, stepcnt=12
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature execute
+SEVERE: execute()2: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, endstepcnt=12, stepcnt=12
+Jan 26, 2021 9:30:59 AM TerminableProviderAgent@test-24 jadex.bridge.component.impl.ExecutionComponentFeature execute
+SEVERE: execute()3: TerminableProviderAgent@test-24, TerminableProviderAgent@test-24, endstepcnt=12, stepcnt=12, null
+Jan 26, 2021 9:30:59 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
+SEVERE: execute()7: endstepcnt=12, ret=false, endagenda.isDone()=true
+Jan 26, 2021 9:31:00 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.micro.testcases.terminate.TerminableProviderAgent$4@66b47522
+Jan 26, 2021 9:31:00 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@5fb6068f
+Jan 26, 2021 9:31:00 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.micro.testcases.terminate.TerminableProviderAgent$4@1191c3c9
+Jan 26, 2021 9:31:00 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@507c00ca
+Jan 26, 2021 9:31:07 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
 INFO: Waiting query for network: test, ServiceQuery(servicetype=jadex.bridge.service.types.registry.ISuperpeerService, multiplicity=0..*, networknames=[test], scope=GLOBAL, owner=superpeerclient@test-24)
-Jan 26, 2021 8:03:45 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
+Jan 26, 2021 9:31:07 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
 INFO: Waiting query for network: ___GLOBAL___, ServiceQuery(servicetype=jadex.bridge.service.types.registry.ISuperpeerService, multiplicity=0..*, networknames=[test], scope=GLOBAL, owner=superpeerclient@test-24)
-Jan 26, 2021 8:03:45 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
+Jan 26, 2021 9:31:07 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
 INFO: Waiting query for network: ___GLOBAL___, ServiceQuery(servicetype=jadex.bridge.service.types.registry.ISuperpeerService, multiplicity=0..*, networknames=[___GLOBAL___], scope=GLOBAL, owner=superpeerclient@test-24)
-Jan 26, 2021 8:03:55 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
+Jan 26, 2021 9:31:17 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
 INFO: Waiting query for network: test, ServiceQuery(servicetype=jadex.bridge.service.types.registry.ISuperpeerService, multiplicity=0..*, networknames=[test], scope=GLOBAL, owner=superpeerclient@test-24)
-Jan 26, 2021 8:03:55 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
+Jan 26, 2021 9:31:17 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
 INFO: Waiting query for network: ___GLOBAL___, ServiceQuery(servicetype=jadex.bridge.service.types.registry.ISuperpeerService, multiplicity=0..*, networknames=[test], scope=GLOBAL, owner=superpeerclient@test-24)
-Jan 26, 2021 8:03:55 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
+Jan 26, 2021 9:31:17 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
 INFO: Waiting query for network: ___GLOBAL___, ServiceQuery(servicetype=jadex.bridge.service.types.registry.ISuperpeerService, multiplicity=0..*, networknames=[___GLOBAL___], scope=GLOBAL, owner=superpeerclient@test-24)
-Jan 26, 2021 8:04:02 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+Jan 26, 2021 9:31:25 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
 SEVERE: step aborted after termination: jadex.micro.testcases.terminate.TerminableProviderAgent$4@5d89e6a7
-Jan 26, 2021 8:04:02 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+Jan 26, 2021 9:31:25 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
 SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@57718dd7
-Jan 26, 2021 8:04:02 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+Jan 26, 2021 9:31:26 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
 SEVERE: step aborted after termination: jadex.micro.testcases.terminate.TerminableProviderAgent$4@5d696a
-Jan 26, 2021 8:04:02 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+Jan 26, 2021 9:31:26 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
 SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@78ef21b3
-Jan 26, 2021 8:04:03 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+Jan 26, 2021 9:31:26 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
 SEVERE: step aborted after termination: waitForDelay(TerminableProviderAgent@test-22)
-Jan 26, 2021 8:04:05 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
+Jan 26, 2021 9:31:27 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
 INFO: Waiting query for network: test, ServiceQuery(servicetype=jadex.bridge.service.types.registry.ISuperpeerService, multiplicity=0..*, networknames=[test], scope=GLOBAL, owner=superpeerclient@test-24)
-Jan 26, 2021 8:04:05 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
+Jan 26, 2021 9:31:27 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
 INFO: Waiting query for network: ___GLOBAL___, ServiceQuery(servicetype=jadex.bridge.service.types.registry.ISuperpeerService, multiplicity=0..*, networknames=[test], scope=GLOBAL, owner=superpeerclient@test-24)
-Jan 26, 2021 8:04:05 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
+Jan 26, 2021 9:31:27 AM superpeerclient@test-24 jadex.platform.service.registry.SuperpeerClientAgent$NetworkManager addWaitingQuery
 INFO: Waiting query for network: ___GLOBAL___, ServiceQuery(servicetype=jadex.bridge.service.types.registry.ISuperpeerService, multiplicity=0..*, networknames=[___GLOBAL___], scope=GLOBAL, owner=superpeerclient@test-24)
-Jan 26, 2021 8:04:06 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@2406ddfc
-Jan 26, 2021 8:04:06 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@2efeb68c
-Jan 26, 2021 8:04:07 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@7907e489
-Jan 26, 2021 8:04:07 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@14cd2f3
-Jan 26, 2021 8:04:07 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@4d365c27
-Jan 26, 2021 8:04:07 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@1a48fc31
-Jan 26, 2021 8:04:07 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@70350fa2
-Jan 26, 2021 8:04:07 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@73fafec4
-Jan 26, 2021 8:04:07 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@497d6d04
-Jan 26, 2021 8:04:07 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@32b6ae94
-Jan 26, 2021 8:04:07 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@68d0c8cb
-Jan 26, 2021 8:04:07 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@a1ce2ab
-Jan 26, 2021 8:04:07 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+Jan 26, 2021 9:31:28 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@7b0dfac1
+Jan 26, 2021 9:31:28 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@71f591b1
+Jan 26, 2021 9:31:29 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@20383e46
+Jan 26, 2021 9:31:29 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@582c5413
+Jan 26, 2021 9:31:29 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@35733077
+Jan 26, 2021 9:31:29 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@43283dca
+Jan 26, 2021 9:31:29 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@7ccaa438
+Jan 26, 2021 9:31:29 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@748b53ab
+Jan 26, 2021 9:31:29 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@3b8f1e94
+Jan 26, 2021 9:31:29 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@1cc7a501
+Jan 26, 2021 9:31:29 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@21d0a5f4
+Jan 26, 2021 9:31:29 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@4fd9b890
+Jan 26, 2021 9:31:29 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
 SEVERE: step aborted after termination: waitForDelay(TerminableProviderAgent@test-24)
-Jan 26, 2021 8:04:07 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@3bbedb64
-Jan 26, 2021 8:04:07 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
-SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@15a6f001
-Jan 26, 2021 8:04:07 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$3$2 resultAvailable
+Jan 26, 2021 9:31:29 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.PlatformComponent$3$2 resultAvailable
 SEVERE: shutdown component features timeout: TerminateIntermediateTestAgent@test-22
-Jan 26, 2021 8:04:07 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService$14 exceptionOccurred
+Jan 26, 2021 9:31:29 AM TerminateIntermediateTestAgent@test-22 jadex.bridge.service.types.cms.SComponentManagementService$14 exceptionOccurred
 SEVERE: destryCompo finished with ex: TerminateIntermediateTestAgent@test-22 jadex.commons.TimeoutException: Timeout during component cleanup: 30000
+Jan 26, 2021 9:31:29 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@19c92edd
+Jan 26, 2021 9:31:29 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
 jadex.commons.TimeoutException: Timeout during component cleanup: 30000
 	at jadex.bridge.service.types.cms.PlatformComponent$3$2.resultAvailable(PlatformComponent.java:359)
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@62d05ae3
 	at jadex.bridge.service.types.cms.PlatformComponent$3$2.resultAvailable(PlatformComponent.java:352)
 	at jadex.commons.future.Future$1.execute(Future.java:769)
 	at jadex.commons.future.Future$1.execute(Future.java:746)
@@ -743,5 +821,5 @@ jadex.commons.TimeoutException: Timeout during component cleanup: 30000
 	at java.base/java.lang.Thread.run(Thread.java:834)
 
 Wrap lines
-Generated by Gradle 6.5 at Jan 26, 2021, 8:05:23 AM
+Generated by Gradle 6.5 at Jan 26, 2021, 9:31:47 AM
 

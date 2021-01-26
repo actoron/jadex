@@ -845,24 +845,33 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 										
 										if(killfut!=null)
 										{
-											levelbar.addFuture(killfut);
+											// Copy future to filter out ComponentTerminatedException
+											Future<Map<String,Object>> killfut2 = new Future<Map<String,Object>>();
+											levelbar.addFuture(killfut2);
+											
 											killfut.addResultListener(new IResultListener<Map<String, Object>>()
 											{
 												public void exceptionOccurred(Exception exception)
 												{
 													// Ignore if already killed from outside during parent shutdown in progress
-													if(!(exception instanceof ComponentTerminatedException))
+													if(exception instanceof ComponentTerminatedException)
+													{
+														killfut2.setResult(null);
+													}
+													else
 													{
 														if(debug)
 														{
 															component.getLogger().severe("doKillComponents3: kill failed: " + inst+"\n"+SUtil.getExceptionStacktrace(exception));
 														}
 														exceptions.add(exception);
+														killfut2.setException(exception);
 													}
 												}
 												
 												public void resultAvailable(Map<String, Object> result)
 												{
+													killfut2.setResult(result);
 													if(debug)
 													{
 														component.getLogger().severe("doKillComponents4: kill succeedeed: " + inst);

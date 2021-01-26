@@ -13,7 +13,7 @@ failures
 
 ignored
 	
-30.570s
+30.876s
 
 duration
 	
@@ -26,138 +26,140 @@ successful
     Standard output
     Standard error
 
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
-SEVERE: destroy2: BlockingTimeoutTestAgent@test-27
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
-SEVERE: destroy3: BlockingTimeoutTestAgent@test-27
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent shutdown
-SEVERE: shutdown component features start: BlockingTimeoutTestAgent@test-27
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
-SEVERE: destroy4 (contains, locked, inited): BlockingTimeoutTestAgent@test-27 (false, false, true) BlockingTimeoutTestAgent@test-27
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-SEVERE: ExternalAccessInvocationHandler.doInvoke5: BlockingTimeoutTestAgent@test-27, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null: jadex.commons.future.Future@7f3f672
-Jan 25, 2021 5:50:35 PM jadex.base.test.impl.ComponentTestBase <init>
+Jan 26, 2021 8:22:24 AM jadex.base.test.impl.ComponentTestBase <init>
 SEVERE: Empty ComponentTest Constructor called
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
-SEVERE: ExternalAccessInvocationHandler.doInvoke6: BlockingTimeoutTestAgent@test-27, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null: jadex.commons.future.Future@7f3f672, done=false
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+SEVERE: destroy1: BlockingTimeoutTestAgent@test-27
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+SEVERE: destroy2: BlockingTimeoutTestAgent@test-27
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+SEVERE: destroy3: BlockingTimeoutTestAgent@test-27
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent shutdown
+SEVERE: shutdown component features start: BlockingTimeoutTestAgent@test-27
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+SEVERE: destroy4 (contains, locked, inited): BlockingTimeoutTestAgent@test-27 (false, false, true) BlockingTimeoutTestAgent@test-27
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+SEVERE: ExternalAccessInvocationHandler.doInvoke5: BlockingTimeoutTestAgent@test-27, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null: jadex.commons.future.Future@87946f0
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler doInvoke
+SEVERE: ExternalAccessInvocationHandler.doInvoke6: BlockingTimeoutTestAgent@test-27, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null: jadex.commons.future.Future@87946f0, done=false
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
 SEVERE: ExternalAccessInvocationHandler.doExecute2: BlockingTimeoutTestAgent@test-27, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null done=false
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
 SEVERE: ExternalAccessInvocationHandler.doExecute2a: BlockingTimeoutTestAgent@test-27, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null done=false
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
-SEVERE: ExternalAccessInvocationHandler.doExecute2b: BlockingTimeoutTestAgent@test-27, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null fut=jadex.commons.future.Future@7f3f672
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
+SEVERE: ExternalAccessInvocationHandler.doExecute2b: BlockingTimeoutTestAgent@test-27, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null fut=jadex.commons.future.Future@87946f0
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
 SEVERE: ExternalAccessInvocationHandler.doExecute2c: BlockingTimeoutTestAgent@test-27, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null done=false
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 doExecute
 SEVERE: ExternalAccessInvocationHandler.doExecute3: BlockingTimeoutTestAgent@test-27, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null done=false
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 execute
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2 execute
 SEVERE: ExternalAccessInvocationHandler.step1 end: BlockingTimeoutTestAgent@test-27, public abstract jadex.commons.future.IFuture jadex.bridge.component.IExternalExecutionFeature.killComponent(), null
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$3 execute
-SEVERE: shutdown component features start: BlockingTimeoutTestAgent@test-27, null, [jadex.bridge.component.impl.MonitoringComponentFeature@5da4370, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@1d0275df, jadex.bridge.component.impl.PropertiesComponentFeature@68330fe2, jadex.bridge.service.component.RequiredServicesComponentFeature@3d5a00fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6acc15e3, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@646e29e8, jadex.micro.features.impl.MicroMessageComponentFeature@14526698, jadex.micro.features.impl.MicroInjectionComponentFeature@7962f131, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@738b80f3, jadex.bridge.component.impl.SubcomponentsComponentFeature@663fc603, jadex.bridge.component.impl.NFPropertyComponentFeature@615e1afa, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@f5b9499, jadex.micro.features.impl.MicroLifecycleComponentFeature@20f80199]
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@5da4370, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@1d0275df, jadex.bridge.component.impl.PropertiesComponentFeature@68330fe2, jadex.bridge.service.component.RequiredServicesComponentFeature@3d5a00fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6acc15e3, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@646e29e8, jadex.micro.features.impl.MicroMessageComponentFeature@14526698, jadex.micro.features.impl.MicroInjectionComponentFeature@7962f131, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@738b80f3, jadex.bridge.component.impl.SubcomponentsComponentFeature@663fc603, jadex.bridge.component.impl.NFPropertyComponentFeature@615e1afa, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@f5b9499, jadex.micro.features.impl.MicroLifecycleComponentFeature@20f80199]
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$3 execute
+SEVERE: shutdown component features start: BlockingTimeoutTestAgent@test-27, null, [jadex.bridge.component.impl.MonitoringComponentFeature@99c3886, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@4b10b183, jadex.bridge.component.impl.PropertiesComponentFeature@37da45ee, jadex.bridge.service.component.RequiredServicesComponentFeature@3de6448e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@555603bc, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@1b843c3c, jadex.micro.features.impl.MicroMessageComponentFeature@7e94ff97, jadex.micro.features.impl.MicroInjectionComponentFeature@71d916ff, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@1477b09b, jadex.bridge.component.impl.NFPropertyComponentFeature@2e281bf5, jadex.bridge.component.impl.SubcomponentsComponentFeature@771921e0, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@4ecebf12, jadex.micro.features.impl.MicroLifecycleComponentFeature@67142d38]
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@99c3886, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@4b10b183, jadex.bridge.component.impl.PropertiesComponentFeature@37da45ee, jadex.bridge.service.component.RequiredServicesComponentFeature@3de6448e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@555603bc, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@1b843c3c, jadex.micro.features.impl.MicroMessageComponentFeature@7e94ff97, jadex.micro.features.impl.MicroInjectionComponentFeature@71d916ff, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@1477b09b, jadex.bridge.component.impl.NFPropertyComponentFeature@2e281bf5, jadex.bridge.component.impl.SubcomponentsComponentFeature@771921e0, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@4ecebf12, jadex.micro.features.impl.MicroLifecycleComponentFeature@67142d38]
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
 SEVERE: lifecycle feature shutdown start: BlockingTimeoutTestAgent@test-27
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroLifecycleComponentFeature shutdown
 SEVERE: lifecycle feature shutdown agent killed invoked: BlockingTimeoutTestAgent@test-27 done=true
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroLifecycleComponentFeature$1 resultAvailable
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroLifecycleComponentFeature$1 resultAvailable
 SEVERE: lifecycle feature shutdown end result: BlockingTimeoutTestAgent@test-27
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroLifecycleComponentFeature@20f80199 done(sync)=true
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@5da4370, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@1d0275df, jadex.bridge.component.impl.PropertiesComponentFeature@68330fe2, jadex.bridge.service.component.RequiredServicesComponentFeature@3d5a00fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6acc15e3, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@646e29e8, jadex.micro.features.impl.MicroMessageComponentFeature@14526698, jadex.micro.features.impl.MicroInjectionComponentFeature@7962f131, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@738b80f3, jadex.bridge.component.impl.SubcomponentsComponentFeature@663fc603, jadex.bridge.component.impl.NFPropertyComponentFeature@615e1afa, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@f5b9499]
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroServiceInjectionComponentFeature@f5b9499 done(sync)=true
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@5da4370, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@1d0275df, jadex.bridge.component.impl.PropertiesComponentFeature@68330fe2, jadex.bridge.service.component.RequiredServicesComponentFeature@3d5a00fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6acc15e3, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@646e29e8, jadex.micro.features.impl.MicroMessageComponentFeature@14526698, jadex.micro.features.impl.MicroInjectionComponentFeature@7962f131, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@738b80f3, jadex.bridge.component.impl.SubcomponentsComponentFeature@663fc603, jadex.bridge.component.impl.NFPropertyComponentFeature@615e1afa]
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.NFPropertyComponentFeature@615e1afa done(sync)=true
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@5da4370, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@1d0275df, jadex.bridge.component.impl.PropertiesComponentFeature@68330fe2, jadex.bridge.service.component.RequiredServicesComponentFeature@3d5a00fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6acc15e3, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@646e29e8, jadex.micro.features.impl.MicroMessageComponentFeature@14526698, jadex.micro.features.impl.MicroInjectionComponentFeature@7962f131, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@738b80f3, jadex.bridge.component.impl.SubcomponentsComponentFeature@663fc603]
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.SubcomponentsComponentFeature@663fc603 done(sync)=true
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@5da4370, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@1d0275df, jadex.bridge.component.impl.PropertiesComponentFeature@68330fe2, jadex.bridge.service.component.RequiredServicesComponentFeature@3d5a00fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6acc15e3, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@646e29e8, jadex.micro.features.impl.MicroMessageComponentFeature@14526698, jadex.micro.features.impl.MicroInjectionComponentFeature@7962f131, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@738b80f3]
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroProvidedServicesComponentFeature@738b80f3 done(sync)=true
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@5da4370, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@1d0275df, jadex.bridge.component.impl.PropertiesComponentFeature@68330fe2, jadex.bridge.service.component.RequiredServicesComponentFeature@3d5a00fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6acc15e3, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@646e29e8, jadex.micro.features.impl.MicroMessageComponentFeature@14526698, jadex.micro.features.impl.MicroInjectionComponentFeature@7962f131]
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroInjectionComponentFeature@7962f131 done(sync)=true
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@5da4370, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@1d0275df, jadex.bridge.component.impl.PropertiesComponentFeature@68330fe2, jadex.bridge.service.component.RequiredServicesComponentFeature@3d5a00fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6acc15e3, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@646e29e8, jadex.micro.features.impl.MicroMessageComponentFeature@14526698]
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroMessageComponentFeature@14526698 done(sync)=true
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@5da4370, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@1d0275df, jadex.bridge.component.impl.PropertiesComponentFeature@68330fe2, jadex.bridge.service.component.RequiredServicesComponentFeature@3d5a00fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6acc15e3, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@646e29e8]
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroPojoComponentFeature@646e29e8 done(sync)=true
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@5da4370, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@1d0275df, jadex.bridge.component.impl.PropertiesComponentFeature@68330fe2, jadex.bridge.service.component.RequiredServicesComponentFeature@3d5a00fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6acc15e3, ExecutionFeature(BlockingTimeoutTestAgent@test-27)]
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature shutdown
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroLifecycleComponentFeature@67142d38 done(sync)=true
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@99c3886, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@4b10b183, jadex.bridge.component.impl.PropertiesComponentFeature@37da45ee, jadex.bridge.service.component.RequiredServicesComponentFeature@3de6448e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@555603bc, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@1b843c3c, jadex.micro.features.impl.MicroMessageComponentFeature@7e94ff97, jadex.micro.features.impl.MicroInjectionComponentFeature@71d916ff, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@1477b09b, jadex.bridge.component.impl.NFPropertyComponentFeature@2e281bf5, jadex.bridge.component.impl.SubcomponentsComponentFeature@771921e0, jadex.micro.features.impl.MicroServiceInjectionComponentFeature@4ecebf12]
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroServiceInjectionComponentFeature@4ecebf12 done(sync)=true
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@99c3886, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@4b10b183, jadex.bridge.component.impl.PropertiesComponentFeature@37da45ee, jadex.bridge.service.component.RequiredServicesComponentFeature@3de6448e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@555603bc, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@1b843c3c, jadex.micro.features.impl.MicroMessageComponentFeature@7e94ff97, jadex.micro.features.impl.MicroInjectionComponentFeature@71d916ff, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@1477b09b, jadex.bridge.component.impl.NFPropertyComponentFeature@2e281bf5, jadex.bridge.component.impl.SubcomponentsComponentFeature@771921e0]
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.SubcomponentsComponentFeature@771921e0 done(sync)=true
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@99c3886, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@4b10b183, jadex.bridge.component.impl.PropertiesComponentFeature@37da45ee, jadex.bridge.service.component.RequiredServicesComponentFeature@3de6448e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@555603bc, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@1b843c3c, jadex.micro.features.impl.MicroMessageComponentFeature@7e94ff97, jadex.micro.features.impl.MicroInjectionComponentFeature@71d916ff, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@1477b09b, jadex.bridge.component.impl.NFPropertyComponentFeature@2e281bf5]
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.NFPropertyComponentFeature@2e281bf5 done(sync)=true
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@99c3886, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@4b10b183, jadex.bridge.component.impl.PropertiesComponentFeature@37da45ee, jadex.bridge.service.component.RequiredServicesComponentFeature@3de6448e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@555603bc, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@1b843c3c, jadex.micro.features.impl.MicroMessageComponentFeature@7e94ff97, jadex.micro.features.impl.MicroInjectionComponentFeature@71d916ff, jadex.micro.features.impl.MicroProvidedServicesComponentFeature@1477b09b]
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroProvidedServicesComponentFeature@1477b09b done(sync)=true
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@99c3886, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@4b10b183, jadex.bridge.component.impl.PropertiesComponentFeature@37da45ee, jadex.bridge.service.component.RequiredServicesComponentFeature@3de6448e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@555603bc, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@1b843c3c, jadex.micro.features.impl.MicroMessageComponentFeature@7e94ff97, jadex.micro.features.impl.MicroInjectionComponentFeature@71d916ff]
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroInjectionComponentFeature@71d916ff done(sync)=true
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@99c3886, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@4b10b183, jadex.bridge.component.impl.PropertiesComponentFeature@37da45ee, jadex.bridge.service.component.RequiredServicesComponentFeature@3de6448e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@555603bc, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@1b843c3c, jadex.micro.features.impl.MicroMessageComponentFeature@7e94ff97]
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroMessageComponentFeature@7e94ff97 done(sync)=true
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@99c3886, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@4b10b183, jadex.bridge.component.impl.PropertiesComponentFeature@37da45ee, jadex.bridge.service.component.RequiredServicesComponentFeature@3de6448e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@555603bc, ExecutionFeature(BlockingTimeoutTestAgent@test-27), jadex.micro.features.impl.MicroPojoComponentFeature@1b843c3c]
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.micro.features.impl.MicroPojoComponentFeature@1b843c3c done(sync)=true
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@99c3886, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@4b10b183, jadex.bridge.component.impl.PropertiesComponentFeature@37da45ee, jadex.bridge.service.component.RequiredServicesComponentFeature@3de6448e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@555603bc, ExecutionFeature(BlockingTimeoutTestAgent@test-27)]
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature shutdown
 SEVERE: shutdown0: ExecutionFeature(BlockingTimeoutTestAgent@test-27)
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
 SEVERE: wakeup0: ExecutionFeature(BlockingTimeoutTestAgent@test-27)
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
 SEVERE: wakeup2: ExecutionFeature(BlockingTimeoutTestAgent@test-27), SyncExecutionService(IExecutionService_#300@test-27)
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature wakeup
 SEVERE: wakeup4: ExecutionFeature(BlockingTimeoutTestAgent@test-27)
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
 SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 ExecutionFeature(BlockingTimeoutTestAgent@test-27) done(sync)=false
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
 SEVERE: async waiting for feature shutdown: BlockingTimeoutTestAgent@test-27 ExecutionFeature(BlockingTimeoutTestAgent@test-27)
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature execute
-SEVERE: execute()5: jadex.bridge.service.types.cms.PlatformComponent$3@611557e6 100 active
-Jan 25, 2021 5:50:35 PM jadex.bridge.component.impl.ExecutionComponentFeature execute
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature execute
+SEVERE: execute()5: jadex.bridge.service.types.cms.PlatformComponent$3@407a0de0 100 active
+Jan 26, 2021 8:22:24 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
 SEVERE: execute()7: endstepcnt=7, ret=false, endagenda.isDone()=false
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature$1 customResultAvailable
-SEVERE: shutdown1: jadex.bridge.component.impl.ExecutionComponentFeature$1@662368ca
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature$1 customResultAvailable
-SEVERE: shutdown2: jadex.bridge.component.impl.ExecutionComponentFeature$1@662368ca
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$8 resultAvailable
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature$1 customResultAvailable
+SEVERE: shutdown1: jadex.bridge.component.impl.ExecutionComponentFeature$1@3d364c22
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature$1 customResultAvailable
+SEVERE: shutdown2: jadex.bridge.component.impl.ExecutionComponentFeature$1@3d364c22
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$8 resultAvailable
 SEVERE: done waiting for feature shutdown: BlockingTimeoutTestAgent@test-27 ExecutionFeature(BlockingTimeoutTestAgent@test-27)
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@5da4370, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@1d0275df, jadex.bridge.component.impl.PropertiesComponentFeature@68330fe2, jadex.bridge.service.component.RequiredServicesComponentFeature@3d5a00fb, jadex.bridge.component.impl.RemoteExecutionComponentFeature@6acc15e3]
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.RemoteExecutionComponentFeature@6acc15e3 done(sync)=true
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@5da4370, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@1d0275df, jadex.bridge.component.impl.PropertiesComponentFeature@68330fe2, jadex.bridge.service.component.RequiredServicesComponentFeature@3d5a00fb]
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.bridge.service.component.RequiredServicesComponentFeature@3d5a00fb done(sync)=true
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@5da4370, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@1d0275df, jadex.bridge.component.impl.PropertiesComponentFeature@68330fe2]
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.PropertiesComponentFeature@68330fe2 done(sync)=true
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@5da4370, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@1d0275df]
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ArgumentsResultsComponentFeature@1d0275df done(sync)=true
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@5da4370]
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
-SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.MonitoringComponentFeature@5da4370 done(sync)=true
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$3$1 proceed
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@99c3886, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@4b10b183, jadex.bridge.component.impl.PropertiesComponentFeature@37da45ee, jadex.bridge.service.component.RequiredServicesComponentFeature@3de6448e, jadex.bridge.component.impl.RemoteExecutionComponentFeature@555603bc]
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.RemoteExecutionComponentFeature@555603bc done(sync)=true
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@99c3886, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@4b10b183, jadex.bridge.component.impl.PropertiesComponentFeature@37da45ee, jadex.bridge.service.component.RequiredServicesComponentFeature@3de6448e]
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.bridge.service.component.RequiredServicesComponentFeature@3de6448e done(sync)=true
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@99c3886, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@4b10b183, jadex.bridge.component.impl.PropertiesComponentFeature@37da45ee]
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.PropertiesComponentFeature@37da45ee done(sync)=true
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@99c3886, jadex.bridge.component.impl.ArgumentsResultsComponentFeature@4b10b183]
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ArgumentsResultsComponentFeature@4b10b183 done(sync)=true
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown start: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, [jadex.bridge.component.impl.MonitoringComponentFeature@99c3886]
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent executeShutdownOnFeatures
+SEVERE: feature shutdown called: BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.MonitoringComponentFeature@99c3886 done(sync)=true
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$3$1 proceed
 SEVERE: shutdown component features end: BlockingTimeoutTestAgent@test-27, null
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$3$1 proceed
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.PlatformComponent$3$1 proceed
 SEVERE: shutdown component features end4: BlockingTimeoutTestAgent@test-27, null
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.SComponentManagementService$14 resultAvailable
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.service.types.cms.SComponentManagementService$14 resultAvailable
 SEVERE: destryCompo finished: BlockingTimeoutTestAgent@test-27
-startScheduledNotifications0: Tuple[jadex.commons.future.Future@7f3f672, Heisenbugjadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2$1@1964983c, jadex.commons.future.Future$1@d4ac98e]
-startScheduledNotifications1: Tuple[jadex.commons.future.Future@7f3f672, Heisenbugjadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2$1@1964983c, jadex.commons.future.Future$1@d4ac98e]
-startScheduledNotifications0: Tuple[jadex.commons.future.SubscriptionIntermediateFuture@51b799ea, jadex.bridge.component.impl.ExecutionComponentFeature$8@76558d47, jadex.commons.future.IntermediateFuture$1@4f220184]
-startScheduledNotifications1: Tuple[jadex.commons.future.SubscriptionIntermediateFuture@51b799ea, jadex.bridge.component.impl.ExecutionComponentFeature$8@76558d47, jadex.commons.future.IntermediateFuture$1@4f220184]
-startScheduledNotifications0: Tuple[jadex.commons.future.SubscriptionIntermediateFuture@51b799ea, jadex.bridge.component.impl.ExecutionComponentFeature$8@76558d47, jadex.commons.future.IntermediateFuture$3@72bac524]
-startScheduledNotifications1: Tuple[jadex.commons.future.SubscriptionIntermediateFuture@51b799ea, jadex.bridge.component.impl.ExecutionComponentFeature$8@76558d47, jadex.commons.future.IntermediateFuture$3@72bac524]
-startScheduledNotifications0: Tuple[jadex.commons.future.Future@29e76444, jadex.commons.future.DelegationResultListener@4472c05b, jadex.commons.future.Future$1@1b83c770]
-startScheduledNotifications1: Tuple[jadex.commons.future.Future@29e76444, jadex.commons.future.DelegationResultListener@4472c05b, jadex.commons.future.Future$1@1b83c770]
-startScheduledNotifications0: Tuple[jadex.commons.future.Future@3f34a2c1, jadex.commons.future.DelegationResultListener@2d633427, jadex.commons.future.Future$1@7fc159c8]
-startScheduledNotifications1: Tuple[jadex.commons.future.Future@3f34a2c1, jadex.commons.future.DelegationResultListener@2d633427, jadex.commons.future.Future$1@7fc159c8]
-startScheduledNotifications0: Tuple[jadex.commons.future.Future@7afcb907, jadex.commons.future.DelegationResultListener@60c43e33, jadex.commons.future.Future$1@5432fc00]
-startScheduledNotifications1: Tuple[jadex.commons.future.Future@7afcb907, jadex.commons.future.DelegationResultListener@60c43e33, jadex.commons.future.Future$1@5432fc00]
-startScheduledNotifications0: Tuple[jadex.bridge.service.component.interceptors.DelegatingFuture@21c8e057, jadex.base.test.impl.ComponentTestBase$2$1@3e6341e8, jadex.commons.future.Future$1@7f17d5b1]
-startScheduledNotifications1: Tuple[jadex.bridge.service.component.interceptors.DelegatingFuture@21c8e057, jadex.base.test.impl.ComponentTestBase$2$1@3e6341e8, jadex.commons.future.Future$1@7f17d5b1]
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature execute
-SEVERE: execute()6: PlatformComponent.executeBodyOnFeatures() jadex.micro.features.impl.MicroLifecycleComponentFeature@20f80199 0 terminated
+startScheduledNotifications0: Tuple[jadex.commons.future.Future@87946f0, Heisenbugjadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2$1@4c548b84, jadex.commons.future.Future$1@77878679]
+startScheduledNotifications1: Tuple[jadex.commons.future.Future@87946f0, Heisenbugjadex.bridge.service.types.cms.PlatformComponent$ExternalAccessInvocationHandler$2$1@4c548b84, jadex.commons.future.Future$1@77878679]
+startScheduledNotifications0: Tuple[jadex.commons.future.SubscriptionIntermediateFuture@79ab2fa5, jadex.bridge.component.impl.ExecutionComponentFeature$8@256cacfa, jadex.commons.future.IntermediateFuture$1@1587973a]
+startScheduledNotifications1: Tuple[jadex.commons.future.SubscriptionIntermediateFuture@79ab2fa5, jadex.bridge.component.impl.ExecutionComponentFeature$8@256cacfa, jadex.commons.future.IntermediateFuture$1@1587973a]
+startScheduledNotifications0: Tuple[jadex.commons.future.SubscriptionIntermediateFuture@79ab2fa5, jadex.bridge.component.impl.ExecutionComponentFeature$8@256cacfa, jadex.commons.future.IntermediateFuture$3@7d6726a5]
+startScheduledNotifications1: Tuple[jadex.commons.future.SubscriptionIntermediateFuture@79ab2fa5, jadex.bridge.component.impl.ExecutionComponentFeature$8@256cacfa, jadex.commons.future.IntermediateFuture$3@7d6726a5]
+startScheduledNotifications0: Tuple[jadex.commons.future.Future@3618d33e, jadex.commons.future.DelegationResultListener@166e145f, jadex.commons.future.Future$1@3ff96fef]
+startScheduledNotifications1: Tuple[jadex.commons.future.Future@3618d33e, jadex.commons.future.DelegationResultListener@166e145f, jadex.commons.future.Future$1@3ff96fef]
+startScheduledNotifications0: Tuple[jadex.commons.future.Future@7bef24bb, jadex.commons.future.DelegationResultListener@b1e99db, jadex.commons.future.Future$1@6db4a80b]
+startScheduledNotifications1: Tuple[jadex.commons.future.Future@7bef24bb, jadex.commons.future.DelegationResultListener@b1e99db, jadex.commons.future.Future$1@6db4a80b]
+startScheduledNotifications0: Tuple[jadex.commons.future.Future@19462445, jadex.commons.future.DelegationResultListener@1b0e012a, jadex.commons.future.Future$1@64a193d1]
+startScheduledNotifications1: Tuple[jadex.commons.future.Future@19462445, jadex.commons.future.DelegationResultListener@1b0e012a, jadex.commons.future.Future$1@64a193d1]
+startScheduledNotifications0: Tuple[jadex.bridge.service.component.interceptors.DelegatingFuture@2c1d9bbe, jadex.base.test.impl.ComponentTestBase$2$1@4d1f674, jadex.commons.future.Future$1@6fbdb095]
+startScheduledNotifications1: Tuple[jadex.bridge.service.component.interceptors.DelegatingFuture@2c1d9bbe, jadex.base.test.impl.ComponentTestBase$2$1@4d1f674, jadex.commons.future.Future$1@6fbdb095]
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature execute
+SEVERE: execute()6: PlatformComponent.executeBodyOnFeatures() jadex.micro.features.impl.MicroLifecycleComponentFeature@67142d38 0 terminated
 jadex.bridge.StepAborted
 	at jadex.bridge.component.impl.ExecutionComponentFeature$1.customResultAvailable(ExecutionComponentFeature.java:193)
 	at jadex.bridge.component.impl.ExecutionComponentFeature$1.customResultAvailable(ExecutionComponentFeature.java:187)
@@ -177,50 +179,221 @@ jadex.bridge.StepAborted
 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
 	at java.base/java.lang.Thread.run(Thread.java:834)
 
-BlockingTimeoutTestAgent@test-27: step after termination: StepInfo(priority=0, step=PlatformComponent.executeBodyOnFeatures() jadex.micro.features.impl.MicroLifecycleComponentFeature@20f80199)
-Jan 25, 2021 5:50:35 PM jadex.bridge.component.impl.ExecutionComponentFeature execute
+BlockingTimeoutTestAgent@test-27: step after termination: StepInfo(priority=0, step=PlatformComponent.executeBodyOnFeatures() jadex.micro.features.impl.MicroLifecycleComponentFeature@67142d38)
+Jan 26, 2021 8:22:24 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
 SEVERE: execute()7: endstepcnt=7, ret=false, endagenda.isDone()=true
-Jan 25, 2021 5:50:35 PM jadex.bridge.component.impl.ExecutionComponentFeature execute
+Jan 26, 2021 8:22:24 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
 SEVERE: execute()0: BlockingTimeoutTestAgent@test-27, null, endstepcnt=7, stepcnt=7
-Jan 25, 2021 5:50:35 PM jadex.bridge.component.impl.ExecutionComponentFeature execute
+Jan 26, 2021 8:22:24 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
 SEVERE: execute()1: BlockingTimeoutTestAgent@test-27, null, endstepcnt=7, stepcnt=7
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature execute
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature execute
 SEVERE: execute()2: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, endstepcnt=7, stepcnt=7
-Jan 25, 2021 5:50:35 PM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature execute
+Jan 26, 2021 8:22:24 AM BlockingTimeoutTestAgent@test-27 jadex.bridge.component.impl.ExecutionComponentFeature execute
 SEVERE: execute()3: BlockingTimeoutTestAgent@test-27, BlockingTimeoutTestAgent@test-27, endstepcnt=7, stepcnt=7, null
-Jan 25, 2021 5:50:35 PM jadex.bridge.component.impl.ExecutionComponentFeature execute
+Jan 26, 2021 8:22:24 AM jadex.bridge.component.impl.ExecutionComponentFeature execute
 SEVERE: execute()7: endstepcnt=7, ret=false, endagenda.isDone()=true
-Jan 25, 2021 5:50:36 PM test-29 jadex.bridge.service.types.cms.PlatformComponent create
+Jan 26, 2021 8:22:25 AM test-29 jadex.bridge.service.types.cms.PlatformComponent create
 SEVERE: Enabled PlatformComponent debugging for SimpleBlockingTestAgent@test-29
-Jan 25, 2021 5:50:36 PM test-29 jadex.bridge.component.impl.ExecutionComponentFeature <init>
+Jan 26, 2021 8:22:25 AM test-29 jadex.bridge.component.impl.ExecutionComponentFeature <init>
 SEVERE: Enabled ExecutionComponentFeature debugging for SimpleBlockingTestAgent@test-29
-Jan 25, 2021 5:50:36 PM jadex.base.test.impl.ComponentTestBase <init>
+Jan 26, 2021 8:22:25 AM jadex.base.test.impl.ComponentTestBase <init>
 SEVERE: Empty ComponentTest Constructor called
-Jan 25, 2021 5:50:45 PM simulation@test-27 jadex.platform.service.simulation.SimulationService$2 execute
-SEVERE: Simulation blocker released after realtime timeout 30000.
-Jan 25, 2021 5:50:45 PM simulation@test-27 jadex.platform.service.simulation.SimulationService$2 execute
-SEVERE: Simulation blocker released after realtime timeout 30000.
-Jan 25, 2021 5:50:55 PM simulation@test-27 jadex.platform.service.simulation.SimulationService$2 execute
-SEVERE: Simulation blocker released after realtime timeout 30000.
-Jan 25, 2021 5:50:55 PM simulation@test-27 jadex.platform.service.simulation.SimulationService$2 execute
-SEVERE: Simulation blocker released after realtime timeout 30000.
-Jan 25, 2021 5:51:05 PM simulation@test-27 jadex.platform.service.simulation.SimulationService$2 execute
-SEVERE: Simulation blocker released after realtime timeout 30000.
-Jan 25, 2021 5:51:05 PM simulation@test-27 jadex.platform.service.simulation.SimulationService$2 execute
-SEVERE: Simulation blocker released after realtime timeout 30000.
-Jan 25, 2021 5:51:05 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+Jan 26, 2021 8:22:34 AM simulation@test-27 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor97.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 8:22:34 AM simulation@test-27 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor97.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 8:22:44 AM simulation@test-27 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor97.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 8:22:44 AM simulation@test-27 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor97.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 8:22:54 AM simulation@test-27 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor97.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 8:22:54 AM simulation@test-27 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor97.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 8:22:54 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
 SEVERE: step aborted after termination: waitForDelay(BlockingTimeoutTestAgent@test-27)
-Jan 25, 2021 5:51:06 PM simulation@test-29 jadex.platform.service.simulation.SimulationService$2 execute
-SEVERE: Simulation blocker released after realtime timeout 30000.
-Jan 25, 2021 5:51:06 PM simulation@test-29 jadex.platform.service.simulation.SimulationService$2 execute
-SEVERE: Simulation blocker released after realtime timeout 30000.
-Jan 25, 2021 5:51:06 PM simulation@test-29 jadex.platform.service.simulation.SimulationService$2 execute
-SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 26, 2021 8:22:55 AM simulation@test-29 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor97.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 8:22:55 AM simulation@test-29 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor97.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 8:22:55 AM simulation@test-29 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor97.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
 jadex.commons.TimeoutException: jadex.micro.testcases.blocking.SimpleBlockingTestAgent(jadex.micro.testcases.blocking.SimpleBlockingTestAgent) did not finish in 30000 ms.
 	at jadex.base.test.impl.ComponentTestBase$1.run(ComponentTestBase.java:112)
 	at java.base/java.util.TimerThread.mainLoop(Timer.java:556)
 	at java.base/java.util.TimerThread.run(Timer.java:506)
 
 Wrap lines
-Generated by Gradle 6.5 at Jan 25, 2021, 5:51:21 PM
+Generated by Gradle 6.5 at Jan 26, 2021, 8:24:56 AM
 
