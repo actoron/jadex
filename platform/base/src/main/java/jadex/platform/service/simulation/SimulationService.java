@@ -31,6 +31,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.DelegationResultListener;
@@ -474,6 +475,10 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 			}
 		});
 		
+		// Debug: todo remove
+		Exception	ex	= new TimeoutException("Simulation blocker released after realtime timeout " + frttimeout + ".");
+		ex.fillInStackTrace();
+		
 		access.waitForDelay(frttimeout, new ImmediateComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -481,8 +486,9 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 				if (!toblocker.isDone())
 				{
 					String	debug	= openfuts.get(toblocker);
-					access.getLogger().severe("Simulation blocker released after realtime timeout " + frttimeout + (debug!=null?", "+debug:"."));
-					toblocker.setExceptionIfUndone(new TimeoutException("Simulation blocker released after realtime timeout " + frttimeout + "."));
+					access.getLogger().severe("Simulation blocker released after realtime timeout " + frttimeout + (debug!=null?", "+debug:".")+"/n"+SUtil.getExceptionStacktrace(ex));
+//					Exception	ex	= new TimeoutException("Simulation blocker released after realtime timeout " + frttimeout + ".");
+					toblocker.setExceptionIfUndone(ex);
 				}
 				return IFuture.DONE;
 			}
