@@ -18,6 +18,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.interceptors.DecouplingInterceptor.InvokeMethodStep;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
@@ -478,6 +479,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 		// Debug: todo remove
 		Exception	ex	= new TimeoutException("Simulation blocker released after realtime timeout " + frttimeout + ".");
 		ex.fillInStackTrace();
+		String debug0	= InvokeMethodStep.DEBUG.get();	// Stack trace from caller thread, if other component
 		
 		access.waitForDelay(frttimeout, new ImmediateComponentStep<Void>()
 		{
@@ -486,7 +488,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 				if (!toblocker.isDone())
 				{
 					String	debug	= openfuts.get(toblocker);
-					access.getLogger().severe("Simulation blocker released after realtime timeout " + frttimeout + (debug!=null?", "+debug:".")+"/n"+SUtil.getExceptionStacktrace(ex));
+					access.getLogger().severe((debug!=null?debug+", ":"") + SUtil.getExceptionStacktrace(ex) + (debug0!=null?"\n caused by "+debug0:""));
 //					Exception	ex	= new TimeoutException("Simulation blocker released after realtime timeout " + frttimeout + ".");
 					toblocker.setExceptionIfUndone(ex);
 				}

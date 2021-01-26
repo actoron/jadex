@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
@@ -29,6 +30,7 @@ import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
+import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
@@ -611,6 +613,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	// Not anonymous class to avoid dependency to XML required for XMLClassname
 	public static class InvokeMethodStep implements IComponentStep<Void>
 	{
+		// For debugging simulation blocker heisenbug -> TODO: remove when fixed
+		protected static final Map<ServiceInvocationContext, String>	_DEBUG	= Collections.synchronizedMap(new WeakHashMap<>());
+		public static final ThreadLocal<String>	DEBUG	= new ThreadLocal<>();
+		
 		protected ServiceInvocationContext sic;
 
 		/**
@@ -619,6 +625,13 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		public InvokeMethodStep(ServiceInvocationContext sic)
 		{
 			this.sic = sic;
+			
+			if(sic.getMethod().getName().equals("addAdvanceBlocker"))
+			{
+				Exception 	e	= new RuntimeException("addAdvanceBlocker called");
+				e.fillInStackTrace();
+				_DEBUG.put(sic, SUtil.getExceptionStacktrace(e));
+			}
 		}
 
 		/**
@@ -633,12 +646,17 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			try
 			{
 //				sic.setObject(service);
+				DEBUG.set(_DEBUG.get(sic));
 				ret	= sic.invoke();
 			}
 			catch(Exception e)
 			{
 //				e.printStackTrace();
 				ret	= new Future<Void>(e);
+			}
+			finally
+			{
+				DEBUG.remove();
 			}
 			
 //			if(sic.getLastServiceCall()==null)
