@@ -476,7 +476,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 					@Override
 					public void resultAvailable(Void result)
 					{
-						component.getLogger().severe("Killing subcomponents5a locals done: "+component);
+						component.getLogger().severe("Killing subcomponents5a locals done: "+component+", "+exceptions);
 					}
 					@Override
 					public void exceptionOccurred(Exception exception)
@@ -490,6 +490,11 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			{
 				public void exceptionOccurred(Exception exception)
 				{
+					if(debug)
+					{
+						component.getLogger().severe("Killing subcomponents5c locals failed: "+component+"\n"+SUtil.getExceptionStacktrace(exception));
+					}
+
 					if(exception instanceof MultiException)
 						exceptions.addAll(Arrays.asList(((MultiException)exception).getCauses()));
 					else
@@ -690,13 +695,13 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			
 			if(debug)
 			{
-				component.getLogger().severe("killLocalComponents00: "+component+", "+cids);			
+				component.getLogger().severe("killLocalComponents00: "+component+", "+SUtil.arrayToString(cids));			
 			}
 		}
 		catch(Throwable e)
 		{
 			debug	= true;
-			component.getLogger().severe("killLocalComponents00a: "+component+", "+cids+"\n"+SUtil.getExceptionStacktrace(e));			
+			component.getLogger().severe("killLocalComponents00a: "+component+", "+SUtil.arrayToString(cids)+"\n"+SUtil.getExceptionStacktrace(e));			
 		}
 		
 		final IntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> ret = new IntermediateFuture<>(); 
@@ -734,6 +739,10 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 				
 				public void exceptionOccurred(Exception exception)
 				{
+					if(debug)
+					{
+						component.getLogger().severe("User kill failed: "+component+"\n"+SUtil.getExceptionStacktrace(exception));
+					}
 					ret.setException(exception);
 				}
 				
