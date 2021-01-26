@@ -671,35 +671,35 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	/** The future functionality. */
 	protected FutureFunctionality func;
 	
-//	//-------- debugging --------
-//	ISubscriptionIntermediateFuture<?> mysrc;
-//	List<Object>	myresults	= new ArrayList<>();
-//	@Override
-//	public String toString()
-//	{
-//		return super.toString() + "(storeforfirst="+storeforfirst+", listener="+(listener!=null)+", src="+mysrc+", results="+results+", ownresults="+ownresults+", myresults="+myresults+")";
-//	}
-//	@Override
-//	protected void	storeResult(Object result)
-//	{
-//		if(result instanceof IComponentIdentifier)
-//		{
-//			try
-//			{
-//				myresults.add(result);
-//				super.storeResult(result);
-//			}
-//			finally
-//			{
-////				System.err.println("storeResult: "+this+", "+result);
-//			}
-//		}
-//		else
-//		{
-//			super.storeResult(result);
-//		}
-//	}
-//	//-------- debugging end --------
+	//-------- debugging --------
+	ISubscriptionIntermediateFuture<?> mysrc;
+	List<Object>	myresults	= new ArrayList<>();
+	@Override
+	public String toString()
+	{
+		return super.toString() + "(storeforfirst="+storeforfirst+", listener="+(listener!=null)+", src="+mysrc+", results="+results+", ownresults="+ownresults+", myresults="+myresults+")";
+	}
+	@Override
+	protected void	storeResult(Object result)
+	{
+		if((""+result).contains("IMarkerService"))
+		{
+			try
+			{
+				myresults.add(result);
+				super.storeResult(result);
+			}
+			finally
+			{
+				Logger.getLogger(getClass().getName()).info("storeResult: "+this+", "+result+", "+IComponentIdentifier.LOCAL.get());
+			}
+		}
+		else
+		{
+			super.storeResult(result);
+		}
+	}
+	//-------- debugging end --------
 
 	
 	/**
@@ -758,7 +758,10 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	@Override
 	protected boolean	doAddIntermediateResult(Object result, boolean undone)
 	{
-//		System.err.println("add: "+this+", "+result);
+		if((""+result).contains("IMarkerService"))
+		{
+			Logger.getLogger(getClass().getName()).info("add: "+this+", "+result+", "+IComponentIdentifier.LOCAL.get());
+		}
 		try
 		{
 			result = func.handleIntermediateResult(result);
