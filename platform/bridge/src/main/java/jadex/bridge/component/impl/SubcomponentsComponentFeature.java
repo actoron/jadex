@@ -841,11 +841,15 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 											{
 												public void exceptionOccurred(Exception exception)
 												{
-													if(debug)
+													// Ignore if already killed from outside during parent shutdown in progress
+													if(!(exception instanceof ComponentTerminatedException))
 													{
-														component.getLogger().severe("doKillComponents3: kill failed: " + inst+"\n"+SUtil.getExceptionStacktrace(exception));
+														if(debug)
+														{
+															component.getLogger().severe("doKillComponents3: kill failed: " + inst+"\n"+SUtil.getExceptionStacktrace(exception));
+														}
+														exceptions.add(exception);
 													}
-													exceptions.add(exception);
 												}
 												
 												public void resultAvailable(Map<String, Object> result)

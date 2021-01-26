@@ -123,6 +123,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		// Confirmed broken (heisenbug!) 
 		_BROKEN.add("jadex.micro.testcases.blocking.BlockingTimeoutTestAgent");
 		_BROKEN.add("jadex.micro.testcases.blocking.SimpleBlockingTestAgent");
+		_BROKEN.add("jadex.micro.testcases.nflatency.NFLatencyTestAgent");
 		
 		// Todo: are these still broken?
 		_BROKEN.add("jadex.micro.testcases.nfcallreturn.NFCallReturnTestAgent");

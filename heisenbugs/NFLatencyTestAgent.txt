@@ -1,0 +1,116 @@
+
+Class jadex.micro.testcases.nflatency.NFLatencyTestAgent
+all > jadex.micro.testcases.nflatency > NFLatencyTestAgent
+1
+
+tests
+	
+1
+
+failures
+	
+0
+
+ignored
+	
+2m4.53s
+
+duration
+	
+0%
+
+successful
+
+    Failed tests
+    Tests
+    Standard output
+    Standard error
+
+Jan 25, 2021 5:40:29 PM jadex.base.test.impl.ComponentTestBase <init>
+SEVERE: Empty ComponentTest Constructor called
+Jan 25, 2021 5:40:30 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.micro.testcases.terminate.TerminableProviderAgent$2@1bb2c648
+Jan 25, 2021 5:40:30 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@6f933e5c
+Jan 25, 2021 5:40:30 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.micro.testcases.terminate.TerminableProviderAgent$2@2d01697
+Jan 25, 2021 5:40:30 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@5c859a34
+Jan 25, 2021 5:40:34 PM jadex.base.test.impl.ComponentTestLazyPlatform setPlatform
+INFO: using timeout: 120000
+Jan 25, 2021 5:40:34 PM jadex.base.test.impl.ComponentTestBase <init>
+SEVERE: Empty ComponentTest Constructor called
+Jan 25, 2021 5:40:59 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@419e484
+Jan 25, 2021 5:40:59 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@6aebf91b
+Jan 25, 2021 5:40:59 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@4e1ede7
+Jan 25, 2021 5:40:59 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@391a9d0b
+Jan 25, 2021 5:40:59 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@45151028
+Jan 25, 2021 5:40:59 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@401b4d4a
+Jan 25, 2021 5:40:59 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@61281471
+Jan 25, 2021 5:40:59 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@75305b13
+Jan 25, 2021 5:40:59 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: waitForDelay(TerminableProviderAgent@test-2)
+Jan 25, 2021 5:40:59 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@1762b905
+Jan 25, 2021 5:40:59 PM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@66f1c3b1
+Jan 25, 2021 5:41:04 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:41:04 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:41:04 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:41:05 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:41:13 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:41:13 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:41:23 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:41:23 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:41:33 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:41:34 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:41:43 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:41:44 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:41:53 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:41:54 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:42:03 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:42:04 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:42:13 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:42:14 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:42:23 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:42:24 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:42:33 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+Jan 25, 2021 5:42:34 PM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000.
+jadex.commons.TimeoutException: jadex.micro.testcases.nflatency.NFLatencyTestAgent(jadex.micro.testcases.nflatency.NFLatencyTestAgent) did not finish in 120000 ms.
+	at jadex.base.test.impl.ComponentTestBase$1.run(ComponentTestBase.java:112)
+	at java.base/java.util.TimerThread.mainLoop(Timer.java:556)
+	at java.base/java.util.TimerThread.run(Timer.java:506)
+
+Wrap lines
+Generated by Gradle 6.5 at Jan 25, 2021, 5:42:37 PM
+
