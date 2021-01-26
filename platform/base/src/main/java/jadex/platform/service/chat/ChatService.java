@@ -200,12 +200,8 @@ public class ChatService implements IChatService, IChatGuiService
 	@OnEnd
 	public IFuture<Void> shutdown()
 	{
-		try {
-		agent.getLogger().severe("shutdown0 "+agent);
-		
 		if(!running)
 		{
-			agent.getLogger().severe("shutdownO1 "+agent);
 			return IFuture.DONE;
 		}
 		else
@@ -221,7 +217,7 @@ public class ChatService implements IChatService, IChatGuiService
 				}
 			}
 			
-			agent.getLogger().severe("shutdown1 publish state dead: "+agent);
+//			agent.getLogger().severe("shutdown1 publish state dead: "+agent);
 			final Future<Void> done	= new Future<Void>();
 			IIntermediateFuture<IChatService>	chatfut	= agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
 			chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
@@ -232,17 +228,16 @@ public class ChatService implements IChatService, IChatGuiService
 				}
 				public void finished()
 				{
-					agent.getLogger().severe("shutdown1a publish state dead: "+agent);
+//					agent.getLogger().severe("shutdown1a publish state dead: "+agent);
 					done.setResultIfUndone(null);
 				}
 				public void exceptionOccurred(Exception exception)
 				{
-					agent.getLogger().severe("shutdown1b publish state dead: "+agent+"\n"+SUtil.getExceptionStacktrace(exception));
+//					agent.getLogger().severe("shutdown1b publish state dead: "+agent+"\n"+SUtil.getExceptionStacktrace(exception));
 					done.setResultIfUndone(null);
 				}
 			});
 			
-			agent.getLogger().severe("shutdown2 deregister properties: "+agent);
 			agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, ServiceScope.PLATFORM))
 				.addResultListener(new IResultListener<ISettingsService>()
 			{
@@ -253,27 +248,17 @@ public class ChatService implements IChatService, IChatGuiService
 						(!(agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave") instanceof Boolean)
 						|| !((Boolean)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave")).booleanValue()))
 					{
-						agent.getLogger().severe("shutdown2a deregister properties: "+agent);
 						settings.deregisterPropertiesProvider(getSubname())
 							.addResultListener(new DelegationResultListener<Void>(ret)
 						{
 							public void customResultAvailable(Void result)
 							{
-								agent.getLogger().severe("shutdown2a1 deregister properties: "+agent);
 								proceed();
-							}
-							
-							@Override
-							public void exceptionOccurred(Exception exception)
-							{
-								agent.getLogger().severe("shutdown2ab deregister properties: "+agent+"\n"+SUtil.getExceptionStacktrace(exception));
-								super.exceptionOccurred(exception);
 							}
 						});
 					}
 					else
 					{
-						agent.getLogger().severe("shutdown2b deregister properties: "+agent);
 						proceed();
 					}
 				}
@@ -281,7 +266,6 @@ public class ChatService implements IChatService, IChatGuiService
 				public void exceptionOccurred(Exception exception)
 				{
 					// No settings service: ignore.
-					agent.getLogger().severe("shutdown2c deregister properties: "+agent);
 					proceed();
 				}
 				
@@ -295,7 +279,6 @@ public class ChatService implements IChatService, IChatGuiService
 						@Override
 						public void run()
 						{
-							agent.getLogger().severe("shutdown1c publish state dead: "+agent);
 							done.setResultIfUndone(null);
 						}
 					}, 2000);
@@ -307,19 +290,14 @@ public class ChatService implements IChatService, IChatGuiService
 //					{
 //						public void exceptionOccurred(Exception exception)
 //						{
+//							agent.getLogger().severe("shutdown1c publish state dead: "+agent);
 //							super.resultAvailable(null);
 //						}
 //					}));
 				}
 			});
 			
-			agent.getLogger().severe("shutdownO2 "+agent);
 			return ret;
-		}
-		
-		} catch(Throwable t) {
-			agent.getLogger().severe("shutdownO3 "+agent+"\n"+SUtil.getExceptionStacktrace(t));
-			throw SUtil.throwUnchecked(t);
 		}
 	}
 
