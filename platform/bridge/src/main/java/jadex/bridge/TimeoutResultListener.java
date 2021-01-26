@@ -1,19 +1,17 @@
 package jadex.bridge;
 
+import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
-import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.DebugException;
 import jadex.commons.TimeoutException;
-import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ExceptionResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IForwardCommandFuture;
 import jadex.commons.future.IFuture;
@@ -26,6 +24,7 @@ import jadex.commons.future.IUndoneResultListener;
  *  Listener that allows to automatically trigger a timeout when
  *  no result (or exception) was received after some timeout interval.
  */
+// TODO: does not work reliably during shutdown (cf. chat service status publish 2 sec timeout)
 public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResultListener<E>, IFutureCommandResultListener<E>
 {
 	//-------- attributes --------
@@ -194,135 +193,103 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 	protected synchronized void initTimer()
 	{
 		// Initialize timeout
-		final Object mon = this;
 		final Exception ex	= Future.DEBUG ? new DebugException() : null;
 		
 		exta.scheduleStep(new ImmediateComponentStep<Void>()
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				IClockService clock	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class).setMultiplicity(Multiplicity.ZERO_ONE));
-				if(clock!=null)
-				{
-					((IService)clock).isValid().addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Boolean>()
-					{
-						public void resultAvailable(Boolean valid)
-						{
-							if(!valid.booleanValue())
-							{
-//										System.out.println("invalid clock");
-								return;
-							}
-							
-							try
-							{
-								final Runnable notify = new Runnable()
-								{
-									public void run()
-									{
-										boolean notify = false;
-										synchronized(TimeoutResultListener.this)
-										{
-											if(!notified)
-											{
-												notify = true;
-												notified = true;
-											}
-										}
-										if(notify)
-										{
-											exta.scheduleStep(new IComponentStep<Void>()
-											{
-												public IFuture<Void> execute(IInternalAccess ia)
-												{
-													TimeoutException te	= new TimeoutException("Timeout was: "+timeout+(realtime?" (realtime) ":" ")+message+(Future.DEBUG ? "" : ". Use PlatformConfiguration.getExtendedPlatformConfiguration().setDebugFutures(true) for timeout cause."), ex);
-													timeoutOccurred(te);
-													return IFuture.DONE;
-												}
-											});
-										}
-									}
-								};
-								
-		//						synchronized(TimeoutResultListener.this)
-								synchronized(mon)
-								{
-									// Do not create new timer if already notified
-									if(timeout>0 && !notified)
-									{
-										cancel();
-										if(realtime)
-										{
-											// each timer creates a thread!
-											
-//													System.out.println("create timer");
-//													Timer t = new Timer();
-//													TimerTask tt = new TimerTask()
-//													{
-//														public void run()
-//														{
-//															notify.run();
-//														}
-//													};
-//													timer = tt;
-//													t.schedule(tt, timeout);
-											
-											timer = clock.createRealtimeTimer(timeout, new ITimedObject()
-											{
-//														Object	timer1	= timer;
-												public void timeEventOccurred(long currenttime)
-												{
-//															if(timer!=timer1)
-//															{
-//																System.out.println("wrong timer: "+message);
-//															}
-													notify.run();
-												}
-
-												public String toString()
-												{
-													return super.toString()+": "+message;
-												}
-											});
-//													System.out.println("new real trl: "+message);
-										}
-										else
-										{
-											timer = clock.createTimer(timeout, new ITimedObject()
-											{
-//														Object	timer1	= timer;
-												public void timeEventOccurred(long currenttime)
-												{
-//															if(timer!=timer1)
-//															{
-//																System.out.println("wrong timer: "+message);
-//															}
-													notify.run();
-												}
-												
-												public String toString()
-												{
-													return super.toString()+": "+message;
-												}
-											});
-//													System.out.println("new clock trl: "+message);
-										}
-									}
-								}
-							}
-							catch(IllegalStateException e)
-							{
-//										e.printStackTrace();
-								// todo: should not happen
-								// causes null pointer exception on clock when clock is uninitialized
-							}
-						}
-					}));
-				}
+				IClockService clock	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 				
+				synchronized(TimeoutResultListener.this)
+				{
+					// Do not create new timer if already notified
+					if(timeout>0 && !notified)
+					{
+						cancel();
+						if(realtime)
+						{
+							timer = clock.createRealtimeTimer(timeout, new ITimedObject()
+							{
+								public void timeEventOccurred(long currenttime)
+								{
+									createTimerTask(ex).run();
+								}
+
+								public String toString()
+								{
+									return super.toString()+": "+message;
+								}
+							});
+						}
+						else
+						{
+							timer = clock.createTimer(timeout, new ITimedObject()
+							{
+								public void timeEventOccurred(long currenttime)
+								{
+									createTimerTask(ex).run();
+								}
+								
+								public String toString()
+								{
+									return super.toString()+": "+message;
+								}
+							});
+						}
+					}
+				}
 				return IFuture.DONE;
 			}
+		}).addResultListener(new ExceptionResultListener<Void>()
+		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				// When platform timer cannot be inited use java timer for realtime, but fail on sim time
+				if(realtime)
+				{
+					TimerTask	notify	= createTimerTask(ex);
+					new Timer(true).schedule(notify, timeout);
+					timer	= notify;
+				}
+				else
+				{
+					TimeoutResultListener.this.exceptionOccurred(exception);
+				}
+			}
 		});
+	}
+
+	protected TimerTask createTimerTask(final Exception debug)
+	{
+		return new TimerTask()
+		{
+			public void run()
+			{
+				boolean notify = false;
+				synchronized(TimeoutResultListener.this)
+				{
+					if(!notified)
+					{
+						notify = true;
+						notified = true;
+					}
+				}
+				if(notify)
+				{
+					exta.scheduleStep(new IComponentStep<Void>()
+					{
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							TimeoutException te	= new TimeoutException("Timeout was: "+timeout+(realtime?" (realtime) ":" ")+message+(Future.DEBUG ? "" : ". Use PlatformConfiguration.getExtendedPlatformConfiguration().setDebugFutures(true) for timeout cause."), debug);
+							timeoutOccurred(te);
+							return IFuture.DONE;
+						}
+					});
+				}
+			}
+		};
 	}
 	
 	/**
