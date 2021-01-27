@@ -93,11 +93,21 @@ public class GenerateService implements IGenerateService
 	//-------- methods --------
 	
 	/**
+	 *  Calculate and display the default image from current settings.
+	 */
+	public IFuture<Void> calcDefaultImage()
+	{
+		panel.calcDefaultImage();
+		return IFuture.DONE;
+	}
+	
+	/**
 	 *  Generate a specific area using a defined x and y size.
 	 */
 	public IFuture<AreaData> generateArea(final AreaData data)
 	{
 		GenerateAgent ga = (GenerateAgent)agent.getFeature(IPojoComponentFeature.class).getPojoAgent();
+		
 		if(ga.getCalculateService()==null)
 			return new Future<AreaData>(new RuntimeException("No calculate service available"));
 		
@@ -179,9 +189,6 @@ public class GenerateService implements IGenerateService
 			
 			public void intermediateResultAvailable(AreaData ad)
 			{
-				if(ad.fetchData()==null)
-					System.out.println("ad null");
-				
 				int xs = ad.getXOffset();
 				int ys = ad.getYOffset();
 				

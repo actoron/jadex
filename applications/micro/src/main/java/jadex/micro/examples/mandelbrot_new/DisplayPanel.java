@@ -18,7 +18,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -100,23 +99,24 @@ public class DisplayPanel extends JComponent
 		this.agent	= agent;
 		this.displayid = ""+UUID.randomUUID();
 		
-		boolean[] dsinit = new boolean[1];
+		boolean[] init = new boolean[2];
 		agent.addQuery(new ServiceQuery<IDisplayService>(IDisplayService.class)).next(ds ->
 		{
-			dsinit[0] = true;
+			init[0] = true;
 			displayServiceAvailable(ds);
-			if(genservice!=null)
-				calcDefaultImage();
+			//if(init[0] && init[1])
+			//	calcDefaultImage();
 		});
 		
 		agent.addQuery(new ServiceQuery<IGenerateService>(IGenerateService.class)).next(gs ->
 		{
+			init[1] = true;
 			this.genservice = gs;
-			if(dsinit[0])
-				calcDefaultImage();
+			//if(init[0] && init[1])
+			//	calcDefaultImage();
 		});
 		
-		Timer timer = new Timer(33, a ->
+		Timer timer = new Timer(10, a ->
 		{
 			if(dirty)
 			{

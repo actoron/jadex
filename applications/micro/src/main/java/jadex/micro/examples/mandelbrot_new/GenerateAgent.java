@@ -1,5 +1,6 @@
 package jadex.micro.examples.mandelbrot_new;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.ServiceScope;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
@@ -23,13 +24,28 @@ import jadex.micro.annotation.RequiredServices;
 @Agent
 public class GenerateAgent
 {
+	@Agent
+	protected IInternalAccess agent;
+	
 	protected ICalculateService calcservice;
+	protected IDisplayService displayservice;
 	
 	@OnService(name="calculateservice")
-	protected void setCalculateService(ICalculateService cs)
+	protected void calculateServiceAvailable(ICalculateService cs)
 	{
-		System.out.println("Found ICalculate service: "+cs);
+		//System.out.println("Found calculate service: "+cs);
 		this.calcservice = cs;
+		if(displayservice!=null)
+			agent.getLocalService(IGenerateService.class).calcDefaultImage();
+	}
+	
+	@OnService(name="displayservice")
+	protected void displayServiceAvailable(IDisplayService ds)
+	{
+		//System.out.println("Found display service: "+cs);
+		this.displayservice = ds;
+		if(calcservice!=null)
+			agent.getLocalService(IGenerateService.class).calcDefaultImage();
 	}
 
 	/**
