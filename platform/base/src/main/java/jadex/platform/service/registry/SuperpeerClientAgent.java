@@ -184,6 +184,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	 */
 	public <T> ITerminableFuture<IServiceIdentifier> searchService(ServiceQuery<T> query)
 	{
+		if(query.getServiceType()!=null && query.getServiceType().toString().indexOf("Calc")!=-1)
+			System.out.println("calc");
 		TerminableFuture<IServiceIdentifier>	ret	= new TerminableFuture<>();
 		AtomicInteger	track	= new AtomicInteger(1);
 		boolean	foundsuperpeer	= false;
@@ -267,7 +269,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		{
 			ret.setExceptionIfUndone(new ServiceNotFoundException(query.toString()));
 		}
-
+		
 		return ret;
 	}
 	

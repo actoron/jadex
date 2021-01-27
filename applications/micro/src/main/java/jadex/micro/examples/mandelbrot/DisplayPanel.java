@@ -67,7 +67,7 @@ public class DisplayPanel extends JComponent
 	protected IExternalAccess agent;
 	
 	/** The colors for drawing. */
-	protected Color[]	colors;
+	protected Color[] colors;
 	
 	/** The latest area data used for determining original coordinates of painted regions. */
 	protected AreaData	data;
@@ -82,10 +82,10 @@ public class DisplayPanel extends JComponent
 	protected Rectangle	range;
 	
 	/** Flag indicating that a calculation is in progress. */
-	protected boolean	calculating;
+	protected boolean calculating;
 	
 	/** Progress data objects, available only when calculating (progress data -> percent finished). */
-	protected Map	progressdata;
+	protected Map<ProgressData, Integer> progressdata;
 	
 	/** Progress update timer. */
 	protected Timer	progressupdate;
@@ -148,7 +148,7 @@ public class DisplayPanel extends JComponent
 			
 			public void intermediateResultAvailable(Object result)
 			{
-//						System.out.println("rec: "+result.getClass());
+//				System.out.println("rec: "+result.getClass());
 				if(result instanceof AreaData)
 				{
 					setResults((AreaData)result);
@@ -339,9 +339,20 @@ public class DisplayPanel extends JComponent
 			public void run()
 			{
 				short[][]	results	= data.fetchData();
+				
+				/*for(int y=0; y<results.length; y++)
+				{
+					for(int x=0; x<results[y].length; x++)
+					{
+						System.out.print(results[x][y]+"-");
+					}
+					System.out.println();
+				}*/
+				
 				DisplayPanel.this.data	= data;
 				DisplayPanel.this.image	= createImage(results.length, results[0].length);
-				Graphics	g	= image.getGraphics();
+				Graphics g = image.getGraphics();
+				
 				for(int x=0; x<results.length; x++)
 				{
 					for(int y=0; y<results[x].length; y++)
@@ -389,7 +400,7 @@ public class DisplayPanel extends JComponent
 			public void run()
 			{
 				if(progressdata==null)
-					progressdata	= new HashMap();
+					progressdata = new HashMap<ProgressData, Integer>();
 				
 				Integer	percent	= (Integer)progressdata.remove(progress);
 				if(percent==null || progress.isFinished())
@@ -401,7 +412,7 @@ public class DisplayPanel extends JComponent
 				
 				if(progressupdate==null)
 				{
-					progressupdate	= new Timer(1000, new ActionListener()
+					progressupdate = new Timer(1000, new ActionListener()
 					{
 						public void actionPerformed(ActionEvent e)
 						{
@@ -412,13 +423,12 @@ public class DisplayPanel extends JComponent
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										// do not depend on hosting component!
-//										IFuture<IComponentManagementService>	fut	= ia.getServiceContainer().getService("cmsservice");
 										if(progressdata!=null)
 										{
-											Object[]	pds	= progressdata.keySet().toArray();
+											Object[] pds = progressdata.keySet().toArray();
 											for(int i=0; i<pds.length; i++)
 											{
-												final ProgressData	progress	= (ProgressData)pds[i];
+												final ProgressData	progress = (ProgressData)pds[i];
 												if(!progress.isFinished())
 												{
 													ia.getExternalAccessAsync(progress.getProviderId())
@@ -428,7 +438,7 @@ public class DisplayPanel extends JComponent
 														{
 															// It is not really possible to define the progress services as required service.
 															// Needs component specific progress service.
-															ea.searchService( new ServiceQuery<>( IProgressService.class))
+															ea.searchService(new ServiceQuery<>(IProgressService.class))
 																.addResultListener(new SwingResultListener<IProgressService>(new IResultListener<IProgressService>()
 															{
 																public void resultAvailable(IProgressService	ps)
@@ -568,6 +578,7 @@ public class DisplayPanel extends JComponent
 				g.setClip(bounds.x+drawarea.x, bounds.y+drawarea.y, drawarea.width, drawarea.height);
 				int	xoff	= enddrag.x-startdrag.x;
 				int	yoff	= enddrag.y-startdrag.y;
+				
 				g.drawImage(image, bounds.x+drawarea.x+xoff, bounds.y+drawarea.y+yoff,
 					bounds.x+drawarea.x+xoff+drawarea.width, bounds.y+drawarea.y+yoff+drawarea.height,
 					ix, iy, ix+iwidth, iy+iheight, this);
@@ -583,10 +594,10 @@ public class DisplayPanel extends JComponent
 			// Draw progress boxes.
 			if(progressdata!=null)
 			{
-				JProgressBar	bar	= new JProgressBar(0, 100);
+				JProgressBar bar	= new JProgressBar(0, 100);
 				bar.setStringPainted(true);
 				Dimension	barsize	= bar.getPreferredSize();
-				for(Iterator it=progressdata.keySet().iterator(); it.hasNext(); )
+				for(Iterator<ProgressData> it=progressdata.keySet().iterator(); it.hasNext(); )
 				{
 					ProgressData	progress	= (ProgressData)it.next();
 					
@@ -608,13 +619,13 @@ public class DisplayPanel extends JComponent
 					// Print provider name.
 					if(progress.getProviderId()!=null)
 					{
-						String	name	= progress.getProviderId().toString();
-						String	provider	= "";
-						int index	=	name.indexOf('@');
+						String name = progress.getProviderId().toString();
+						String provider	= "";
+						int index =	name.indexOf('@');
 						if(index!=-1)
 						{
-							provider	= name.substring(index+1);
-							name	= name.substring(0, index);
+							provider = name.substring(index+1);
+							name = name.substring(0, index);
 						}
 //						provider	= progress.getTaskId().toString();
 						

@@ -20,6 +20,7 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceEvent;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQueryInfo;
 import jadex.bridge.service.search.ServiceRegistry;
@@ -164,7 +165,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	public IFuture<IServiceIdentifier> searchService(ServiceQuery<?> query)
 	{
 		IServiceIdentifier ret = serviceregistry.searchService(query);
-		if (ret == null)
+		if(ret == null)
 		{
 			Iterator<IServiceRegistry> it = getApplicablePeers(query).iterator();			
 			while(ret==null && it.hasNext())
@@ -174,7 +175,9 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			}
 		}
 		
-		return new Future<>(ret);
+		return ret==null && query.getMultiplicity().getFrom()!=0
+			? new Future<>(new ServiceNotFoundException(query.toString()))
+		    : new Future<>(ret);
 	}
 	
 	/**

@@ -777,7 +777,18 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 				@Override
 				public Object handleResult(Object result) throws Exception
 				{
-					return processResult(result, info);
+					// todo: remove after superpeer fix
+					result = processResult(result, info);
+					if(result==null)
+					{
+						if(query.getMultiplicity().getFrom()!=0)
+						{
+							throw new ServiceNotFoundException(query.toString());
+						}
+					}
+					return result;
+					
+					//return processResult(result, info);
 				}
 			});
 			((IInternalExecutionFeature)component.getFeature(IExecutionFeature.class)).addSimulationBlocker(ret);

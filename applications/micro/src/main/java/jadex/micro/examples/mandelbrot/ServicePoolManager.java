@@ -89,7 +89,7 @@ public class ServicePoolManager
 	 */
 	public IIntermediateFuture	performTasks(Set tasks, boolean retry, Object user)
 	{
-//		System.out.println("Peforming "+tasks.size()+" tasks");
+		System.out.println("Peforming "+tasks.size()+" tasks");
 //		System.out.println("Performing tasks: busy="+busy.size()+", free="+free.size());
 		
 		// Allocation data binds tasks together to a single result future.
