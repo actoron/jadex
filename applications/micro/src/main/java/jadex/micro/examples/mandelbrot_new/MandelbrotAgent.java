@@ -7,12 +7,11 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
-import jadex.platform.service.servicepool.ServicePoolAgent;
 
 @ComponentTypes({
 	@ComponentType(name="Generator", clazz=GenerateAgent.class),
 	@ComponentType(name="Display", clazz=DisplayAgent.class),
-	@ComponentType(name="CalculatorPool", clazz=ServicePoolAgent.class)
+	@ComponentType(name="CalculatorPool", filename = "jadex/platform/service/servicepool/ServicePoolAgent.class")	// avoid compile time dependency to platform
 })
 @Configurations({
 	
