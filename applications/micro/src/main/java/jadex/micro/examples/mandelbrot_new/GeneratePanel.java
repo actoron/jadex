@@ -34,6 +34,9 @@ public class GeneratePanel extends JPanel
 	/** The properties panel. */
 	protected PropertiesPanel pp;
 	
+	/** The ok button. */
+	protected JButton okbut;
+	
 	/**
 	 *  Create a new panel.
 	 */
@@ -66,6 +69,7 @@ public class GeneratePanel extends JPanel
 		pp.createTextField("task size", ""+data.getTaskSize(), true, 0);
 		
 		final JButton[] buts = pp.createButtons("buts", new String[]{"Go"}, 0);
+		this.okbut = buts[0];
 		
 		buts[0].addActionListener(new ActionListener()
 		{
@@ -143,6 +147,14 @@ public class GeneratePanel extends JPanel
 
 		this.add(pp, BorderLayout.CENTER);
 		this.add(sb, BorderLayout.SOUTH);
+	}
+	
+	/**
+	 *  Calculate and display the default image from current settings.
+	 */
+	public void calcDefaultImage()
+	{
+		okbut.doClick();
 	}
 	
 	/**
