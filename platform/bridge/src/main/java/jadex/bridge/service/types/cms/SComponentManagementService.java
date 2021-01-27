@@ -1560,15 +1560,18 @@ public class SComponentManagementService
 			
 			if(achildren != null && achildren.length > 0)
 			{
+				agent.getLogger().info("Terminating component structure (a): "+cid.getName()+", "+SUtil.arrayToString(achildren));
 				agent.getFeature(ISubcomponentsFeature.class).killComponents(achildren).addResultListener(new IResultListener<Collection<Tuple2<IComponentIdentifier, Map<String,Object>>>>()
 				{
 					public void resultAvailable(Collection<Tuple2<IComponentIdentifier, Map<String, Object>>> result)
 					{
+						agent.getLogger().info("Terminated component structure (1): "+cid.getName());
 						finishkill.run();
 					}
 					public void exceptionOccurred(Exception exception)
 					{
 //						exception.printStackTrace();
+						agent.getLogger().info("Terminated component structure (2): "+cid.getName()+", "+exception);
 						finishkill.run();
 						SComponentManagementService.exitDestroy(cid, desc, exception, null);
 					}
@@ -1576,6 +1579,7 @@ public class SComponentManagementService
 			}
 			else
 			{
+				agent.getLogger().info("Terminated component structure (3): "+cid.getName());
 				finishkill.run();
 			}
 		}			

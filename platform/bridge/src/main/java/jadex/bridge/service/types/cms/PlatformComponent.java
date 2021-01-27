@@ -114,6 +114,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	// Agents with more debug output for catching heisenbugs causing hangs on component termination
 	public static final Set<String>	_BROKEN	= new LinkedHashSet<String>();
 	{
+		// fixed(?)
 //		_BROKEN.add("jadex.bdiv3.examples.booktrading.seller.SellerAgent");
 //		_BROKEN.add("jadex.micro.testcases.subscriptionlistener.SubscriptionListenerTestAgent");
 		

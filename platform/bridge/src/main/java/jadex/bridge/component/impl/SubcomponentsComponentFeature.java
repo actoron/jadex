@@ -360,8 +360,13 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		Set<IComponentIdentifier> killset = new HashSet<>(Arrays.asList(cids));
 		Map<IComponentIdentifier, Set<IComponentIdentifier>> killparents = new HashMap<>();
 		
-		debug	= debug | killset.stream().anyMatch(id -> PlatformComponent._BROKEN.contains(
-				SComponentManagementService.internalGetComponentDescription(id).getModelName()));
+		// Enable debug on parent, if any child is in debug set.
+		debug	= debug | killset.stream().anyMatch(cid -> 
+		{
+			IComponentDescription	child	= SComponentManagementService.internalGetComponentDescription(cid);
+			return child!=null && PlatformComponent._BROKEN.contains(child.getModelName());
+		});
+		
 		if(debug)
 		{
 			component.getLogger().severe("Killing subcomponents0: "+component+", "+killset);
