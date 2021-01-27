@@ -279,7 +279,7 @@ public class GenerateService implements IGenerateService
 					{
 						cs.calculateArea(part).next(chunk ->
 						{
-							//System.out.println("got chunk: "+data);
+//							System.out.println("got chunk: "+chunk);
 							chunk.setDisplayId(part.getDisplayId());
 							chunk.setArea(new Rectangle(part.getXOffset(), part.getYOffset(), part.getSizeX(), part.getSizeY()));
 							chunk.setImageWidth(complete.getSizeX());
