@@ -54,6 +54,7 @@ import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
@@ -146,6 +147,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/** The termination future (used in noplatform case). */
 	protected Future<Map<String, Object>> termfuture;
 	
+	/** Heisenbug debug flag cached for speed. */
+	protected boolean debug;
+	
 	//-------- constructors --------
 	
 	/**
@@ -155,6 +159,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		super(component, cinfo);
 		this.endagenda = new Future<Void>();
+		this.debug	= component instanceof IPlatformComponentAccess && ((IPlatformComponentAccess) component).getPlatformComponent().debug;
+		if(debug)
+		{
+			component.getLogger().severe("Enabled ExecutionComponentFeature debugging for "+component);
+		}
 	}
 	
 	/**
@@ -171,20 +180,20 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //			System.out.println("shut platform");
 		
 //		System.out.println("shutdown start: "+getComponent().getComponentIdentifier());
-		if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-			getComponent().getLogger().info("shutdown0: "+this);
+		if(debug)
+			getComponent().getLogger().severe("shutdown0: "+this);
 		
 		endagenda.addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
-				if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-					getComponent().getLogger().info("shutdown1: "+this);
+				if(debug)
+					getComponent().getLogger().severe("shutdown1: "+this);
 				
 				doCleanup(new StepAborted());
 				
-				if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-					getComponent().getLogger().info("shutdown2: "+this);
+				if(debug)
+					getComponent().getLogger().severe("shutdown2: "+this);
 				
 				super.customResultAvailable(result);
 			}
@@ -305,8 +314,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
 			if(endagenda.isDone() && prio<STEP_PRIORITY_IMMEDIATE)
 			{
-				if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-					getComponent().getLogger().info("step aborted after termination: "+step);
+				if(debug)
+					getComponent().getLogger().severe("step aborted after termination: "+step);
 				ret.setExceptionIfUndone(new ComponentTerminatedException(getComponent().getId()));
 			}
 			else
@@ -336,8 +345,16 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			}
 		}
 
-		if(!ret.isDone())
-			wakeup();
+		try
+		{
+			if(!ret.isDone())
+				wakeup();
+		}
+		catch(Exception e)
+		{
+			// rare racecondition that component is terminated after synchronized block but before wakeup() call.
+			ret.setExceptionIfUndone(e);
+		}
 		
 		return ret;
 	}
@@ -759,8 +776,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
-			if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-				getComponent().getLogger().info("wakeup0: "+this);
+			if(endstepcnt!=-1 && debug)
+				getComponent().getLogger().severe("wakeup0: "+this);
 
 			IExecutionService exe = getExecutionService();
 			//IExecutionService exe = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
@@ -768,8 +785,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			// Do not use rescue thread for bisimulation of platform init/shutdown/zombie agents to avoid clock running out.
 			if(exe==null && SSimulation.isBisimulating(getInternalAccess()))
 			{
-				if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-					getComponent().getLogger().info("wakeup1: "+this);
+				if(endstepcnt!=-1 && debug)
+					getComponent().getLogger().severe("wakeup1: "+this);
 				
 				try
 				{
@@ -785,30 +802,30 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				System.err.println(getInternalAccess()+" bisim exe is"+exe);
 			}
 
-			if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-				getComponent().getLogger().info("wakeup2: "+this+", "+exe);
+			if(endstepcnt!=-1 && debug)
+				getComponent().getLogger().severe("wakeup2: "+this+", "+exe);
 
 			// Hack!!! service is found before it is started, grrr.
 			if(exe!=null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
 				if(bootstrap)
 				{
-					if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-						getComponent().getLogger().info("wakeup3: "+this);
+					if(endstepcnt!=-1 && debug)
+						getComponent().getLogger().severe("wakeup3: "+this);
 					// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
 					available	= true;
 				}
 				else
 				{
-					if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-						getComponent().getLogger().info("wakeup4: "+this);
+					if(endstepcnt!=-1 && debug)
+						getComponent().getLogger().severe("wakeup4: "+this);
 					exe.execute(ExecutionComponentFeature.this);
 				}
 			}
 			else
 			{
-				if(getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-					getComponent().getLogger().info("wakeup5: "+this);
+				if(endstepcnt!=-1 && debug)
+					getComponent().getLogger().severe("wakeup5: "+this);
 //				System.err.println(getInternalAccess()+" rescue "+SSimulation.isBisimulating(getInternalAccess())+", "+Starter.getPlatformValue(getInternalAccess().getId().getRoot(), IClockService.BISIMULATION_CLOCK_FLAG));
 				available = false;
 				// Happens during platform bootstrapping -> execute on platform rescue thread.
@@ -1057,7 +1074,14 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
 				if(endagenda.isDone())
 				{
-					throw new ThreadDeath();
+					throw new ThreadDeath()
+					{
+						@Override
+						public String toString()
+						{
+							return "java.lang.ThreadDeath("+component+")";
+						}
+					};
 				}
 			}
 			catch(ThreadDeath e)
@@ -1155,8 +1179,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public boolean execute()
 	{
-		if(endstepcnt!=-1 && getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-			getComponent().getLogger().info("execute()0: "+getComponent().getId()+", "+IComponentIdentifier.LOCAL.get()+", endstepcnt="+endstepcnt+", stepcnt="+stepcnt);
+		if(endstepcnt!=-1 && debug)
+			getComponent().getLogger().severe("execute()0: "+getComponent().getId()+", "+IComponentIdentifier.LOCAL.get()+", endstepcnt="+endstepcnt+", stepcnt="+stepcnt);
 
 		synchronized(this)
 		{
@@ -1168,8 +1192,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			executing	= true;
 		}
 
-		if(endstepcnt!=-1 && getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-			getComponent().getLogger().info("execute()1: "+getComponent().getId()+", "+IComponentIdentifier.LOCAL.get()+", endstepcnt="+endstepcnt+", stepcnt="+stepcnt);
+		if(endstepcnt!=-1 && debug)
+			getComponent().getLogger().severe("execute()1: "+getComponent().getId()+", "+IComponentIdentifier.LOCAL.get()+", endstepcnt="+endstepcnt+", stepcnt="+stepcnt);
 		// Todo: termination and exception!?
 //		// Note: wakeup() can be called from arbitrary threads (even when the
 //		// component itself is currently running. I.e. it cannot be ensured easily
@@ -1213,8 +1237,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				}
 
 			}
-			if(endstepcnt!=-1 && getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-				getComponent().getLogger().info("execute()2: "+getComponent().getId()+", "+IComponentIdentifier.LOCAL.get()+", endstepcnt="+endstepcnt+", stepcnt="+stepcnt);
+			if(endstepcnt!=-1 && debug)
+				getComponent().getLogger().severe("execute()2: "+getComponent().getId()+", "+IComponentIdentifier.LOCAL.get()+", endstepcnt="+endstepcnt+", stepcnt="+stepcnt);
 			
 //			boolean	again	= false;
 //			if(!breakpoint_triggered && !extexecuted  && !notifexecuted && (!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) || dostep))
@@ -1364,8 +1388,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			getComponent().suspendComponent(getComponent().getDescription().getName());
 		}
 		
-		if(endstepcnt!=-1 && getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-			getComponent().getLogger().info("execute()3: "+getComponent().getId()+", "+IComponentIdentifier.LOCAL.get()+", endstepcnt="+endstepcnt+", stepcnt="+stepcnt+", "+step);
+		if(endstepcnt!=-1 && debug)
+			getComponent().getLogger().severe("execute()3: "+getComponent().getId()+", "+IComponentIdentifier.LOCAL.get()+", endstepcnt="+endstepcnt+", stepcnt="+stepcnt+", "+step);
 
 		boolean	hasstep;
 		if(step!=null)
@@ -1403,21 +1427,21 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					step.getTransfer().afterSwitch();
 					
-					if(endstepcnt!=-1 && getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-						getComponent().getLogger().info("execute()4: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState());
+					if(endstepcnt!=-1 && debug)
+						getComponent().getLogger().severe("execute()4: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState());
 					
 					try
 					{
 						stepfut	= step.getStep().execute(component);
 
 						
-						if(endstepcnt!=-1 && getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-							getComponent().getLogger().info("execute()5: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState());
+						if(endstepcnt!=-1 && debug)
+							getComponent().getLogger().severe("execute()5: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState());
 					}
 					catch(Throwable dummy)
 					{
-						if(endstepcnt!=-1 && getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-							getComponent().getLogger().info("execute()6: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+"\n"+SUtil.getExceptionStacktrace(dummy));
+						if(endstepcnt!=-1 && debug)
+							getComponent().getLogger().severe("execute()6: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+"\n"+SUtil.getExceptionStacktrace(dummy));
 						
 						throw dummy;
 					}
@@ -1473,6 +1497,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				}
 				else if(ex instanceof ThreadDeath)
 				{
+					System.err.println("Thread death on component: "+component);
+					ex.printStackTrace();
+					
 					// Hard cleanup during kill.
 					resetExecutionState(cl);
 					throw (ThreadDeath)ex;
@@ -1723,8 +1750,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			}
 		}
 		
-		if(endstepcnt!=-1 && getComponent().getId().toString().indexOf("SellerAgent")!=-1)
-			getComponent().getLogger().info("execute()6: endstepcnt="+endstepcnt+", ret="+ret+", endagenda.isDone()="+endagenda.isDone());
+		if(endstepcnt!=-1 && debug)
+			getComponent().getLogger().severe("execute()7: endstepcnt="+endstepcnt+", ret="+ret+", endagenda.isDone()="+endagenda.isDone());
 		
 		if(endstepcnt!=-1 && !ret && !endagenda.isDone())
 		{
@@ -2084,7 +2111,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/**
 	 *  Execute a step of a suspended component.
 	 *  @param componentid The component identifier.
-	 *  @param listener Called when the step is finished (result will be the component description).
 	 */
 	public IFuture<Void> stepComponent(String stepinfo)
 	{

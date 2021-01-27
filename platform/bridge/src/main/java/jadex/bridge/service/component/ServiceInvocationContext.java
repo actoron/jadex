@@ -425,6 +425,12 @@ public class ServiceInvocationContext
 //		if(SReflect.isSupertype(IFuture.class, getMethod().getReturnType()) && !(result instanceof Future))
 //			System.out.println("haeaeaeaeaeae");
 		
+//		if(getMethod().getName().equals("getRegisteredClients"))
+//		{
+//			System.err.println("setResult of getRegisteredClients call: "+result+", "+IComponentIdentifier.LOCAL.get()+", "+Thread.currentThread());
+//			Thread.dumpStack();
+//		}
+		
 		this.result.set(used.size()-1, result);
 	}
 

@@ -182,10 +182,11 @@ public class LocalHostAwarenessAgent implements IAwarenessService
 	 *  Implements the start.
 	 */
 	@OnEnd
-	public IFuture<Void> end(Exception e)
+//	public IFuture<Void> end(Exception e)
+	public IFuture<Void> end()
 	{
-		System.out.println("Terminated agent: "+e);
-		e.printStackTrace();
+//		System.out.println("Terminated agent: "+e);
+//		e.printStackTrace();
 		return IFuture.DONE;
 	}
 	

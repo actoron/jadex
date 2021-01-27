@@ -8,6 +8,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -17,11 +18,13 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IPullIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -34,9 +37,10 @@ import jadex.micro.testcases.TestAgent;
 //@ComponentTypes(@ComponentType(name="provider", filename="jadex.micro.testcases.maxresults.ProviderAgent.class"))
 //@Configurations(@Configuration(name="default", components=@Component(type="provider")))
 @Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
+//@Properties(@NameValue(name = "test.timeout", value = "300000"))
 public class UserAgent extends TestAgent
 {
-	protected int tstcnt = 2;
+	protected int tstcnt = 3;
 	
 	/**
 	 *  The test count.
@@ -200,6 +204,7 @@ public class UserAgent extends TestAgent
 			final TestReport tr = new TestReport("#"+testno, "Test if intermediate future max works");
 			int max = -1;
 			int maxcnt;
+			int rescnt;
 			
 			public void exceptionOccurred(Exception exception) 
 			{
@@ -220,14 +225,15 @@ public class UserAgent extends TestAgent
 			
 			public void intermediateResultAvailable(String result) 
 			{
-				//System.out.println("ires: "+result);
+//				System.out.println("ires: "+result);
+				this.rescnt++;
 			}
 			
 			public void finished() 
 			{
 				System.out.println("fini 1");
 				
-				if(this.max!=-1 && this.maxcnt==1)
+				if(this.max!=-1 && this.rescnt==this.max && this.maxcnt==1)
 				{
 					tr.setSucceeded(true);
 				}
@@ -235,23 +241,29 @@ public class UserAgent extends TestAgent
 				{
 					tr.setFailed("No max value received.");
 				}
+				else if(this.rescnt!=this.max)
+				{
+					tr.setFailed("Wrong number of results received: "+rescnt+", expecting: "+max);
+				}
 				else
 				{
 					tr.setFailed("Received max value n times: "+this.maxcnt);
 				}
 				ret.addIntermediateResult(tr);
 			
-				if(++cnt[0]==2)
+				if(++cnt[0]==tstcnt)
 					barrier.setResult(null);
 			}
 		});
 		
-		IIntermediateFuture<String> fut2 = ser.subscribeToInfos();
+		IPullIntermediateFuture<String> fut2 = ser.pullInfos();
+		fut2.pullIntermediateResult();
 		fut2.addResultListener(new IIntermediateResultListener<String>() 
 		{
-			final TestReport tr = new TestReport("#"+testno+1, "Test if subscription future max works");
+			final TestReport tr = new TestReport("#"+testno+1, "Test if pull intermediate future max works");
 			int max = -1;
 			int maxcnt;
+			int rescnt;
 			
 			public void exceptionOccurred(Exception exception) 
 			{
@@ -272,14 +284,19 @@ public class UserAgent extends TestAgent
 			
 			public void intermediateResultAvailable(String result) 
 			{
-				//System.out.println("ires: "+result);
+//				System.out.println("ires pull: "+result);
+				this.rescnt++;
+
+				// Todo: how to signal to stop pulling when future is done?
+				if(!fut2.isDone())
+					fut2.pullIntermediateResult();
 			}
 			
 			public void finished() 
 			{
 				System.out.println("fini 2");
 				
-				if(this.max!=-1 && this.maxcnt==1)
+				if(this.max!=-1 && this.rescnt==this.max && this.maxcnt==1)
 				{
 					tr.setSucceeded(true);
 				}
@@ -287,13 +304,69 @@ public class UserAgent extends TestAgent
 				{
 					tr.setFailed("No max value received.");
 				}
+				else if(this.rescnt!=this.max)
+				{
+					tr.setFailed("Wrong number of results received: "+rescnt+", expecting: "+max);
+				}
 				else
 				{
 					tr.setFailed("Received max value n times: "+this.maxcnt);
 				}
 				ret.addIntermediateResult(tr);
 				
-				if(++cnt[0]==2)
+				if(++cnt[0]==tstcnt)
+					barrier.setResult(null);
+			}
+		});
+		
+		IIntermediateFuture<String> fut3 = ser.subscribeToInfos();
+		fut3.addResultListener(new IIntermediateResultListener<String>() 
+		{
+			final TestReport tr = new TestReport("#"+testno+1, "Test if subscription future max fails");
+			
+			public void exceptionOccurred(Exception exception) 
+			{
+				if(exception instanceof UnsupportedOperationException)
+				{
+					System.out.println("fini 3: "+exception);
+					
+					tr.setSucceeded(true);
+				}
+				else
+				{
+					tr.setFailed(exception);
+				}
+				
+				cont();
+			}
+			
+			public void resultAvailable(Collection<String> result) 
+			{
+				tr.setFailed("No exception: "+result);
+				
+				cont();
+			}
+			
+			public void maxResultCountAvailable(int max) 
+			{
+			}
+			
+			public void intermediateResultAvailable(String result) 
+			{
+			}
+			
+			public void finished() 
+			{
+				tr.setFailed("No exception");
+				
+				cont();
+			}
+			
+			void cont()
+			{
+				ret.addIntermediateResult(tr);
+				
+				if(++cnt[0]==tstcnt)
 					barrier.setResult(null);
 			}
 		});

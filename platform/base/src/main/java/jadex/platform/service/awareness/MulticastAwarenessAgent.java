@@ -3,6 +3,7 @@ package jadex.platform.service.awareness;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.SocketException;
 
 import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnInit;
@@ -30,8 +31,22 @@ public class MulticastAwarenessAgent	extends LocalNetworkAwarenessBaseAgent
 	@OnInit
 	public void	start() throws Exception
 	{
-		sendsocket	= new DatagramSocket(0);
-		recvsocket = new MulticastSocket(port);
+		// Happens sometimes in Windows: java.net.SocketException: Unrecognized Windows Sockets error: 0: Cannot bind
+		// -> try 10 times then give up
+		// cf. https://stackoverflow.com/questions/3947555/java-net-socketexception-unrecognized-windows-sockets-error-0-jvm-bind-jboss
+		for(int i=1; i<=10; i++)
+		{
+			try
+			{
+				sendsocket	= sendsocket!=null ? sendsocket : new DatagramSocket(0);
+				recvsocket = recvsocket!=null ? recvsocket : new MulticastSocket(port);
+			}
+			catch(SocketException e)
+			{
+				if(i==10)
+					throw e;
+			}
+		}
 		((MulticastSocket)recvsocket).joinGroup(InetAddress.getByName(address));
 		
 		super.init();

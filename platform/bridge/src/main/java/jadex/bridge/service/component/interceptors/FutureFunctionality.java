@@ -1,8 +1,11 @@
 package jadex.bridge.service.component.interceptors;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Logger;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
@@ -668,6 +671,37 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	/** The future functionality. */
 	protected FutureFunctionality func;
 	
+	//-------- debugging --------
+	ISubscriptionIntermediateFuture<?> mysrc;
+	List<Object>	myresults	= new ArrayList<>();
+	@Override
+	public String toString()
+	{
+		return super.toString() + "(storeforfirst="+storeforfirst+", listener="+(listener!=null)+", src="+mysrc+", results="+results+", ownresults="+ownresults+", myresults="+myresults+")";
+	}
+	@Override
+	protected void	storeResult(Object result)
+	{
+		if((""+result).contains("IMarkerService"))
+		{
+			try
+			{
+				myresults.add(result);
+				super.storeResult(result);
+			}
+			finally
+			{
+				Logger.getLogger(getClass().getName()).info("storeResult: "+this+", "+result+", "+IComponentIdentifier.LOCAL.get());
+			}
+		}
+		else
+		{
+			super.storeResult(result);
+		}
+	}
+	//-------- debugging end --------
+
+	
 	/**
 	 * 
 	 */
@@ -683,6 +717,8 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	 */
 	public DelegatingSubscriptionIntermediateDelegationFuture(ISubscriptionIntermediateFuture<?> src, FutureFunctionality func)
 	{
+//		this.mysrc	= src;	// for debugging only
+		
 		if(func==null)
 			throw new IllegalArgumentException("Func must not null.");
 		this.func = func;
@@ -722,6 +758,10 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	@Override
 	protected boolean	doAddIntermediateResult(Object result, boolean undone)
 	{
+		if((""+result).contains("IMarkerService"))
+		{
+			Logger.getLogger(getClass().getName()).info("add: "+this+", "+result+", "+IComponentIdentifier.LOCAL.get());
+		}
 		try
 		{
 			result = func.handleIntermediateResult(result);
@@ -733,7 +773,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		catch(Exception e)
 		{
 			return doSetException(e, func.isUndone(undone));
-		}		
+		}
 	}
 
 	/**
@@ -1174,7 +1214,21 @@ class DelegatingFuture extends Future<Object>
 	@Override
     protected void	executeNotification(IResultListener<Object> listener, ICommand<IResultListener<Object>> command)
     {
-		func.scheduleForward(command, listener);
+		if((""+listener).indexOf("Heisenbug")!=-1)
+			System.err.println("exe0: "+this+", "+command+", "+listener+", "+func.getClass());
+		try
+		{
+			func.scheduleForward(command, listener);
+		}
+		finally
+		{
+			if((""+listener).indexOf("Heisenbug")!=-1)
+			{
+				System.err.println("exe1: "+this+", "+command+", "+listener);
+				Thread.dumpStack();
+			}
+		}
+
     }
 };
 

@@ -622,15 +622,31 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     		try
     		{
 	    		NOTIFYING.set(Boolean.TRUE);
+	    		boolean heisenbug	= false;
 	    		
 	    		while(STACK.get()!=null && !STACK.get().isEmpty())
 	        	{
 	    			Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>	next = STACK.get().remove();
+	    			heisenbug	= heisenbug || next.getSecondEntity().toString().indexOf("Heisenbug")!=-1;
+	    			if(heisenbug)
+	    			{
+	    				System.err.println("startScheduledNotifications0: "+next);
+	    			}
 	
 	    			// Need to use corrent future for executeNotification, because might be overriden by e.g. delegation future for rescheduling on other thread
 	        		@SuppressWarnings("rawtypes")
 					Future	fut	= next.getFirstEntity();
-	        		fut.executeNotification(next.getSecondEntity(), next.getThirdEntity());
+	        		try
+	        		{
+	        			fut.executeNotification(next.getSecondEntity(), next.getThirdEntity());
+	        		}
+	        		finally
+	        		{
+		    			if(heisenbug)
+		    			{
+		    				System.err.println("startScheduledNotifications1: "+next);
+		    			}
+	        		}
 	        	}
     		}
     		finally
@@ -645,9 +661,6 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
      */
     protected void executeNotification(IResultListener<E> listener, ICommand<IResultListener<E>> command)
     {
-    	if(listener==null)
-    		System.out.println("exe: "+command);
-    	
     	command.execute(listener);
     }
     

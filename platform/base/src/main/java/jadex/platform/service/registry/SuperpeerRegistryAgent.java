@@ -33,7 +33,6 @@ import jadex.commons.IFilter;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -104,6 +103,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 //				System.out.println(agent+": Initiated super peer connection with client "+client+" for network "+networkname);
 				for(SubscriptionIntermediateFuture<IComponentIdentifier> reglis: reglisteners)
 				{
+					agent.getLogger().info("new connection: "+client);
 					reglis.addIntermediateResult(client);
 				}
 				return IFuture.DONE;
@@ -445,6 +445,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 		
 		for(IComponentIdentifier client: clients)
 		{
+			agent.getLogger().info("new connection: "+client+", "+reglis+", "+IComponentIdentifier.LOCAL.get());
 			reglis.addIntermediateResult(client);
 		}
 		

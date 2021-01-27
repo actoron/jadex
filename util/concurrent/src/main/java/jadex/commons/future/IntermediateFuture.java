@@ -146,15 +146,6 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    	}
 	    	else
 	    	{
-	    		//if(this instanceof SubscriptionIntermediateDelegationFuture && result!=null && result instanceof String)//result.toString().indexOf("ServiceEvent")!=-1)
-	    		//	System.out.println("store event: "+result+" "+listener);
-	    		boolean stored = storeResult(result);
-	    		
-	    		if(!stored && listener==null && listeners==null)
-	    			throw new RuntimeException("lost value");
-
-	    		notify	= true;
-
 	    		//if(listener!=null && getResultCount()==1)
 	    		//	scheduleMaxNotification(null);
 	    		
@@ -169,6 +160,9 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 		        		}
 	    			}
 				});
+	    		
+	    		storeResult(result);
+	    		notify	= true;
 	    	}
     	}
     	
@@ -183,7 +177,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 *  Add a result.
 	 *  @param result The result.
 	 */
-	protected boolean storeResult(E result)
+	protected void	storeResult(E result)
 	{
 //		if(result!=null && result.getClass().getName().indexOf("ChangeEvent")!=-1)
 //			System.out.println("ires: "+this+" "+result);
@@ -192,8 +186,11 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 			results	= new ArrayList<E>();
 		results.add(result);
 		if(maxresultcnt==getResultCount())
+		{
+//			boolean	fini	= setFinishedIfUndone();
+//			System.out.println("Finished due to max cnt: "+this+", "+maxresultcnt+", "+fini);
 			setFinishedIfUndone();
-		return true;
+		}
 	}
 	
 	/**
@@ -594,14 +591,32 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     public void setMaxResultCount(int max)
     {
-    	//System.out.println("max set: "+max);
-    	this.maxresultcnt = max;
-    	
-    	if(listener!=null)
-    	{
-    		scheduleMaxNotification(null);
-    		startScheduledNotifications();
+       	boolean	notify	= false;
+    	synchronized(this)
+    	{	    	
+	    	if(isDone())
+	    	{
+	    		throw new IllegalStateException("Future already finished.");
+	    	}
+	    	else if(maxresultcnt!=-1)
+	    	{
+	    		throw new IllegalStateException("Max result count must only be set once.");	    		
+	    	}
+	    	else
+	    	{
+	        	//System.out.println("max set: "+max);
+	        	this.maxresultcnt = max;
+	        	intermediate = intermediate | max!=-1;
+	        	
+	        	if(listener!=null)
+	        	{
+		    		notify	= scheduleMaxNotification(null);
+	        	}
+	    	}
     	}
+    	
+    	if(notify)
+    		startScheduledNotifications();
     	
     	if(getResultCount()==max)
     		setFinishedIfUndone();

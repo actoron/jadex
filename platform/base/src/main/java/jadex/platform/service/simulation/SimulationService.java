@@ -18,6 +18,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.interceptors.DecouplingInterceptor.InvokeMethodStep;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
@@ -31,6 +32,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.DelegationResultListener;
@@ -99,7 +101,6 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 
 	/**
 	 *  Shutdown the service.
-	 *  @param listener The listener.
 	 */
 	//@ServiceShutdown
 	@OnEnd
@@ -475,6 +476,11 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 			}
 		});
 		
+		// Debug: todo remove
+		Exception	ex	= new TimeoutException("Simulation blocker released after realtime timeout " + frttimeout + ".");
+		ex.fillInStackTrace();
+		String debug0	= InvokeMethodStep.DEBUG.get();	// Stack trace from caller thread, if other component
+		
 		access.waitForDelay(frttimeout, new ImmediateComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -482,8 +488,9 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 				if (!toblocker.isDone())
 				{
 					String	debug	= openfuts.get(toblocker);
-					access.getLogger().severe("Simulation blocker released after realtime timeout " + frttimeout + (debug!=null?", "+debug:"."));
-					toblocker.setExceptionIfUndone(new TimeoutException("Simulation blocker released after realtime timeout " + frttimeout + "."));
+					access.getLogger().severe((debug!=null?debug+", ":"") + SUtil.getExceptionStacktrace(ex) + (debug0!=null?"\n caused by "+debug0:""));
+//					Exception	ex	= new TimeoutException("Simulation blocker released after realtime timeout " + frttimeout + ".");
+					toblocker.setExceptionIfUndone(ex);
 				}
 				return IFuture.DONE;
 			}

@@ -38,7 +38,7 @@ public class PlatformsTest //extends TestCase
 	// Base arguments used for every platform.
 	String[]	BASEARGS	= new String[]
     {
-		"-logging", "true",
+//		"-logging", "true",
 //		"-debugfutures", "true",
 //		"-nostackcompaction", "true",
 		"-platformname", "testcases_*",
@@ -69,18 +69,18 @@ public class PlatformsTest //extends TestCase
 	 */
 	public static void main(String[] args)
 	{
-		IExternalAccess	ea	= Starter.createPlatform("-gui", "false","-logging","true").get();
-		ea.killComponent().get();
+//		IExternalAccess	ea	= Starter.createPlatform("-gui", "false","-logging","true").get();
+//		ea.killComponent().get();
 		
 //		System.out.println("guiclass: "+ jadex.commons.SReflect.classForName0("jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel",
 //		   	jadex.platform.service.library.LibraryService.class.getClassLoader()));
 //		
-//		PlatformsTest test = new PlatformsTest();
-//		for(int i=0; i<10000; i++)
-//		{
-//			System.out.println("Run: "+i);
-//			test.testPlatforms();
-//		}
+		PlatformsTest test = new PlatformsTest();
+		for(int i=0; i<10000; i++)
+		{
+			System.out.println("Run: "+i);
+			test.testPlatforms();
+		}
 	}
 	
 	/**
