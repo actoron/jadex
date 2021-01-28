@@ -134,8 +134,12 @@ public class GenerateService implements IGenerateService
 		final Set<AreaData>	areas = new HashSet<>();	// {AreaData}
 		long task = (long)data.getTaskSize()*data.getTaskSize()*256;
 		long pic	= (long)data.getSizeX()*data.getSizeY()*data.getMax();
-		int numx = (int)Math.max(Math.round(Math.sqrt((double)pic/task)), 1);
-		int numy = (int)Math.max(Math.round((double)pic/(task*numx)), 1);
+		//int numx = (int)Math.max(Math.round(Math.sqrt((double)pic/task)), 1);
+		//int numy = (int)Math.max(Math.round((double)pic/(task*numx)), 1);
+		
+		int numx = 1;//(int)Math.max(Math.round(Math.sqrt((double)pic/task)), 1);
+	    int numy = 1;//(int)Math.max(Math.round((double)pic/(task*numx)), 1);
+
 //		final long	time	= System.nanoTime();	
 		//System.out.println("Number of tasks: "+numx+", "+numy+", max="+data.getMax()+" tasksize="+data.getTaskSize());
 		
@@ -286,7 +290,7 @@ public class GenerateService implements IGenerateService
 					{
 						cs.calculateArea(part).next(chunk ->
 						{
-							//System.out.println("got chunk: "+data);
+							System.out.println("generate got chunk (calls display): "+chunk);
 							chunk.setDisplayId(part.getDisplayId());
 							chunk.setArea(new Rectangle(part.getXOffset(), part.getYOffset(), part.getSizeX(), part.getSizeY()));
 							chunk.setImageWidth(complete.getSizeX());

@@ -468,15 +468,22 @@ public class DisplayPanel extends JComponent
 					}
 				*/
 				
-				int cnt = 0;
-				while(cnt<chunk.length)
+				try
 				{
-					results[xi][yi] = chunk[cnt++];
-					if(++xi>=xmax)
+					int cnt = 0;
+					while(cnt<chunk.length)
 					{
-						xi=((int)data.getArea().getX());
-						yi++;
+						results[xi][yi] = chunk[cnt++];
+						if(++xi>=xmax)
+						{
+							xi=((int)data.getArea().getX());
+							yi++;
+						}
 					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
 				}
 				
 				/*if(DisplayPanel.this.image==null)
@@ -502,6 +509,8 @@ public class DisplayPanel extends JComponent
 				}*/
 				
 				dirty = true;
+				
+				System.out.println("display received: "+data);
 			}
 		});
 	}

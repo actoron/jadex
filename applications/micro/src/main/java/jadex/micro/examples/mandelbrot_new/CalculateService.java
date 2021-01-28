@@ -35,7 +35,7 @@ public class CalculateService implements ICalculateService
 		IntermediateFuture<PartDataChunk> ret = new IntermediateFuture<>();
 		
 		//long start = System.currentTimeMillis();
-		//System.out.println("calc start: "+data.getId()+" "+ag.getId());
+		System.out.println("calc start: "+data.getId()+" "+ag.getId());
 		
 		agent.setTaskId(data.getId());
 		ret.addIntermediateResult(new PartDataChunk(0, null, 0, 0, ag.getId()));
@@ -85,8 +85,9 @@ public class CalculateService implements ICalculateService
 				if((chunkcnt==numchunks-1 && lastchunk==pointcnt) || (chunkcnt!=numchunks-1 && pointcnt==perchunk))
 				{
 					int psize = (yend-ystart+1)*(xend-xstart+1);
-					//System.out.println("cnt: "+cnt+" "+size+" "+psize);
+					System.out.println("cnt: "+cnt+" "+size+" "+psize);
 					ret.addIntermediateResult(new PartDataChunk(cnt*100/size, chunk, xcs, ycs, ag.getId()));
+					ag.waitForDelay(100).get(); // yield
 					pointcnt = 0;
 					chunkcnt++;
 					chunk = new short[chunkcnt==numchunks-1? lastchunk: perchunk];
@@ -112,7 +113,7 @@ public class CalculateService implements ICalculateService
 		
 		ret.setFinished();
 		
-		//System.out.println("calc finished: "+data.getId()+" "+ag.getId());
+		System.out.println("calc finished: "+data.getId()+" "+ag.getId());
 		
 		return ret;
 	}
