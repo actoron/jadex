@@ -694,10 +694,20 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
      */
     public void	addResultListener(IResultListener<E> listener)
     {
+    	if(doAddResultListener(listener))
+    		notifyListener(listener);
+    }
+
+	/**
+	 *  Add a listener and check if it should be notified immediately due to the future already being finished before add.
+	 *  Safe to be called in synmchronized block.
+	 */
+    protected boolean doAddResultListener(IResultListener<E> listener)
+	{
     	if(listener==null)
-    		throw new RuntimeException();
+    		throw new NullPointerException();
     	
-    	boolean	notify	= false;
+		boolean	notify	= false;
     	synchronized(this)
     	{
 	    	if(isDone())
@@ -718,9 +728,8 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	    		}
 	    	}
     	}
-    	if(notify)
-    		notifyListener(listener);
-    }
+		return notify;
+	}
     
     /**
      *  Notify all result listeners of the finished future (result or exception).

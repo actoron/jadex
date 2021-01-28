@@ -273,9 +273,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		throw new RuntimeException();
        	
     	boolean	scheduled = false;
+    	boolean notify;
     	
     	synchronized(this)
-    	{
+    	{    		
+        	notify	= doAddResultListener(listener);
+
     		// If results==null its a subscription future and first results are already collected.
     		if(intermediate && listener instanceof IIntermediateResultListener)
     		{
@@ -306,14 +309,19 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		}
     	}
 
+    	// Notify intermediate results if any
     	if(scheduled)
     		startScheduledNotifications();
+    	
+    	// Notify final result if any
+    	if(notify)
+    		notifyListener(listener);
+
 
     	//if(!scheduled && maxresultcnt!=-1)
     	//	System.out.println("addRes scheduleAll NOT: "+maxresultcnt+" "+this);
-
     	
-       	super.addResultListener(listener);
+//       	super.addResultListener(listener);	// add must be synchronized, but notify outside synchronized{}
     }
     
     protected ICommand<IResultListener<Collection<E>>>	notcommand	= new ICommand<IResultListener<Collection<E>>>()
