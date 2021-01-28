@@ -1078,6 +1078,15 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
  */
 class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 {
+//	//-------- debugging --------
+//	@Override
+//	public String toString()
+//	{
+//		return super.toString() + "(listener="+listener+", listeners="+listeners+")";
+//	}
+//	//-------- debugging end --------
+
+	
 	/** The future functionality. */
 	protected FutureFunctionality func;
 	
@@ -1124,6 +1133,13 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 	{
 		try
 		{
+//			//-------- debugging --------
+//			if((""+result).contains("PartDataChunk"))
+//			{
+//				Logger.getLogger(getClass().getName()).info("doAddIntermediateResult: "+this+", "+result+", "+IComponentIdentifier.LOCAL.get());
+//			}
+//			//-------- debugging end --------
+			
 			result = func.handleIntermediateResult(result);
 			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingIntermediateFuture.super.doAddIntermediateResult(result, func.isUndone(undone));

@@ -411,7 +411,8 @@ public class DisplayPanel extends JComponent
 					calculating = false;
 				
 				dirty = true;
-				//repaint();
+				
+				System.out.println("progressdata: "+progressdata.size());
 			}
 		};
 		

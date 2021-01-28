@@ -423,6 +423,12 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					@Override
 					public Object handleIntermediateResult(Object result) throws Exception
 					{
+//						//-------- debugging --------
+//						if((""+result).contains("PartDataChunk"))
+//						{
+//							Logger.getLogger(getClass().getName()).info("handleIntermediateResult: "+sic+", "+result+", "+IComponentIdentifier.LOCAL.get());
+//						}
+//						//-------- debugging end --------
 //						if(method.getName().equals("getRegisteredClients"))
 //						{
 //							System.err.println("Copy return value handleIntermediateResult of getRegisteredClients call: "+res+", "+result+", "+IComponentIdentifier.LOCAL.get());

@@ -48,7 +48,7 @@ public class PartDataChunk
 		this.ystart = ystart;
 		this.worker = worker;
 		
-		//System.out.println("chunk: "+data.length+" "+xstart+" "+ystart+" "+progress);
+		System.out.println("chunk: "+(data!=null? data.length: 0)+" "+xstart+" "+ystart+" "+progress+" "+worker.getLocalName());
 	}
 
 	/**
@@ -198,7 +198,7 @@ public class PartDataChunk
 	@Override
 	public String toString() 
 	{
-		return "PartDataChunk [progress=" + progress + ", xstart=" + xstart + ", ystart=" + ystart + "]";
+		return "PartDataChunk [progress=" + progress + ", xstart=" + xstart + ", ystart=" + ystart + ", worker="+worker.getLocalName()+"]";
 	}
 	
 }

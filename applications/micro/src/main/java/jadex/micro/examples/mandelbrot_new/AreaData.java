@@ -514,15 +514,22 @@ public class AreaData
 			}
 		*/
 		
-		int cnt = 0;
-		while(cnt<chunk.length)
+		try
 		{
-			this.data[xi][yi] = chunk[cnt++];
-			if(++xi>=xmax)
+			int cnt = 0;
+			while(cnt<chunk.length)
 			{
-				xi=0; // xstart only for first line in chunk
-				yi++;
+				this.data[xi][yi] = chunk[cnt++];
+				if(++xi>=xmax)
+				{
+					xi=0; // xstart only for first line in chunk
+					yi++;
+				}
 			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
 		}
 	}
 

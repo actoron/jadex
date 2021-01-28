@@ -1,6 +1,7 @@
 package jadex.micro.examples.mandelbrot_new;
 
 import java.awt.Rectangle;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -18,6 +19,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.gui.SGUI;
@@ -134,11 +136,11 @@ public class GenerateService implements IGenerateService
 		final Set<AreaData>	areas = new HashSet<>();	// {AreaData}
 		long task = (long)data.getTaskSize()*data.getTaskSize()*256;
 		long pic	= (long)data.getSizeX()*data.getSizeY()*data.getMax();
-		//int numx = (int)Math.max(Math.round(Math.sqrt((double)pic/task)), 1);
-		//int numy = (int)Math.max(Math.round((double)pic/(task*numx)), 1);
+		int numx = (int)Math.max(Math.round(Math.sqrt((double)pic/task)), 1);
+		int numy = (int)Math.max(Math.round((double)pic/(task*numx)), 1);
 		
-		int numx = 1;//(int)Math.max(Math.round(Math.sqrt((double)pic/task)), 1);
-	    int numy = 1;//(int)Math.max(Math.round((double)pic/(task*numx)), 1);
+		//numx = 2;
+	    //numy = 1;
 
 //		final long	time	= System.nanoTime();	
 		//System.out.println("Number of tasks: "+numx+", "+numy+", max="+data.getMax()+" tasksize="+data.getTaskSize());
@@ -193,6 +195,9 @@ public class GenerateService implements IGenerateService
 			
 			public void intermediateResultAvailable(AreaData ad)
 			{
+				if(ad.fetchData()==null)
+					return;
+				
 				int xs = ad.getXOffset();
 				int ys = ad.getYOffset();
 				
@@ -286,11 +291,62 @@ public class GenerateService implements IGenerateService
 					//System.out.println("calc start: "+Thread.currentThread());
 					
 					IFuture<ICalculateService> futc = agent.getFeature(IRequiredServicesFeature.class).getService("calculateservice");
+					
 					futc.then(cs -> 
 					{
-						cs.calculateArea(part).next(chunk ->
+						cs.calculateArea(part).addResultListener(new IIntermediateResultListener<PartDataChunk>() 
+						{
+							public void resultAvailable(Collection<PartDataChunk> results)
+							{
+							}
+							
+							public void intermediateResultAvailable(PartDataChunk chunk)
+							{
+								System.out.println("generate got chunk (calls display): "+chunk);
+								
+								chunk.setDisplayId(part.getDisplayId());
+								chunk.setArea(new Rectangle(part.getXOffset(), part.getYOffset(), part.getSizeX(), part.getSizeY()));
+								chunk.setImageWidth(complete.getSizeX());
+								chunk.setImageHeight(complete.getSizeY());
+								
+								part.addChunk(chunk);
+								
+								// Inform display service that a chunk is finsihed
+								ds.displayIntermediateResult(chunk).then(v2 -> {}
+									//System.out.println("da")
+									// Use result from calculation service instead of result from display service.
+									//ret.setResult(calcresult)
+								).catchErr(ex -> {}
+									//System.out.println("da2: "+ex)
+									// Use result from calculation service instead of exception from display service.
+									//ret.setResult(calcresult)
+								);
+							}
+							
+						    public void finished()
+						    {
+						    	// Add result of task execution.
+								alda.taskFinished(part);
+								//System.out.println("perform task ended: "+task);
+								ret.setResult(part);
+						    }
+						    
+							public void maxResultCountAvailable(int max)
+							{
+							}
+							
+							public void exceptionOccurred(Exception e)
+							{
+								System.out.println("ex");
+								System.out.println("exception during task execution: "+e);
+								performTask(task, alda).delegate(ret);
+							}
+						});
+						
+						/*cs.calculateArea(part).next(chunk ->
 						{
 							System.out.println("generate got chunk (calls display): "+chunk);
+							
 							chunk.setDisplayId(part.getDisplayId());
 							chunk.setArea(new Rectangle(part.getXOffset(), part.getYOffset(), part.getSizeX(), part.getSizeY()));
 							chunk.setImageWidth(complete.getSizeX());
@@ -321,7 +377,7 @@ public class GenerateService implements IGenerateService
 	//						System.out.println("ex");
 							System.out.println("exception during task execution: "+ex);
 							performTask(task, alda).delegate(ret);
-						});
+						});*/
 					}).catchErr(ex ->
 					{
 						System.out.println("ex: "+ex);
