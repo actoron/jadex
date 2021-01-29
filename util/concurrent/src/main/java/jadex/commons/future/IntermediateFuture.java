@@ -191,6 +191,9 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 //			System.out.println("Finished due to max cnt: "+this+", "+maxresultcnt+", "+fini);
 			setFinishedIfUndone();
 		}
+		
+		//if(result!=null && result.toString().indexOf("Chunk")!=-1)
+		//	System.out.println("ifuture: "+results.size()+" "+hashCode());
 	}
 	
 	/**

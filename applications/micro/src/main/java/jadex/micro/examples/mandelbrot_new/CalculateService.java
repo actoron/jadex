@@ -52,7 +52,7 @@ public class CalculateService implements ICalculateService
 		// Do calc on step so intermediate future can be returned while still calculating
 		IFuture<Void> calcstep = agent.agent.scheduleStep(ia ->
 		{
-			long start = System.currentTimeMillis();
+			//long start = System.currentTimeMillis();
 //			System.out.println("calc start: "+data.getId()+" "+ag.getId());
 						
 			// This code iterates over the area in a bounding boxes

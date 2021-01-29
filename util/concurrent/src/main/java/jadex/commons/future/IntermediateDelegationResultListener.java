@@ -20,15 +20,6 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	/** Custom functional result listener */
 	protected IIntermediateResultListener<E> delegate;
 
-	/** Custom functional result listener */
-	protected IFunctionalResultListener<Collection<E>> crlistener;
-
-	/** Custom functional intermediate result listener */
-	protected IFunctionalIntermediateResultListener<E> cirlistener;
-	
-	/** Custom functional result count listener. */
-	protected IFunctionalIntermediateResultCountListener clistener;
-
 	// -------- constructors --------
 
 //	public IntermediateDelegationResultListener(final IFunctionalResultListener<E> intermediateListener, final IFunctionalResultListener<Void> finishedListener,
@@ -79,18 +70,7 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public IntermediateDelegationResultListener(IntermediateFuture<E> future)
 	{
-		this(future, null, null, null);
-	}
-
-	/**
-	 * Create a new listener.
-	 * @param future The delegation target.
-	 * @param crlistener Custom result listener that overwrites the delegation behaviour.
-	 * @param cirlistener Custom intermediate result listener that overwrites the delegation behaviour.
-	 */
-	public IntermediateDelegationResultListener(IntermediateFuture<E> future, IFunctionalResultListener<Collection<E>> crlistener, IFunctionalIntermediateResultListener<E> cirlistener, IFunctionalIntermediateResultCountListener clistener)
-	{
-		this(future, false, crlistener, cirlistener, clistener);
+		this(future, false);
 	}
 
 	/**
@@ -100,25 +80,10 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public IntermediateDelegationResultListener(IntermediateFuture<E> future, boolean undone) 
 	{
-		this(future, undone, null, null, null);
-	}
-	
-	/**
-	 * Create a new listener.
-	 * @param future The delegation target.
-	 * @param undone use undone methods.
-	 * @param crlistener Custom result listener that overwrites the delegation behaviour.
-	 * @param cirlistener Custom intermediate result listener that overwrites the delegation behaviour.
-	 */
-	public IntermediateDelegationResultListener(IntermediateFuture<E> future, boolean undone, IFunctionalResultListener<Collection<E>> crlistener, IFunctionalIntermediateResultListener<E> cirlistener, IFunctionalIntermediateResultCountListener clistener)
-	{
 		this.future = future;
 		this.undone = undone;
-		this.crlistener = crlistener;
-		this.cirlistener = cirlistener;
-		this.clistener = clistener;
 	}
-
+	
 	// -------- methods --------
 
 	/**
@@ -162,6 +127,13 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public final void intermediateResultAvailable(E result)
 	{
+		//-------- debugging --------
+		if((""+result).contains("PartDataChunk"))
+		{
+			Logger.getLogger(getClass().getName()).info("doAddIntermediateResult: "+this+", "+result);
+		}
+		//-------- debugging end --------
+		
 		try
 		{
 			customIntermediateResultAvailable(result);
@@ -226,33 +198,26 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public void customResultAvailable(Collection<E> result)
 	{
-		if(crlistener != null)
+		if (delegate != null) 
 		{
-			crlistener.resultAvailable(result);
-		}
-		else
-		{
-			if (delegate != null) 
+			if (undone && delegate instanceof IUndoneResultListener) 
 			{
-				if (undone && delegate instanceof IUndoneResultListener) 
-				{
-					((IUndoneResultListener) delegate).resultAvailableIfUndone(result);
-				} 
-				else 
-				{
-					delegate.resultAvailable(result);
-				}
+				((IUndoneResultListener) delegate).resultAvailableIfUndone(result);
 			} 
 			else 
 			{
-				if(undone) 
-				{
-					future.setResultIfUndone(result);
-				} 
-				else 
-				{
-					future.setResult(result);
-				}
+				delegate.resultAvailable(result);
+			}
+		} 
+		else 
+		{
+			if(undone) 
+			{
+				future.setResultIfUndone(result);
+			} 
+			else 
+			{
+				future.setResult(result);
 			}
 		}
 	}
@@ -293,33 +258,26 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public void customIntermediateResultAvailable(E result)
 	{
-		if(cirlistener != null)
+		if(delegate != null) 
 		{
-			cirlistener.intermediateResultAvailable(result);
-		}
-		else
-		{
-			if(delegate != null) 
+			if (undone && delegate instanceof IUndoneIntermediateResultListener) 
 			{
-				if (undone && delegate instanceof IUndoneIntermediateResultListener) 
-				{
-					((IUndoneIntermediateResultListener) delegate).intermediateResultAvailableIfUndone(result);
-				} 
-				else 
-				{
-					delegate.intermediateResultAvailable(result);
-				}
+				((IUndoneIntermediateResultListener) delegate).intermediateResultAvailableIfUndone(result);
 			} 
 			else 
 			{
-				if (undone) 
-				{
-					future.addIntermediateResultIfUndone(result);
-				} 
-				else 
-				{
-					future.addIntermediateResult(result);
-				}
+				delegate.intermediateResultAvailable(result);
+			}
+		} 
+		else 
+		{
+			if (undone) 
+			{
+				future.addIntermediateResultIfUndone(result);
+			} 
+			else 
+			{
+				future.addIntermediateResult(result);
 			}
 		}
 	}
@@ -333,34 +291,27 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public void maxResultCountAvailable(int max) 
 	{
-		if(clistener != null)
+		if(delegate != null) 
 		{
-			clistener.maxResultCountAvailable(max);
-		}
-		else
-		{
-			if(delegate != null) 
-			{
 //				if(undone && delegate instanceof IUndoneIntermediateResultListener) 
 //				{
 //					((IUndoneIntermediateResultListener)delegate).res
 //				} 
 //				else 
 //				{
-					delegate.maxResultCountAvailable(max);
-				//}
-			} 
-			else 
-			{
-				//if(undone) 
-				//{
-				//	future.setMaxResultCount(count);
-				//} 
-				//else 
-				//{
-					future.setMaxResultCount(max);
-				//}
-			}
+				delegate.maxResultCountAvailable(max);
+			//}
+		} 
+		else 
+		{
+			//if(undone) 
+			//{
+			//	future.setMaxResultCount(count);
+			//} 
+			//else 
+			//{
+				future.setMaxResultCount(max);
+			//}
 		}
 	}
 
