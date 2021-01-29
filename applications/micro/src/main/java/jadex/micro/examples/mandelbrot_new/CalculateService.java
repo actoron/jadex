@@ -6,9 +6,12 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.Timeout;
+import jadex.commons.ICommand;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 
 /**
@@ -36,7 +39,29 @@ public class CalculateService implements ICalculateService
 	@Timeout(30000)
 	public IIntermediateFuture<PartDataChunk> calculateArea(AreaData data)
 	{
-		IntermediateFuture<PartDataChunk> ret = new IntermediateFuture<>();
+		IntermediateFuture<PartDataChunk> ret = new IntermediateFuture<PartDataChunk>()
+		{
+			@Override
+			protected boolean doAddResultListener(IResultListener<Collection<PartDataChunk>> listener)
+			{
+				System.out.println(agent.agent+": doAddResultListener("+listener+")");
+				return super.doAddResultListener(listener);
+			}
+			
+			@Override
+			protected void scheduleNotification(IResultListener<Collection<PartDataChunk>> listener, ICommand<IResultListener<Collection<PartDataChunk>>> command)
+			{
+				System.out.println(agent.agent+":scheduleNotification("+command+")");
+				super.scheduleNotification(listener, command);
+			}
+			
+			@Override
+			protected void notifyIntermediateResult(IIntermediateResultListener<PartDataChunk> listener, PartDataChunk result)
+			{
+				System.out.println(agent.agent+":notifyIntermediateResult("+listener+", "+result+")");
+				super.notifyIntermediateResult(listener, result);
+			}
+		};
 		
 		//long start = System.currentTimeMillis();
 		System.out.println("calc start: "+data.getId()+" "+ag.getId());
@@ -52,7 +77,7 @@ public class CalculateService implements ICalculateService
 		// Do calc on step so intermediate future can be returned while still calculating
 		IFuture<Void> calcstep = agent.agent.scheduleStep(ia ->
 		{
-			long start = System.currentTimeMillis();
+//			long start = System.currentTimeMillis();
 //			System.out.println("calc start: "+data.getId()+" "+ag.getId());
 						
 			// This code iterates over the area in a bounding boxes

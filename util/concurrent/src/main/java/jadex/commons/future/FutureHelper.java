@@ -1,9 +1,6 @@
 package jadex.commons.future;
 
-import java.util.Queue;
-
-import jadex.commons.ICommand;
-import jadex.commons.Tuple3;
+import java.util.Set;
 
 /**
  *  Helper class to access future notification stack
@@ -23,22 +20,22 @@ public abstract class FutureHelper
 	/**
 	 *  Remove all collected listener notifications for the current thread.
 	 */
-	public static Queue<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>>	removeStackedListeners()
+	public static Set<Future<?>>	removeStackedListeners()
 	{
-		Queue<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>>	ret	= Future.STACK.get();
-		Future.STACK.remove();
+		Set<Future<?>>	ret	= Future.NOTIFY.get();
+		Future.NOTIFY.remove();
 		return ret;
 	}
 	
 	/**
 	 *  Add listener notifications to the current thread.
 	 */
-	public static void	addStackedListeners(Queue<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>> notifications)
+	public static void	addStackedListeners(Set<Future<?>> notifications)
 	{
-		Queue<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>>	stack	= Future.STACK.get();
+		Set<Future<?>>	stack	= Future.NOTIFY.get();
 		if(stack==null)
 		{
-    		Future.STACK.set(notifications);
+    		Future.NOTIFY.set(notifications);
 		}
 		else
 		{

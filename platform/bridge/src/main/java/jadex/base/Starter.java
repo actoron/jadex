@@ -403,8 +403,8 @@ public class Starter
 		// pass configuration parameters to static fields:
 		MethodInvocationInterceptor.DEBUG = getBooleanValueWithArgs(args, "debugservices", config.getExtendedPlatformConfiguration().getDebugServices());
 		ExecutionComponentFeature.DEBUG = getBooleanValueWithArgs(args, "debugsteps", config.getExtendedPlatformConfiguration().getDebugSteps());
-//		Future.NO_STACK_COMPACTION	= true;
 		Future.NO_STACK_COMPACTION	= getBooleanValueWithArgs(args, "nostackcompaction", config.getExtendedPlatformConfiguration().getNoStackCompaction());
+//		Future.NO_STACK_COMPACTION	= true;
 		Future.DEBUG = getBooleanValueWithArgs(args, "debugfutures", config.getExtendedPlatformConfiguration().getDebugFutures()); 
 		
 //		new FastClasspathScanner(new String[]

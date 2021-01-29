@@ -149,6 +149,14 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    		//if(listener!=null && getResultCount()==1)
 	    		//	scheduleMaxNotification(null);
 	    		
+//				//-------- debugging --------
+//				if((""+result).contains("PartDataChunk"))
+//				{
+//					System.out.println("doAddIntermediateResult0: "+this+", "+result+", "+listener+", "+listeners);
+//				}
+//				//-------- debugging end --------
+
+	    		
 	    		scheduleNotification(new ICommand<IResultListener<Collection<E>>>()
 				{
 	    			@Override
@@ -156,6 +164,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    			{
 		        		if(listener instanceof IIntermediateResultListener)
 		        		{
+//		    				//-------- debugging --------
+//		    				if((""+result).contains("PartDataChunk"))
+//		    				{
+//		    					System.out.println("doAddIntermediateResult1: "+IntermediateFuture.this+", "+result+", "+listener+", "+listeners);
+//		    				}
+//		    				//-------- debugging end --------
 		        			notifyIntermediateResult((IIntermediateResultListener<E>)listener, result);
 		        		}
 	    			}
@@ -296,6 +310,14 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 		    			@SuppressWarnings("unchecked")
 						ICommand<IResultListener<Collection<E>>> c = (ICommand<IResultListener<Collection<E>>>) ((Object) new ICommand<IIntermediateResultListener<E>>()
 						{
+//							//-------- debugging --------
+//							@Override
+//							public String toString()
+//							{
+//								return "NotifyIntermediateResultCommand("+listener+", "+result+")";
+//							}
+//							//-------- debugging end --------
+							
 		    				@Override
 		    				public void execute(IIntermediateResultListener<E> listener)
 		    				{
