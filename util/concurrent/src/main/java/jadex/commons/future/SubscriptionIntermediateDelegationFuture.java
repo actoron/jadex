@@ -38,11 +38,11 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	/**
 	 *  Create a new future.
 	 */
-	public SubscriptionIntermediateDelegationFuture(ITerminableIntermediateFuture<?> src)
+	public SubscriptionIntermediateDelegationFuture(ITerminableIntermediateFuture<E> src)
 	{
 		super();
 		//super(src); does not work as storeforfirst is not yet set :-(
-		src.addResultListener(new TerminableIntermediateDelegationResultListener(this, src));
+		src.addResultListener(new TerminableIntermediateDelegationResultListener<E>(this, src));
 	}
 	
 	//-------- methods (hack!!! copied from subscription future) --------
@@ -55,27 +55,27 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	{
 		throw new UnsupportedOperationException("Subscription futures do not allow max result setting.");
 	}
-
+	
 	/**
 	 *  Add a result.
 	 *  @param result The result.
+	 *  @param scheduled	True, if any listener notification has been scheduled for this result. (used for subscription futures to check for lost values)
 	 */
-	protected void	storeResult(E result)
+	@Override
+	protected void	storeResult(E result, boolean scheduled)
 	{
-		//System.out.println("store: "+result+" "+storeforfirst+" "+ownresults);
-		
 		resultssize++;
 		
 		// Store results only if not yet any listener added or thread waiting
 		if(storeforfirst)
 		{
-			super.storeResult(result);
+			super.storeResult(result, scheduled);
 		}
-		else if(listener==null && ownresults==null)
+		else if(!scheduled && ownresults==null)
 		{
 			throw new RuntimeException("lost value: "+result);
 		}
-
+		
 		if(ownresults!=null)
 		{
 			for(List<E> res: ownresults.values())
@@ -87,7 +87,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 		resumeIntermediate();
 	}
 	
-    /** 
+	/** 
      *  Get the number of results already collected.
      *  @return The number of results.
      */
@@ -104,36 +104,40 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	public void	addQuietListener(IResultListener<Collection<E>> listener)
 	{
     	if(!(listener instanceof IIntermediateResultListener))
+    	{
     		throw new IllegalArgumentException("Subscription futures require intermediate listeners.");
+    	}
     	
     	super.addResultListener(listener);		
 	}
 
-	Exception e;
 	
 	/**
      *  Add a result listener.
-     *  @param listener The listener.
+     *  @param listsner The listener.
      */
+	@Override
     public void	addResultListener(IResultListener<Collection<E>> listener)
     {
     	if(!(listener instanceof IIntermediateResultListener))
     		throw new IllegalArgumentException("Subscription futures require intermediate listeners.");
     	
+//    	System.out.println("adding listener: "+this+" "+listener);
+    	
     	super.addResultListener(listener);
     	
-      	boolean first;
+    	boolean first;
     	synchronized(this)
 		{
 			first = storeforfirst;
 			storeforfirst = false;
-//    		System.out.println("adding first listener: "+this+" "+listener);
+			//System.out.println("store false: "+this);
 		}
     	
 		if(first)
-			results=null;
+			results = null;
     }
-    
+	
     /**
      *  Get the intermediate results that are available.
      *  Note: The semantics of this method is different to the normal intermediate future
@@ -210,6 +214,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 			if(storeforfirst)
 			{
 				storeforfirst	= false;
+				//System.out.println("store false: "+this);
 				ownres	= results;
 				results	= null;
 			}
@@ -282,6 +287,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 			if(storeforfirst)
 			{
 				storeforfirst	= false;
+				//System.out.println("store false: "+this);
 				ownres	= results;
 				results	= null;
 			}
@@ -316,9 +322,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     		{
     			suspend	= true;
 	    	   	if(icallers==null)
-	    	   	{
 	    	   		icallers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
-	    	   	}
 	    	   	icallers.put(caller, CALLER_QUEUED);
     		}
     	}

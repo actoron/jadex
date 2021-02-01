@@ -149,33 +149,30 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    		//if(listener!=null && getResultCount()==1)
 	    		//	scheduleMaxNotification(null);
 	    		
-//				//-------- debugging --------
-//				if((""+result).contains("PartDataChunk"))
-//				{
-//					System.out.println("doAddIntermediateResult0: "+this+", "+result+", "+listener+", "+listeners);
-//				}
-//				//-------- debugging end --------
+				//-------- debugging --------
+				if((""+result).contains("PartDataChunk"))
+				{
+					System.out.println("doAddIntermediateResult0: "+this+", "+result+", "+listeners);
+				}
+				//-------- debugging end --------
 
 	    		
-	    		scheduleNotification(new ICommand<IResultListener<Collection<E>>>()
+	    		boolean	scheduled	= scheduleNotification(listener -> listener instanceof IIntermediateResultListener, new ICommand<IResultListener<Collection<E>>>()
 				{
 	    			@Override
 	    			public void execute(IResultListener<Collection<E>> listener)
 	    			{
-		        		if(listener instanceof IIntermediateResultListener)
-		        		{
-//		    				//-------- debugging --------
-//		    				if((""+result).contains("PartDataChunk"))
-//		    				{
-//		    					System.out.println("doAddIntermediateResult1: "+IntermediateFuture.this+", "+result+", "+listener+", "+listeners);
-//		    				}
-//		    				//-------- debugging end --------
-		        			notifyIntermediateResult((IIntermediateResultListener<E>)listener, result);
-		        		}
+	    				//-------- debugging --------
+	    				if((""+result).contains("PartDataChunk"))
+	    				{
+	    					System.out.println("doAddIntermediateResult1: "+IntermediateFuture.this+", "+result+", "+listener);
+	    				}
+	    				//-------- debugging end --------
+		        		notifyIntermediateResult((IIntermediateResultListener<E>)listener, result);
 	    			}
 				});
 	    		
-	    		storeResult(result);
+	    		storeResult(result, scheduled);
 	    		notify	= true;
 	    	}
     	}
@@ -190,9 +187,18 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	/**
 	 *  Add a result.
 	 *  @param result The result.
+	 *  @param scheduled	True, if any listener notification has been scheduled for this result. (used for subscription futures to check for lost values)
 	 */
-	protected void	storeResult(E result)
+	protected void	storeResult(E result, boolean scheduled)
 	{
+		//-------- debugging --------
+		if((""+result).contains("PartDataChunk"))
+		{
+			System.out.println("storeResult: "+IntermediateFuture.this+", "+result+", "+listeners);
+		}
+		//-------- debugging end --------
+
+		
 //		if(result!=null && result.getClass().getName().indexOf("ChangeEvent")!=-1)
 //			System.out.println("ires: "+this+" "+result);
       	intermediate = true;
@@ -286,24 +292,24 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	if(listener==null)
     		throw new RuntimeException();
        	
-    	boolean	scheduled = false;
-    	boolean notify;
+    	boolean	notify_intermediate = false;
+    	boolean notify_finished;
     	
     	synchronized(this)
     	{    		
-        	notify	= doAddResultListener(listener);
+        	notify_finished	= doAddResultListener(listener);
 
     		// If results==null its a subscription future and first results are already collected.
     		if(intermediate && listener instanceof IIntermediateResultListener)
     		{
 	    		IIntermediateResultListener<E> lis = (IIntermediateResultListener<E>)listener;
-	    		scheduled = scheduleMaxNotification(lis);
+	    		notify_intermediate = scheduleMaxNotification(lis);
 	    		//System.out.println("addRes scheduleAll: "+maxresultcnt+" "+this);
 
 	    		if(results!=null && !results.isEmpty())
 	    		{    			
 	    			//System.out.println("notify scheduled: "+results);
-	    			scheduled = true;
+	    			notify_intermediate = true;
 		    				    		
 		    		for(final E result: results)
 		    		{
@@ -331,19 +337,13 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		}
     	}
 
-    	// Notify intermediate results if any
-    	if(scheduled)
-    		startScheduledNotifications();
-    	
     	// Notify final result if any
-    	if(notify)
-    		notifyListener(listener);
-
-
-    	//if(!scheduled && maxresultcnt!=-1)
-    	//	System.out.println("addRes scheduleAll NOT: "+maxresultcnt+" "+this);
+    	if(notify_finished)
+    		scheduleNotification(listener, getNotificationCommand());
     	
-//       	super.addResultListener(listener);	// add must be synchronized, but notify outside synchronized{}
+    	// Notify intermediate results and or final result if any
+    	if(notify_intermediate || notify_finished)
+    		startScheduledNotifications();
     }
     
     protected ICommand<IResultListener<Collection<E>>>	notcommand	= new ICommand<IResultListener<Collection<E>>>()
@@ -638,7 +638,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	        	this.maxresultcnt = max;
 	        	intermediate = intermediate | max!=-1;
 	        	
-	        	if(listener!=null)
+	        	if(hasResultListener())
 	        	{
 		    		notify	= scheduleMaxNotification(null);
 	        	}
@@ -670,11 +670,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 				@Override
 				public void execute(IResultListener<Collection<E>> listener)
 				{
-					//System.out.println("notific: "+listener);
-	        		if(listener instanceof IIntermediateResultListener)
-	        		{
-	        			((IIntermediateResultListener)listener).maxResultCountAvailable(maxresultcnt);
-	        		}
+        			((IIntermediateResultListener<E>)listener).maxResultCountAvailable(maxresultcnt);
 				}
 				
 				@Override
@@ -686,7 +682,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		
 			// Important! two methods fitting scheduleNotification(lis, com) :-(
     		if(lis==null)
-    			scheduleNotification(com);
+    			scheduleNotification(l -> l instanceof IIntermediateResultListener, com);
     		else
     			scheduleNotification(lis, com);
     	}

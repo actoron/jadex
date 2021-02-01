@@ -44,21 +44,21 @@ public class CalculateService implements ICalculateService
 			@Override
 			protected boolean doAddResultListener(IResultListener<Collection<PartDataChunk>> listener)
 			{
-				System.out.println(agent.agent+": doAddResultListener("+listener+")");
+				System.out.println(agent.agent+": doAddResultListener("+this+", "+listener+")");
 				return super.doAddResultListener(listener);
 			}
 			
 			@Override
 			protected void scheduleNotification(IResultListener<Collection<PartDataChunk>> listener, ICommand<IResultListener<Collection<PartDataChunk>>> command)
 			{
-				System.out.println(agent.agent+":scheduleNotification("+command+")");
+				System.out.println(agent.agent+":scheduleNotification("+this+", "+listener+", "+command+")");
 				super.scheduleNotification(listener, command);
 			}
 			
 			@Override
 			protected void notifyIntermediateResult(IIntermediateResultListener<PartDataChunk> listener, PartDataChunk result)
 			{
-				System.out.println(agent.agent+":notifyIntermediateResult("+listener+", "+result+")");
+				System.out.println(agent.agent+":notifyIntermediateResult("+this+", "+listener+", "+result+")");
 				super.notifyIntermediateResult(listener, result);
 			}
 		};

@@ -114,8 +114,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/** The current timer. */
 	protected List<ITimer> timers = new ArrayList<ITimer>();
 	
-	/** Retained listener notifications when switching threads due to blocking. */
-	protected Set<Future<?>>	notifications;
+//	/** Retained listener notifications when switching threads due to blocking. */
+//	protected Set<Future<?>>	notifications;
 	
 	/** Flag for testing double execution. */
 	protected volatile boolean executing;
@@ -1014,9 +1014,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
-			// Retain listener notifications for new component thread.
-			assert notifications==null : getComponent()+", "+IComponentIdentifier.LOCAL.get();
-			notifications	= FutureHelper.removeStackedListeners();
+			// Perform scheduled notifications before blocking thread.
+			FutureHelper.notifyStackedListeners();
+			
+//			// Retain listener notifications for new component thread.
+//			assert notifications==null : getComponent()+", "+IComponentIdentifier.LOCAL.get();
+//			notifications	= FutureHelper.removeStackedListeners();
 //			if(notifications!=null && getComponent().toString().indexOf("IntermediateBlockingTest@")!=-1)
 //				System.err.println("setting notifications: "+getComponent());
 			
@@ -1113,14 +1116,14 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				
 				afterBlock();
 				
-				// If no other thread for component in mean time, maybe there are notifications left -> readd
-				if(notifications!=null)
-				{
-//					if(getComponent().toString().indexOf("IntermediateBlockingTest@")!=-1)
-//						System.err.println("unsetting notifications2: "+getComponent());
-					FutureHelper.addStackedListeners(notifications);
-					notifications	= null;
-				}
+//				// If no other thread for component in mean time, maybe there are notifications left -> readd
+//				if(notifications!=null)
+//				{
+////					if(getComponent().toString().indexOf("IntermediateBlockingTest@")!=-1)
+////						System.err.println("unsetting notifications2: "+getComponent());
+//					FutureHelper.addStackedListeners(notifications);
+//					notifications	= null;
+//				}
 			}
 		}
 	}
@@ -1206,34 +1209,34 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	
 			ClassLoader cl = setExecutionState();
 			
-			// Process listener notifications from old component thread.
-//			boolean notifexecuted	= false;
-			if(notifications!=null)
-			{
-//				if(getComponent().toString().indexOf("IntermediateBlockingTest@")!=-1)
-//					System.err.println("unsetting notifications: "+getComponent());
-				FutureHelper.addStackedListeners(notifications);
-				notifications	= null;
-				
-				// Todo: termination and exception!?
-//				try
-//				{
-					FutureHelper.notifyStackedListeners();
-//					notifexecuted	= true;
-//				}
-//				catch(Exception e)
-//				{
-//					fatalError(e);
-//				}
-//				catch(StepAborted sa)
-//				{
-//				}
-//				catch(Throwable t)
-//				{
-//					fatalError(new RuntimeException(t));
-//				}
-
-			}
+//			// Process listener notifications from old component thread.
+////			boolean notifexecuted	= false;
+//			if(notifications!=null)
+//			{
+////				if(getComponent().toString().indexOf("IntermediateBlockingTest@")!=-1)
+////					System.err.println("unsetting notifications: "+getComponent());
+//				FutureHelper.addStackedListeners(notifications);
+//				notifications	= null;
+//				
+//				// Todo: termination and exception!?
+////				try
+////				{
+//					FutureHelper.notifyStackedListeners();
+////					notifexecuted	= true;
+////				}
+////				catch(Exception e)
+////				{
+////					fatalError(e);
+////				}
+////				catch(StepAborted sa)
+////				{
+////				}
+////				catch(Throwable t)
+////				{
+////					fatalError(new RuntimeException(t));
+////				}
+//
+//			}
 			if(endstepcnt!=-1 && debug)
 				getComponent().getLogger().severe("execute()2: "+getComponent().getId()+", "+IComponentIdentifier.LOCAL.get()+", endstepcnt="+endstepcnt+", stepcnt="+stepcnt);
 			

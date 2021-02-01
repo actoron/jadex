@@ -81,20 +81,21 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	}
 	
 	/**
-	 *  Store a result.
+	 *  Add a result.
 	 *  @param result The result.
+	 *  @param scheduled	True, if any listener notification has been scheduled for this result. (used for subscription futures to check for lost values)
 	 */
 	@Override
-	protected void	storeResult(E result)
+	protected void	storeResult(E result, boolean scheduled)
 	{
 		resultssize++;
 		
 		// Store results only if not yet any listener added or thread waiting
 		if(storeforfirst)
 		{
-			super.storeResult(result);
+			super.storeResult(result, scheduled);
 		}
-		else if(listener==null && ownresults==null)
+		else if(!scheduled && ownresults==null)
 		{
 			throw new RuntimeException("lost value: "+result);
 		}

@@ -677,17 +677,17 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	@Override
 	public String toString()
 	{
-		return super.toString() + "(storeforfirst="+storeforfirst+", listener="+(listener!=null)+", src="+mysrc+", results="+results+", ownresults="+ownresults+", myresults="+myresults+")";
+		return super.toString() + "(storeforfirst="+storeforfirst+", src="+mysrc+", results="+results+", ownresults="+ownresults+", myresults="+myresults+")";
 	}
 	@Override
-	protected void	storeResult(Object result)
+	protected void	storeResult(Object result, boolean scheduled)
 	{
 		if((""+result).contains("IMarkerService"))
 		{
 			try
 			{
 				myresults.add(result);
-				super.storeResult(result);
+				super.storeResult(result, scheduled);
 			}
 			finally
 			{
@@ -696,7 +696,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		else
 		{
-			super.storeResult(result);
+			super.storeResult(result, scheduled);
 		}
 	}
 	//-------- debugging end --------
@@ -759,6 +759,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	protected boolean	doAddIntermediateResult(Object result, boolean undone)
 	{
 		if((""+result).contains("IMarkerService"))
+//			|| (""+result).contains("PartDataChunk"))
 		{
 			Logger.getLogger(getClass().getName()).info("add: "+this+", "+result+", "+IComponentIdentifier.LOCAL.get());
 		}
@@ -1078,13 +1079,13 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
  */
 class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 {
-//	//-------- debugging --------
-//	@Override
-//	public String toString()
-//	{
-//		return super.toString() + "(listener="+listener+", listeners="+listeners+")";
-//	}
-//	//-------- debugging end --------
+	//-------- debugging --------
+	@Override
+	public String toString()
+	{
+		return super.toString() + "(listeners="+listeners+")";
+	}
+	//-------- debugging end --------
 
 	
 	/** The future functionality. */
