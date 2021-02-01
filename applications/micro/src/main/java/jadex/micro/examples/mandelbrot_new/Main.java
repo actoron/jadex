@@ -20,8 +20,7 @@ public class Main
 	{
 		//IExternalAccess platform = Starter.createPlatform().get();
 		IExternalAccess platform = Starter.createPlatform(PlatformConfigurationHandler.getDefault()).get();
-		//CreationInfo ci = new CreationInfo().setFilenameClass(MandelbrotAgent.class).setConfiguration("all");
-		CreationInfo ci = new CreationInfo().setFilenameClass(MandelbrotAgent.class);
+		CreationInfo ci = new CreationInfo().setFilenameClass(MandelbrotAgent.class).setConfiguration("pools");
 		platform.createComponent(ci).get();
 	}
 }

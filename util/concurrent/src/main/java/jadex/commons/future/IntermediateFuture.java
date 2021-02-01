@@ -116,6 +116,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     {
     	boolean	ret	= true;
     	boolean	notify	= false;
+    	
     	synchronized(this)
     	{
 	    	if(undone)

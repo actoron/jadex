@@ -1,9 +1,11 @@
 package jadex.micro.examples.mandelbrot_new;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.SwingUtilities;
@@ -11,11 +13,13 @@ import javax.swing.SwingUtilities;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IPojoComponentFeature;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -23,6 +27,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.gui.SGUI;
+import jadex.platform.service.servicepool.ServicePoolAgent;
 
 /**
  *  Generate service implementation. 
@@ -47,6 +52,9 @@ public class GenerateService implements IGenerateService
 	
 	/** The generate panel. */
 	protected GeneratePanel panel;
+
+	/** The current calculator count (for selecting the next). */
+	protected int curcalc;
 	
 	//-------- constructors --------
 	
@@ -110,8 +118,8 @@ public class GenerateService implements IGenerateService
 	{
 		GenerateAgent ga = (GenerateAgent)agent.getFeature(IPojoComponentFeature.class).getPojoAgent();
 		
-		if(ga.getCalculateService()==null)
-			return new Future<AreaData>(new RuntimeException("No calculate service available"));
+		//if(ga.getCalculateService()==null)
+		//	return new Future<AreaData>(new RuntimeException("No calculate service available"));
 		
 		// Update own gui settings
 		SwingUtilities.invokeLater(new Runnable()
@@ -290,7 +298,8 @@ public class GenerateService implements IGenerateService
 				//{
 					//System.out.println("calc start: "+Thread.currentThread());
 					
-					IFuture<ICalculateService> futc = agent.getFeature(IRequiredServicesFeature.class).getService("calculateservice");
+					//IFuture<ICalculateService> futc = agent.getFeature(IRequiredServicesFeature.class).getService("calculateservice");
+					IFuture<ICalculateService> futc = getNextCalculateService();
 					
 					futc.then(cs -> 
 					{
@@ -302,7 +311,7 @@ public class GenerateService implements IGenerateService
 							
 							public void intermediateResultAvailable(PartDataChunk chunk)
 							{
-								System.out.println("generate got chunk (calls display): "+chunk);
+								//System.out.println("generate got chunk (calls display): "+chunk);
 								
 								chunk.setDisplayId(part.getDisplayId());
 								chunk.setArea(new Rectangle(part.getXOffset(), part.getYOffset(), part.getSizeX(), part.getSizeY()));
@@ -473,6 +482,89 @@ public class GenerateService implements IGenerateService
 		
 		return ret;
 	}*/
+		
+	/**
+	 *  Manage all available calculators and calculator pools.
+	 *  Tasks are distributed by allocating one by one as long
+	 *  as free capacity permits. If no free capacity it will pick
+	 *  just the next in order.
+	 *  @return The next free calculator service.
+	 */
+	protected IFuture<ICalculateService> getNextCalculateService()
+	{
+		Future<ICalculateService> ret = new Future<>();
+		
+		GenerateAgent ga = (GenerateAgent)agent.getFeature(IPojoComponentFeature.class).getPojoAgent();
+		
+		// has calcs -> get next free
+		if(ga.getCalculateServices().size()>0)
+		{
+			findFreeCalculatorService(new ArrayList<ICalculateService>(ga.getCalculateServices()), curcalc, 0)
+			.then(tup -> 
+			{
+				System.out.println("Found: "+curcalc+" "+tup.getSecondEntity()+" "+tup.getFirstEntity());
+				curcalc = tup.getSecondEntity();
+				ret.setResult(tup.getFirstEntity());
+			})
+			.catchErr(ex -> ret.setException(ex));
+		}
+		// no calculators found
+		else if(ga.getCalculateServices().size()==0)
+		{
+			long wait = 2000;
+			System.out.println("No calculators found, retrying in: "+wait);
+			agent.waitForDelay(2000).then(c -> getNextCalculateService().delegate(ret))
+			.catchErr(ex -> getNextCalculateService().delegate(ret));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Find a free calculator. Searches linearly for pools and if none is avilable in
+	 *  the second round takes all available calculator.
+	 *  @param calcs The calculators.
+	 *  @param pos The current position.
+	 *  @param tried The number of already inspected calculators. 
+	 *  @return The calculator.
+	 */
+	protected IFuture<Tuple2<ICalculateService, Integer>> findFreeCalculatorService(List<ICalculateService> calcs, int pos, int tried)
+	{
+		Future<Tuple2<ICalculateService, Integer>> ret = new Future<>();
+		boolean takeany = false;
+		
+		if(tried==calcs.size())
+			takeany = true;
+		
+		if(pos>=calcs.size())
+			pos = 0;
+		
+		ICalculateService calc = calcs.get(pos);
+		if(takeany)
+		{
+			ret.setResult(new Tuple2<ICalculateService, Integer>(calc, pos+1));
+		}
+		else
+		{
+			int fpos = pos;
+			ServicePoolAgent.getFreeCapacity(agent, (IService)calc).then(cap ->
+			{
+				System.out.println("capa: "+calc+" "+cap);
+				if(cap>0)
+				{
+					ret.setResult(new Tuple2<ICalculateService, Integer>(calc, fpos+1));
+				}
+				else
+				{
+					findFreeCalculatorService(calcs, fpos+1, tried+1).delegate(ret);
+				}
+			}).catchErr(ex -> findFreeCalculatorService(calcs, fpos+1, tried+1).delegate(ret));
+		}
+		
+		curcalc++;
+		
+		return ret;
+	}
 	
 	/**
 	 *  Handler for a single task allocation.

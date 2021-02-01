@@ -412,7 +412,7 @@ public class DisplayPanel extends JComponent
 				
 				dirty = true;
 				
-				System.out.println("progressdata: "+progressdata.size());
+				//System.out.println("progressdata: "+progressdata.size());
 			}
 		};
 		
@@ -511,7 +511,7 @@ public class DisplayPanel extends JComponent
 				
 				dirty = true;
 				
-				System.out.println("display received: "+data);
+				//System.out.println("display received: "+data);
 			}
 		});
 	}

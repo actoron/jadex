@@ -127,13 +127,6 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public final void intermediateResultAvailable(E result)
 	{
-		//-------- debugging --------
-		if((""+result).contains("PartDataChunk"))
-		{
-			Logger.getLogger(getClass().getName()).info("doAddIntermediateResult: "+this+", "+result);
-		}
-		//-------- debugging end --------
-		
 		try
 		{
 			customIntermediateResultAvailable(result);

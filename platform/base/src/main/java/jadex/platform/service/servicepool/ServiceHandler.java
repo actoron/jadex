@@ -549,6 +549,15 @@ public class ServiceHandler implements InvocationHandler
 		
 		return ret;
 	}
+	
+	/**
+	 *  Get the strategy.
+	 *  @return The strategy.
+	 */
+	public IPoolStrategy getStrategy() 
+	{
+		return strategy;
+	}
 
 	/**
 	 *  Get the string representation.

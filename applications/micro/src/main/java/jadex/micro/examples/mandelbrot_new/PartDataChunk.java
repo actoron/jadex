@@ -48,7 +48,7 @@ public class PartDataChunk
 		this.ystart = ystart;
 		this.worker = worker;
 		
-		System.out.println("chunk: "+(data!=null? data.length: 0)+" "+xstart+" "+ystart+" "+progress+" "+worker.getLocalName());
+		//System.out.println("chunk: "+(data!=null? data.length: 0)+" "+xstart+" "+ystart+" "+progress+" "+worker.getLocalName());
 	}
 
 	/**

@@ -24,6 +24,12 @@ import jadex.micro.annotation.Configurations;
 		@Component(type="CalculatorPool", arguments = @NameValue(name="serviceinfos",
 			value="new jadex.platform.service.servicepool.PoolServiceInfo[]{new jadex.platform.service.servicepool.PoolServiceInfo(\"jadex/micro/examples/mandelbrot_new/CalculateAgent.class\", jadex.micro.examples.mandelbrot_new.ICalculateService.class, new jadex.commons.DefaultPoolStrategy(10, 10000, 20))}")),
 		@Component(type="Display")
+	}),
+	@Configuration(name="pools", components={
+		@Component(type="Generator"),
+		@Component(type="CalculatorPool", number = "3", arguments = @NameValue(name="serviceinfos",
+			value="new jadex.platform.service.servicepool.PoolServiceInfo[]{new jadex.platform.service.servicepool.PoolServiceInfo(\"jadex/micro/examples/mandelbrot_new/CalculateAgent.class\", jadex.micro.examples.mandelbrot_new.ICalculateService.class, new jadex.commons.DefaultPoolStrategy(2, 2))}")),
+		@Component(type="Display")
 	})
 })
 @Agent

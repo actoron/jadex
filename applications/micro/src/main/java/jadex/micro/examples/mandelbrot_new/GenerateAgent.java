@@ -1,5 +1,8 @@
 package jadex.micro.examples.mandelbrot_new;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.ServiceScope;
 import jadex.micro.annotation.Agent;
@@ -27,14 +30,14 @@ public class GenerateAgent
 	@Agent
 	protected IInternalAccess agent;
 	
-	protected ICalculateService calcservice;
+	protected List<ICalculateService> calcservices = new ArrayList<>();
 	protected IDisplayService displayservice;
 	
 	@OnService(name="calculateservice")
 	protected void calculateServiceAvailable(ICalculateService cs)
 	{
-		//System.out.println("Found calculate service: "+cs);
-		this.calcservice = cs;
+		System.out.println("Found calculate service: "+cs);
+		calcservices.add(cs);
 		if(displayservice!=null)
 			agent.getLocalService(IGenerateService.class).calcDefaultImage();
 	}
@@ -44,15 +47,15 @@ public class GenerateAgent
 	{
 		//System.out.println("Found display service: "+cs);
 		this.displayservice = ds;
-		if(calcservice!=null)
+		if(calcservices.size()>0)
 			agent.getLocalService(IGenerateService.class).calcDefaultImage();
 	}
 
 	/**
 	 * @return the calcservice
 	 */
-	public ICalculateService getCalculateService() 
+	public List<ICalculateService> getCalculateServices() 
 	{
-		return calcservice;
+		return calcservices;
 	}
 }
