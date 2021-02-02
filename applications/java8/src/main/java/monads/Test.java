@@ -10,8 +10,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 
 /**
@@ -109,7 +109,7 @@ public class Test
     {
         IntermediateFuture<R> ret = new IntermediateFuture<>();
 
-        orig.addIntermediateResultListener(new IIntermediateResultListener<V>()
+        orig.addResultListener(new IntermediateEmptyResultListener<V>()
         {
             public void resultAvailable(Collection<V> result)
             {
@@ -278,7 +278,7 @@ public class Test
     {
         final IntermediateFuture<R> ret = new IntermediateFuture<R>();
 
-        orig.addIntermediateResultListener(new IIntermediateResultListener<E>()
+        orig.addResultListener(new IntermediateEmptyResultListener<E>()
         {
         	boolean fin = false;
         	int cnt = 0;
@@ -297,7 +297,7 @@ public class Test
             {
             	cnt++;
                 IIntermediateFuture<R> res = function.execute(result);
-                res.addResultListener(new IIntermediateResultListener<R>()
+                res.addResultListener(new IntermediateEmptyResultListener<R>()
                 {
                     public void intermediateResultAvailable(R result)
                     {

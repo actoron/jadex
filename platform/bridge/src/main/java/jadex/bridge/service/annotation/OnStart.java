@@ -8,6 +8,9 @@ import java.lang.annotation.Target;
 
 /**
  *  A method marked with this annotation will be called upon start of the element.
+ *  
+ *  todo: refactor @OnInit @OnStart @OnEnd to @OnStart @OnRun @OnEnd to have
+ *  it consistent with services and agents
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

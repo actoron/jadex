@@ -1,5 +1,6 @@
 package jadex.commons.future;
 
+import jadex.commons.ICommand;
 import jadex.commons.functional.BiFunction;
 import jadex.commons.functional.Consumer;
 import jadex.commons.functional.Function;
@@ -19,17 +20,17 @@ public interface IFuture<E>
 	 *  value of methods that do not perform asynchronous operations and do not
 	 *  return a result value.
 	 */
-	public static final IFuture<Void>	DONE	= new Future<Void>((Void)null);
+	public static final IFuture<Void> DONE = new Future<Void>((Void)null);
 	
 	/**
 	 *  A future representing a true result.
 	 */
-	public static final IFuture<Boolean>	TRUE	= new Future<Boolean>(Boolean.TRUE);
+	public static final IFuture<Boolean> TRUE = new Future<Boolean>(Boolean.TRUE);
 	
 	/**
 	 *  A future representing a false result.
 	 */
-	public static final IFuture<Boolean>	FALSE	= new Future<Boolean>(Boolean.FALSE);
+	public static final IFuture<Boolean> FALSE = new Future<Boolean>(Boolean.FALSE);
 	
 	// -------- methods --------
 
@@ -108,7 +109,7 @@ public interface IFuture<E>
 	 * Exceptions will be handled by DefaultResultListener.
 	 * 
 	 * @param listener The listener.
-	 */
+	 * /
 	public void addResultListener(IFunctionalResultListener<E> listener);
 
 	/**
@@ -118,12 +119,21 @@ public interface IFuture<E>
 	 * @param sucListener The listener that is called on success.
 	 * @param exListener The listener that is called on exceptions. Passing
 	 *        <code>null</code> enables default exception logging.
-	 */
+	 * /
 	public void addResultListener(IFunctionalResultListener<E> sucListener, IFunctionalExceptionListener exListener);
-
+	*/
 
 	//-------- java8 extensions --------
 	
+	/**
+	 *  Applies a function after the result is available, using the result of this Future as input.
+	 *  @param function Function that takes the result of this future as input and delivers t. 
+	 *  @return Future of the result after the function has been applied.
+	 */
+	//public <T> IFuture<T> then(final Function<? super E, ? extends T> function);
+	//public <T> IFuture<? extends T> then(Consumer<? super T> function);
+	public IFuture<? extends E> then(Consumer<? super E> function);
+	 	
 	/**
 	 *  Applies a function after the result is available, using the result of this Future as input.
 	 *  @param function Function that takes the result of this future as input and delivers t. 
@@ -160,7 +170,7 @@ public interface IFuture<E>
 	 *  Applies a synchronous function consuming the result after it is available.
 	 *  @param consumer Consumer that takes the result of this future as input and consumes it. 
 	 *  @return Future of the result of the second async call.
-	 */
+	 * /
 	public IFuture<Void> thenAccept(Consumer<? super E> consumer);
 	
 	/**
@@ -168,7 +178,7 @@ public interface IFuture<E>
 	 *  @param consumer Consumer that takes the result of this future as input and consumes it. 
 	 *  @param futuretype The type of the return future. If null, a default future is created.
 	 *  @return Future of the second async call (returning void).
-	 */
+	 * /
 	public IFuture<Void> thenAccept(Consumer<? super E> consumer, Class<?> futuretype);
 	
 	/**
@@ -179,7 +189,7 @@ public interface IFuture<E>
 	 *  @return Future of the second async call.
 	 *  
 	 *  Types: function is: E,U -> V
-	 */
+	 * /
 	public <U,V> IFuture<V> thenCombine(IFuture<U> other, BiFunction<? super E,? super U, ? extends V> function, Class<?> futuretype);
 	
 	/**
@@ -203,8 +213,9 @@ public interface IFuture<E>
 	 * @param fn function to receive result
 	 * @param futuretype The type of the return future. If null, a default future is created.
 	 * @return Future of the async function execution.
-	 */
+	 * /
 	public <U> IFuture<U> applyToEither(IFuture<E> other, Function<E,U> fn, Class<?> futuretype);
+	*/
 	
 //	public <U> IFuture<U> applyToEitherAsync(IFuture<? extends E> other, Function<? super E,IFuture<U>> fn);
 	
@@ -218,8 +229,9 @@ public interface IFuture<E>
 	 * @param fn function to receive result
 	 * @param futuretype The type of the return future. If null, a default future is created.
 	 * @return Future of the async function execution.
-	 */
+	 * /
 	public IFuture<Void> acceptEither(IFuture<E> other, Consumer<E> action, Class<?> futuretype);
+	*/
 	
 	// = thenCompose
 	/**
@@ -238,11 +250,11 @@ public interface IFuture<E>
 	 */
 //	public <T> IFuture<T> thenApplyAndDelegate(final Function<E, IFuture<T>> function, Class<?> futuretype, final Future<T> ret);
 	
-	public <T> void exceptionally(Future<T> delegate);
+	public <T> void catchErr(Future<T> delegate);
 	
-	public IFuture<E> exceptionally(final Consumer<? super Exception> consumer);
+	public IFuture<E> catchErr(final Consumer<? super Exception> consumer);
 	
-	public IFuture<E> exceptionally(final Consumer<? super Exception> function, Class<?> consumer);
+	public IFuture<E> catchErr(final Consumer<? super Exception> function, Class<?> consumer);
 	
 	public void delegate(Future<E> delegate);
 }

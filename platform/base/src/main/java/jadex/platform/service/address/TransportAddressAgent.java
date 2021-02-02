@@ -29,15 +29,14 @@ import jadex.commons.Boolean3;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -491,20 +490,10 @@ public class TransportAddressAgent implements ITransportAddressService
 		final Future<List<TransportAddress>> ret = new Future<List<TransportAddress>>();
 		ServiceQuery<ITransportAddressService> query = (new ServiceQuery<>(ITransportAddressService.class)).setScope(ServiceScope.GLOBAL);
 		final ITerminableIntermediateFuture<ITransportAddressService> fut = agent.getFeature(IRequiredServicesFeature.class).searchServices(query);
-		fut.addIntermediateResultListener(new IIntermediateResultListener<ITransportAddressService>()
+		fut.addResultListener(new IntermediateEmptyResultListener<ITransportAddressService>()
 		{
 			/** The peers. */
 			protected List<ITransportAddressService> peers = new ArrayList<ITransportAddressService>();
-			
-			
-			
-			public void exceptionOccurred(Exception exception)
-			{
-			}
-			
-			public void resultAvailable(Collection<ITransportAddressService> result)
-			{
-			}
 			
 			public void intermediateResultAvailable(ITransportAddressService result)
 			{

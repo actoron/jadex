@@ -9,6 +9,9 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
+import jadex.base.Starter;
 import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
@@ -28,6 +31,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.annotation.OnEnd;
@@ -35,6 +39,7 @@ import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -98,12 +103,7 @@ public class SellerAgent implements IBuyBookService, INegotiationAgent
 	public void shutdown()
 	{
 		if(gui!=null)
-		{
-			gui.addResultListener(thegui ->
-			{
-				SwingUtilities.invokeLater(()->thegui.dispose());
-			});
-		}
+			gui.then(thegui -> SwingUtilities.invokeLater(()->thegui.dispose()));
 	}
 	
 	@Goal(recur=true, recurdelay=10000, unique=true)

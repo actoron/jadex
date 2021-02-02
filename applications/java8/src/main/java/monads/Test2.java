@@ -10,7 +10,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
-import jadex.commons.future.SResultListener;
 
 public class Test2
 {
@@ -56,26 +55,32 @@ public class Test2
 //		return Test.$$$(orig, function);
 //	}
 	
+	
+	// todo???
+	/*
 	public static <R, E> IIntermediateFuture<R> mapAsync(IFuture<? extends Collection<E>> orig, final Function<E, IFuture<R>> function)
 	{
 		final IntermediateFuture<R> ret = new IntermediateFuture<R>();
 
-		orig.addResultListener(coll -> {
+		orig.then(coll -> {
 			CounterResultListener<R> counter = new CounterResultListener<R>(coll.size(), res -> ret.setFinished());
 
-			for (E item : coll) {
+			for (E item : coll) 
+			{
 				IFuture<R> apply = function.apply(item);
 				
-				apply.addResultListener(result -> {
+				apply.then(result -> 
+				{
 					ret.addIntermediateResult(result);
 					counter.resultAvailable(result);
 				});
 			}
 			
-		}, SResultListener.delegate(ret));
+		}).catchErr(ex -> ret.setException(ex));
+		//}).catchErr(ex -> SResultListener.delegate(ret));
 
 		return ret;
-	}
+	}*/
 
 
 }

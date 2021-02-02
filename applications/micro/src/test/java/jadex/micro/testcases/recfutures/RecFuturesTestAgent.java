@@ -214,7 +214,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
 				"-saveonexit", "false", "-welcome", "false", "-awareness", "false",
 	//			"-logging_level", "java.util.logging.Level.INFO",
-				"-gui", "false", "-simulation", "false", "-printpass", "false",
+				"-gui", "false", "-simulation", "false", "-printsecret", "false",
 				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
 			}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)

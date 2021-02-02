@@ -23,7 +23,8 @@
 			<targetcondition>$beliefbase.money==$beliefbase.target</targetcondition>
 		</achievegoal>
 		
-		<achievegoal name="getoneeuro" recur="true" recurdelay="1000"/>
+		<!-- <achievegoal name="getoneeuro" recur="true" recurdelay="1000"/> -->
+		<achievegoal name="getoneeuro" retry="true" retrydelay="1000" exclude="never"/>
  	</goals>
 
 	<plans>

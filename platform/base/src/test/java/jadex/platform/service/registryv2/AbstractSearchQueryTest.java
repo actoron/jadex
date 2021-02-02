@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -198,9 +199,13 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		
 		// 1) start client platform and search for service -> not found (test if works with no super peers and no other platforms)
 		System.out.println("1) start client platform and search for service");
+		System.err.println("1a) start client platform and search for service");
 		IExternalAccess	client	= createPlatform(clientconf);
+		System.err.println("1b) start client platform and search for service");
 		waitForRegistryClient(client, true);
+		System.err.println("1c) start client platform and search for service");
 		Collection<ITestService>	result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
+		System.err.println("1d) start client platform and search for service");
 		Assert.assertTrue(""+result, result.isEmpty());
 		
 		IExternalAccess	pro1, pro2;
@@ -208,9 +213,13 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		{
 			// 2) start provider platform, search for service -> test if awa fallback works with one platform 
 			System.out.println("2) start provider platform, search for service");
+			System.err.println("2a) start provider platform, search for service");
 			pro1	= createPlatform(proconf);
+			System.err.println("2a) start provider platform, search for service");
 			waitForRegistryWithProvider(client, pro1, true);
+			System.err.println("2a) start provider platform, search for service");
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
+			System.err.println("2a) start provider platform, search for service");
 			Assert.assertEquals(""+result, 1, result.size());
 			
 			// 3) start provider platform, search for service -> test if awa fallback works with two platforms 
@@ -258,13 +267,15 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitForSuperpeerConnections(sp, pro1);
 			waitForRegistryClient(client, false);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals(""+result, 2, result.size());
+			Assert.assertEquals("found: "+result+", new platform: "+pro1.getId(), 2, result.size());
 			
 			// 7) kill one provider platform, search for service -> test if remote disconnection and service removal works
-			System.out.println("7) kill one provider platform, search for service");
+			System.out.println("7) kill provider platform"+pro1.getId()+", search for service");
 			removePlatform(pro1);
 			waitForRegistryClient(client, false);
-			waitALittle(client);	// Hack for timeout in CI Pipeline!?
+//			waitALittle(client);	// Hack for timeout in CI Pipeline!?
+			waitALittle(client);
+			waitALittle(client);	// two waits for disconnection, because contimeout = 2* WAITFACTOR
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			Assert.assertEquals(""+result, 1, result.size());
 	
@@ -278,8 +289,6 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		}
 	}
 
-	IExternalAccess	marker;
-	
 	/**
 	 *  Wait to allow remote platform/registry interaction.
 	 *  The idea is that the registry is roughly FCFS so
@@ -288,19 +297,23 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 	 */
 	protected void waitForRegistryClient(IExternalAccess client, boolean global)
 	{
+		Logger.getLogger(getClass().getName()).info("waitForRegistryClient0: "+client+", "+true);
 		// Can only use global when ssp available. Otherwise uses awa fallback via network.
 		global	= global && sspconf!=null;
 		
-		if(marker==null)
-		{
-			marker	= Starter.createPlatform(clientconf).get();
-		}
+		IExternalAccess	marker	= Starter.createPlatform(clientconf).get();
 		ISubscriptionIntermediateFuture<IMarkerService>	sub	= client.addQuery(new ServiceQuery<>(IMarkerService.class, global ? ServiceScope.GLOBAL : ServiceScope.NETWORK));
 		IExternalAccess	agent	= marker.addComponent(global ? new GlobalMarkerAgent() : new NetworkMarkerAgent()).get();
-		while(!agent.getId().equals(((IService)sub.getNextIntermediateResult()).getServiceId().getProviderId()))
+		IComponentIdentifier	found;
+		do
 		{
+			found	= ((IService)sub.getNextIntermediateResult()).getServiceId().getProviderId();
+			Logger.getLogger(getClass().getName()).info("Found marker: "+found+"; expecting: "+agent.getId()+", "+agent.getId().equals(found));
 		}
-		agent.killComponent().get();
+		while(!agent.getId().equals(found));
+			
+		marker.killComponent().get();
+		marker	= null;
 	}
 	
 	/**

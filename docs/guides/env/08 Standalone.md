@@ -15,7 +15,7 @@ PlatformConfiguration config = PlatformConfiguration.getDefault();
 config.setGui(false);
 config.setWelcome(false);
 config.setCli(false);
-config.setPrintPass(false);
+config.setPrintSecret(false);
 IFuture<IExternalAccess> platfut = Starter.createPlatform(config);
 IExternalAccess platform = platfut.get();
 IComponentManagementService cms = SServiceProvider.searchService(platform, new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM)).get();

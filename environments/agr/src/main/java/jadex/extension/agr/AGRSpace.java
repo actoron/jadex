@@ -207,6 +207,10 @@ public class AGRSpace	implements IExtensionInstance
 					    {
 					    	// ignore timer updates
 					    }
+					    
+					    public void maxResultCountAvailable(int max) 
+					    {
+					    }
 					});
 					
 					return IFuture.DONE;

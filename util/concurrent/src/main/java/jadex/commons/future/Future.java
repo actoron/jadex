@@ -3,7 +3,6 @@ package jadex.commons.future;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,11 +51,11 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	
 	/** Debug flag. */
 	// Hack!!! Non-final to be setable from Starter 
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 	
 	/** Disable Stack unfolding for easier debugging. */
 	// Hack!!! Non-final to be setable from Starter 
-	public static boolean NO_STACK_COMPACTION = false;
+	public static boolean NO_STACK_COMPACTION = true;
 	
 	/** Constant for no timeout. */
 	public static final long NONE = -1;
@@ -108,7 +107,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 //	protected Map<ICommand<Object>, IFilter<Object>> fcommands;
 	
 	/** The scheduled notifications. */
-	protected Queue<Tuple2<IResultListener<E>, ICommand<IResultListener<E>>>>	notifications;
+	protected Queue<Tuple2<IResultListener<E>, ICommand<IResultListener<E>>>> notifications;
 	
 	//-------- constructors --------
 	
@@ -118,9 +117,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	public Future()
 	{
     	if(DEBUG)
-    	{
-    		creation	= new DebugException("future creation: "+this);
-    	}
+    		creation = new DebugException("future creation: "+this);
 	}
 	
 	/**
@@ -231,9 +228,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		ISuspendable caller = ISuspendable.SUSPENDABLE.get();
 
 		if(caller==null) 
-		{
 			caller = new ThreadSuspendable();
-		}
 		
 		if(!isDone())
 			FutureHelper.notifyStackedListeners();	// Avoid self-blocking
@@ -320,9 +315,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     	synchronized(this)
 		{
     		if(undone)
-    		{
     			this.undone	= undone;
-    		}
     		
         	if(isDone())
         	{
@@ -564,24 +557,22 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
      */
     protected void	scheduleNotification(IResultListener<E> listener, ICommand<IResultListener<E>> command)
     {
+    	assert listener!=null;
+    	
     	if(NO_STACK_COMPACTION || SUtil.isGuiThread())
     	{
 	    	synchronized(this)
 	    	{
 	    		assert notifications==null || !notifications.isEmpty();
 	    		if(notifications==null)
-	    		{
-	    			notifications	= new ArrayDeque<Tuple2<IResultListener<E>,ICommand<IResultListener<E>>>>();
-	    		}
+	    			notifications = new ArrayDeque<Tuple2<IResultListener<E>,ICommand<IResultListener<E>>>>();
 	    		notifications.add(new Tuple2<IResultListener<E>,ICommand<IResultListener<E>>>(listener, command));
 	    	}
     	}
     	else
     	{
     		if(STACK.get()==null)
-    		{
     			STACK.set(new ArrayDeque<Tuple3<Future<?>, IResultListener<?>,ICommand<IResultListener<?>>>>());
-    		}
     		
     		// !%$$%* generics
     		@SuppressWarnings({"unchecked", "rawtypes"})
@@ -598,23 +589,23 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
      *  Start scheduled listener notifications.
      *  Must not be called from synchronized block.
      */
-    protected final void	startScheduledNotifications()
+    protected final void startScheduledNotifications()
     {
     	if(NO_STACK_COMPACTION || SUtil.isGuiThread())
     	{
         	boolean	notify	= true;
         	while(notify)
         	{
-    			Tuple2<IResultListener<E>, ICommand<IResultListener<E>>>	next	= null;
+    			Tuple2<IResultListener<E>, ICommand<IResultListener<E>>> next = null;
 	        	synchronized(this)
 	        	{
 	        		if(notifications==null)
 	        		{
-	        			notify	= false;
+	        			notify = false;
 	        		}
 	        		else
 	        		{
-	        			next	= notifications.remove();
+	        			next = notifications.remove();
 	        			if(notifications.isEmpty())
 	        				notifications	= null;
 	            	}
@@ -631,15 +622,31 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     		try
     		{
 	    		NOTIFYING.set(Boolean.TRUE);
+	    		boolean heisenbug	= false;
 	    		
 	    		while(STACK.get()!=null && !STACK.get().isEmpty())
 	        	{
-	    			Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>	next	= STACK.get().remove();
+	    			Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>	next = STACK.get().remove();
+	    			heisenbug	= heisenbug || next.getSecondEntity().toString().indexOf("Heisenbug")!=-1;
+	    			if(heisenbug)
+	    			{
+	    				System.err.println("startScheduledNotifications0: "+next);
+	    			}
 	
 	    			// Need to use corrent future for executeNotification, because might be overriden by e.g. delegation future for rescheduling on other thread
 	        		@SuppressWarnings("rawtypes")
 					Future	fut	= next.getFirstEntity();
-	        		fut.executeNotification(next.getSecondEntity(), next.getThirdEntity());
+	        		try
+	        		{
+	        			fut.executeNotification(next.getSecondEntity(), next.getThirdEntity());
+	        		}
+	        		finally
+	        		{
+		    			if(heisenbug)
+		    			{
+		    				System.err.println("startScheduledNotifications1: "+next);
+		    			}
+	        		}
 	        	}
     		}
     		finally
@@ -652,7 +659,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     /**
      *  Execute a notification. Override for scheduling on other threads.
      */
-    protected void	executeNotification(IResultListener<E> listener, ICommand<IResultListener<E>> command)
+    protected void executeNotification(IResultListener<E> listener, ICommand<IResultListener<E>> command)
     {
     	command.execute(listener);
     }
@@ -662,11 +669,11 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 * Exceptions will be handled by DefaultResultListener.
 	 * 
 	 * @param sucListener The listener.
-	 */
+	 * /
 	public void addResultListener(IFunctionalResultListener<E> sucListener)
 	{
 		addResultListener(sucListener, null);
-	}
+	}*/
 
 	/**
 	 * Add a result listener by combining an OnSuccessListener and an
@@ -675,11 +682,11 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 * @param sucListener The listener that is called on success.
 	 * @param exListener The listener that is called on exceptions. Passing
 	 *        <code>null</code> enables default exception logging.
-	 */
+	 * /
 	public void addResultListener(IFunctionalResultListener<E> sucListener, IFunctionalExceptionListener exListener)
 	{
 		addResultListener(SResultListener.createResultListener(sucListener, exListener));
-	}
+	}*/
 
     /**
      *  Add a result listener.
@@ -687,10 +694,20 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
      */
     public void	addResultListener(IResultListener<E> listener)
     {
+    	if(doAddResultListener(listener))
+    		notifyListener(listener);
+    }
+
+	/**
+	 *  Add a listener and check if it should be notified immediately due to the future already being finished before add.
+	 *  Safe to be called in synmchronized block.
+	 */
+    protected boolean doAddResultListener(IResultListener<E> listener)
+	{
     	if(listener==null)
-    		throw new RuntimeException();
+    		throw new NullPointerException();
     	
-    	boolean	notify	= false;
+		boolean	notify	= false;
     	synchronized(this)
     	{
 	    	if(isDone())
@@ -711,9 +728,8 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	    		}
 	    	}
     	}
-    	if(notify)
-    		notifyListener(listener);
-    }
+		return notify;
+	}
     
     /**
      *  Notify all result listeners of the finished future (result or exception).
@@ -954,6 +970,22 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	
 	//-------- java8 extensions --------
 	
+	public IFuture<? extends E> then(Consumer<? super E> function)
+    {
+		this.addResultListener(new IResultListener<E>()
+        {
+        	public void resultAvailable(E result)
+        	{
+        		 function.accept(result);
+        	}	
+        	public void exceptionOccurred(Exception exception) 
+        	{
+        	}
+        });
+		 
+        return this;
+    }
+	
 	public <T> IFuture<T> thenApply(final Function<? super E, ? extends T> function)
     {
         return thenApply(function, null);
@@ -989,7 +1021,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
         	public void customResultAvailable(E result)
         	{
         		 IFuture<T> res = function.apply(result);
-                 res.addResultListener(SResultListener.delegate(ret));
+                 res.delegate(ret);
         	}	
         });
 
@@ -1037,6 +1069,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
         return ret;
     }
 	
+	/*
 	public <U> IFuture<U> applyToEither(IFuture<E> other, final Function<E, U> fn, Class<?> futuretype)
 	{
 		final CounterResultListener<Void> exceptionCounter = new CounterResultListener<Void>(2, SResultListener.<Void>ignoreResults());
@@ -1109,7 +1142,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		other.addResultListener(listener);
 		
 		return ret;
-	}
+	}*/
 	
 	
 //	public <U,V> IFuture<V> thenCombineAsync(final IFuture<U> other, final BiFunction<? super E,? super U, IFuture<V>> function, Class<?> futuretype)
@@ -1172,7 +1205,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
         return ret;
     }*/
 	
-	public <T> void exceptionally(Future<T> delegate)
+	public <T> void catchErr(Future<T> delegate)
 	{
 		this.addResultListener(new IResultListener<E>()
 		{
@@ -1234,31 +1267,35 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		}
 	}
 	
-	public IFuture<E> exceptionally(final Consumer<? super Exception> consumer)
+	public IFuture<E> catchErr(final Consumer<? super Exception> consumer)
     {
-        return exceptionally(consumer, null);
+        return catchErr(consumer, null);
     }
 	
-	public IFuture<E> exceptionally(final Consumer<? super Exception> consumer, Class<?> futuretype)
+	public IFuture<E> catchErr(final Consumer<? super Exception> consumer, Class<?> futuretype)
     {
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		IResultListener<E> reslis = new IIntermediateResultListener()
+		/*IResultListener reslis = new IntermediateEmptyResultListener()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
 				 consumer.accept(exception);
 			}
-			public void resultAvailable(Object result)
-			{
-			}
-			public void intermediateResultAvailable(Object result)
-			{
-			}
-			public void finished()
-			{
-			}
 		};
-		addResultListener(reslis);
+		addResultListener(reslis);*/
+		
+		this.addResultListener(new IResultListener<E>()
+		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				consumer.accept(exception);
+			}
+			
+			@Override
+			public void resultAvailable(E result)
+			{
+			}
+		});
 		
         return this;
     }

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>MessageSending</jadex:modelname>
+    <jadex:description>&lt;h3&gt;Message sending process&lt;/h3&gt;The Message Sending process waits for a predefined number of messages and then terminates.</jadex:description>
+    <jadex:package>jadex.bpmn.examples.message</jadex:package>
+    <jadex:imports>
+      <jadex:import>jadex.commons.*</jadex:import>
+      <jadex:import>jadex.bridge.*</jadex:import>
+      <jadex:import>jadex.bridge.fipa.*</jadex:import>
+    </jadex:imports>
+    <jadex:arguments>
+      <jadex:argument name="message_number" type="int">
+        <jadex:description>The number of messages to send.</jadex:description>
+        <jadex:value>10</jadex:value>
+      </jadex:argument>
+      <jadex:argument name="receivers" type="String[]">
+        <jadex:description>The names of the receivers.</jadex:description>
+        <jadex:value>new String[]{&quot;MessageReceival&quot;}</jadex:value>
+      </jadex:argument>
+    </jadex:arguments>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_RYESV8-fEd6NWbZHdUI2WQ">
+    <semantic:startEvent id="__uTy0dBNEd6NWbZHdUI2WQ">
+      <semantic:outgoing>_AACcAdBOEd6NWbZHdUI2WQ</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:task name="PreMessage" id="_RYESWc-fEd6NWbZHdUI2WQ">
+      <semantic:incoming>_65RzAdBMEd6NWbZHdUI2WQ</semantic:incoming>
+      <semantic:incoming>_AACcAdBOEd6NWbZHdUI2WQ</semantic:incoming>
+      <semantic:outgoing>_cEBesc-fEd6NWbZHdUI2WQ</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:parameter direction="inout" name="i" type="int">0</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:intermediateCatchEvent name="Send Message" id="_cD3tsc-fEd6NWbZHdUI2WQ">
+      <semantic:incoming>_cEBesc-fEd6NWbZHdUI2WQ</semantic:incoming>
+      <semantic:outgoing>_0G1-gc-fEd6NWbZHdUI2WQ</semantic:outgoing>
+      <semantic:messageEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:property name="isThrowing">true</jadex:property>
+        <jadex:property name="message">&quot;hello&quot;</jadex:property>
+        <jadex:property name="receiver">receivers</jadex:property>
+      </semantic:extensionElements>
+    </semantic:intermediateCatchEvent>
+    <semantic:task name="Message Sent" id="_0Gs0kc-fEd6NWbZHdUI2WQ">
+      <semantic:incoming>_0G1-gc-fEd6NWbZHdUI2WQ</semantic:incoming>
+      <semantic:outgoing>_5-3ZMdBMEd6NWbZHdUI2WQ</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:parameter direction="inout" name="i" type="int">i</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Print results" id="_NvCksRZBEd-yC473XtaJZQ">
+      <semantic:incoming>_NvMVsRZBEd-yC473XtaJZQ</semantic:incoming>
+      <semantic:outgoing>__TzdkdBMEd6NWbZHdUI2WQ</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="String">((String)$component.getId().getLocalName())+&quot; sent &quot;+message_number+&quot; messages.&quot;</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:endEvent id="__TpskdBMEd6NWbZHdUI2WQ">
+      <semantic:incoming>__TzdkdBMEd6NWbZHdUI2WQ</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:exclusiveGateway id="_5-keQdBMEd6NWbZHdUI2WQ" default="_NvMVsRZBEd-yC473XtaJZQ">
+      <semantic:incoming>_5-3ZMdBMEd6NWbZHdUI2WQ</semantic:incoming>
+      <semantic:outgoing>_65RzAdBMEd6NWbZHdUI2WQ</semantic:outgoing>
+      <semantic:outgoing>_NvMVsRZBEd-yC473XtaJZQ</semantic:outgoing>
+    </semantic:exclusiveGateway>
+    <semantic:sequenceFlow sourceRef="__uTy0dBNEd6NWbZHdUI2WQ" targetRef="_RYESWc-fEd6NWbZHdUI2WQ" id="_AACcAdBOEd6NWbZHdUI2WQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_RYESWc-fEd6NWbZHdUI2WQ" targetRef="_cD3tsc-fEd6NWbZHdUI2WQ" id="_cEBesc-fEd6NWbZHdUI2WQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_cD3tsc-fEd6NWbZHdUI2WQ" targetRef="_0Gs0kc-fEd6NWbZHdUI2WQ" id="_0G1-gc-fEd6NWbZHdUI2WQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_0Gs0kc-fEd6NWbZHdUI2WQ" targetRef="_5-keQdBMEd6NWbZHdUI2WQ" id="_5-3ZMdBMEd6NWbZHdUI2WQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_NvCksRZBEd-yC473XtaJZQ" targetRef="__TpskdBMEd6NWbZHdUI2WQ" id="__TzdkdBMEd6NWbZHdUI2WQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_5-keQdBMEd6NWbZHdUI2WQ" targetRef="_RYESWc-fEd6NWbZHdUI2WQ" id="_65RzAdBMEd6NWbZHdUI2WQ">
+      <semantic:conditionExpression>i+1 &lt; message_number</semantic:conditionExpression>
+      <semantic:extensionElements>
+        <jadex:parametermapping name="i">i +1</jadex:parametermapping>
+      </semantic:extensionElements>
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_5-keQdBMEd6NWbZHdUI2WQ" targetRef="_NvCksRZBEd-yC473XtaJZQ" id="_NvMVsRZBEd-yC473XtaJZQ">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_RYESV8-fEd6NWbZHdUI2WQ">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="__uTy0dBNEd6NWbZHdUI2WQ">
+        <dc:Bounds height="40.0" width="40.0" x="80.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_RYESWc-fEd6NWbZHdUI2WQ">
+        <dc:Bounds height="100.0" width="160.0" x="260.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_cD3tsc-fEd6NWbZHdUI2WQ">
+        <dc:Bounds height="40.0" width="40.0" x="490.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_0Gs0kc-fEd6NWbZHdUI2WQ">
+        <dc:Bounds height="100.0" width="160.0" x="670.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_NvCksRZBEd-yC473XtaJZQ">
+        <dc:Bounds height="100.0" width="160.0" x="1020.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="__TpskdBMEd6NWbZHdUI2WQ">
+        <dc:Bounds height="40.0" width="40.0" x="1220.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_5-keQdBMEd6NWbZHdUI2WQ">
+        <dc:Bounds height="60.0" width="60.0" x="890.0" y="150.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_cEBesc-fEd6NWbZHdUI2WQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_cEBesc-fEd6NWbZHdUI2WQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_0G1-gc-fEd6NWbZHdUI2WQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_0G1-gc-fEd6NWbZHdUI2WQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_5-3ZMdBMEd6NWbZHdUI2WQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_5-3ZMdBMEd6NWbZHdUI2WQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_65RzAdBMEd6NWbZHdUI2WQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_NvMVsRZBEd-yC473XtaJZQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_65RzAdBMEd6NWbZHdUI2WQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_NvMVsRZBEd-yC473XtaJZQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_AACcAdBOEd6NWbZHdUI2WQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_AACcAdBOEd6NWbZHdUI2WQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="__TzdkdBMEd6NWbZHdUI2WQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="__TzdkdBMEd6NWbZHdUI2WQ">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

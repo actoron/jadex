@@ -144,9 +144,17 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 						}
 					};
 					
+//					String resstring	= sic.getMethod().getName().equals("getRegisteredClients") ? res.toString() : null;	// string before connect to see storeforfirst results
+					
 					@SuppressWarnings({"unchecked"})
 					Future<Object> fut = (Future<Object>)FutureFunctionality.getDelegationFuture((IFuture<?>)res, func);
 					sic.setResult(fut);
+					
+//					if(sic.getMethod().getName().equals("getRegisteredClients"))
+//					{
+//						System.err.println("DecouplingReturnInterceptor getDelegationFuture: "+resstring+", "+fut+", "+IComponentIdentifier.LOCAL.get());
+//						Thread.dumpStack();
+//					}
 					
 					// Monitoring below.
 					if(feat instanceof IInternalServiceMonitoringFeature && ((IInternalServiceMonitoringFeature)feat).isMonitoring())
@@ -183,6 +191,13 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 								{
 									((IInternalServiceMonitoringFeature)feat).postServiceEvent(
 										new ServiceCallEvent(ServiceCallEvent.Type.FINISHED, sic.getServiceIdentifier(), new MethodInfo(sic.getMethod()), sic.getCaller(), null));
+								}
+								
+								@Override
+								public void maxResultCountAvailable(int max) 
+								{
+									((IInternalServiceMonitoringFeature)feat).postServiceEvent(
+										new ServiceCallEvent(ServiceCallEvent.Type.MAX, sic.getServiceIdentifier(), new MethodInfo(sic.getMethod()), sic.getCaller(), max));
 								}
 	
 //								Not necessary?

@@ -83,7 +83,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //		"-cli", "false",
 ////		"-persist", "true", // for testing persistence
 ////		"-deftimeout", "-1",
-//		"-printpass", "false",
+//		"-printsecret", "false",
 //		"-superpeerclient", "false",
 //		"-wstransport", "false",
 //		"-relaytransport", "false",
@@ -186,6 +186,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 			timer	= new Timer(true);
 			timer.schedule(new TimerTask()
 			{
+				@SuppressWarnings("deprecation")	// for Thread.stop()
 				public void run()
 				{
 					aborted	= true;
@@ -194,7 +195,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 					{
 						try
 						{
-							runner.stop();;
+							runner.stop();
 							// Broken in Java 11, method removed.
 							//runner.stop(new RuntimeException("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms)."));
 						}
@@ -425,6 +426,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 							
 							else if(load)
 							{
+								@SuppressWarnings("serial")
 								ComponentLoadTest test = new ComponentLoadTest(abspath, new IErrorReport()
 								{
 									public String getErrorText()

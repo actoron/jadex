@@ -29,7 +29,7 @@ public class InvokeMethodTask extends AbstractTask
 		String methodname = (String)context.getParameterValue("methodname");
 		String returnname = context.hasParameterValue("returnname")? (String)context.getParameterValue("returnname"): null;
 
-//		System.out.println("invoke method task: "+instance.getComponentIdentifier().getLocalName()+" "+methodname);
+		//System.out.println("invoke method task: "+instance.getId().getLocalName()+" "+methodname+" "+object);
 		
 		// Collect parameters.
 		List params = new ArrayList();

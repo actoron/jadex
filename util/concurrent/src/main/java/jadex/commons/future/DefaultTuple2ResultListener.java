@@ -8,6 +8,7 @@ import java.util.Collection;
  *  - resultAvailable
  *  - intermediateResultAvailable
  *  - finished
+ *  - resultCountAvailable
  */
 public abstract class DefaultTuple2ResultListener<E, F> implements ITuple2ResultListener<E, F>
 {
@@ -38,6 +39,17 @@ public abstract class DefaultTuple2ResultListener<E, F> implements ITuple2Result
 	 *  intermediate results before.
      */
 	public void finished()
+	{
+	}
+	
+	/**
+	 *  Declare that the future result count is available.
+	 *  This method is only called for intermediate futures,
+	 *  i.e. when this method is called it is guaranteed that the
+	 *  intermediateResultAvailable method will be called as
+	 *  often as the result count indicates.
+	 */
+	public void maxResultCountAvailable(int count) 
 	{
 	}
 }

@@ -14,9 +14,8 @@ import jadex.bridge.service.types.remote.ServiceInputConnection;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
@@ -147,7 +146,7 @@ public class StreamProviderAgent implements IStreamService
 		final Future<Long> ret = new Future<Long>();
 		
 		final long[] size = new long[1];
-		con.aread().addResultListener(new IIntermediateResultListener<byte[]>()
+		con.aread().addResultListener(new IntermediateEmptyResultListener<byte[]>()
 		{
 			public void resultAvailable(Collection<byte[]> result)
 			{

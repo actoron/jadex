@@ -1,6 +1,5 @@
 package jadex.base;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 
 /**
@@ -366,8 +365,6 @@ public interface IExtendedPlatformConfiguration
      */
     public void setStrictCom(boolean value);
 
-    // todo: refactor, in SecurityAgent other names are used
-    
 //    /**
 //     *  Flag if the platform should be protected with password. 
 //     *  @return True if protected.
@@ -379,18 +376,6 @@ public interface IExtendedPlatformConfiguration
 //     *  @param value True for protected.
 //     */
 //    public void setUsePass(boolean value);
-
-//    /**
-//     *  Get the print password flag on startup.
-//     *  @return Flag if password should be printed.
-//     */
-//    public boolean getPrintPass();
-//
-//    /**
-//     *  Set the print password flag on startup.
-//     *  @param value Flag if password should be printed.
-//     */
-//    public void setPrintPass(boolean value);
 
     // will be removed 
 //    /**

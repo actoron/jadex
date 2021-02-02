@@ -17,6 +17,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 /**
@@ -50,18 +51,25 @@ public class Gui extends JFrame
 		});
 		
 		// Dispose frame on exception.
-		IResultListener<Void>	dislis	= new IResultListener<Void>()
+		IResultListener<Void>	dislis	= new SwingResultListener<Void>(new IResultListener<Void>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-//				System.out.println("booktrading5: "+agent.getComponentIdentifier());
-				dispose();
+//				System.err.println("booktrading5: "+agent.getId());
+//				try
+//				{
+					dispose();
+//				}
+//				finally
+//				{
+//					System.err.println("booktrading5a: "+agent.getId());
+//				}
 			}
 			public void resultAvailable(Void result)
 			{
 //				System.out.println("booktrading6: "+agent.getComponentIdentifier());
 			}
-		};
+		});
 		
 //		System.out.println("booktrading1: "+agent.getComponentIdentifier());
 		agent.scheduleStep(new IComponentStep<Void>()

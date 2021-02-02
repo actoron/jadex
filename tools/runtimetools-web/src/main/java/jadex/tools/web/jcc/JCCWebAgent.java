@@ -201,7 +201,7 @@ public class JCCWebAgent implements IJCCWebService
 			{
 				public void resultAvailable(IJCCWebService jccser)
 				{
-					jccser.getPluginFragments(cid).thenAccept(m ->
+					jccser.getPluginFragments(cid).then(m ->
 					{
 						for(String name: m.values())
 						{
@@ -260,7 +260,7 @@ public class JCCWebAgent implements IJCCWebService
 			{
 				public void resultAvailable(IJCCWebService jccser)
 				{
-					jccser.getPluginInfos(cid).thenAccept(pis ->
+					jccser.getPluginInfos(cid).then(pis ->
 					{
 						for(JCCWebPluginInfo pi: pis)
 						{

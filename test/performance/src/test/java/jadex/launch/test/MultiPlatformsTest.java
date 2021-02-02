@@ -73,7 +73,7 @@ public class MultiPlatformsTest //extends TestCase
 			IPlatformConfiguration	config	= STest.getDefaultTestConfig(getClass());
 			futures.add(Starter.createPlatform(config,
 				new String[]{
-//				"-gui", "false", "-printpass", "false", "-cli", "false",
+//				"-gui", "false", "-printsecret", "false", "-cli", "false",
 //				"-logging", "true",
 //				"-awareness", "false",
 //				"-componentfactory", "jadex.micro.MicroAgentFactory",

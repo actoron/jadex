@@ -14,11 +14,10 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
 import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.commons.future.SResultListener;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.examples.presentationtimer.common.ICountdownService;
 import jadex.examples.presentationtimer.common.State;
 import jadex.examples.presentationtimer.remotecontrol.ClientMain;
@@ -138,22 +137,30 @@ public class ClientFrame extends JFrame
 				}
 				
 				System.out.println("Subscribing");
-				service.getTime().addResultListener(timeString -> timeLabel.setText(timeString));
-				service.getState().addResultListener(state -> stateLabel.setText(state.toString()));
+				service.getTime().then(timeString -> timeLabel.setText(timeString));
+				service.getState().then(state -> stateLabel.setText(state.toString()));
 				
 				stateFut = service.registerForState();
 				timeFut = service.registerForTime();
 				
-				stateFut.addIntermediateResultListener(new SwingIntermediateResultListener<State>(
+				stateFut.next(state -> SwingUtilities.invokeLater(() -> stateLabel.setText(state.toString())))
+					.catchErr(ex -> {if (stateFut != null) stateFut.terminate();});
+				// exception occurs when terminating subscription
+				
+				/*stateFut.addResultListener(new SwingIntermediateResultListener<State>(
 					state -> stateLabel.setText(state.toString()),
 					SResultListener.ignoreResults(),
-					ex -> {if (stateFut != null) stateFut.terminate();} // exception occurs when terminating subscription
-					));
-				timeFut.addIntermediateResultListener(new SwingIntermediateResultListener<String>(
+					ex -> {if (stateFut != null) stateFut.terminate();}, // exception occurs when terminating subscription
+					null));*/
+				
+				timeFut.next(timeString -> SwingUtilities.invokeLater(() -> timeLabel.setText(timeString)))
+					.catchErr(ex -> {if (timeFut != null) timeFut.terminate();});
+				
+				/*timeFut.addResultListener(new SwingIntermediateResultListener<String>(
 					timeString -> timeLabel.setText(timeString),
 					SResultListener.ignoreResults(),
-					ex -> {if (timeFut != null) timeFut.terminate();}
-					));
+					ex -> {if (timeFut != null) timeFut.terminate();},
+					null));*/
 				
 			}
 		});

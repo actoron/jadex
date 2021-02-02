@@ -43,6 +43,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 
 /**
  *  The service handler is used as service implementation for proxy services.
@@ -368,12 +369,8 @@ public class ServiceHandler implements InvocationHandler
 			// Must reschedule on component thread as it has no required service proxy
 			if(res instanceof IIntermediateFuture)
 			{
-				IIntermediateResultListener lis = component.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<Object>()
+				IIntermediateResultListener lis = component.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<Object>()
 				{
-					public void intermediateResultAvailable(Object result)
-					{
-					}
-					
 					public void finished()
 					{
 						boolean	remove	= strategy.taskFinished(); 
@@ -551,6 +548,15 @@ public class ServiceHandler implements InvocationHandler
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the strategy.
+	 *  @return The strategy.
+	 */
+	public IPoolStrategy getStrategy() 
+	{
+		return strategy;
 	}
 
 	/**

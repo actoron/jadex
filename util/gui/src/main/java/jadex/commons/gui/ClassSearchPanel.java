@@ -43,9 +43,9 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPool;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 
@@ -369,7 +369,7 @@ public class ClassSearchPanel extends JPanel
 				
 				fut[0] = SDirScan.asyncScanForClasses(cl, filefilter, classfilter, -1, true);
 				
-				fut[0].addResultListener(new SwingIntermediateResultListener<Class<?>>(new IIntermediateResultListener<Class<?>>()
+				fut[0].addResultListener(new SwingIntermediateResultListener<Class<?>>(new IntermediateEmptyResultListener<Class<?>>()
 				{
 					List<Class<?>> res = new ArrayList<Class<?>>();
 					

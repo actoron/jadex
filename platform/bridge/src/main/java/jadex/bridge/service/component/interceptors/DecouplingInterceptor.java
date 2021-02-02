@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
@@ -29,6 +30,7 @@ import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
+import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
@@ -394,6 +396,13 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			if(res instanceof IFuture)
 			{
 				Method method = sic.getMethod();
+				
+//				if(method.getName().equals("getRegisteredClients"))
+//				{
+//					System.err.println("Copy return value of getRegisteredClients call: "+res+", "+IComponentIdentifier.LOCAL.get());
+//					Thread.dumpStack();
+//				}
+				
 				Reference ref = method.getAnnotation(Reference.class);
 				final boolean copy = DecouplingInterceptor.this.copy && !sic.isRemoteCall() && !getSerializationServices().isRemoteObject(sic.getProxy()) && (ref!=null? !ref.local(): true);
 				final IFilter	deffilter = new IFilter()
@@ -414,6 +423,18 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					@Override
 					public Object handleIntermediateResult(Object result) throws Exception
 					{
+//						//-------- debugging --------
+//						if((""+result).contains("PartDataChunk"))
+//						{
+//							Logger.getLogger(getClass().getName()).info("handleIntermediateResult: "+sic+", "+result+", "+IComponentIdentifier.LOCAL.get());
+//						}
+//						//-------- debugging end --------
+//						if(method.getName().equals("getRegisteredClients"))
+//						{
+//							System.err.println("Copy return value handleIntermediateResult of getRegisteredClients call: "+res+", "+result+", "+IComponentIdentifier.LOCAL.get());
+//							Thread.dumpStack();
+//						}
+						
 						if(ex!=null)
 							throw ex;
 						return doCopy(copy, deffilter, result);
@@ -480,7 +501,15 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					}
 				};
 				
+//				String resstring	= sic.getMethod().getName().equals("getRegisteredClients") ? res.toString() : null;	// string before connect to see storeforfirst results
+				
 				final Future<?> fut = FutureFunctionality.getDelegationFuture((IFuture<?>)res, func);
+
+//				if(method.getName().equals("getRegisteredClients"))
+//				{
+//					System.err.println("Copy return value getDelegationFuture of getRegisteredClients call: "+resstring+", "+fut+", "+IComponentIdentifier.LOCAL.get());
+//					Thread.dumpStack();
+//				}
 				
 				// Add timeout handling for local case.
 				if(!((IFuture<?>)res).isDone() && !sic.isRemoteCall())
@@ -498,10 +527,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 								{
 									// Ignore if result is normally set.
 								}
-								public void resultAvailable(Collection result)
+								/*public void resultAvailable(Collection result)
 								{
 									// Ignore if result is normally set.
-								}
+								}*/
 								public void exceptionOccurred(Exception exception)
 								{
 									// Forward timeout exception to future.
@@ -521,6 +550,9 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 								{
 								}
 								public void commandAvailable(Object command)
+								{
+								}
+								public void maxResultCountAvailable(int max) 
 								{
 								}
 							});
@@ -587,6 +619,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	// Not anonymous class to avoid dependency to XML required for XMLClassname
 	public static class InvokeMethodStep implements IComponentStep<Void>
 	{
+		// For debugging simulation blocker heisenbug -> TODO: remove when fixed
+		protected static final Map<ServiceInvocationContext, String>	_DEBUG	= Collections.synchronizedMap(new WeakHashMap<>());
+		public static final ThreadLocal<String>	DEBUG	= new ThreadLocal<>();
+		
 		protected ServiceInvocationContext sic;
 
 		/**
@@ -595,6 +631,13 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		public InvokeMethodStep(ServiceInvocationContext sic)
 		{
 			this.sic = sic;
+			
+			if(sic.getMethod().getName().equals("addAdvanceBlocker"))
+			{
+				Exception 	e	= new RuntimeException("addAdvanceBlocker called");
+				e.fillInStackTrace();
+				_DEBUG.put(sic, SUtil.getExceptionStacktrace(e));
+			}
 		}
 
 		/**
@@ -609,12 +652,17 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			try
 			{
 //				sic.setObject(service);
+				DEBUG.set(_DEBUG.get(sic));
 				ret	= sic.invoke();
 			}
 			catch(Exception e)
 			{
 //				e.printStackTrace();
 				ret	= new Future<Void>(e);
+			}
+			finally
+			{
+				DEBUG.remove();
 			}
 			
 //			if(sic.getLastServiceCall()==null)

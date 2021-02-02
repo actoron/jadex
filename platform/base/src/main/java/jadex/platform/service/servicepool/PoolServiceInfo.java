@@ -84,7 +84,7 @@ public class PoolServiceInfo
 	public PoolServiceInfo(String workermodel, Class<?> servicetype,
 		Object poolstrategy, PublishInfo publishinfo, String[] argnames, Object[] argvals)
 	{
-		this(workermodel, servicetype, null, null, publishinfo, argnames, argvals);
+		this(workermodel, servicetype, null, poolstrategy, publishinfo, argnames, argvals);
 	}
 	
 	/**

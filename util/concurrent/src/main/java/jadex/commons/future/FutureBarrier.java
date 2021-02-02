@@ -44,7 +44,7 @@ public class FutureBarrier<E>
 				if(fut instanceof ISubscriptionIntermediateFuture)
 				{
 					@SuppressWarnings("unchecked")
-					IResultListener<E>	tmplis	= (IResultListener<E>)new IIntermediateResultListener<Object>()
+					IResultListener<E>	tmplis	= (IResultListener<E>)new IntermediateEmptyResultListener<Object>()
 					{
 						@Override
 						public void finished()
@@ -56,11 +56,6 @@ public class FutureBarrier<E>
 						public void exceptionOccurred(Exception exception)
 						{
 							lis.exceptionOccurred(exception);
-						}
-						
-						@Override
-						public void intermediateResultAvailable(Object result)
-						{
 						}
 						
 						@Override

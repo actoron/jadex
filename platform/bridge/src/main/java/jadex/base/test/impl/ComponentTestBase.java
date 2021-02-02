@@ -130,26 +130,26 @@ public class ComponentTestBase extends TestCase
 				platform = createPlatform();
 			}
 			 
-			System.out.println("Creating component: "+System.currentTimeMillis()+" "+filename);
+			//System.out.println("Creating component: "+System.currentTimeMillis()+" "+filename);
 			IFuture<IExternalAccess> fut = platform.createComponent(new CreationInfo(rid).setFilename(filename));
 			componentStarted(fut);
 			fut.addResultListener(new IResultListener<IExternalAccess>()
 			{
 				public void resultAvailable(IExternalAccess result)
 				{
-					System.out.println("Created component: "+System.currentTimeMillis()+" "+filename);
+					//System.out.println("Created component: "+System.currentTimeMillis()+" "+filename);
 					cid[0] = result.getId();
 					
 					result.waitForTermination().addResultListener(new IResultListener<Map<String,Object>>()
 					{
 						public void resultAvailable(Map<String, Object> result)
 						{
-							System.out.println("COMP FINI: "+cid[0]);
+							//System.out.println("COMP FINI: "+cid[0]);
 							finished.setResultIfUndone(result);
 						}
 						public void exceptionOccurred(Exception exception)
 						{
-							System.out.println("COMP FINI EX: "+cid[0]);
+							//System.out.println("COMP FINI EX: "+cid[0]);
 							finished.setExceptionIfUndone(exception);
 						}
 					});
@@ -161,21 +161,21 @@ public class ComponentTestBase extends TestCase
 				}
 			});
 			Map<String, Object>	res	= null;
-			try
-			{
-				System.out.println("WAIT FOR TESTCASE: "+cid[0]);
+//			try
+//			{
+				//System.out.println("WAIT FOR TESTCASE: "+cid[0]);
 				res	= finished.get();	// Timeout set by timer above -> no get timeout needed.
-				System.out.println("TESTCASE FINISHED: "+cid[0]);
-			}
-			catch(TimeoutException te)
-			{
-				System.out.println("TESTCASE TIMEOUT: "+cid[0]);
-				// Hack!! Allow timeout exception for start tests when not from test execution, e.g. termination timeout in EndStateAbort.
-				if(triggered[0])
-				{
-					throw te;
-				}
-			}
+				//System.out.println("TESTCASE FINISHED: "+cid[0]);
+//			}
+//			catch(TimeoutException te)
+//			{
+//				//System.out.println("TESTCASE TIMEOUT: "+cid[0]);
+//				// Hack!! Allow timeout exception for start tests when not from test execution, e.g. termination timeout in EndStateAbort.
+//				if(triggered[0])
+//				{
+//					throw te;
+//				}
+//			}
 		
 			checkTestResults(res);	// Do last -> throws exception on failure.
 			//System.out.println("FINISHED runBare(): "+System.currentTimeMillis()+" "+filename);

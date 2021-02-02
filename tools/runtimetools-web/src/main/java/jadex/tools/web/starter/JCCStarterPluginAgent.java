@@ -91,7 +91,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		else
 		{
 			agent.searchService(new ServiceQuery<ILibraryService>(ILibraryService.class).setPlatform(cid).setScope(ServiceScope.PLATFORM))
-				.thenAccept(libs -> {libs.getComponentModels().delegate(ret);}).exceptionally(ret);
+				.then(libs -> {libs.getComponentModels().delegate(ret);}).catchErr(ret);
 		}
 		
 		return ret;
@@ -132,6 +132,11 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 			    public void finished()
 			    {
 			    	ret.setFinished();
+			    }
+			    
+			    public void maxResultCountAvailable(int max)
+			    {
+			    	System.out.println("max count is: "+max);
 			    }
 			});
 		/*}
@@ -212,7 +217,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	{
 		final Future<IComponentDescription[]> ret = new Future<IComponentDescription[]>();
 		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
-		ea.getChildren(null, parent).thenAccept(cids -> 
+		ea.getChildren(null, parent).then(cids -> 
 		{
 			FutureBarrier<IComponentDescription> barrier = new FutureBarrier<IComponentDescription>();
 			for(int i=0; i<cids.length; i++)
@@ -220,8 +225,8 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 				IFuture<IComponentDescription>fut = ea.getDescription(cids[i]);
 				barrier.addFuture(fut);
 			}
-			barrier.waitForResults().thenAccept(descs -> ret.setResult(descs==null? null: descs.toArray(new IComponentDescription[cids.length])))
-				.exceptionally(ex -> ret.setException(ex));
+			barrier.waitForResults().then(descs -> ret.setResult(descs==null? null: descs.toArray(new IComponentDescription[cids.length])))
+				.catchErr(ex -> ret.setException(ex));
 		});
 		return ret;
 	}
@@ -387,7 +392,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		
 		if(name!=null)
 		{
-			getNFValue(cid, sid, mi, req, name).thenAccept(val ->
+			getNFValue(cid, sid, mi, req, name).then(val ->
 			{
 				res.put(name, val);
 				ret.setResult(res);
@@ -410,14 +415,14 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 						if(valfut!=null)
 						{
 							bar.addFuture(valfut);
-							valfut.thenAccept(val -> 
+							valfut.then(val -> 
 							{
 								res.put(meti.getName(), val);
 							});
 						}
 					});
 					
-					bar.waitFor().thenAccept(Void -> ret.setResult(res)).exceptionally(ret);
+					bar.waitFor().then(Void -> ret.setResult(res)).catchErr(ret);
 				}
 			};
 			
@@ -426,11 +431,11 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 			{
 				if(mi!=null)
 				{
-					ea.getRequiredMethodNFPropertyMetaInfos(sid, mi).thenAccept(mis -> getvals.execute(mis));
+					ea.getRequiredMethodNFPropertyMetaInfos(sid, mi).then(mis -> getvals.execute(mis));
 				}
 				else
 				{
-					ea.getRequiredNFPropertyMetaInfos(sid).thenAccept(mis -> getvals.execute(mis));
+					ea.getRequiredNFPropertyMetaInfos(sid).then(mis -> getvals.execute(mis));
 				}
 			}
 			// provided services and methods
@@ -438,17 +443,17 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 			{
 				if(mi!=null)
 				{
-					ea.getMethodNFPropertyMetaInfos(sid, mi).thenAccept(mis -> getvals.execute(mis));
+					ea.getMethodNFPropertyMetaInfos(sid, mi).then(mis -> getvals.execute(mis));
 				}
 				else
 				{
-					ea.getNFPropertyMetaInfos(sid).thenAccept(mis -> getvals.execute(mis));
+					ea.getNFPropertyMetaInfos(sid).then(mis -> getvals.execute(mis));
 				}
 			}
 			// components
 			else if(ea!=null)
 			{
-				ea.getNFPropertyMetaInfos().thenAccept(mis -> getvals.execute(mis));
+				ea.getNFPropertyMetaInfos().then(mis -> getvals.execute(mis));
 			}
 			else
 			{

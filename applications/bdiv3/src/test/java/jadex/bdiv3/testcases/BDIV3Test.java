@@ -4,6 +4,7 @@ import java.io.File;
 
 import jadex.base.test.ComponentTestSuite;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import junit.framework.Test;
 
 
@@ -44,6 +45,10 @@ public class BDIV3Test	extends	ComponentTestSuite
 	 *  Constructor called by Maven JUnit runner.
 	 */
 	public BDIV3Test()	throws Exception {
+//		super(new String[]
+//		{
+//			"-logging", "true"	// For finding heisenbugs in pipeline builds
+//		}, new File[][]{SUtil.findOutputDirs("applications"+File.separator+"bdiv3", true)}, null, EXCLUDES, true, true, true);
 		super("applications"+File.separator+"bdiv3", EXCLUDES, true);
 	}
 

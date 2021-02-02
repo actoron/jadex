@@ -114,6 +114,10 @@ public class ServiceRankingResultListener<S> implements IIntermediateResultListe
 		rankResults();
 	}
 	
+	public void maxResultCountAvailable(int max) 
+	{
+	}
+	
 	/**
 	 *  Get the finished.
 	 *  @return The finished.

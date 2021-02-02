@@ -23,12 +23,11 @@ import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.TupleResult;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Properties;
@@ -128,12 +127,9 @@ public class NFLatencyTestAgent extends TestAgent
 						{
 							public void resultAvailable(IExternalAccess result)
 							{
-								result.waitForTermination().addResultListener(new IFunctionalResultListener<Map<String, Object>>()
+								result.waitForTermination().then(res ->
 								{
-									public void resultAvailable(Map<String, Object> result)
-									{
-										System.out.println("sec");
-									}
+									System.out.println("sec");
 								});
 								performTest(result.getId(), testno, false)
 									.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
@@ -212,7 +208,7 @@ public class NFLatencyTestAgent extends TestAgent
 		
 		
 		IIntermediateFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).getServices("aser");
-		fut.addResultListener(new IIntermediateResultListener<ITestService>()
+		fut.addResultListener(new IntermediateEmptyResultListener<ITestService>()
 		{
 			boolean called;
 			public void intermediateResultAvailable(ITestService result)

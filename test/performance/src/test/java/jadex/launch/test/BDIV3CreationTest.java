@@ -37,7 +37,7 @@ public class BDIV3CreationTest //extends TestCase
 //			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
 ////			"-componentfactory", "jadex.component.ComponentComponentFactory",
 ////			"-conf", "jadex.standalone.Platform.component.xml",
-//			"-printpass", "false"
+//			"-printsecret", "false"
 			}
 			).get();
 		

@@ -2,7 +2,6 @@ package jadex.base.gui.componenttree;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -34,9 +33,9 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
@@ -376,13 +375,13 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 						});
 					}
 				}
-				fubar.waitFor().addResultListener(v->
+				fubar.waitFor().then(v->
 				{
 					ready[0]	= true;
 					if(ready[0] &&  ready[1])
 					{
 						ret.setResult(children);
-					}					
+					}	
 				});
 			}
 			
@@ -706,17 +705,12 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 		assert cmslistener==null;
 		CMSUpdateHandler	cmshandler	= (CMSUpdateHandler)getTree().getClientProperty(CMSUpdateHandler.class);
 		this.cmslistener	= cmshandler.addCMSListener(cid);
-		cmslistener.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+		cmslistener.addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 		{
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
 				System.out.println("Exception occurred: "+exception);
-			}
-
-			@Override
-			public void resultAvailable(Collection<CMSStatusEvent> result)
-			{
 			}
 
 			@Override
@@ -824,11 +818,6 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 						}
 					});
 				}				
-			}
-
-			@Override
-			public void finished()
-			{
 			}
 		});
 	}

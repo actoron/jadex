@@ -30,6 +30,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 
 /**
  *  Task for creating a component.
@@ -120,7 +121,7 @@ public class CreateComponentTask implements ITask
 		}
 //				System.out.println("args: "+args);
 		
-		IIntermediateResultListener<Tuple2<String, Object>> lis = new IIntermediateResultListener<Tuple2<String, Object>>()
+		IIntermediateResultListener<Tuple2<String, Object>> lis = new IntermediateEmptyResultListener<Tuple2<String, Object>>()
 		{
 			protected Map<String, Object> results;
 			

@@ -55,10 +55,10 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.transformation.annotations.Classname;
@@ -1293,7 +1293,7 @@ public class SRemoteGui
 						soc.writeFromInputStream(fis, sourceaccess);
 						
 						ITerminableIntermediateFuture<Long> fut = targetds.uploadFile(soc.getInputConnection(), target, sourcefile.getName());
-						fut.addResultListener(new IIntermediateResultListener<Long>()
+						fut.addResultListener(new IntermediateEmptyResultListener<Long>()
 						{
 							long	lasttime	= System.currentTimeMillis();
 							public void intermediateResultAvailable(final Long result)
@@ -1322,6 +1322,11 @@ public class SRemoteGui
 							public void exceptionOccurred(final Exception exception)
 							{
 								ret.setException(exception);
+							}
+							
+							public void maxResultCountAvailable(int max) 
+							{
+								ret.setMaxResultCount(max);
 							}
 						});
 					}

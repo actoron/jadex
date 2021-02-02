@@ -1,6 +1,8 @@
 package jadex.bridge.fipa;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import jadex.commons.SUtil;
@@ -302,5 +304,35 @@ public class SFipa
 	public static String createUniqueId(String name)
 	{
 		return SUtil.createUniqueId(name);
+	}
+	
+	/**
+	 *  Create a reply message using a map.
+	 *  @param msg The fipa message as map.
+	 *  @return The reply.
+	 */
+	public static Map<String, Object> createReply(Map<String, Object> msg)
+	{
+		Map<String, Object>	ret	= new HashMap<String, Object>();
+
+		// Copied parameters
+		if(msg.get(CONVERSATION_ID)!=null)
+			ret.put(CONVERSATION_ID, msg.get(CONVERSATION_ID));
+		if(msg.get(PROTOCOL)!=null)
+			ret.put(PROTOCOL, msg.get(PROTOCOL));
+		if(msg.get(LANGUAGE)!=null)
+			ret.put(LANGUAGE, msg.get(LANGUAGE));
+		if(msg.get(ONTOLOGY)!=null)
+			ret.put(ONTOLOGY, msg.get(ONTOLOGY));
+		if(msg.get(ENCODING)!=null)
+			ret.put(ENCODING, msg.get(ENCODING));
+		
+		// Mapped parameters
+		if(msg.get(REPLY_TO)!=null || msg.get(SENDER)!=null)
+			ret.put(RECEIVERS, msg.get(REPLY_TO)!=null? msg.get(REPLY_TO): msg.get(SENDER));
+		if(msg.get(REPLY_WITH)!=null)
+			ret.put(IN_REPLY_TO, msg.get(REPLY_WITH));
+		
+		return ret;
 	}
 }

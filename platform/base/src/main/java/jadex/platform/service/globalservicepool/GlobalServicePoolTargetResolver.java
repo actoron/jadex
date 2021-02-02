@@ -22,6 +22,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 
 /**
@@ -102,7 +103,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 			searchfuture = searchServices(sid, agent);
 //			services = new IndexMap<IServiceIdentifier, IService>();
 			
-			searchfuture.addResultListener(new IIntermediateResultListener<IService>() 
+			searchfuture.addResultListener(new IntermediateEmptyResultListener<IService>() 
 			{
 				boolean first=true;
 				public void intermediateResultAvailable(IService result) 
@@ -145,7 +146,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 		// Case the search is already running so just add a listener and take the first incoming result
 		if(searchfuture!=null && !done)
 		{
-			searchfuture.addResultListener(new IIntermediateResultListener<IService>() 
+			searchfuture.addResultListener(new IntermediateEmptyResultListener<IService>() 
 			{
 				boolean first=true;
 				public void intermediateResultAvailable(IService result) 

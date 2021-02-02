@@ -50,7 +50,7 @@ public class LongcallTestAgent extends TestAgent
 	/**
 	 *  The test count.
 	 */
-	protected int	getTestCount()
+	protected int getTestCount()
 	{
 		return SReflect.isAndroid() ? 6 : 12;
 	}
@@ -300,6 +300,10 @@ public class LongcallTestAgent extends TestAgent
 					public void commandAvailable(Object command)
 					{
 						// ignore timer updates
+					}
+					
+					public void maxResultCountAvailable(int max) 
+					{
 					}
 					
 					public void proceed()

@@ -895,8 +895,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public IFuture<Void> abort()
 	{
-		if(agent.getId().toString().indexOf("Sokrates")!=-1)
-			System.out.println("aborting: "+this+" "+IComponentIdentifier.LOCAL.get()+" "+agent.getId());
+		//if(agent.getId().toString().indexOf("Sokrates")!=-1)
+		//System.out.println("aborting: "+this+" "+IComponentIdentifier.LOCAL.get()+" "+agent.getId());
 		
 		if(!isFinishing())
 		{
@@ -937,7 +937,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 							ICommand<ResumeCommandArgs> resc = getResumeCommand();
 							if(resc!=null)
 							{
-								System.out.println("aborting5: "+this+", "+resc);
+								//System.out.println("aborting5: "+this+", "+resc);
 								resc.execute(new ResumeCommandArgs(null, null, ex));
 							}
 							List<ICommand<ResumeCommandArgs>> rescoms = getResumeCommands();
@@ -955,7 +955,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 				}
 				else
 				{
-					System.out.println("plan abort: not performing abort due to plan state: "+getProcessingState());
+					// happens with state=RUNNING ?!
+					//System.out.println("plan abort: not performing abort due to plan state: "+getProcessingState());
 				}
 	//			// Can be currently executing and being abort due to e.g. goal condition triggering
 	//			else if(PlanProcessingState.RUNNING.equals(getProcessingState()))

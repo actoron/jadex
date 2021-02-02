@@ -453,6 +453,10 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 									fut.addResultListener(term);
 								}
 							}
+							
+							public void maxResultCountAvailable(int max) 
+							{
+							}
 						}));
 					}
 					else

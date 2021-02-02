@@ -43,11 +43,11 @@ public class CollectionResultListener<E> implements IResultListener<E>, IUndoneR
 	 *  @param resultDelegate	The functional delegate result listener.
 	 *  @param exceptionDelegate The functional delegate exception listener.
 	 *        Passing <code>null</code> enables default exception logging.
-	 */
+	 * /
 	public CollectionResultListener(IFunctionalResultListener<Collection<E>> resultDelegate, IFunctionalExceptionListener exceptionDelegate)
 	{
 		this(-1, false, resultDelegate, exceptionDelegate);
-	}
+	}*/
 	
 	/**
 	 *  Create a new collection listener that stops on failures.
@@ -68,11 +68,11 @@ public class CollectionResultListener<E> implements IResultListener<E>, IUndoneR
 	 * @param resultDelegate The functional delegate result listener.
 	 * @param exceptionDelegate The functional delegate exception listener.
 	 *        Passing <code>null</code> enables default exception logging.
-	 */
+	 * /
 	public CollectionResultListener(boolean ignorefailes, IFunctionalResultListener<Collection<E>> resultDelegate, IFunctionalExceptionListener exceptionDelegate)
 	{
 		this(-1, ignorefailes, SResultListener.createResultListener(resultDelegate, exceptionDelegate));
-	}
+	}*/
 	
 	/**
 	 *  Create a new collection listener.
@@ -92,11 +92,11 @@ public class CollectionResultListener<E> implements IResultListener<E>, IUndoneR
 	 *  @param resultDelegate	The functional delegate result listener.
 	 *  @param exceptionDelegate The functional delegate exception listener.
 	 *        Passing <code>null</code> enables default exception logging.
-	 */
+	 * /
 	public CollectionResultListener(int num, IFunctionalResultListener<Collection<E>> resultDelegate, IFunctionalExceptionListener exceptionDelegate)
 	{
 		this(num, false, resultDelegate, exceptionDelegate);
-	}
+	}*/
 	
 	/**
 	 *  Create a new collection listener that stops on failures.
@@ -117,11 +117,11 @@ public class CollectionResultListener<E> implements IResultListener<E>, IUndoneR
 	 * @param resultDelegate The functional delegate result listener.
 	 * @param exceptionDelegate The functional delegate exception listener.
 	 *        Passing <code>null</code> enables default exception logging.
-	 */
+	 * /
 	public CollectionResultListener(int num, boolean ignorefailes, IFunctionalResultListener<Collection<E>> resultDelegate, IFunctionalExceptionListener exceptionDelegate)
 	{
 		this(num, ignorefailes, SResultListener.createResultListener(resultDelegate, exceptionDelegate));
-	}
+	}*/
 	
 	/**
 	 *  Create a new collection listener.

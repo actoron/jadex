@@ -103,7 +103,7 @@ public class JCCCloudviewPluginAgent extends JCCPluginAgent implements IJCCCloud
 						
 					}*/
 				}
-				bar.waitFor().thenAccept(d -> ret.setResult(res));
+				bar.waitFor().then(d -> ret.setResult(res));
 			}
 		});
 		return ret;

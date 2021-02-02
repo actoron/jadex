@@ -51,7 +51,7 @@ public class MicroProvidedServicesComponentFeature extends ProvidedServicesCompo
 	{
 		Future<Object> ret = new Future<>();
 
-		super.createServiceImplementation(info, fetcher).thenAccept(impl -> 
+		super.createServiceImplementation(info, fetcher).then(impl -> 
 		{
 			// Proxy class can happen when service reuses impl, e.g. external access service 
 			// service impl can also be pojo agent itself -> do not inject twice, checks agent annotation
@@ -68,26 +68,26 @@ public class MicroProvidedServicesComponentFeature extends ProvidedServicesCompo
 				MicroClassReader.findInjections(impl.getClass(), component.getClassLoader(), holder, rsers);
 				
 				MicroInjectionComponentFeature.injectStuff(component, impl, holder)
-					.thenAccept(p -> 
+					.then(p -> 
 				{
 					String[] sernames = holder.getServiceInjectionNames();
 					Stream<Tuple2<String, ServiceInjectionInfo[]>> s = Arrays.stream(sernames).map(sername -> new Tuple2<String, ServiceInjectionInfo[]>(sername, holder.getServiceInjections(sername)));
 					Map<String, ServiceInjectionInfo[]> serinfos = s.collect(Collectors.toMap(t -> t.getFirstEntity(), t -> t.getSecondEntity())); 
 					
 					MicroServiceInjectionComponentFeature.injectServices(component, impl, sernames, serinfos, component.getModel())
-						.thenAccept(q ->
+						.then(q ->
 					{
 						ret.setResult(impl);
-					}).exceptionally(ret);
+					}).catchErr(ret);
 					
-				}).exceptionally(ret);
+				}).catchErr(ret);
 				
 			}
 			else
 			{
 				ret.setResult(impl);
 			}
-		}).exceptionally(ret);
+		}).catchErr(ret);
 			
 		return ret;
 	}

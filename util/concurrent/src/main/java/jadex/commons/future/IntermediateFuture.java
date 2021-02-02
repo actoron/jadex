@@ -12,6 +12,7 @@ import java.util.NoSuchElementException;
 
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
+import jadex.commons.functional.Consumer;
 import jadex.commons.functional.Function;
 
 /**
@@ -32,6 +33,9 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     
 	/** The index of the next result for a thread. */
     protected Map<Thread, Integer>	indices;
+    
+    /** The max result count (if given by the producer). */
+    protected int maxresultcnt = -1;
     
 	//-------- constructors--------
 	
@@ -94,14 +98,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      *  @param result The result.
      *  @return True if result was set.
      */
-    public boolean	addIntermediateResultIfUndone(E result)
+    public boolean addIntermediateResultIfUndone(E result)
     {
     	boolean	ret	= doAddIntermediateResult(result, true);
 
     	if(ret)
-    	{
     		resumeIntermediate();
-    	}
     	
     	return ret;
     }
@@ -114,6 +116,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     {
     	boolean	ret	= true;
     	boolean	notify	= false;
+    	
     	synchronized(this)
     	{
 	    	if(undone)
@@ -144,14 +147,9 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    	}
 	    	else
 	    	{
-	    		//if(this instanceof SubscriptionIntermediateDelegationFuture && result!=null && result.toString().indexOf("ServiceEvent")!=-1)
-	    		//	System.out.println("store event: "+result+" "+listener);
-	    		boolean stored = storeResult(result);
+	    		//if(listener!=null && getResultCount()==1)
+	    		//	scheduleMaxNotification(null);
 	    		
-	    		if(!stored && listener==null && listeners==null)
-	    			throw new RuntimeException("lost value");
-	    		
-	    		notify	= true;
 	    		scheduleNotification(new ICommand<IResultListener<Collection<E>>>()
 				{
 	    			@Override
@@ -163,6 +161,9 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 		        		}
 	    			}
 				});
+	    		
+	    		storeResult(result);
+	    		notify	= true;
 	    	}
     	}
     	
@@ -177,7 +178,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 *  Add a result.
 	 *  @param result The result.
 	 */
-	protected boolean storeResult(E result)
+	protected void	storeResult(E result)
 	{
 //		if(result!=null && result.getClass().getName().indexOf("ChangeEvent")!=-1)
 //			System.out.println("ires: "+this+" "+result);
@@ -185,7 +186,15 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 		if(results==null)
 			results	= new ArrayList<E>();
 		results.add(result);
-		return true;
+		if(maxresultcnt==getResultCount())
+		{
+//			boolean	fini	= setFinishedIfUndone();
+//			System.out.println("Finished due to max cnt: "+this+", "+maxresultcnt+", "+fini);
+			setFinishedIfUndone();
+		}
+		
+		//if(result!=null && result.toString().indexOf("Chunk")!=-1)
+		//	System.out.println("ifuture: "+results.size()+" "+hashCode());
 	}
 	
 	/**
@@ -216,10 +225,16 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     public void setFinished()
     {
+    	//if(done.contains(this.toString()))
+    	//	System.out.println("setFini: "+this);
+    	//done.add(this.toString());
+    	//Thread.currentThread().dumpStack();
     	doSetFinished(false);
     	
     	resume();
     }
+    
+    //protected static Set<String> done = new HashSet<>();
     
     /**
      *  Declare that the future is finished.
@@ -228,9 +243,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     {
     	boolean	ret	= doSetFinished(true);
     	if(ret)
-    	{
     		resume();
-    	}
     	return ret;
     }
 
@@ -248,9 +261,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 			// Hack!!! Set results to avoid inconsistencies between super.result and this.results,
     		// because getIntermediateResults() returns empty list when results==null.
     		if(results==null)
-    		{
     			results	= Collections.emptyList();
-    		}
 		}
 
     	return ret;
@@ -266,36 +277,55 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		throw new RuntimeException();
        	
     	boolean	scheduled = false;
+    	boolean notify;
     	
     	synchronized(this)
-    	{
+    	{    		
+        	notify	= doAddResultListener(listener);
+
     		// If results==null its a subscription future and first results are already collected.
-    		if(results!=null && !results.isEmpty() && intermediate && listener instanceof IIntermediateResultListener)
+    		if(intermediate && listener instanceof IIntermediateResultListener)
     		{
-    			//System.out.println("notify scheduled: "+results);
-    			scheduled = true;
-	    		IIntermediateResultListener<E>	lis	= (IIntermediateResultListener<E>)listener;
-	    		for(final E result: results)
-	    		{
-	    			@SuppressWarnings("unchecked")
-					ICommand<IResultListener<Collection<E>>> c = (ICommand<IResultListener<Collection<E>>>) ((Object) new ICommand<IIntermediateResultListener<E>>()
-					{
-	    				@Override
-	    				public void execute(IIntermediateResultListener<E> listener)
-	    				{
-	    					// Use template method to allow overwriting (e.g. for tuple2future).
-	    					notifyIntermediateResult(listener, result);
-	    				}
-					}); 
-	    			scheduleNotification(lis, c);
+	    		IIntermediateResultListener<E> lis = (IIntermediateResultListener<E>)listener;
+	    		scheduled = scheduleMaxNotification(lis);
+	    		//System.out.println("addRes scheduleAll: "+maxresultcnt+" "+this);
+
+	    		if(results!=null && !results.isEmpty())
+	    		{    			
+	    			//System.out.println("notify scheduled: "+results);
+	    			scheduled = true;
+		    				    		
+		    		for(final E result: results)
+		    		{
+		    			@SuppressWarnings("unchecked")
+						ICommand<IResultListener<Collection<E>>> c = (ICommand<IResultListener<Collection<E>>>) ((Object) new ICommand<IIntermediateResultListener<E>>()
+						{
+		    				@Override
+		    				public void execute(IIntermediateResultListener<E> listener)
+		    				{
+		    					// Use template method to allow overwriting (e.g. for tuple2future).
+		    					notifyIntermediateResult(listener, result);
+		    				}
+						}); 
+		    			scheduleNotification(lis, c);
+		    		}
 	    		}
     		}
     	}
 
+    	// Notify intermediate results if any
     	if(scheduled)
     		startScheduledNotifications();
     	
-       	super.addResultListener(listener);
+    	// Notify final result if any
+    	if(notify)
+    		notifyListener(listener);
+
+
+    	//if(!scheduled && maxresultcnt!=-1)
+    	//	System.out.println("addRes scheduleAll NOT: "+maxresultcnt+" "+this);
+    	
+//       	super.addResultListener(listener);	// add must be synchronized, but notify outside synchronized{}
     }
     
     protected ICommand<IResultListener<Collection<E>>>	notcommand	= new ICommand<IResultListener<Collection<E>>>()
@@ -344,11 +374,11 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	/**
 	 * Add an result listener, which called on intermediate results.
 	 * 
-	 * @param intermediateListener The intermediate listener.
+	 * @param listener The intermediate listener.
 	 */
-	public void addIntermediateResultListener(IIntermediateResultListener<E> intermediateListener)
+	public void addIntermediateResultListener(IIntermediateResultListener<E> listener)
 	{
-		addResultListener(intermediateListener);
+		addResultListener(listener);
 	}
     
 	/**
@@ -356,11 +386,11 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 * Exceptions will be logged.
 	 * 
 	 * @param intermediateListener The intermediate listener.
-	 */
+	 * /
 	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener)
 	{
 		addIntermediateResultListener(intermediateListener, null, null);
-	}
+	}*/
 
 	/**
 	 * Add a functional result listener, which called on intermediate results.
@@ -370,58 +400,68 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 * @param finishedListener The finished listener, called when no more
 	 *        intermediate results will arrive. If <code>null</code>, the finish
 	 *        event will be ignored.
-	 */
+	 * /
 	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener, IFunctionalIntermediateFinishedListener<Void> finishedListener)
 	{
 		addIntermediateResultListener(intermediateListener, finishedListener, null);
-	}
+	}*/
 	
 	/**
 	 * Add a functional result listener, which called on intermediate results.
 	 * 
-	 * @param intermediateListener The intermediate listener.
-	 * @param exceptionListener The listener that is called on exceptions. Passing
+	 * @param ilistener The intermediate listener.
+	 * @param elistener The listener that is called on exceptions. Passing
 	 *        <code>null</code> enables default exception logging.
-	 */
-    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener, IFunctionalExceptionListener exceptionListener)
+	 * /
+    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> ilistener, IFunctionalExceptionListener elistener)
     {    	
-		addIntermediateResultListener(intermediateListener, null, exceptionListener);
-    }
+		addIntermediateResultListener(ilistener, null, elistener);
+    }* /
 
+    public void addIntermediateResultListener(final IFunctionalIntermediateResultListener<E> ilistener, final IFunctionalIntermediateFinishedListener<Void> flistener,
+    	IFunctionalExceptionListener elistener)
+    {
+    	addIntermediateResultListener(ilistener, flistener, elistener, null);
+    }
+    	
 	/**
 	 * Add a functional result listener, which called on intermediate results.
 	 * 
-	 * @param intermediateListener The intermediate listener.
-	 * @param finishedListener The finished listener, called when no more
+	 * @param ilistener The intermediate listener.
+	 * @param flistener The finished listener, called when no more
 	 *        intermediate results will arrive. If <code>null</code>, the finish
 	 *        event will be ignored.
-	 * @param exceptionListener The listener that is called on exceptions. Passing
+	 * @param elistener The listener that is called on exceptions. Passing
 	 *        <code>null</code> enables default exception logging.
-	 */
-	public void addIntermediateResultListener(final IFunctionalIntermediateResultListener<E> intermediateListener, final IFunctionalIntermediateFinishedListener<Void> finishedListener,
-		IFunctionalExceptionListener exceptionListener)
+	 * /
+	public void addIntermediateResultListener(final IFunctionalIntermediateResultListener<E> ilistener, final IFunctionalIntermediateFinishedListener<Void> flistener,
+		IFunctionalExceptionListener elistener, final IFunctionalIntermediateResultCountListener rlistener)
 	{
-		final IFunctionalExceptionListener innerExceptionListener = (exceptionListener == null) ? SResultListener.printExceptions(): exceptionListener;
+		final IFunctionalExceptionListener ielistener = (elistener == null) ? SResultListener.printExceptions(): elistener;
 		addResultListener(new IntermediateDefaultResultListener<E>()
 		{
 			public void intermediateResultAvailable(E result)
 			{
-				intermediateListener.intermediateResultAvailable(result);
+				ilistener.intermediateResultAvailable(result);
 			}
 
 			public void finished()
 			{
-				if (finishedListener != null) {
-					finishedListener.finished();
-				}
+				if(flistener != null) 
+					flistener.finished();
 			}
 
 			public void exceptionOccurred(Exception exception)
 			{
-				innerExceptionListener.exceptionOccurred(exception);
+				ielistener.exceptionOccurred(exception);
+			}
+			
+			public void maxResultCountAvailable(int max) 
+			{
+				rlistener.maxResultCountAvailable(max);
 			}
 		});
-	}
+	}*/
 
 	/**
      *  Check if there are more results for iteration for the given caller.
@@ -551,12 +591,102 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 			index	= index==null ? Integer.valueOf(1) : Integer.valueOf(index.intValue()+1);
 			
 			if(indices==null)
-			{
 				indices	= new HashMap<Thread, Integer>();
-			}
 			indices.put(Thread.currentThread(), index);
     	}
 		return doGetNextIntermediateResult(index.intValue()-1, timeout, realtime);
+    }
+    
+    /**
+     *  Set the maximum number of results.
+     *  @param max The maximum number of results.
+     */
+    public void setMaxResultCount(int max)
+    {
+       	boolean	notify	= false;
+    	synchronized(this)
+    	{	    	
+	    	if(isDone())
+	    	{
+	    		throw new IllegalStateException("Future already finished.");
+	    	}
+	    	else if(maxresultcnt!=-1)
+	    	{
+	    		throw new IllegalStateException("Max result count must only be set once.");	    		
+	    	}
+	    	else
+	    	{
+	        	//System.out.println("max set: "+max);
+	        	this.maxresultcnt = max;
+	        	intermediate = intermediate | max!=-1;
+	        	
+	        	if(listener!=null)
+	        	{
+		    		notify	= scheduleMaxNotification(null);
+	        	}
+	    	}
+    	}
+    	
+    	if(notify)
+    		startScheduledNotifications();
+    	
+    	if(getResultCount()==max)
+    		setFinishedIfUndone();
+    }
+    
+    /**
+     * 
+     * @param max
+     */
+    protected boolean scheduleMaxNotification(IResultListener<Collection<E>> lis)
+    {
+    	boolean donotify = false;
+    	
+    	if(maxresultcnt!=-1)
+    	{
+    		donotify = true;
+    		//System.out.println("donotify max: "+maxresultcnt+" "+lis);
+    		
+    		ICommand<IResultListener<Collection<E>>> com = new ICommand<IResultListener<Collection<E>>>()
+			{
+				@Override
+				public void execute(IResultListener<Collection<E>> listener)
+				{
+					//System.out.println("notific: "+listener);
+	        		if(listener instanceof IIntermediateResultListener)
+	        		{
+	        			((IIntermediateResultListener)listener).maxResultCountAvailable(maxresultcnt);
+	        		}
+				}
+				
+				@Override
+				public String toString() 
+				{
+					return "notifyMaxCount";
+				}
+			};
+    		
+			// Important! two methods fitting scheduleNotification(lis, com) :-(
+    		if(lis==null)
+    			scheduleNotification(com);
+    		else
+    			scheduleNotification(lis, com);
+    	}
+//    	else
+//    	{
+//    		System.out.println("max: "+maxresultcnt+" "+lis);
+//    	}
+    	
+    	return donotify;
+    }
+    
+    /** 
+     *  Get the number of results already collected.
+     *  @return The number of results.
+     */
+    protected int getResultCount()
+    {
+    	return results!=null? results.size(): 0;
     }
     
     /**
@@ -727,7 +857,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 		    		Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
 		    		synchronized(mon)
 					{
-		    			String	state	= icallers.get(caller);
+		    			String	state = icallers.get(caller);
 		    			if(CALLER_SUSPENDED.equals(state))
 		    			{
 		    				// Only reactivate thread when previously suspended.
@@ -741,6 +871,72 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	}
 	
 	//-------- java 8 extensions --------
+	
+	public IFuture<Collection<E>> catchErr(final Consumer<? super Exception> consumer, Class<?> futuretype)
+    {
+		IResultListener reslis = new IntermediateEmptyResultListener()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				 consumer.accept(exception);
+			}
+		};
+		addResultListener(reslis);
+		
+		/*this.addResultListener(new IResultListener<E>()
+		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				consumer.accept(exception);
+			}
+			
+			@Override
+			public void resultAvailable(E result)
+			{
+			}
+		});*/
+		
+        return this;
+    }
+	
+	// todo: subscriptions need special treatment for first listener
+	
+	public IIntermediateFuture<? extends E> next(Consumer<? super E> function)
+	{
+		addResultListener(new IntermediateEmptyResultListener<E>()
+		{
+			public void intermediateResultAvailable(E result)
+			{
+				function.accept(result);
+			}
+		});
+		return this;
+	}
+	
+	public IIntermediateFuture<? extends E> max(Consumer<Integer> function)
+	{
+		addResultListener(new IntermediateEmptyResultListener<E>()
+		{
+			public void maxResultCountAvailable(int max) 
+			{
+				function.accept(max);
+			}
+		});
+		return this;
+	}
+	
+	public IIntermediateFuture<? extends E> finished(Consumer<? super E> function)
+	{
+		addResultListener(new IntermediateEmptyResultListener<E>()
+		{
+			public void finished() 
+			{
+				function.accept(null);
+			}
+		});
+		return this;
+	}
 	
 	/**
 	 *  Implements async loop and applies a an async function to each element.
@@ -797,6 +993,11 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
             public void exceptionOccurred(Exception exception)
             {
                 ret.setException(exception);
+            }
+            
+            public void maxResultCountAvailable(int count) 
+            {
+            	ret.setMaxResultCount(count);
             }
         });
 
@@ -859,6 +1060,11 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
                     {
                     	ret.setExceptionIfUndone(exception);
                     }
+                    
+                    public void maxResultCountAvailable(int max) 
+                    {
+                    	ret.setMaxResultCount(max);
+                    }
                 });
             }
 
@@ -872,6 +1078,11 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
             public void exceptionOccurred(Exception exception)
             {
                 ret.setException(exception);
+            }
+            
+            public void maxResultCountAvailable(int max) 
+            {
+            	ret.setMaxResultCount(max);
             }
         });
 

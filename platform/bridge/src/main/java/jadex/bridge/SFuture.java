@@ -348,7 +348,7 @@ public class SFuture
 	 */
 	public static <T> T getFirstResultAndTerminate(ITerminableIntermediateFuture<T> fut)
 	{
-		T	ret	= fut.getNextIntermediateResult(Timeout.UNSET, true);
+		T ret = fut.getNextIntermediateResult(Timeout.UNSET, true);
 		fut.terminate();
 		return ret;
 	}
@@ -450,10 +450,10 @@ public class SFuture
 		// Add remote results to future
 		if(f2!=null)
 		{
-			f2.addIntermediateResultListener(result-> 
+			f2.next(result-> 
 			{
 				((IntermediateFuture)ret).addIntermediateResult((T)result);
-			}, exception -> {}); // Ignore exception (printed when no listener supplied)
+			}).catchErr(exception -> {}); // Ignore exception (printed when no listener supplied)
 		}
 		
 		return ret;

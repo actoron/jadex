@@ -53,6 +53,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
@@ -183,6 +184,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	 */
 	public <T> ITerminableFuture<IServiceIdentifier> searchService(ServiceQuery<T> query)
 	{
+		if(query.getServiceType()!=null && query.getServiceType().toString().indexOf("Calc")!=-1)
+			System.out.println("calc");
 		TerminableFuture<IServiceIdentifier>	ret	= new TerminableFuture<>();
 		AtomicInteger	track	= new AtomicInteger(1);
 		boolean	foundsuperpeer	= false;
@@ -266,7 +269,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		{
 			ret.setExceptionIfUndone(new ServiceNotFoundException(query.toString()));
 		}
-
+		
 		return ret;
 	}
 	
@@ -820,7 +823,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						agent.getLogger().info(agent.getId()+" requesting super peer connection for network "+networkname+" from super peer: "+sp);
 						//System.out.println(agent.getId()+" requesting super peer connection for network "+networkname+" from super peer: "+sp);
 						ISubscriptionIntermediateFuture<Void>	regfut	= sp.registerClient(networkname);
-						regfut.addResultListener(new IIntermediateResultListener<Void>()
+						regfut.addResultListener(new IntermediateEmptyResultListener<Void>()
 						{
 							@Override
 							public void intermediateResultAvailable(Void result)
@@ -881,7 +884,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									}
 									localquery = ServiceRegistry.getRegistry(agent.getId()).addQuery(lquery);									
 
-									localquery.addResultListener(new IIntermediateResultListener<ServiceEvent<IServiceIdentifier>>()
+									localquery.addResultListener(new IntermediateEmptyResultListener<ServiceEvent<IServiceIdentifier>>()
 									{
 										public void resultAvailable(Collection<ServiceEvent<IServiceIdentifier>> result)
 										{
@@ -1229,12 +1232,16 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						adjustConnectionTimeout();
 						ITerminableIntermediateFuture<T>	fut	= superpeer.addQuery(query);
 						futures.add(fut);	// Remember future for later termination
-						fut.addResultListener(new IIntermediateResultListener<T>()
+						fut.addResultListener(new IntermediateEmptyResultListener<T>()
 						{
 							@Override
 							public void intermediateResultAvailable(T result)
 							{
 								// Forward result to user query
+//								if((""+result).indexOf("ITestService")!=-1)
+//								{
+//									System.out.println("Received result: "+agent+", "+result+", "+query);
+//								}
 								retfut.addIntermediateResultIfUndone(result);
 							}
 							
@@ -1284,7 +1291,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				{
 					// Start current search
 					searchRemoteServices(query)
-						.addResultListener(new IIntermediateResultListener<IServiceIdentifier>()
+						.addResultListener(new IntermediateEmptyResultListener<IServiceIdentifier>()
 					{
 						@SuppressWarnings({ "unchecked", "rawtypes" })
 						@Override

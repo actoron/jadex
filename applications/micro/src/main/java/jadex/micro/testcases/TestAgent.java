@@ -21,7 +21,9 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.security.ISecurityService;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -29,7 +31,6 @@ import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -61,16 +62,60 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	@OnEnd
 	public IFuture<Void>	cleanup()
 	{
+		if(((IPlatformComponentAccess)agent).getPlatformComponent().debug)
+		{
+			agent.getLogger().severe("cleanup0");
+		}
+		
 		FutureBarrier<Void>	outer	= new FutureBarrier<Void>();
 		outer.addFuture(super.cleanup());
 		
+		if(((IPlatformComponentAccess)agent).getPlatformComponent().debug)
+		{
+			agent.getLogger().severe("cleanup1 killing platforms"+platforms);
+		}
 		FutureBarrier<Map<String, Object>>	inner	= new FutureBarrier<Map<String,Object>>();
 		for(final IExternalAccess platform: platforms)
 		{
 			inner.addFuture(platform.killComponent());
 		}
 		platforms	= null;
+		if(((IPlatformComponentAccess)agent).getPlatformComponent().debug)
+		{
+			inner.waitFor().addResultListener(new IResultListener<Void>()
+			{
+				@Override
+				public void resultAvailable(Void result)
+				{
+					agent.getLogger().severe("cleanup2 killed platforms");
+				}
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					agent.getLogger().severe("cleanup3 failed killing platforms\n"+SUtil.getExceptionStacktrace(exception));
+				}
+			});
+			agent.getLogger().severe("cleanup4 started killing platforms");
+		}
+
 		outer.addFuture(inner.waitFor());
+
+		if(((IPlatformComponentAccess)agent).getPlatformComponent().debug)
+		{
+			outer.waitFor().addResultListener(new IResultListener<Void>()
+			{
+				@Override
+				public void resultAvailable(Void result)
+				{
+					agent.getLogger().severe("cleanup5 finished");
+				}
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					agent.getLogger().severe("cleanup6 failed\n"+SUtil.getExceptionStacktrace(exception));
+				}
+			});
+		}
 
 		return outer.waitFor();
 	}
@@ -125,7 +170,8 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		test(agent.getExternalAccess(), true).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		test(agent.getExternalAccess(), true).addResultListener(agent.createResultListener(
+				new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
@@ -149,7 +195,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 					}
 				});
 			}
-		});
+		}));
 		
 		return ret;
 	}
@@ -175,6 +221,11 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	 */
 	protected IFuture<IExternalAccess> createPlatform(IPlatformConfiguration config, String[] args)
 	{
+		if(((IPlatformComponentAccess)agent).getPlatformComponent().debug)
+		{
+			config.setLogging(true);
+		}
+
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		// Start platform
 		Starter.createPlatform(config, args).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(

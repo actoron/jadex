@@ -445,23 +445,23 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		String isloggedin = request.getHeader(HEADER_JADEX_ISLOGGEDIN);
 		if(platformsecret!=null)
 		{
-			login(request, platformsecret).thenAccept((Boolean ok) ->
+			login(request, platformsecret).then((Boolean ok) ->
 			{
 				if(ok)
 					writeResponse(Boolean.TRUE, Response.Status.OK.getStatusCode(), callid, null, request, response, true);
 				else
 					writeResponse(Boolean.FALSE, Response.Status.UNAUTHORIZED.getStatusCode(), callid, null, request, response, true);
-			}).exceptionally((Exception e) ->
+			}).catchErr((Exception e) ->
 			{
 				writeResponse(new SecurityException("Login failed"), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true);
 			});
 		}
 		else if(logout!=null)
 		{
-			logout(request).thenAccept((Boolean ok) ->
+			logout(request).then((Boolean ok) ->
 			{
 				writeResponse(ok, Response.Status.OK.getStatusCode(), callid, null, request, response, true);
-			}).exceptionally((Exception e) ->
+			}).catchErr((Exception e) ->
 			{
 				writeResponse(new SecurityException("Logout failed"), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), callid, null, request, response, true);
 			});
@@ -568,7 +568,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	
 					// Check security
 					RemoteMethodInvocationCommand.isUnrestricted(service.getServiceId(), component, new MethodInfo(mi.getMethod()))
-					.addResultListener((Boolean unres) ->
+					.then((Boolean unres) ->
 					{
 						try
 						{
@@ -593,7 +593,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 									// System.out.println("added context: "+fcallid+""+ctx);
 			
 									((IIntermediateFuture<Object>)ret)
-										.addIntermediateResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateFutureCommandResultListener<Object>()
+										.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateFutureCommandResultListener<Object>()
 									{
 										public void resultAvailable(Collection<Object> result)
 										{
@@ -629,7 +629,11 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 											// element in writeResponse
 											handleResult(FINISHED, null, null);
 										}
-		
+										
+										public void maxResultCountAvailable(int max)
+										{
+										}
+										
 										/**
 										 * Handle a final or intermediate
 										 * result/exception/command of a service call.
@@ -842,12 +846,12 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	{
 		Future<Boolean> ret = new Future<Boolean>();
 		ISecurityService ss = component.getLocalService(ISecurityService.class);
-		ss.checkPlatformPassword(secret).thenAccept((Boolean ok) ->
+		ss.checkPlatformPassword(secret).then((Boolean ok) ->
 		{
 			if(ok)
 				request.getSession(true).setAttribute("loggedin", Boolean.TRUE);
 			ret.setResult(ok);
-		}).exceptionally((Exception e) -> 
+		}).catchErr((Exception e) -> 
 		{
 			ret.setResult(Boolean.FALSE);
 		});

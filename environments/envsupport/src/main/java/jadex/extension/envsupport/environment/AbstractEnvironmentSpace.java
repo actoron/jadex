@@ -39,9 +39,9 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.meta.IPropertyMetaDataSet;
 import jadex.extension.envsupport.IObjectCreator;
 import jadex.extension.envsupport.MEnvSpaceInstance;
@@ -641,18 +641,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					observercenters.add(oc);
 					
 					getExternalAccess().listenToComponent()
-						.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+						.addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 					{
-						@Override
-						public void exceptionOccurred(Exception exception)
-						{
-						}
-						
-						@Override
-						public void resultAvailable(Collection<CMSStatusEvent> result)
-						{
-						}
-						
 						@Override
 						public void intermediateResultAvailable(CMSStatusEvent result)
 						{
@@ -666,11 +656,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 									}
 								});
 							}
-						}
-						
-						@Override
-						public void finished()
-						{
 						}
 					});
 					
@@ -2914,10 +2899,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 //				System.out.println("sub add: "+this);
 				sub.addResultListener(new IIntermediateFutureCommandResultListener<IMonitoringEvent>()
 				{
-					public void resultAvailable(Collection<IMonitoringEvent> result)
-					{
-					}
-					
 					public void intermediateResultAvailable(IMonitoringEvent result)
 					{
 //						System.out.println("rec: "+result);
@@ -2937,8 +2918,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 							componentRemoved((IComponentDescription)result.getProperty("details"));
 						}
 					}
-					
-				    public void finished()
+
+					public void finished()
 				    {
 //				    	System.out.println("fini");
 				    }
@@ -2951,6 +2932,14 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				    public void commandAvailable(Object command)
 				    {
 				    	// ignore timer updates
+				    }
+				    
+				    public void resultAvailable(Collection<IMonitoringEvent> result) 
+				    {
+				    }
+				    
+				    public void maxResultCountAvailable(int max) 
+				    {
 				    }
 				});
 			}

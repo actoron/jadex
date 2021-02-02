@@ -28,10 +28,12 @@ import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.commons.FieldInfo;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.Tuple3;
 import jadex.commons.future.Future;
@@ -149,8 +151,11 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	 */
 	public IFuture<Void> shutdown()
 	{
-//		if(getComponent().getComponentIdentifier().getName().indexOf("Initiator")!=-1)
-//			System.out.println("lifecycle feature shutdown start: "+getComponent().getComponentIdentifier());
+		boolean debug	= component instanceof IPlatformComponentAccess && ((IPlatformComponentAccess)component).getPlatformComponent().debug;
+		if(debug)
+		{
+			component.getLogger().severe("lifecycle feature shutdown start: "+getComponent());
+		}
 			
 		final Future<Void> ret = new Future<Void>();
 		
@@ -162,32 +167,53 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 		{
 			//return invokeMethod(getInternalAccess(), OnInit.class, null);
 			if(wasAnnotationCalled(ann))
+			{
 				fut = IFuture.DONE;
+				if(debug)
+				{
+					component.getLogger().severe("lifecycle feature shutdown method already invoked: "+getComponent());
+				}
+			}
 			else
+			{
 				fut = invokeMethod(getInternalAccess(), ann, null);
+				if(debug)
+				{
+					component.getLogger().severe("lifecycle feature shutdown method invoked: "+getComponent()+" done="+fut.isDone());
+				}
+			}
 		}
 		else
 		{
 			fut = invokeMethod(getInternalAccess(), AgentKilled.class, null);
+			if(debug)
+			{
+				component.getLogger().severe("lifecycle feature shutdown agent killed invoked: "+getComponent()+" done="+fut.isDone());
+			}
 		}
 		
 		fut.addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
+				if(debug)
+				{
+					component.getLogger().severe("lifecycle feature shutdown end result: "+getComponent());
+				}
 				proceed(null);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				if(debug)
+				{
+					component.getLogger().severe("lifecycle feature shutdown end exception: "+getComponent()+"\n"+SUtil.getExceptionStacktrace(exception));
+				}
 				proceed(exception);
 			}
 			
 			protected void proceed(Exception e)
 			{
-//				if(getComponent().getComponentIdentifier().getName().indexOf("Initiator")!=-1)
-//					System.out.println("lifecycle feature shutdown end: "+getComponent().getComponentIdentifier());
-				
 				try
 				{
 					MicroModel micromodel = (MicroModel)getComponent().getModel().getRawModel();

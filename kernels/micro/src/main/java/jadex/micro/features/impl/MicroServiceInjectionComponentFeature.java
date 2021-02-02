@@ -37,9 +37,9 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.MicroModel;
 import jadex.micro.MicroModel.ServiceInjectionInfo;
@@ -148,7 +148,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 							final int fj = j;
 							
 							// Invokes methods for each intermediate result
-							sfut.addResultListener(new IIntermediateResultListener<Object>()
+							sfut.addResultListener(new IntermediateEmptyResultListener<Object>()
 							{
 								boolean first = true;
 								public void intermediateResultAvailable(final Object result)
@@ -186,10 +186,6 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 								public void resultAvailable(Collection<Object> result)
 								{
 									finished();
-								}
-								
-								public void finished()
-								{
 								}
 								
 								public void exceptionOccurred(Exception e)

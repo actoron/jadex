@@ -25,6 +25,9 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	
     /** Flag if results should be stored till first listener is added. */
     protected boolean storeforfirst;
+    
+    /** The number of results. */
+    protected int resultssize;
 	
 	//-------- constructors --------
 
@@ -69,18 +72,31 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	//-------- methods --------
 	
 	/**
+	 *  Unsupported for subscriptions.
+	 */
+	@Override
+	public void setMaxResultCount(int max)
+	{
+		throw new UnsupportedOperationException("Subscription futures do not allow max result setting.");
+	}
+	
+	/**
 	 *  Store a result.
 	 *  @param result The result.
 	 */
 	@Override
-	protected boolean storeResult(E result)
+	protected void	storeResult(E result)
 	{
-		boolean ret = false;
-		// Store results only if necessary for first listener.
+		resultssize++;
+		
+		// Store results only if not yet any listener added or thread waiting
 		if(storeforfirst)
 		{
 			super.storeResult(result);
-			ret = true;
+		}
+		else if(listener==null && ownresults==null)
+		{
+			throw new RuntimeException("lost value: "+result);
 		}
 		
 		if(ownresults!=null)
@@ -89,12 +105,19 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 			{
 				res.add(result);
 			}
-			ret = true;
 		}
 		
 		resumeIntermediate();
-		return ret;
 	}
+	
+	/** 
+     *  Get the number of results already collected.
+     *  @return The number of results.
+     */
+    protected int getResultCount()
+    {
+    	return resultssize;
+    }
 	
 	/**
 	 *  Add a listener which is only informed about new results,
@@ -124,6 +147,8 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     	
 //    	System.out.println("adding listener: "+this+" "+listener);
     	
+    	super.addResultListener(listener);
+    	
     	boolean first;
     	synchronized(this)
 		{
@@ -131,7 +156,6 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 			storeforfirst = false;
 			//System.out.println("store false: "+this);
 		}
-    	super.addResultListener(listener);
     	
 		if(first)
 			results = null;

@@ -1,7 +1,6 @@
 package jadex.micro.testcases.servicequeries;
 
 import java.util.Collection;
-import java.util.Map;
 
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
@@ -20,19 +19,17 @@ import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Properties;
-import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.TestAgent;
 
 
 /**
- *  The user agent uses service queries. 
+ *  Test if an open ended query finds the right number of available services.
  */
 @Agent(keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
@@ -67,7 +64,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 		{
 			ISubscriptionIntermediateFuture<IExampleService> queryfut = rsf.addQuery(
 				new ServiceQuery<>(IExampleService.class, local? ServiceScope.APPLICATION: ServiceScope.GLOBAL));
-			queryfut.addResultListener(new IIntermediateResultListener<IExampleService>()
+			queryfut.addResultListener(new IntermediateEmptyResultListener<IExampleService>()
 			{
 				int num = 0;
 				public void exceptionOccurred(Exception exception)
@@ -80,7 +77,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 						}
 						else
 						{
-							tr.setFailed("Wrong number of results: "+cnt);
+							tr.setFailed("Wrong number of results: expected "+cnt+" but was "+num);
 						}
 					}
 					else
@@ -128,7 +125,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 			// Wait some time and then terminate query
 			
 			long start = System.currentTimeMillis();
-			agent.getFeature(IExecutionFeature.class).waitForDelay(local? 1000: 11000, true).get();
+			agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledDefaultTimeout(agent.getId().getRoot(), local? 0.1: 0.9), true).get();
 			System.out.println("wait dur: "+(System.currentTimeMillis()-start));
 			
 			queryfut.terminate();

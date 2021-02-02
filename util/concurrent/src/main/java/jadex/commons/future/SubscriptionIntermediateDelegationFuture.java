@@ -25,6 +25,9 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     /** Flag if results should be stored till first listener is. */
     protected boolean storeforfirst = true;
 	
+    /** The number of results. */
+    protected int resultssize;
+    
 	/**
 	 *  Create a new future.
 	 */
@@ -45,34 +48,53 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	//-------- methods (hack!!! copied from subscription future) --------
 	
 	/**
+	 *  Unsupported for subscriptions.
+	 */
+	@Override
+	public void setMaxResultCount(int max)
+	{
+		throw new UnsupportedOperationException("Subscription futures do not allow max result setting.");
+	}
+
+	/**
 	 *  Add a result.
 	 *  @param result The result.
 	 */
-	protected boolean storeResult(E result)
+	protected void	storeResult(E result)
 	{
-		boolean ret = false;
-		
 		//System.out.println("store: "+result+" "+storeforfirst+" "+ownresults);
 		
-		// Store results only if necessary for first listener.
+		resultssize++;
+		
+		// Store results only if not yet any listener added or thread waiting
 		if(storeforfirst)
 		{
-			ret = true;
 			super.storeResult(result);
 		}
-		
+		else if(listener==null && ownresults==null)
+		{
+			throw new RuntimeException("lost value: "+result);
+		}
+
 		if(ownresults!=null)
 		{
 			for(List<E> res: ownresults.values())
 			{
 				res.add(result);
 			}
-			ret = true;
 		}
 		
 		resumeIntermediate();
-		return ret;
 	}
+	
+    /** 
+     *  Get the number of results already collected.
+     *  @return The number of results.
+     */
+    protected int getResultCount()
+    {
+    	return resultssize;
+    }
 	
 	/**
 	 *  Add a listener which is only informed about new results,
@@ -98,22 +120,15 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	if(!(listener instanceof IIntermediateResultListener))
     		throw new IllegalArgumentException("Subscription futures require intermediate listeners.");
     	
-    	/*if(storeforfirst)
-    		e = new RuntimeException();
-    	
-    	if(!storeforfirst && listeners!=null && listeners.size()>=0)
-    	{
-    		e.printStackTrace();
-    		System.out.println("adding listener: "+this+" "+listener);
-    	}*/
+    	super.addResultListener(listener);
     	
       	boolean first;
     	synchronized(this)
 		{
 			first = storeforfirst;
 			storeforfirst = false;
+//    		System.out.println("adding first listener: "+this+" "+listener);
 		}
-    	super.addResultListener(listener);
     	
 		if(first)
 			results=null;

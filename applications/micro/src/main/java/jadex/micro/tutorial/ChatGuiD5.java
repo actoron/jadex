@@ -21,7 +21,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 
 /**
  *  Basic chat user interface.
@@ -68,7 +68,7 @@ public class ChatGuiD5 extends JFrame
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IIntermediateFuture<IChatService>	fut	= ia.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
-						fut.addResultListener(new IIntermediateResultListener<IChatService>()
+						fut.addResultListener(new IntermediateEmptyResultListener<IChatService>()
 						{
 							public void resultAvailable(Collection<IChatService> result)
 							{
@@ -91,15 +91,6 @@ public class ChatGuiD5 extends JFrame
 								System.out.println("found: "+cs);
 								cs.message(ChatGuiD5.this.agent.getId().getName(), text);
 							}
-							
-							public void finished()
-							{
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-							}
-							
 						});
 						return IFuture.DONE;
 					}

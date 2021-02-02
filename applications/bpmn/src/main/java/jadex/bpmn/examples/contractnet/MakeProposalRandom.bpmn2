@@ -10,7 +10,7 @@
   <semantic:extension>
     <jadex:modelname>MakeProposalRandom</jadex:modelname>
     <jadex:package>jadex.bpmn.examples.contractnet</jadex:package>
-    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" master="" synchronous="false" monitoring="OFF" keepalive="false"/>
     <jadex:imports>
       <jadex:import>jadex.bridge.IComponentIdentifier</jadex:import>
     </jadex:imports>
@@ -61,7 +61,7 @@
     <semantic:sequenceFlow sourceRef="_aS2w0Vm8Ed-CVtZr0hfiVg" targetRef="_ZHwPoVm8Ed-CVtZr0hfiVg" id="_aS2w2lm8Ed-CVtZr0hfiVg">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_ZHwPoVm8Ed-CVtZr0hfiVg" targetRef="_5q6OSVm7Ed-CVtZr0hfiVg" id="_ZHwPqlm8Ed-CVtZr0hfiVg">
-      <semantic:conditionExpression>Math.random()&lt;0.666666</semantic:conditionExpression>
+      <semantic:conditionExpression>Math.random()&lt;0.5</semantic:conditionExpression>
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_ZHwPoVm8Ed-CVtZr0hfiVg" targetRef="_cpWuIVm8Ed-CVtZr0hfiVg" id="_cpWuKlm8Ed-CVtZr0hfiVg">
     </semantic:sequenceFlow>

@@ -30,9 +30,9 @@ public class ClientMain  {
 //		config.setDht(true);
 
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
-		fut.addResultListener(access -> {
+		fut.then(access -> {
 			IFuture<IExternalAccess>	fut2	= access.createComponent(new CreationInfo().setName("CDClient").setFilename(ClientAgent.class.getName() + ".class"));
-			fut2.addResultListener(access2 -> System.out.println("Client Agent created"));
+			fut2.then(access2 -> System.out.println("Client Agent created"));
 		});
 	}
 

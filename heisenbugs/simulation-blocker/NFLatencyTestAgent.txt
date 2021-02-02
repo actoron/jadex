@@ -1,0 +1,546 @@
+
+Class jadex.micro.testcases.nflatency.NFLatencyTestAgent
+all > jadex.micro.testcases.nflatency > NFLatencyTestAgent
+1
+
+tests
+	
+1
+
+failures
+	
+0
+
+ignored
+	
+2m4.55s
+
+duration
+	
+0%
+
+successful
+
+    Failed tests
+    Tests
+    Standard output
+    Standard error
+
+Jan 26, 2021 9:28:39 AM jadex.base.test.impl.ComponentTestBase <init>
+SEVERE: Empty ComponentTest Constructor called
+Jan 26, 2021 9:28:40 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.micro.testcases.terminate.TerminableProviderAgent$2@1504aa2
+Jan 26, 2021 9:28:40 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@5e988982
+Jan 26, 2021 9:28:40 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.micro.testcases.terminate.TerminableProviderAgent$2@72cc5c27
+Jan 26, 2021 9:28:40 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@4ed310f9
+Jan 26, 2021 9:28:44 AM jadex.base.test.impl.ComponentTestLazyPlatform setPlatform
+INFO: using timeout: 120000
+Jan 26, 2021 9:28:44 AM test-3 jadex.bridge.service.types.cms.PlatformComponent create
+SEVERE: Enabled PlatformComponent debugging for NFLatencyTestAgent@test-3
+Jan 26, 2021 9:28:44 AM test-3 jadex.bridge.component.impl.ExecutionComponentFeature <init>
+SEVERE: Enabled ExecutionComponentFeature debugging for NFLatencyTestAgent@test-3
+Jan 26, 2021 9:28:44 AM jadex.base.test.impl.ComponentTestBase <init>
+SEVERE: Empty ComponentTest Constructor called
+Jan 26, 2021 9:29:09 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@4efbc6b5
+Jan 26, 2021 9:29:09 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@30de746b
+Jan 26, 2021 9:29:09 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@7430813e
+Jan 26, 2021 9:29:09 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@6602a360
+Jan 26, 2021 9:29:09 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@35b8188
+Jan 26, 2021 9:29:09 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@327b5d74
+Jan 26, 2021 9:29:09 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@83917ce
+Jan 26, 2021 9:29:09 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@2e62c951
+Jan 26, 2021 9:29:09 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: waitForDelay(TerminableProviderAgent@test-2)
+Jan 26, 2021 9:29:09 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.component.impl.MessageComponentFeature$4@1e6d2e7e
+Jan 26, 2021 9:29:09 AM jadex.bridge.component.impl.ExecutionComponentFeature scheduleStep
+SEVERE: step aborted after termination: jadex.bridge.ComponentResultListener$8@61a57209
+Jan 26, 2021 9:29:14 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:29:14 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:29:14 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:29:14 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:29:23 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:29:23 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:29:33 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:29:33 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:29:43 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:29:43 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:29:53 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:29:53 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:30:03 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:30:03 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:30:13 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:30:13 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:30:23 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:30:23 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:30:33 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:30:33 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:30:43 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Jan 26, 2021 9:30:43 AM simulation@test-3 jadex.platform.service.simulation.SimulationService$2 execute
+SEVERE: Simulation blocker released after realtime timeout 30000./njadex.commons.TimeoutException: Simulation blocker released after realtime timeout 30000.
+	at jadex.platform.service.simulation.SimulationService.addAdvanceBlocker(SimulationService.java:480)
+	at jdk.internal.reflect.GeneratedMethodAccessor47.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at jadex.bridge.service.component.interceptors.MethodInvocationInterceptor.execute(MethodInvocationInterceptor.java:98)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.ResolveInterceptor.execute(ResolveInterceptor.java:233)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:459)
+	at jadex.bridge.service.component.ServiceInvocationContext.invoke(ServiceInvocationContext.java:546)
+	at jadex.bridge.service.component.interceptors.DecouplingInterceptor$InvokeMethodStep.execute(DecouplingInterceptor.java:636)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1435)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+jadex.commons.TimeoutException: jadex.micro.testcases.nflatency.NFLatencyTestAgent(jadex.micro.testcases.nflatency.NFLatencyTestAgent) did not finish in 120000 ms.
+	at jadex.base.test.impl.ComponentTestBase$1.run(ComponentTestBase.java:112)
+	at java.base/java.util.TimerThread.mainLoop(Timer.java:556)
+	at java.base/java.util.TimerThread.run(Timer.java:506)
+Jan 26, 2021 9:30:44 AM NFLatencyTestAgent@test-3 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+SEVERE: destroy1: NFLatencyTestAgent@test-3
+Jan 26, 2021 9:30:44 AM NFLatencyTestAgent@test-3 jadex.bridge.service.types.cms.SComponentManagementService destroyComponent
+SEVERE: destroy2: NFLatencyTestAgent@test-3
+
+Wrap lines
+Generated by Gradle 6.5 at Jan 26, 2021, 9:30:46 AM
+

@@ -72,10 +72,10 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.MinimalAgent;
 import jadex.micro.annotation.Agent;
@@ -1016,7 +1016,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 									f.getParentFile().mkdirs();
 									final OutputStream	os	= new BufferedOutputStream(new FileOutputStream(f));
 									icon.writeToOutputStream(os, component.getExternalAccess())
-										.addResultListener(new IIntermediateResultListener<Long>()
+										.addResultListener(new IntermediateEmptyResultListener<Long>()
 									{
 										public void exceptionOccurred(Exception exception)
 										{
@@ -1380,7 +1380,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/** 
 	 *  Shutdown the service.
 	 *  Releases all cached resources and shuts down the library service.
-	 *  @param listener The listener.
 	 */
 	//@ServiceShutdown
 	@OnEnd
@@ -1781,7 +1780,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				});
 			});
 			search = ret;
-			ret.thenAccept(x -> {componentmodels=(List<String[]>)x; search = null;}).exceptionally(x -> search = null);
+			ret.then(x -> {componentmodels=(List<String[]>)x; search = null;}).catchErr(x -> search = null);
 		}
 		else 
 		{

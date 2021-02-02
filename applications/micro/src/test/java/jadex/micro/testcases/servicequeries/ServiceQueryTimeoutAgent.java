@@ -18,10 +18,9 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
-import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.Result;
@@ -65,7 +64,7 @@ public class ServiceQueryTimeoutAgent extends TestAgent
 			
 			Future<Void> waitfut = new Future<>();
 			
-			queryfut.addResultListener(new IIntermediateResultListener<IExampleService>()
+			queryfut.addResultListener(new IntermediateEmptyResultListener<IExampleService>()
 			{
 				public void exceptionOccurred(Exception exception)
 				{
@@ -117,7 +116,7 @@ public class ServiceQueryTimeoutAgent extends TestAgent
 			// Wait for completion of query fut (or some timeout)
 
 			long start = System.currentTimeMillis();
-			agent.getFeature(IExecutionFeature.class).waitForDelay(5000, true).thenAccept(v -> 
+			agent.getFeature(IExecutionFeature.class).waitForDelay(5000, true).then(v -> 
 			{
 				if(!tr.isFinished())
 					tr.setFailed("query was not terminated in time"); 

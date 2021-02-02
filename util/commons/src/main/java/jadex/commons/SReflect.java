@@ -1014,10 +1014,13 @@ public class SReflect
 	 */
 	public static Method[]	getAllMethods(Class<?> clazz)
 	{
+		if(clazz==null)
+			throw new IllegalArgumentException("clazz must not null");
+		
 		// todo: should add methods of interfaces when clazz is a class?
 		// currently adds interface methods only when clazz is interface
 
-			List<Method> ret = new ArrayList<Method>();
+		List<Method> ret = new ArrayList<Method>();
 		
 		List<Class<?>> todo = new ArrayList<Class<?>>();
 		todo.add(clazz);

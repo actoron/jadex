@@ -108,6 +108,10 @@ public class PropertyUpdateHandler
 					public void finished()
 					{
 					}
+					
+					public void maxResultCountAvailable(int max) 
+					{
+					}
 				});
 			}
 			

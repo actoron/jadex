@@ -4,6 +4,7 @@ package jadex.commons.future;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 
+import jadex.commons.functional.Consumer;
 import jadex.commons.functional.Function;
 
 /**
@@ -19,7 +20,7 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 	 *  value of methods that do not perform asynchronous operations and do not
 	 *  return a result value.
 	 */
-	public static final IntermediateFuture<Void>	DONE	= new IntermediateFuture<Void>((Collection<Void>)null);
+	public static final IntermediateFuture<Void> DONE = new IntermediateFuture<Void>((Collection<Void>)null);
 
 	
     /**
@@ -98,53 +99,59 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
     /**
 	 * Add a result listener.
 	 * 
-	 * @param intermediateListener The intermediate listener.
+	 * @param ilistener The intermediate listener.
 	 * 
 	 * @deprecated Use addResultListener()
-	 */
-	public void addIntermediateResultListener(IIntermediateResultListener<E> intermediateListener);
+	 * /
+	public void addIntermediateResultListener(IIntermediateResultListener<E> ilistener);
+    */
     
 	/**
 	 * Add a functional result listener, which called on intermediate results.
 	 * Exceptions will be logged.
 	 * 
-	 * @param intermediateListener The intermediate listener.
-	 */
-	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener);
+	 * @param ilistener The intermediate listener.
+	 * /
+	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> ilistener);
     
 	/**
 	 * Add a functional result listener, which called on intermediate results.
 	 * Exceptions will be logged.
 	 * 
-	 * @param intermediateListener The intermediate listener.
-	 * @param finishedListener The finished listener, called when no more
+	 * @param ilistener The intermediate listener.
+	 * @param flistener The finished listener, called when no more
 	 *        intermediate results will arrive. If <code>null</code>, the finish
 	 *        event will be ignored.
-	 */
-	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener, IFunctionalIntermediateFinishedListener<Void> finishedListener);
+	 * /
+	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> ilistener, IFunctionalIntermediateFinishedListener<Void> flistener);
     
 	/**
 	 * Add a functional result listener, which called on intermediate results.
 	 * 
-	 * @param intermediateListener The intermediate listener.
-	 * @param exceptionListener The listener that is called on exceptions. Passing
+	 * @param ilistener The intermediate listener.
+	 * @param elistener The listener that is called on exceptions. Passing
 	 *        <code>null</code> enables default exception logging.
-	 */
-    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener, IFunctionalExceptionListener exceptionListener);
+	 * /
+    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> ilistener, IFunctionalExceptionListener elistener);
 
 	/**
 	 * Add a functional result listener, which called on intermediate results.
 	 * 
-	 * @param intermediateListener The intermediate listener.
-	 * @param finishedListener The finished listener, called when no more
+	 * @param ilistener The intermediate listener.
+	 * @param flistener The finished listener, called when no more
 	 *        intermediate results will arrive. If <code>null</code>, the finish
 	 *        event will be ignored.
-	 * @param exceptionListener The listener that is called on exceptions. Passing
+	 * @param elistener The listener that is called on exceptions. Passing
 	 *        <code>null</code> enables default exception logging.
-	 */
-    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener, IFunctionalIntermediateFinishedListener<Void> finishedListener, IFunctionalExceptionListener exceptionListener);
-
+	 * /
+    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> ilistener, IFunctionalIntermediateFinishedListener<Void> flistener, IFunctionalExceptionListener elistener);
+    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> ilistener, IFunctionalIntermediateFinishedListener<Void> flistener, IFunctionalExceptionListener elistener, IFunctionalIntermediateResultCountListener clistener);
+*/
     //-------- java 8 extensions --------
+	
+	public IIntermediateFuture<? extends E> next(Consumer<? super E> function);
+	public IIntermediateFuture<? extends E> max(Consumer<Integer> function);
+	public IIntermediateFuture<? extends E> finished(Consumer<? super E> function);
     
     /**
 	 *  Implements async loop and applies a an async function to each element.

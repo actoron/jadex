@@ -52,8 +52,8 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.javaparser.SJavaParser;
 
 /**
@@ -183,7 +183,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			else
 			{
 				createServiceImplementation(info, getComponent().getFetcher())
-					.thenAccept(ser ->
+					.then(ser ->
 				{
 					// Implementation may null to disable service in some configurations.
 					if(ser!=null)
@@ -225,11 +225,11 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 					}
 					fut.setResult(null);
 					
-				}).exceptionally(e -> fut.setResult(null));
+				}).catchErr(e -> fut.setResult(null));
 			}
 		}
 		
-		bar.waitFor().thenAccept(v ->
+		bar.waitFor().then(v ->
 		{
 			// Start the services.
 			Collection<IInternalService> allservices = getAllServices();
@@ -241,7 +241,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			{
 				ret.setResult(null);
 			}
-		}).exceptionally(ret);
+		}).catchErr(ret);
 		
 		return ret;
 	}
@@ -541,7 +541,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			{
 				getComponent().getFeature(IRequiredServicesFeature.class)
 					.searchServices(new ServiceQuery<>(IPublishService.class, pi.getPublishScope()))
-					.addResultListener(new IIntermediateResultListener<IPublishService>()
+					.addResultListener(new IntermediateEmptyResultListener<IPublishService>()
 				{
 					/** Flag if published at least once. */
 					protected boolean published = false;
@@ -554,11 +554,6 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 						exception.printStackTrace();
 					}
 
-					public void resultAvailable(
-							Collection<IPublishService> result)
-					{
-					}
-					
 					public void intermediateResultAvailable(final IPublishService result)
 					{
 						result.publishService(service.getServiceId(), pi).addResultListener(new IResultListener<Void>()

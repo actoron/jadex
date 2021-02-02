@@ -13,8 +13,8 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
@@ -39,20 +39,23 @@ public class TerminateIntermediateTestAgent extends TerminateTestAgent
 		
 		int	max	= 3;
 		final ITerminableIntermediateFuture<String> fut = service.getResults(delay, max);
-		fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
+		fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<String>()
 		{
 			public void resultAvailable(Collection<String> result)
 			{
 				tmp.setException(new RuntimeException("Termination did not occur: "+result));
 			}
+			
 			public void intermediateResultAvailable(String result)
 			{
 //				System.out.println("intermediate result: "+result);
 			}
+			
 			public void finished()
 			{
 				tmp.setException(new RuntimeException("Termination did not occur"));
 			}
+			
 			public void exceptionOccurred(Exception exception)
 			{
 				if(exception instanceof FutureTerminatedException)

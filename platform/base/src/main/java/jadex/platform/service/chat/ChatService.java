@@ -14,6 +14,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
@@ -24,7 +26,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
-import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnEnd;
@@ -60,6 +61,7 @@ import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
@@ -215,6 +217,7 @@ public class ChatService implements IChatService, IChatGuiService
 				}
 			}
 			
+//			agent.getLogger().severe("shutdown1 publish state dead: "+agent);
 			final Future<Void> done	= new Future<Void>();
 			IIntermediateFuture<IChatService>	chatfut	= agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
 			chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
@@ -225,11 +228,13 @@ public class ChatService implements IChatService, IChatGuiService
 				}
 				public void finished()
 				{
-					done.setResult(null);
+//					agent.getLogger().severe("shutdown1a publish state dead: "+agent);
+					done.setResultIfUndone(null);
 				}
 				public void exceptionOccurred(Exception exception)
 				{
-					done.setResult(null);
+//					agent.getLogger().severe("shutdown1b publish state dead: "+agent+"\n"+SUtil.getExceptionStacktrace(exception));
+					done.setResultIfUndone(null);
 				}
 			});
 			
@@ -238,7 +243,7 @@ public class ChatService implements IChatService, IChatGuiService
 			{
 				public void resultAvailable(ISettingsService settings)
 				{
-					// Settings can null during shutdown!? Dependency ordering issue? See https://git.actoron.com/jadex/jadex/-/issues/9
+					// Settings can null during shutdown
 					if(settings!=null &&
 						(!(agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave") instanceof Boolean)
 						|| !((Boolean)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave")).booleanValue()))
@@ -266,16 +271,29 @@ public class ChatService implements IChatService, IChatGuiService
 				
 				public void proceed()
 				{
-					
 					// Only wait 2 secs for sending status before terminating the agent.
-					done.addResultListener(new TimeoutResultListener<Void>(2000, agent.getExternalAccess(),
-						new DelegationResultListener<Void>(ret)
+					// Hack!!! clock service / timeout result listener unreliable during shutdown.
+					Timer	timer	= new Timer(true);
+					timer.schedule(new TimerTask()
 					{
-						public void exceptionOccurred(Exception exception)
+						@Override
+						public void run()
 						{
-							super.resultAvailable(null);
+							done.setResultIfUndone(null);
 						}
-					}));
+					}, 2000);
+					done.addResultListener(new DelegationResultListener<Void>(ret));
+					
+//					// TODO: TimeoutResultListener unreliable during platform shutdown
+//					done.addResultListener(new TimeoutResultListener<Void>(2000, agent.getExternalAccess(),
+//						new DelegationResultListener<Void>(ret)
+//					{
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							agent.getLogger().severe("shutdown1c publish state dead: "+agent);
+//							super.resultAvailable(null);
+//						}
+//					}));
 				}
 			});
 			
@@ -1228,9 +1246,7 @@ public class ChatService implements IChatService, IChatGuiService
 		{
 			// Enable sending
 			if(ret!=null)
-			{
 				ret.addIntermediateResult(Long.valueOf(0));
-			}
 			
 			final FileOutputStream fos = new FileOutputStream(ti.getFilePath());
 			final ITerminableIntermediateFuture<Long> fut = con.writeToOutputStream(fos, agent.getExternalAccess());
@@ -1286,6 +1302,11 @@ public class ChatService implements IChatService, IChatGuiService
 					transfers2.remove(ti.getId());
 					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 				}
+				
+				public void maxResultCountAvailable(int max) 
+				{
+					ret.setMaxResultCount(max);
+				}
 			});
 		}
 		catch(Exception e)
@@ -1323,7 +1344,7 @@ public class ChatService implements IChatService, IChatGuiService
 			
 			final ISubscriptionIntermediateFuture<Long> fut = ocon.writeFromInputStream(is, agent.getExternalAccess());
 
-			fut.addResultListener(new IIntermediateResultListener<Long>()
+			fut.addResultListener(new IntermediateEmptyResultListener<Long>()
 			{
 				public void resultAvailable(Collection<Long> result)
 				{

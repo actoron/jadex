@@ -38,7 +38,7 @@ public class StartScenario
 	{
 		final Future<IExternalAccess[]> ret = new Future<IExternalAccess[]>();
 		
-//		String[] defargs = new String[]{"-logging", "true", "-platformname", "local", "-tcpport", "10000", "-tcpport", "10001", "-printpass", "false", "-networkname", "abc"};
+//		String[] defargs = new String[]{"-logging", "true", "-platformname", "local", "-tcpport", "10000", "-tcpport", "10001", "-printsecret", "false", "-networkname", "abc"};
 		
 		
 //		Starter.createPlatform(createArguments(defargs, libpaths))
@@ -49,7 +49,7 @@ public class StartScenario
 		{
 			public void resultAvailable(final IExternalAccess lplat)
 			{
-				String[] defargs = new String[]{"-platformname", "remote", "-tcpport", "11000", "-tcpport", "11001", "-printpass", "false", "-networkname", "abc"};
+				String[] defargs = new String[]{"-platformname", "remote", "-tcpport", "11000", "-tcpport", "11001", "-printsecret", "false", "-networkname", "abc"};
 				
 //				Starter.createPlatform(createArguments(defargs, libpaths))
 				Starter.createPlatform(PlatformConfigurationHandler.getMinimal())

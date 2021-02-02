@@ -23,6 +23,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.JavaThreadPool;
 import jadex.commons.future.DelegationResultListener;
@@ -217,7 +218,14 @@ public class ClockService extends BasicService implements IClockService
 		{
 			public void run()
 			{
-				to.timeEventOccurred(System.currentTimeMillis());
+				try
+				{
+					to.timeEventOccurred(System.currentTimeMillis());
+				}
+				catch(Exception e)
+				{
+					System.err.println("Exception on timer: "+component+"\n"+SUtil.getExceptionStacktrace(e));
+				}
 			}
 		};
 //		try
@@ -377,7 +385,6 @@ public class ClockService extends BasicService implements IClockService
 	
 	/**
 	 *  Shutdown the service.
-	 *  @param listener The listener.
 	 */
 	public IFuture<Void> shutdownService()
 	{
