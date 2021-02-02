@@ -9,6 +9,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -1137,7 +1138,7 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 //			//-------- debugging --------
 //			if((""+result).contains("PartDataChunk"))
 //			{
-//				Logger.getLogger(getClass().getName()).info("doAddIntermediateResult: "+this+", "+result+", "+IComponentIdentifier.LOCAL.get());
+//				System.out.println("DelegatingIntermediateFuture.doAddIntermediateResult: "+this+", "+result+", "+IComponentIdentifier.LOCAL.get());
 //			}
 //			//-------- debugging end --------
 			

@@ -114,10 +114,24 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     protected boolean doAddIntermediateResult(final E result, boolean undone)
     {
+//		//-------- debugging --------
+//		if((""+result).contains("PartDataChunk"))
+//		{
+//			System.out.println("IntermediateFuture.doAddIntermediateResult0: "+this+", "+result);
+//		}
+//		//-------- debugging end --------
+
     	boolean	ret	= true;
     	boolean	notify	= false;
     	synchronized(this)
     	{
+//    		//-------- debugging --------
+//    		if((""+result).contains("PartDataChunk"))
+//    		{
+//    			System.out.println("IntermediateFuture.doAddIntermediateResult1: "+this+", "+result);
+//    		}
+//    		//-------- debugging end --------
+    		
 	    	if(undone)
 	    		this.undone = true;
 	
@@ -131,6 +145,13 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    	
 	    	if(isDone())
 	    	{
+	    		//-------- debugging --------
+	    		if((""+result).contains("PartDataChunk"))
+	    		{
+	    			System.out.println("IntermediateFuture.doAddIntermediateResult2: "+this+", "+result+", "+Thread.currentThread());
+	    		}
+	    		//-------- debugging end --------
+	    		
 	    		if(undone)
 	    		{
 	    			ret	= false;
@@ -152,7 +173,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 				//-------- debugging --------
 				if((""+result).contains("PartDataChunk"))
 				{
-					System.out.println("doAddIntermediateResult0: "+this+", "+result+", "+listeners);
+					System.out.println("IntermediateFuture.doAddIntermediateResult3: "+this+", "+result+", "+listeners+", "+Thread.currentThread());
 				}
 				//-------- debugging end --------
 
@@ -162,12 +183,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    			@Override
 	    			public void execute(IResultListener<Collection<E>> listener)
 	    			{
-	    				//-------- debugging --------
-	    				if((""+result).contains("PartDataChunk"))
-	    				{
-	    					System.out.println("doAddIntermediateResult1: "+IntermediateFuture.this+", "+result+", "+listener);
-	    				}
-	    				//-------- debugging end --------
+//	    				//-------- debugging --------
+//	    				if((""+result).contains("PartDataChunk"))
+//	    				{
+//	    					System.out.println("IntermediateFuture.doAddIntermediateResult4: "+IntermediateFuture.this+", "+result+", "+listener);
+//	    				}
+//	    				//-------- debugging end --------
 		        		notifyIntermediateResult((IIntermediateResultListener<E>)listener, result);
 	    			}
 				});
@@ -191,12 +212,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 */
 	protected void	storeResult(E result, boolean scheduled)
 	{
-		//-------- debugging --------
-		if((""+result).contains("PartDataChunk"))
-		{
-			System.out.println("storeResult: "+IntermediateFuture.this+", "+result+", "+listeners);
-		}
-		//-------- debugging end --------
+//		//-------- debugging --------
+//		if((""+result).contains("PartDataChunk"))
+//		{
+//			System.out.println("storeResult: "+IntermediateFuture.this+", "+result+", "+listeners);
+//		}
+//		//-------- debugging end --------
 
 		
 //		if(result!=null && result.getClass().getName().indexOf("ChangeEvent")!=-1)
@@ -221,19 +242,16 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	@Override
 	protected synchronized boolean doSetResult(Collection<E> result, boolean undone)
 	{
-    	synchronized(this)
-		{
-        	if(intermediate)
-        	{
-        		throw new RuntimeException("setResult() only allowed without intermediate results: "+results);
-        	}
-       		boolean	ret	= super.doSetResult(result, undone);
-       		if(ret)
-       		{
-       			this.results	= result!=null ? new ArrayList<>(result) : null;
-       		}
-       		return ret;
-		}
+		if(intermediate)
+    	{
+    		throw new RuntimeException("setResult() only allowed without intermediate results: "+results);
+    	}
+   		boolean	ret	= super.doSetResult(result, undone);
+   		if(ret)
+   		{
+   			this.results	= result!=null ? new ArrayList<>(result) : null;
+   		}
+   		return ret;
     }
 
     /**
@@ -268,6 +286,14 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     protected synchronized boolean	doSetFinished(boolean undone)
     {
+		//-------- debugging --------
+		if((""+results).contains("PartDataChunk"))
+		{
+			System.out.println("IntermediateFuture.doSetFinished: "+this+", "+results+", "+Thread.currentThread()
+				+"\n"+SUtil.getExceptionStacktrace(new Exception("Stack trace").fillInStackTrace()));
+		}
+		//-------- debugging end --------
+    	
     	boolean	 ret;
     	
     	Collection<E>	res	= getIntermediateResults();
@@ -281,6 +307,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 		}
 
     	return ret;
+    }
+    
+    @Override
+    protected boolean doSetException(Exception exception, boolean undone)
+    {
+    	return super.doSetException(exception, undone);
     }
     
     /**
@@ -335,12 +367,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 		    		}
 	    		}
     		}
+    		
+        	// Notify final result if any
+        	if(notify_finished)
+        		scheduleNotification(listener, getNotificationCommand());
     	}
 
-    	// Notify final result if any
-    	if(notify_finished)
-    		scheduleNotification(listener, getNotificationCommand());
-    	
     	// Notify intermediate results and or final result if any
     	if(notify_intermediate || notify_finished)
     		startScheduledNotifications();

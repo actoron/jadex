@@ -1,4 +1,5 @@
-package jadex.commons.future;
+package jadex.bridge.service.component.interceptors;
+
 
 import static org.junit.Assert.assertEquals;
 
@@ -6,13 +7,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Logger;
 
 import org.junit.Test;
 
+import jadex.commons.future.Future;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateFuture;
+
 /**
  *  Test intermediate futures / listeners.
+ *  Mostly copied from util.concurrent.IntermediateFutureTest
  */
-public class IntermediateFutureTest
+public class DelegatingIntermediateFutureTest
 {
 	/**
 	 *  Test that parallel intermediate result notifications are consistently sequentialized. 
@@ -91,6 +98,7 @@ public class IntermediateFutureTest
 	 */
 	protected Thread	createAdderThread(String prefix, int count, IntermediateFuture<String> fut, List<String> results)
 	{
+		Future<Collection<String>>	del	= FutureFunctionality.getDelegationFuture(fut, new FutureFunctionality(Logger.getLogger(getClass().getName())));
 		return new Thread(() -> 
 		{
 			int	addnum	= new Random().nextInt(count);
@@ -100,7 +108,7 @@ public class IntermediateFutureTest
 				
 				if(i==addnum)
 				{
-					fut.addResultListener(new TestListener<>(results));
+					del.addResultListener(new TestListener<>(results));
 				}
 			}
 		});
