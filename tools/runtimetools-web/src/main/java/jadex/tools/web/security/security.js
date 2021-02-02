@@ -46,14 +46,13 @@ class SecurityElement extends BaseElement
 	
 	init()
 	{
-		console.log("security: "+this.cid);
-		
-		super.init().then(()=>
-		{
+		let ret = new Promise((resolve, reject) => {
+			console.log("security: "+this.cid);
+			
 			this.myservice = "jadex.tools.web.security.IJCCSecurityService";
-	
-			var res1 ="jadex/tools/web/security/scrypt.js";
-			var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+		
+			let res1 ="jadex/tools/web/security/scrypt.js";
+			let ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
 	
 			//console.log("jstree load files start");
 			
@@ -63,13 +62,15 @@ class SecurityElement extends BaseElement
 				if(window.scrypt!=null)
 					this.scrypt = window.scrypt;
 				this.refresh();
+				resolve();
 			})
 			.catch(err => 
 			{
 				console.log("js tree load files err: "+err);
+				reject();
 			});
-		})
-		.catch((err)=>console.log(err));
+		});
+		return ret;
 	}
 	
 	getMethodPrefix() 
@@ -143,21 +144,21 @@ class SecurityElement extends BaseElement
 				<div id="accordion">
 					<div class="card m-2">
 						<div class="card-header">
-        					<h4 class="card-link" data-toggle="collapse" href="#collapseOne">${BaseElement.language.getLanguage()? 'General Settings': 'Allgemeine Einstellungen'}</h4>
+        					<h4 class="card-link" data-toggle="collapse" href="#collapseOne">${this.app.lang.t('General Settings')}</h4>
     					</div>
 						<div id="collapseOne" class="collapse show" data-parent="#accordion">
 							<div class="card-body">
 								<div class="row m-1">
 									<div class="col-6">
-										<input type="checkbox" id="usesecret" @click="${e => {this.useSecret()}}" .checked="${this.secstate.useSecret}">${BaseElement.language.getLanguage()? 'Use secret': 'Verwende Geheimnis'}</input>
+										<input type="checkbox" id="usesecret" @click="${e => {this.useSecret()}}" .checked="${this.secstate.useSecret}">${this.app.lang.t('Use secret')}</input>
 									</div>
 									<div class="col-6">
-										<input type="checkbox" id="printsecret" @click="${e => {this.printSecret()}}" .checked="${this.secstate.printSecret}">${BaseElement.language.getLanguage()? 'Print secret': 'Gebe Geheimnis aus'}</input>
+										<input type="checkbox" id="printsecret" @click="${e => {this.printSecret()}}" .checked="${this.secstate.printSecret}">${this.app.lang.t('Print secret')}</input>
 									</div>
 								</div>
 								<div class="row m-1">
 									<div class="col-12">
-										<label for="platformsecret">${BaseElement.language.getLanguage()? 'Platform Secret (Password, Key, Certificate)': 'Plattform Geheimnis (Passwort, Schlüssel, Zertifikat)'}</label>
+										<label for="platformsecret">${this.app.lang.t('Platform Secret (Password, Key, Certificate)')}</label>
   										<textarea class="form-control rounded-0" id="platformsecret" rows="10" id="platformsecret" disabled="true">${this.secstate.platformSecret}</textarea>
 									</div>
 								</div>
@@ -167,7 +168,7 @@ class SecurityElement extends BaseElement
 			
 					<div class="card m-2">
 						<div class="card-header">
-							<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">${BaseElement.language.getLanguage()? 'Networks': 'Netzwerke'}</h4>
+							<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">${this.app.lang.t('Networks')}</h4>
 						</div>
 						<div id="collapseTwo" class="collapse" data-parent="#accordion">
 							<div class="card-body">
@@ -176,8 +177,8 @@ class SecurityElement extends BaseElement
 										<table class="table">
 											<thead>
 					    						<tr class="d-flex">
-					      							<th class="col-4" scope="col">${BaseElement.language.getLanguage()? 'Network Name': 'Netzwerkname'}</th>
-					      							<th class="col-8" scope="col">${BaseElement.language.getLanguage()? 'Network Secret': 'Netzwerkgeheimnis'}</th>
+					      							<th class="col-4" scope="col">${this.app.lang.t('Network Name')}</th>
+					      							<th class="col-8" scope="col">${this.app.lang.t('Network Secret')}</th>
 											    </tr>
 					  						</thead>
 					  						<tbody>
@@ -195,7 +196,7 @@ class SecurityElement extends BaseElement
 									<div class="col-9">
 									</div>
 									<div class="col-3">
-										<button type="button" class="btn btn-primary w100" @click="${e => {this.removeNetwork()}}" ?disabled="${this.selnet == null}">${BaseElement.language.getLanguage()? 'Remove Network': 'Entferne Netzwerk'}</button>
+										<button type="button" class="btn btn-primary w100" @click="${e => {this.removeNetwork()}}" ?disabled="${this.selnet == null}">${this.app.lang.t('Remove Network')}</button>
 									</div>
 								</div>
 								<div class="row m-1">
@@ -207,16 +208,16 @@ class SecurityElement extends BaseElement
 									<div class="col">
 										<div class="btn-group btn-group-toggle">
 											<label class="btn btn-secondary ${this.nn_option=='option1'? 'active': ''}" @click="${e => this.nn_option='option1'}">
-												<input type="radio" name="options" autocomplete="off" checked> ${BaseElement.language.getLanguage()? 'Key': 'Schlüssel'}
+												<input type="radio" name="options" autocomplete="off" checked> ${this.app.lang.t('Key')}
 											</label>
 											<label class="btn btn-secondary ${this.nn_option=='option2'? 'active': ''}" @click="${e => { console.log('opt2'); this.nn_option='option2'}}">
-												<input type="radio" name="options" autocomplete="off"> ${BaseElement.language.getLanguage()? 'Password': 'Passwort'}
+												<input type="radio" name="options" autocomplete="off"> ${this.app.lang.t('Password')}
 											</label>
 											<!--<label class="btn btn-secondary ${this.nn_option=='option3'? 'active': ''}" @click="${e => this.nn_option='option3'}">
-												<input type="radio" name="options" autocomplete="off"> ${BaseElement.language.getLanguage()? 'X509 Certificates': 'X509 Zertifikate'}
+												<input type="radio" name="options" autocomplete="off"> ${this.app.lang.t('X509 Certificates')}
 											</label>-->
 											<label class="btn btn-secondary ${this.nn_option=='option4'? 'active': ''}" @click="${e => this.nn_option='option4'}">
-												<input type="radio" name="options" autocomplete="off"> ${BaseElement.language.getLanguage()? 'Encoded Secret': 'Kodiertes Geheimnis'}
+												<input type="radio" name="options" autocomplete="off"> ${this.app.lang.t('Encoded Secret')}
 											</label>
 										</div>
 									</div>
@@ -225,15 +226,15 @@ class SecurityElement extends BaseElement
 									<div class="col m-0 p-0">
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-9">
-												<input class="w100 h100" type="text" placeholder="${BaseElement.language.getLanguage()? 'Key': 'Schlüssel'}" id="key" disabled="true">
+												<input class="w100 h100" type="text" placeholder="${this.app.lang.t('Key')}" id="key" disabled="true">
 											</div>
 											<div class="col-3">
-												<button type="button" class="btn btn-primary w100 h100" @click="${e => this.generateRandom()}">${BaseElement.language.getLanguage()? 'Generate Key': 'Erzeuge Schlüssel'}</button>
+												<button type="button" class="btn btn-primary w100 h100" @click="${e => this.generateRandom()}">${this.app.lang.t('Generate Key')}</button>
 											</div>
 										</div>
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-6">
-												<input class="w100 h100" type="text" placeholder="${BaseElement.language.getLanguage()? 'Password (min 16 characters, 24 recommended)': 'Passwort (min 16 Zeichen, 24 empfohlen)'}" id="pass">
+												<input class="w100 h100" type="text" placeholder="${this.app.lang.t('Password (min. 16 characters, 24 recommended)')}" id="pass">
 											</div>
 											<div class="col-3">
 												<div class="progress w100 h100">
@@ -241,7 +242,7 @@ class SecurityElement extends BaseElement
 												</div> 
 											</div>
 											<div class="col-3">
-												<button type="button" class="btn btn-primary w100 h100" @click="${e => this.generateFromPassword()}">${BaseElement.language.getLanguage()? 'Derive Key': 'Leite Schlüssel ab'}</button>
+												<button type="button" class="btn btn-primary w100 h100" @click="${e => this.generateFromPassword()}">${this.app.lang.t('Derive Key')}</button>
 											</div>
 										</div>
 									</div>
@@ -250,7 +251,7 @@ class SecurityElement extends BaseElement
 									<div class="col m-0 p-0">
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-12">
-												<input class="w100 h100" type="text" placeholder="${BaseElement.language.getLanguage()? 'Password (min 10 characters)': 'Passwort (min 10 Zeichen)'}" id="pass2" @change="${e => this.secret = "pw:"+e.target.value}">
+												<input class="w100 h100" type="text" placeholder="${this.app.lang.t('Password (min. 10 characters)')}" id="pass2" @change="${e => this.secret = "pw:"+e.target.value}">
 											</div>
 										</div>
 									</div>
@@ -264,9 +265,7 @@ class SecurityElement extends BaseElement
 									<div class="col m-0 p-0">
 										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 											<div class="col-12">
-												<label for="rawsecret">${BaseElement.language.getLanguage()?
-													'Secret (Password, Key, Certificate) in Jadex format (pw:, key:, pem:)':
-													'Geheimnis (Passwort, Schlüssel, Zertifikat) im Jadex Format (pw:, key:, pem:)'}</label>
+												<label for="rawsecret">${this.app.lang.t('Secret (Password, Key, Certificate) in Jadex format (pw:, key:, pem:)')}</label>
 		  										<textarea class="form-control rounded-0" id="rawsecret" rows="10" @change="${e => this.secret = e.target.value}"></textarea>
 											</div>
 										</div>
@@ -276,7 +275,7 @@ class SecurityElement extends BaseElement
 									<div class="col-9">
 									</div>
 									<div class="col-3">
-										<button type="button" class="btn btn-primary w100" @click="${e => this.addNetwork()}" ?disabled="${this.netname==null || this.secret==null}">${BaseElement.language.getLanguage()? 'Add Network': 'Füge Netzwerk hinzu'}</button>
+										<button type="button" class="btn btn-primary w100" @click="${e => this.addNetwork()}" ?disabled="${this.netname==null || this.secret==null}">${this.app.lang.t('Add Network')}</button>
 									</div>
 								</div>
 							</div>
@@ -285,7 +284,7 @@ class SecurityElement extends BaseElement
 				
 					<div class="card m-2">
 						<div class="card-header">
-							<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseThree">${BaseElement.language.getLanguage()? 'Roles' :'Rollen'}</h4>
+							<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseThree">${this.app.lang.t('Roles')}</h4>
 						</div>
 						<div id="collapseThree" class="collapse" data-parent="#accordion">
 							<div class="card-body">
@@ -294,8 +293,8 @@ class SecurityElement extends BaseElement
 										<table class="table">
 											<thead>
 					    						<tr>
-					      							<th scope="col">${BaseElement.language.getLanguage()? 'Entity': 'Entität'}</th>
-					      							<th scope="col">${BaseElement.language.getLanguage()? 'Role': 'Rolle'}</th>
+					      							<th scope="col">${this.app.lang.t('Entity')}</th>
+					      							<th scope="col">${this.app.lang.t('Role')}</th>
 											    </tr>
 					  						</thead>
 					  						<tbody>
@@ -311,15 +310,15 @@ class SecurityElement extends BaseElement
 								</div>
 								<div class="row m-1">
 									<div class="col-4">
-										<input type="text" placeholder="${BaseElement.language.getLanguage()? 'Entity': 'Entität'}" id="entity" @change="${this.requestUpdate()}" required>
+										<input type="text" placeholder="${this.app.lang.t('Entity)}" id="entity" @change="${this.requestUpdate()}" required>
 										
 									</div>
 									<div class="col-4">
-										<input type="text" placeholder="${BaseElement.language.getLanguage()? 'Role': 'Rolle'}" id="role" @change="${this.requestUpdate()}" required>
+										<input type="text" placeholder="${this.app.lang.t('Role')}" id="role" @change="${this.requestUpdate()}" required>
 									</div>
 									<div class="col-4">
-										<button type="button" class="btn btn-primary" @click="${e => this.addRole(e)}" disabled="${this.isRoleDisabled()}">${BaseElement.language.getLanguage()? 'Add': 'Füge hinzu'}</button>
-										<button type="button" class="btn btn-primary" @click="${e => this.removeRole(e)}" disabled="${this.isRoleDisabled()}">${BaseElement.language.getLanguage()? 'Remove': 'Entferne'}</button>
+										<button type="button" class="btn btn-primary" @click="${e => this.addRole(e)}" disabled="${this.isRoleDisabled()}">${this.app.lang.t('Add')}</button>
+										<button type="button" class="btn btn-primary" @click="${e => this.removeRole(e)}" disabled="${this.isRoleDisabled()}">${this.app.lang.t('Remove')}</button>
 									</div>
 								</div>
 							</div>
@@ -328,7 +327,7 @@ class SecurityElement extends BaseElement
 					
 					<div class="card m-2">
 						<div class="card-header">
-							<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseFour">${BaseElement.language.getLanguage()? 'Name Authorities': 'Behördenbezeichnung'}</h4>
+							<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseFour">${this.app.lang.t('Name Authorities')}</h4>
 						</div>
 						<div id="collapseFour" class="collapse" data-parent="#accordion">
 							<div class="card-body">
@@ -337,9 +336,9 @@ class SecurityElement extends BaseElement
 										<table class="table">
 											<thead>
 					    						<tr>
-					      							<th scope="col-5">${BaseElement.language.getLanguage()? 'Subject Common Name': 'Allgemeiner Name'}</th>
-					      							<th scope="col-5">${BaseElement.language.getLanguage()? 'Subject Distinguished Name': 'Spezieller Name'}</th>
-					      							<th scope="col-2">${BaseElement.language.getLanguage()? 'Type': 'Typ'}</th>
+					      							<th scope="col-5">${this.app.lang.t('Subject Common Name)}</th>
+					      							<th scope="col-5">${this.app.lang.t('Subject Distinguished Name')}</th>
+					      							<th scope="col-2">${this.app.lang.t('Type')}</th>
 											    </tr>
 					  						</thead>
 					  						<tbody>
@@ -360,7 +359,7 @@ class SecurityElement extends BaseElement
 				
 					<div class="card m-2">
 						<div class="card-header">
-							<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseFive">${BaseElement.language.getLanguage()? 'Trusted Platform Names': 'Vertrauenwürdige Plattformnamen'}</h4>
+							<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseFive">${this.app.lang.t('Trusted Platform Names')}</h4>
 						</div>
 						<div id="collapseFive" class="collapse" data-parent="#accordion">
 							<div class="card-body">
@@ -369,7 +368,7 @@ class SecurityElement extends BaseElement
 										<table class="table">
 											<thead>
 					    						<tr>
-					      							<th scope="col-5">${BaseElement.language.getLanguage()? 'Trusted Platform Name': 'Vertrauenwürdiger Plattformname'}</th>
+					      							<th scope="col-5">${this.app.lang.t('Trusted Platform Name)}</th>
 											    </tr>
 					  						</thead>
 					  						<tbody>
@@ -387,8 +386,8 @@ class SecurityElement extends BaseElement
 										<input class="w100 h100" type="text" placeholder="Trusted Platform Name" id="tpn" @change="${this.requestUpdate()}" required>
 									</div>
 									<div class="col-4">
-										<button type="button" class="btn btn-primary" @click="${e => this.addTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">${BaseElement.language.getLanguage()?'Add':'Füge hinzu'}</button>
-										<button type="button" class="btn btn-primary" @click="${e => this.removeTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">${BaseElement.language.getLanguage()? 'Remove': 'Entferne'}</button>
+										<button type="button" class="btn btn-primary" @click="${e => this.addTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">${this.app.lang.t('Add')}</button>
+										<button type="button" class="btn btn-primary" @click="${e => this.removeTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">${this.app.lang.t('Remove')}</button>
 									</div>
 								</div>
 							</div>
@@ -398,7 +397,7 @@ class SecurityElement extends BaseElement
 			
 				<div class="row m-1">
 					<div class="col">
-						<button type="button" class="btn btn-success" @click="${e => this.refresh()}">${BaseElement.language.getLanguage()?'Refresh':'Aktualisieren'}</button>
+						<button type="button" class="btn btn-success" @click="${e => this.refresh()}">${this.app.lang.t('Refresh')}</button>
 					</div>
 				</div>
 			</div>

@@ -1,9 +1,9 @@
 let { LitElement, html, css } = modLoad('lit-element');
 let { BaseElement } = modLoad('base-element');
-let { LoginElement } = modLoad('login-element');
+let { CidElement } = modLoad('cid-element');
 
 // Tag name 'jadex-platform'
-class PlatformElement extends BaseElement 
+class PlatformElement extends CidElement 
 {
 	loaded = false;
 
@@ -20,15 +20,21 @@ class PlatformElement extends BaseElement
 		return ret;
 	}
 	
-	constructor() 
+	/*constructor() 
 	{
 		super();
+		
+	}*/
+	
+	init()
+	{
 		console.log("platform");
-		this.cid = null;
 		this.plugin = null;
-		this.plugins = [];
-		//this.loggedin = false;
+		console.log("setting plugins to {}");
+		this.plugins = {};
+		console.log("set plugins to {}");
 		this.no = 0;
+		
 		var self = this;
 		this.listener = function refresh()
 		{
@@ -48,6 +54,22 @@ class PlatformElement extends BaseElement
 			}	
 			self.requestUpdate();
 		};
+		this.checkPlatform(10000);
+		this.loadPluginInfos().then(function()
+    	{
+    		self.loaded = true;
+    		if(self.plugin != null)
+    			self.showPlugin2({ "name" : self.plugin });
+    		else if(self.plugins.length > 0)
+    			self.showPlugin2(self.getPlugins()[0].name);
+    	}).catch(function(err) 
+		{
+			self.createErrorMessage("Could not load plugins", err);
+			console.log("err: "+err);
+			throw err;
+		});
+		
+		"../webcomponents/login.js"
 	}
 	
 	/*init() 
@@ -72,40 +94,6 @@ class PlatformElement extends BaseElement
 		window.removeEventListener("resize", this.listener);
 	}
 	
-	attributeChangedCallback(name, oldVal, newVal) 
-	{
-	    //console.log('attribute change: ', name, newVal, oldVal);
-	    super.attributeChangedCallback(name, oldVal, newVal);
-	    
-	    if("cid"==name) 
-		{
-	    	let self = this;
-	
-			// Continously check platform availability
-			this.checkPlatform(10000);
-
-	    	this.loadPluginInfos().then(function()
-	    	{
-	    		self.loaded = true;
-	    		if(self.plugin != null)
-	    			self.showPlugin2({ "name" : self.plugin });
-	    		else if(self.plugins.length > 0)
-	    			self.showPlugin2(self.getPlugins()[0].name);
-	    	}).catch(function(err) 
-			{
-				self.createErrorMessage("Could not load plugins", err);
-				//console.log("err: "+err);
-			});
-	    }
-	    
-	    if("plugin"==name) 
-		{
-	    	this.plugin = newVal;
-	    	if(this.loaded)
-	    		this.showPlugin2(newVal);
-	    }
-	}
-	
 	showPlugin(event)
 	{
 		// Logic for setting the active link in the navbar
@@ -124,17 +112,27 @@ class PlatformElement extends BaseElement
 		// Only show if available
 		if(this.plugins[name]==null)
 			return;
+			
+		let done = null;
+		let fail = null;
+		let ret = new Promise((resolve, reject) => {
+			done = resolve;
+			fail = reject;
+		});
 		
 		//console.log("login is: "+LoginElement.loginhandler.isLoggedIn());
 		//console.log("show plugin: "+name+" "+this.cid);
 
 		let self = this;
 		
-		if(!this.plugins[name].unrestricted && !LoginElement.loginhandler.isLoggedIn())
+		if(!this.plugins[name].unrestricted && !this.app.login.isLoggedIn())
 		{
 			let html = "<jadex-restricted></jadex-restricted>";
 			self.shadowRoot.getElementById("plugin").innerHTML = html;
-			self.requestUpdate();
+			self.requestUpdate().then(() => 
+			{
+				done();
+			});
 		}
 		else
 		{
@@ -149,7 +147,10 @@ class PlatformElement extends BaseElement
 					//console.log("Insert plugin element: " + p.name);
 					self.shadowRoot.getElementById("plugin").innerHTML = html;
 					//console.log("Req update: " + p.name);
-					self.requestUpdate();
+					self.requestUpdate().then(() => 
+					{
+						done();
+					});
 					//console.log("Updated1: " + name);
 				}).catch(function(err)
 				{
@@ -162,10 +163,14 @@ class PlatformElement extends BaseElement
 				//console.log("Insert plugin element: " + p.name);
 				this.shadowRoot.getElementById("plugin").innerHTML = html;
 				//console.log("Req update: " + p.name);
-				this.requestUpdate();
+				self.requestUpdate().then(() => 
+				{
+					done();
+				});
 				//console.log("Updated2: " + name);
 			}
 		}
+		return ret;
 	}
 	
 	loadPlugin(name)
@@ -209,7 +214,7 @@ class PlatformElement extends BaseElement
 		{
 			axios.get('webjcc/getPluginInfos?cid='+self.cid, self.transform).then(function(resp)
 			{
-				//console.log("received: "+resp);	
+				console.log("received: "+resp);	
 				
 				var pis = resp.data;
 				//console.log(map);
@@ -302,11 +307,11 @@ class PlatformElement extends BaseElement
 	
 	getPlugins()
 	{
-		//var self = this;
-		var ret = Object.values(this.plugins).sort(function(p1, p2) 
+		let self = this;
+		let ret = Object.values(this.plugins).sort(function(p1, p2) 
 		{
 			var ret = 0;
-			if(!LoginElement.loginhandler.isLoggedIn())
+			if(!self.app.login.isLoggedIn())
 				ret = p2.unrestricted - p1.unrestricted;
 			
 			if(ret===0)
@@ -323,10 +328,10 @@ class PlatformElement extends BaseElement
 	
 	requestUpdate()
 	{
-		if(this.plugin!=null && !LoginElement.loginhandler.isLoggedIn() && !this.plugins[this.plugin].unrestricted)
+		if(this.plugin!=null && !this.app.login.isLoggedIn() && !this.plugins[this.plugin].unrestricted)
 			this.showPlugin2(this.getPlugins()[0].name);
 		
-		super.requestUpdate();
+		return super.requestUpdate();
 	}
 	
 	/*getScaledImage(img, width, height)
@@ -350,14 +355,14 @@ class PlatformElement extends BaseElement
 		return w;
 	}
 	
-	render() 
+	asyncRender() 
 	{
 		var self = this;
 		return html`
 			<h1 class="m-0 p-0">Platform ${this.cid}</h1>
 			<div class="container-fluid m-0 p-0" id="plugincont">
 				${this.getPlugins().map((p, index) => html`
-					${!p.unrestricted && !LoginElement.loginhandler.isLoggedIn()? "": p.icon!=null? 
+					${!p.unrestricted && !this.app.login.isLoggedIn()? "": p.icon!=null? 
 						html`<img id="${'plugin'+index}" class="${self.plugin===p.name? "overlay": ""}" src="data:image/png;base64,${p.icon.__base64}" alt="Red dot" @click="${(e) => {self.showPlugin2(p.name)}}" data-toggle="tooltip" data-placement="top" title="${p.name}"/>`:
 						html`<span @click="${(e) => {self.showPlugin2(p.name)}}">${p.name}</span>`
 					}

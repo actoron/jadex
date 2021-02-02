@@ -4,12 +4,17 @@ let { BaseElement } = modLoad('base-element');
 // Defined as <jadex-imprint> tag
 class ImprintElement extends BaseElement 
 {
-	render() 
+	init()
+	{
+		this.app.lang.listeners.add(this);
+	}
+	
+	asyncRender() 
 	{
 		return html`
 			<div class="jumbotron jumbotron-fluid m-3 p-3">
 				<div class="row">
-					<div class="col-12" class="${language.getLanguage()? 'visible': 'hidden'}"">
+					<div class="col-12" class="${this.app.lang.getLanguage()? 'visible': 'hidden'}"">
 						<a href="http://www.actoron.com">Actoron GmbH</a><br/><br/>
 			
 						Richardstra&szlig;e 49<br/>
@@ -27,7 +32,7 @@ class ImprintElement extends BaseElement
 			
 						&copy; Copyright 2014-${new Date().getFullYear()} All rights reserved.<br/>
 					</div>
-					<div class="col-12" class="${!language.getLanguage()? 'visible': 'hidden'}">
+					<div class="col-12" class="${!this.app.lang.getLanguage()? 'visible': 'hidden'}">
 						<a href="http://www.actoron.com">Actoron GmbH</a><br/><br/>
 			
 						Richardstra&szlig;e 49<br/>

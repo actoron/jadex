@@ -1,39 +1,36 @@
 let { LitElement, html, css } = modLoad('lit-element');
 let { BaseElement } = modLoad('base-element');
+let { CidElement } = modLoad('cid-element');
 
 // Tag name 'jadex-starter'
-class StarterElement extends BaseElement 
+class StarterElement extends CidElement 
 {
 	listener;
 	
 	init() 
 	{
 		console.log("starter: "+this.cid);
+		this.app.lang.listeners.add(this);
+		this.model = null; // loaded model
+		this.reversed = false;
+		this.myservice = "jadex.tools.web.starter.IJCCStarterService";
 		
-		super.init().then(()=>
-		{
-			this.model = null; // loaded model
-			this.reversed = false;
-			this.myservice = "jadex.tools.web.starter.IJCCStarterService";
-			
-			var self = this;
-			
-			var res1 = "jadex/tools/web/starter/modeltree.js";
-			var res2 = "jadex/tools/web/starter/componenttree.js";
-			var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
-			var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
-	
-			// load subcomponents
-			var p1 = this.loadSubmodule(ures1);
-			var p2 = this.loadSubmodule(ures2);
-			
-			Promise.all([p1, p2]).then((values) => 
-			{
-				//console.log("starter load files ok");
-			});
-			
-		})
-		.catch((err)=>console.log(err))
+		var self = this;
+		
+		var res1 = "jadex/tools/web/starter/modeltree.js";
+		var res2 = "jadex/tools/web/starter/componenttree.js";
+		var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+		var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
+
+		// load subcomponents
+		var p1 = this.loadSubmodule(ures1);
+		var p2 = this.loadSubmodule(ures2);
+		
+		//Promise.all([p1, p2]).then((values) => 
+		//{
+			//console.log("starter load files ok");
+		//});
+		return Promise.all([p1, p2]);
 	}
 	
 	connectedCallback() 
@@ -203,14 +200,14 @@ class StarterElement extends BaseElement
 			<div class="container-fluid m-0 p-0">
 				<div class="row m-0 p-0">
 					<div class="col-12 m-0 p-0">
-						<h3>${BaseElement.language.getLanguage()? 'Components': 'Komponenten'}</h3>
+						<h3>${this.app.lang.t('Components')}</h3>
 						<jadex-componenttree cid='${this.cid}'></jadex-componenttree>
 					</div>
 				</div>
 				
 				<div class="row m-0 p-0">
 					<div class="col-12 m-0 p-0">
-						<h3>${BaseElement.language.getLanguage()? 'Available Models': 'Verfügbare Modelle'}</h3>
+						<h3>${this.app.lang.t('Available Models')}</h3>
 						<jadex-modeltree cid='${this.cid}'></jadex-modeltree>
 					</div>
 				</div>
@@ -219,12 +216,12 @@ class StarterElement extends BaseElement
 				<div class="bgwhitealpha m-0 p-0"> <!-- sticky-top  -->
 					<div class="row m-1">
 						<div class="col-12">
-							<h3>${BaseElement.language.getLanguage()? 'Settings': 'Einstellungen'}</h3>
+							<h3>${this.app.lang.t('Settings')}</h3>
 						</div>
 					</div>
 					<div class="row m-1">
 						<div class="col-2">
-							${BaseElement.language.getLanguage()? 'Filename': 'Dateiname'}
+							${this.app.lang.t('Filename')}
 						</div>
 						<div class="col-10" id="filename">
 							<input type="text" ref="filename" class="w100" value="${this.model!=null? this.model.filename: ''}">
@@ -232,7 +229,7 @@ class StarterElement extends BaseElement
 					</div>
 					<div class="row m-1">
 						<div class="col-2">
-							${BaseElement.language.getLanguage()? 'Configuration': 'Konfiguration'}
+							${this.app.lang.t('Configuration')}
 						</div>
 						<div class="col-10">
 							<select id="config" class="w100">
@@ -242,13 +239,13 @@ class StarterElement extends BaseElement
 					</div>
 					<div class="row m-1">
 						<div class="col-2">
-							${BaseElement.language.getLanguage()? 'Comp. name': 'Komp.name'}
+							${this.app.lang.t('Comp. name')}
 						</div>
 						<div class="col-5">
 							<input type="text" class="w100" value="${this.model!=null && this.model.instancename!=null? this.model.instancename: ''}" id="name"></input>
 						</div>
 						<div class="col-3">
-							<input type="checkbox" id="autogen">${BaseElement.language.getLanguage()? 'Auto generate': 'Autogenerieren'}</input>
+							<input type="checkbox" id="autogen">${this.app.lang.t('Auto generate')}</input>
 						</div>
 						<div class="col-2">
 							<input class="w100" type="number" value="1" id="gencnt"></input>
@@ -256,18 +253,18 @@ class StarterElement extends BaseElement
 					</div>
 					<div class="row m-1">
 						<div class="col-4">
-							<input type="checkbox" id="suspended">${BaseElement.language.getLanguage()? 'Suspended': 'Angehalten'}</input>
+							<input type="checkbox" id="suspended">${this.app.lang.t('Suspended')}</input>
 						</div>
 						<div class="col-4">
-							<input type="checkbox" id="synchronous">${BaseElement.language.getLanguage()? 'Synchronous': 'Synchron'}</input>
+							<input type="checkbox" id="synchronous">${this.app.lang.t('Synchronous')}</input>
 						</div>
 						<div class="col-4">
-							${BaseElement.language.getLanguage()? 'Monitoring':'Überwachung'}
+							${this.app.lang.t('Monitoring')}
 							<select id="monitoring" class="w100">
 		   						<option value="OFF">OFF</option> 
-		   						<option value="COARSE">${BaseElement.language.getLanguage()? 'COARSE': 'Grob'}</option> 
-		   						<option value="MEDIUM">${BaseElement.language.getLanguage()? 'MEDIUM': 'Mittel'}</option> 
-		   						<option value="FINE">${BaseElement.language.getLanguage()? 'FINE': 'Fein'}</option> 
+		   						<option value="COARSE">${this.app.lang.t('COARSE')}</option> 
+		   						<option value="MEDIUM">${this.app.lang.t('MEDIUM')}</option> 
+		   						<option value="FINE">${this.app.lang.t('FINE')}</option> 
 		 					</select>
 		 				</div>
 					</div>

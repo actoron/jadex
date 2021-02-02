@@ -1,82 +1,13 @@
-import {LitElement, html, css} from '../libs/lit/lit-element.js';
-import { BaseElement } from "../webcomponents/baseelement.js"
+let { LitElement, html, css } = modLoad('lit-element');
+let { BaseElement } = modLoad('base-element');
 
 export class LoginElement extends BaseElement
 {
 	//loggedin; WARNING: must NOT be declared. Property changes do not work then
 	
-	constructor() 
-	{
-		super();	
-		//this.loggedin = false;
-		this.no = 0;
-		console.log("login");
-	}
-	
-	static loginhandler = 
-	{
-		loggedin: false,
-		listeners: [],
-		setLogin: function(loggedin)
-		{
-			if(this.loggedin!=loggedin && loggedin!=null)
-			{
-				console.log("login change happened")
-				this.loggedin = loggedin;
-				for(var i=0; i<this.listeners.length; i++)
-				{
-					this.listeners[i](this.loggedin);
-				}
-				
-				BaseElement.loadedelements.forEach( elem => {
-					console.log("Updating " + elem)
-					elem.requestUpdate();
-				});
-			}
-			console.log("loggedin is: "+this.loggedin);
-		},
-		isLoggedIn: function()
-		{
-			return this.loggedin;
-		},
-		addListener: function(listener)
-		{
-			this.listeners.push(listener);
-		},
-		removeListener: function(listener)
-		{
-			for(var i=0; i < this.listeners.length; i++) 
-			{
-				if(this.listeners[i] === listener) 
-				{
-					this.listeners.splice(i, 1);
-					break;
-			    } 
-			}
-		},
-		updateLogin()
-		{
-			var self = this;
-			return new Promise(function(resolve, reject) 
-			{
-				axios.get('webjcc/isLoggedIn', {headers: {'x-jadex-isloggedin': true}}, self.transform).then(function(resp)
-				{
-					//console.log("is logged in: "+resp);
-					self.setLogin(resp.data);
-					resolve(self.loggedin);
-				})
-				.catch(function(err) 
-				{
-					console.log("check failed: "+err);	
-					reject(err);
-				});
-			});
-		}
-	}
-	
 	static get properties() 
 	{
-		var ret = {};
+		let ret = {};
 		if(super.properties!=null)
 		{
 			for(let key in super.properties)
@@ -86,21 +17,27 @@ export class LoginElement extends BaseElement
 		return ret;
 	}
 	
+	init() 
+	{
+		this.no = 0;
+		this.app.login.listeners.add(this);
+		
+		//console.log("login INITED");
+	}
+	
+	postInit()
+	{
+		let pass = localStorage.getItem("platformpassword")
+		console.log("session store pass " + pass);
+		if (pass)
+			this.login(pass);
+	}
+	
 	connectedCallback() 
 	{
 		super.connectedCallback();
-		var self = this;
-		//console.log("connnnn")
-		this.isLoggedIn().then((res)=>{
-			self.requestUpdate();
-			if (!res)
-			{
-				let pass = localStorage.getItem("platformpassword")
-				console.log("session store pass " + pass);
-				if (pass)
-					self.login(pass);
-			}
-		});
+		let self = this;
+		//console.log("connnnn----")
 		
 		// turn on to cintinuously check if we are stll logged in
 		//this.checkLoggedIn();
@@ -129,7 +66,7 @@ export class LoginElement extends BaseElement
 	
 	internalCheckLoggedIn(interval, no) 
 	{
-		var self = this;
+		let self = this;
 		
 		// terminate when another call to checkPlatform() has been performed
 		//console.log("check platform: "+no+" "+this.no);
@@ -152,29 +89,29 @@ export class LoginElement extends BaseElement
 		});
 	}
 	
-	render() 
+	asyncRender() 
 	{
     	return html`
-			<div class="${LoginElement.loginhandler.isLoggedIn()? 'hidden': ''}">
+			<div class="${this.app.login.isLoggedIn()? 'hidden': ''}">
 				<div class="flexcontainerrow">
-					<input class="flexcellgrow mt-1 mb-1" id="pass" name="platformpass" type="text" placeholder="${BaseElement.language.getLanguage()? 'Platform password': 'Plattformpasswort'}"></input>
+					<input class="flexcellgrow mt-1 mb-1" id="pass" name="platformpass" type="text" placeholder="${this.app.lang.t('Platform password')}"></input>
 					<button class="btn btn-primary mt-1 mb-1 ml-1" @click="${e => {this.login(this.shadowRoot.getElementById('pass').value)}}">Login</button>
 				</div>
-				<input class"mt-1 mb-1 ml-1 flow-right" id="rememberpassword" type="checkbox" >${BaseElement.language.tl("Remember password")}</input>
+				<input class"mt-1 mb-1 ml-1 flow-right" id="rememberpassword" type="checkbox" >${this.app.lang.t("Remember password")}</input>
 			</div>
-			<button class="btn btn-primary mt-1 mb-1 ml-1 flow-right ${LoginElement.loginhandler.isLoggedIn()? '': 'hidden'}" @click="${e => {this.logout()}}">Logout</button>
+			<button class="btn btn-primary mt-1 mb-1 ml-1 flow-right ${this.app.login.isLoggedIn()? '': 'hidden'}" @click="${e => {this.logout()}}">Logout</button>
     	`;
  	}
 
 	login(pass)
 	{
-		var self = this;
+		let self = this;
 		axios.get('webjcc/login?pass='+pass, {headers: {'x-jadex-login': pass}}, self.transform).then(function(resp)
 		//axios.get('webjcc/login?pass='+pass, self.transform).then(function(resp)
 		{
 			//console.log("logged in: "+resp);
 			//self.loggedin = true;
-			LoginElement.loginhandler.setLogin(true);
+			self.app.login.setLogin(true);
 			
 			if (typeof(Storage) !== undefined) {
 				let checkbox = self.shadowRoot.getElementById("rememberpassword");
@@ -192,26 +129,26 @@ export class LoginElement extends BaseElement
 			//console.log("login failed: "+err);	
 			self.createErrorMessage("login failed", err);
 			//self.loggedin = false;
-			LoginElement.loginhandler.setLogin(false);
+			self.app.login.setLogin(false);
 		});
 	}
 	
 	logout()
 	{
-		var self = this;
+		let self = this;
 		axios.get('webjcc/logout', {headers: {'x-jadex-logout': true}}, self.transform).then(function(resp)
 		//axios.get('webjcc/login?pass='+pass, self.transform).then(function(resp)
 		{
 			//console.log("logged out: "+resp);
 			//self.loggedin = false;
-			LoginElement.loginhandler.setLogin(false);
+			self.app.login.setLogin(false);
 			self.createInfoMessage("logged out");
 		})
 		.catch(function(err) 
 		{
 			//console.log("logout failed: "+err);	
 			//self.loggedin = false;
-			LoginElement.loginhandler.setLogin(false);
+			self.app.login.setLogin(false);
 			self.createErrorMessage("logout failed", err);
 		});
 		localStorage.removeItem("platformpassword");
@@ -219,21 +156,21 @@ export class LoginElement extends BaseElement
 	
 	isLoggedIn()
 	{
-		var self = this;
+		let self = this;
 		return new Promise(function(resolve, reject) 
 		{
 			axios.get('webjcc/isLoggedIn', {headers: {'x-jadex-isloggedin': true}}, self.transform).then(function(resp)
 			{
 				//console.log("is logged in: "+resp);
 				//self.loggedin = resp.data;
-				LoginElement.loginhandler.setLogin(resp.data);
+				self.app.login.setLogin(resp.data);
 				resolve(self.loggedin);
 			})
 			.catch(function(err) 
 			{
 				//console.log("check failed: "+err);
 				self.createErrorMessage("check failed", err);
-				//LoginElement.loginhandler.setLogin(false);	
+				//this.app.login.setLogin(false);	
 				reject(err);
 			});
 		});
@@ -242,4 +179,4 @@ export class LoginElement extends BaseElement
 
 if(customElements.get('jadex-login') === undefined)
 	customElements.define('jadex-login', LoginElement);
-
+	

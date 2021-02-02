@@ -2,15 +2,14 @@ import {LitElement, html, css} from '../libs/lit/lit-element.js';
 
 export class BaseElement extends LitElement 
 {
+	static app_singleton;
+	
 	static apppromise = new Promise((resolve,reject) => {
-		axios.get('app.js').then(function(resp) {
-			let fun = new Function(resp.data + "\n//# sourceURL=app.js\n");
+		axios.get('/webcomponents/app.js').then(function(resp) {
+			let appfun = new Function("return " + resp.data + "\n//# sourceURL=app.js\n");
 			try {
-				fun().then(theapp => {
-					resolve(theapp);
-				}).catch(err) {
-					reject(err);
-				}
+				BaseElement.app_singleton = appfun();
+				resolve();
 			}
 			catch (err) {
 				reject(err);
@@ -22,129 +21,100 @@ export class BaseElement extends LitElement
 	
 	static loadedelements = [];
 	
-	static language = {
-		lang: "en",
-		listeners: [],
-		translationtable: {},
-		translate: function(text) {
-			let ret;
-			if (this.lang !== "en")
-			{
-				let langtl = this.translationtable[text];
-				if (langtl)
-					ret = langtl[this.lang];
-			}
-			if (!ret)
-				ret = text;
-			return ret;
-		},
-		$t: function(text) 
-		{
-			return this.translate(text);
-		},
-		getLanguage: function() 
-		{
-			return this.lang=='de'? 0: 1;
-		},
-		switchLanguage: function()
-		{
-			this.lang=='de'? this.lang='en': this.lang='de';
-			for(var i=0; i<this.listeners.length; i++)
-			{
-				this.listeners[i]({lang: this.lang});
-			}
-			//console.log("language is: "+this.lang);
-		},
-		addListener: function(listener)
-		{
-			this.listeners.push(listener);
-		},
-		removeListener: function(listener)
-		{
-			for(var i=0; i < this.listeners.length; i++) 
-			{
-				if(this.listeners[i] === listener) 
-				{
-					this.listeners.splice(i, 1);
-					break;
-			    } 
-			}
-		}
-	};
-	
 	static loaded = {};
 	
-	cid = null;
+	app = null;
 	jadexservice = null;
-	langlistener = null;
-	loadedprom = null;
-	
-	static get properties() 
-	{
-		return { 
-			cid: { type: String },
-		};
-	}
-	
-	attributeChangedCallback(name, oldval, newval) 
-	{
-	    //console.log('attribute change: ', this, name, newval, oldval);
-	    
-		super.attributeChangedCallback(name, oldval, newval);
-	    
-	    //console.log('checking for init function.... ' + typeof this.init + " " + this.constructor.name);
-	    if(name === 'cid' && newval!=null && typeof this.init === 'function')
-	    {
-			this.cid = newval;
-	    	//console.log('init found, calling...');
-	    	this.init();
-	    }
-	    
-		//console.log("baseelement: "+this.cid);
-	}
+	cid = null;
+	//langlistener = null;
+	inited = false;
 	
 	constructor() 
 	{
 		super();
-		var self = this;
-		
-		self.loadedprom = new Promise(function(resolve, reject) 
+		let self = this;
+		//console.log(typeof self.prototype.init);
+		self.preInit().then(() =>
 		{
-			// must load sync to ensure that style.css rules are defined and gain precedence		
-			self.loadStyle("/libs/bootstrap_4.5.0/bootstrap.min.css")
-			.then(()=>
+			console.log('checking for init function.... ' + typeof self.init + " " + self.constructor.name);
+			let initprom;
+			//if(name === 'cid' && newval!=null && typeof this.init === 'function')
+			if(typeof self.init === 'function')
+		    {
+		    	console.log('init found, calling...');
+		    	initprom = self.init();
+		    }
+			let callpostinit = function() {
+				self.inited = true;
+				self.requestUpdate().then(() => {
+					//console.log("update done, calling postinit");
+					self.postInit();
+				}).catch(err => {
+					console.log("Error updating element: " + self.constructor.name)
+					console.log(err);
+				});
+			};
+			if (typeof initprom === 'object' && typeof initprom.then === 'function')
 			{
-				//console.log("loaded bootstrap css")
-				self.loadScript("libs/jquery_3.4.1/jquery.js")
-				.then(()=>
-				{
-					//console.log("loaded jquery")
-					self.loadScript("/libs/bootstrap_4.5.0/bootstrap.bundle.min.js")
-					.then(()=>
-					{
-						//console.log("loaded bootstrap")
-						self.loadStyle("/css/style.css")
-						.then(()=>{
-							//console.log("loaded all"); 
-							resolve();
-						})
-						.catch((err)=>reject(err));
-					})
-					.catch((err)=>reject(err));
-				})
-				.catch((err)=>reject(err));
-			})
-			.catch((err)=>reject(err));
-		});
-		
-		self.loadedprom.then( function() {
-			BaseElement.loadedelements.push(self);
+				initprom.then(() => {
+					callpostinit();
+				});
+			}
+			else
+				callpostinit();
 		});
 	}
 	
-	init()
+	preInit()
 	{
-		return this.loadedprom;
+		let self = this;
+		//console.log("starting preinit " + this.constructor.name);
+		
+		let preinitprom = new Promise((resolv, rejec) => 
+		{
+			//console.log('starting init prom');
+			BaseElement.apppromise
+			.then(()=>
+			{
+				//console.log('app loaded');
+				self.app = BaseElement.app_singleton;
+				
+				// must load sync to ensure that style.css rules are defined and gain precedence		
+				self.loadStyle("/libs/bootstrap_4.5.0/bootstrap.min.css")
+				.then(()=>
+				{
+					//console.log("loaded bootstrap css")
+					self.loadScript("libs/jquery_3.4.1/jquery.js")
+					.then(()=>
+					{
+						//console.log("loaded jquery")
+						self.loadScript("/libs/bootstrap_4.5.0/bootstrap.bundle.min.js")
+						.then(()=>
+						{
+							//console.log("loaded bootstrap")
+							self.loadStyle("/css/style.css")
+							.then(()=>{
+								
+								console.log("loaded all, requesting update...");
+								resolv();
+								
+							})
+							.catch((err)=>rejec(err));
+						})
+						.catch((err)=>rejec(err));
+					})
+					.catch((err)=>rejec(err));
+				})
+				.catch((err)=>rejec(err));
+			})
+			.catch((err)=>rejec(err));
+		});
+		
+		return preinitprom;
+	}
+	
+	postInit()
+	{
 	}
 	
 	connectedCallback() 
@@ -154,7 +124,7 @@ export class BaseElement extends LitElement
 		var self = this;
 		//console.log('connected')
 		
-		if(this.langlistener==null)
+		/*if(this.langlistener==null)
 		{
 			this.langlistener = e => 
 			{
@@ -163,7 +133,7 @@ export class BaseElement extends LitElement
 			};
 		}
 		
-		BaseElement.language.addListener(this.langlistener);
+		BaseElement.language.addListener(this.langlistener);*/
 		
 		/*if(this.loginlistener==null)
 		{
@@ -179,112 +149,11 @@ export class BaseElement extends LitElement
 	disconnectedCallback()
 	{
 		super.disconnectedCallback();
-		if(this.langlistener!=null)
-			BaseElement.language.removeListener(this.langlistener);
+		/*if(this.langlistener!=null)
+			BaseElement.language.removeListener(this.langlistener);*/
 		if(this.loginlistener!=null)
 			BaseElement.login.removeListener(this.loginlistener);
 	}
-	
-	/*loadStyle(url)
-	{
-		var self = this;
-		var ret = null;
-		
-		var sheet = BaseElement.loaded[url];
-		if(sheet!=null)
-		{
-			if(sheet instanceof Promise)
-			{
-				ret = sheet;	
-			}
-			else
-			{
-				ret = new Promise(function(resolve, reject) 
-				{
-					//var sheet = new CSSStyleSheet();
-					//sheet.replaceSync(css);
-					self.shadowRoot.adoptedStyleSheets = self.shadowRoot.adoptedStyleSheets.concat(sheet);
-					resolve(sheet);
-					//console.log("cached version: "+url+" "+self.shadowRoot.adoptedStyleSheets.length);
-				});
-			}	
-		}
-		else
-		{
-			ret = new Promise(function(resolve, reject) 
-			{
-				axios.get(url).then(function(resp)
-				{
-					//console.log("loaded version: "+url+" "+self.shadowRoot.adoptedStyleSheets.length);
-					var css = resp.data;    
-					//console.log(css);
-					var sheet = new CSSStyleSheet();
-					sheet.replaceSync(css);
-					self.shadowRoot.adoptedStyleSheets = self.shadowRoot.adoptedStyleSheets.concat(sheet);
-					BaseElement.loaded[url] = sheet;
-					resolve(sheet);
-				})
-				.catch(function(err)
-				{
-					reject(err);
-				});
-			});
-			BaseElement.loaded[url] = ret;
-		}
-		
-		return ret;
-	}*/
-	
-	/*loadStyle(url)
-	{
-		var self = this;
-		var ret = null;
-		
-		var css = BaseElement.loaded[url];
-		if(css!=null)
-		{
-			if(css instanceof Promise)
-			{
-				ret = css;	
-			}
-			else
-			{
-				ret = new Promise(function(resolve, reject) 
-				{
-					var sheet = new CSSStyleSheet();
-					sheet.replaceSync(css);
-					self.shadowRoot.adoptedStyleSheets = self.shadowRoot.adoptedStyleSheets.concat(sheet);
-					resolve(css);
-					console.log("cached version: "+url+" "+self.shadowRoot.adoptedStyleSheets.length);
-					console.log("cache: "+css);
-				});
-			}	
-		}
-		else
-		{
-			ret = new Promise(function(resolve, reject) 
-			{
-				axios.get(url).then(function(resp)
-				{
-					console.log("loaded version: "+url+" "+self.shadowRoot.adoptedStyleSheets.length);
-					var css = resp.data;    
-					console.log(css);
-					var sheet = new CSSStyleSheet();
-					sheet.replaceSync(css);
-					self.shadowRoot.adoptedStyleSheets = self.shadowRoot.adoptedStyleSheets.concat(sheet);
-					BaseElement.loaded[url] = css;
-					resolve(css);
-				})
-				.catch(function(err)
-				{
-					reject(err);
-				});
-			});
-			BaseElement.loaded[url] = ret;
-		}
-		
-		return ret;
-	}*/
 	
 	// todo: why does caching (above) not work :-(
 	loadStyle(url)
@@ -509,7 +378,7 @@ export class BaseElement extends LitElement
 	
 	switchLanguage() 
 	{
-	    BaseElement.language.switchLanguage(); 
+	    this.app.lang.switchLanguage(); 
 	    //this.requestUpdate(); // update is done via event listeners on the language object
 	}
 	
@@ -538,6 +407,25 @@ export class BaseElement extends LitElement
             composed: true 
         });
 	    this.dispatchEvent(event);
+	}
+	
+	render() 
+	{
+		if (this.inited)
+		{
+			//console.log('calling real render: ' + this.constructor.name);
+			return this.asyncRender();
+		}
+		else
+		{
+			//console.log('calling fake render' + this.constructor.name);
+			return html``;
+		}
+	}
+	
+	asyncRender()
+	{
+		return html``;
 	}
 }
 

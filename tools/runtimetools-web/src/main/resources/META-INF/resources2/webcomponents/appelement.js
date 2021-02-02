@@ -8,57 +8,49 @@ class AppElement extends BaseElement
 	listener = null;
 	loggedin = false;
 	
-	constructor()
+	postInit() 
 	{
-		super();
-		this.init();
-	} 
-	
-	init() 
-	{
-		console.log("app element");
+		//console.log("app element");
 		
-		var self = this;
+		let self = this;
 		
-		super.init().then(()=>
-		{
-			page.base('/#');
-			page('/index.html', () => {
-				page.redirect("/platforms");
-		    });
-		    page('/', () => {
-		    	page.redirect("/platforms");
-		    });
-	 		page('/login', () => {
-		    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-login></jadex-login>";
-		    });
-		    page('/platforms', () => {
-		    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platforms></jadex-platforms>";
-		    });
-		    page('/platform/:cid', (ctx, next) => {
-		    	//console.log("router, cid: "+ctx.params.cid);
-		    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platform cid='"+ctx.params.cid+"'></jadex-platform>";
-		    });
-		    page('/platform/:cid/:plugin', (ctx, next) => {
-		    	//console.log("router, cid: "+ctx.params.cid+ " plugin: " + ctx.params.plugin);
-		    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platform cid='"+ctx.params.cid+"' plugin='"+ctx.params.plugin+"'></jadex-platform>";
-		    });
-		    page('/about', () => {
-		    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-about></jadex-about>";
-		    });
-		    page('/imprint', () => {
-		    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-imprint></jadex-imprint>";
-		    });
-		    page('/privacy', () => {
-		    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-privacy></jadex-privacy>";
-		    });
-		    /*page('*', (ctx, next) => {
-		    	console.log("nav not found: "+ctx);
-		    });*/
+		this.app.lang.listeners.add(self);
+		
+		page.base('/#');
+		page('/index.html', () => {
+			page.redirect("/platforms");
+	    });
+	    page('/', () => {
+	    	page.redirect("/platforms");
+	    });
+ 		page('/login', () => {
+	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-login></jadex-login>";
+	    });
+	    page('/platforms', () => {
+	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platforms></jadex-platforms>";
+	    });
+	    page('/platform/:cid', (ctx, next) => {
+	    	//console.log("router, cid: "+ctx.params.cid);
+	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platform cid='"+ctx.params.cid+"'></jadex-platform>";
+	    });
+	    page('/platform/:cid/:plugin', (ctx, next) => {
+	    	//console.log("router, cid: "+ctx.params.cid+ " plugin: " + ctx.params.plugin);
+	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platform cid='"+ctx.params.cid+"' plugin='"+ctx.params.plugin+"'></jadex-platform>";
+	    });
+	    page('/about', () => {
+	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-about></jadex-about>";
+	    });
+	    page('/imprint', () => {
+	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-imprint></jadex-imprint>";
+	    });
+	    page('/privacy', () => {
+	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-privacy></jadex-privacy>";
+	    });
+	    /*page('*', (ctx, next) => {
+	    	console.log("nav not found: "+ctx);
+	    });*/
 
-			page();
-		})
-		.catch((err)=>console.log(err));
+		page();
 	}
 	
 	connectedCallback() 
@@ -80,6 +72,11 @@ class AppElement extends BaseElement
 		this.addEventListener('jadex-message', this.listener);
 	}
 	
+	switchLanguage()
+	{
+		this.app.lang.setLanguage(this.app.lang.getLang()==='en'? 'de' : 'en');
+	}
+	
 	/*disconnectedCallback()
 	{
 		super.disconnectedCallback();
@@ -91,8 +88,8 @@ class AppElement extends BaseElement
 	{
 		page();
 	}*/
-		
-	render() 
+	
+	asyncRender() 
 	{
 		return html`
 			<div style="height:100%" class="d-flex flex-column">
@@ -100,7 +97,7 @@ class AppElement extends BaseElement
 				<div class="navbar-brand mr-auto">
 		 			<img src="images/jadex_logo_ac.png" width="200px"/>
 					<a class="p-0 m-0" href="#">WebJCC</a>
-					<img class="p-0 m-0" @click="${this.switchLanguage}" src="${BaseElement.language.lang=='de'? 'images/language_de.png': 'images/language_en.png'}" />
+					<img class="p-0 m-0" @click="${this.switchLanguage}" src="${this.app.lang.getFlagUrl()}" />
 				</div>
 				<!--
 				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -109,10 +106,10 @@ class AppElement extends BaseElement
 				<div class="collapse navbar-collapse" id="navbarSupportedContent" ref="navcol">
 					<ul class="navbar-nav mr-auto">
 		   				<li class="nav-item">
-		      				<a class="nav-link" href="">${BaseElement.language.$t("message.home")}</a>
+		      				<a class="nav-link" href="">${this.app.lang.t("message.home")}</a>
 		    			</li>
 		    			<li class="nav-item">
-		      				<a class="nav-link" href="#about">${BaseElement.language.$t("message.about")}</a>
+		      				<a class="nav-link" href="#about">${this.app.lang.t("message.about")}</a>
 		    			</li>
 		 			</ul>
 		 			<form class="form-inline my-2 my-lg-0"></form>
@@ -146,9 +143,9 @@ class AppElement extends BaseElement
 			<footer class="container-fluid footer navbar-light bg-light">
 		        <span class="text-muted">Copyright by <a href="http://www.actoron.com">Actoron GmbH</a> 2017-${new Date().getFullYear()}</span>
 		    	<div class="float-right">
-					<a href="#/about">${BaseElement.language.$t("message.about")}</a>
-		    		<a href="#/privacy">${BaseElement.language.$t("message.privacy")}</a>
-		    		<a href="#/imprint">${BaseElement.language.$t("message.imprint")}</a>
+					<a href="#/about">${this.app.lang.t("About")}</a>
+		    		<a href="#/privacy">${this.app.lang.t("Privacy")}</a>
+		    		<a href="#/imprint">${this.app.lang.t("Imprint")}</a>
 		    	</div>
 		    </footer>
 		    </div>

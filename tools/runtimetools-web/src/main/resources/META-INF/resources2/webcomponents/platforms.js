@@ -23,10 +23,10 @@ class PlatformsElement extends BaseElement
 		return ret;
 	}
 	
-	constructor() 
+	init()
 	{
-		super();	
-		console.log("platforms");
+		this.app.lang.listeners.add(this);
+		console.log('platforms')
 	}
 	
 	connectedCallback() 
@@ -97,18 +97,17 @@ class PlatformsElement extends BaseElement
 		);
 	}
 	
-	render() 
+	asyncRender() 
 	{
 		return html`
 			<div class="actwtable section">
 				<div>
 					<div class="head">
-						<h1 class="m-0 p-0 inline" id="HConnectedPlatforms">${BaseElement.language.getLanguage()? 'Connected Platforms': 'Verbundene Plattformen'}</h1>
+						<h1 class="m-0 p-0 inline" id="HConnectedPlatforms">${this.app.lang.t('Connected Platforms')}</h1>
 						<span id="connected" class="dot fl ${this.connected? "green": "red"}"></span>
 					</div>
 					<p>
-						${BaseElement.language.getLanguage()? 'This page shows a self-updating list of remote platforms known to this Jadex platform.'
-						:'Diese Seite zeigt eine sich selbst aktualisierende Plattformliste an.'}
+						${this.app.lang.t('This page shows a self-updating list of remote platforms known to this Jadex platform.')}
 					</p>
 				</div>
 
@@ -119,7 +118,7 @@ class PlatformsElement extends BaseElement
 						<tbody>
 							<tr>
 								<th>Name</th>
-								<!-- <th>${!BaseElement.language.getLanguage()? "Connected": "Verbunden"}</th> 
+								<!-- <th>${this.app.lang.t("Connected")}</th> 
 								<th>Protocol</th>-->
 							</tr>
 							

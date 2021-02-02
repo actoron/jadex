@@ -1,102 +1,67 @@
 let { html, css } = modLoad('lit-element');
 let { BaseElement } = modLoad('base-element');
+let { CidElement } = modLoad('cid-element');
 
 // Tag name 'jadex-modeltree'
-class ModelTree extends BaseElement 
+class ModelTree extends CidElement 
 {
-	constructor()
+	init()
 	{
-		super();
+		console.log("modetree init: "+this.models);
+		
+		let self = this;
+		this.app.lang.listeners.add(this);
 		
 		this.models = []; // available component models [filename, classname]
 		this.reversed = false;
 		//this.myservice = "jadex.tools.web.starter.IJCCStarterService";
 		this.treeid = "modeltree";
-	}
-	
-	init()
-	{
-		console.log("modetree init: "+this.models);
-	
-		var self = this;
-		super.init().then(()=>
+		
+		//console.log("modeltree");
+		this.loadJSTree().then(function()
 		{
-			//console.log("modeltree");
-			this.loadJSTree().then(function()
-			{
-				//console.log("jstree");
+			//console.log("jstree");
+			
+			// init tree
+			$(function() 
+			{ 
+				self.getTree(self.treeid).jstree(
+				{
+					"core" : {"check_callback" : true},
+					"plugins" : ["sort"],
+					'sort': function(a, b) 
+					{
+				        var a1 = this.get_node(a);
+				        var b1 = this.get_node(b);
+				        if(a1.icon == b1.icon)
+				        {
+				            return (a1.text > b1.text) ? 1 : -1;
+				        } 
+				        else 
+				        {
+				            return (a1.icon > b1.icon) ? 1 : -1;
+				        }
+					}
+				});
 				
-				// init tree
-				$(function() 
-				{ 
-					self.getTree(self.treeid).jstree(
+				// no args here
+				//console.log("getComponentModels start");
+				
+				var t = jadex.getIntermediate(self.getMethodPrefix()+'&methodname=getComponentModelsAsStream'+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
+				function(response)
+				{
+					if(!response.data)
 					{
-						"core" : {"check_callback" : true},
-						"plugins" : ["sort"],
-						'sort': function(a, b) 
-						{
-					        var a1 = this.get_node(a);
-					        var b1 = this.get_node(b);
-					        if(a1.icon == b1.icon)
-					        {
-					            return (a1.text > b1.text) ? 1 : -1;
-					        } 
-					        else 
-					        {
-					            return (a1.icon > b1.icon) ? 1 : -1;
-					        }
-						}
-					});
+						console.log("received: "+response.data);
+						return;
+					}
 					
-					// no args here
-					//console.log("getComponentModels start");
-					
-					var t = jadex.getIntermediate(self.getMethodPrefix()+'&methodname=getComponentModelsAsStream'+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
-					function(response)
+					if(self.addModel(response.data))
 					{
-						if(!response.data)
-						{
-							console.log("received: "+response.data);
-							return;
-						}
+						//self.createModelTree(self.treeid);
+						self.createNodes(self.treeid, response.data[1]);
 						
-						if(self.addModel(response.data))
-						{
-							//self.createModelTree(self.treeid);
-							self.createNodes(self.treeid, response.data[1]);
-							
-							//self.addToModelTree(self.treeid);
-							//$('#'+treeid).jstree('open_all');
-							var childs = self.getTree(self.treeid).jstree('get_node', '#').children;
-							for(var i=0; i<childs.length; i++)
-							{
-								self.getTree(self.treeid).jstree("open_node", childs[i]);
-							}
-							
-							//console.log("models loaded");
-							
-							//$("#"+treeid).jstree("open_node", '#');
-							self.requestUpdate();
-							
-							/*self.getTree(self.treeid).on('select_node.jstree', function (e, data) 
-							{
-								self.select(data.instance.get_path(data.node, '.'));
-							});*/
-						}
-					},
-					function(response)
-					{
-						console.log("Could not load models.");
-						console.log("Err: "+JSON.stringify(response));
-					});
-					
-					/*axios.get(self.getMethodPrefix()+'&methodname=getComponentModels', self.transform).then(function(resp)
-					{
-						//console.log("getComponentModels"+resp.data);
-						
-						self.models = resp.data;
-						
-						self.createModelTree(self.treeid);
+						//self.addToModelTree(self.treeid);
 						//$('#'+treeid).jstree('open_all');
 						var childs = self.getTree(self.treeid).jstree('get_node', '#').children;
 						for(var i=0; i<childs.length; i++)
@@ -109,15 +74,44 @@ class ModelTree extends BaseElement
 						//$("#"+treeid).jstree("open_node", '#');
 						self.requestUpdate();
 						
-						self.getTree(self.treeid).on('select_node.jstree', function (e, data) 
+						/*self.getTree(self.treeid).on('select_node.jstree', function (e, data) 
 						{
 							self.select(data.instance.get_path(data.node, '.'));
-						});
-					});*/
+						});*/
+					}
+				},
+				function(response)
+				{
+					console.log("Could not load models.");
+					console.log("Err: "+JSON.stringify(response));
 				});
+				
+				/*axios.get(self.getMethodPrefix()+'&methodname=getComponentModels', self.transform).then(function(resp)
+				{
+					//console.log("getComponentModels"+resp.data);
+					
+					self.models = resp.data;
+					
+					self.createModelTree(self.treeid);
+					//$('#'+treeid).jstree('open_all');
+					var childs = self.getTree(self.treeid).jstree('get_node', '#').children;
+					for(var i=0; i<childs.length; i++)
+					{
+						self.getTree(self.treeid).jstree("open_node", childs[i]);
+					}
+					
+					//console.log("models loaded");
+					
+					//$("#"+treeid).jstree("open_node", '#');
+					self.requestUpdate();
+					
+					self.getTree(self.treeid).on('select_node.jstree', function (e, data) 
+					{
+						self.select(data.instance.get_path(data.node, '.'));
+					});
+				});*/
 			});
-		})
-		.catch((err)=>console.log(err));
+		});
 	}
 	
 	loadJSTree()
@@ -376,7 +370,7 @@ class ModelTree extends BaseElement
 			<div class="container-fluid m-0 p-0">
 				<div class="row m-0 p-0">
 					<div class="col-12 m-0 p-0">
-						<input id="model" list="models" placeholder="${BaseElement.language.getLanguage()? 'Search models...': 'Suche Modelle'}" class="w100" type="text" @change="${(e) => this.select(e)}"></input>
+						<input id="model" list="models" placeholder="${this.app.lang.t('Search models...')}" class="w100" type="text" @change="${(e) => this.select(e)}"></input>
 						<datalist id="models">
 							${this.getModelNames().map((model) => html`<option class="w100" value="${model.name+' ['+model.pck+']'}"></option>`)}
 						</datalist>
