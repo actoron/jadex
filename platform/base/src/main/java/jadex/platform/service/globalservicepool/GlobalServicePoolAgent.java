@@ -25,6 +25,7 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.servicepool.IServicePoolService;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -42,7 +43,6 @@ import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.platform.service.servicepool.IServicePoolService;
 import jadex.platform.service.servicepool.PoolServiceInfo;
 import jadex.platform.service.servicepool.ServicePoolAgent;
 
