@@ -195,7 +195,7 @@ class StarterElement extends CidElement
 		return ret;
 	}
 	
-	render() {
+	asyncRender() {
 		return html`
 			<div class="container-fluid m-0 p-0">
 				<div class="row m-0 p-0">

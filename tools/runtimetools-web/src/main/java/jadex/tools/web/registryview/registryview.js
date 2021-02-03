@@ -1,9 +1,9 @@
 let { LitElement, html, css } = modLoad('lit-element');
 let { BaseElement } = modLoad('base-element');
-//import '/libs/lit-datatable/lit-datatable.js'
+let { CidElement } = modLoad('cid-element');
 
 // Tag name 'jadex-registry'
-class RegistryViewElement extends BaseElement 
+class RegistryViewElement extends CidElement 
 {
 	static get properties() 
 	{
@@ -40,51 +40,57 @@ class RegistryViewElement extends BaseElement
 		var self = this;
 		
 		//console.log("load style start");
-		this.loadStyle(ures)
-		.then(()=>
-		{
-			var res1 ="jadex/tools/web/registryview/st_styles.css";
-			var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
-			var res2 ="jadex/tools/web/registryview/st_min.js";
-			var ures2 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
-			
-			//console.log("load datatables start");
-			this.loadStyle(ures1)
+		let ret = new Promise((resolve, reject) => {
+			this.loadStyle(ures)
 			.then(()=>
 			{
-				//console.log("loaded datatables.js");
+				var res1 ="jadex/tools/web/registryview/st_styles.css";
+				var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+				var res2 ="jadex/tools/web/registryview/st_min.js";
+				var ures2 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 				
-				this.loadScript(ures2)
+				//console.log("load datatables start");
+				this.loadStyle(ures1)
 				.then(()=>
 				{
-					//console.log("loaded datatables.css");
+					//console.log("loaded datatables.js");
 					
-					var opts = {perPageSelect: [5,10,15,25,50,100,1000], perPage: 15};
-					self.getSubscription("Services").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableservices'), opts);
-					self.getSubscription("Platforms").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableplatforms'), opts);
-					self.getSubscription("Queries").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tablequeries'), opts);
-					
-					self.getSubscription("Services").table.insert({headings: ["","","","",""]});
-					self.getSubscription("Platforms").table.insert({headings: ["","",""]})
-					self.getSubscription("Queries").table.insert({headings: ["","",""]})
-					
-					self.initready = true;
-					self.subscribe();
+					this.loadScript(ures2)
+					.then(()=>
+					{
+						//console.log("loaded datatables.css");
+						
+						var opts = {perPageSelect: [5,10,15,25,50,100,1000], perPage: 15};
+						self.getSubscription("Services").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableservices'), opts);
+						self.getSubscription("Platforms").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableplatforms'), opts);
+						self.getSubscription("Queries").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tablequeries'), opts);
+						
+						self.getSubscription("Services").table.insert({headings: ["","","","",""]});
+						self.getSubscription("Platforms").table.insert({headings: ["","",""]})
+						self.getSubscription("Queries").table.insert({headings: ["","",""]})
+						
+						self.initready = true;
+						self.subscribe();
+						resolve();
+					})
+					.catch((err)=>
+					{
+						console.log("b: "+err);
+						reject(err);
+					});
 				})
 				.catch((err)=>
 				{
-					console.log("b: "+err);
+					console.log("a: "+err);
+					reject(err);
 				});
+				
 			})
 			.catch((err)=>
 			{
-				console.log("a: "+err);
+				console.log(err);
+				reject(err);
 			});
-			
-		})
-		.catch((err)=>
-		{
-			console.log(err);
 		});
 	}
 	
@@ -375,7 +381,7 @@ class RegistryViewElement extends BaseElement
 		return super.requestUpdate();
 	}
 	
-	render() 
+	asyncRender() 
 	{
 		return html`
 		<div id="tab"></div>

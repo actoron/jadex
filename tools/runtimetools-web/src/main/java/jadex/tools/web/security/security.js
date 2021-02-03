@@ -1,8 +1,9 @@
 let { LitElement, html, css } = modLoad('lit-element');
 let { BaseElement } = modLoad('base-element');
+let { CidElement } = modLoad('cid-element');
 
 // Tag name 'jadex-security'
-class SecurityElement extends BaseElement 
+class SecurityElement extends CidElement 
 {
 	static get properties() 
 	{
@@ -20,32 +21,19 @@ class SecurityElement extends BaseElement
 		return ret;
 	}
 	
-	constructor()
+	init()
 	{
-		super();
+		this.app.lang.listeners.add(this);
 		
-		//console.log("security");
-		
-		this.cid = null;
 		this.myservice = "jadex.tools.web.security.IJCCSecurityService";
 		
-		//console.log("security plugin started: "+opts);
-				
 		this.secstate = {};
 		this.nn_option = "option1";
 		this.progress = 0;
 		this.secret = null;
 		this.selnet = null;
 		this.netname = null;
-				
-		/*$("#nn_opts :input").change(function() 
-		{
-			console.log(this); 
-		});*/
-	}
-	
-	init()
-	{
+		
 		let ret = new Promise((resolve, reject) => {
 			console.log("security: "+this.cid);
 			
@@ -137,7 +125,7 @@ class SecurityElement extends BaseElement
 		return ret;
 	}
 	
-	render() 
+	asyncRender() 
 	{
 		return html`
 			<div id="panel" class="container-fluid m-0 p-0">
@@ -310,7 +298,7 @@ class SecurityElement extends BaseElement
 								</div>
 								<div class="row m-1">
 									<div class="col-4">
-										<input type="text" placeholder="${this.app.lang.t('Entity)}" id="entity" @change="${this.requestUpdate()}" required>
+										<input type="text" placeholder="${this.app.lang.t('Entity')}" id="entity" @change="${this.requestUpdate()}" required>
 										
 									</div>
 									<div class="col-4">
@@ -336,7 +324,7 @@ class SecurityElement extends BaseElement
 										<table class="table">
 											<thead>
 					    						<tr>
-					      							<th scope="col-5">${this.app.lang.t('Subject Common Name)}</th>
+					      							<th scope="col-5">${this.app.lang.t('Subject Common Name')}</th>
 					      							<th scope="col-5">${this.app.lang.t('Subject Distinguished Name')}</th>
 					      							<th scope="col-2">${this.app.lang.t('Type')}</th>
 											    </tr>
@@ -368,7 +356,7 @@ class SecurityElement extends BaseElement
 										<table class="table">
 											<thead>
 					    						<tr>
-					      							<th scope="col-5">${this.app.lang.t('Trusted Platform Name)}</th>
+					      							<th scope="col-5">${this.app.lang.t('Trusted Platform Name')}</th>
 											    </tr>
 					  						</thead>
 					  						<tbody>
@@ -738,7 +726,7 @@ class SecurityElement extends BaseElement
 			selel.classList.add("selected");
 	}
 	
-	stringToUtf8 = function(str) 
+	stringToUtf8(str) 
 	{
 		var out = [], p = 0;
 		for(var i = 0; i < str.length; i++) 

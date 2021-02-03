@@ -29,6 +29,7 @@ import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.commons.Boolean3;
 import jadex.commons.IResultCommand;
 import jadex.commons.MethodInfo;
+import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
@@ -247,7 +248,16 @@ public class JCCWebAgent implements IJCCWebService
 			boolean unres = ((IService)service).getServiceId().isUnrestricted();
 			IServiceIdentifier sid = ((IService)service).getServiceId();
 			int prio = service.getPriority().get();
-			byte[] icon = service.getPluginIcon().get();
+			byte[] icon = null;
+			try
+			{
+				icon = service.getPluginIcon().get();
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				SUtil.throwUnchecked(e);
+			}
 			JCCWebPluginInfo pi = new JCCWebPluginInfo(name, icon, prio, unres, sid);
 			res.add(pi);
 		}
@@ -364,6 +374,8 @@ public class JCCWebAgent implements IJCCWebService
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
+				exception.printStackTrace();
+				System.out.println("FUCK FUCK FUCK FUCK: " + servicetype);
 				// Did not find the service, so use it locally with cid
 				// (Allows for resusing (having some webjcc plugins only) on the access platform)
 				//System.out.println("locally with cid: "+ methodname + " " + servicetype);
