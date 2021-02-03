@@ -114,7 +114,8 @@ public class GenerateService implements IGenerateService
 	/**
 	 *  Generate a specific area using a defined x and y size.
 	 */
-	public IFuture<AreaData> generateArea(final AreaData data)
+	//public IFuture<AreaData> generateArea(final AreaData data)
+	public IFuture<Void> generateArea(final AreaData data)
 	{
 		GenerateAgent ga = (GenerateAgent)agent.getFeature(IPojoComponentFeature.class).getPojoAgent();
 		
@@ -136,9 +137,10 @@ public class GenerateService implements IGenerateService
 	/**
 	 *  Distribute the work to available or newly created calculation services.
 	 */
-	protected IFuture<AreaData>	distributeWork(final AreaData data)
+	//protected IFuture<AreaData>	distributeWork(final AreaData data)
+	protected IFuture<Void>	distributeWork(final AreaData data)
 	{
-		final Future<AreaData> ret = new Future<AreaData>();	
+		final Future<Void> ret = new Future<>();	
 
 		// Split area into work units.
 		final Set<AreaData>	areas = new HashSet<>();	// {AreaData}
@@ -182,7 +184,7 @@ public class GenerateService implements IGenerateService
 		}
 
 		// Create array for holding results.
-		data.setData(new short[data.getSizeX()][data.getSizeY()]);
+		//data.setData(new short[data.getSizeX()][data.getSizeY()]);
 		
 		// Assign tasks to service pool.
 		final int number = areas.size();
@@ -205,10 +207,7 @@ public class GenerateService implements IGenerateService
 			{
 				if(ad.fetchData()==null)
 					return;
-				
-				int xs = ad.getXOffset();
-				int ys = ad.getYOffset();
-				
+								
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
@@ -217,9 +216,13 @@ public class GenerateService implements IGenerateService
 					}
 				});
 				
+//				int xs = ad.getXOffset();
+//				int ys = ad.getYOffset();
+				
 	//			System.out.println("x:y: end "+xs+" "+ys);
 	//			System.out.println("partial: "+SUtil.arrayToString(ad.getData()));
-				for(int yi=0; yi<ad.getSizeY(); yi++)
+				
+				/*for(int yi=0; yi<ad.getSizeY(); yi++)
 				{
 					for(int xi=0; xi<ad.getSizeX(); xi++)
 					{
@@ -232,14 +235,15 @@ public class GenerateService implements IGenerateService
 							e.printStackTrace();
 						}
 					}
-				}
+				}*/
 			}
 			
 			public void finished()
 			{
 //				double	millis	= ((System.nanoTime() - time)/100000)/10.0;
 //				System.out.println("took: "+millis+" millis.");
-				ret.setResult(data);
+				//ret.setResult(data);
+				ret.setResult(null);
 			}
 		}));
 		
