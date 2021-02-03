@@ -1,14 +1,13 @@
 package jadex.commons.future;
 
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.logging.Logger;
 
 import jadex.commons.DebugException;
@@ -18,7 +17,6 @@ import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
-import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.functional.BiFunction;
 import jadex.commons.functional.Consumer;
@@ -37,8 +35,14 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	
 	//-------- constants --------
 	
-	/** Notification stack for unwinding call stack to topmost future. */
-	public static final ThreadLocal<Queue<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>>>	STACK	= new ThreadLocal<Queue<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>>>();
+	/** Notification queues for active notification threads.
+	 *  Notifications for a specific future/listener combination are assigned to only one thread at a time
+	 *  to assure notification ordering across threads and avoid duplicate notifications.
+	 *  @see(listeners) */
+	public static final Map<Thread, List<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>>>	NOTIFICATIONS	= new IdentityHashMap<>();
+	
+	/** Marker indicating if a given thread is currently executing the notification loop. */
+	static final ThreadLocal<Boolean>	NOTIFYING	= new ThreadLocal<>();
 	
 	/** A caller is queued for suspension. */
 	protected static final String	CALLER_QUEUED	= "queued";
@@ -55,7 +59,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	
 	/** Disable Stack unfolding for easier debugging. */
 	// Hack!!! Non-final to be setable from Starter 
-	public static boolean NO_STACK_COMPACTION = true;
+	public static boolean NO_STACK_COMPACTION = false;
 	
 	/** Constant for no timeout. */
 	public static final long NONE = -1;
@@ -86,11 +90,11 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	/** The blocked callers (caller->state). */
 	protected Map<ISuspendable, String> callers;
 	
-	/** The first listener (for avoiding array creation). */
-	protected IResultListener<E> listener;
+	/** The listeners, mapped to current notification thread (if any). */
+	protected Map<IResultListener<E>, Thread> listeners;
 	
-	/** The listeners. */
-	protected List<IResultListener<E>> listeners;
+	/** The listeners, mapped to current notification count (if any). */
+	protected Map<IResultListener<E>, Integer> notificount;
 	
 	/** For capturing call stack of future creation. */
 	// Only for debugging;
@@ -105,9 +109,6 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	
 //	/** The list of commands. */
 //	protected Map<ICommand<Object>, IFilter<Object>> fcommands;
-	
-	/** The scheduled notifications. */
-	protected Queue<Tuple2<IResultListener<E>, ICommand<IResultListener<E>>>> notifications;
 	
 	//-------- constructors --------
 	
@@ -451,6 +452,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 */
 	protected void resume()
 	{
+		boolean	scheduled;
 		synchronized(this)
 		{
     	   	if(callers!=null)
@@ -472,11 +474,17 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 					}
 		    	}
 			}
+
+    	   	// cast to filter for notifying all listeners
+    		scheduled	= scheduleNotification((IFilter<IResultListener<E>>)null, getNotificationCommand());
+    		
+    		// avoid memory leaks
+			listeners	= null;
+			notificount	= null;
 		}
 		
-		notifyListener();
-		listener	= null; // avoid memory leaks
-		listeners	= null; // avoid memory leaks
+		if(scheduled)
+			startScheduledNotifications();
 	}
 	
 	/**
@@ -509,152 +517,177 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	}
 
     /**
-     *  Schedule a listener notification.
+     *  Schedule a notification for selected listeners.
+     *  Safe to be called from synchronized block.
+     *  Assigns notifications to existing notification thread (if any) for each giving listener
+     *  or selects the current thread as notification thread when a listener does not yet have an assigned notification thread. 
      *  @param filter Optional filter to select only specific listener (e.g. for forward commands). Otherwise uses all listeners.
      *  @param command The notification command to execute for each selected listener.
+     *  @return True, when at least one listener notification was scheduled.
      */
-    protected void	scheduleNotification(IFilter<IResultListener<E>> filter, ICommand<IResultListener<E>> command)
+    protected boolean	scheduleNotification(IFilter<IResultListener<E>> filter, ICommand<IResultListener<E>> command)
     {
+    	boolean	scheduled	= false;
     	synchronized(this)
     	{
-    		if(listener!=null)
-    		{
-    			if(filter==null || filter.filter(listener))
-    			{
-		    		scheduleNotification(listener, command);
-    			}
-    			
-    			if(listeners!=null)
-    			{
-    				for(IResultListener<E> listener: listeners)
-    				{
-    	    			if(filter==null || filter.filter(listener))
-    	    			{
-    			    		scheduleNotification(listener, command);
-    	    			}    					
-    				}
-    			}
-    		}
+			if(listeners!=null)
+			{
+				for(IResultListener<E> listener: listeners.keySet())
+				{
+					if(filter==null || filter.filter(listener))
+					{
+			    		scheduleNotification(listener, command);
+			    		scheduled	= true;
+					}    					
+				}
+			}
     	}
+    	return scheduled;
     }
     
     /**
-     *  Schedule a notification for all listeners.
-     *  @param command The notification command to execute for each currently registered listener.
-     *  @return Notify true, when notifications are not yet running (i.e. startScheduledNotifications() required).
-     */
-    protected void	scheduleNotification(ICommand<IResultListener<E>> command)
-    {
-    	scheduleNotification((IFilter<IResultListener<E>>)null, command);
-    }
-    
-    /**
-     *  Schedule a listener notification for a specific listener.
-     *  Can be called from synchronized block.
+     *  Schedule a listener notification for a specific listener to be executed outside the synchronized block.
+     *  Can be called from synchronized block; after exiting the synchronized block, scheduled notifications should be executed (@see startScheduledNotifications()). 
      *  @param listener The listener to notify.
      *  @param command The notification command to execute for the listener.
-     *  @return Notify true, when notifications are not yet running (i.e. startScheduledNotifications() required).
      */
     protected void	scheduleNotification(IResultListener<E> listener, ICommand<IResultListener<E>> command)
     {
     	assert listener!=null;
-    	
-    	if(NO_STACK_COMPACTION || SUtil.isGuiThread())
+
+    	Thread notificator	= null;
+    	synchronized(this)
     	{
-	    	synchronized(this)
-	    	{
-	    		assert notifications==null || !notifications.isEmpty();
-	    		if(notifications==null)
-	    			notifications = new ArrayDeque<Tuple2<IResultListener<E>,ICommand<IResultListener<E>>>>();
-	    		notifications.add(new Tuple2<IResultListener<E>,ICommand<IResultListener<E>>>(listener, command));
-	    	}
+    		if(isDone() && (listeners==null || !listeners.containsKey(listener)))
+    		{
+    			notificator	= Thread.currentThread();
+    		}
+    		else
+    		{
+            	// Find existing notification thread or choose current thread.
+	    		if(listeners!=null)
+	    		{
+	    			notificator	= listeners.get(listener);
+	    		}
+	    		if(notificator==null)
+	    		{
+	    			notificator	= Thread.currentThread();
+	    			listeners.put(listener, notificator);
+	    		}
+	    		
+	    		// Remember number of notifications for this listener to reset notification thread after last notification
+	    		int cnt	= notificount!=null && notificount.containsKey(listener) ? notificount.get(listener) : 0;
+	    		if(notificount==null)
+	    		{
+	    			notificount	= new IdentityHashMap<IResultListener<E>, Integer>();
+	    		}
+	    		notificount.put(listener, cnt+1);
+    		}
     	}
-    	else
+
+    	// Queue notification in global map of queues. (todo: bottleneck? use less synchronization?)
+    	synchronized(NOTIFICATIONS)
     	{
-    		if(STACK.get()==null)
-    			STACK.set(new ArrayDeque<Tuple3<Future<?>, IResultListener<?>,ICommand<IResultListener<?>>>>());
-    		
-    		// !%$$%* generics
-    		@SuppressWarnings({"unchecked", "rawtypes"})
-			Tuple3	tup = new Tuple3<Future<?>, IResultListener,ICommand<IResultListener>>(this, listener, (ICommand)command);
-    		@SuppressWarnings("unchecked")
-			Tuple3<Future<?>, IResultListener<?>,ICommand<IResultListener<?>>>	tup2	= tup;
-    		STACK.get().add(tup2);
+    		List<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>>	queue	= NOTIFICATIONS.get(notificator);
+    		if(queue==null)
+    		{
+    			queue	= new LinkedList<>();
+    			NOTIFICATIONS.put(notificator, queue);
+    		}
+    		@SuppressWarnings({ "rawtypes", "unchecked" })
+    		Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>	entry	= new Tuple3(this, listener, command);
+    		queue.add(entry);
     	}
     }
 	
-	static final ThreadLocal<Boolean>	NOTIFYING	= new ThreadLocal<>();
-	
+    /**
+     *  Start scheduled listener notifications
+     *  using stack compaction, if desired.
+     *  Must not be called from synchronized block.
+     *  Can be called from any thread and checks if thread is chosen one.
+     */
+    protected static final void startScheduledNotifications()
+    {
+    	// Do stack compaction? -> i.e. mark thread so inner startScheduledNotifications() are skipped
+    	boolean	compaction	= !NO_STACK_COMPACTION && !SUtil.isGuiThread();
+		if(compaction)
+		{
+	    	// Not yet notifying on this thread (no startScheduledNotifications() call for this future higher up the stack trace)
+	    	if(NOTIFYING.get()==null)
+	    	{
+       			NOTIFYING.set(true);
+        		try
+        		{
+    				doStartScheduledNotifications();
+        		}
+        		finally
+        		{
+            		NOTIFYING.remove();
+        		}
+	    	}
+		}
+		else
+		{
+			doStartScheduledNotifications();
+		}
+    }
+
     /**
      *  Start scheduled listener notifications.
      *  Must not be called from synchronized block.
+     *  Is not called recursively if stack compaction is enabled.
      */
-    protected final void startScheduledNotifications()
-    {
-    	if(NO_STACK_COMPACTION || SUtil.isGuiThread())
-    	{
-        	boolean	notify	= true;
-        	while(notify)
-        	{
-    			Tuple2<IResultListener<E>, ICommand<IResultListener<E>>> next = null;
-	        	synchronized(this)
-	        	{
-	        		if(notifications==null)
-	        		{
-	        			notify = false;
-	        		}
-	        		else
-	        		{
-	        			next = notifications.remove();
-	        			if(notifications.isEmpty())
-	        				notifications	= null;
-	            	}
-	        	}
-        	
-	        	if(next!=null)
-	        	{
-	        		executeNotification(next.getFirstEntity(), next.getSecondEntity());
-	        	}
-        	}
-    	}
-    	else if(NOTIFYING.get()==null)
-    	{
-    		try
-    		{
-	    		NOTIFYING.set(Boolean.TRUE);
-	    		boolean heisenbug	= false;
-	    		
-	    		while(STACK.get()!=null && !STACK.get().isEmpty())
-	        	{
-	    			Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>	next = STACK.get().remove();
-	    			heisenbug	= heisenbug || next.getSecondEntity().toString().indexOf("Heisenbug")!=-1;
-	    			if(heisenbug)
-	    			{
-	    				System.err.println("startScheduledNotifications0: "+next);
-	    			}
-	
-	    			// Need to use corrent future for executeNotification, because might be overriden by e.g. delegation future for rescheduling on other thread
-	        		@SuppressWarnings("rawtypes")
-					Future	fut	= next.getFirstEntity();
-	        		try
-	        		{
-	        			fut.executeNotification(next.getSecondEntity(), next.getThirdEntity());
-	        		}
-	        		finally
-	        		{
-		    			if(heisenbug)
-		    			{
-		    				System.err.println("startScheduledNotifications1: "+next);
-		    			}
-	        		}
-	        	}
-    		}
-    		finally
-    		{
-    			NOTIFYING.remove();
-    		}
-    	}
-    }
+	protected static <T> void doStartScheduledNotifications()
+	{
+		Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>> next	= null;
+		do
+		{
+			// Fetch next notification if any (todo: bottleneck? use less synchronization?)
+			synchronized(NOTIFICATIONS)
+			{
+				List<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>>	queue	= NOTIFICATIONS.get(Thread.currentThread());
+				next	= queue!=null && !queue.isEmpty() ? queue.remove(0) : null;
+				
+	        	// Only reset after(!) last notification is executed to avoid other thread interfering between check in synchronized block and execute outside
+				if(next==null)
+				{
+					NOTIFICATIONS.remove(Thread.currentThread());
+				}
+			}
+
+			if(next!=null)
+			{
+				// How to tell Java that the <?> in the Tuple3 is always the same type???
+				@SuppressWarnings("unchecked")
+				Future<T>	fut	= (Future<T>) next.getFirstEntity();
+				@SuppressWarnings("unchecked")
+				IResultListener<T>	lis	= (IResultListener<T>) next.getSecondEntity();
+				@SuppressWarnings({ "unchecked", "rawtypes" })
+				ICommand<IResultListener<T>>	com	= (ICommand) next.getThirdEntity();
+				
+				fut.executeNotification(lis, com);
+
+				// Decrement notification count and reset notification thread for future/listener combination after last notification
+				synchronized(fut)
+				{
+		    		int cnt	= fut.notificount!=null && fut.notificount.containsKey(lis) ? fut.notificount.get(lis) : 0;
+		    		if(cnt>1)
+		    		{
+			    		fut.notificount.put(lis, cnt-1);
+		    		}
+		    		else if(cnt==1)
+		    		{
+			    		fut.notificount.remove(lis);
+			    		if(fut.listeners!=null)
+			    		{
+			    			fut.listeners.put(lis, null);	// null to reset thread but keep listener in future
+			    		}
+		    		}
+				}
+			}
+		}
+		while(next!=null);	// repeat after execution (even when last notification was removed from queue) to check for new entries after execution
+	}
     
     /**
      *  Execute a notification. Override for scheduling on other threads.
@@ -695,12 +728,15 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     public void	addResultListener(IResultListener<E> listener)
     {
     	if(doAddResultListener(listener))
-    		notifyListener(listener);
+    	{
+    		scheduleNotification(listener, getNotificationCommand());
+    		startScheduledNotifications();
+    	}
     }
 
 	/**
 	 *  Add a listener and check if it should be notified immediately due to the future already being finished before add.
-	 *  Safe to be called in synmchronized block.
+	 *  Safe to be called in synchronized block.
 	 */
     protected boolean doAddResultListener(IResultListener<E> listener)
 	{
@@ -716,40 +752,13 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	    	}
 	    	else
 	    	{
-	    		if(this.listener==null)
-	    		{
-	    			this.listener = listener;
-	    		}
-	    		else
-	    		{
-	    			if(listeners==null)
-	    				listeners = new ArrayList<IResultListener<E>>();
-	    			listeners.add(listener);
-	    		}
+    			if(listeners==null)
+    				listeners = new IdentityHashMap<>();
+    			listeners.put(listener, null);	// Add listener but don't set notification thread until there is something to notify...
 	    	}
     	}
 		return notify;
 	}
-    
-    /**
-     *  Notify all result listeners of the finished future (result or exception).
-     */
-    protected void notifyListener()
-    {
-		// cast to filter for notifying all listeners
-		scheduleNotification((IFilter<IResultListener<E>>)null, getNotificationCommand());
-		startScheduledNotifications();
-    }
-    
-    /**
-     *  Notify a specific result listener of the finished future (result or exception).
-     *  @param listener The listener.
-     */
-    protected void notifyListener(IResultListener<E> listener)
-    {
-		scheduleNotification(listener, getNotificationCommand());
-		startScheduledNotifications();
-    }
     
     protected ICommand<IResultListener<E>>	notcommand	= new ICommand<IResultListener<E>>()
 	{
@@ -885,19 +894,6 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 */
 	public void sendForwardCommand(Object command)
 	{
-//		if(fcommands!=null)
-//		{
-//			for(Map.Entry<ICommand<Object>, IFilter<Object>> entry: fcommands.entrySet())
-//			{
-//				IFilter<Object> fil = entry.getValue();
-//				if(fil==null || fil.filter(command))
-//				{
-//					ICommand<Object> com = entry.getKey();
-//					com.execute(command);
-//				}
-//			}
-//		}
-		
 		scheduleNotification(new IFilter<IResultListener<E>>()
 		{
 			@Override
@@ -965,7 +961,10 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 */
 	public boolean	hasResultListener()
 	{
-		return listener!=null;
+		synchronized(this)
+		{
+			return listeners!=null && !listeners.isEmpty();
+		}
 	}
 	
 	//-------- java8 extensions --------

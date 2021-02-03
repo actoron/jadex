@@ -19,6 +19,7 @@ import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.servicepool.ServicePoolHelper;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -27,7 +28,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.gui.SGUI;
-import jadex.platform.service.servicepool.ServicePoolAgent;
 
 /**
  *  Generate service implementation. 
@@ -147,8 +147,8 @@ public class GenerateService implements IGenerateService
 		int numx = (int)Math.max(Math.round(Math.sqrt((double)pic/task)), 1);
 		int numy = (int)Math.max(Math.round((double)pic/(task*numx)), 1);
 		
-		//numx = 2;
-	    //numy = 1;
+//		numx = 1;
+//	    numy = 1;
 
 //		final long	time	= System.nanoTime();	
 		//System.out.println("Number of tasks: "+numx+", "+numy+", max="+data.getMax()+" tasksize="+data.getTaskSize());
@@ -187,7 +187,7 @@ public class GenerateService implements IGenerateService
 		// Assign tasks to service pool.
 		final int number = areas.size();
 		
-		//System.out.println("tasks: "+areas);
+		System.out.println("tasks: "+areas);
 		
 		//manager.setMax(data.getParallel());
 		performTasks(areas, true, data).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
@@ -547,7 +547,7 @@ public class GenerateService implements IGenerateService
 		else
 		{
 			int fpos = pos;
-			ServicePoolAgent.getFreeCapacity(agent, (IService)calc).then(cap ->
+			ServicePoolHelper.getFreeCapacity(agent, (IService)calc).then(cap ->
 			{
 				System.out.println("capa: "+calc+" "+cap);
 				if(cap>0)

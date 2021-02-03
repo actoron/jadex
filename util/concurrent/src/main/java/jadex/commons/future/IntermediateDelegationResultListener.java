@@ -161,6 +161,14 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public void finished()
 	{
+//		//-------- debugging --------
+//		if(future!=null && (""+future.results).contains("PartDataChunk"))
+//		{
+//			System.out.println("IntermediateDelegationResultListener.finished: "+future+", "+future.listeners+", "+ this+", "+Thread.currentThread()
+//				+"\n"+SUtil.getExceptionStacktrace(new Exception("Stack trace").fillInStackTrace()));
+//		}
+//		//-------- debugging end --------
+
 		if(delegate != null)
 		{
 			if(undone && delegate instanceof IUndoneIntermediateResultListener)
@@ -251,7 +259,15 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public void customIntermediateResultAvailable(E result)
 	{
-		if(delegate != null) 
+//		//-------- debugging --------
+//		if(future!=null && (""+result).contains("PartDataChunk"))
+//		{
+//			System.out.println("IntermediateDelegationResultListener.customIntermediateResultAvailable: "+future+", "+result+", "+future.listeners+", "+ this+", "+Thread.currentThread()
+//				+"\n"+SUtil.getExceptionStacktrace(new Exception("Stack trace").fillInStackTrace()));
+//		}
+//		//-------- debugging end --------
+
+		if(delegate != null)
 		{
 			if (undone && delegate instanceof IUndoneIntermediateResultListener) 
 			{

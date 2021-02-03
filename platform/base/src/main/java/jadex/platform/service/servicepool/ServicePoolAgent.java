@@ -7,14 +7,13 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.servicepool.IServicePoolService;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.IPoolStrategy;
 import jadex.commons.future.CounterResultListener;
@@ -235,51 +234,6 @@ public class ServicePoolAgent implements IServicePoolService
 	{
 		ServiceHandler handler = servicetypes.get(servicetype);
 		return new Future<Integer>(handler==null? 0: handler.getStrategy().getCapacity());
-	}
-	
-	/**
-	 *  Test if a service is pooled.
-	 *  @param service The service.
-	 *  @return True, if it is a pooled service.
-	 */
-	public static IFuture<Boolean> isPooledService(IInternalAccess ia, IService service)
-	{
-		Future<Boolean> ret = new Future<Boolean>();
-		IServiceIdentifier sid = service.getServiceId();
-		ia.searchService(new ServiceQuery<IServicePoolService>(IServicePoolService.class).setProvider(sid.getProviderId()))
-			.then(ps -> ret.setResult(Boolean.TRUE))
-			.catchErr(ex -> ret.setResult(Boolean.FALSE));
-		return ret;
-	}
-	
-	/**
-	 *  Test if a service is pooled.
-	 *  @param service The service.
-	 *  @return True, if it is a pooled service.
-	 */
-	public static IFuture<Integer> getMaxCapacity(IInternalAccess ia, IService service)
-	{
-		Future<Integer> ret = new Future<Integer>();
-		IServiceIdentifier sid = service.getServiceId();
-		ia.searchService(new ServiceQuery<IServicePoolService>(IServicePoolService.class).setProvider(sid.getProviderId()))
-			.then(ps -> ps.getMaxCapacity(sid.getServiceType().getType(ia.getClassLoader())).delegate(ret))
-			.catchErr(ex -> ret.setResult(-1));
-		return ret;
-	}
-	
-	/**
-	 *  Test if a service is pooled.
-	 *  @param service The service.
-	 *  @return True, if it is a pooled service.
-	 */
-	public static IFuture<Integer> getFreeCapacity(IInternalAccess ia, IService service)
-	{
-		Future<Integer> ret = new Future<Integer>();
-		IServiceIdentifier sid = service.getServiceId();
-		ia.searchService(new ServiceQuery<IServicePoolService>(IServicePoolService.class).setProvider(sid.getProviderId()))
-			.then(ps -> ps.getFreeCapacity(sid.getServiceType().getType(ia.getClassLoader())).delegate(ret))
-			.catchErr(ex -> ret.setResult(-1));
-		return ret;
 	}
 	
 	// Not necessary because service publication scope of workers is set to parent

@@ -1,6 +1,7 @@
 package jadex.platform.service.parallelizer;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.servicepool.IServicePoolService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -11,7 +12,6 @@ import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.platform.service.servicepool.IServicePoolService;
 
 @Agent
 @Arguments(
