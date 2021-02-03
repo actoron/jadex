@@ -147,8 +147,8 @@ public class GenerateService implements IGenerateService
 		int numx = (int)Math.max(Math.round(Math.sqrt((double)pic/task)), 1);
 		int numy = (int)Math.max(Math.round((double)pic/(task*numx)), 1);
 		
-		//numx = 2;
-	    //numy = 1;
+//		numx = 1;
+//	    numy = 1;
 
 //		final long	time	= System.nanoTime();	
 		//System.out.println("Number of tasks: "+numx+", "+numy+", max="+data.getMax()+" tasksize="+data.getTaskSize());
@@ -187,7 +187,7 @@ public class GenerateService implements IGenerateService
 		// Assign tasks to service pool.
 		final int number = areas.size();
 		
-		//System.out.println("tasks: "+areas);
+		System.out.println("tasks: "+areas);
 		
 		//manager.setMax(data.getParallel());
 		performTasks(areas, true, data).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(

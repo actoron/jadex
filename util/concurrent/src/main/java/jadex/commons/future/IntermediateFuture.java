@@ -114,11 +114,25 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     protected boolean doAddIntermediateResult(final E result, boolean undone)
     {
+//		//-------- debugging --------
+//		if((""+result).contains("PartDataChunk"))
+//		{
+//			System.out.println("IntermediateFuture.doAddIntermediateResult0: "+this+", "+result);
+//		}
+//		//-------- debugging end --------
+
     	boolean	ret	= true;
     	boolean	notify	= false;
     	
     	synchronized(this)
     	{
+//    		//-------- debugging --------
+//    		if((""+result).contains("PartDataChunk"))
+//    		{
+//    			System.out.println("IntermediateFuture.doAddIntermediateResult1: "+this+", "+result);
+//    		}
+//    		//-------- debugging end --------
+    		
 	    	if(undone)
 	    		this.undone = true;
 	
@@ -132,6 +146,13 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    	
 	    	if(isDone())
 	    	{
+//	    		//-------- debugging --------
+//	    		if((""+result).contains("PartDataChunk"))
+//	    		{
+//	    			System.out.println("IntermediateFuture.doAddIntermediateResult2: "+this+", "+result+", "+Thread.currentThread());
+//	    		}
+//	    		//-------- debugging end --------
+	    		
 	    		if(undone)
 	    		{
 	    			ret	= false;
@@ -150,19 +171,30 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    		//if(listener!=null && getResultCount()==1)
 	    		//	scheduleMaxNotification(null);
 	    		
-	    		scheduleNotification(new ICommand<IResultListener<Collection<E>>>()
+//				//-------- debugging --------
+//				if((""+result).contains("PartDataChunk"))
+//				{
+//					System.out.println("IntermediateFuture.doAddIntermediateResult3: "+this+", "+result+", "+listeners+", "+Thread.currentThread());
+//				}
+//				//-------- debugging end --------
+
+	    		
+	    		boolean	scheduled	= scheduleNotification(listener -> listener instanceof IIntermediateResultListener, new ICommand<IResultListener<Collection<E>>>()
 				{
 	    			@Override
 	    			public void execute(IResultListener<Collection<E>> listener)
 	    			{
-		        		if(listener instanceof IIntermediateResultListener)
-		        		{
-		        			notifyIntermediateResult((IIntermediateResultListener<E>)listener, result);
-		        		}
+//	    				//-------- debugging --------
+//	    				if((""+result).contains("PartDataChunk"))
+//	    				{
+//	    					System.out.println("IntermediateFuture.doAddIntermediateResult4: "+IntermediateFuture.this+", "+result+", "+listener);
+//	    				}
+//	    				//-------- debugging end --------
+		        		notifyIntermediateResult((IIntermediateResultListener<E>)listener, result);
 	    			}
 				});
 	    		
-	    		storeResult(result);
+	    		storeResult(result, scheduled);
 	    		notify	= true;
 	    	}
     	}
@@ -177,9 +209,18 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	/**
 	 *  Add a result.
 	 *  @param result The result.
+	 *  @param scheduled	True, if any listener notification has been scheduled for this result. (used for subscription futures to check for lost values)
 	 */
-	protected void	storeResult(E result)
+	protected void	storeResult(E result, boolean scheduled)
 	{
+//		//-------- debugging --------
+//		if((""+result).contains("PartDataChunk"))
+//		{
+//			System.out.println("storeResult: "+IntermediateFuture.this+", "+result+", "+listeners);
+//		}
+//		//-------- debugging end --------
+
+		
 //		if(result!=null && result.getClass().getName().indexOf("ChangeEvent")!=-1)
 //			System.out.println("ires: "+this+" "+result);
       	intermediate = true;
@@ -205,19 +246,16 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	@Override
 	protected synchronized boolean doSetResult(Collection<E> result, boolean undone)
 	{
-    	synchronized(this)
-		{
-        	if(intermediate)
-        	{
-        		throw new RuntimeException("setResult() only allowed without intermediate results: "+results);
-        	}
-       		boolean	ret	= super.doSetResult(result, undone);
-       		if(ret)
-       		{
-       			this.results	= result!=null ? new ArrayList<>(result) : null;
-       		}
-       		return ret;
-		}
+		if(intermediate)
+    	{
+    		throw new RuntimeException("setResult() only allowed without intermediate results: "+results);
+    	}
+   		boolean	ret	= super.doSetResult(result, undone);
+   		if(ret)
+   		{
+   			this.results	= result!=null ? new ArrayList<>(result) : null;
+   		}
+   		return ret;
     }
 
     /**
@@ -252,6 +290,14 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     protected synchronized boolean	doSetFinished(boolean undone)
     {
+//		//-------- debugging --------
+//		if((""+results).contains("PartDataChunk"))
+//		{
+//			System.out.println("IntermediateFuture.doSetFinished: "+this+", "+results+", "+Thread.currentThread()
+//				+"\n"+SUtil.getExceptionStacktrace(new Exception("Stack trace").fillInStackTrace()));
+//		}
+//		//-------- debugging end --------
+    	
     	boolean	 ret;
     	
     	Collection<E>	res	= getIntermediateResults();
@@ -267,6 +313,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	return ret;
     }
     
+    @Override
+    protected boolean doSetException(Exception exception, boolean undone)
+    {
+    	return super.doSetException(exception, undone);
+    }
+    
     /**
      *  Add a result listener.
      *  @param listener The listener.
@@ -276,30 +328,38 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	if(listener==null)
     		throw new RuntimeException();
        	
-    	boolean	scheduled = false;
-    	boolean notify;
+    	boolean	notify_intermediate = false;
+    	boolean notify_finished;
     	
     	synchronized(this)
     	{    		
-        	notify	= doAddResultListener(listener);
+        	notify_finished	= doAddResultListener(listener);
 
     		// If results==null its a subscription future and first results are already collected.
     		if(intermediate && listener instanceof IIntermediateResultListener)
     		{
 	    		IIntermediateResultListener<E> lis = (IIntermediateResultListener<E>)listener;
-	    		scheduled = scheduleMaxNotification(lis);
+	    		notify_intermediate = scheduleMaxNotification(lis);
 	    		//System.out.println("addRes scheduleAll: "+maxresultcnt+" "+this);
 
 	    		if(results!=null && !results.isEmpty())
 	    		{    			
 	    			//System.out.println("notify scheduled: "+results);
-	    			scheduled = true;
+	    			notify_intermediate = true;
 		    				    		
 		    		for(final E result: results)
 		    		{
 		    			@SuppressWarnings("unchecked")
 						ICommand<IResultListener<Collection<E>>> c = (ICommand<IResultListener<Collection<E>>>) ((Object) new ICommand<IIntermediateResultListener<E>>()
 						{
+//							//-------- debugging --------
+//							@Override
+//							public String toString()
+//							{
+//								return "NotifyIntermediateResultCommand("+listener+", "+result+")";
+//							}
+//							//-------- debugging end --------
+							
 		    				@Override
 		    				public void execute(IIntermediateResultListener<E> listener)
 		    				{
@@ -311,21 +371,15 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 		    		}
 	    		}
     		}
+    		
+        	// Notify final result if any
+        	if(notify_finished)
+        		scheduleNotification(listener, getNotificationCommand());
     	}
 
-    	// Notify intermediate results if any
-    	if(scheduled)
+    	// Notify intermediate results and or final result if any
+    	if(notify_intermediate || notify_finished)
     		startScheduledNotifications();
-    	
-    	// Notify final result if any
-    	if(notify)
-    		notifyListener(listener);
-
-
-    	//if(!scheduled && maxresultcnt!=-1)
-    	//	System.out.println("addRes scheduleAll NOT: "+maxresultcnt+" "+this);
-    	
-//       	super.addResultListener(listener);	// add must be synchronized, but notify outside synchronized{}
     }
     
     protected ICommand<IResultListener<Collection<E>>>	notcommand	= new ICommand<IResultListener<Collection<E>>>()
@@ -620,7 +674,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	        	this.maxresultcnt = max;
 	        	intermediate = intermediate | max!=-1;
 	        	
-	        	if(listener!=null)
+	        	if(hasResultListener())
 	        	{
 		    		notify	= scheduleMaxNotification(null);
 	        	}
@@ -652,11 +706,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 				@Override
 				public void execute(IResultListener<Collection<E>> listener)
 				{
-					//System.out.println("notific: "+listener);
-	        		if(listener instanceof IIntermediateResultListener)
-	        		{
-	        			((IIntermediateResultListener)listener).maxResultCountAvailable(maxresultcnt);
-	        		}
+        			((IIntermediateResultListener<E>)listener).maxResultCountAvailable(maxresultcnt);
 				}
 				
 				@Override
@@ -668,7 +718,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		
 			// Important! two methods fitting scheduleNotification(lis, com) :-(
     		if(lis==null)
-    			scheduleNotification(com);
+    			scheduleNotification(l -> l instanceof IIntermediateResultListener, com);
     		else
     			scheduleNotification(lis, com);
     	}

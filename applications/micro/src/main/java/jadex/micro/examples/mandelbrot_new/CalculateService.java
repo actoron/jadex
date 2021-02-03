@@ -36,7 +36,29 @@ public class CalculateService implements ICalculateService
 	@Timeout(30000)
 	public IIntermediateFuture<PartDataChunk> calculateArea(AreaData data)
 	{
-		IntermediateFuture<PartDataChunk> ret = new IntermediateFuture<>();
+		IntermediateFuture<PartDataChunk> ret = new IntermediateFuture<PartDataChunk>();
+//		{
+//			@Override
+//			protected boolean doAddResultListener(IResultListener<Collection<PartDataChunk>> listener)
+//			{
+//				System.out.println(agent.agent+": doAddResultListener("+this+", "+listener+"), "+Thread.currentThread());
+//				return super.doAddResultListener(listener);
+//			}
+//			
+//			@Override
+//			protected void scheduleNotification(IResultListener<Collection<PartDataChunk>> listener, ICommand<IResultListener<Collection<PartDataChunk>>> command)
+//			{
+//				System.out.println(agent.agent+":scheduleNotification("+this+", "+listener+", "+command+"), "+Thread.currentThread());
+//				super.scheduleNotification(listener, command);
+//			}
+//			
+//			@Override
+//			protected void notifyIntermediateResult(IIntermediateResultListener<PartDataChunk> listener, PartDataChunk result)
+//			{
+//				System.out.println(agent.agent+":notifyIntermediateResult("+this+", "+listener+", "+result+"), "+Thread.currentThread());
+//				super.notifyIntermediateResult(listener, result);
+//			}
+//		};
 		
 		//long start = System.currentTimeMillis();
 		System.out.println("calc start: "+data.getId()+" "+ag.getId());
