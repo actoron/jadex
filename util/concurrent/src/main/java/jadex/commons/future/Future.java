@@ -558,7 +558,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     	Thread notificator	= null;
     	synchronized(this)
     	{
-    		if(isDone())
+    		if(isDone() && (listeners==null || !listeners.containsKey(listener)))
     		{
     			notificator	= Thread.currentThread();
     		}

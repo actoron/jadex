@@ -145,12 +145,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    	
 	    	if(isDone())
 	    	{
-	    		//-------- debugging --------
-	    		if((""+result).contains("PartDataChunk"))
-	    		{
-	    			System.out.println("IntermediateFuture.doAddIntermediateResult2: "+this+", "+result+", "+Thread.currentThread());
-	    		}
-	    		//-------- debugging end --------
+//	    		//-------- debugging --------
+//	    		if((""+result).contains("PartDataChunk"))
+//	    		{
+//	    			System.out.println("IntermediateFuture.doAddIntermediateResult2: "+this+", "+result+", "+Thread.currentThread());
+//	    		}
+//	    		//-------- debugging end --------
 	    		
 	    		if(undone)
 	    		{
@@ -170,12 +170,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    		//if(listener!=null && getResultCount()==1)
 	    		//	scheduleMaxNotification(null);
 	    		
-				//-------- debugging --------
-				if((""+result).contains("PartDataChunk"))
-				{
-					System.out.println("IntermediateFuture.doAddIntermediateResult3: "+this+", "+result+", "+listeners+", "+Thread.currentThread());
-				}
-				//-------- debugging end --------
+//				//-------- debugging --------
+//				if((""+result).contains("PartDataChunk"))
+//				{
+//					System.out.println("IntermediateFuture.doAddIntermediateResult3: "+this+", "+result+", "+listeners+", "+Thread.currentThread());
+//				}
+//				//-------- debugging end --------
 
 	    		
 	    		boolean	scheduled	= scheduleNotification(listener -> listener instanceof IIntermediateResultListener, new ICommand<IResultListener<Collection<E>>>()
@@ -286,13 +286,13 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     protected synchronized boolean	doSetFinished(boolean undone)
     {
-		//-------- debugging --------
-		if((""+results).contains("PartDataChunk"))
-		{
-			System.out.println("IntermediateFuture.doSetFinished: "+this+", "+results+", "+Thread.currentThread()
-				+"\n"+SUtil.getExceptionStacktrace(new Exception("Stack trace").fillInStackTrace()));
-		}
-		//-------- debugging end --------
+//		//-------- debugging --------
+//		if((""+results).contains("PartDataChunk"))
+//		{
+//			System.out.println("IntermediateFuture.doSetFinished: "+this+", "+results+", "+Thread.currentThread()
+//				+"\n"+SUtil.getExceptionStacktrace(new Exception("Stack trace").fillInStackTrace()));
+//		}
+//		//-------- debugging end --------
     	
     	boolean	 ret;
     	
