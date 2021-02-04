@@ -122,7 +122,7 @@ buildscript
 		classpath "org.bouncycastle:bcpkix-jdk15on:1.64" // bouncycastle for ssh
 		classpath 'com.hierynomus:sshj:0.27.0' // ssh capabilities for docs upload
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.21.2"
-		classpath 'org.eclipse.jgit:org.eclipse.jgit:5.6.0.201912101111-r' // git capabilities
+		classpath 'org.eclipse.jgit:org.eclipse.jgit:5.10.0.202012080955-r' // git capabilities
 		classpath 'de.marcphilipp.gradle:nexus-publish-plugin:0.4.0'
     }
     
