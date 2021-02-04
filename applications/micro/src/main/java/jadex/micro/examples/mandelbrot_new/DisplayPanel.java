@@ -346,7 +346,10 @@ public class DisplayPanel extends JComponent
 			public void run()
 			{
 				//short[][] results = data.fetchData();
-				DisplayPanel.this.data	= data;
+				if(data.fetchData()==null)
+					data.setData(new short[data.getSizeX()][data.getSizeY()]);
+				DisplayPanel.this.data = data;
+					
 				dirty = true;
 				
 				/*DisplayPanel.this.image	= createImage(results.length, results[0].length);
@@ -445,7 +448,7 @@ public class DisplayPanel extends JComponent
 		{
 			public void run()
 			{
-				short[] chunk	= data.getData();
+				short[] chunk = data.getData();
 				short[][] results;
 				results = DisplayPanel.this.data.fetchData();
 				
@@ -528,7 +531,12 @@ public class DisplayPanel extends JComponent
 		if(data!=null)
 		{
 			short[][] results = data.fetchData();
+			
+			if(results==null)
+				return;
+			
 			//if(image==null || image.getWidth(this)!=results[0].length || image.getHeight(this)!=results.length)
+			//image = createImage(data.getSizeX(), data.getSizeY());
 			image = createImage(results.length, results[0].length);
 			
 			Graphics go = image.getGraphics();
@@ -1031,9 +1039,9 @@ public class DisplayPanel extends JComponent
 		
 		if(genservice!=null)
 		{
-			genservice.generateArea(ad).addResultListener(new SwingDefaultResultListener<AreaData>()
+			genservice.generateArea(ad).addResultListener(new SwingDefaultResultListener<Void>()
 			{
-				public void customResultAvailable(AreaData result)
+				public void customResultAvailable(Void result)
 				{
 					// already done with partials
 					//DisplayPanel.this.setResults(result);
