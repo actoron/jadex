@@ -28,6 +28,8 @@ class PlatformElement extends CidElement
 	
 	init()
 	{
+		this.app.login.listeners.add(this);
+		
 		console.log("platform");
 		this.plugin = null;
 		console.log("setting plugins to {}");
