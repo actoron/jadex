@@ -61,15 +61,15 @@ class SecurityElement extends CidElement
 		return ret;
 	}
 	
+	postInit()
+	{
+		let el = this.shadowRoot.getElementById("panel");
+		el.addEventListener("click", this.collapseOnClick);
+	}
+	
 	getMethodPrefix() 
 	{
 		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.myservice;
-	}
-	
-	firstUpdated(p) 
-	{
-		var el = this.shadowRoot.getElementById("panel");
-		el.addEventListener("click", this.collapseOnClick);
 	}
 	
 	// Bootstrap collapse not working in shadow dom :-(

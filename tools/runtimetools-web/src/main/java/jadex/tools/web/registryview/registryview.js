@@ -59,18 +59,6 @@ class RegistryViewElement extends CidElement
 					.then(()=>
 					{
 						//console.log("loaded datatables.css");
-						
-						var opts = {perPageSelect: [5,10,15,25,50,100,1000], perPage: 15};
-						self.getSubscription("Services").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableservices'), opts);
-						self.getSubscription("Platforms").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableplatforms'), opts);
-						self.getSubscription("Queries").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tablequeries'), opts);
-						
-						self.getSubscription("Services").table.insert({headings: ["","","","",""]});
-						self.getSubscription("Platforms").table.insert({headings: ["","",""]})
-						self.getSubscription("Queries").table.insert({headings: ["","",""]})
-						
-						self.initready = true;
-						self.subscribe();
 						resolve();
 					})
 					.catch((err)=>
@@ -92,6 +80,27 @@ class RegistryViewElement extends CidElement
 				reject(err);
 			});
 		});
+		return ret;
+	}
+	
+	postInit()
+	{
+		let self = this;
+		
+		let el = this.shadowRoot.getElementById("panel");
+		el.addEventListener("click", this.collapseOnClick);
+		
+		let opts = {perPageSelect: [5,10,15,25,50,100,1000], perPage: 15};
+		self.getSubscription("Services").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableservices'), opts);
+		self.getSubscription("Platforms").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableplatforms'), opts);
+		self.getSubscription("Queries").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tablequeries'), opts);
+		
+		self.getSubscription("Services").table.insert({headings: ["","","","",""]});
+		self.getSubscription("Platforms").table.insert({headings: ["","",""]})
+		self.getSubscription("Queries").table.insert({headings: ["","",""]})
+		
+		self.initready = true;
+		self.subscribe();
 	}
 	
 	connectedCallback()
@@ -344,12 +353,6 @@ class RegistryViewElement extends CidElement
 			}
 		}
     }
-
-	firstUpdated(p) 
-	{
-		var el = this.shadowRoot.getElementById("panel");
-		el.addEventListener("click", this.collapseOnClick);
-	}
 	
 	/*getFilteredElements()
 	{
