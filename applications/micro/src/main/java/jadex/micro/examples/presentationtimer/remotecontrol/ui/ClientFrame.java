@@ -1,4 +1,4 @@
-package jadex.examples.presentationtimer.remotecontrol.ui;
+package jadex.micro.examples.presentationtimer.remotecontrol.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -18,9 +18,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
 import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.examples.presentationtimer.common.ICountdownService;
-import jadex.examples.presentationtimer.common.State;
-import jadex.examples.presentationtimer.remotecontrol.ClientMain;
+import jadex.micro.examples.presentationtimer.common.ICountdownService;
+import jadex.micro.examples.presentationtimer.common.State;
+import jadex.micro.examples.presentationtimer.remotecontrol.ClientMain;
 
 public class ClientFrame extends JFrame
 {
@@ -144,7 +144,7 @@ public class ClientFrame extends JFrame
 				timeFut = service.registerForTime();
 				
 				stateFut.next(state -> SwingUtilities.invokeLater(() -> stateLabel.setText(state.toString())))
-					.catchErr(ex -> {if (stateFut != null) stateFut.terminate();});
+					.catchEx(ex -> {if (stateFut != null) stateFut.terminate();});
 				// exception occurs when terminating subscription
 				
 				/*stateFut.addResultListener(new SwingIntermediateResultListener<State>(
@@ -154,7 +154,7 @@ public class ClientFrame extends JFrame
 					null));*/
 				
 				timeFut.next(timeString -> SwingUtilities.invokeLater(() -> timeLabel.setText(timeString)))
-					.catchErr(ex -> {if (timeFut != null) timeFut.terminate();});
+					.catchEx(ex -> {if (timeFut != null) timeFut.terminate();});
 				
 				/*timeFut.addResultListener(new SwingIntermediateResultListener<String>(
 					timeString -> timeLabel.setText(timeString),

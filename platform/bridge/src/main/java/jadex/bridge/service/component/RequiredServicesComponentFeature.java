@@ -1188,7 +1188,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 					IntermediateFuture<T> fut = (IntermediateFuture<T>)ret[0];
 					fut.addIntermediateResultIfUndone(result);
 				})
-			.catchErr(exception -> {}); // Ignore exception (printed when no listener supplied)
+			.catchEx(exception -> {}); // Ignore exception (printed when no listener supplied)
 		}
 		
 		return ret[0];

@@ -156,7 +156,7 @@ public class LazyInjectTestAgent extends JunitAgentTest
 			// should not happen as finish is never called
 			tr2.setFailed(new Exception("finish unexpected"));
 			checkFinished();
-		}).catchErr(exception -> 
+		}).catchEx(exception -> 
 		{
 			System.out.println("ex: "+exception);
 			tr2.setFailed(exception);

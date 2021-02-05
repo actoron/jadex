@@ -1204,23 +1204,11 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
         return ret;
     }*/
 	
-	public <T> void catchErr(Future<T> delegate)
-	{
-		this.addResultListener(new IResultListener<E>()
-		{
-			@Override
-			public void exceptionOccurred(Exception exception)
-			{
-				delegate.setException(exception);
-			}
-			
-			@Override
-			public void resultAvailable(E result)
-			{
-			}
-		});
-	}
-	
+	/**
+	 *  Delegate the result and exception to another future.
+	 *  Short form for adding a delegation listener.
+	 *  @param delegate The other future.
+	 */
 	public void delegate(Future<E> target)
 	{
 		if(target==null)
@@ -1266,12 +1254,43 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		}
 	}
 	
-	public IFuture<E> catchErr(final Consumer<? super Exception> consumer)
+	/**
+	 *  Called on exception.
+	 *  @param delegate The future the exception will be delegated to.
+	 */
+	public <T> IFuture<E> catchEx(Future<T> delegate)
+	{
+		this.addResultListener(new IResultListener<E>()
+		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				delegate.setException(exception);
+			}
+			
+			@Override
+			public void resultAvailable(E result)
+			{
+			}
+		});
+		
+		return this;
+	}
+	
+	/**
+	 *  Called on exception.
+	 *  @param delegate The future the exception will be delegated to.
+	 */
+	public IFuture<E> catchEx(final Consumer<? super Exception> consumer)
     {
-        return catchErr(consumer, null);
+        return catchEx(consumer, null);
     }
 	
-	public IFuture<E> catchErr(final Consumer<? super Exception> consumer, Class<?> futuretype)
+	/**
+	 *  Called on exception.
+	 *  @param consumer The function called with the exception.
+	 */
+	public IFuture<E> catchEx(final Consumer<? super Exception> consumer, Class<?> futuretype)
     {
 		/*IResultListener reslis = new IntermediateEmptyResultListener()
 		{

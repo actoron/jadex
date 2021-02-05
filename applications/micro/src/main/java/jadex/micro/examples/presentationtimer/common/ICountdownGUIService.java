@@ -1,8 +1,8 @@
-package jadex.examples.presentationtimer.common;
+package jadex.micro.examples.presentationtimer.common;
 
 
-public interface ICountdownGUIService extends ICountdownService {
-
+public interface ICountdownGUIService extends ICountdownService 
+{
 	void informTimeUpdated(String timeString);
 	
 	void informStateUpdated(State state);

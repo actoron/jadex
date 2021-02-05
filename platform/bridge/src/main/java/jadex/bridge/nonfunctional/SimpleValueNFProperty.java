@@ -108,7 +108,7 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 			// return raw value as string
 			if(!ret.isDone())
 				ret.setResult(""+v);
-		}).catchErr(ret);
+		}).catchEx(ret);
 	
 		return ret;
 	}

@@ -1,4 +1,4 @@
-package jadex.examples.presentationtimer.remotecontrol.ui;
+package jadex.micro.examples.presentationtimer.remotecontrol.ui;
 
 import javax.swing.DefaultListModel;
 

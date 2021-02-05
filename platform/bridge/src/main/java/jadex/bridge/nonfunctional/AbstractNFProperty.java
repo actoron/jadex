@@ -77,7 +77,7 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 		getValue().then(v ->
 		{
 			ret.setResult(""+v);
-		}).catchErr(ret);
+		}).catchEx(ret);
 		return ret;
 	}
 	

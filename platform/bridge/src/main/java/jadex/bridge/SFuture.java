@@ -453,7 +453,7 @@ public class SFuture
 			f2.next(result-> 
 			{
 				((IntermediateFuture)ret).addIntermediateResult((T)result);
-			}).catchErr(exception -> {}); // Ignore exception (printed when no listener supplied)
+			}).catchEx(exception -> {}); // Ignore exception (printed when no listener supplied)
 		}
 		
 		return ret;

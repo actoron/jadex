@@ -1,4 +1,4 @@
-package jadex.examples.presentationtimer.display;
+package jadex.micro.examples.presentationtimer.display;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,15 +14,15 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
-import jadex.examples.presentationtimer.common.ICountdownController;
-import jadex.examples.presentationtimer.common.ICountdownGUIService;
-import jadex.examples.presentationtimer.common.ICountdownService;
-import jadex.examples.presentationtimer.common.State;
-import jadex.examples.presentationtimer.display.ui.ConfigureFrame;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.examples.presentationtimer.common.ICountdownController;
+import jadex.micro.examples.presentationtimer.common.ICountdownGUIService;
+import jadex.micro.examples.presentationtimer.common.ICountdownService;
+import jadex.micro.examples.presentationtimer.common.State;
+import jadex.micro.examples.presentationtimer.display.ui.ConfigureFrame;
 
 @Agent
 @ProvidedServices({
@@ -30,8 +30,8 @@ import jadex.micro.annotation.ProvidedServices;
 	@ProvidedService(type = ICountdownGUIService.class)
 }
 )
-public class CountdownAgent implements ICountdownService, ICountdownGUIService {
-
+public class CountdownAgent implements ICountdownService, ICountdownGUIService 
+{
 	private Set<ICountdownListener> listeners;
 	private ICountdownController controller;
 	private Set<SubscriptionIntermediateFuture<State>> stateFutures;
@@ -42,21 +42,24 @@ public class CountdownAgent implements ICountdownService, ICountdownGUIService {
 	private String lastTime = "00:00";
 	private State lastState = new State();
 	
-	public CountdownAgent() {
+	public CountdownAgent() 
+	{
 		listeners = new HashSet<ICountdownService.ICountdownListener>();
 		stateFutures = new HashSet<SubscriptionIntermediateFuture<State>>();
 		timeFutures = new HashSet<SubscriptionIntermediateFuture<String>>();
 	}
 
 	@Override
-	public IFuture<Void> addListener(@Reference ICountdownListener l) {
+	public IFuture<Void> addListener(@Reference ICountdownListener l) 
+	{
 		System.out.println("Received addListener()");
 		this.listeners.add(l);
 		return Future.DONE;
 	}
 	
 	@Override
-	public ISubscriptionIntermediateFuture<State> registerForState() {
+	public ISubscriptionIntermediateFuture<State> registerForState() 
+	{
 		System.out.println("Register for state");
 //		IntermediateFuture<State> intermediateFuture = new IntermediateFuture<State>();
 		SubscriptionIntermediateFuture<State> intermediateFuture = (SubscriptionIntermediateFuture<State>) SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
@@ -65,7 +68,8 @@ public class CountdownAgent implements ICountdownService, ICountdownGUIService {
 	}
 	
 	@Override
-	public ISubscriptionIntermediateFuture<String> registerForTime() {
+	public ISubscriptionIntermediateFuture<String> registerForTime() 
+	{
 		System.out.println("Register for time");
 		SubscriptionIntermediateFuture<String> intermediateFuture = (SubscriptionIntermediateFuture<String>) SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
 		this.timeFutures.add(intermediateFuture);
@@ -74,53 +78,64 @@ public class CountdownAgent implements ICountdownService, ICountdownGUIService {
 	
 	
 	@Override
-	public IFuture<State> getState() {
+	public IFuture<State> getState() 
+	{
 		return new Future<State>(lastState);
 	}
 
 	@Override
-	public IFuture<String> getTime() {
+	public IFuture<String> getTime() 
+	{
 		return new Future<String>(lastTime);
 	}
 
 	@Override
-	public IFuture<Void> start() {
+	public IFuture<Void> start() 
+	{
 		System.out.println("Received start()");
 		controller.start();
 		
 //		IComponentManagementService cms = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class)).get();
 		agent.createComponent(new CreationInfo().setFilename("jadex.examples.presentationtimer.display.CountdownAgent.class")).then(
-			t -> System.out.println(t)).catchErr(
+			t -> System.out.println(t)).catchEx(
 			ex -> System.out.println(ex));
 		return Future.DONE;
 	}
 
 	@Override
-	public IFuture<Void> stop() {
+	public IFuture<Void> stop() 
+	{
 		System.out.println("Received stop()");
 		controller.stop();
 		return Future.DONE;
 	}
 
 	@Override
-	public IFuture<Void> reset() {
+	public IFuture<Void> reset() 
+	{
 		System.out.println("Received reset()");
 		return Future.DONE;
 	}
 
 	
 	@Override
-	public synchronized void informTimeUpdated(String timeString) {
+	public synchronized void informTimeUpdated(String timeString) 
+	{
 		this.lastTime = timeString;
-		for (ICountdownListener l : listeners) {
+		for (ICountdownListener l : listeners) 
+		{
 			l.timeChanged(timeString);
 		}
 		
 		List<SubscriptionIntermediateFuture> terminated = new ArrayList<SubscriptionIntermediateFuture>();
-		for (SubscriptionIntermediateFuture<String> fut : timeFutures) {
-			if (!fut.isDone()) {
+		for (SubscriptionIntermediateFuture<String> fut : timeFutures)
+		{
+			if (!fut.isDone()) 
+			{
 				fut.addIntermediateResult(timeString);
-			} else {
+			} 
+			else 
+			{
 				System.out.println("Found terminated future, removing");
 				terminated.add(fut);
 			}
@@ -133,17 +148,23 @@ public class CountdownAgent implements ICountdownService, ICountdownGUIService {
 	}
 
 	@Override
-	public synchronized void informStateUpdated(State state) {
+	public synchronized void informStateUpdated(State state) 
+	{
 		this.lastState = state;
-		for (ICountdownListener l : listeners) {
+		for(ICountdownListener l : listeners) 
+		{
 			l.stateChanged(state);
 		}
 		
 		List<TerminableIntermediateFuture> terminated = new ArrayList<TerminableIntermediateFuture>();
-		for (TerminableIntermediateFuture<State> fut : stateFutures) {
-			if (!fut.isDone()) {
+		for (TerminableIntermediateFuture<State> fut : stateFutures) 
+		{
+			if (!fut.isDone()) 
+			{
 				fut.addIntermediateResult(state);
-			} else {
+			} 
+			else 
+			{
 				terminated.add(fut);
 			}
 		}
@@ -154,16 +175,17 @@ public class CountdownAgent implements ICountdownService, ICountdownGUIService {
 	}
 
 	@Override
-	public void setController(ICountdownController controller) {
+	public void setController(ICountdownController controller) 
+	{
 		this.controller = controller;
 	}
 	
 	@AgentCreated
-	public void agentCreated() {
+	public void agentCreated() 
+	{
 		System.out.println("Countdown agent created!");
 		ConfigureFrame configureFrame = new ConfigureFrame(this);
 		configureFrame.setLocationRelativeTo(null);
 		configureFrame.setVisible(true);
 	}
-
 }

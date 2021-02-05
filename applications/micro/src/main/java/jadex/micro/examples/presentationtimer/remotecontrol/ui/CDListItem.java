@@ -1,7 +1,7 @@
-package jadex.examples.presentationtimer.remotecontrol.ui;
+package jadex.micro.examples.presentationtimer.remotecontrol.ui;
 
-import jadex.examples.presentationtimer.common.ICountdownService;
-import jadex.examples.presentationtimer.common.State;
+import jadex.micro.examples.presentationtimer.common.ICountdownService;
+import jadex.micro.examples.presentationtimer.common.State;
 
 
 public class CDListItem

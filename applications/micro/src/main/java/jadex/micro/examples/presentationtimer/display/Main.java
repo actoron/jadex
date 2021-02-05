@@ -1,4 +1,4 @@
-package jadex.examples.presentationtimer.display;
+package jadex.micro.examples.presentationtimer.display;
 
 import java.awt.AWTException;
 import java.awt.Robot;
@@ -12,15 +12,20 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.IFuture;
 
-
+/**
+ *  Starts the presentation timer.
+ *  Allows for tracking the time of a presentation and warns
+ *  in two phases when time runs low.
+ *  First phase: display turns yellow
+ *  Second phase: display turns red
+ *  Time runs out: display blinks red
+ */
 public class Main
 {
-
 	public static boolean startedWithMain;
 
 	public static void main(String[] args)
 	{
-
 		startedWithMain = true;
 
 		Main main = new Main();
@@ -37,9 +42,7 @@ public class Main
 					try
 					{
 						if(robot == null)
-						{
 							robot = new Robot();
-						}
 						Thread.sleep(60 * 1000);
 						robot.keyPress(KeyEvent.VK_SHIFT);
 						robot.keyRelease(KeyEvent.VK_SHIFT);
@@ -53,13 +56,10 @@ public class Main
 					{
 						e.printStackTrace();
 					}
-
 				}
 			};
 		}.start();
-
 	}
-
 
 	public void init()
 	{
@@ -76,7 +76,8 @@ public class Main
 
 		fut.then(access -> {
 			IFuture<IExternalAccess> fut2 = access.createComponent(new CreationInfo().setName("CDDisplay").setFilename(CountdownAgent.class.getName() + ".class"));
-			fut2.then((IExternalAccess created) -> {
+			fut2.then((IExternalAccess created) -> 
+			{
 				System.out.println("CDDisplay Component created.");
 				created.waitForTermination().then((Map<String, Object> terminated) -> {
 					System.out.println("CDDisplay Component terminated!");

@@ -23,7 +23,7 @@ public class ServicePoolHelper
 		IServiceIdentifier sid = service.getServiceId();
 		ia.searchService(new ServiceQuery<IServicePoolService>(IServicePoolService.class).setProvider(sid.getProviderId()))
 			.then(ps -> ps.getFreeCapacity(sid.getServiceType().getType(ia.getClassLoader())).delegate(ret))
-			.catchErr(ex -> ret.setResult(-1));
+			.catchEx(ex -> ret.setResult(-1));
 		return ret;
 	}
 	
@@ -38,7 +38,7 @@ public class ServicePoolHelper
 		IServiceIdentifier sid = service.getServiceId();
 		ia.searchService(new ServiceQuery<IServicePoolService>(IServicePoolService.class).setProvider(sid.getProviderId()))
 			.then(ps -> ps.getMaxCapacity(sid.getServiceType().getType(ia.getClassLoader())).delegate(ret))
-			.catchErr(ex -> ret.setResult(-1));
+			.catchEx(ex -> ret.setResult(-1));
 		return ret;
 	}
 	
@@ -53,7 +53,7 @@ public class ServicePoolHelper
 		IServiceIdentifier sid = service.getServiceId();
 		ia.searchService(new ServiceQuery<IServicePoolService>(IServicePoolService.class).setProvider(sid.getProviderId()))
 			.then(ps -> ret.setResult(Boolean.TRUE))
-			.catchErr(ex -> ret.setResult(Boolean.FALSE));
+			.catchEx(ex -> ret.setResult(Boolean.FALSE));
 		return ret;
 	}
 }
