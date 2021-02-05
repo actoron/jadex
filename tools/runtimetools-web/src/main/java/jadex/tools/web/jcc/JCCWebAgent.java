@@ -375,7 +375,6 @@ public class JCCWebAgent implements IJCCWebService
 			public void exceptionOccurred(Exception exception)
 			{
 				exception.printStackTrace();
-				System.out.println("FUCK FUCK FUCK FUCK: " + servicetype);
 				// Did not find the service, so use it locally with cid
 				// (Allows for resusing (having some webjcc plugins only) on the access platform)
 				//System.out.println("locally with cid: "+ methodname + " " + servicetype);

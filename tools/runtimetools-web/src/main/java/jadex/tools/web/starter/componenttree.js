@@ -9,18 +9,12 @@ class ComponentTree extends BaseElement
 		return { cid: { type: String }};
 	}
 	
-	constructor()
+	init() 
 	{
-		super();
-		
-		//this.components = []; // component descriptions
 		this.typemap = null;
 		this.treedata = {};
 		this.treeid = "componenttree";
-	}
-	
-	init() 
-	{
+		
 		console.log("component tree");
 		// fixed types
 		var cloud = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/cloud.png';
@@ -998,7 +992,7 @@ class ComponentTree extends BaseElement
 	    `;
 	}
 	
-	render() {
+	asyncRender() {
 		return html`
 			<div class="container-fluid m-0 p-0">
 				<div class="row m-0 p-0">
@@ -1008,12 +1002,6 @@ class ComponentTree extends BaseElement
 				</div>
 			</div>
 		`;
-	}
-	
-	switchLanguage() 
-	{
-	    language.switchLanguage(); 
-	    this.requestUpdate(); // needs manual update as language.lang is not mapped to an attribute 
 	}
 }
 
