@@ -1513,7 +1513,7 @@ public class Starter
 			
 			// Shutdown is called via killComponent()
 			//component.shutdown().get();
-		}).catchErr(ret);
+		}).catchEx(ret);
 		
 		return ret;
 	}

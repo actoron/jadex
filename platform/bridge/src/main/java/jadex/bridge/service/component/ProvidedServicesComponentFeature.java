@@ -225,7 +225,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 					}
 					fut.setResult(null);
 					
-				}).catchErr(e -> fut.setResult(null));
+				}).catchEx(e -> fut.setResult(null));
 			}
 		}
 		
@@ -241,7 +241,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			{
 				ret.setResult(null);
 			}
-		}).catchErr(ret);
+		}).catchEx(ret);
 		
 		return ret;
 	}

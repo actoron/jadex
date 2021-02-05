@@ -13,7 +13,6 @@ import java.util.NoSuchElementException;
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.functional.Consumer;
-import jadex.commons.functional.Function;
 
 /**
  *  Default implementation of an intermediate future.
@@ -429,11 +428,11 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 * Add an result listener, which called on intermediate results.
 	 * 
 	 * @param listener The intermediate listener.
-	 */
+	 * /
 	public void addIntermediateResultListener(IIntermediateResultListener<E> listener)
 	{
 		addResultListener(listener);
-	}
+	}*/
     
 	/**
 	 * Add a functional result listener, which called on intermediate results.
@@ -922,7 +921,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	
 	//-------- java 8 extensions --------
 	
-	public IFuture<Collection<E>> catchErr(final Consumer<? super Exception> consumer, Class<?> futuretype)
+	public IIntermediateFuture<E> catchEx(final Consumer<? super Exception> consumer, Class<?> futuretype)
     {
 		IResultListener reslis = new IntermediateEmptyResultListener()
 		{
@@ -952,6 +951,11 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	
 	// todo: subscriptions need special treatment for first listener
 	
+	/**
+     *  Called when the next intermediate value is available.
+     *  @param function Called when value arrives.
+     *  @return The future for chaining.
+     */
 	public IIntermediateFuture<? extends E> next(Consumer<? super E> function)
 	{
 		addResultListener(new IntermediateEmptyResultListener<E>()
@@ -964,6 +968,11 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 		return this;
 	}
 	
+	/**
+     *  Called when the maximum number of results is available.
+     *  @param function Called when max value arrives.
+     *  @return The future for chaining.
+     */
 	public IIntermediateFuture<? extends E> max(Consumer<Integer> function)
 	{
 		addResultListener(new IntermediateEmptyResultListener<E>()
@@ -976,7 +985,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 		return this;
 	}
 	
-	public IIntermediateFuture<? extends E> finished(Consumer<? super E> function)
+	/**
+     *  Called when the future is finished.
+     *  @param function Called when max value arrives.
+     *  @return The future for chaining.
+     */
+	public IIntermediateFuture<? extends E> finished(Consumer<Void> function)
 	{
 		addResultListener(new IntermediateEmptyResultListener<E>()
 		{
@@ -992,22 +1006,22 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 *  Implements async loop and applies a an async function to each element.
 	 *  @param function The function.
 	 *  @return True result intermediate future.
-	 */
+	 * /
 	public <R> IIntermediateFuture<R> mapAsync(final Function<E, IFuture<R>> function)
     {
        return mapAsync(function, null);
-    }
+    }*/
 	
 	/**
 	 *  Implements async loop and applies a an async function to each element.
 	 *  @param function The function.
 	 *  @return True result intermediate future.
-	 */
+	 * /
 	public <R> IIntermediateFuture<R> mapAsync(final Function<E, IFuture<R>> function, Class<?> futuretype)
     {
         final IntermediateFuture<R> ret = futuretype==null? new IntermediateFuture<R>(): (IntermediateFuture)getFuture(futuretype);
 
-        this.addIntermediateResultListener(new IIntermediateResultListener<E>()
+        this.addResultListener(new IIntermediateResultListener<E>()
         {
             public void resultAvailable(Collection<E> result)
             {
@@ -1052,18 +1066,18 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
         });
 
         return ret;
-    }
+    }*/
 	
 	/**
 	 *  Implements async loop and applies a an async multi-function to each element.
 	 *  @param function The function.
 	 *  @return True result intermediate future.
-	 */
+	 * /
 	public <R> IIntermediateFuture<R> flatMapAsync(final Function<E, IIntermediateFuture<R>> function)
     {
         final IntermediateFuture<R> ret = new IntermediateFuture<R>();
 
-        this.addIntermediateResultListener(new IIntermediateResultListener<E>()
+        this.addResultListener(new IIntermediateResultListener<E>()
         {
         	boolean fin = false;
         	int cnt = 0;
@@ -1137,5 +1151,5 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
         });
 
         return ret;
-    }
+    }*/
 }

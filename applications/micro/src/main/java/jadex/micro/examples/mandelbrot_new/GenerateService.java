@@ -329,7 +329,7 @@ public class GenerateService implements IGenerateService
 									//System.out.println("da")
 									// Use result from calculation service instead of result from display service.
 									//ret.setResult(calcresult)
-								).catchErr(ex -> {}
+								).catchEx(ex -> {}
 									//System.out.println("da2: "+ex)
 									// Use result from calculation service instead of exception from display service.
 									//ret.setResult(calcresult)
@@ -391,7 +391,7 @@ public class GenerateService implements IGenerateService
 							System.out.println("exception during task execution: "+ex);
 							performTask(task, alda).delegate(ret);
 						});*/
-					}).catchErr(ex ->
+					}).catchEx(ex ->
 					{
 						System.out.println("ex: "+ex);
 						ret.setException(ex);
@@ -402,12 +402,12 @@ public class GenerateService implements IGenerateService
 //					System.out.println("ex: "+ex);
 //					ret.setException(ex);
 //				});
-			}).catchErr(ex -> 
+			}).catchEx(ex -> 
 			{	
 				System.out.println("ex: "+ex);
 				ret.setException(ex);
 			});
-		}).catchErr(ex -> 
+		}).catchEx(ex -> 
 		{	
 			System.out.println("ex: "+ex); 
 			ret.setException(ex);
@@ -510,7 +510,7 @@ public class GenerateService implements IGenerateService
 				curcalc = tup.getSecondEntity();
 				ret.setResult(tup.getFirstEntity());
 			})
-			.catchErr(ex -> ret.setException(ex));
+			.catchEx(ex -> ret.setException(ex));
 		}
 		// no calculators found
 		else if(ga.getCalculateServices().size()==0)
@@ -518,7 +518,7 @@ public class GenerateService implements IGenerateService
 			long wait = 2000;
 			System.out.println("No calculators found, retrying in: "+wait);
 			agent.waitForDelay(2000).then(c -> getNextCalculateService().delegate(ret))
-			.catchErr(ex -> getNextCalculateService().delegate(ret));
+			.catchEx(ex -> getNextCalculateService().delegate(ret));
 		}
 		
 		return ret;
@@ -562,7 +562,7 @@ public class GenerateService implements IGenerateService
 				{
 					findFreeCalculatorService(calcs, fpos+1, tried+1).delegate(ret);
 				}
-			}).catchErr(ex -> findFreeCalculatorService(calcs, fpos+1, tried+1).delegate(ret));
+			}).catchEx(ex -> findFreeCalculatorService(calcs, fpos+1, tried+1).delegate(ret));
 		}
 		
 		curcalc++;

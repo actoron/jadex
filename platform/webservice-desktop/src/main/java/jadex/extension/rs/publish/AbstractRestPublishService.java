@@ -451,7 +451,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					writeResponse(Boolean.TRUE, Response.Status.OK.getStatusCode(), callid, null, request, response, true);
 				else
 					writeResponse(Boolean.FALSE, Response.Status.UNAUTHORIZED.getStatusCode(), callid, null, request, response, true);
-			}).catchErr((Exception e) ->
+			}).catchEx((Exception e) ->
 			{
 				writeResponse(new SecurityException("Login failed"), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true);
 			});
@@ -461,7 +461,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			logout(request).then((Boolean ok) ->
 			{
 				writeResponse(ok, Response.Status.OK.getStatusCode(), callid, null, request, response, true);
-			}).catchErr((Exception e) ->
+			}).catchEx((Exception e) ->
 			{
 				writeResponse(new SecurityException("Logout failed"), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), callid, null, request, response, true);
 			});
@@ -851,7 +851,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			if(ok)
 				request.getSession(true).setAttribute("loggedin", Boolean.TRUE);
 			ret.setResult(ok);
-		}).catchErr((Exception e) -> 
+		}).catchEx((Exception e) -> 
 		{
 			ret.setResult(Boolean.FALSE);
 		});

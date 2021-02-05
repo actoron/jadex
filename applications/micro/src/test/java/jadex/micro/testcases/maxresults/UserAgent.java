@@ -326,23 +326,26 @@ public class UserAgent extends TestAgent
 			
 			public void exceptionOccurred(Exception exception) 
 			{
-				if(exception instanceof UnsupportedOperationException)
-				{
-					System.out.println("fini 3: "+exception);
-					
-					tr.setSucceeded(true);
-				}
-				else
-				{
-					tr.setFailed(exception);
-				}
+				tr.setFailed(exception);
+				
+//				if(exception instanceof UnsupportedOperationException)
+//				{
+//					System.out.println("fini 3: "+exception);
+//					
+//					tr.setSucceeded(true);
+//				}
+//				else
+//				{
+//					tr.setFailed(exception);
+//				}
 				
 				cont();
 			}
 			
 			public void resultAvailable(Collection<String> result) 
 			{
-				tr.setFailed("No exception: "+result);
+				tr.setSucceeded(true);
+				//tr.setFailed("No exception: "+result);
 				
 				cont();
 			}
@@ -357,7 +360,8 @@ public class UserAgent extends TestAgent
 			
 			public void finished() 
 			{
-				tr.setFailed("No exception");
+				tr.setSucceeded(true);
+//				tr.setFailed("No exception");
 				
 				cont();
 			}

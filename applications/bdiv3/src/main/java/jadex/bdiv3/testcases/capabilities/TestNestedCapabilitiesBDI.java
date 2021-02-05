@@ -34,7 +34,7 @@ public class TestNestedCapabilitiesBDI
 		{
 			tr1.setSucceeded(true);
 			checkFinished(agent);
-		}).catchErr(ex ->
+		}).catchEx(ex ->
 		{
 			tr1.setFailed(ex);
 			checkFinished(agent);
@@ -43,7 +43,7 @@ public class TestNestedCapabilitiesBDI
 		{
 			tr2.setSucceeded(true);
 			checkFinished(agent);
-		}).catchErr(ex ->
+		}).catchEx(ex ->
 		{
 			tr2.setFailed(ex);
 			checkFinished(agent);

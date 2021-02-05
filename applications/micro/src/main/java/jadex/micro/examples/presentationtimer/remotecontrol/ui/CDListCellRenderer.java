@@ -1,4 +1,4 @@
-package jadex.examples.presentationtimer.remotecontrol.ui;
+package jadex.micro.examples.presentationtimer.remotecontrol.ui;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -19,7 +19,7 @@ import javax.swing.UIManager;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
-import jadex.examples.presentationtimer.common.State;
+import jadex.micro.examples.presentationtimer.common.State;
 
 public class CDListCellRenderer extends JPanel implements ListCellRenderer<CDListItem>
 {
@@ -37,44 +37,52 @@ public class CDListCellRenderer extends JPanel implements ListCellRenderer<CDLis
 		
 		add(Box.createRigidArea(new Dimension(0,5)));
 		
-		add(new JLabel("platformname") {
+		add(new JLabel("platformname") 
 		{
-			setAlignmentX(LEFT_ALIGNMENT);
-			platformLabel = this;
-		}});
-		
-		add(new JPanel() {
-		{
-			setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
-			setOpaque(false);
-			setAlignmentX(LEFT_ALIGNMENT);
-			add(new JLabel("state") {
 			{
-				setForeground(Color.gray);
-				stateLabel = this;
 				setAlignmentX(LEFT_ALIGNMENT);
-			}});
-			
-			add(Box.createRigidArea(new Dimension(10, 0)));
-
-			add(new JLabel("time") {
-			{
-				setForeground(Color.gray);
-				timeLabel = this;
-				setAlignmentX(LEFT_ALIGNMENT);
-			}});
-		}});
+				platformLabel = this;
+			}
+		});
 		
-		
-		add(new JTextArea("addrs") {
+		add(new JPanel() 
 		{
-			Font font = getFont();
-			setFont(font.deriveFont((float)(font.getSize()*0.85)));
-			setAlignmentX(LEFT_ALIGNMENT);
-			platformAddresses = this;
-			setEditable(false);
-			setOpaque(false);
-		}});
+			{
+				setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+				setOpaque(false);
+				setAlignmentX(LEFT_ALIGNMENT);
+				add(new JLabel("state") {
+				{
+					setForeground(Color.gray);
+					stateLabel = this;
+					setAlignmentX(LEFT_ALIGNMENT);
+				}});
+				
+				add(Box.createRigidArea(new Dimension(10, 0)));
+	
+				add(new JLabel("time") 
+				{
+					{
+						setForeground(Color.gray);
+						timeLabel = this;
+						setAlignmentX(LEFT_ALIGNMENT);
+					}
+				});
+			}
+		});
+		
+		
+		add(new JTextArea("addrs") 
+		{
+			{
+				Font font = getFont();
+				setFont(font.deriveFont((float)(font.getSize()*0.85)));
+				setAlignmentX(LEFT_ALIGNMENT);
+				platformAddresses = this;
+				setEditable(false);
+				setOpaque(false);
+			}
+		});
 		
 		add(Box.createRigidArea(new Dimension(0,5)));
 	}
@@ -85,7 +93,8 @@ public class CDListCellRenderer extends JPanel implements ListCellRenderer<CDLis
 		CDListItem item = list.getModel().getElementAt(index);
 		
 		InvocationHandler invocationHandler = Proxy.getInvocationHandler(item.getService());
-		if(invocationHandler instanceof BasicServiceInvocationHandler) {
+		if(invocationHandler instanceof BasicServiceInvocationHandler) 
+		{
 			BasicServiceInvocationHandler sih = (BasicServiceInvocationHandler) invocationHandler;
 			
 			IComponentIdentifier providerId = sih.getServiceIdentifier().getProviderId();

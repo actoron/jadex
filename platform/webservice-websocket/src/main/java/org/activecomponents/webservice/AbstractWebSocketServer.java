@@ -177,7 +177,7 @@ public abstract class AbstractWebSocketServer
 							}
 						});
 					}
-				}).catchErr(ret);
+				}).catchEx(ret);
 				//}).exceptionally(e -> {ret.setException(e); return IFuture.DONE;});
 			}
 			else
@@ -357,7 +357,7 @@ public abstract class AbstractWebSocketServer
 				ret.setResult(filenames.iterator().next());
 			else
 				ret.setException(new RuntimeException("No mapping found for: "+typename));
-		}).catchErr(ret);
+		}).catchEx(ret);
 		
 		return ret;
 	}
@@ -706,7 +706,7 @@ public abstract class AbstractWebSocketServer
 					serviceinfos.put(iface, mis);
 					ServiceInfo si = new ServiceInfo(((IService)res).getServiceId(), getMethodNames(mis));
 					sendMessage(new ResultMessage(si, callid, finished), session).delegate(ret);
-				}).catchErr(ret);
+				}).catchEx(ret);
 			}
 			else
 			{

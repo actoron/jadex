@@ -854,7 +854,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				{
 					if (debug)
 						System.out.println(agent + " forwarding: " + header);
-					forwardMessage(header, (byte[]) msg).catchErr(e ->
+					forwardMessage(header, (byte[]) msg).catchEx(e ->
 					{
 						// Failed to forward on intermediary node (prob. lost route), nothing can be done to salvage the situation...
 						// TODO: Inform sender transmission has failed if possible.

@@ -502,7 +502,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 		if(SSimulation.DEBUG_BLOCKERS)
 		{
 			openfuts.put(toblocker, ""+ServiceCall.getCurrentInvocation());
-			toblocker.then(result -> {openfuts.remove(toblocker);}).catchErr(exception -> {openfuts.remove(toblocker);});
+			toblocker.then(result -> {openfuts.remove(toblocker);}).catchEx(exception -> {openfuts.remove(toblocker);});
 //			System.out.println("adblocks: "+openfuts);
 //			System.out.println(advanceblockers.size());
 //			System.out.println("addBlocker: "+ServiceCall.getCurrentInvocation()+" "+access);

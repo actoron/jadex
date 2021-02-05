@@ -1,4 +1,4 @@
-package jadex.examples.presentationtimer.display.ui;
+package jadex.micro.examples.presentationtimer.display.ui;
 
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -10,71 +10,79 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-import jadex.examples.presentationtimer.common.ICountdownGUIService;
-import jadex.examples.presentationtimer.common.ICountdownService.ICountdownListener;
-import jadex.examples.presentationtimer.common.State;
-import jadex.examples.presentationtimer.display.Main;
+import jadex.micro.examples.presentationtimer.common.ICountdownGUIService;
+import jadex.micro.examples.presentationtimer.common.State;
+import jadex.micro.examples.presentationtimer.common.ICountdownService.ICountdownListener;
+import jadex.micro.examples.presentationtimer.display.Main;
 
-public class ConfigureFrame extends JFrame {
-
+public class ConfigureFrame extends JFrame 
+{
 	protected JTextField countDownTimeTF;
 	protected JTextField infoTimeTF;
 	protected JTextField warningTimeTF;
-	protected JLabel fehlerLabel;
+	protected JLabel errLabel;
 	
 	private ICountdownGUIService guiService;
 
-	public ConfigureFrame(ICountdownGUIService guiService) {
+	public ConfigureFrame(ICountdownGUIService guiService) 
+	{
 		this.guiService = guiService;
 		
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new GridLayout(4, 2));
 
-		contentPane.add(new JLabel("Countdownzeit (mm:ss): "));
-		contentPane.add(new JTextField("08:00") {
+		contentPane.add(new JLabel("Countdown time (mm:ss): "));
+		contentPane.add(new JTextField("08:00") 
+		{
 			{
 				countDownTimeTF = this;
 			}
 		});
 
-		contentPane.add(new JLabel("Zeit fuer gelbe Ansicht (mm:ss): "));
-		contentPane.add(new JTextField("01:00") {
+		contentPane.add(new JLabel("Time for yellow view (mm:ss): "));
+		contentPane.add(new JTextField("01:00") 
+		{
 			{
 				infoTimeTF = this;
 			}
 		});
 
-		contentPane.add(new JLabel("Zeit fuer rote Ansicht (mm:ss): "));
-		contentPane.add(new JTextField("00:15") {
+		contentPane.add(new JLabel("Zeit for red view (mm:ss): "));
+		contentPane.add(new JTextField("00:15") 
+		{
 			{
 				warningTimeTF = this;
 			}
 		});
 
-		contentPane.add(new JLabel() {
+		contentPane.add(new JLabel() 
+		{
 			{
-				fehlerLabel = this;
+				errLabel = this;
 			}
 		});
-		contentPane.add(new JButton("Starten") {
+		contentPane.add(new JButton("Start") 
+		{
 			{
 				addActionListener(onOkClickListener);
 			}
 		});
 
 		this.pack();
-		this.setTitle("Countdown konfigurieren");
-		if (Main.startedWithMain) {
+		this.setTitle("Configure countdown");
+		if (Main.startedWithMain) 
+		{
 			this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		}
 	}
 
-	private ActionListener onOkClickListener = new ActionListener() {
-
+	private ActionListener onOkClickListener = new ActionListener() 
+	{
 		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			try {
+		public void actionPerformed(ActionEvent e) 
+		{
+			try 
+			{
 				int cdTime = parseTimeString(countDownTimeTF.getText());
 				int infoTime = parseTimeString(infoTimeTF.getText());
 				int warnTime = parseTimeString(warningTimeTF.getText());
@@ -100,25 +108,28 @@ public class ConfigureFrame extends JFrame {
 					});
 					
 					countDownView.setVisible(true);
-					
-					
-				} else {
-					fehlerLabel.setText("info und warnzeit muessen groesser als Gesamtzeit sein!");
+				} 
+				else 
+				{
+					errLabel.setText("Info and warn time must be bigger than whole time");
 				}
 				
-				
-
-			} catch (NumberFormatException nfe) {
-				fehlerLabel
-						.setText("Fehler beim parsen der Werte!");
+			} 
+			catch (NumberFormatException nfe) 
+			{
+				errLabel.setText("Err with parsing values");
 			}
 		}
 
-		private int parseTimeString(String text) {
+		private int parseTimeString(String text)
+		{
 			String[] timeArr = text.split(":");
-			if (timeArr.length != 2) {
+			if(timeArr.length != 2) 
+			{
 				throw new NumberFormatException("");
-			} else {
+			} 
+			else 
+			{
 				int minutes = Integer.parseInt(timeArr[0]);
 				int seconds = Integer.parseInt(timeArr[1]);
 				return minutes*60 + seconds;

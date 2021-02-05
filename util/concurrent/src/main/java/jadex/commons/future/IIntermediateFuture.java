@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.NoSuchElementException;
 
 import jadex.commons.functional.Consumer;
-import jadex.commons.functional.Function;
 
 /**
  *  Future that support intermediate results.
@@ -13,7 +12,7 @@ import jadex.commons.functional.Function;
 //@Reference
 public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 {
-	// -------- constants --------
+	//-------- constants --------
 
 	/**
 	 *  A future representing a completed action. Can be used as direct return
@@ -22,6 +21,7 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 	 */
 	public static final IntermediateFuture<Void> DONE = new IntermediateFuture<Void>((Collection<Void>)null);
 
+	//-------- methods --------
 	
     /**
      *  Get the intermediate results that are currently available.
@@ -149,28 +149,45 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 */
     //-------- java 8 extensions --------
 	
+    /**
+     *  Called when the next intermediate value is available.
+     *  @param function Called when value arrives.
+     *  @return The future for chaining.
+     */
 	public IIntermediateFuture<? extends E> next(Consumer<? super E> function);
+	
+	/**
+     *  Called when the maximum number of results is available.
+     *  @param function Called when max value arrives.
+     *  @return The future for chaining.
+     */
 	public IIntermediateFuture<? extends E> max(Consumer<Integer> function);
-	public IIntermediateFuture<? extends E> finished(Consumer<? super E> function);
+	
+	/**
+     *  Called when the future is finished.
+     *  @param function Called when max value arrives.
+     *  @return The future for chaining.
+     */
+	public IIntermediateFuture<? extends E> finished(Consumer<Void> function);
     
     /**
 	 *  Implements async loop and applies a an async function to each element.
 	 *  @param function The function.
 	 *  @return True result intermediate future.
 	 */
-	public <R> IIntermediateFuture<R> mapAsync(Function<E, IFuture<R>> function);
+	//public <R> IIntermediateFuture<R> mapAsync(Function<E, IFuture<R>> function);
 	
 	/**
 	 *  Implements async loop and applies a an async function to each element.
 	 *  @param function The function.
 	 *  @return True result intermediate future.
 	 */
-	public <R> IIntermediateFuture<R> mapAsync(Function<E, IFuture<R>> function, Class<?> futuretype);
+	//public <R> IIntermediateFuture<R> mapAsync(Function<E, IFuture<R>> function, Class<?> futuretype);
 	
 	/**
 	 *  Implements async loop and applies a an async multi-function to each element.
 	 *  @param function The function.
 	 *  @return True result intermediate future.
 	 */
-	public <R> IIntermediateFuture<R> flatMapAsync(Function<E, IIntermediateFuture<R>> function);
+	//public <R> IIntermediateFuture<R> flatMapAsync(Function<E, IIntermediateFuture<R>> function);
 }

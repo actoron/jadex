@@ -250,11 +250,28 @@ public interface IFuture<E>
 	 */
 //	public <T> IFuture<T> thenApplyAndDelegate(final Function<E, IFuture<T>> function, Class<?> futuretype, final Future<T> ret);
 	
-	public <T> void catchErr(Future<T> delegate);
+	/**
+	 *  Called on exception.
+	 *  @param delegate The future the exception will be delegated to.
+	 */
+	public <T> IFuture<E> catchEx(Future<T> delegate);
 	
-	public IFuture<E> catchErr(final Consumer<? super Exception> consumer);
+	/**
+	 *  Called on exception.
+	 *  @param consumer The function called with the exception.
+	 */
+	public IFuture<E> catchEx(final Consumer<? super Exception> consumer);
 	
-	public IFuture<E> catchErr(final Consumer<? super Exception> function, Class<?> consumer);
+	/**
+	 *  Called on exception.
+	 *  @param consumer The function called with the exception.
+	 */
+	public IFuture<E> catchEx(final Consumer<? super Exception> function, Class<?> consumer);
 	
+	/**
+	 *  Delegate the result and exception to another future.
+	 *  Short form for adding a delegation listener.
+	 *  @param delegate The other future.
+	 */
 	public void delegate(Future<E> delegate);
 }

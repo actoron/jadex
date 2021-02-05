@@ -1,4 +1,4 @@
-package jadex.examples.presentationtimer.common;
+package jadex.micro.examples.presentationtimer.common;
 
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
@@ -7,9 +7,8 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 public interface ICountdownService
 {
-
 	@Reference
-	// geht nur so und nicht im parameter
+	// does not work as parameter
 	public interface ICountdownListener
 	{
 		void timeChanged(String timeString);

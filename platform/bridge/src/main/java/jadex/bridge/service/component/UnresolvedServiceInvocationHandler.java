@@ -53,7 +53,7 @@ public class UnresolvedServiceInvocationHandler implements InvocationHandler
 				{
 					delegate = serv;
 					delegatefut = null;
-				}).catchErr(e -> delegatefut = null);
+				}).catchEx(e -> delegatefut = null);
 				delegatefut = (IFuture<IService>) fut;
 			}
 			if (!SReflect.isSupertype(IFuture.class, method.getReturnType()))

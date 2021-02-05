@@ -91,7 +91,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		else
 		{
 			agent.searchService(new ServiceQuery<ILibraryService>(ILibraryService.class).setPlatform(cid).setScope(ServiceScope.PLATFORM))
-				.then(libs -> {libs.getComponentModels().delegate(ret);}).catchErr(ret);
+				.then(libs -> {libs.getComponentModels().delegate(ret);}).catchEx(ret);
 		}
 		
 		return ret;
@@ -226,7 +226,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 				barrier.addFuture(fut);
 			}
 			barrier.waitForResults().then(descs -> ret.setResult(descs==null? null: descs.toArray(new IComponentDescription[cids.length])))
-				.catchErr(ex -> ret.setException(ex));
+				.catchEx(ex -> ret.setException(ex));
 		});
 		return ret;
 	}
@@ -422,7 +422,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 						}
 					});
 					
-					bar.waitFor().then(Void -> ret.setResult(res)).catchErr(ret);
+					bar.waitFor().then(Void -> ret.setResult(res)).catchEx(ret);
 				}
 			};
 			

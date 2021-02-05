@@ -78,16 +78,16 @@ public class MicroProvidedServicesComponentFeature extends ProvidedServicesCompo
 						.then(q ->
 					{
 						ret.setResult(impl);
-					}).catchErr(ret);
+					}).catchEx(ret);
 					
-				}).catchErr(ret);
+				}).catchEx(ret);
 				
 			}
 			else
 			{
 				ret.setResult(impl);
 			}
-		}).catchErr(ret);
+		}).catchEx(ret);
 			
 		return ret;
 	}

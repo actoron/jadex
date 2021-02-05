@@ -130,7 +130,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 				// invoke 1) basic service start 2) domain service start
 				invokeDoubleMethod(sic, si, START_METHOD, ServiceStart.class, true, false)
 					.then(x->ret.setResult(null))
-					.catchErr(x->
+					.catchEx(x->
 					{
 						// Hack! Check if impl class has @Agent annotation -> defer method call to agent lifecycle start
 						Object obj = ProxyFactory.isProxyClass(si.getDomainService().getClass())? ProxyFactory.getInvocationHandler(si.getDomainService()): si.getDomainService();
@@ -168,7 +168,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 				
 				invokeDoubleMethod(sic, si, SHUTDOWN_METHOD, ServiceShutdown.class, true, false)
 					.then(x->ret.setResult(null))
-					.catchErr(x->
+					.catchEx(x->
 					{
 						invokeDoubleMethod(sic, si, SHUTDOWN_METHOD, OnEnd.class, true, true).delegate(ret);	
 					});

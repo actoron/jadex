@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import jadex.commons.SUtil;
+import jadex.commons.functional.Consumer;
 
 
 /**
@@ -73,12 +74,12 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	
 	/**
 	 *  Unsupported for subscriptions.
-	 */
+	 * /
 	@Override
 	public void setMaxResultCount(int max)
 	{
 		throw new UnsupportedOperationException("Subscription futures do not allow max result setting.");
-	}
+	}*/
 	
 	/**
 	 *  Add a result.
@@ -128,10 +129,10 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	public void	addQuietListener(IResultListener<Collection<E>> listener)
 	{
     	if(!(listener instanceof IIntermediateResultListener))
-    	{
     		throw new IllegalArgumentException("Subscription futures require intermediate listeners.");
-    	}
-    	
+    
+    	// Functionality is overridden in addResultListener
+    	// Thus by delegating to super that func. is skipped
     	super.addResultListener(listener);		
 	}
 
@@ -372,4 +373,98 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     	
     	return ret;
     }
+    
+    /**
+   	 *  Called on exception.
+   	 *  @param delegate The future the exception will be delegated to.
+   	 */
+    public IIntermediateFuture<E> catchEx(final Consumer<? super Exception> consumer, Class<?> futuretype)
+    {
+		IResultListener reslis = new IntermediateEmptyResultListener()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				 consumer.accept(exception);
+			}
+		};
+		addQuietListener(reslis);
+		
+		/*this.addResultListener(new IResultListener<E>()
+		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				consumer.accept(exception);
+			}
+			
+			@Override
+			public void resultAvailable(E result)
+			{
+			}
+		});*/
+		
+        return this;
+    }
+    
+    /**
+	 *  Called on exception.
+	 *  @param delegate The future the exception will be delegated to.
+	 */
+	public <T> IIntermediateFuture<E> catchEx(Future<T> delegate)
+	{
+		IResultListener reslis = new IntermediateEmptyResultListener()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				delegate.setException(exception);
+			}
+		};
+		addQuietListener(reslis);
+		
+		return this;
+	}
+	
+	// todo: subscriptions need special treatment for first listener
+	
+    // next is a consuming listener and must not be overridden
+	/**
+     *  Called when the next intermediate value is available.
+     *  @param function Called when value arrives.
+     *  @return The future for chaining.
+     * /
+	public IIntermediateFuture<? extends E> next(Consumer<? super E> function)
+	
+	/**
+     *  Called when the maximum number of results is available.
+     *  @param function Called when max value arrives.
+     *  @return The future for chaining.
+     */
+	public IIntermediateFuture<? extends E> max(Consumer<Integer> function)
+	{
+		addQuietListener(new IntermediateEmptyResultListener<E>()
+		{
+			public void maxResultCountAvailable(int max) 
+			{
+				function.accept(max);
+			}
+		});
+		return this;
+	}
+	
+	/**
+     *  Called when the future is finished.
+     *  @param function Called when max value arrives.
+     *  @return The future for chaining.
+     */
+	public IIntermediateFuture<? extends E> finished(Consumer<Void> function)
+	{
+		addQuietListener(new IntermediateEmptyResultListener<E>()
+		{
+			public void finished() 
+			{
+				function.accept(null);
+			}
+		});
+		return this;
+	}
 }

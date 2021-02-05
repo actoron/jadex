@@ -1780,7 +1780,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				});
 			});
 			search = ret;
-			ret.then(x -> {componentmodels=(List<String[]>)x; search = null;}).catchErr(x -> search = null);
+			ret.then(x -> {componentmodels=(List<String[]>)x; search = null;}).catchEx(x -> search = null);
 		}
 		else 
 		{
