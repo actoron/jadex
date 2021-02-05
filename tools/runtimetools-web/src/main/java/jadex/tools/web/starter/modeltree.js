@@ -5,9 +5,22 @@ let { CidElement } = modLoad('cid-element');
 // Tag name 'jadex-modeltree'
 class ModelTree extends CidElement 
 {
+	static get properties() 
+	{
+		var ret = {};
+		if(super.properties!=null)
+		{
+			for (let key in super.properties)
+				ret[key]=super.properties[key];
+		}
+		ret['progressnow'] = {type: Number, attribute: false};
+		ret['progressmax'] = {type: Number, attribute: false};
+		return ret;
+	}
+	
 	init()
 	{
-		console.log("modetree init: "+this.models);
+		console.log("modetree init");
 		
 		let self = this;
 		this.app.lang.listeners.add(this);
@@ -16,6 +29,9 @@ class ModelTree extends CidElement
 		this.reversed = false;
 		//this.myservice = "jadex.tools.web.starter.IJCCStarterService";
 		this.treeid = "modeltree";
+		
+		this.progressnow = 0;
+		this.progressmax = 100;
 		
 		//console.log("modeltree");
 		this.loadJSTree().then(function()
@@ -46,7 +62,8 @@ class ModelTree extends CidElement
 				
 				// no args here
 				//console.log("getComponentModels start");
-				
+
+				this.progressnow = 0;				
 				var t = jadex.getIntermediate(self.getMethodPrefix()+'&methodname=getComponentModelsAsStream'+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 				function(response)
 				{
@@ -55,8 +72,35 @@ class ModelTree extends CidElement
 						console.log("received: "+response.data);
 						return;
 					}
+					 
+					self.progressnow++;
 					
-					if(self.addModel(response.data))
+					var changed = false;
+					for(var i=0; i<response.data.length; i++)
+					{
+						if(self.addModel(response.data[i]))
+						{
+							changed = true;
+							//self.createModelTree(self.treeid);
+							self.createNodes(self.treeid, response.data[i][1]);
+						}
+					}
+					
+					if(changed)
+					{
+						var childs = self.getTree(self.treeid).jstree('get_node', '#').children;
+						for(var i=0; i<childs.length; i++)
+						{
+							self.getTree(self.treeid).jstree("open_node", childs[i]);
+						}
+					}
+					
+					//console.log("models loaded");
+					
+					//$("#"+treeid).jstree("open_node", '#');
+					self.requestUpdate();
+					
+					/*if(self.addModel(response.data))
 					{
 						//self.createModelTree(self.treeid);
 						self.createNodes(self.treeid, response.data[1]);
@@ -77,13 +121,18 @@ class ModelTree extends CidElement
 						/*self.getTree(self.treeid).on('select_node.jstree', function (e, data) 
 						{
 							self.select(data.instance.get_path(data.node, '.'));
-						});*/
-					}
+						});* /
+					}*/
 				},
 				function(response)
 				{
 					console.log("Could not load models.");
 					console.log("Err: "+JSON.stringify(response));
+				},
+				function(max)
+				{
+					console.log("received max value: "+max);
+					self.progressmax = max;
 				});
 				
 				/*axios.get(self.getMethodPrefix()+'&methodname=getComponentModels', self.transform).then(function(resp)
@@ -364,10 +413,20 @@ class ModelTree extends CidElement
 	    `;
 	}
 	
-	render() 
+	asyncRender() 
 	{
 		return html`
 			<div class="container-fluid m-0 p-0">
+			
+				${this.progressnow<this.progressmax? html`
+				<div class="row m-0 p-0">
+					<div class="col-12 m-0 p-0">
+						<label for="mpro">Loading models:</label>
+						<progress id="mpro" class="w100" value="${this.progressnow}" max="${this.progressmax}">${this.progressnow}</progress>
+					</div>
+				</div>
+				`: ''}
+				
 				<div class="row m-0 p-0">
 					<div class="col-12 m-0 p-0">
 						<input id="model" list="models" placeholder="${this.app.lang.t('Search models...')}" class="w100" type="text" @change="${(e) => this.select(e)}"></input>

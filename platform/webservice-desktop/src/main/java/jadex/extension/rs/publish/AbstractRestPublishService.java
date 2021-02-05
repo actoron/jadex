@@ -131,7 +131,10 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 	/** Http header for the call id siganlling that this is the last response (resp). */
 	public static final String HEADER_JADEX_CALLFINISHED = "x-jadex-callidfin";
-
+	
+	/** Http header for max value of intermediate future. */
+	public static final String HEADER_JADEX_MAX = "x-jadex-max";
+	
 	/** Http header for the client side timeout of calls (req). */
 	public static final String HEADER_JADEX_CLIENTTIMEOUT = "x-jadex-clienttimeout";
 	
@@ -306,7 +309,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					{
 						//System.out.println("sending timeout to client " + ctx.getRequest());
 						writeResponse(null, Response.Status.REQUEST_TIMEOUT.getStatusCode(), callid, null, (HttpServletRequest)ctx.getRequest(),
-							(HttpServletResponse)ctx.getResponse(), false);
+							(HttpServletResponse)ctx.getResponse(), false, null);
 					}
 				}
 				// ctx.complete();
@@ -448,28 +451,28 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			login(request, platformsecret).then((Boolean ok) ->
 			{
 				if(ok)
-					writeResponse(Boolean.TRUE, Response.Status.OK.getStatusCode(), callid, null, request, response, true);
+					writeResponse(Boolean.TRUE, Response.Status.OK.getStatusCode(), callid, null, request, response, true, null);
 				else
-					writeResponse(Boolean.FALSE, Response.Status.UNAUTHORIZED.getStatusCode(), callid, null, request, response, true);
+					writeResponse(Boolean.FALSE, Response.Status.UNAUTHORIZED.getStatusCode(), callid, null, request, response, true, null);
 			}).catchEx((Exception e) ->
 			{
-				writeResponse(new SecurityException("Login failed"), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true);
+				writeResponse(new SecurityException("Login failed"), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true, null);
 			});
 		}
 		else if(logout!=null)
 		{
 			logout(request).then((Boolean ok) ->
 			{
-				writeResponse(ok, Response.Status.OK.getStatusCode(), callid, null, request, response, true);
+				writeResponse(ok, Response.Status.OK.getStatusCode(), callid, null, request, response, true, null);
 			}).catchEx((Exception e) ->
 			{
-				writeResponse(new SecurityException("Logout failed"), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), callid, null, request, response, true);
+				writeResponse(new SecurityException("Logout failed"), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), callid, null, request, response, true, null);
 			});
 		}
 		else if(isloggedin!=null)
 		{
 			boolean ret = isLoggedIn(request);
-			writeResponse(ret, Response.Status.OK.getStatusCode(), callid, null, request, response, true);
+			writeResponse(ret, Response.Status.OK.getStatusCode(), callid, null, request, response, true, null);
 		}
 		else
 		{
@@ -506,14 +509,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					// Normal result (or FINISHED as handled in writeResponse())
 					Object result = rinfo.getNextResult();
 					result = FINISHED.equals(result) ? result : mapResult(rinfo.getMappingInfo().getMethod(), result);
-					writeResponse(result, callid, rinfo.getMappingInfo(), request, response, false);
+					writeResponse(result, callid, rinfo.getMappingInfo(), request, response, false, null);
 				}
 	
 				// Exception in mean time?
 				else if(rinfo.getException() != null)
 				{
 					Object result = mapResult(rinfo.getMappingInfo().getMethod(), rinfo.getException());
-					writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), callid, rinfo.getMappingInfo(), request, response, true);
+					writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), callid, rinfo.getMappingInfo(), request, response, true, null);
 				}
 	
 				// No result yet -> store current request context until next result available
@@ -529,7 +532,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			{
 				// System.out.println("callid not found: "+callid);
 	
-				writeResponse(null, Response.Status.NOT_FOUND.getStatusCode(), callid, null, request, response, true);
+				writeResponse(null, Response.Status.NOT_FOUND.getStatusCode(), callid, null, request, response, true, null);
 	
 				// if(request.isAsyncStarted())
 				// request.getAsyncContext().complete();
@@ -574,7 +577,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						{
 							if(loginsec && !unres && !isLoggedIn(request))
 							{
-								writeResponse(new SecurityException("Access not allowed as not logged in"), Response.Status.UNAUTHORIZED.getStatusCode(), null, mi, request, response, true);
+								writeResponse(new SecurityException("Access not allowed as not logged in"), Response.Status.UNAUTHORIZED.getStatusCode(), null, mi, request, response, true, null);
 							}
 							else
 							{
@@ -607,40 +610,42 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		
 										public void exceptionOccurred(Exception exception)
 										{
-											handleResult(null, exception, null);
+											handleResult(null, exception, null, null);
 										}
 		
 										public void intermediateResultAvailable(Object result)
 										{
 											//System.out.println("intermediate: "+result);
 											
-											handleResult(result, null, null);
+											handleResult(result, null, null, null);
 										}
 		
 										@Override
 										public void commandAvailable(Object command)
 										{
-											handleResult(null, null, command);
+											handleResult(null, null, command, null);
 										}
 		
 										public void finished()
 										{
 											// maps will be cleared when processing fin
 											// element in writeResponse
-											handleResult(FINISHED, null, null);
+											handleResult(FINISHED, null, null, null);
 										}
 										
 										public void maxResultCountAvailable(int max)
-										{
+										{											
+											handleResult(null, null, null, max);
 										}
 										
 										/**
 										 * Handle a final or intermediate
 										 * result/exception/command of a service call.
 										 */
-										protected void handleResult(Object result, Throwable exception, Object command)
+										protected void handleResult(Object result, Throwable exception, Object command, Integer max)
 										{
-											// System.out.println("handleResult:"+result+", "+exception+", "+command+","+Thread.currentThread());
+											//if(max!=null)
+											//	System.out.println("handleResult:"+result+", "+exception+", "+command+","+Thread.currentThread());
 		
 											if(rinfo.isTerminated())
 											{
@@ -663,7 +668,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 													// HTTP 202 -> accepted
 													AsyncContext ctx = cls.iterator().next();
 													cls.remove(ctx);
-													writeResponse(null, 202, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
+													writeResponse(null, 202, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false, null);
 												}
 												else if(exception != null)
 												{
@@ -682,7 +687,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 													for(AsyncContext ac: acs)
 													{
 														writeResponse(result, rescode, fcallid, mi, (HttpServletRequest)ac.getRequest(),
-															(HttpServletResponse)ac.getResponse(), true);
+															(HttpServletResponse)ac.getResponse(), true, null);
 														cls.remove(ac);
 													}
 												}
@@ -692,7 +697,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 													cls.remove(ctx);
 													// Normal result (or FINISHED as handled in writeResponse())
 													result = FINISHED.equals(result) ? result : mapResult(method, result);
-													writeResponse(result, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
+													writeResponse(result, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false, max);
 												}
 												// ctx.complete();
 											}
@@ -771,14 +776,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 											// "+SUtil.arrayToString(method.getParameterTypes())+"
 											// on "+service+" "+Arrays.toString(params));
 											ret = mapResult(method, ret);
-											writeResponse(ret, fcallid, mi, request, response, true);
+											writeResponse(ret, fcallid, mi, request, response, true, null);
 											// ctx.complete();
 										}
 			
 										public void exceptionOccurred(Exception exception)
 										{
 											Object result = mapResult(method, exception);
-											writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), fcallid, mi, request, response, true);
+											writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), fcallid, mi, request, response, true, null);
 											// ctx.complete();
 										}
 									}));
@@ -794,14 +799,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 									// map the result by user defined mappers
 									Object res = mapResult(method, ret);
 									// convert content and write result to servlet response
-									writeResponse(res, fcallid, mi, request, response, true);
+									writeResponse(res, fcallid, mi, request, response, true, null);
 								}
 							}
 						}
 						catch(Exception e)
 						{
 							// System.out.println("call exception: "+e);
-							writeResponse(e, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true);
+							writeResponse(e, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true, null);
 						}
 					});
 				}
@@ -1441,15 +1446,15 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	/**
 	*
 	*/
-	protected void writeResponse(Object result, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin)
+	protected void writeResponse(Object result, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin, Integer max)
 	{
-		writeResponse(result, Response.Status.OK.getStatusCode(), callid, mi, request, response, fin);
+		writeResponse(result, Response.Status.OK.getStatusCode(), callid, mi, request, response, fin, max);
 	}
 
 	/**
 	*
 	*/
-	protected void writeResponse(Object result, int status, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin)
+	protected void writeResponse(Object result, int status, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin, Integer max)
 	{
 		// System.out.println("writeResponse: "+result+", "+status+", "+callid);
 		// Only write response on first exception
@@ -1458,12 +1463,12 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 		if(FINISHED.equals(result))
 		{
-			writeResponse(null, status, callid, mi, request, response, true);
+			writeResponse(null, status, callid, mi, request, response, true, max);
 			fin = true;
 		}
 		else
 		{
-			List<String> sr = writeResponseHeader(result, status, callid, mi, request, response, fin);
+			List<String> sr = writeResponseHeader(result, status, callid, mi, request, response, fin, max);
 			writeResponseContent(result, request, response, sr);
 		}
 		
@@ -1486,7 +1491,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	/**
 	 *
 	 */
-	protected List<String> writeResponseHeader(Object ret, int status, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin)
+	protected List<String> writeResponseHeader(Object ret, int status, String callid, MappingInfo mi, 
+		HttpServletRequest request, HttpServletResponse response, boolean fin, Integer max)
 	{
 		List<String> sr = null;
 
@@ -1542,6 +1548,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				{
 					response.addHeader(HEADER_JADEX_CALLID, callid);
 				}
+				
+				if(max!=null)
+					response.addHeader(HEADER_JADEX_MAX, ""+max);
 			}
 
 			// todo: add option for CORS

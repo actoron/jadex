@@ -1803,6 +1803,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		System.out.println("getComponentModelsAsStream: "+l.size());
 		final int cnt[] = new int[1];
 		
+		ret.setMaxResultCount(l.size());
+		
 		IComponentStep<List<String[]>> step = new IComponentStep<List<String[]>>()
 		{
 			public IFuture<List<String[]>> execute(IInternalAccess ia)

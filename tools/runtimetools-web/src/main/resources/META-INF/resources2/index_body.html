@@ -65,7 +65,7 @@
 			}]
 		},	
 			
-		getIntermediate: function(path, handler, error) 
+		getIntermediate: function(path, handler, error, maxhandler) 
 		{
 			// problem with hanging requests to same URL because of cache
 			// https://stackoverflow.com/questions/27513994/chrome-stalls-when-making-multiple-requests-to-same-resource
@@ -101,12 +101,19 @@
 				
 				var fini = resp.headers["x-jadex-callidfin"];
 				var callid = resp.headers["x-jadex-callid"];
+				var max = resp.headers["x-jadex-max"];
 				
 				if(resp.status!=202)	// ignore updatetimer commands
-					handler(resp);
+				{
+					if(max!=null)
+						maxhandler(max);
+					else
+						handler(resp);
+				}
 				
 				call = axios.CancelToken.source();
 
+				console.log("received: "+resp)
 				
 				//console.log("call headers: "+resp.headers["x-jadex-callid"]+" "+resp.headers["x-jadex-callidfin"]);
 				

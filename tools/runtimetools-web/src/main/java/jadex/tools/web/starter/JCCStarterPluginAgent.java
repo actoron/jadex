@@ -100,7 +100,54 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	/**
 	 * 
 	 */
-	public ISubscriptionIntermediateFuture<String[]> getComponentModelsAsStream(IComponentIdentifier cid)
+	public ISubscriptionIntermediateFuture<Collection<String[]>> getComponentModelsAsStream(IComponentIdentifier cid)
+	{
+		final SubscriptionIntermediateFuture<Collection<String[]>> ret = new SubscriptionIntermediateFuture<>();
+		//if(cid==null || cid.hasSameRoot(cid))
+		//{
+			ILibraryService ls = agent.getLocalService(ILibraryService.class);
+			ls.getComponentModelsAsStream().addResultListener(new IIntermediateResultListener<Collection<String[]>>()
+			{
+				public void intermediateResultAvailable(Collection<String[]> result)
+				{
+					ret.addIntermediateResult(result);
+				}
+				
+				public void resultAvailable(Collection<Collection<String[]>> result)
+				{
+					for(Collection<String[]> res: result)
+					{
+						intermediateResultAvailable(res);
+					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setException(exception);
+				}
+				
+			    public void finished()
+			    {
+			    	ret.setFinished();
+			    }
+			    
+			    public void maxResultCountAvailable(int max)
+			    {
+			    	ret.setMaxResultCount(max);
+			    	System.out.println("max count is: "+max);
+			    }
+			});
+		/*}
+		else
+		{
+			agent.searchService(new ServiceQuery<ILibraryService>(ILibraryService.class).setPlatform(cid).setScope(ServiceScope.PLATFORM))
+				.thenAccept(libs -> {libs.getComponentModels().delegate(ret);}).exceptionally(ret);
+		}*/
+			
+		return ret;
+	}
+	
+	/*public ISubscriptionIntermediateFuture<String[]> getComponentModelsAsStream(IComponentIdentifier cid)
 	{
 		final SubscriptionIntermediateFuture<String[]> ret = new SubscriptionIntermediateFuture<>();
 		//if(cid==null || cid.hasSameRoot(cid))
@@ -136,6 +183,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 			    
 			    public void maxResultCountAvailable(int max)
 			    {
+			    	ret.setMaxResultCount(max);
 			    	System.out.println("max count is: "+max);
 			    }
 			});
@@ -144,11 +192,10 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		{
 			agent.searchService(new ServiceQuery<ILibraryService>(ILibraryService.class).setPlatform(cid).setScope(ServiceScope.PLATFORM))
 				.thenAccept(libs -> {libs.getComponentModels().delegate(ret);}).exceptionally(ret);
-		}*/
+		}* /
 			
 		return ret;
-	}
-
+	}*/
 	
 	/**
 	 *  Create a component for a model.
