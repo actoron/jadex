@@ -709,7 +709,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 								{
 									//System.out.println("Security handshake timeout from "+agent+" to "+rplat);
 									checkCleanup();
-									ret.setExceptionIfUndone(new TimeoutException("Security handshake timeout from "+agent+" to "+rplat));
+									ret.setExceptionIfUndone(new TimeoutException("Communication with remote platform " + rplat + " failed when sending messages from " + agent + "."));
+									//ret.setExceptionIfUndone(new TimeoutException("Security handshake timeout from "+agent+" to "+rplat));
 								}
 							});
 						}
