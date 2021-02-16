@@ -347,16 +347,12 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 						
 						if (createcon)
 						{
-							try
-							{
-								createNewConnections(receiverpf);
-							}
-							catch (Exception e)
+							createNewConnections(receiverpf).catchEx(e ->
 							{
 								Collection<Tuple3<ICommand<Con>, Long, TerminableFuture<Integer>>> cmds = commandswaitingforcons.remove(receiverpf);
 								for (Tuple3<ICommand<Con>, Long, TerminableFuture<Integer>> c : SUtil.notNull(cmds))
 									c.getThirdEntity().setExceptionIfUndone(e);
-							}
+							});
 						}
 					}
 					return IFuture.DONE;
@@ -652,92 +648,101 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 	 *  Creates new connections to a remote platform.
 	 *  @param remotepf The remote platform ID.
 	 */
-	protected void createNewConnections(IComponentIdentifier remotepf)
+	protected IFuture<Void> createNewConnections(IComponentIdentifier remotepf)
 	{
-		assert execfeat.isComponentThread();
-		ITransportAddressService tas = agent.getFeature(IRequiredServicesFeature.class).getLocalService(ITransportAddressService.class);
-		tas.resolveAddresses(remotepf, impl.getProtocolName()).addResultListener(new IResultListener<List<TransportAddress>>()
+		Future<Void>	ret	= new Future<Void>();
+		try
 		{
-			public void exceptionOccurred(Exception exception)
+			assert execfeat.isComponentThread();
+			ITransportAddressService tas = agent.getFeature(IRequiredServicesFeature.class).getLocalService(ITransportAddressService.class);
+			tas.resolveAddresses(remotepf, impl.getProtocolName()).addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Void>(ret)
 			{
-				exception.printStackTrace();
-			}
-			
-			public void resultAvailable(List<TransportAddress> result)
-			{
-				if (result != null && result.size() > 0)
+				public void customResultAvailable(List<TransportAddress> result)
 				{
-					for (TransportAddress address : result)
+					if (result != null && result.size() > 0)
 					{
-						impl.createConnection(address.getAddress(), remotepf).addResultListener(
-							new IResultListener<Con>()
+						for (TransportAddress address : result)
 						{
-							public void resultAvailable(final Con con)
+							impl.createConnection(address.getAddress(), remotepf).addResultListener(
+								new IResultListener<Con>()
 							{
-								if (canDecide(remotepf))
+								public void resultAvailable(final Con con)
 								{
-									boolean notconnected = false;
-									try
+									if (canDecide(remotepf))
 									{
-										establishedconnections.getWriteLock().lock();
-										notconnected = !establishedconnections.containsKey(remotepf);
+										boolean notconnected = false;
+										try
+										{
+											establishedconnections.getWriteLock().lock();
+											notconnected = !establishedconnections.containsKey(remotepf);
+											if (notconnected)
+												establishedconnections.put(remotepf, null);
+										}
+										finally
+										{
+											establishedconnections.getWriteLock().unlock();
+										}
+										
 										if (notconnected)
-											establishedconnections.put(remotepf, null);
+										{
+											impl.sendMessage(con, new byte[0], platformid.toString().getBytes(SUtil.UTF8))
+												.addResultListener(execfeat.createResultListener(new IResultListener<Integer>()
+												{
+													public void resultAvailable(Integer result)
+													{
+														handshakingconnections.put(con, remotepf);
+													}
+													
+													public void exceptionOccurred(Exception exception)
+													{
+														establishedconnections.remove(remotepf);
+														impl.closeConnection(con);
+													}
+												}));
+										}
 									}
-									finally
-									{
-										establishedconnections.getWriteLock().unlock();
-									}
-									
-									if (notconnected)
+									else
 									{
 										impl.sendMessage(con, new byte[0], platformid.toString().getBytes(SUtil.UTF8))
 											.addResultListener(execfeat.createResultListener(new IResultListener<Integer>()
+										{
+											public void resultAvailable(Integer result)
 											{
-												public void resultAvailable(Integer result)
-												{
-													handshakingconnections.put(con, remotepf);
-												}
-												
-												public void exceptionOccurred(Exception exception)
-												{
-													establishedconnections.remove(remotepf);
-													impl.closeConnection(con);
-												}
-											}));
+												handshakingconnections.put(con, remotepf);
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												impl.closeConnection(con);
+		//										exception.printStackTrace();
+											}
+										}));
 									}
 								}
-								else
+								public void exceptionOccurred(Exception exception)
 								{
-									impl.sendMessage(con, new byte[0], platformid.toString().getBytes(SUtil.UTF8))
-										.addResultListener(execfeat.createResultListener(new IResultListener<Integer>()
-									{
-										public void resultAvailable(Integer result)
-										{
-											handshakingconnections.put(con, remotepf);
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-											impl.closeConnection(con);
-	//										exception.printStackTrace();
-										}
-									}));
+									// TODO: if finally failed, propagate exception for command cleanup?
+	//								exception.printStackTrace();
 								}
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-//								exception.printStackTrace();
-							}
-						});
+							});
+						}
+						
+						PlatformData data = new PlatformData(remotepf, impl.getProtocolName(), false);
+						for (SubscriptionIntermediateFuture<PlatformData> sub : infosubscribers)
+							sub.addIntermediateResult(data);
 					}
-					
-					PlatformData data = new PlatformData(remotepf, impl.getProtocolName(), false);
-					for (SubscriptionIntermediateFuture<PlatformData> sub : infosubscribers)
-						sub.addIntermediateResult(data);
+					else
+					{
+						ret.setException(new RuntimeException("No transport addresses for: "+remotepf));
+					}
 				}
-			}
-		});
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		return ret;
 	}
 	
 	/**

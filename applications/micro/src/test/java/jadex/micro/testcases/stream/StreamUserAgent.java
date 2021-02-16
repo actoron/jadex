@@ -42,6 +42,11 @@ public class StreamUserAgent extends TestAgent
 		IPlatformConfiguration ret = STest.getDefaultTestConfig(getClass());
 		ret.getExtendedPlatformConfiguration().setSimul(false);
 		ret.getExtendedPlatformConfiguration().setSimulation(false);
+		
+//		// For debugging heisenbug
+//		ret.setLogging(true);
+//		ret.setValue("security.debug", true);
+		
 		return ret;
 	}
 	
@@ -68,8 +73,7 @@ public class StreamUserAgent extends TestAgent
 		{
 			public void customResultAvailable(Integer testcnt)
 			{
-//				testRemote(testcnt.intValue(), tc, false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
-				testRemote(1, tc, false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+				testRemote(testcnt, tc, false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 				{
 					public void customResultAvailable(Integer testcnt)
 					{
@@ -199,25 +203,25 @@ public class StreamUserAgent extends TestAgent
 						{
 							public void customResultAvailable(TestReport result)
 							{
-								System.out.println(result);
+								System.out.println("Test result: "+agent+", "+root+", "+result);
 								tc.addReport(result);
 								testGetOutputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 								{
 									public void customResultAvailable(TestReport result)
 									{
-										System.out.println(result);
+										System.out.println("Test result: "+agent+", "+root+", "+result);
 										tc.addReport(result);
 										testPassInputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 										{
 											public void customResultAvailable(TestReport result)
 											{
-												System.out.println(result);
+												System.out.println("Test result: "+agent+", "+root+", "+result);
 												tc.addReport(result);
 												testPassOutputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 												{
 													public void customResultAvailable(TestReport result)
 													{
-														System.out.println(result);
+														System.out.println("Test result: "+agent+", "+root+", "+result);
 														tc.addReport(result);
 														destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Integer>(ret)
 														{
@@ -381,7 +385,7 @@ public class StreamUserAgent extends TestAgent
 	protected IFuture<TestReport> testPassOutputStream(int testno, IStreamService ss)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
-		final TestReport tr = new TestReport("#"+testno, "Test passInputStream()");
+		final TestReport tr = new TestReport("#"+testno, "Test passOutputStream()");
 		
 		ServiceInputConnection con = new ServiceInputConnection();
 		

@@ -38,6 +38,7 @@ public class RemoteReferenceTest //extends TestCase
 		
 		// Start platform2 with (remote) search service.
 		IPlatformConfiguration	config2	= STest.getDefaultTestConfig(getClass());
+//		config2.setLogging(true);
 		config2.addComponent(SearchServiceProviderAgent.class);
 		IExternalAccess	platform2	= Starter.createPlatform(config2).get(timeout);
 		

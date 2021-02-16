@@ -20,4 +20,31 @@ public class IntravmTransportAgent extends AbstractTransportAgent<IntravmTranspo
 	{
 		return new IntravmTransport();
 	}
+	
+//	/**
+//	 *  Heisendebug handshake issue
+//	 */
+//	@Override
+//	public IFuture<Void> startService()
+//	{
+//		// Heisenbug test if not simulating (TODO: test also when simulating?)
+//		if(!SSimulation.isSimulating(getAccess()) && !SSimulation.isBisimulating(getAccess()))
+//		{
+//	//		return agent.waitForDelay(400, ia -> super.startService());	// works
+//	//		return agent.waitForDelay(450, ia -> super.startService());	// heisenbug
+//			return agent.waitForDelay(550, ia -> super.startService());	// broken
+//	//		return agent.waitForDelay(700, ia -> super.startService());	// broken
+//	//		return agent.waitForDelay(800, ia -> super.startService());	// broken
+//	//		return agent.waitForDelay(900, ia -> super.startService());	// broken
+//	//		return agent.waitForDelay(1000, ia -> super.startService());	// broken
+//	//		return agent.waitForDelay(5000, ia -> super.startService());	// broken
+//	//		return agent.waitForDelay(3000, ia -> super.startService());	// works
+//	//		return agent.waitForDelay(300, ia -> super.startService());	// works
+//	//		return agent.waitForDelay(5, ia -> super.startService());	// works
+//		}
+//		else
+//		{
+//			return super.startService();	// works
+//		}
+//	}
 }
