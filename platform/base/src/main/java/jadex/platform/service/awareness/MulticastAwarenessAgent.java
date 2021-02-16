@@ -31,23 +31,16 @@ public class MulticastAwarenessAgent	extends LocalNetworkAwarenessBaseAgent
 	@OnInit
 	public void	start() throws Exception
 	{
-		// Happens sometimes in Windows: java.net.SocketException: Unrecognized Windows Sockets error: 0: Cannot bind
-		// -> try 10 times then give up
-		// cf. https://stackoverflow.com/questions/3947555/java-net-socketexception-unrecognized-windows-sockets-error-0-jvm-bind-jboss
-		for(int i=1; i<=10; i++)
+		try
 		{
-			try
-			{
-				sendsocket	= sendsocket!=null ? sendsocket : new DatagramSocket(0);
-				recvsocket = recvsocket!=null ? recvsocket : new MulticastSocket(port);
-			}
-			catch(SocketException e)
-			{
-				if(i==10)
-					throw e;
-			}
+			sendsocket	= sendsocket!=null ? sendsocket : new DatagramSocket(0);
+			recvsocket = recvsocket!=null ? recvsocket : new MulticastSocket(port);
+			((MulticastSocket)recvsocket).joinGroup(InetAddress.getByName(address));
 		}
-		((MulticastSocket)recvsocket).joinGroup(InetAddress.getByName(address));
+		catch(SocketException se)
+		{
+			throw new RuntimeException("port "+port+" problem?", se);
+		}
 		
 		super.init();
 	}
