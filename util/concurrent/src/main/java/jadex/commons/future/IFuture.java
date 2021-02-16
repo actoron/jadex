@@ -274,4 +274,10 @@ public interface IFuture<E>
 	 *  @param delegate The other future.
 	 */
 	public void delegate(Future<E> delegate);
+	
+	/**
+	 *  Called on exception.
+	 *  @param delegate The future the exception will be delegated to.
+	 */
+	public <T> IFuture<E> delegateEx(Future<T> delegate);
 }

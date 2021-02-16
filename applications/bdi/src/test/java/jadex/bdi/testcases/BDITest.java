@@ -51,7 +51,7 @@ public class BDITest	extends	ComponentTestSuite
 			"ErrorMessages",
 			//"MLRRetry", //broken
 			
-			SReflect.isAndroid() ? "GUICloser" : NOEXCLUDE
+			NOEXCLUDE
 		};
 	
 	/**

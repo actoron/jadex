@@ -191,7 +191,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 				{
 					aborted	= true;
 					System.out.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
-					if(!SReflect.isAndroid())
+					//if(!SReflect.isAndroid())
 					{
 						try
 						{
@@ -204,11 +204,11 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 							runner.stop();
 						}
 					}
-					else
+					/*else
 					{
 						System.err.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
 						System.exit(1);
-					}
+					}*/
 				}
 			}, timeout);
 		}
@@ -474,7 +474,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	{
 		List<String> result = new ArrayList<String>();
 
-		if (SReflect.isAndroid())
+		/*if(SReflect.isAndroid())
 		{
 			try
 			{
@@ -519,7 +519,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 				e.printStackTrace();
 			}
 		}
-		else
+		else*/
 		{
 			List<File>	todo	= new LinkedList<File>();
 //			if(path.toString().indexOf("micro")!=-1)

@@ -7,6 +7,7 @@ import java.util.Map;
 import jadex.base.SRemoteGui;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IServiceIdentifier;
@@ -78,7 +79,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	/**
 	 *  Get all startable component models.
 	 *  @return The file names of the component models.
-	 */
+	 * /
 	public IFuture<Collection<String[]>> getComponentModels(final IComponentIdentifier cid)
 	{
 		Future<Collection<String[]>> ret = new Future<>();
@@ -95,18 +96,18 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		}
 		
 		return ret;
-	}
+	}*/
 	
 	/**
-	 * 
+	 *  Get all startable component models.
+	 *  @return The file names of the component models.
 	 */
 	public ISubscriptionIntermediateFuture<Collection<String[]>> getComponentModelsAsStream(IComponentIdentifier cid)
 	{
 		final SubscriptionIntermediateFuture<Collection<String[]>> ret = new SubscriptionIntermediateFuture<>();
-		//if(cid==null || cid.hasSameRoot(cid))
-		//{
-			ILibraryService ls = agent.getLocalService(ILibraryService.class);
-			ls.getComponentModelsAsStream().addResultListener(new IIntermediateResultListener<Collection<String[]>>()
+		if(cid==null || cid.hasSameRoot(cid))
+		{
+			SComponentFactory.getComponentModelsAsStream(agent).addResultListener(new IIntermediateResultListener<Collection<String[]>>()
 			{
 				public void intermediateResultAvailable(Collection<String[]> result)
 				{
@@ -134,15 +135,48 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 			    public void maxResultCountAvailable(int max)
 			    {
 			    	ret.setMaxResultCount(max);
-			    	System.out.println("max count is: "+max);
+			    	//System.out.println("max count is: "+max);
 			    }
 			});
-		/*}
+		}
 		else
 		{
-			agent.searchService(new ServiceQuery<ILibraryService>(ILibraryService.class).setPlatform(cid).setScope(ServiceScope.PLATFORM))
-				.thenAccept(libs -> {libs.getComponentModels().delegate(ret);}).exceptionally(ret);
-		}*/
+			agent.getExternalAccess(cid).scheduleStep(ia ->
+			{
+				SComponentFactory.getComponentModelsAsStream(ia).addResultListener(new IIntermediateResultListener<Collection<String[]>>()
+				{
+					public void intermediateResultAvailable(Collection<String[]> result)
+					{
+						ret.addIntermediateResult(result);
+					}
+					
+					public void resultAvailable(Collection<Collection<String[]>> result)
+					{
+						for(Collection<String[]> res: result)
+						{
+							intermediateResultAvailable(res);
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setException(exception);
+					}
+					
+				    public void finished()
+				    {
+				    	ret.setFinished();
+				    }
+				    
+				    public void maxResultCountAvailable(int max)
+				    {
+				    	ret.setMaxResultCount(max);
+				    	//System.out.println("max count is: "+max);
+				    }
+				});
+				return IFuture.DONE;
+			}).delegateEx(ret);
+		}
 			
 		return ret;
 	}

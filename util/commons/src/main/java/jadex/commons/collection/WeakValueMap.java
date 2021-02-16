@@ -215,7 +215,7 @@ public class WeakValueMap<K, V>	implements Map<K, V>
 					{
 						final Entry<K, WeakEntry<V>> ret = oit.next();
 						final WeakEntry<V> we = ret.getValue();
-						if(SReflect.isAndroid() && SUtil.androidUtils().getAndroidVersion() <= 8)
+						/*if(SReflect.isAndroid() && SUtil.androidUtils().getAndroidVersion() <= 8)
 						{
 							return new Entry<K, V>() {
 								public K getKey() {
@@ -230,9 +230,9 @@ public class WeakValueMap<K, V>	implements Map<K, V>
 							};
 						}
 						else
-						{
+						{*/
 							return new AbstractMap.SimpleEntry<K, V>(ret.getKey(), we!=null ? we.get() : null);
-						}
+						//}
 					}
 					public void remove()
 					{

@@ -30,7 +30,7 @@ public abstract class AbstractModelLoader
 	 */
 	public AbstractModelLoader(String[] extensions)
 	{
-		this(extensions, SReflect.isAndroid() ? 12 : 450);
+		this(extensions, 450);
 	}
 	
 	/**

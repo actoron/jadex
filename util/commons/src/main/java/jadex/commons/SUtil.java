@@ -201,13 +201,10 @@ public class SUtil
 	 * Mapping from single characters to encoded version for displaying on
 	 * xml-style interfaces.
 	 */
-	protected static final Map<String, String>			htmlwraps;
+	protected static final Map<String, String> htmlwraps;
 	
-	/** Cached AndroidUtils */
-	protected static volatile AndroidUtils androidutils;
-
 	/** Holds the single characters. */
-	protected static final String			seps;
+	protected static final String seps;
 	
 
 	/** An empty enumeration. */
@@ -443,7 +440,7 @@ public class SUtil
 		
 		Long ret = dtoprop!=null? Long.parseLong(dtoprop): null;
 		if(ret==null)
-			ret = SReflect.isAndroid()? DEFTIMEOUT_DEFAULT*2 : DEFTIMEOUT_DEFAULT;
+			ret = DEFTIMEOUT_DEFAULT;
 		DEFTIMEOUT	= ret;
 	}
 
@@ -1701,12 +1698,12 @@ public class SUtil
 
 		Set<URL> cps = new LinkedHashSet<URL>(); 
 	
-		if(SReflect.isAndroid()) 
-		{
-			cps.addAll(androidUtils().collectDexPathUrls(classloader));
-		} 
-		else 
-		{
+//		if(SReflect.isAndroid()) 
+//		{
+//			cps.addAll(androidUtils().collectDexPathUrls(classloader));
+//		} 
+//		else 
+//		{
 			StringTokenizer stok = new StringTokenizer(System.getProperty("java.class.path"), System.getProperty("path.separator"));
 			while(stok.hasMoreTokens())
 			{
@@ -1778,7 +1775,7 @@ public class SUtil
 //					cps.add(urls[i]);
 //			}
 			cps.addAll(collectClasspathURLs(classloader));
-		}
+		//}
 		
 		return new ArrayList<URL>(cps);
 	}
@@ -3602,10 +3599,7 @@ public class SUtil
 	public static short getNetworkPrefixLength(InetAddress iadr)
 	{
 		short ret = -1;
-		if(!SReflect.isAndroid() || androidUtils().getAndroidVersion() > 8)
-		{
-			ret	= SNonAndroid.getNetworkPrefixLength(iadr);
-		}
+		ret	= SNonAndroid.getNetworkPrefixLength(iadr);
 		
 		return ret;
 	}
@@ -3985,7 +3979,7 @@ public class SUtil
 	 */
 	public static File	getHomeDirectory()
 	{
-		return SReflect.isAndroid() ? new File(System.getProperty("user.home")) : SNonAndroid.getHomeDirectory();		
+		return SNonAndroid.getHomeDirectory();		
 	}
 	
 	/**
@@ -3994,7 +3988,7 @@ public class SUtil
 	public static File	getDefaultDirectory()
 	{
 		// Todo: default directory on android?
-		return SReflect.isAndroid() ? new File(System.getProperty("user.home")) : SNonAndroid.getDefaultDirectory();		
+		return SNonAndroid.getDefaultDirectory();		
 	}
 	
 	/**
@@ -4003,7 +3997,7 @@ public class SUtil
 	public static File	getParentDirectory(File file)
 	{
 		// Todo: parent directory on android?
-		return SReflect.isAndroid() ? file.getParentFile() : SNonAndroid.getParentDirectory(file);		
+		return SNonAndroid.getParentDirectory(file);		
 	}
 
 	/**
@@ -4012,7 +4006,7 @@ public class SUtil
 	public static File[]	getFiles(File file, boolean hiding)
 	{
 		// Todo: hidden files on android?
-		return SReflect.isAndroid() ? file.listFiles() : SNonAndroid.getFiles(file, hiding);		
+		return SNonAndroid.getFiles(file, hiding);		
 	}
 	
 	/**
@@ -4050,7 +4044,7 @@ public class SUtil
 	 */
 	public static boolean isFloppyDrive(File file)
 	{
-		return SReflect.isAndroid() ? false : SNonAndroid.isFloppyDrive(file);
+		return SNonAndroid.isFloppyDrive(file);
 	}
 
 	/**
@@ -4059,7 +4053,7 @@ public class SUtil
 	 */
 	public static String getDisplayName(File file)
 	{
-		return SReflect.isAndroid() ? null : SNonAndroid.getDisplayName(file);
+		return SNonAndroid.getDisplayName(file);
 	}
 
 	/**
@@ -4069,7 +4063,7 @@ public class SUtil
 	public static boolean isGuiThread()
 	{
 		// Todo: ask android helper for android UI thread.
-		return SReflect.isAndroid() ? false : SNonAndroid.isGuiThread();
+		return SNonAndroid.isGuiThread();
 	}
 	
 	/**
@@ -5017,16 +5011,7 @@ public class SUtil
 	public static String[] getMacAddresses()
 	{
 		if(macs==null)
-		{
-			if(!SReflect.isAndroid() || androidUtils().getAndroidVersion() > 8)
-			{
-				macs = SNonAndroid.getMacAddresses();
-			} 
-			else 
-			{
-				macs = new String[0];
-			}
-		}
+			macs = SNonAndroid.getMacAddresses();
 		
 		return macs;
 	}
@@ -5139,7 +5124,7 @@ public class SUtil
 			{
 				if (appdir == null)
 				{
-					if (SReflect.isAndroid())
+					/*if (SReflect.isAndroid())
 					{
 						try
 						{
@@ -5172,106 +5157,13 @@ public class SUtil
 						}
 					}
 					else
-					{
+					{*/
 						appdir = (new File("")).getAbsoluteFile();
-					}
+					//}
 				}
 			}
 		}
 		return appdir;
-	}
-	
-	/**
-	 * Get the AndroidUtils, if available.
-	 * @return AndroidUtils
-	 */
-	public static AndroidUtils androidUtils() 
-	{
-		if (SReflect.isAndroid() && androidutils == null)
-		{
-			synchronized (SUtil.class)
-			{
-				if(androidutils == null && SReflect.isAndroid())
-				{
-					Class<?> clazz = SReflect.classForName0("jadex.android.commons.AndroidUtilsImpl", SReflect.class.getClassLoader());
-					try
-					{
-						androidutils = (AndroidUtils) clazz.newInstance();
-					}
-					catch(InstantiationException e)
-					{
-						e.printStackTrace();
-					}
-					catch(IllegalAccessException e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		return androidutils;
-	}
-	
-	public interface AndroidUtils {
-
-		/**
-		 * Get Android API version. Possible values:
-		 * http://developer.android.com/reference/android/os/Build.VERSION_CODES.html
-		 * 
-		 * @return Android API version
-		 */
-		int getAndroidVersion();
-
-		/**
-		 * Traverse the Hierarchy of the given classloader and collect all
-		 * DexPaths that are found as URLs.
-		 * @param classloader
-		 * @return URLs
-		 */
-		Collection<? extends URL> collectDexPathUrls(ClassLoader classloader);
-
-		/**
-		 * Checks whether the Platform has the necessary classes to provide XML
-		 * encoding and decoding support.
-		 * @return true, if platform supports xml
-		 */
-		boolean hasXmlSupport();
-
-		/**
-		 * Looks up the ClassLoader Hierarchy and tries to find a JadexDexClassLoader in it.
-		 * @param cl
-		 * @return {@link ClassLoader} or <code>null</code>, if none found.
-		 */
-		ClassLoader findJadexDexClassLoader(ClassLoader cl);
-
-		/**
-		 * Creates an URL object from a given Path to an android APK file
-		 * @param apkPath
-		 * @return {@link URL}
-		 * @throws MalformedURLException
-		 */
-		URL urlFromApkPath(String apkPath) throws MalformedURLException;
-		
-		/**
-		 * Retrieves the APK Path from a given URL, if its an Android APK URL.
-		 * @param url
-		 * @return {@link String}
-		 */
-		String apkPathFromUrl(URL url);
-
-		/**
-		 * Get all Classes in a dex file as Enumeration.
-		 * @param dexFile the dex file
-		 * @return Enumeration of full-qualified classnames
-		 * @throws IOException
-		 */
-		Enumeration<String> getDexEntries(File dexFile) throws IOException;
-
-		/**
-		 * Check whether the current Thread is the android UI thread.
-		 * @return true, if current thread is ui main thread.
-		 */
-		boolean runningOnUiThread();
 	}
 	
 //	/**

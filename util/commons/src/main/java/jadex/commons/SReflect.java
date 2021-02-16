@@ -5,6 +5,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
@@ -77,7 +78,10 @@ public class SReflect
 	protected static final Set convertabletypes;
 	
 	/** This is set to true if the VM has a working GUI environment available. */
-	public static final boolean HAS_GUI	= !isAndroid() && SNonAndroid.hasGui();
+	public static final boolean HAS_GUI	= SNonAndroid.hasGui();
+	
+	/** Null object. */
+	public static final Object NULL = new Object();
 	
 	static
 	{
@@ -414,8 +418,8 @@ public class SReflect
 		else if(t instanceof ParameterizedType)
 		{
 			// Bug in Android 2.2. see http://code.google.com/p/android/issues/detail?id=6636
-			if(!SReflect.isAndroid() ||  SUtil.androidUtils().getAndroidVersion() > 8)
-			{
+			//if(!SReflect.isAndroid() ||  SUtil.androidUtils().getAndroidVersion() > 8)
+			//{
 				// Hack!!! Bug in JDK returning the owner type twice!?
 //				ret = t.toString();
 				
@@ -441,11 +445,11 @@ public class SReflect
 						ret	+= ", ";
 					}
 				}
-			}
-			else
-			{
-				ret	= "n/a";
-			}
+//			}
+//			else
+//			{
+//				ret	= "n/a";
+//			}
 		}
 		else if(t instanceof GenericArrayType)
 		{
@@ -2211,6 +2215,9 @@ public class SReflect
 	
 	/**
 	 *  Scan for files in a given list of urls.
+	 *  @return Map of files matching the filter in the following format:
+	 *  <jarpath>[entrypath1,entrypath2,...]
+	 *  jarpath is null for directories
 	 */
 	public static Map<String, Set<String>> scanForFiles2(URL[] urls, IFilter<Object> filter)
 	{
@@ -2275,6 +2282,8 @@ public class SReflect
 		
 		return ret;
 	}
+	
+
 	
 	/**
 	 *  Scan directories.
@@ -2421,51 +2430,30 @@ public class SReflect
 //		});
 //	}
 	
-	/** Cached flag for android check. */
-	protected static volatile Boolean isAndroid;
-
-	/** Flag set by testcases that indicates we're testing android projects in a desktop environment. **/
-	protected static Boolean isAndroidTesting;
-
-	/** private setter that can be made accessible for robolectric testcases. **/
-	protected static void setAndroid(boolean isAndroidFlag, boolean isAndroidTestingFlag) {
-		synchronized (SReflect.class) {
-			isAndroid = isAndroidFlag;
-			isAndroidTesting = isAndroidTestingFlag;
-		}
-	}
-
-	public static Boolean isAndroidTesting() {
-		return isAndroidTesting;
-	}
-
-	/**
-	 *  Test if running on android.
-	 */
-	public static boolean	isAndroid()
-	{
-		if(isAndroid==null)
-		{
-			synchronized (SReflect.class)
-			{
-				if (isAndroid==null)
-				{
-					String vmName = System.getProperty("java.vm.name");
-					String vmVendor = System.getProperty("java.vm.vendor");
-					String vendorUrl = System.getProperty("java.vendor.url");
-
-					isAndroid =
-							("Dalvik".equalsIgnoreCase(vmName) ||
-							"The Android Project".equalsIgnoreCase(vmVendor) ||
-							"http://www.android.com".equalsIgnoreCase(vendorUrl));
-				}
-			}
-		}
-		return isAndroid.booleanValue();
-	}
-	
 	private class NotFound
 	{
+	}
+	
+	/**
+	 *  Get the default value of an annotation method.
+	 *  @param clazz The annotation class.
+	 *  @param name The method name.
+	 *  @return The value.
+	 */
+	public static<T> T getAnnotationDefaultValue(Class<? extends Annotation> clazz, String name)
+	{
+		T ret = null;
+		
+		try
+		{
+			Method method = clazz.getMethod(name,(Class[])null);
+			ret = (T)method.getDefaultValue();
+		}
+		catch(Exception e)
+		{
+		}
+		
+		return ret;
 	}
 }
 

@@ -29,7 +29,7 @@ public abstract class BDIClassGeneratorFactory
 	{
 		if(INSTANCE == null)
 		{
-			if(SReflect.isAndroid())
+			/*if(SReflect.isAndroid())
 			{
 				Class<?> clz;
 				try
@@ -54,9 +54,9 @@ public abstract class BDIClassGeneratorFactory
 				}
 			}
 			else
-			{
+			{*/
 				INSTANCE = new BDIClassGeneratorFactoryDesktop();
-			}
+			//}
 		}
 		return INSTANCE;
 	}

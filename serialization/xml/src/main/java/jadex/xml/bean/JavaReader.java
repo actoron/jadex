@@ -1016,10 +1016,7 @@ public class JavaReader
 			);
 			typeinfos.add(ti_ste);
 			
-			if(!SReflect.isAndroid()) 
-			{
-				typeinfos.addAll(STypeInfosAWT.getReaderTypeInfos());
-			}
+			typeinfos.addAll(STypeInfosAWT.getReaderTypeInfos());
 		}
 		catch(NoSuchMethodException e)
 		{

@@ -84,6 +84,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 {
 	/** Kernel model property for extensions */
 	protected static final String KERNEL_EXTENSIONS = "kernel.types";
+	protected static final String KERNEL_FILTER = "kernel.filter";
 	
 	/** Filter for scanning for kernel agent class files. */
 	protected static FileFilter ffilter = new FileFilter("$", false, ".class")

@@ -2,6 +2,7 @@ package jadex.platform.service.library;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -15,6 +16,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,6 +27,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
@@ -52,12 +55,15 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.context.IContextService;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.commons.ComposedFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
@@ -71,11 +77,14 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateEmptyResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.MinimalAgent;
 import jadex.micro.annotation.Agent;
@@ -626,7 +635,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	public IFuture<List<URL>> getAllURLs()
 	{
 //		final long	start	= System.currentTimeMillis();
-		final Future<List<URL>> ret = new Future<List<URL>>();
+		/*final Future<List<URL>> ret = new Future<List<URL>>();
 		
 		getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, List<URL>>(ret)
 		{
@@ -657,7 +666,43 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			}
 		});
 		
-		return ret;
+		return ret;*/
+		return new Future<List<URL>>(internalGetAllURLs());
+	}
+	
+	/**
+	 *  Get all urls (managed, indirect and non-managed from parent loader).
+	 *  @return The list of urls.
+	 */
+	public List<URL> internalGetAllURLs()
+	{
+//		final long	start	= System.currentTimeMillis();
+		
+		Set<IResourceIdentifier> rids = internalgetAllResourceIdentifiers();
+		final List<URL> res = new ArrayList<URL>();
+		Iterator<IResourceIdentifier> it = rids.iterator();
+		while(it.hasNext())
+		{
+			IResourceIdentifier rid = it.next();
+			if(!rootrid.equals(rid))
+			{
+				URL url = SUtil.toURL0(rid.getLocalIdentifier().getUri());
+				if(url!=null)
+					res.add(url);
+			}
+		}
+		
+		Set<URI> re = getInternalNonManagedURLs();
+		for(URI uri: re)
+		{
+			URL url = SUtil.toURL0(uri);
+			if(url!=null)
+				res.add(url);
+		}
+//		res.addAll();
+		
+//		System.out.println("getAllUrls: "+(System.currentTimeMillis()-start));
+		return res;
 	}
 		
 	/** 
@@ -1790,17 +1835,31 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		return ret;
 	}
 	
+	/**
+	 *  Scans for component models and returns them as stream.
+	 *  @return Collection<String[](filename, classname)>>
+	 * /
 	public ISubscriptionIntermediateFuture<Collection<String[]>> getComponentModelsAsStream()
 	{
 		SubscriptionIntermediateFuture<Collection<String[]>> ret = new SubscriptionIntermediateFuture<>();
+		
 		URL[] urls = getAllURLs().get().toArray(new URL[0]);			
 		urls = SUtil.removeSystemUrls(urls);
 					
 		// scanning is time expensive
 		
+		Map<URL, IResourceIdentifier> rids = new HashMap<>();
+		for(IResourceIdentifier entry:  internalgetAllResourceIdentifiers())
+		{
+			if(entry.getLocalIdentifier()!=null && entry.getLocalIdentifier().getUri()!=null)
+				rids.put(SUtil.toURL0(entry.getLocalIdentifier().getUri()), entry);
+		}
+		//final ModelFileFilter mff = new ModelFileFilter(false, rids, component);
+		
+		
 		final List<URL> l = SUtil.arrayToList(urls);
 		final Iterator<URL> it = (Iterator<URL>)l.iterator();
-		System.out.println("getComponentModelsAsStream: "+l.size());
+		//System.out.println("getComponentModelsAsStream: "+l.size());
 		final int cnt[] = new int[1];
 		
 		ret.setMaxResultCount(l.size());
@@ -1809,7 +1868,11 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		{
 			public IFuture<List<String[]>> execute(IInternalAccess ia)
 			{
-				Set<SClassReader.ClassFileInfo> cis = SReflect.scanForClassFileInfos(new URL[]{it.next()}, null, new IFilter<SClassReader.ClassFileInfo>()
+				Future<List<String[]>> ret = new Future<>();
+				
+				URL[] url = new URL[]{it.next()};
+				
+				/*Set<SClassReader.ClassFileInfo> cis = SReflect.scanForClassFileInfos(url, null, new IFilter<SClassReader.ClassFileInfo>()
 				{
 					public boolean filter(SClassReader.ClassFileInfo ci)
 					{
@@ -1819,11 +1882,31 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 							ret = true;
 						return ret;
 					}
-				});
+				});* /
+
+				IFilter<Object>[] filters = getKernelFilters().toArray(new IFilter[0]);
+				IFilter fil = new ComposedFilter(filters, ComposedFilter.OR);
+
+				Set<SClassReader.ClassFileInfo> cis = SReflect.scanForClassFileInfos(url, null, fil);
 				
 				List<String[]> res = cis.stream().map(a -> new String[]{a.getFilename(), a.getClassInfo().getClassName()}).collect(Collectors.toList());
 				
-				return new Future<List<String[]>>(res);
+				//IIntermediateFuture<String> fut = scanForFilesAsync(url[0], mff);
+				//fut.next(er -> res.add(new String[]{er, er}))
+				//	.finished(v -> ret.setResult(res))
+				//	.catchEx(ex -> ret.setException(ex));
+				
+				String[] res2 = SReflect.scanForFiles(url, fil);
+				
+				for(String r: res2)
+					res.add(new String[]{r, r});
+				
+				if(res.size()>0)
+					System.out.println("found for: "+url[0]+" "+res.size());
+				
+				ret.setResult(res);
+				
+				return ret;
 			}
 		};
 		
@@ -1852,6 +1935,220 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		});
 		
 		return ret;
-	}
+	}*/
+	
+	/**
+	 *  Scan for files in a given list of urls.
+	 * /
+	public static IIntermediateFuture<String> scanForFilesAsync(URL url, IAsyncFilter<Object> filter)
+	{
+		IntermediateFuture<String> ret = new IntermediateFuture<String>();
+		
+		try
+		{
+//			System.out.println("url: "+urls[i].toURI());
+			File f = new File(url.toURI());
+			if(f.getName().endsWith(".jar"))
+			{
+				try
+				{
+					final JarFile jar = new JarFile(f);
+					
+					int[] cnt = new int[1];
+					int[] max = new int[1];
+					boolean[] leftloop = new boolean[1];
+					for(Enumeration<JarEntry> e=jar.entries(); e.hasMoreElements(); )
+					{
+						max[0]++;
+						JarEntry je	= e.nextElement();
+						
+						filter.filter(je).then(b ->
+						{
+							if(b)
+							{
+								System.out.println("adding1: "+f.getAbsolutePath()+je.getName());
+								ret.addIntermediateResult(f.getAbsolutePath()+je.getName());
+							}
+							/*else
+							{
+								System.out.println("not adding: "+f.getAbsolutePath()+je.getName());
+							}* /
+							if(max[0]==++cnt[0] && leftloop[0])
+							{
+								try{jar.close();} catch(Exception ex){}
+								ret.setFinished();
+							}
+						}).catchEx(ex -> ex.printStackTrace());
+					}
+					if(max[0]==cnt[0])
+					{
+						try{jar.close();} catch(Exception ex){}
+						ret.setFinished();
+					}
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+//					System.out.println("Error opening jar: "+urls[i]+" "+e.getMessage());
+				}
+			}
+			else if(f.isDirectory())
+			{
+				scanDirAsync(f, filter, new ArrayList<String>()).delegate(ret);
+//				throw new UnsupportedOperationException("Currently only jar files supported: "+f);
+			}
+			else
+			{
+				ret.setFinished();
+			}
+		}
+		catch(Exception e)
+		{
+			System.out.println("scan problem with: "+url);
+			e.printStackTrace();
+			ret.setException(e);
+		}
+		
+		return ret;
+	}*/
+	
+	/**
+	 *  Scan directories.
+	 * /
+	public static IIntermediateFuture<String> scanDirAsync(File file, IAsyncFilter<Object> filter, List<String> donedirs)
+	{
+		//System.out.println("handling: "+file);
+		
+		IntermediateFuture<String> ret = new IntermediateFuture<String>();
+		FutureBarrier<Void> bar = new FutureBarrier<Void>();
+		final Future<Void> filesfut = new Future<>();
+		final Future<Void> dirsfut = new Future<>();
+		bar.addFuture(filesfut);
+		bar.addFuture(dirsfut);
+		bar.waitForResults()
+			.then(e -> ret.setFinished())
+			.catchEx(ex -> ret.setException(ex));
+		
+		File[] files = file.listFiles(new FileFilter()
+		{
+			public boolean accept(File f)
+			{
+				return !f.isDirectory();
+			}
+		});
+		
+		int[] fcnt = new int[1];
+		final int fmax = files.length;
+		if(fmax==0)
+		{
+			filesfut.setResult(null);
+		}
+		else
+		{
+			for(File fi: files)
+			{
+				filter.filter(fi).then(b ->
+				{
+					if(b)
+					{
+						System.out.println("adding: "+fi.getAbsolutePath());
+						ret.addIntermediateResult(fi.getAbsolutePath());
+					}
+					/*else
+					{
+						System.out.println("not adding: "+fi.getAbsolutePath());
+					}* /
+					if(fmax==++fcnt[0])
+						filesfut.setResult(null);
+				}).catchEx(ex ->
+				{
+					ex.printStackTrace();
+					if(fmax==++fcnt[0])
+						filesfut.setResult(null);
+				});
+			}
+		}
+		
+		if(file.isDirectory())
+		{
+			donedirs.add(file.getAbsolutePath());
+			File[] sudirs = file.listFiles(new FileFilter()
+			{
+				public boolean accept(File f)
+				{
+					return f.isDirectory();
+				}
+			});
+			
+			final int dmax = sudirs.length;
+			int[] dcnt = new int[1];
+			
+			if(dmax==0)
+			{
+				dirsfut.setResult(null);
+			}
+			else
+			{
+				for(File dir: sudirs)
+				{
+					if(!donedirs.contains(dir.getAbsolutePath()))
+					{
+						scanDirAsync(dir, filter, donedirs).next(e -> ret.addIntermediateResult(e))
+						.finished(v -> 
+						{
+							if(dmax==++dcnt[0])
+								dirsfut.setResult(null);
+						}).catchEx(ex ->
+						{
+							ex.printStackTrace();
+							if(dmax==++dcnt[0])
+								dirsfut.setResult(null);
+						});
+					}
+					else
+					{
+						if(dmax==++dcnt[0])
+							dirsfut.setResult(null);
+					}
+				}
+			}
+		}
+		else
+		{
+			dirsfut.setResult(null);
+		}
+		
+		return ret;
+	}*/
+	
+	/*protected Collection<IFilter<Object>> kernelfilters;
+	protected boolean dirty;
+	
+	/**
+	 *  Get all kernel files, i.e. specs to start a kernel.
+	 * /
+	protected Collection<IFilter<Object>> getKernelFilters()
+	{
+		if(kernelfilters==null || dirty)
+			kernelfilters = SComponentFactory.scanForKernelFilters(internalGetAllURLs());
+		dirty = false;
+		return kernelfilters;
+	}*/
+	
+	/*public static void main(String[] args) throws Exception
+	{
+		
+		IIntermediateFuture<String> fut = scanForFilesAsync(new URL("file:///C:/projects/jadex/applications/bpmn/build/libs/jadex-applications-bpmn-4.0.171.jar"), f -> new Future<Boolean>(Boolean.TRUE));
+		fut
+			.next(n -> System.out.println(n))
+			.finished(v -> System.out.println("fini"))
+			.catchEx(ex -> ex.printStackTrace());
+		
+		/*IIntermediateFuture<String> fut = scanDirAsync(new File("."), f -> new Future<Boolean>(Boolean.TRUE), new ArrayList<String>());
+		fut
+			.next(n -> System.out.println(n))
+			.finished(v -> System.out.println("fini"))
+			.catchEx(ex -> ex.printStackTrace());* /
+	}*/
 }
 

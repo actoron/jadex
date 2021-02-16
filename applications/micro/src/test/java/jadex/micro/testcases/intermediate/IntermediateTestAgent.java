@@ -60,14 +60,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 	public void body()
 	{
 		final Testcase tc = new Testcase();
-		if(SReflect.isAndroid()) 
-		{
-			tc.setTestCount(1);
-		} 
-		else 
-		{
-			tc.setTestCount(2);	
-		}
+		tc.setTestCount(2);	
 		
 		
 		final Future<TestReport> ret = new Future<TestReport>();
@@ -111,21 +104,14 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
-				if(SReflect.isAndroid()) 
+				testRemote(2, 100, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
-					ret.setResult(null);
-				}
-				else
-				{
-					testRemote(2, 100, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+					public void customResultAvailable(TestReport result)
 					{
-						public void customResultAvailable(TestReport result)
-						{
-							tc.addReport(result);
-							ret.setResult(null);
-						}
-					}));
-				}
+						tc.addReport(result);
+						ret.setResult(null);
+					}
+				}));
 			}
 		}));
 	}
