@@ -254,7 +254,7 @@ public class LongcallTestAgent extends TestAgent
 			System.out.println("calling method "+cnt+": "+System.currentTimeMillis());
 			
 			// set timeout to low value to avoid long waiting in test
-			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledDefaultTimeout(agent.getId(), 0.1));
+			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledDefaultTimeout(agent.getId(), 0.05));
 			
 			final long start	= System.currentTimeMillis();
 			Object	fut	= m.invoke(ts, new Object[0]);
