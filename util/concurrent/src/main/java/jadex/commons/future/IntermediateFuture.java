@@ -949,6 +949,23 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
         return this;
     }
 	
+	/**
+	 *  Called on exception.
+	 *  @param delegate The future the exception will be delegated to.
+	 */
+	public <T> IIntermediateFuture<E> delegateEx(Future<T> delegate)
+	{
+		IResultListener reslis = new IntermediateEmptyResultListener()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				 delegate.setException(exception);
+			}
+		};
+		addResultListener(reslis);
+		return this;
+	}
+	
 	// todo: subscriptions need special treatment for first listener
 	
 	/**

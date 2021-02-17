@@ -145,7 +145,7 @@ public class SSecurity
 		SUtil.ensureNonblockingSecureRandom();
 		getSecureRandom();
 		
-		if (SReflect.isAndroid())
+		/*if(SReflect.isAndroid())
 		{
 			// Probe for a weird bug caused by the interaction between
 			// Java 9+, Android and Bouncycastle
@@ -170,7 +170,7 @@ public class SSecurity
 					System.setProperty("javax.net.ssl.trustStoreType", oldstoretype);
 				}
 			}
-		}
+		}*/
 	}
 	
 	/**

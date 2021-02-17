@@ -33,7 +33,7 @@ public abstract class XMLWriterFactory
 	{
 		if(INSTANCE == null)
 		{
-			if(SReflect.isAndroid() && !SReflect.isAndroidTesting())
+			/*if(SReflect.isAndroid() && !SReflect.isAndroidTesting())
 			{
 				Class< ? > clz;
 				try
@@ -58,9 +58,9 @@ public abstract class XMLWriterFactory
 				}
 			}
 			else
-			{
+			{*/
 				INSTANCE = new XMLWriterFactoryDesktop();
-			}
+			//}
 		}
 		return INSTANCE;
 	}

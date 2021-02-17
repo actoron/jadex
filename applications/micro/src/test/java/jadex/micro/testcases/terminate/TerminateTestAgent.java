@@ -54,14 +54,7 @@ public class TerminateTestAgent extends TestAgent
 	@Override
 	protected IFuture<Void> performTests(Testcase tc)
 	{
-		if(SReflect.isAndroid()) 
-		{
-			tc.setTestCount(2);
-		} 
-		else 
-		{
-			tc.setTestCount(4);	
-		}
+		tc.setTestCount(4);	
 		
 		final Future<Void>	ret	= new Future<Void>();
 		
@@ -75,25 +68,18 @@ public class TerminateTestAgent extends TestAgent
 			
 			public void finished()
 			{
-				if (SReflect.isAndroid()) 
+				testRemote(3, 1000).addResultListener(new ExceptionDelegationResultListener<Collection<TestReport>, Void>(ret)
 				{
-					ret.setResult(null);
-				} 
-				else 
-				{
-					testRemote(3, 1000).addResultListener(new ExceptionDelegationResultListener<Collection<TestReport>, Void>(ret)
+					public void customResultAvailable(Collection<TestReport> result)
 					{
-						public void customResultAvailable(Collection<TestReport> result)
+						for(TestReport rep: result)
 						{
-							for(TestReport rep: result)
-							{
-								tc.addReport(rep);
-							}
-							
-							ret.setResult(null);
+							tc.addReport(rep);
 						}
-					});
-				}
+						
+						ret.setResult(null);
+					}
+				});
 			}
 		});
 		

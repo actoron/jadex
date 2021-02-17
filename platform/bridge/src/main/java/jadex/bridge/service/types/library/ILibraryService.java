@@ -144,14 +144,15 @@ public interface ILibraryService
 	 */
 	public IFuture<List<URL>> getAllURLs();
 	
+	// -> moved to SComponentFactory
 	/**
 	 *  todo: support all component models
 	 *  
 	 *  Get all startable component models (currently only Java classes with @Agent).
 	 *  @return The file names of the component models.
-	 */
+	 * /
 	public IFuture<Collection<String[]>> getComponentModels();
-	public ISubscriptionIntermediateFuture<Collection<String[]>> getComponentModelsAsStream();
+	public ISubscriptionIntermediateFuture<Collection<String[]>> getComponentModelsAsStream();*/
 	
 	//-------- listener methods --------
 	

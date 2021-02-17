@@ -59,10 +59,8 @@ public class ShutdownAgent
 					public void customResultAvailable(IBlockService bs)
 					{
 						int numBlocks = 1000;
-						if (SReflect.isAndroid()) {
-							numBlocks = 100;
-						}
-						for(int i=0; i<numBlocks; i++) {
+						for(int i=0; i<numBlocks; i++) 
+						{
 							bs.block(-1);
 						}
 						

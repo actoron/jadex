@@ -45,12 +45,12 @@ public class ThreadingTestAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(SReflect.isAndroid()) 
+		/*if(SReflect.isAndroid()) 
 		{
 			// reduce number of threads for android
 			maxlocal /=100;
 			maxremote /=100;
-		}
+		}*/
 		
 //		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
 		testLocal(1, maxlocal).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)

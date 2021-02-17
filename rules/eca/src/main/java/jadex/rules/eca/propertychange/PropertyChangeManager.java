@@ -43,14 +43,14 @@ public class PropertyChangeManager
 	/** Returns a new PropertyChangeManager instance **/ 
 	public static PropertyChangeManager createInstance()
 	{
-		if(SReflect.isAndroid()) 
-		{
-			return new PropertyChangeManager();
-		} 
-		else 
-		{
+//		if(SReflect.isAndroid()) 
+//		{
+//			return new PropertyChangeManager();
+//		} 
+//		else 
+//		{
 			return new PropertyChangeManagerDesktop();
-		}
+		//}
 	}
 	
 	/**

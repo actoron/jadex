@@ -118,6 +118,10 @@ public class Starter
     /** The weak set of invoked init, start or shutdown methods - to not invoke twice. */
     public static String DATA_INVOKEDMETHODS = "INVOKEDMETHODS";
     
+    /** The cache of component models found by scanning available resources. */
+    public static String DATA_COMPONENTMODELS = "componentmodels";
+    public static String DATA_KERNELFILTERS = "kernelfilters";
+
     
     // todo: cannot be used because registry needs to know when superpeer changes (remap queries)
 //    /** Constant for the superpeer. */

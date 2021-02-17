@@ -56,6 +56,8 @@ public class ModelFileFilter implements IAsyncFilter
 //		this.selectedcomponents	=  selectedcomponents;
 		this.rids	= rids;
 		this.exta = exta;
+		
+		System.out.println("created model file filter: "+rids);
 	}
 
 	//-------- methods --------
@@ -150,9 +152,9 @@ public class ModelFileFilter implements IAsyncFilter
 			}
 			else
 			{
-				String	furl	= SUtil.toURL(file.getAbsolutePath()).toString();
+				String furl = SUtil.toURL(file.getAbsolutePath()).toString();
 				if(furl.startsWith("jar:"))
-					furl	= furl.substring(4);
+					furl = furl.substring(4);
 				IResourceIdentifier	rid	= null;
 				for(Iterator<URL> it=rids.keySet().iterator(); rid==null && it.hasNext(); )
 				{

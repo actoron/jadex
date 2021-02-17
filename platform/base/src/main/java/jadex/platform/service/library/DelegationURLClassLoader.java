@@ -57,7 +57,7 @@ public class DelegationURLClassLoader extends URLClassLoader
 	{
 		super(url!=null? new URL[]{url}: new URL[0],
 			// No parent class loader to avoid multiple lookups of unavailable classes (not supported on android)
-			SReflect.isAndroid()? basecl : null);
+			null);
 
 		this.rid = rid;
 		this.basecl	= basecl;

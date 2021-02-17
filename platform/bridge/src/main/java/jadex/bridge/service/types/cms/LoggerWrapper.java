@@ -924,9 +924,11 @@ public class LoggerWrapper extends Logger
 			// ClassLoader. Drop through.
 		}
 
-		if (!SReflect.isAndroid()) {
+		//if(!SReflect.isAndroid()) 
+		{
 			ResourceBundle cat = SNonAndroid.findResourceBundle(name, currentLocale, cl);
-			if (cat != null) {
+			if (cat != null) 
+			{
 				catalog = cat;
 				catalogName = name;
 				catalogLocale = currentLocale;

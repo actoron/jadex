@@ -705,7 +705,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			
 			// Do not try to call isAnnotationPresent for Proxy on Android
 			// see http://code.google.com/p/android/issues/detail?id=24846
-			if(!(SReflect.isAndroid() && ProxyFactory.isProxyClass(serclass)))
+			if(!(ProxyFactory.isProxyClass(serclass)))
+			//if(!(SReflect.isAndroid() && ProxyFactory.isProxyClass(serclass)))
 			{
 				while(!Object.class.equals(serclass))
 				{
