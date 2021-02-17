@@ -37,8 +37,8 @@ public class ReceiverAgent
 	@AgentArgument
 	protected String filename;
 	
-	@AgentServiceSearch
-	protected IContextService contextService;
+	//@AgentServiceSearch
+	//protected IContextService contextService;
 
 //	@AgentCreated
 //	public void created()
@@ -55,7 +55,7 @@ public class ReceiverAgent
 	{
 		// todo: how to avoid garbage collection of connection?
 //		final IInputConnection con = (IInputConnection)msg.get(SFipa.CONTENT);
-//		System.out.println("received: "+con+" "+con.hashCode());
+		//System.out.println("received: "+con+" "+con.hashCode());
 		
 		receiveBehavior((IInputConnection)con);
 	}
@@ -68,7 +68,8 @@ public class ReceiverAgent
 		try
 		{
 			final long[] cnt = new long[1];
-			File f = contextService.getFile(filename).get();
+			//File f = contextService.getFile(filename).get();
+			File f = new File(filename);
 			final FileOutputStream fos = new FileOutputStream(f);
 			
 			ISubscriptionIntermediateFuture<byte[]> fut = ((IInputConnection)con).aread();
@@ -91,8 +92,8 @@ public class ReceiverAgent
 				public void intermediateResultAvailable(byte[] result)
 				{
 					cnt[0] += result.length;
-//					if(cnt[0]%1000==0)
-//						System.out.println("bytes: "+cnt[0]);
+					//if(cnt[0]%1000==0)
+					//	System.out.println("bytes: "+cnt[0]);
 					try
 					{
 						fos.write(result);
