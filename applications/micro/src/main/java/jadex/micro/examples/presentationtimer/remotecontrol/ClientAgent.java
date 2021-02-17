@@ -19,8 +19,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.examples.presentationtimer.common.ICountdownService;
-import jadex.micro.examples.presentationtimer.common.State;
-import jadex.micro.examples.presentationtimer.common.ICountdownService.ICountdownListener;
 import jadex.micro.examples.presentationtimer.remotecontrol.ui.CDListItem;
 import jadex.micro.examples.presentationtimer.remotecontrol.ui.CDListModel;
 import jadex.micro.examples.presentationtimer.remotecontrol.ui.ClientFrame;
@@ -53,8 +51,13 @@ public class ClientAgent
 	public void body()
 	{
 		ClientFrame clientFrame = new ClientFrame();
-		clientFrame.setVisible(true);
 		CDListModel listmodel = clientFrame.getListmodel();
+		
+		SwingUtilities.invokeLater(() ->
+		{
+			clientFrame.setVisible(true);
+			access.getExternalAccess().waitForTermination().then(it -> SwingUtilities.invokeLater(() ->	clientFrame.dispose()));
+		});
 		
 		//searchCdServices().addIntermediateResultListener(cdService -> {
 		searchCdServices().next(cdService -> {
