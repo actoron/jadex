@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.cms;
 
+import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -10,8 +11,6 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.commons.SNonAndroid;
-import jadex.commons.SReflect;
 
 
 /**
@@ -926,7 +925,7 @@ public class LoggerWrapper extends Logger
 
 		//if(!SReflect.isAndroid()) 
 		{
-			ResourceBundle cat = SNonAndroid.findResourceBundle(name, currentLocale, cl);
+			ResourceBundle cat = findResourceBundle(name, currentLocale, cl);
 			if (cat != null) 
 			{
 				catalog = cat;
@@ -1267,5 +1266,60 @@ public class LoggerWrapper extends Logger
         }
         log(Level.FINEST, msg);
     }
+    
+    /**
+	 * Try to find a {@link ResourceBundle} by trying Classloaders 
+	 * from all calling Classes.
+	 * @param name Name of the ResourceBundle to find
+	 * @param currentLocale Name of the locale
+	 * @param cl the default classloader
+	 * @return The found {@link ResourceBundle} or <code>null</code>.
+	 */
+	public static ResourceBundle findResourceBundle(String name, Locale currentLocale, ClassLoader cl)
+	{
+		// Fall back to searching up the call stack and trying each
+		// calling ClassLoader.
+		for(int ix = 0;; ix++)
+		{
+			Class<?> clz = null;
+			try
+			{
+				Class<?> ref = Class.forName("sun.reflect.Reflection");
+				Method m = ref.getMethod("getCallerClass", new Class[]{int.class});
+				clz = (Class<?>)m.invoke(null, new Object[]{Integer.valueOf(ix)});
+			}
+			catch(Exception e)
+			{
+			}
+//			Class<?> clz = sun.reflect.Reflection.getCallerClass(ix);
+			
+			if(clz == null)
+			{
+				break;
+			}
+			ClassLoader cl2 = clz.getClassLoader();
+			if(cl2 == null)
+			{
+				cl2 = ClassLoader.getSystemClassLoader();
+			}
+			if(cl == cl2)
+			{
+				// We've already checked this classloader.
+				continue;
+			}
+			cl = cl2;
+			try
+			{
+				return ResourceBundle.getBundle(name, currentLocale, cl);
+			}
+			catch(MissingResourceException ex)
+			{
+				// Ok, this one didn't work either.
+				// Drop through, and try the next one.
+			}
+		}
+		
+		return null;
+	}
 
 }

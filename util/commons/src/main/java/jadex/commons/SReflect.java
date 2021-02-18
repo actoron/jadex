@@ -1,5 +1,6 @@
 package jadex.commons;
 
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -78,7 +79,7 @@ public class SReflect
 	protected static final Set convertabletypes;
 	
 	/** This is set to true if the VM has a working GUI environment available. */
-	public static final boolean HAS_GUI	= SNonAndroid.hasGui();
+	public static final boolean HAS_GUI	= hasGui();
 	
 	/** Null object. */
 	public static final Object NULL = new Object();
@@ -2454,6 +2455,25 @@ public class SReflect
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Test if there is a gui available.
+	 */
+	public static boolean hasGui()
+	{
+		boolean hasgui;
+		try
+		{
+			hasgui = !(GraphicsEnvironment.isHeadless() ||
+				GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length < 1);
+		}
+		catch(Error e)
+		{
+			// On system misconfigurations, Java throws an Error (grr).
+			hasgui = false;
+		}
+		return hasgui;
 	}
 }
 
