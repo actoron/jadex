@@ -583,7 +583,7 @@ subprojects
 				// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
 				def distzip = project.jadexDistZip.outputs.files.first().canonicalPath
 				//def distzip2 = rebuilddirfile.getCanonicalPath() + '/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
-				def distzip2 = rebuilddirfile.getCanonicalPath() + '/build/distributions/zips/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+				def distzip2 = rebuilddirfile.getCanonicalPath() + '/'+project.buildDir.name+'/distributions/zips/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
 				def diff	= diffZips(distzip, distzip2)
 				if(diff.length()!=0)
 					throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);
