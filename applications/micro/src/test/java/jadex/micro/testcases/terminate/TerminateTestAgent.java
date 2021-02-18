@@ -15,7 +15,6 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -58,7 +57,7 @@ public class TerminateTestAgent extends TestAgent
 		
 		final Future<Void>	ret	= new Future<Void>();
 		
-		testLocal(1, 100).addResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
+		testLocal(1, 1000).addResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			@Override
 			public void intermediateResultAvailable(TestReport result)
