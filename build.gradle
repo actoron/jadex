@@ -339,8 +339,12 @@ subprojects
 
     sourceCompatibility = 1.8
     
-    if(isTestParallel(project)) {
-		tasks.withType(Test) {
+	tasks.withType(Test) {
+		// Add current time as test input so tests are always run (i.e. outputs not uptodate and not taken from cache by gradle)
+		// cf. https://blog.gradle.org/stop-rerunning-tests
+		systemProperty "test.timestamp", ""+System.currentTimeMillis()
+		
+		if(isTestParallel(project)) {	
  			maxParallelForks = Runtime.runtime.availableProcessors()
  		}
 	}

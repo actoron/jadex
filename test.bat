@@ -1,7 +1,7 @@
 @REM perform all tests
 
-set jadex_timeout=90000
-CMD /C gradlew -Pdist=publishdists cleanTest test -x javadoc --continue
+@rem set jadex_timeout=90000
+CMD /C gradlew -Pdist=publishdists test -x javadoc --continue
 
 @set builderror=%ERRORLEVEL%
 @IF "%builderror%" NEQ "0" (
