@@ -9,25 +9,18 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.types.context.IContextService;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.OnStream;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 @Arguments(@Argument(name="filename", clazz=String.class, defaultvalue="\"copy.copy\""))
 @Results(@Result(name="filesize", clazz=long.class))
-@RequiredServices({
-	@RequiredService(name="contextService", type=IContextService.class)
-})
 @Agent
 public class ReceiverAgent
 {

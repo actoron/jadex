@@ -1,5 +1,6 @@
 package jadex.platform.service.filetransfer;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -10,11 +11,8 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.filetransfer.FileData;
 import jadex.bridge.service.types.filetransfer.IFileTransferService;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -161,26 +159,17 @@ public class FileTransferService implements IFileTransferService
 	public IFuture<Void> openFile(final String path)
 	{
 		final Future<Void> ret = new Future<Void>();
-		agent.searchService( new ServiceQuery<>( IContextService.class))
-			.addResultListener(new DefaultResultListener<IContextService>()
-		{
-			public void resultAvailable(IContextService cs)
-			{
-				try
-				{
-					cs.openFile(path);
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-					ret.setException(e);
-				}
-			}
-		});
-
 		// exec produces strange exceptions?!
 		// Runtime.getRuntime().exec(path);
-		ret.setResult(null);
+		try
+		{
+			Desktop.getDesktop().open(new File(path));
+			ret.setResult(null);
+		}
+		catch(IOException e)
+		{
+			ret.setException(e);
+		}
 		return ret;
 	}
 	
