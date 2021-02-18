@@ -1,6 +1,6 @@
 @REM perform all tests repeatedly until failure
 
-@rem set jadex_timeout=90000
+set jadex_timeout=90000
 :test_loop
 CMD /C gradlew -Pdist=publishdists test -x javadoc --continue -PbuildDir=build2
 

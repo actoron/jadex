@@ -7,11 +7,9 @@ import org.junit.Test;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.util.STest;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ITuple2Future;
 
 public class BPMNStartElementsTest //extends TestCase
 {
