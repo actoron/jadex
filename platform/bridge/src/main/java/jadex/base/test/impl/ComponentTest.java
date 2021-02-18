@@ -41,7 +41,7 @@ public class ComponentTest extends ComponentTestBase
 	 */
 	public ComponentTest() 
 	{
-		Logger.getLogger("ComponentTest").log(Level.SEVERE, "Empty ComponentTest Constructor called");
+		//Logger.getLogger("ComponentTest").log(Level.SEVERE, "Empty ComponentTest Constructor called");
 	}
 	
 	/**

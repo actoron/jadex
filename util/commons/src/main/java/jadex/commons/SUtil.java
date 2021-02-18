@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
@@ -67,6 +68,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
+import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.jar.Attributes;
@@ -78,6 +80,9 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+
+import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileSystemView;
 
 import jadex.commons.collection.IAutoLock;
 import jadex.commons.collection.IRwMap;
@@ -3599,10 +3604,85 @@ public class SUtil
 	public static short getNetworkPrefixLength(InetAddress iadr)
 	{
 		short ret = -1;
-		ret	= SNonAndroid.getNetworkPrefixLength(iadr);
+		try
+		{
+			NetworkInterface ni = NetworkInterface.getByInetAddress(iadr);
+			List<InterfaceAddress> iads = ni.getInterfaceAddresses();
+			if(iads!=null)
+			{
+				for(int i=0; i<iads.size() && ret==-1; i++)
+				{
+					InterfaceAddress ia = iads.get(i);
+					if(ia.getAddress() instanceof Inet4Address)
+						ret = ia.getNetworkPrefixLength();
+				}
+			}
+			
+		}
+		catch(Exception e)
+		{
+//				e.printStackTrace();
+		}
 		
 		return ret;
 	}
+	
+	/**
+	 * Get the network ips.
+	 */
+	public static List<InetAddress> getNetworkIps()
+	{
+		List<InetAddress> ret = new ArrayList<InetAddress>();
+		try
+		{
+			// Generate network identifiers
+			for(NetworkInterface ni : SUtil.getNetworkInterfaces())
+			{
+				for(InterfaceAddress ifa : ni.getInterfaceAddresses())
+				{
+					if(ifa != null) // Yes, there may be a null in the list. grrr.
+					{
+						InetAddress addr = ifa.getAddress();
+						// System.out.println("addr: "+addr+" "+addr.isAnyLocalAddress()+" "+addr.isLinkLocalAddress()+" "+addr.isLoopbackAddress()+" "+addr.isSiteLocalAddress()+", "+ni.getDisplayName());
+
+						if(addr.isLoopbackAddress())
+						{
+							// ignore
+						}
+						else if(addr.isLinkLocalAddress())
+						{
+							// ignore
+						}
+						else
+						// if(addr.isSiteLocalAddress()) or other
+						{
+							// Hack!!! Use sensible default prefix when -1 or 128
+							// due to JDK bug on windows
+							// http://bugs.sun.com/view_bug.do?bug_id=6707289
+							short prefix = ifa.getNetworkPrefixLength();
+							if(prefix==-1 || prefix==128 && addr instanceof Inet4Address)
+							{
+								prefix	= 24;
+							}
+							InetAddress ad = SUtil.getNetworkIp(addr, prefix);
+							ret.add(ad);
+						}
+					}
+				}
+			}
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+
+		return ret;
+	}
+
 	
 	/**
 	 *  Copy an array.
@@ -3979,7 +4059,7 @@ public class SUtil
 	 */
 	public static File	getHomeDirectory()
 	{
-		return SNonAndroid.getHomeDirectory();		
+		return FileSystemView.getFileSystemView().getHomeDirectory();		
 	}
 	
 	/**
@@ -3987,8 +4067,7 @@ public class SUtil
 	 */
 	public static File	getDefaultDirectory()
 	{
-		// Todo: default directory on android?
-		return SNonAndroid.getDefaultDirectory();		
+		return FileSystemView.getFileSystemView().getDefaultDirectory();		
 	}
 	
 	/**
@@ -3996,8 +4075,7 @@ public class SUtil
 	 */
 	public static File	getParentDirectory(File file)
 	{
-		// Todo: parent directory on android?
-		return SNonAndroid.getParentDirectory(file);		
+		return FileSystemView.getFileSystemView().getParentDirectory(file);	
 	}
 
 	/**
@@ -4005,8 +4083,7 @@ public class SUtil
 	 */
 	public static File[]	getFiles(File file, boolean hiding)
 	{
-		// Todo: hidden files on android?
-		return SNonAndroid.getFiles(file, hiding);		
+		return FileSystemView.getFileSystemView().getFiles(file, hiding);	
 	}
 	
 	/**
@@ -4044,7 +4121,7 @@ public class SUtil
 	 */
 	public static boolean isFloppyDrive(File file)
 	{
-		return SNonAndroid.isFloppyDrive(file);
+		return FileSystemView.getFileSystemView().isFloppyDrive(file);
 	}
 
 	/**
@@ -4053,18 +4130,28 @@ public class SUtil
 	 */
 	public static String getDisplayName(File file)
 	{
-		return SNonAndroid.getDisplayName(file);
+		return FileSystemView.getFileSystemView().getSystemDisplayName(file);
 	}
 
 	/**
-	 *  Test if a call is running on a gui (e.g. Swing or Android UI) thread.
-	 *  Currently returns false on android.
+	 *  Test if a call is running on the swing thread.
 	 */
 	public static boolean isGuiThread()
 	{
-		// Todo: ask android helper for android UI thread.
-		return SNonAndroid.isGuiThread();
+		try
+		{
+			return SReflect.HAS_GUI
+				// pre-check because isEventDispatchThread is slow
+				&& Thread.currentThread().getName().startsWith("AWT-EventQueue")
+				&& SwingUtilities.isEventDispatchThread();
+		}
+		catch(Exception e)
+		{
+			// null pointer exception thrown by swing: http://bugs.java.com/view_bug.do?bug_id=8143287
+			return false;
+		}
 	}
+
 	
 	/**
 	 *  Escape a java string.
@@ -5011,7 +5098,39 @@ public class SUtil
 	public static String[] getMacAddresses()
 	{
 		if(macs==null)
-			macs = SNonAndroid.getMacAddresses();
+		{
+			TreeSet<String> res = new TreeSet<String>(new Comparator<String>()
+			{
+				public int compare(String o1, String o2)
+				{
+					return o1.compareTo(o2);
+				}
+			});
+			
+			try
+			{
+				List<NetworkInterface> nis = SUtil.getNetworkInterfaces();
+				for(NetworkInterface ni: nis)
+				{
+					byte[] hwa = ni.getHardwareAddress();
+					if(hwa!=null && hwa.length>0)
+					{
+						//String mac = Arrays.toString(hwa);
+						String mac = SUtil.getMacAddressAsString(hwa);
+						if(!res.contains(mac))
+						{
+							res.add(mac);
+						}
+					}
+				}
+			}
+			catch(Exception e)
+			{
+//					e.printStackTrace();
+			}
+				
+			macs = res.isEmpty()? new String[0]: (String[])res.toArray(new String[res.size()]);
+		}
 		
 		return macs;
 	}
