@@ -166,7 +166,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 	{
-		Object ret = null;
+		Object ret = proxy;	// default to builder pattern
 		
 		String mname = method.getName();
 		

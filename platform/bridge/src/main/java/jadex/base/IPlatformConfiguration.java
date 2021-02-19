@@ -598,7 +598,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
        *   Enhance this config with given other config. Will overwrite all values
        *  that are set in the other config.
        */
-      public void enhanceWith(IPlatformConfiguration other);
+      public IPlatformConfiguration enhanceWith(IPlatformConfiguration other);
 	
 	/**
 	 *  Clone this configuration.
@@ -617,7 +617,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
 	 *  @param key The key.
 	 *  @return The value.
 	 */
-	public void setValue(String key, Object value);
+	public IPlatformConfiguration setValue(String key, Object value);
 	
 	/**
 	 *  Get the platform name.
@@ -629,7 +629,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
 	 *  Set the platform name.
 	 *  @param value The name.
 	 */
-	public void setPlatformName(String value);
+	public IPlatformConfiguration setPlatformName(String value);
 	
 	/**
 	 *  Get the configuration name.
@@ -641,25 +641,25 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
 	 *  Set the configuration name.
 	 *  @param value The configuration name.
 	 */
-	public void setConfigurationName(String value);
+	public IPlatformConfiguration setConfigurationName(String value);
 	
 	/**
 	 *  Add a component via class.
 	 *  @param clazz The classinfo of the component.
 	 */
-	public void addComponent(Class<?> clazz);
+	public IPlatformConfiguration addComponent(Class<?> clazz);
 	
 	/**
 	 *  Add a component via file.
 	 *  @param path The file path.
 	 */
-	public void addComponent(String path);
+	public IPlatformConfiguration addComponent(String path);
 	
 	/**
 	 *  Set multiple components as list.
 	 *  @param newcomps The list of components.
 	 */
-	public void setComponents(List<String> newcomps);
+	public IPlatformConfiguration setComponents(List<String> newcomps);
 	
 	/**
 	 *  Get the components as list.
@@ -677,13 +677,13 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
 	 *  Set print exceptions flag.
 	 *  @return Flag is exceptions should be printed.
 	 */
-	public void setPrintExceptions(boolean printex);
+	public IPlatformConfiguration setPrintExceptions(boolean printex);
 	
 	/**
 	 *  Set the default timeout.
 	 *  @param to The timeout.
 	 */
-	public void setDefaultTimeout(long to);
+	public IPlatformConfiguration setDefaultTimeout(long to);
 	
 	/**
 	 *  Get the default timeout.
@@ -701,7 +701,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Tell starter to print welcome message.
      *  @param value
      */
-    public void setWelcome(boolean value);
+    public IPlatformConfiguration setWelcome(boolean value);
     
     /**
      *  Get the flag if gui is opened.
@@ -713,7 +713,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Set the gui flag.
      *  @param value True for starting with gui.
      */
-    public void setGui(boolean value);
+    public IPlatformConfiguration setGui(boolean value);
     
     /**
      *  Get the logging flag.
@@ -725,7 +725,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Set the logging flag.
      *  @param value The logging flag.
      */
-    public void setLogging(boolean value);
+    public IPlatformConfiguration setLogging(boolean value);
     
     /**
      *  Get the logging level.
@@ -737,7 +737,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Set the logging level.
      *  @param value The logging level.
      */
-    public void setLoggingLevel(Level value);
+    public IPlatformConfiguration setLoggingLevel(Level value);
     
     /**
      *  Get the flag for starting with awareness.
@@ -749,7 +749,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Set the flag for starting with awareness.
      *  @param value True for starting with awareness.
      */
-    public void setAwareness(boolean value);
+    public IPlatformConfiguration setAwareness(boolean value);
 
     /**
      *  Get the sensors flag.
@@ -761,7 +761,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Set the sensors flag.
      *  @param value The sensors flag.
      */
-    public void setSensors(boolean value);
+    public IPlatformConfiguration setSensors(boolean value);
     
     /**
      *  Get the superpeer flag.
@@ -773,7 +773,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Set the superpeer flag.
      *  @param value The superpeer flag.
      */
-    public void setSuperpeer(boolean value);
+    public IPlatformConfiguration setSuperpeer(boolean value);
 
     /**
      *  Get the superpeer flag.
@@ -785,7 +785,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Set the supersuperpeer flag.
      *  @param value The supersuperpeer flag.
      */
-    public void setSupersuperpeer(boolean value);
+    public IPlatformConfiguration setSupersuperpeer(boolean value);
     
     /**
      *  Get the superpeer client flag.
@@ -797,7 +797,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Set the superpeer client flag.
      *  @param value The superpeer client flag.
      */
-    public void setSuperpeerClient(boolean value);
+    public IPlatformConfiguration setSuperpeerClient(boolean value);
     
     /**
      *  Get the init command.
@@ -809,7 +809,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Set the init cmd.
      *  @param value The init cmd.
      */
-    public void setInitCommand(ICommand<IComponentIdentifier> cmd);
+    public IPlatformConfiguration setInitCommand(ICommand<IComponentIdentifier> cmd);
     
 ////  /**
 ////  *  Get the kernel names.
@@ -822,9 +822,9 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
 ////  *  Set the kernel names.
 ////  *  @param value The kernel names.
 ////  */
-//    public void setKernels(String... value);
+//    public IPlatformConfiguration setKernels(String... value);
 ////
-////// public void setKernels(IRootComponentConfiguration.KERNEL... value);
+////// public IPlatformConfiguration setKernels(IRootComponentConfiguration.KERNEL... value);
 	
 	 /**
      *  Get the network name (used at startup).
@@ -836,19 +836,19 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Set the network name (used at startup).
      *  @param value The network name.
      */
-    public void setNetworkNames(String... value);
+    public IPlatformConfiguration setNetworkNames(String... value);
     
 //    /**
 //     *  Add the network name (used at startup).
 //     *  @param value The network name.
 //     */
-//    public void addNetworkName(String value);
+//    public IPlatformConfiguration addNetworkName(String value);
     
 //    /**
 //     *  Set the network names (used at startup).
 //     *  @param value The network name.
 //     */
-//    public void setNetworkNames(String[] values);
+//    public IPlatformConfiguration setNetworkNames(String[] values);
 
     // ---- Security Settings ----
     
@@ -866,7 +866,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  
      *  @param usesecret Set true (default) if the security service should use a platform secret.
      */
-    public void setUseSecret(boolean usesecret);
+    public IPlatformConfiguration setUseSecret(boolean usesecret);
     
     /**
      *  Returns if the security service should print the platform secret during start.
@@ -880,7 +880,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  
      *  @param Set true (default) if the security service should print the platform secret during start.
      */
-    public void setPrintSecret(boolean printsecret);
+    public IPlatformConfiguration setPrintSecret(boolean printsecret);
     
     /**
      *  Returns if the security service allows unauthenticated connections.
@@ -896,7 +896,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  
      *  @param refuseunauth Flag if unauthenticated platforms are refused.
      */
-    public void setRefuseUnauth(boolean refuseunauth);
+    public IPlatformConfiguration setRefuseUnauth(boolean refuseunauth);
     
     /**
      *  Get the network secret (used at startup).
@@ -908,5 +908,5 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Set the network secret (used at startup).
      *  @param value The network secret.
      */
-    public void setNetworkSecrets(String... value);
+    public IPlatformConfiguration setNetworkSecrets(String... value);
 }

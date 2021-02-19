@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,7 +22,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentCreated;
 
 /**
  *  Passive awareness based on a pre-defined catalog of platforms + addresses.
@@ -37,7 +35,7 @@ public class CatalogAwarenessAgent implements IAwarenessService
 	protected static final String DEFAULT_URLS = "ws://ssp@ssp.activecomponents.org:80";
 	
 	/** Platform URL pattern. */
-	protected static final Pattern URL_PATTERN = Pattern.compile("[a-zA-Z]+://[a-zA-Z0-9]+@.+:[0-9]+");
+	protected static final Pattern URL_PATTERN = Pattern.compile("[a-zA-Z][a-zA-Z0-9+-\\.]*://[^@:]+@.+:[0-9]+");
 	
 	/** The agent access. */
 	@Agent
@@ -177,10 +175,10 @@ public class CatalogAwarenessAgent implements IAwarenessService
 			}
 			// else ignore self
 		}
-		else
-		{
-			agent.getLogger().warning("Invalid platform URL: " + url + ". Format: <transport>://<platformname>@<hostname>:<port>");
-		}
+//		else
+//		{
+//			agent.getLogger().warning("Invalid platform URL: " + url + ". Format: <transport>://<platformname>@<hostname>:<port>");
+//		}
 
 		return ret;
 	}
