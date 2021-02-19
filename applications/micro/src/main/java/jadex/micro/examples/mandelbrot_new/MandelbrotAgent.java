@@ -32,9 +32,13 @@ import jadex.micro.annotation.Imports;
 	}),
 	@Configuration(name="pools", components={
 		@Component(type="Generator"),
-		/*@Component(type="CalculatorPool", number = "3", arguments = @NameValue(name="serviceinfos",
+		@Component(type="CalculatorPool", number = "3", arguments = @NameValue(name="serviceinfos",
 			value="new PoolServiceInfo[]{new PoolServiceInfo().setWorkermodel(\"jadex/micro/examples/mandelbrot_new/CalculateAgent.class\").setServiceType(ICalculateService.class).setPoolStrategy(new jadex.commons.DefaultPoolStrategy(2, 2)).setPublicationScope(jadex.bridge.service.ServiceScope.GLOBAL)}")),
-		*/@Component(type="Display")
+		@Component(type="Display")
+	}),
+	@Configuration(name="nocalcs", components={
+		@Component(type="Generator"),
+		@Component(type="Display")
 	})
 })
 @Agent
