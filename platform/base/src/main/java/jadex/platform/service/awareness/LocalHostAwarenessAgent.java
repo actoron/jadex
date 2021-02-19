@@ -21,19 +21,24 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.awareness.IAwarenessService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.bridge.service.types.transport.ITransportService;
 import jadex.commons.Boolean3;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
@@ -70,6 +75,9 @@ public class LocalHostAwarenessAgent implements IAwarenessService
 	/** Do scan flag. */
 	protected boolean doscan;
 	
+	/** ServiceQuery looking for new Transports */
+	protected ISubscriptionIntermediateFuture<ITransportService> tpquery;
+	
 	/**
 	 *  Creates the agent empty.
 	 */
@@ -78,10 +86,10 @@ public class LocalHostAwarenessAgent implements IAwarenessService
 	}
 	
 	/**
-	 *  Implements the start.
+	 *  Implements the init.
 	 */
-	@OnStart
-	public void start()
+	@OnInit
+	public void init()
 	{
 		if(!DISCOVERY_DIR.exists())
 			DISCOVERY_DIR.mkdir();
@@ -94,6 +102,15 @@ public class LocalHostAwarenessAgent implements IAwarenessService
 		else
 		{
 			postInfo();
+			
+			// Listen for transport to update addresses
+			ServiceQuery<ITransportService> query = new ServiceQuery<>(ITransportService.class);
+			query.setScope(ServiceScope.PLATFORM);
+			tpquery = agent.addQuery(query);
+			tpquery.then(res ->
+			{
+				postInfo();
+			});
 			
 			// Leasetime for posting infos
 			final long updaterate = (long)(((Long)agent.getArguments().get("leasetime"))*0.9);
@@ -185,6 +202,8 @@ public class LocalHostAwarenessAgent implements IAwarenessService
 //	public IFuture<Void> end(Exception e)
 	public IFuture<Void> end()
 	{
+		if (tpquery != null)
+			tpquery.terminate();
 //		System.out.println("Terminated agent: "+e);
 //		e.printStackTrace();
 		return IFuture.DONE;
