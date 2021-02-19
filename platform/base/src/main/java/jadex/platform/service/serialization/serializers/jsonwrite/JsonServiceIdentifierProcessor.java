@@ -2,6 +2,7 @@ package jadex.platform.service.serialization.serializers.jsonwrite;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
@@ -51,6 +52,13 @@ public class JsonServiceIdentifierProcessor implements ITraverseProcessor
 		wr.write("\"providerId\":");
 		traverser.traverse(sid.getProviderId(), IComponentIdentifier.class, conversionprocessors, processors, mode, targetcl, context);
 		wr.write(", ");
+		wr.write("\"networkNames\":");
+		traverser.traverse(sid.getNetworkNames(), Set.class, conversionprocessors, processors, mode, targetcl, context);
+		wr.write(", ");
+		wr.write("\"tags\":");
+		traverser.traverse(sid.getTags(), Set.class, conversionprocessors, processors, mode, targetcl, context);
+		wr.write(", ");
+		wr.writeNameValue("unrestricted", sid.isUnrestricted()).write(", ");
 		wr.write("\"resourceIdentifier\":");
 		traverser.traverse(sid.getResourceIdentifier(), IResourceIdentifier.class, conversionprocessors, processors, mode, targetcl, context);
 

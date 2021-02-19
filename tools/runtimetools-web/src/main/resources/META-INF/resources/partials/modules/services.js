@@ -44,21 +44,24 @@ app.filter('cid', function() {
 app.filter('networks', function() {
 	return function(networks) {
 		var nets	= null;
-		networks.forEach(function(network)
+		if(networks!=null)
 		{
-			if("___GLOBAL___".localeCompare(network)!=0)
+			networks.forEach(function(network)
 			{
-				if(nets==null)
+				if("___GLOBAL___".localeCompare(network)!=0)
 				{
-					nets = network;
+					if(nets==null)
+					{
+						nets = network;
+					}
+					else
+					{
+						nets += ", "+network
+					}
 				}
-				else
-				{
-					nets += ", "+network
-				}
-			}
-		});
-		return nets==null ? "" : nets;
+			});
+		}
+		return nets!=null ? nets : "";
 	}
 });
 
@@ -70,7 +73,7 @@ function	updateService($scope, event)
 //	alert("Service: "+JSON.stringify(service));
 	for(var i=0; i<$scope.services.length; i++)
 	{
-		found	= $scope.services[i].serviceName==event.service.serviceName
+		found	= $scope.services[i].name==event.service.name
 			&& $scope.services[i].providerId.name==event.service.providerId.name;
 		if(found)
 		{

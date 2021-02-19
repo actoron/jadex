@@ -8,15 +8,17 @@
 			<tr>
 				<th>Service Type</th>
 				<th>Provided By</th>
+				<th>Tags</th>
 				<th>Publication Scope</th>
  				<th>Networks</th>
 				<th>Security</th>
 			</tr>
 			<tr ng-repeat="x in services | orderBy: cidOrder"
 				ng-class="{'connecting': !x.connected}">
-				<td>{{x.serviceType.value}}</td>
+				<td>{{x.type}}</td>
 				<td>{{x.providerId.name | cid}}</td>
-				<td>{{x.scope.value.toLowerCase()}}</td>
+ 				<td>{{x.tags | networks}}</td>
+				<td>{{x.scope.toLowerCase()}}</td>
  				<td>{{x.networkNames | networks}}</td>
 				<td>{{x.unrestricted && 'unrestricted' || 'restricted'}}</td>
 			</tr>
