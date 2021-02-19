@@ -1,0 +1,24 @@
+<!--
+	<H3>The hello provider</H3>
+-->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+	                    http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd
+	                    http://www.activecomponents.org/jadex-envspace 
+	                    http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
+	name="HelloProvider" package="jadex.webservice.examples.rs.hello">
+	
+	<imports>
+		<import>jadex.extension.rs.invoke.*</import>
+	</imports>
+	
+	<services>
+		<providedservice class="IHelloService">
+			<implementation>SRest.createServiceImplementation($component, 
+				IHelloService.class, IRSHelloService.class)</implementation>
+		</providedservice>
+	</services>
+	
+</componenttype>
