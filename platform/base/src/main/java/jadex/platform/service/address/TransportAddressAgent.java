@@ -269,7 +269,7 @@ public class TransportAddressAgent implements ITransportAddressService
 //							throw new Error(agent.getComponentIdentifier() + " FAILED: " + platformid);
 						}
 						
-						System.out.println("Resolved addresses for " + platformid + ": " + result);
+//						System.out.println("Resolved addresses for " + platformid + ": " + result);
 						fret.setResult(filterAddresses(result, transporttype));
 					}
 				});
