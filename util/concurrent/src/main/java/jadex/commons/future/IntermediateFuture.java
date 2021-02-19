@@ -968,6 +968,18 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	
 	// todo: subscriptions need special treatment for first listener
 	
+	public IIntermediateFuture<E> then(Consumer<? super Collection<E>> function)
+    {
+		this.addResultListener(new IntermediateEmptyResultListener<E>()
+		{
+			public void resultAvailable(Collection<E> result)
+        	{
+        		 function.accept(result);
+        	}
+		});
+        return this;
+    }
+	
 	/**
      *  Called when the next intermediate value is available.
      *  @param function Called when value arrives.
