@@ -5,7 +5,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService;
 /**
  * 
  */
-public interface IExtendedPlatformConfiguration
+public interface IExtendedPlatformConfiguration	extends IPlatformConfiguration
 {
 //	/**
 //     *  Get the auto shutdown flag.
@@ -17,7 +17,7 @@ public interface IExtendedPlatformConfiguration
 //     *  Set the auto shutdown flag.
 //     *  @param value The value.
 //     */
-//    public void setAutoShutdown(boolean value);
+//    public IExtendedPlatformConfiguration setAutoShutdown(boolean value);
     
     /**
      *  Get the platform component.
@@ -30,8 +30,8 @@ public interface IExtendedPlatformConfiguration
      *  Set the platform component.
      *  @param value The platform component.
      */
-//    public void setPlatformComponent(Class<?> value);
-//    public void setPlatformComponent(ClassInfo value);
+//    public IExtendedPlatformConfiguration setPlatformComponent(Class<?> value);
+//    public IExtendedPlatformConfiguration setPlatformComponent(ClassInfo value);
     
     /**
      *  Get the component factory.
@@ -42,7 +42,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the configuration file.
      *  @param value The configuration file.
      */
-    public void setConfigurationFile(String value);
+    public IExtendedPlatformConfiguration setConfigurationFile(String value);
 
     /**
      *  Get the configuration file.
@@ -54,7 +54,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the debug futures flag.
      *  @param value The debug futures flag.
      */
-    public void setDebugFutures(boolean value);
+    public IExtendedPlatformConfiguration setDebugFutures(boolean value);
 
     /**
      *  Get the debug futures flag.
@@ -66,7 +66,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the debug services flag.
      *  @param value The debug futures flag.
      */
-    public void setDebugServices(boolean value);
+    public IExtendedPlatformConfiguration setDebugServices(boolean value);
 
     /**
      *  Get the debug services flag.
@@ -78,7 +78,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the debug steps flag.
      *  @param value The debug steps flag.
      */
-    public void setDebugSteps(boolean value);
+    public IExtendedPlatformConfiguration setDebugSteps(boolean value);
 
     /**
      *  Get the debug steps flag.
@@ -90,7 +90,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the no stack compaction flag.
      *  @param value The no stack compaction flag.
      */
-    public void setNoStackCompaction(boolean value);
+    public IExtendedPlatformConfiguration setNoStackCompaction(boolean value);
 
     /**
      *  Get the no stack compaction flag.
@@ -109,7 +109,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the opengl flag.
      *  @param value The opengl flag.
      */
-    public void setOpenGl(boolean value);
+    public IExtendedPlatformConfiguration setOpenGl(boolean value);
 
     /**
      *  Get the opengl flag.
@@ -123,7 +123,7 @@ public interface IExtendedPlatformConfiguration
      *  
      *  @param value True, if the platform should retain root privileges.
      */
-    public void setDropPrivileges(boolean value);
+    public IExtendedPlatformConfiguration setDropPrivileges(boolean value);
 
     /**
      *  Gets if the platform should keep admin/root privileges
@@ -137,7 +137,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the monitoring level.
      *  @param level The monitoring level.
      */
-    public void setMonitoring(IMonitoringService.PublishEventLevel level);
+    public IExtendedPlatformConfiguration setMonitoring(IMonitoringService.PublishEventLevel level);
 
     /**
      *  Get the monitoring level.
@@ -157,7 +157,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the command line interface flag.
      *  @param value True for starting with gui.
      */
-    void setCli(boolean value);
+    IExtendedPlatformConfiguration setCli(boolean value);
 
     /**
      *  Should the cli console (in jcc)
@@ -169,7 +169,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the cli console flag (in jcc).
      *  @param value Flag if cli console should be active.
      */
-    public void setCliConsole(boolean value);
+    public IExtendedPlatformConfiguration setCliConsole(boolean value);
 
     /**
      *  Get flag for save settings on exit.
@@ -181,7 +181,7 @@ public interface IExtendedPlatformConfiguration
      *  Set flag for save settings on exit.
      *  @param True, if settings are saved on exit.
      */
-    public void setSaveOnExit(boolean value);
+    public IExtendedPlatformConfiguration setSaveOnExit(boolean value);
 
     /**
      *  Get flag for open jcc for specific remote platforms.
@@ -193,7 +193,7 @@ public interface IExtendedPlatformConfiguration
      *  Set flag for open jcc for specific remote platforms.
      *  @param value The jcc platform names.
      */
-    public void setJccPlatforms(String value);
+    public IExtendedPlatformConfiguration setJccPlatforms(String value);
 
  
 
@@ -209,7 +209,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the flag for simulation execution.
      *  @param value True for simulation mode.
      */
-    public void setSimulation(boolean value);
+    public IExtendedPlatformConfiguration setSimulation(boolean value);
 
     /**
      *  Get the async execution mode flag.
@@ -221,11 +221,11 @@ public interface IExtendedPlatformConfiguration
      *  Set the async execution mode flag.
      *  @param value The async execution mode flag.
      */
-    public void setAsyncExecution(boolean value);
+    public IExtendedPlatformConfiguration setAsyncExecution(boolean value);
 
 //    public boolean getPersist();
 
-//    public void setPersist(boolean value);
+//    public IExtendedPlatformConfiguration setPersist(boolean value);
 
     /**
      *  Get the unique id flag, i.e. do not reuse ids formerly used by dead components.
@@ -237,7 +237,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the unique id flag, i.e. do not reuse ids formerly used by dead components.
      *  @param value True for unique ids.
      */
-    public void setUniqueIds(boolean value);
+    public IExtendedPlatformConfiguration setUniqueIds(boolean value);
 
     /**
      *  Get the flag for deferred thread creation/deletion in threadpool.
@@ -249,7 +249,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the flag for deferred thread creation/deletion in threadpool.
      *  @param value The defer flag.
      */
-    public void setThreadpoolDefer(boolean value);
+    public IExtendedPlatformConfiguration setThreadpoolDefer(boolean value);
 
     /**
      *  Get the library path.
@@ -261,7 +261,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the library path.
      *  @param value The library path.
      */
-    public void setLibPath(String value);
+    public IExtendedPlatformConfiguration setLibPath(String value);
 
     /**
      *  Get the base classloader.
@@ -273,7 +273,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the base classloader.
      *  @param value The base classloader.
      */
-    public void setBaseClassloader(ClassLoader value);
+    public IExtendedPlatformConfiguration setBaseClassloader(ClassLoader value);
 
     /**
      *  Get the flag for starting with chat.
@@ -285,7 +285,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the flag for starting with chat.
      *  @param value True for starting with chat.
      */
-    public void setChat(boolean value);
+    public IExtendedPlatformConfiguration setChat(boolean value);
 
 
 
@@ -300,8 +300,8 @@ public interface IExtendedPlatformConfiguration
      *  Set the awareness mechanisms.
      *  @param values The awareness mechanisms.
      */
-//    public void setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM... values);
-    public void setAwaMechanisms(String... values);
+//    public IExtendedPlatformConfiguration setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM... values);
+    public IExtendedPlatformConfiguration setAwaMechanisms(String... values);
 
     /**
      *  Get the delay between awareness notifications.
@@ -313,7 +313,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the delay between awareness notifications.
      *  @param value The delay in millis.
      */
-    public void setAwaDelay(long value);
+    public IExtendedPlatformConfiguration setAwaDelay(long value);
 
     /**
      *  Get the awareness platform includes.
@@ -325,7 +325,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the awareness platform includes.
      *  @param value The awareness platform includes.
      */
-    public void setAwaIncludes(String value);
+    public IExtendedPlatformConfiguration setAwaIncludes(String value);
 
     /**
      *  Get the awareness platform excludes.
@@ -337,7 +337,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the awareness platform excludes.
      *  @param value The awareness platform excludes.
      */
-    public void setAwaExcludes(String value);
+    public IExtendedPlatformConfiguration setAwaExcludes(String value);
 
     /**
      *  Get the flag for binary messages.
@@ -349,7 +349,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the flag for binary messages.
      *  @param value The flag for binary messages.
      */
-    public void setBinaryMessages(boolean value);
+    public IExtendedPlatformConfiguration setBinaryMessages(boolean value);
 
     /**
      *  Get flag for strict communication.
@@ -363,7 +363,7 @@ public interface IExtendedPlatformConfiguration
      *  Fail on recoverable message decoding errors instead of ignoring
      *  @return Strict communication flag.
      */
-    public void setStrictCom(boolean value);
+    public IExtendedPlatformConfiguration setStrictCom(boolean value);
 
 //    /**
 //     *  Flag if the platform should be protected with password. 
@@ -375,7 +375,7 @@ public interface IExtendedPlatformConfiguration
 //     *  Flag if the platform should be protected with password. 
 //     *  @param value True for protected.
 //     */
-//    public void setUsePass(boolean value);
+//    public IExtendedPlatformConfiguration setUsePass(boolean value);
 
     // will be removed 
 //    /**
@@ -388,7 +388,7 @@ public interface IExtendedPlatformConfiguration
 //     *  Flag if trusted lan is activated. (Trusts internal ips)
 //     *  @param value True if trusted lan is active.
 //     */
-//    public void setTrustedLan(boolean value);
+//    public IExtendedPlatformConfiguration setTrustedLan(boolean value);
 
     // todo: ?
     
@@ -402,7 +402,7 @@ public interface IExtendedPlatformConfiguration
 //     *  Set the virtual names (roles).
 //     *  @param value The virtual names.
 //     */
-//    public void setVirtualNames(Map<String, String> value);
+//    public IExtendedPlatformConfiguration setVirtualNames(Map<String, String> value);
 
 //    /**
 //     *  Get the validity duration of messages.
@@ -414,7 +414,7 @@ public interface IExtendedPlatformConfiguration
 //     *  Set the validity duration of messages.
 //     *  @param value The validity duration.
 //     */
-//    public void setValidityDuration(long value);
+//    public IExtendedPlatformConfiguration setValidityDuration(long value);
 
 //    /**
 //     *  Get the flag if the local transport is active.
@@ -426,7 +426,7 @@ public interface IExtendedPlatformConfiguration
 //     *  Set the flag if the local transport is active.
 //     *  @param value Flag if the local transport is active.
 //     */
-//    public void setLocalTransport(boolean value);
+//    public IExtendedPlatformConfiguration setLocalTransport(boolean value);
 
     /**
      *  Get the flag if the tcp transport is active.
@@ -438,7 +438,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the flag if the tcp transport is active.
      *  @param value Flag if the tcp transport is active.
      */
-    public void setTcpTransport(boolean value);
+    public IExtendedPlatformConfiguration setTcpTransport(boolean value);
 
     /**
      *  Get the tcp port of the tcp transport.
@@ -450,7 +450,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the tcp port of the tcp transport.
      *  @param value The tcp port.
      */
-    public void setTcpPort(int value);
+    public IExtendedPlatformConfiguration setTcpPort(int value);
 
     /**
      *  Get the flag if the relay transport is active.
@@ -462,7 +462,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the flag if the relay transport is active.
      *  @param value Flag if the relay transport is active.
      */
-    public void setRelayTransport(boolean value);
+    public IExtendedPlatformConfiguration setRelayTransport(boolean value);
 
     /**
      *  Get the relay addresses.
@@ -474,7 +474,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the relay addresses.
      *  @param value The relay addresses.
      */
-    public void setRelayAddresses(String value);
+    public IExtendedPlatformConfiguration setRelayAddresses(String value);
 
     /**
      *  Checks if the relay transport should support
@@ -490,7 +490,7 @@ public interface IExtendedPlatformConfiguration
      * 
      *  @param dynamicrouting If true, the routing service should support dynamic routing.
      */
-    public void setRelayDynamicRouting(boolean dynamicrouting);
+    public IExtendedPlatformConfiguration setRelayDynamicRouting(boolean dynamicrouting);
     
     /**
      *  Get the flag if the ws transport is active.
@@ -502,7 +502,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the flag if the ws transport is active.
      *  @param value Flag if the ws transport is active.
      */
-    public void setWsTransport(boolean value);
+    public IExtendedPlatformConfiguration setWsTransport(boolean value);
 
     /**
      *  Get the websocket port of the websocket transport.
@@ -514,7 +514,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the websocket port of the websocket transport.
      *  @param value The websocket port.
      */
-    public void setWsPort(int value);
+    public IExtendedPlatformConfiguration setWsPort(int value);
 
     /**
      *  Should the platform act as relay, i.e. forward messages from one platform to another platform?
@@ -524,19 +524,19 @@ public interface IExtendedPlatformConfiguration
     /**
      *  Should the platform act as relay, i.e. forward messages from one platform to another platform?
      */
-    void setRelayForwarding(boolean value);
+    IExtendedPlatformConfiguration setRelayForwarding(boolean value);
 //
 //    boolean getRelayAwaonly();
 //
-//    void setRelayAwaonly(boolean value);
+//    IExtendedPlatformConfiguration setRelayAwaonly(boolean value);
 //
 //    boolean getSslTcpTransport();
 //
-//    void setSslTcpTransport(boolean value);
+//    IExtendedPlatformConfiguration setSslTcpTransport(boolean value);
 //
 //    int getSslTcpPort();
 //
-//    void setSslTcpPort(int value);
+//    IExtendedPlatformConfiguration setSslTcpPort(int value);
 
     /**
      *  Get the flag if wsdl publishing is on.
@@ -548,7 +548,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the flag if wsdl publishing is on.
      *  @param value True if wsdl publishing is on.
      */
-    public void setWsPublish(boolean value);
+    public IExtendedPlatformConfiguration setWsPublish(boolean value);
 
     /**
      *  Get the flag if rest publishing is on.
@@ -560,7 +560,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the flag if rest publishing is on.
      *  @param value True if rest publishing is on.
      */
-    public void setRsPublish(boolean value);
+    public IExtendedPlatformConfiguration setRsPublish(boolean value);
 
     /**
      *  Get the rest publish component.
@@ -572,7 +572,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the rest publishing component.
      *  @param value The rest publishing component.
      */
-    public void setRsPublishComponent(String value);
+    public IExtendedPlatformConfiguration setRsPublishComponent(String value);
 
 //    /**
 //     *  Get the flag if maven dependencies are on.
@@ -584,7 +584,7 @@ public interface IExtendedPlatformConfiguration
 //     *  Set the maven dependencies flag.
 //     *  @param value The maven dependencies.
 //     */
-//    public void setMavenDependencies(boolean value);
+//    public IExtendedPlatformConfiguration setMavenDependencies(boolean value);
 
     /**
      *  Get the monitoring component flag.
@@ -596,7 +596,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the monitoring component flag.
      *  @param value The monitoring component flag.
      */
-    public void setMonitoringComp(boolean value);
+    public IExtendedPlatformConfiguration setMonitoringComp(boolean value);
 
     /**
      *  Get the threadpool class.
@@ -608,7 +608,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the threadpool class name.
      *  @param value The threadpool class name.
      */
-    public void setThreadpoolClass(String value);
+    public IExtendedPlatformConfiguration setThreadpoolClass(String value);
 //
 //    /**
 //     *  Get the context service class.
@@ -620,7 +620,7 @@ public interface IExtendedPlatformConfiguration
 //     *  Get the context service class.
 //     *  @param value The context service class.
 //     */
-//    public void setContextServiceClass(String value);
+//    public IExtendedPlatformConfiguration setContextServiceClass(String value);
 //
     
     
@@ -637,7 +637,7 @@ public interface IExtendedPlatformConfiguration
      *  Get the df (directory facilitator) flag.
      *  @param value The df flag.
      */
-    public void setDf(boolean value);
+    public IExtendedPlatformConfiguration setDf(boolean value);
 
     /**
      *  Get the clock flag.
@@ -649,7 +649,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the clock flag.
      *  @param value The clock flag.
      */
-    public void setClock(boolean value);
+    public IExtendedPlatformConfiguration setClock(boolean value);
 
     /**
      *  Get the simulation flag.
@@ -661,7 +661,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the simulation flag.
      *  @param value The simulation flag.
      */
-    public void setSimul(boolean value);
+    public IExtendedPlatformConfiguration setSimul(boolean value);
 
     /**
      *  Get the file transfer flag.
@@ -673,7 +673,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the file transfer flag.
      *  @param value The file transfer flag.
      */
-    public void setFiletransfer(boolean value);
+    public IExtendedPlatformConfiguration setFiletransfer(boolean value);
 
 //    /**
 //     *  Get the marshal flag.
@@ -685,7 +685,7 @@ public interface IExtendedPlatformConfiguration
 //     *  Set the marshal flag.
 //     *  @param value The marshal flag.
 //     */
-//    public void setMarshal(boolean value);
+//    public IExtendedPlatformConfiguration setMarshal(boolean value);
 
     /**
      *  Get the security flag.
@@ -697,7 +697,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the security flag.
      *  @param value The security flag.
      */
-    public void setSecurity(boolean value);
+    public IExtendedPlatformConfiguration setSecurity(boolean value);
 
     /**
      *  Get the library flag.
@@ -709,7 +709,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the library flag.
      *  @param value The library flag.
      */
-    public void setLibrary(boolean value);
+    public IExtendedPlatformConfiguration setLibrary(boolean value);
 
     /**
      *  Get the settings flag.
@@ -721,7 +721,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the settings flag.
      *  @param value The settings flag.
      */
-    public void setSettings(boolean value);
+    public IExtendedPlatformConfiguration setSettings(boolean value);
 
     /**
      *  Get the context flag.
@@ -733,7 +733,7 @@ public interface IExtendedPlatformConfiguration
      *  Set the context flag.
      *  @param value The context flag.
      */
-    public void setContext(boolean value);
+    public IExtendedPlatformConfiguration setContext(boolean value);
 
     /**
      *  Get the address flag.
@@ -745,6 +745,6 @@ public interface IExtendedPlatformConfiguration
      *  Set the address flag.
      *  @param value The address flag.
      */
-    public void setAddress(boolean value);
+    public IExtendedPlatformConfiguration setAddress(boolean value);
     
 }
