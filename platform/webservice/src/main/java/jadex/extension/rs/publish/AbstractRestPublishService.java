@@ -53,7 +53,6 @@ import javax.ws.rs.core.Response;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonObject.Member;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.base.Starter;
@@ -69,7 +68,6 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.ParameterInfo;
-import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.types.publish.IPublishService;
@@ -82,9 +80,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.Tuple2;
-import jadex.commons.collection.ILeaseTimeSet;
 import jadex.commons.collection.LeaseTimeMap;
-import jadex.commons.collection.LeaseTimeSet;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -97,7 +93,6 @@ import jadex.commons.future.ITerminableFuture;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.STransformation;
-import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo.HttpMethod;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
@@ -113,7 +108,6 @@ import jadex.platform.service.serialization.SerializationServices;
 import jadex.platform.service.serialization.serializers.JadexBinarySerializer;
 import jadex.platform.service.serialization.serializers.JadexJsonSerializer;
 import jadex.transformation.jsonserializer.JsonTraverser;
-import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
 
@@ -1113,7 +1107,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 								// put all contained objects in the params map
 								int[] i = new int[1];
 								final Map<String, Object> finparamsmap = inparamsmap;
-								jobj.forEach((Member x)->
+								jobj.forEach((com.eclipsesource.json.JsonObject.Member x)->
 								{
 									i[0]++;
 									Class<?> type = typesmap.get(x.getName());
