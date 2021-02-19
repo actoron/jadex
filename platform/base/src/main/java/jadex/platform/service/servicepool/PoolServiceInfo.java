@@ -6,6 +6,7 @@ import java.util.Map;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.IPoolStrategy;
 
@@ -136,16 +137,17 @@ public class PoolServiceInfo
 	 *  Set the workermodel. 
 	 *  @param workermodel The workermodel to set.
 	 */
-	public void setWorkermodel(String workermodel)
+	public PoolServiceInfo setWorkermodel(String workermodel)
 	{
 		this.workermodel = workermodel;
+		return this;
 	}
 
 	/**
 	 *  Get the servicetype.
 	 *  return The servicetype.
 	 */
-	public ClassInfo getServicetype()
+	public ClassInfo getServiceType()
 	{
 		return servicetype;
 	}
@@ -154,9 +156,20 @@ public class PoolServiceInfo
 	 *  Set the servicetype. 
 	 *  @param servicetype The servicetype to set.
 	 */
-	public void setServicetype(ClassInfo servicetype)
+	public PoolServiceInfo setServiceType(ClassInfo servicetype)
 	{
 		this.servicetype = servicetype;
+		return this;
+	}
+	
+	/**
+	 *  Set the servicetype. 
+	 *  @param servicetype The servicetype to set.
+	 */
+	public PoolServiceInfo setServiceType(Class<?> servicetype)
+	{
+		this.servicetype = new ClassInfo(servicetype);
+		return this;
 	}
 
 	/**
@@ -172,9 +185,10 @@ public class PoolServiceInfo
 	 *  Set the publish info. 
 	 *  @param publishinfo The publish info to set.
 	 */
-	public void setPublishInfo(PublishInfo publishinfo)
+	public PoolServiceInfo setPublishInfo(PublishInfo publishinfo)
 	{
 		this.publishinfo = publishinfo;
+		return this;
 	}
 
 	/**
@@ -190,9 +204,10 @@ public class PoolServiceInfo
 	 *  Set the pool strategy. 
 	 *  @param poolstrategy The pool strategy to set.
 	 */
-	public void setPoolStrategy(Object poolstrategy)
+	public PoolServiceInfo setPoolStrategy(Object poolstrategy)
 	{
 		this.poolstrategy = poolstrategy;
+		return this;
 	}
 
 	/**
@@ -208,9 +223,10 @@ public class PoolServiceInfo
 	 *  Set the info.
 	 *  @param info The info to set
 	 */
-	public void setCreationInfo(CreationInfo info) 
+	public PoolServiceInfo setCreationInfo(CreationInfo info) 
 	{
 		this.info = info;
+		return this;
 	}
 
 	/**
@@ -221,16 +237,31 @@ public class PoolServiceInfo
 	{
 		return info==null? null: info.getArguments();//arguments;
 	}
-//
-//	/**
-//	 *  Set the arguments.
-//	 *  @param arguments The arguments to set.
-//	 */
-//	public void setArguments(Map<String, Object> arguments)
-//	{
-//		info.setArguments(arguments);
-////		this.arguments = arguments;
-//	}
+
+	/**
+	 *  Set the arguments.
+	 *  @param arguments The arguments to set.
+	 * /
+	//public PoolServiceInfo setArguments(Map<String, Object> arguments)
+	public PoolServiceInfo setArgs(Map<String, Object> arguments)
+	{
+		if(info!=null)
+			info.setArguments(arguments);
+//		this.arguments = arguments;
+		return this;
+	}*/
+	
+	/**
+	 *  Set the publication scope.
+	 *  @scope The scope.
+	 */
+	public PoolServiceInfo setPublicationScope(ServiceScope scope)
+	{
+		if(publishinfo==null)
+			publishinfo = new PublishInfo();
+		publishinfo.setPublishScope(scope);
+		return this;
+	}
 	
 	
 }

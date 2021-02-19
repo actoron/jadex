@@ -45,7 +45,6 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.Tuple2;
-import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -489,13 +488,15 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		}
 		else
 		{
+			int[]	cnt	= new int[]{transports.size()};
 			for(final ITransportService transport : transports)
 			{
+//				component.getLogger().info("sending msg with0: "+transport);
 				transport.sendMessage(header, encheader, encryptedbody).addResultListener(execfeat.createResultListener(new IResultListener<Integer>()
 				{
-					int cnt;
 					public void resultAvailable(Integer result)
 					{
+//						component.getLogger().info("sending msg with1: "+transport);
 						// Successful sent, check if transport cache needs to be updated (to speedup further sending)
 						Map<IComponentIdentifier, Tuple2<ITransportService, Integer>> cache = getTransportCache(platformid);
 						if(cache.get(rplat) == null || cache.get(rplat).getSecondEntity() < result)
@@ -508,14 +509,15 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	
 					public void exceptionOccurred(Exception exception)
 					{
-						cnt++;
+//						component.getLogger().info("sending msg with2: "+transport);
+						cnt[0]--;
 						
 //						System.out.println("Transport failed: "+cnt+"/"+transports.size()+" "+exception);
 						//exception.printStackTrace();
 					
-						if(cnt==transports.size())
+						if(cnt[0]==0)
 						{
-							System.out.println("Finally failed to send message: "+exception);
+							component.getLogger().warning("Finally failed to send message: "+exception);
 							ret.setExceptionIfUndone(exception);
 						}
 					}
@@ -641,7 +643,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 //		if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
 //			throw new RuntimeException("wrooongMMMM");
-//		System.out.println("doSendMessage: "+header+", "+message);
+//		component.getLogger().info("doSendMessage: "+header+", "+message);
 		
 		final Future<Void> ret = new Future<Void>();
 

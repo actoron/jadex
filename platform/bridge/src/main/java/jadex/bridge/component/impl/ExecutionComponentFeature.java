@@ -77,8 +77,8 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ISuspendable;
-import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateEmptyResultListener;
+import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.ThreadLocalTransferHelper;
@@ -704,7 +704,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			//System.out.println("adding termination listener for: "+component.getId());
 			final Future<Map<String, Object>> ret = new Future<>();
-			SComponentManagementService.listenToComponent(component.getId(), component).addResultListener(new IntermediateDefaultResultListener<CMSStatusEvent>()
+			SComponentManagementService.listenToComponent(component.getId(), component).addResultListener(new IntermediateExceptionDelegationResultListener<CMSStatusEvent, Map<String, Object>>(ret)
 			{
 				public void intermediateResultAvailable(CMSStatusEvent result)
 				{

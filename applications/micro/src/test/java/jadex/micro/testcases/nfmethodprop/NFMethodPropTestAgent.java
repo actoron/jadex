@@ -55,8 +55,8 @@ public class NFMethodPropTestAgent extends JunitAgentTest
 		ITestService ser = (ITestService)agent.getFeature(IRequiredServicesFeature.class).getService("testser").get();
 		
 		final List<TestReport> results = new ArrayList<TestReport>();
-		final long wa = SReflect.isAndroid() ? 5000 : 500;
-		final long wb = SReflect.isAndroid() ? 10000 : 1000;
+		final long wa = 500;
+		final long wb = 1000;
 		
 		for(int i=0; i<5; i++)
 		{

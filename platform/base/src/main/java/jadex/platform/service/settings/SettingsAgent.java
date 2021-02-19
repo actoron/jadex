@@ -75,9 +75,6 @@ public class SettingsAgent	implements ISettingsService
 	@AgentArgument
 	protected boolean	readonly;
 	
-	/** The context service. */
-	//protected IContextService contextService;
-	
 	//-------- Service methods --------
 	
 	/**
@@ -101,7 +98,6 @@ public class SettingsAgent	implements ISettingsService
 		//this.filename	= access.getComponentIdentifier().getPlatformPrefix() + SETTINGS_EXTENSION;
 		
 		final Future<Void>	ret	= new Future<Void>();
-		//contextService = access.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IContextService.class, ServiceScope.PLATFORM));
 		loadProperties().addResultListener(new DelegationResultListener<Void>(ret));
 		
 		return ret;

@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
@@ -67,6 +68,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
+import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.jar.Attributes;
@@ -78,6 +80,9 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+
+import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileSystemView;
 
 import jadex.commons.collection.IAutoLock;
 import jadex.commons.collection.IRwMap;
@@ -201,13 +206,10 @@ public class SUtil
 	 * Mapping from single characters to encoded version for displaying on
 	 * xml-style interfaces.
 	 */
-	protected static final Map<String, String>			htmlwraps;
+	protected static final Map<String, String> htmlwraps;
 	
-	/** Cached AndroidUtils */
-	protected static volatile AndroidUtils androidutils;
-
 	/** Holds the single characters. */
-	protected static final String			seps;
+	protected static final String seps;
 	
 
 	/** An empty enumeration. */
@@ -443,7 +445,7 @@ public class SUtil
 		
 		Long ret = dtoprop!=null? Long.parseLong(dtoprop): null;
 		if(ret==null)
-			ret = SReflect.isAndroid()? DEFTIMEOUT_DEFAULT*2 : DEFTIMEOUT_DEFAULT;
+			ret = DEFTIMEOUT_DEFAULT;
 		DEFTIMEOUT	= ret;
 	}
 
@@ -1701,12 +1703,12 @@ public class SUtil
 
 		Set<URL> cps = new LinkedHashSet<URL>(); 
 	
-		if(SReflect.isAndroid()) 
-		{
-			cps.addAll(androidUtils().collectDexPathUrls(classloader));
-		} 
-		else 
-		{
+//		if(SReflect.isAndroid()) 
+//		{
+//			cps.addAll(androidUtils().collectDexPathUrls(classloader));
+//		} 
+//		else 
+//		{
 			StringTokenizer stok = new StringTokenizer(System.getProperty("java.class.path"), System.getProperty("path.separator"));
 			while(stok.hasMoreTokens())
 			{
@@ -1778,7 +1780,7 @@ public class SUtil
 //					cps.add(urls[i]);
 //			}
 			cps.addAll(collectClasspathURLs(classloader));
-		}
+		//}
 		
 		return new ArrayList<URL>(cps);
 	}
@@ -3602,13 +3604,85 @@ public class SUtil
 	public static short getNetworkPrefixLength(InetAddress iadr)
 	{
 		short ret = -1;
-		if(!SReflect.isAndroid() || androidUtils().getAndroidVersion() > 8)
+		try
 		{
-			ret	= SNonAndroid.getNetworkPrefixLength(iadr);
+			NetworkInterface ni = NetworkInterface.getByInetAddress(iadr);
+			List<InterfaceAddress> iads = ni.getInterfaceAddresses();
+			if(iads!=null)
+			{
+				for(int i=0; i<iads.size() && ret==-1; i++)
+				{
+					InterfaceAddress ia = iads.get(i);
+					if(ia.getAddress() instanceof Inet4Address)
+						ret = ia.getNetworkPrefixLength();
+				}
+			}
+			
+		}
+		catch(Exception e)
+		{
+//				e.printStackTrace();
 		}
 		
 		return ret;
 	}
+	
+	/**
+	 * Get the network ips.
+	 */
+	public static List<InetAddress> getNetworkIps()
+	{
+		List<InetAddress> ret = new ArrayList<InetAddress>();
+		try
+		{
+			// Generate network identifiers
+			for(NetworkInterface ni : SUtil.getNetworkInterfaces())
+			{
+				for(InterfaceAddress ifa : ni.getInterfaceAddresses())
+				{
+					if(ifa != null) // Yes, there may be a null in the list. grrr.
+					{
+						InetAddress addr = ifa.getAddress();
+						// System.out.println("addr: "+addr+" "+addr.isAnyLocalAddress()+" "+addr.isLinkLocalAddress()+" "+addr.isLoopbackAddress()+" "+addr.isSiteLocalAddress()+", "+ni.getDisplayName());
+
+						if(addr.isLoopbackAddress())
+						{
+							// ignore
+						}
+						else if(addr.isLinkLocalAddress())
+						{
+							// ignore
+						}
+						else
+						// if(addr.isSiteLocalAddress()) or other
+						{
+							// Hack!!! Use sensible default prefix when -1 or 128
+							// due to JDK bug on windows
+							// http://bugs.sun.com/view_bug.do?bug_id=6707289
+							short prefix = ifa.getNetworkPrefixLength();
+							if(prefix==-1 || prefix==128 && addr instanceof Inet4Address)
+							{
+								prefix	= 24;
+							}
+							InetAddress ad = SUtil.getNetworkIp(addr, prefix);
+							ret.add(ad);
+						}
+					}
+				}
+			}
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+
+		return ret;
+	}
+
 	
 	/**
 	 *  Copy an array.
@@ -3985,7 +4059,7 @@ public class SUtil
 	 */
 	public static File	getHomeDirectory()
 	{
-		return SReflect.isAndroid() ? new File(System.getProperty("user.home")) : SNonAndroid.getHomeDirectory();		
+		return FileSystemView.getFileSystemView().getHomeDirectory();		
 	}
 	
 	/**
@@ -3993,8 +4067,7 @@ public class SUtil
 	 */
 	public static File	getDefaultDirectory()
 	{
-		// Todo: default directory on android?
-		return SReflect.isAndroid() ? new File(System.getProperty("user.home")) : SNonAndroid.getDefaultDirectory();		
+		return FileSystemView.getFileSystemView().getDefaultDirectory();		
 	}
 	
 	/**
@@ -4002,8 +4075,7 @@ public class SUtil
 	 */
 	public static File	getParentDirectory(File file)
 	{
-		// Todo: parent directory on android?
-		return SReflect.isAndroid() ? file.getParentFile() : SNonAndroid.getParentDirectory(file);		
+		return FileSystemView.getFileSystemView().getParentDirectory(file);	
 	}
 
 	/**
@@ -4011,8 +4083,7 @@ public class SUtil
 	 */
 	public static File[]	getFiles(File file, boolean hiding)
 	{
-		// Todo: hidden files on android?
-		return SReflect.isAndroid() ? file.listFiles() : SNonAndroid.getFiles(file, hiding);		
+		return FileSystemView.getFileSystemView().getFiles(file, hiding);	
 	}
 	
 	/**
@@ -4050,7 +4121,7 @@ public class SUtil
 	 */
 	public static boolean isFloppyDrive(File file)
 	{
-		return SReflect.isAndroid() ? false : SNonAndroid.isFloppyDrive(file);
+		return FileSystemView.getFileSystemView().isFloppyDrive(file);
 	}
 
 	/**
@@ -4059,18 +4130,28 @@ public class SUtil
 	 */
 	public static String getDisplayName(File file)
 	{
-		return SReflect.isAndroid() ? null : SNonAndroid.getDisplayName(file);
+		return FileSystemView.getFileSystemView().getSystemDisplayName(file);
 	}
 
 	/**
-	 *  Test if a call is running on a gui (e.g. Swing or Android UI) thread.
-	 *  Currently returns false on android.
+	 *  Test if a call is running on the swing thread.
 	 */
 	public static boolean isGuiThread()
 	{
-		// Todo: ask android helper for android UI thread.
-		return SReflect.isAndroid() ? false : SNonAndroid.isGuiThread();
+		try
+		{
+			return SReflect.HAS_GUI
+				// pre-check because isEventDispatchThread is slow
+				&& Thread.currentThread().getName().startsWith("AWT-EventQueue")
+				&& SwingUtilities.isEventDispatchThread();
+		}
+		catch(Exception e)
+		{
+			// null pointer exception thrown by swing: http://bugs.java.com/view_bug.do?bug_id=8143287
+			return false;
+		}
 	}
+
 	
 	/**
 	 *  Escape a java string.
@@ -5018,14 +5099,37 @@ public class SUtil
 	{
 		if(macs==null)
 		{
-			if(!SReflect.isAndroid() || androidUtils().getAndroidVersion() > 8)
+			TreeSet<String> res = new TreeSet<String>(new Comparator<String>()
 			{
-				macs = SNonAndroid.getMacAddresses();
-			} 
-			else 
+				public int compare(String o1, String o2)
+				{
+					return o1.compareTo(o2);
+				}
+			});
+			
+			try
 			{
-				macs = new String[0];
+				List<NetworkInterface> nis = SUtil.getNetworkInterfaces();
+				for(NetworkInterface ni: nis)
+				{
+					byte[] hwa = ni.getHardwareAddress();
+					if(hwa!=null && hwa.length>0)
+					{
+						//String mac = Arrays.toString(hwa);
+						String mac = SUtil.getMacAddressAsString(hwa);
+						if(!res.contains(mac))
+						{
+							res.add(mac);
+						}
+					}
+				}
 			}
+			catch(Exception e)
+			{
+//					e.printStackTrace();
+			}
+				
+			macs = res.isEmpty()? new String[0]: (String[])res.toArray(new String[res.size()]);
 		}
 		
 		return macs;
@@ -5139,7 +5243,7 @@ public class SUtil
 			{
 				if (appdir == null)
 				{
-					if (SReflect.isAndroid())
+					/*if (SReflect.isAndroid())
 					{
 						try
 						{
@@ -5172,106 +5276,13 @@ public class SUtil
 						}
 					}
 					else
-					{
+					{*/
 						appdir = (new File("")).getAbsoluteFile();
-					}
+					//}
 				}
 			}
 		}
 		return appdir;
-	}
-	
-	/**
-	 * Get the AndroidUtils, if available.
-	 * @return AndroidUtils
-	 */
-	public static AndroidUtils androidUtils() 
-	{
-		if (SReflect.isAndroid() && androidutils == null)
-		{
-			synchronized (SUtil.class)
-			{
-				if(androidutils == null && SReflect.isAndroid())
-				{
-					Class<?> clazz = SReflect.classForName0("jadex.android.commons.AndroidUtilsImpl", SReflect.class.getClassLoader());
-					try
-					{
-						androidutils = (AndroidUtils) clazz.newInstance();
-					}
-					catch(InstantiationException e)
-					{
-						e.printStackTrace();
-					}
-					catch(IllegalAccessException e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		return androidutils;
-	}
-	
-	public interface AndroidUtils {
-
-		/**
-		 * Get Android API version. Possible values:
-		 * http://developer.android.com/reference/android/os/Build.VERSION_CODES.html
-		 * 
-		 * @return Android API version
-		 */
-		int getAndroidVersion();
-
-		/**
-		 * Traverse the Hierarchy of the given classloader and collect all
-		 * DexPaths that are found as URLs.
-		 * @param classloader
-		 * @return URLs
-		 */
-		Collection<? extends URL> collectDexPathUrls(ClassLoader classloader);
-
-		/**
-		 * Checks whether the Platform has the necessary classes to provide XML
-		 * encoding and decoding support.
-		 * @return true, if platform supports xml
-		 */
-		boolean hasXmlSupport();
-
-		/**
-		 * Looks up the ClassLoader Hierarchy and tries to find a JadexDexClassLoader in it.
-		 * @param cl
-		 * @return {@link ClassLoader} or <code>null</code>, if none found.
-		 */
-		ClassLoader findJadexDexClassLoader(ClassLoader cl);
-
-		/**
-		 * Creates an URL object from a given Path to an android APK file
-		 * @param apkPath
-		 * @return {@link URL}
-		 * @throws MalformedURLException
-		 */
-		URL urlFromApkPath(String apkPath) throws MalformedURLException;
-		
-		/**
-		 * Retrieves the APK Path from a given URL, if its an Android APK URL.
-		 * @param url
-		 * @return {@link String}
-		 */
-		String apkPathFromUrl(URL url);
-
-		/**
-		 * Get all Classes in a dex file as Enumeration.
-		 * @param dexFile the dex file
-		 * @return Enumeration of full-qualified classnames
-		 * @throws IOException
-		 */
-		Enumeration<String> getDexEntries(File dexFile) throws IOException;
-
-		/**
-		 * Check whether the current Thread is the android UI thread.
-		 * @return true, if current thread is ui main thread.
-		 */
-		boolean runningOnUiThread();
 	}
 	
 //	/**

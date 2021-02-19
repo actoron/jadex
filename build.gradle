@@ -339,8 +339,12 @@ subprojects
 
     sourceCompatibility = 1.8
     
-    if(isTestParallel(project)) {
-		tasks.withType(Test) {
+	tasks.withType(Test) {
+		// Add current time as test input so tests are always run (i.e. outputs not uptodate and not taken from cache by gradle)
+		// cf. https://blog.gradle.org/stop-rerunning-tests
+		systemProperty "test.timestamp", ""+System.currentTimeMillis()
+		
+		if(isTestParallel(project)) {	
  			maxParallelForks = Runtime.runtime.availableProcessors()
  		}
 	}
@@ -375,24 +379,31 @@ subprojects
 			def projs = new HashSet();	// keep track of added projects to avoid duplicates
 			arts.each { artname ->
 				Project sp = subprojectmap.get(artname)
-				while((isaddon?sp!=rootProject:sp!=null) && !projs.contains(sp)) {
-					projs.add(sp);
-					from(sp.projectDir) {
-						into 'sources' + sp.projectDir.canonicalPath.replace(File.separator, "/").substring(prefixsize)
-						includes = ['*.properties', '*.gradle', 'src/**', 'dist/**', 'lib/**', 'gradle/**', 'gradlew.bat']
-						excludes = ['secret.properties', '**/.gradle', 'src/main/config', 'src/main/buildutils/jadexversion.properties', 'dist/generated/**']
+				if(sp==null)
+				{
+					out.println("Project not found: "+artname);
+				}
+				else
+				{
+					while((isaddon?sp!=rootProject:sp!=null) && !projs.contains(sp)) {
+						projs.add(sp);
+						from(sp.projectDir) {
+							into 'sources' + sp.projectDir.canonicalPath.replace(File.separator, "/").substring(prefixsize)
+							includes = ['*.properties', '*.gradle', 'src/**', 'dist/**', 'lib/**', 'gradle/**', 'gradlew.bat']
+							excludes = ['secret.properties', '**/.gradle', 'src/main/config', 'src/main/buildutils/jadexversion.properties', 'dist/generated/**']
+						}
+						from(sp.projectDir) {
+							into 'sources' + sp.projectDir.canonicalPath.replace(File.separator, "/").substring(prefixsize)
+							include	'gradlew'
+							fileMode 0755
+						}
+	//					// Allow special files being included in source tree (e.g. readmes for building)
+	//					from(new File(sp.projectDir, '/dist/sources')) {
+	//						into 'sources'
+	//						includes = ['*/**']
+	//					}
+						sp	= sp.parent;
 					}
-					from(sp.projectDir) {
-						into 'sources' + sp.projectDir.canonicalPath.replace(File.separator, "/").substring(prefixsize)
-						include	'gradlew'
-						fileMode 0755
-					}
-//					// Allow special files being included in source tree (e.g. readmes for building)
-//					from(new File(sp.projectDir, '/dist/sources')) {
-//						into 'sources'
-//						includes = ['*/**']
-//					}
-					sp	= sp.parent;
 				}
 			}
 			if(!isaddon) {
@@ -579,7 +590,7 @@ subprojects
 				// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
 				def distzip = project.jadexDistZip.outputs.files.first().canonicalPath
 				//def distzip2 = rebuilddirfile.getCanonicalPath() + '/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
-				def distzip2 = rebuilddirfile.getCanonicalPath() + '/build/distributions/zips/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+				def distzip2 = rebuilddirfile.getCanonicalPath() + '/'+project.buildDir.name+'/distributions/zips/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
 				def diff	= diffZips(distzip, distzip2)
 				if(diff.length()!=0)
 					throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);
@@ -708,7 +719,7 @@ task copyJars(type: Copy) {
 }
 
 task testReport(type: TestReport) {
-    destinationDir = file("build/testreport")
+    destinationDir = file("$buildDir/testreport")
     // Include the results from the `test` task in all subprojects
     //reportOn subprojects*.test
 	reportOn subprojects.collect { it.tasks.withType(Test).collect {it.binResultsDir} }

@@ -8,12 +8,12 @@ import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
+import jadex.base.test.ComponentTestSuite;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IPojoComponentFeature;
-import jadex.commons.SNonAndroid;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -76,7 +76,7 @@ public class JCCTest //extends TestCase
 		platform	= null;
 		jcc	= null;
 		
-		SNonAndroid.clearAWT();
+		ComponentTestSuite.clearAWT();
 		
 //		try
 //		{

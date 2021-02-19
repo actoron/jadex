@@ -24,5 +24,5 @@ public interface ILocalResourceIdentifier
 	 *  Get the uri.
 	 *  @return The resource uri.
 	 */
-	public URI	getUri();
+	public URI getUri();
 }

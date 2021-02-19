@@ -38,7 +38,7 @@ public class BDIV3Test	extends	ComponentTestSuite
 			"3d",	// OpenGL problems on termination?
 			"CreationBDI",	// should only be run as separate benchmark,
 			"WorkpieceBDI",
-			SReflect.isAndroid() ? "GuiBDI" : NOEXCLUDE
+			NOEXCLUDE
 		};
 	
 	/**

@@ -272,7 +272,7 @@ public class TransportAddressAgent implements ITransportAddressService
 						
 						freshness.put(platformid, delay.updateExpirationTime());
 						
-//						System.out.println("Resolved addresses for " + platformid + ": " + Arrays.toString(result.toArray()));
+//						System.out.println("Resolved addresses for " + platformid + ": " + result);
 						fret.setResult(filterAddresses(result, transporttype));
 					}
 				});

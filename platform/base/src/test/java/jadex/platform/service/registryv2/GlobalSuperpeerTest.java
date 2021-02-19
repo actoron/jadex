@@ -40,45 +40,46 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		AbstractAuthenticationSecret clientsecret = AbstractAuthenticationSecret.fromKeyPair(ca, true);
 		AbstractAuthenticationSecret serversecret = AbstractAuthenticationSecret.fromKeyPair(cert, false, ca);
 		
-		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(GlobalSuperpeerTest.class);
-		baseconf.setValue("superpeerclient.awaonly", false);
-		baseconf.setValue("superpeerclient.contimeout", WAITFACTOR*2);
-		baseconf.setValue("intravmawareness", false);
-		baseconf.setValue("catalogawareness", true);
-		baseconf.setValue("rt", true);
-		baseconf.setValue("platformurls", "intravm://GlobalSuperpeerTestSSP@localhost:"+sspport);
-		baseconf.setNetworkNames(SecurityAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name);
-		baseconf.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass);
-		// Remote only -> no simulation please
-		baseconf.getExtendedPlatformConfiguration().setSimul(false);
-		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
-//		baseconf.setValue("security.debug", true);
-		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
+		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(GlobalSuperpeerTest.class)
+			.setValue("superpeerclient.awaonly", false)
+			.setValue("superpeerclient.contimeout", WAITFACTOR*2)
+			.setValue("intravmawareness", false)
+			.setValue("catalogawareness", true)
+			.setValue("rt", true)
+			.setValue("platformurls", "intravm://GlobalSuperpeerTestSSP@localhost:"+sspport)
+			.setNetworkNames(SecurityAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name)
+			.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass)
+			// Remote only -> no simulation please
+			.getExtendedPlatformConfiguration()
+				.setSimul(false)
+				.setSimulation(false)
+				.setDebugFutures(true)
+			.setValue("security.debug", true);
 			
-		CLIENTCONF	= baseconf.clone();
-		CLIENTCONF.setPlatformName("GlobalSuperpeerTestClient_*");
-//		CLIENTCONF.setLogging(true);
-//		CLIENTCONF.setValue("rt.debug", true);
+		CLIENTCONF	= baseconf.clone()
+			.setPlatformName("GlobalSuperpeerTestClient_*");
+//			.setLogging(true);
+//			.setValue("rt.debug", true);
 		
-		PROCONF	= baseconf.clone();
-		PROCONF.addComponent(NetworkProviderAgent.class);
-		PROCONF.addComponent(LocalProviderAgent.class);
-		PROCONF.setPlatformName("GlobalSuperpeerTestProvider_*");
+		PROCONF	= baseconf.clone()
+			.addComponent(NetworkProviderAgent.class)
+			.addComponent(LocalProviderAgent.class)
+			.setPlatformName("GlobalSuperpeerTestProvider_*");
 		
-		SPCONF	= baseconf.clone();
-		SPCONF.setValue("superpeer", true);
-		SPCONF.setPlatformName("GlobalSuperpeerTestSP_*");
+		SPCONF	= baseconf.clone()
+			.setValue("superpeer", true)
+			.setPlatformName("GlobalSuperpeerTestSP_*");
 //		SPCONF.setValue("rt.debug", true);
 //		SPCONF.setLogging(true);
 		
-		RELAYCONF	= baseconf.clone();
-		RELAYCONF.setValue("superpeer", true);
-		RELAYCONF.setValue("supersuperpeer", true);
-		RELAYCONF.setValue("rt.forwarding", true);
-		RELAYCONF.setValue("intravm.port", sspport);
-		RELAYCONF.setPlatformName("GlobalSuperpeerTestSSP");
-		RELAYCONF.setNetworkNames(SecurityAgent.GLOBAL_NETWORK_NAME);
-		RELAYCONF.setNetworkSecrets(serversecret.toString());
+		RELAYCONF	= baseconf.clone()
+			.setValue("superpeer", true)
+			.setValue("supersuperpeer", true)
+			.setValue("rt.forwarding", true)
+			.setValue("intravm.port", sspport)
+			.setPlatformName("GlobalSuperpeerTestSSP")
+			.setNetworkNames(SecurityAgent.GLOBAL_NETWORK_NAME)
+			.setNetworkSecrets(serversecret.toString());
 //		RELAYCONF.setLogging(true);
 //		RELAYCONF.setValue("rt.debug", true);
 //		RELAYCONF.setValue("status", true);

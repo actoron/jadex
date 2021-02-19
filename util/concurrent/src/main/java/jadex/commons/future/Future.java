@@ -249,12 +249,12 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     	
     	if(suspend)
 		{
-			if (SReflect.isAndroid()
+			/*if (SReflect.isAndroid()
 					&& !SReflect.isAndroidTesting()
 					&& ISuspendable.SUSPENDABLE.get() == null
 					&& SUtil.androidUtils().runningOnUiThread()) {
 				new Exception("Should not suspend Android UI main thread. Try executing your calls from a different thread! (see stacktrace)").printStackTrace();
-			}
+			}*/
 
 	    	Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
 	    	synchronized(mon)
@@ -1317,6 +1317,29 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		
         return this;
     }
+	
+	/**
+	 *  Called on exception.
+	 *  @param delegate The future the exception will be delegated to.
+	 */
+	public <T> IFuture<E> delegateEx(Future<T> delegate)
+	{
+		this.addResultListener(new IResultListener<E>()
+		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				delegate.setException(exception);
+			}
+			
+			@Override
+			public void resultAvailable(E result)
+			{
+			}
+		});
+		
+		return this;
+	}
 	
 	/**
 	 *  Sequential execution of async methods via implicit delegation.

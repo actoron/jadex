@@ -97,7 +97,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 			{
 				IGlobalPoolStrategy str = psi.getPoolStrategy()==null? new ConstantGlobalPoolStrategy(): (IGlobalPoolStrategy)psi.getPoolStrategy();
 //				CreationInfo ci = psi.getArguments()!=null? new CreationInfo(psi.getArguments()): null;
-				addServiceType(psi.getServicetype().getType(agent.getClassLoader(), agent.getModel().getAllImports()), psi.getWorkermodel(), psi.getCreationInfo(), str).addResultListener(lis);
+				addServiceType(psi.getServiceType().getType(agent.getClassLoader(), agent.getModel().getAllImports()), psi.getWorkermodel(), psi.getCreationInfo(), str).addResultListener(lis);
 			}
 		}
 		else

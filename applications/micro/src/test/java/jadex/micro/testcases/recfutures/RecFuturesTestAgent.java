@@ -75,15 +75,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 	public void body()
 	{
 		final Testcase tc = new Testcase();
-		if(SReflect.isAndroid()) 
-		{
-			System.out.println("Running on android, setting test nr to 1");
-			tc.setTestCount(1);
-		} 
-		else 
-		{
-			tc.setTestCount(2);	
-		}
+		tc.setTestCount(2);	
 		
 		final Future<TestReport> ret = new Future<TestReport>();
 		ret.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<TestReport>()
@@ -126,22 +118,14 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
-				if(SReflect.isAndroid()) 
+				testRemote(2, 100, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
-					System.out.println("Running on android, so skipping remote tests.");
-					ret.setResult(null);
-				}
-				else
-				{
-					testRemote(2, 100, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+					public void customResultAvailable(TestReport result)
 					{
-						public void customResultAvailable(TestReport result)
-						{
-							tc.addReport(result);
-							ret.setResult(null);
-						}
-					}));
-				}
+						tc.addReport(result);
+						ret.setResult(null);
+					}
+				}));
 			}
 		}));
 		

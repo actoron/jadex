@@ -41,7 +41,7 @@ public class ComponentTest extends ComponentTestBase
 	 */
 	public ComponentTest() 
 	{
-		Logger.getLogger("ComponentTest").log(Level.SEVERE, "Empty ComponentTest Constructor called");
+		//Logger.getLogger("ComponentTest").log(Level.SEVERE, "Empty ComponentTest Constructor called");
 	}
 	
 	/**
@@ -64,7 +64,7 @@ public class ComponentTest extends ComponentTestBase
 		}
 		else
 		{
-			this.timeout	= Starter.getDefaultTimeout(platform.getId());
+			this.timeout	= Starter.getScaledDefaultTimeout(platform.getId(), 2);
 		}
 	}
 	

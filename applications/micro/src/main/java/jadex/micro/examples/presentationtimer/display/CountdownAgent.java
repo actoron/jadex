@@ -5,8 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.SwingUtilities;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.Future;
@@ -15,7 +18,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.examples.presentationtimer.common.ICountdownController;
@@ -180,12 +182,17 @@ public class CountdownAgent implements ICountdownService, ICountdownGUIService
 		this.controller = controller;
 	}
 	
-	@AgentCreated
+	@OnStart
 	public void agentCreated() 
 	{
-		System.out.println("Countdown agent created!");
-		ConfigureFrame configureFrame = new ConfigureFrame(this);
-		configureFrame.setLocationRelativeTo(null);
-		configureFrame.setVisible(true);
+		SwingUtilities.invokeLater(() ->
+		{
+			System.out.println("Countdown agent created!");
+			ConfigureFrame configureFrame = new ConfigureFrame(this);
+			configureFrame.setLocationRelativeTo(null);
+			configureFrame.setVisible(true);
+			agent.getExternalAccess().waitForTermination().then(it -> SwingUtilities.invokeLater(() -> configureFrame.dispose()));
+		});
+		
 	}
 }

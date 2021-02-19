@@ -30,7 +30,7 @@ public interface IJCCStarterService extends IJCCPluginService
 	 *  @return The filenames and classnames of the component models.
 	 */
 	//public IFuture<Collection<String[]>> getComponentModels();
-	public IFuture<Collection<String[]>> getComponentModels(IComponentIdentifier cid);
+	//public IFuture<Collection<String[]>> getComponentModels(IComponentIdentifier cid);
 	
 	//public ISubscriptionIntermediateFuture<String[]> getComponentModelsAsStream(IComponentIdentifier cid);
 	public ISubscriptionIntermediateFuture<Collection<String[]>> getComponentModelsAsStream(IComponentIdentifier cid);

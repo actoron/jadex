@@ -52,7 +52,7 @@ public class LongcallTestAgent extends TestAgent
 	 */
 	protected int getTestCount()
 	{
-		return SReflect.isAndroid() ? 6 : 12;
+		return 12;
 	}
 	
 	/**
@@ -84,35 +84,27 @@ public class LongcallTestAgent extends TestAgent
 			
 			public void proceed()
 			{
-				if(SReflect.isAndroid()) 
-				{
-					// skip remote tests
-					ret.setResult(null);
-				} 
-				else 
-				{
 //					agent.getLogger().severe("Testagent test rmeote: "+agent.getDescription());
-					testRemote(3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
+				testRemote(3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
+				{
+					public void customResultAvailable(Collection<TestReport> result)
 					{
-						public void customResultAvailable(Collection<TestReport> result)
-						{
-							for(TestReport tr: result)
-								tc.addReport(tr);
-							ret.setResult(null);
-						}
-						
-						public void finished()
-						{
+						for(TestReport tr: result)
+							tc.addReport(tr);
+						ret.setResult(null);
+					}
+					
+					public void finished()
+					{
 //							agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
-							ret.setResult(null);
-						}
-						
-						public void intermediateResultAvailable(TestReport result)
-						{
-							tc.addReport(result);
-						}
-					}));
-				}
+						ret.setResult(null);
+					}
+					
+					public void intermediateResultAvailable(TestReport result)
+					{
+						tc.addReport(result);
+					}
+				}));
 			}
 		}));
 		
@@ -262,7 +254,7 @@ public class LongcallTestAgent extends TestAgent
 			System.out.println("calling method "+cnt+": "+System.currentTimeMillis());
 			
 			// set timeout to low value to avoid long waiting in test
-			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledDefaultTimeout(agent.getId(), 0.1));
+			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledDefaultTimeout(agent.getId(), 0.05));
 			
 			final long start	= System.currentTimeMillis();
 			Object	fut	= m.invoke(ts, new Object[0]);

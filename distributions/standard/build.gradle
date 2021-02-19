@@ -17,7 +17,6 @@ dependencies
 	
 	// excluded? ---> why??? Comment removed
 	api project(':platform:webservice')
-	api project(':platform:webservice-desktop')
-	api project(':platform:webservice-desktop-jetty')
-	api project(':platform:webservice-desktop-grizzly') // todo: remove grizzly dependency in jadex-application-webservice
+	api project(':platform:webservice-jetty')
+	api project(':platform:webservice-grizzly') // todo: remove grizzly dependency in jadex-application-webservice
 }

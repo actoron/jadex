@@ -68,14 +68,7 @@ public class AutoTerminateTestAgent extends	TestAgent implements IAutoTerminateS
 	{
 		ret	= new Future<Void>();
 		this.tc	= tc;
-		if(SReflect.isAndroid()) 
-		{
-			tc.setTestCount(1);
-		} 
-		else 
-		{
-			tc.setTestCount(3);
-		}
+		tc.setTestCount(3);
 		
 		InitInfo ii = SComponentManagementService.getState(agent.getId().getRoot()).getComponent(agent.getId()).getInitInfo();
 		if(ii!=null)
@@ -87,20 +80,17 @@ public class AutoTerminateTestAgent extends	TestAgent implements IAutoTerminateS
 		{
 			public void customResultAvailable(IComponentIdentifier result)
 			{
-				if(!SReflect.isAndroid()) 
-				{
 //					agent.getLogger().severe("Testagent test remote1: "+agent.getComponentDescription());
-					setupRemoteTest(SubscriberAgent.class.getName()+".class", "self", null, false)
-						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				setupRemoteTest(SubscriberAgent.class.getName()+".class", "self", null, false)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier result)
 					{
-						public void customResultAvailable(IComponentIdentifier result)
-						{
 //							agent.getLogger().severe("Testagent test remote2: "+agent.getComponentDescription());
-							setupRemoteTest(SubscriberAgent.class.getName()+".class", "platform", null, true);
-							// keep future open -> is set in check finished.
-						}
-					});
-				}
+						setupRemoteTest(SubscriberAgent.class.getName()+".class", "platform", null, true);
+						// keep future open -> is set in check finished.
+					}
+				});
 			}
 		});
 		

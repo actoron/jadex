@@ -12,6 +12,7 @@ dependencies
 //	testImplementation files(project(':serialization:traverser').sourceSets.test.runtimeClasspath)
 	
 	// Correct(?) way: (project dependency correctly interpreted by eclipse import as well as gradle build)
+	// currently broken in newer gradles :( >= 6.7 https://github.com/eclipse/buildship/issues/1035
 	testImplementation project(path: ':serialization:traverser', configuration: 'testOutput')
 
 	api 'com.eclipsesource.minimal-json:minimal-json:0.9.4'

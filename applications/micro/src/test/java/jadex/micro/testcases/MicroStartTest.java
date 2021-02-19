@@ -96,11 +96,11 @@ public class MicroStartTest extends ComponentTestSuite
 		"MegaParallelStarter",
 		
 		// android excludes
-		SReflect.isAndroid() ? "authenticate/InitiatorAgent" : NOEXCLUDE,
-		SReflect.isAndroid() ? "nfpropvis/ProviderAndUserAgent" : NOEXCLUDE,
-		SReflect.isAndroid() ? "nfpropvis/ProviderAgent" : NOEXCLUDE,
-		SReflect.isAndroid() ? "nfpropvis/UserAgent" : NOEXCLUDE,
-		SReflect.isAndroid() ? "nfpropvis/Application" : NOEXCLUDE,
+		//SReflect.isAndroid() ? "authenticate/InitiatorAgent" : NOEXCLUDE,
+		//SReflect.isAndroid() ? "nfpropvis/ProviderAndUserAgent" : NOEXCLUDE,
+		//SReflect.isAndroid() ? "nfpropvis/ProviderAgent" : NOEXCLUDE,
+		//SReflect.isAndroid() ? "nfpropvis/UserAgent" : NOEXCLUDE,
+		//SReflect.isAndroid() ? "nfpropvis/Application" : NOEXCLUDE,
 	};
 
 	/**

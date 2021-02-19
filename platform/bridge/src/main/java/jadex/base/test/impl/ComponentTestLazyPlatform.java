@@ -71,7 +71,7 @@ public class ComponentTestLazyPlatform extends ComponentTestBase
 				}
 				else
 				{
-					this.timeout = Starter.getDefaultTimeout(platform.getId());
+					this.timeout = Starter.getScaledDefaultTimeout(platform.getId(), 2);
 				}
 			}
 			else

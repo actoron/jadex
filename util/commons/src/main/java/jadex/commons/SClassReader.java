@@ -1020,6 +1020,15 @@ public class SClassReader
 		public void setFilename(String filename) 
 		{
 			this.filename = filename;
+		}
+
+		/**
+		 *  Get the string representation.
+		 *  @return The string representation.
+		 */
+		public String toString() 
+		{
+			return "ClassFileInfo [filename=" + filename + "]";
 		} 
     }
     

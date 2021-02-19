@@ -1,14 +1,16 @@
 package jadex.base.test;
 
+import java.awt.BorderLayout;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,9 +18,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
@@ -38,7 +44,6 @@ import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.commons.SNonAndroid;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
@@ -191,7 +196,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 				{
 					aborted	= true;
 					System.out.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
-					if(!SReflect.isAndroid())
+					//if(!SReflect.isAndroid())
 					{
 						try
 						{
@@ -204,11 +209,11 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 							runner.stop();
 						}
 					}
-					else
+					/*else
 					{
 						System.err.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
 						System.exit(1);
-					}
+					}*/
 				}
 			}, timeout);
 		}
@@ -474,7 +479,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	{
 		List<String> result = new ArrayList<String>();
 
-		if (SReflect.isAndroid())
+		/*if(SReflect.isAndroid())
 		{
 			try
 			{
@@ -519,7 +524,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 				e.printStackTrace();
 			}
 		}
-		else
+		else*/
 		{
 			List<File>	todo	= new LinkedList<File>();
 //			if(path.toString().indexOf("micro")!=-1)
@@ -612,9 +617,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	public static void	clearAWT()
 	{
 		if(SReflect.HAS_GUI)
-		{
-			SNonAndroid.clearAWT();
-		}
+			internalClearAWT();
 	}
 
 	/**
@@ -674,4 +677,86 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //		System.out.println("Test added: "+test);
 //		super.addTest(test);
 //	}
+	
+	/**
+	 *  Workaround for AWT/Swing memory leaks.
+	 */
+	public static void	internalClearAWT()
+	{
+		// Java Bug not releasing the last focused window, see:
+		// http://www.lucamasini.net/Home/java-in-general-/the-weakness-of-swing-s-memory-model
+		// http://bugs.sun.com/view_bug.do?bug_id=4726458
+		
+//		final Future<Void>	disposed	= new Future<Void>();
+		final Semaphore sem = new Semaphore(0);
+		
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						final JFrame f	= new JFrame("dummy");
+						f.getContentPane().add(new JButton("Dummy"), BorderLayout.CENTER);
+						f.pack();
+						f.setVisible(true);
+						
+						javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								f.dispose();
+								javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+								{
+									public void actionPerformed(ActionEvent e)
+									{
+//										System.out.println("cleanup dispose");
+										KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+										sem.release();
+//										disposed.setResult(null);
+									}
+								});
+								t.setRepeats(false);
+								t.start();
+
+							}
+						});
+						t.setRepeats(false);
+						t.start();
+					}
+				});
+				t.setRepeats(false);
+				t.start();
+			}
+		});
+		
+//		disposed.get(new ThreadSuspendable(), BasicService.getDefaultTimeout());
+//		disposed.get(new ThreadSuspendable(), 30000);
+//		disposed.get(30000);
+		try
+		{
+			sem.tryAcquire(30000, TimeUnit.MILLISECONDS);
+		}
+		catch (InterruptedException e)
+		{
+		}
+		
+//		// Another bug not releasing the last drawn window.
+//		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6857676
+//		
+//		try
+//		{
+//			Class<?> clazz	= Class.forName("sun.java2d.pipe.BufferedContext");
+//			Field	field	= clazz.getDeclaredField("currentContext");
+//			field.setAccessible(true);
+//			field.set(null, null);
+//		}
+//		catch(Throwable e)
+//		{
+//			e.printStackTrace();
+//		}
+
+	}
 }

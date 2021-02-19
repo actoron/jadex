@@ -458,7 +458,7 @@ public class VmHacks
 		 */
 		protected void init()
 		{
-			asm = !SReflect.isAndroid();
+			asm = true;//!SReflect.isAndroid();
 			
 			SecurityProviderStore.inject();
 			

@@ -18,8 +18,8 @@ public class Main
 	 */
 	public static void main(String[] args) 
 	{
-		//IExternalAccess platform = Starter.createPlatform().get();
 		IExternalAccess platform = Starter.createPlatform(PlatformConfigurationHandler.getDefault()).get();
+		//CreationInfo ci = new CreationInfo().setFilenameClass(MandelbrotAgent.class).setConfiguration("nocalcs");
 		CreationInfo ci = new CreationInfo().setFilenameClass(MandelbrotAgent.class).setConfiguration("pools");
 		platform.createComponent(ci).get();
 	}
