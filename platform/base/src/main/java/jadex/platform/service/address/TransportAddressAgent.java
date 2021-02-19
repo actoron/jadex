@@ -54,7 +54,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	protected static final long CACHE_VALIDITY_DUR = 10*60*1000;
 	
 	/** Freshness limit for previously failed renewed searches. */
-	protected static final long CACHE_INVALIDITY_DUR = 5000;
+	protected static final long MAX_CACHE_INVALIDITY_DUR = 5000;
 	
 	/** Maximum number of peers to ask for addresses. */
 	protected static final int ASK_ALL_LIMIT = 3;
@@ -70,7 +70,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	protected Map<IComponentIdentifier, IFuture<List<TransportAddress>>> searches;
 	
 	/** Freshness state of the cache. */
-	protected Map<IComponentIdentifier, Long> freshness;
+	protected Map<IComponentIdentifier, SearchDelay> freshness;
 	
 	/** The managed addresses: target platform -> (transport name -> transport addresses) */
 	protected Map<IComponentIdentifier, LinkedHashSet<TransportAddress>> addresses;
@@ -107,7 +107,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		addresses = new HashMap<IComponentIdentifier, LinkedHashSet<TransportAddress>>();
 		manualaddresses = new HashMap<IComponentIdentifier, LinkedHashSet<TransportAddress>>();
 		addresssubs = new LinkedHashSet<SubscriptionIntermediateFuture<Tuple2<TransportAddress, Boolean>>>(); 
-		freshness = new HashMap<IComponentIdentifier, Long>();
+		freshness = new HashMap<IComponentIdentifier, SearchDelay>();
 		searches = new HashMap<IComponentIdentifier, IFuture<List<TransportAddress>>>();
 		
 		return IFuture.DONE;
@@ -208,7 +208,7 @@ public class TransportAddressAgent implements ITransportAddressService
 			ret.setResult(addrs);
 			
 			if (freshness.get(platformid) == null ||
-				freshness.get(platformid) > System.currentTimeMillis())
+				freshness.get(platformid).getExpirationTime() > System.currentTimeMillis())
 			{
 				final Future<List<TransportAddress>> fret = new Future<List<TransportAddress>>();
 				
@@ -261,13 +261,16 @@ public class TransportAddressAgent implements ITransportAddressService
 					
 					public void resultAvailable(List<TransportAddress> result)
 					{
-						if (result != null)
-							freshness.put(platformid, System.currentTimeMillis() + CACHE_VALIDITY_DUR );
-						else
+						SearchDelay delay = freshness.get(platformid);
+						
+						if (delay == null ||
+							(delay.isValid() && result == null) ||
+							(!delay.isValid() && result != null))
 						{
-							freshness.put(platformid, System.currentTimeMillis() + CACHE_INVALIDITY_DUR );
-//							throw new Error(agent.getComponentIdentifier() + " FAILED: " + platformid);
+							delay = new SearchDelay(result != null);
 						}
+						
+						freshness.put(platformid, delay.updateExpirationTime());
 						
 //						System.out.println("Resolved addresses for " + platformid + ": " + Arrays.toString(result.toArray()));
 						fret.setResult(filterAddresses(result, transporttype));
@@ -648,5 +651,68 @@ public class TransportAddressAgent implements ITransportAddressService
 			}
 		}
 		return ret;
+	}
+	
+	/**
+	 *  A delay for further searches.
+	 *
+	 */
+	protected class SearchDelay
+	{
+		/** Current wait time before another search is attempted */
+		protected float currentwaittime = 0.125f;
+		
+		/** Expiration time of the current delay */
+		protected long expiration;
+		
+		/** Flag, if the current result is valid. */
+		protected boolean valid;
+		
+		/**
+		 *  Creates the delay.
+		 * 
+		 *  @param valid Flag, if the current result is valid.
+		 */
+		public SearchDelay(boolean valid)
+		{
+			this.valid = valid;
+		}
+		
+		/**
+		 *  Returns if the delay is for a valid result.
+		 *  @return True, if valid.
+		 */
+		public boolean isValid()
+		{
+			return valid;
+		}
+		
+		/**
+		 *  Returns the current wait time in ms.
+		 *  
+		 *  @return The current wait time in ms.
+		 */
+		public long getExpirationTime()
+		{
+			return expiration;
+		}
+		
+		/**
+		 *  Doubles the wait time.
+		 *  @param maxwait Maximum wait time.
+		 *  @return The object itself.
+		 */
+		public SearchDelay updateExpirationTime()
+		{
+			if (valid)
+				expiration = System.currentTimeMillis() + CACHE_VALIDITY_DUR;
+			else
+			{
+				currentwaittime += currentwaittime;
+				currentwaittime = Math.min(currentwaittime, MAX_CACHE_INVALIDITY_DUR);
+				expiration = System.currentTimeMillis() + (long) currentwaittime;
+			}
+			return this;
+		}
 	}
 }
