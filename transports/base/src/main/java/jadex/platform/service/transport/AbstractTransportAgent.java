@@ -1,6 +1,7 @@
 package jadex.platform.service.transport;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -38,9 +39,8 @@ import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.component.IInternalRequiredServicesFeature;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.cms.SComponentManagementService;
@@ -65,7 +65,6 @@ import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
@@ -82,7 +81,6 @@ import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
 
 @Agent
 @ProvidedServices({
@@ -125,13 +123,11 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 	protected IComponentIdentifier platformid;
 	
 	/** Security service. */
-	@OnService(query=Boolean3.TRUE, required=Boolean3.TRUE, requiredservice = @RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, type = Object.class))
-	//@AgentServiceSearch(requiredservice=@RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, name = "", type = Object.class))
+	@OnService(query=Boolean3.TRUE, required=Boolean3.TRUE)
 	protected ISecurityService secser;
 	
 	/** Transport address service. */
-	@OnService(query=Boolean3.TRUE, required=Boolean3.TRUE, requiredservice = @RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, type = Object.class))
-	//@AgentServiceSearch(requiredservice=@RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, name = "", type = Object.class))
+	@OnService(query=Boolean3.TRUE, required=Boolean3.TRUE)
 	protected ITransportAddressService tas;
 	
 	/** Serialization services. */
@@ -158,14 +154,18 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 	@OnInit
 	public IFuture<Void> start()
 	{
-		//if(tas==null)
-		//	System.out.println("tas is null");
+		// Convert required tas to provided (for speed?) and required secser to raw (TODO: why is RequiredService.proxytype deprecated?
+		assert tas!=null;
+		assert secser!=null;
+		tas	= (ITransportAddressService) ((BasicServiceInvocationHandler)Proxy.getInvocationHandler(tas)).getDomainService();
+		secser	= (ISecurityService) ((BasicServiceInvocationHandler)Proxy.getInvocationHandler(secser)).getDomainService();
+//		assert !Proxy.isProxyClass(tas.getClass());	// Still provided service proxy as tas is not thread safe
+		assert !Proxy.isProxyClass(secser.getClass());
 		
 		platformid = agent.getId().getRoot();
 		cleanupinterval = Starter.getDefaultTimeout(platformid);
 		cleanupinterval = cleanupinterval > 0 ? cleanupinterval : 30000;
 		nextcleanup = new AtomicLong(System.currentTimeMillis() + cleanupinterval);
-		impl = createTransportImpl();
 		
 		handshakingconnections = new LeaseTimeMap<>(Starter.getDefaultTimeout(platformid), new ICommand<Tuple2<Entry<Con, IComponentIdentifier>, Long>>()
 		{
@@ -180,19 +180,16 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 		establishedconnections = wrappedmap;
 		restablishedconnections = new RwMapWrapper<>(econsbimap.flip(), wrappedmap.getLock());
 		
-		//secser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(
-		//	new ServiceQuery<>(ISecurityService.class).setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW));
 		serser =  (ISerializationServices)Starter.getPlatformValue(platformid, Starter.DATA_SERIALIZATIONSERVICES);
 		
 		infosubscribers = new ArrayList<SubscriptionIntermediateFuture<PlatformData>>();
-		
-		Future<Void> openportret = new Future<>();
-		FutureBarrier<Void> retbar = new FutureBarrier<>();
-		retbar.addFuture(openportret);
+
+		impl = createTransportImpl();
 		impl.init(this);
 		
 		// Set up server, if port given.
 		// If port==0 -> any free port
+		Future<Void> openportret = new Future<>();
 		if(port >= 0)
 		{
 			impl.openPort(port).addResultListener(new ExceptionDelegationResultListener<Integer, Void>(openportret)
@@ -238,25 +235,7 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 			openportret.setResult(null);
 		}
 		
-		Future<Void> secfut = new Future<>();
-		retbar.addFuture(secfut);
-		ServiceQuery<ISecurityService> secquery = new ServiceQuery<>(ISecurityService.class);
-		agent.searchService(secquery, 0).then( result ->
-		{
-			secser = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ISecurityService.class);
-			secfut.setResult(null);
-		});
-		
-		Future<Void> tasfut = new Future<>();
-		retbar.addFuture(tasfut);
-		ServiceQuery<ITransportAddressService> tasquery = new ServiceQuery<>(ITransportAddressService.class);
-		agent.searchService(tasquery, 0).then( result ->
-		{
-			tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
-			tasfut.setResult(null);
-		});
-		
-		return retbar.waitFor();
+		return IFuture.DONE;
 	}
 	
 	//@AgentKilled
