@@ -66,7 +66,7 @@ public class StatusAgent implements IStatusService
 	
 	@AgentArgument
 	protected int	port	= 8081;
-
+	
 	@OnService(requiredservice = @RequiredService(min = 1, max = 1))
 	protected IFuture<Void> publish(IWebPublishService wps)
 	{
@@ -75,7 +75,7 @@ public class StatusAgent implements IStatusService
 		IFuture<Void>	ret	= (IFuture<Void>)
 			wps.publishService(sid, new PublishInfo("[http://localhost:"+port+"/]status", IPublishService.PUBLISH_RS, null))
 				.then(v ->
-			wps.publishResources("[http://localhost:"+port+"/]", "META-INF/resources"));
+			wps.publishResources("[http://localhost:"+port+"/]", "META-INF/legacystatuswebgui"));
 		return ret;
 	}
 	
@@ -143,7 +143,9 @@ public class StatusAgent implements IStatusService
 		// TODO: Use query for dynamically added transports
 		for(final ITransportInfoService tis: agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITransportInfoService.class)))
 		{
+			System.out.println("subscribing: "+tis);
 			ISubscriptionIntermediateFuture<PlatformData>	fut	= tis.subscribeToConnections();
+			System.out.println("subscribed: "+tis+", "+fut);
 			fut.addResultListener(new IIntermediateResultListener<PlatformData>()	// Do not use delegation listener (ignore forward commands like update timer)
 			{
 				@Override
@@ -169,7 +171,8 @@ public class StatusAgent implements IStatusService
 				@Override
 				public void intermediateResultAvailable(PlatformData result)
 				{
-					ret.addIntermediateResult(result);
+					System.out.println("result: "+tis+", "+result);
+					ret.addIntermediateResultIfUndone(result);
 				}
 				
 				@Override
@@ -276,6 +279,6 @@ public class StatusAgent implements IStatusService
 //		config.setLogging(true);
 //		config.setValue("nanorspublish", false);
 		
-		Starter.createPlatform(config).get();
+		Starter.createPlatform(config, args).get();
 	}
 }

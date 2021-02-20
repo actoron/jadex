@@ -556,7 +556,10 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 				// Add initial data
 				List<PlatformData> constat = collectConnectionStatus();
 				for (PlatformData data : constat)
+				{
+					//System.out.println("post connection to subscriber: "+data+", "+ret);
 					ret.addIntermediateResult(data);
+				}
 				
 				return IFuture.DONE;
 			}
