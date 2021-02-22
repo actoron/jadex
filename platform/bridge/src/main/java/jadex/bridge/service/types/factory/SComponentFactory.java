@@ -1040,11 +1040,11 @@ public class SComponentFactory
 					{
 						Starter.putPlatformValue(component.getId().getRoot(), Starter.DATA_COMPONENTMODELS, allres);
 					})
-					.delegateEx(ret);
+					.catchEx(ret);
 				})
-				.delegateEx(ret);
+				.catchEx(ret);
 			})
-			.delegateEx(ret);
+			.catchEx(ret);
 			return ret;
 		}
 	}

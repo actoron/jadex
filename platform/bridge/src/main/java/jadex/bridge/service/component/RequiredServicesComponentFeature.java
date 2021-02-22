@@ -1062,6 +1062,8 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		enhanceQuery(query, true);
 		SlidingCuckooFilter scf = new SlidingCuckooFilter();
 		
+		//System.out.println("query: "+query);
+		
 		// Query remote
 //		ISearchQueryManagerService sqms = searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 //		if(isRemote(query) && sqms==null)
