@@ -22,6 +22,9 @@ public class PoolServiceInfo
 	/** The service interface type. */
 	protected ClassInfo servicetype;
 	
+	/** The publication scope. */
+	protected ServiceScope publicationscope;
+	
 	/** The pool strategy. */
 	protected Object poolstrategy; // IPoolStrategy or IGlobalPoolStrategy
 	
@@ -239,6 +242,25 @@ public class PoolServiceInfo
 	}
 
 	/**
+	 *  Get the publication scope.
+	 *  @return the publicationscope
+	 */
+	public ServiceScope getPublicationScope()
+	{
+		return publicationscope;
+	}
+
+	/**
+	 *  Set the publication scope.
+	 *  @param publicationScope the publicationScope to set
+	 */
+	public PoolServiceInfo setPublicationScope(ServiceScope publicationscope)
+	{
+		this.publicationscope = publicationscope;
+		return this;
+	}
+
+	/**
 	 *  Set the arguments.
 	 *  @param arguments The arguments to set.
 	 * /
@@ -250,18 +272,7 @@ public class PoolServiceInfo
 //		this.arguments = arguments;
 		return this;
 	}*/
-	
-	/**
-	 *  Set the publication scope.
-	 *  @scope The scope.
-	 */
-	public PoolServiceInfo setPublicationScope(ServiceScope scope)
-	{
-		if(publishinfo==null)
-			publishinfo = new PublishInfo();
-		publishinfo.setPublishScope(scope);
-		return this;
-	}
+
 	
 	
 }

@@ -72,7 +72,7 @@ public class ServicePoolAgent implements IServicePoolService
 				Class<?> sertype = psi.getServiceType().getType(agent.getClassLoader(), agent.getModel().getAllImports());
 				if(sertype==null)
 					throw new RuntimeException("Could not resolve service class: "+psi.getServiceType());
-				addServiceType(sertype, str, psi.getWorkermodel(), ci, psi.getPublishInfo()).addResultListener(lis);
+				addServiceType(sertype, str, psi.getWorkermodel(), ci, psi.getPublishInfo(), psi.getPublicationScope()).addResultListener(lis);
 			}
 		}
 		else
@@ -146,7 +146,7 @@ public class ServicePoolAgent implements IServicePoolService
 	 */
 	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi)
 	{
-		return addServiceType(servicetype, strategy, componentmodel, info, pi, ServiceScope.DEFAULT);
+		return addServiceType(servicetype, strategy, componentmodel, info, pi, null);
 	}
 	
 	/**
@@ -160,6 +160,8 @@ public class ServicePoolAgent implements IServicePoolService
 			servicetypes = new HashMap<Class<?>, ServiceHandler>();
 		if(strategy==null)
 			strategy = getDefaultStrategy();
+		if(scope==null)
+			scope = ServiceScope.DEFAULT;
 		ServiceHandler handler = new ServiceHandler(agent, servicetype, strategy, componentmodel, info);
 		servicetypes.put(servicetype, handler);
 

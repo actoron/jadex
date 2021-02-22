@@ -1,14 +1,15 @@
 package jadex.micro.examples.mandelbrot_new;
 
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Timeout;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 
 /**
  *  Interface for calculating an area of points.
  */
 @Service
+@Security(roles=Security.UNRESTRICTED)
 public interface ICalculateService
 {
 	/**
