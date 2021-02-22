@@ -57,7 +57,7 @@ public class ModelFileFilter implements IAsyncFilter
 		this.rids	= rids;
 		this.exta = exta;
 		
-		System.out.println("created model file filter: "+rids);
+		//System.out.println("created model file filter: "+rids);
 	}
 
 	//-------- methods --------
