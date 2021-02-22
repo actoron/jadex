@@ -44,4 +44,15 @@ public class PlatformData
 		this.protocol	= protocol;
 		this.connected	= connected;
 	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  String representation
+	 */
+	@Override
+	public String toString()
+	{
+		return getClass().getSimpleName()+"("+protocol+"://"+platform+" ("+(connected?"":"not ")+"connected))";
+	}
 }
