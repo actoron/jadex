@@ -12,8 +12,8 @@ dependencies
 	api project(':kernels:application')
 	
 	testImplementation project(':platform:base')
-	testImplementation project(':transports:websockettransport')
-	testImplementation project(':transports:relaytransport')
+	testImplementation project(':transports:websocket')
+	testImplementation project(':transports:relay')
 	testImplementation project(':transports:intravm')
 
 	

@@ -17,8 +17,8 @@ dependencies
 	api project(':platform:base')
 	api project(':transports:base')
 	api project(':transports:tcp')
-	api project(':transports:relaytransport')
-	api project(':transports:websockettransport')
+	api project(':transports:relay')
+	api project(':transports:websocket')
 }
 
 // Add uptodate applications-quickstart sources to example project

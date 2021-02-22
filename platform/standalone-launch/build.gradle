@@ -24,8 +24,8 @@ dependencies
 										   ':environments:envsupport-opengl',
 //										   ':platform:maven',
 										   ':environments:envsupport-jmonkey',' :platform:webservice',
-										   ':transports:relaytransport',
-										   ':transports:websockettransport',
+										   ':transports:relay',
+										   ':transports:websocket',
 										   ':platform:webservice',
 										   ':platform:webservice-nano',
 										   ':platform:webservice-websocket'
