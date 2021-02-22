@@ -47,7 +47,7 @@ class PlatformsElement extends BaseElement
 	terminateSubscription()
 	{
 		if(this.termcmd!=null)
-			this.termcmd().then(() => {console.log("Terminated subscription.")})
+			this.termcmd().then(() => {/*console.log("Terminated subscription.")*/})
 				.catch(() => {console.log("Could not terminate subscription")});
 	}
 	
