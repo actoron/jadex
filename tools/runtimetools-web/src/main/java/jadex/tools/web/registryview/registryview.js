@@ -28,8 +28,8 @@ class RegistryViewElement extends CidElement
 		console.log("relayview");
 		
 		this.subscriptions = {};
-		this.concom = false;
-		this.initready = false;
+		//this.concom = false;
+		//this.initready = false;
 		this.global = true;
 		
 		this.app.lang.listeners.add(this);
@@ -99,17 +99,17 @@ class RegistryViewElement extends CidElement
 		self.getSubscription("Platforms").table.insert({headings: ["","",""]})
 		self.getSubscription("Queries").table.insert({headings: ["","",""]})
 		
-		self.initready = true;
+		//self.initready = true;
 		self.subscribe();
 	}
 	
-	connectedCallback()
+	/*connectedCallback()
 	{
 		super.connectedCallback();
 		this.concom = true;	
 	
 		this.subscribe();
-	}
+	}*/
 	
 	subscribe()
 	{
@@ -117,8 +117,9 @@ class RegistryViewElement extends CidElement
 		
 		var self = this;
 		
-		if(this.initready && this.concom)
+		//if(this.initready && this.concom)
 		{
+			console.log('reg subscribing');
 			var wait = 5000;
 			this.subscribeToX("Services", wait, 
 				function(elem, event) 
@@ -249,7 +250,7 @@ class RegistryViewElement extends CidElement
 				}
 				else
 				{
-					console.log("Subcribe terminated due to component disconnect: "+x);
+					//console.log("Subcribe terminated due to component disconnect: "+x);
 				}
 			}, interval);
 		});
