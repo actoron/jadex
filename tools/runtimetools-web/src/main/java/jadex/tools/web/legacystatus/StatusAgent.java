@@ -19,6 +19,7 @@ import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
+import jadex.bridge.service.search.QueryEvent;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQueryInfo;
@@ -38,6 +39,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
@@ -75,10 +77,12 @@ public class StatusAgent implements IStatusService
 		IFuture<Void>	ret	= (IFuture<Void>)
 			wps.publishService(sid, new PublishInfo("[http://localhost:"+port+"/]status", IPublishService.PUBLISH_RS, null))
 				.then(v ->
-			wps.publishResources("[http://localhost:"+port+"/]", "META-INF/legacystatuswebgui"));
+			wps.publishResources("[http://localhost:"+port+"/]", "META-INF/legacystatuswebgui")
+				.then(w ->
+			wps.publishResources("[http://localhost:"+port+"/]", "META-INF/resources")));
 		return ret;
 	}
-	
+
 	@Override
 	public IIntermediateFuture<PlatformData>	getConnectedPlatforms()
 	{
@@ -118,6 +122,32 @@ public class StatusAgent implements IStatusService
 				ret.setFinished();
 			}
 		});
+		return ret;
+	}
+	
+	/**
+	 *  Get registered queries of a given (set of) scope(s) or no scope for all queries.
+	 *  @return A list of queries.
+	 */
+	public ISubscriptionIntermediateFuture<QueryEvent>	subscribeToQueries(String... scope)
+	{
+		Set<String>	scopes	= scope==null ? null: new HashSet<String>(Arrays.asList(scope));
+		ISubscriptionIntermediateFuture<QueryEvent>	ret	= new SubscriptionIntermediateDelegationFuture<QueryEvent>(ServiceRegistry.getRegistry(agent.getId()).subscribeToQueries())
+		{
+			@Override
+			public boolean doAddIntermediateResult(QueryEvent event, boolean undone)
+			{
+				if(scopes==null || scopes.contains(event.getQuery().getScope().name().toLowerCase()))
+				{
+					return super.doAddIntermediateResult(event, undone);
+				}
+				else
+				{
+					System.out.println("query ignored in status agent: "+event);
+				}
+				return false;
+			}
+		};
 		return ret;
 	}
 

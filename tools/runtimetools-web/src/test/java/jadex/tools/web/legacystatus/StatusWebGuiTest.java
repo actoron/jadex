@@ -72,7 +72,7 @@ public class StatusWebGuiTest
 		assertContainsField(service, "unrestricted");
 
 		// Check that queries can be retrieved.
-		String	query	= getUrlContent(new URL("http://localhost:"+port+"/status/getQueries"));
+		String	query	= getUrlContent(new URL("http://localhost:"+port+"/status/subscribeToQueries"));
 		System.out.println("query: "+query);
 		assertContainsField(query, "serviceType");
 		assertContainsField(query, "owner");

@@ -18,6 +18,19 @@ app.controller('Services', [ '$scope', '$http',
 ]);
 app.controller('Queries', [ '$scope', '$http',
 	function($scope, $http) {
+		getIntermediate($http, 'status/subscribeToQueries',
+			function(response)
+			{
+				updateQuery($scope, response.data);
+			},
+			function(response)
+			{
+				$scope.superpeerDown	= true;
+			});
+	}
+]);
+app.controller('Queries', [ '$scope', '$http',
+	function($scope, $http) {
 		$http.get('status/getQueries',
 			{params: {'scope': JSON.stringify(["global","network"])},	// Stringify otherwise angular adds multiple singlevalued parameter occurrences, grrr.
 			 data: '',	// Otherwise angular removes content type header required for json unpacking of arg (TODO: Jadex bug, should use something different than contetn type for get?)
@@ -93,6 +106,36 @@ function	updateService($scope, event)
 	if(!found)
 	{
 		$scope.services.push(event.service);
+	}
+}
+
+function	updateQuery($scope, event)
+{
+	var	found	= false;
+	$scope.queries	= $scope.queries===undefined ? [] : $scope.queries;
+	
+//	alert("Query: "+JSON.stringify(event));
+	for(var i=0; i<$scope.queries.length; i++)
+	{
+		found	= $scope.queries[i].id==event.query.id;
+		if(found)
+		{
+			// 0: added, 1: removed, 2: changed
+			if(event.type==1)	// removed
+			{
+				$scope.queries.splice(i,1);
+			}
+			else	// added / changed
+			{
+				$scope.queries[i]	= event.query;
+			}
+			break;
+		}
+	}
+	
+	if(!found)
+	{
+		$scope.queries.push(event.query);
 	}
 }
 //]]>
