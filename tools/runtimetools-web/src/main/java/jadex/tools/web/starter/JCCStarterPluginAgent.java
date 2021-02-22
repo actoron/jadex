@@ -175,7 +175,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 				    }
 				});
 				return IFuture.DONE;
-			}).delegateEx(ret);
+			}).catchEx(ret);
 		}
 			
 		return ret;

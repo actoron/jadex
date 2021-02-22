@@ -2531,18 +2531,33 @@ public class MicroClassReader
 			{
 				OnService ser = getAnnotation(methods[i], OnService.class, cl);
 				RequiredService rs = ser.requiredservice();
-				String name = ser.requiredservice().name().length()>0? ser.requiredservice().name(): guessName(methods[i].getName());
-				RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
-				if(new ClassInfo(Object.class).equals(rsis.getType()))
-				{
-					Class<?> iftype = Object.class.equals(ser.requiredservice().type())? guessParameterType(methods[i].getParameterTypes(), cl): ser.requiredservice().type();
-					rsis.setType(new ClassInfo(iftype));
-				}
+					
+				//String name = ser.requiredservice().name().length()>0? ser.requiredservice().name(): guessName(methods[i].getName());
+				String name = ser.name();
 				
+				if(name.length()==0)
+					name = rs.name();
+				if(name.length()==0)
+					guessName(methods[i].getName());
+				
+				RequiredServiceInfo rsis = (RequiredServiceInfo)rsers.get(name);
+				if(rsis==null)
+				{
+					rsis = createRequiredServiceInfo(rs, cl);
+					
+					if(new ClassInfo(Object.class).equals(rsis.getType()))
+					{
+						Class<?> iftype = Object.class.equals(ser.requiredservice().type())? guessParameterType(methods[i].getParameterTypes(), cl): ser.requiredservice().type();
+						rsis.setType(new ClassInfo(iftype));
+					}
+					
+					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
+				}
+								
 				ServiceInjectionInfo sii = new ServiceInjectionInfo().setMethodInfo(new MethodInfo(methods[i])).setRequiredServiceInfo(rsis);
 						
-				if(ser.requiredservice().name().length()>0)
-					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
+				//if(ser.requiredservice().name().length()>0)
+				//	checkAndAddRequiredServiceInfo(rsis, rsers, cl);
 				
 				if(ser.query().toBoolean()!=null)
 					sii.setQuery(ser.query().toBoolean());
@@ -2621,12 +2636,6 @@ public class MicroClassReader
 		if(rsis.getName()==null || rsis.getName().length()==0)
 			return;
 		
-		//Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
-		
-		//RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
-		//if(rsis.getName().length()==0)
-		//	rsis.setName(fields[i].getName());
-	
 		if(rsers.containsKey(rsis.getName()))
 		{
 			RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(rsis.getName());

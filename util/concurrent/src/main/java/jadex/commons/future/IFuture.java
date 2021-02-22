@@ -278,6 +278,6 @@ public interface IFuture<E>
 	/**
 	 *  Called on exception.
 	 *  @param delegate The future the exception will be delegated to.
-	 */
-	public <T> IFuture<E> delegateEx(Future<T> delegate);
+	 * /
+	public <T> IFuture<E> delegateEx(Future<T> delegate);*/
 }
