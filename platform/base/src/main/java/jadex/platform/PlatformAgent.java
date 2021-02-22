@@ -380,9 +380,6 @@ public class PlatformAgent
 
 			String name = ai.getValue("name")==null || ((String)ai.getValue("name")).length()==0? null: (String)ai.getValue("name");
 			
-			if("rt".equals(name))
-				System.out.println("sdgjndfjk");
-			
 			boolean ok = ei==null? true: "true".equals(ei.getValue().toLowerCase());
 			
 			Boolean agentstart = null;
