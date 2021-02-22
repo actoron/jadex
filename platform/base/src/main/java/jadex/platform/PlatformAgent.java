@@ -377,8 +377,13 @@ public class PlatformAgent
 			EnumInfo ei = (EnumInfo)ai.getValue("autostart");
 			if(ei==null)
 				System.out.println("No autostart agent: "+ci);
-			boolean ok = ei==null? true: "true".equals(ei.getValue().toLowerCase());
+
 			String name = ai.getValue("name")==null || ((String)ai.getValue("name")).length()==0? null: (String)ai.getValue("name");
+			
+			if("rt".equals(name))
+				System.out.println("sdgjndfjk");
+			
+			boolean ok = ei==null? true: "true".equals(ei.getValue().toLowerCase());
 			
 			Boolean agentstart = null;
 			if(name!=null)
@@ -390,25 +395,31 @@ public class PlatformAgent
 			
 			if(agentstart==null)
 			{
-				name = SReflect.getUnqualifiedTypeName(ci.getClassName());
+				String typename = SReflect.getUnqualifiedTypeName(ci.getClassName());
 				
-				if(getAgentStart(name.toLowerCase())!=null)
+				if(getAgentStart(typename.toLowerCase())!=null)
 				{	
-					ok = getAgentStart(name.toLowerCase());
+					ok = getAgentStart(typename.toLowerCase());
+					if(name==null)
+						name = typename;
 				}
 				else
 				{
 					// check classname - suffix (BDI/Agent etc) in lowercase
-					int suf = SUtil.inndexOfLastUpperCaseCharacter(name);
+					int suf = SUtil.inndexOfLastUpperCaseCharacter(typename);
 					if(suf>0)
 					{
-						name = name.substring(0, suf).toLowerCase();
-						if(getAgentStart(name)!=null)
+						typename = typename.substring(0, suf).toLowerCase();
+						if(getAgentStart(typename)!=null)
 						{	
-							ok = getAgentStart(name);
+							ok = getAgentStart(typename);
 						}
 					}
 				}
+				
+				// only set name, if was not explicitly set
+				if(name==null)
+					name = typename;
 			}
 			
 			if(ok)
@@ -422,7 +433,7 @@ public class PlatformAgent
 		}
 		
 		//for(CreationInfo ci: infos)
-		//	System.out.println("creating: "+ci.getFilename());
+		//	System.out.println("creating: "+ci);
 		
 		agent.getFeature(ISubcomponentsFeature.class).createComponents(infos.toArray(new CreationInfo[infos.size()])).addResultListener(new IResultListener<Collection<IExternalAccess>>()
 		{
@@ -505,7 +516,7 @@ public class PlatformAgent
 				
 				String name = ai.getValue("name")==null || ((String)ai.getValue("name")).length()==0? null: (String)ai.getValue("name");
 //				String name = autostart.name().length()==0? null: autostart.name();
-				
+								
 				EnumInfo ei = (EnumInfo)ai.getValue("autostart");
 				
 				String val = ei.getValue();
