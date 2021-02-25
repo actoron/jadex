@@ -53,7 +53,6 @@ if (propFile.exists()) {
 	def	propstamp	= props.getProperty("jadextimestamp")
 	project.ext.timestamp = propstamp.equals('${SRCDIST_TIMESTAMP}') ? null : propstamp
 }
-//println 'timestamp: ' + project.ext.timestamp
 // Generate new timestamp (i.e. build from git sources)
 if(timestamp==null) {
 	project.ext.timestamp	= new Date().format('yyyyMMdd.HHmmss')
@@ -130,7 +129,6 @@ buildscript
 }
 
 //apply plugin: 'eclipse'
-//eclipse.project.buildCommands.remove('org.eclipse.jdt.core.javabuilder');
 
 apply plugin: 'de.marcphilipp.nexus-publish'
 
