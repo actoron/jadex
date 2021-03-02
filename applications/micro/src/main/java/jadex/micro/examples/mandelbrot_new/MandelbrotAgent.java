@@ -11,11 +11,15 @@ import jadex.micro.annotation.Imports;
 
 @Imports(
 {
-	"jadex.platform.service.servicepool.*"
+	"jadex.platform.service.servicepool.*",
+	"jadex.platform.service.distributedservicepool.*",
+	"jadex.bridge.service.*",
+	"jadex.bridge.service.search.*"
 })
 @ComponentTypes({
 	@ComponentType(name="Generator", clazz=GenerateAgent.class),
 	@ComponentType(name="Display", clazz=DisplayAgent.class),
+	@ComponentType(name="DistributedPool", filename = "jadex/platform/service/distributedservicepool/DistributedServicePoolAgent.class"),
 	@ComponentType(name="CalculatorPool", filename = "jadex/platform/service/servicepool/ServicePoolAgent.class")	// avoid compile time dependency to platform
 })
 @Configurations({
@@ -28,17 +32,23 @@ import jadex.micro.annotation.Imports;
 		@Component(type="Generator"),
 		@Component(type="CalculatorPool", arguments = @NameValue(name="serviceinfos",
 			value="new PoolServiceInfo[]{new PoolServiceInfo().setWorkermodel(\"jadex/micro/examples/mandelbrot_new/CalculateAgent.class\").setServiceType(ICalculateService.class).setPoolStrategy(new jadex.commons.DefaultPoolStrategy(2, 2)).setPublicationScope(jadex.bridge.service.ServiceScope.GLOBAL)}")),
-		@Component(type="Display")
+		@Component(type="Display"),
+		@Component(type="DistributedPool", arguments = @NameValue(name="serviceinfo",
+			value="new ServiceQuery(ICalculateService.class).setScope(ServiceScope.GLOBAL)")),
 	}),
 	@Configuration(name="pools", components={
 		@Component(type="Generator"),
 		@Component(type="CalculatorPool", number = "3", arguments = @NameValue(name="serviceinfos",
 			value="new PoolServiceInfo[]{new PoolServiceInfo().setWorkermodel(\"jadex/micro/examples/mandelbrot_new/CalculateAgent.class\").setServiceType(ICalculateService.class).setPoolStrategy(new jadex.commons.DefaultPoolStrategy(2, 2)).setPublicationScope(jadex.bridge.service.ServiceScope.GLOBAL)}")),
-		@Component(type="Display")
+		@Component(type="Display"),
+		@Component(type="DistributedPool", arguments = @NameValue(name="serviceinfo",
+			value="new ServiceQuery(ICalculateService.class).setScope(ServiceScope.GLOBAL)")),
 	}),
 	@Configuration(name="nocalcs", components={
 		@Component(type="Generator"),
-		@Component(type="Display")
+		@Component(type="Display"),
+		@Component(type="DistributedPool", arguments = @NameValue(name="serviceinfo",
+			value="new ServiceQuery(ICalculateService.class).setScope(ServiceScope.GLOBAL)")),
 	})
 })
 @Agent

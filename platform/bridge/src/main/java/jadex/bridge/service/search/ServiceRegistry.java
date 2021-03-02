@@ -818,7 +818,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		boolean ret = false;
 		
 		ServiceScope scope = query.getScope();
-		
+				
 //		IComponentIdentifier searchstart	= query.getProvider()!=null ? query.getProvider()
 //			: query.getPlatform()!=null ? query.getPlatform() : query.getOwner();
 		IComponentIdentifier searchstart = query.getSearchStart() != null ? query.getSearchStart() : query.getOwner();
@@ -870,6 +870,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			String subname = getSubcomponentName(searchstart);
 			ret = sercid.getName().endsWith(subname);
 		}
+		
+		//if(query.getServiceType()!=null && query.getServiceType().toString().indexOf("Calc")!=-1)
+		//	System.out.println("calc check: "+query.getOwner()+" "+scope+" "+ser+" "+ret);
 		
 		return ret;
 	}
@@ -927,10 +930,20 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		}
 		else if(ServiceScope.PARENT.equals(scope))
 		{
+			//if(query.getServiceType()!=null && query.getServiceType().toString().indexOf("Calc")!=-1)
+			//	System.out.println("found");
+				
 			// check if parent of service reaches the searcher
 			IComponentIdentifier sercid = ser.getProviderId();
 			String subname = getSubcomponentName(sercid);
-			ret = getDotName(query.getOwner()).endsWith(subname);
+			String owner = getDotName(query.getOwner());
+			ret = owner.equals(subname) || owner.endsWith(":"+subname);
+			// Must include delimiter to avoid special cases like
+			// DistributedServicePoolAgent:MandelbrotAgent:DESKTOP-TMQFG7J_tyg
+			// ServicePoolAgent:MandelbrotAgent:DESKTOP-TMQFG7J_tyg
+			// delivering true
+			
+			//System.out.println("parent check: "+subname+" "+getDotName(query.getOwner())+" "+ret);
 		}
 		
 		return ret;

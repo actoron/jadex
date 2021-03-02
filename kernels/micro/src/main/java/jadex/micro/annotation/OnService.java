@@ -22,7 +22,14 @@ public @interface OnService
 	//-------- search details --------
 	
 	/**
-	 *  Fail at startup if no service is found?
+	 *  Fail at startup if no service is found for a field?
+	 *  
+	 *  If required is false, a proxy will be injected. 
+	 *  The proxy will be resolved on first method invocation and
+	 *  performs a time limited query for the service (i.e. a time span search).
+	 *  If true on a field, init will only proceed when the service
+	 *  has been found and injected. If no service is found the startup
+	 *  of the component startup will fail.
 	 */
 	public Boolean3 required() default Boolean3.NULL;
 	

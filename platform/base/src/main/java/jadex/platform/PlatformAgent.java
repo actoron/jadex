@@ -474,7 +474,7 @@ public class PlatformAgent
 			{
 				try
 				{
-					if(!result.getId().getRoot().equals(agent.getId().getRoot()))
+					if(!agent.getId().getRoot().equals(result.getId().getRoot()))
 					{
 						//System.out.println("found platform: "+result.getId());//+" "+SComponentManagementService.containsComponent(result.getId()));
 						Map<String, Object> args = new HashMap<>();

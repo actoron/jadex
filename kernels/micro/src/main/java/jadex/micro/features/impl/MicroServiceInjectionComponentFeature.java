@@ -121,8 +121,8 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 	
 					String sername = (String)SJavaParser.evaluateExpressionPotentially(sernames[i], component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
 							
-					if(sername!=null && sername.indexOf("calc")!=-1)
-						System.out.println("calc");
+					//if(sername!=null && sername.indexOf("calc")!=-1)
+					//	System.out.println("calc");
 					
 					for(int j=0; j<infos.length; j++)
 					{

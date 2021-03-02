@@ -1,11 +1,9 @@
 package jadex.micro.examples.mandelbrot_new;
 
 import java.awt.Rectangle;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.SwingUtilities;
@@ -19,8 +17,8 @@ import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.servicepool.ServicePoolHelper;
-import jadex.commons.Tuple2;
+import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -303,7 +301,8 @@ public class GenerateService implements IGenerateService
 					//System.out.println("calc start: "+Thread.currentThread());
 					
 					//IFuture<ICalculateService> futc = agent.getFeature(IRequiredServicesFeature.class).getService("calculateservice");
-					IFuture<ICalculateService> futc = getNextCalculateService();
+					IFuture<ICalculateService> futc = getCalculateService();
+					//IFuture<ICalculateService> futc = getNextCalculateService();
 					
 					futc.then(cs -> 
 					{
@@ -352,6 +351,9 @@ public class GenerateService implements IGenerateService
 							{
 								System.out.println("ex");
 								System.out.println("exception during task execution: "+e);
+								
+								// retry 
+								// todo: abort after some tries
 								performTask(task, alda).delegate(ret);
 							}
 						});
@@ -486,14 +488,40 @@ public class GenerateService implements IGenerateService
 		
 		return ret;
 	}*/
+	
+	/**
+	 * 
+	 */
+	protected IFuture<ICalculateService> getCalculateService()
+	{
+		Collection<ICalculateService> sers = agent.searchLocalServices(new ServiceQuery<ICalculateService>(ICalculateService.class));
 		
+		// todo: how to identify pool or worker (tagging workers or tagging pools)
+		ICalculateService ser = null;
+		for(ICalculateService s: sers)
+		{
+			if(((IService)s).getServiceId().toString().indexOf("Distributed")!=-1)
+			{
+				ser = s;
+				break;
+			}
+		}
+		
+		if(ser==null && sers.size()>0)
+			ser = sers.iterator().next();
+	
+		//System.out.println("selected calculator: "+ser);
+		
+		return ser!=null? new Future<ICalculateService>(ser): new Future<ICalculateService>(new ServiceNotFoundException("ICalculateService"));
+	}
+	
 	/**
 	 *  Manage all available calculators and calculator pools.
 	 *  Tasks are distributed by allocating one by one as long
 	 *  as free capacity permits. If no free capacity it will pick
 	 *  just the next in order.
 	 *  @return The next free calculator service.
-	 */
+	 * /
 	protected IFuture<ICalculateService> getNextCalculateService()
 	{
 		Future<ICalculateService> ret = new Future<>();
@@ -522,7 +550,7 @@ public class GenerateService implements IGenerateService
 		}
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Find a free calculator. Searches linearly for pools and if none is avilable in
@@ -531,7 +559,7 @@ public class GenerateService implements IGenerateService
 	 *  @param pos The current position.
 	 *  @param tried The number of already inspected calculators. 
 	 *  @return The calculator.
-	 */
+	 * /
 	protected IFuture<Tuple2<ICalculateService, Integer>> findFreeCalculatorService(List<ICalculateService> calcs, int pos, int tried)
 	{
 		Future<Tuple2<ICalculateService, Integer>> ret = new Future<>();
@@ -568,7 +596,7 @@ public class GenerateService implements IGenerateService
 		curcalc++;
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Handler for a single task allocation.

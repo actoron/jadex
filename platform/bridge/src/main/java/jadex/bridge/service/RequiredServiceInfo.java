@@ -203,9 +203,10 @@ public class RequiredServiceInfo
 	 *  Set the name.
 	 *  @param name The name to set.
 	 */
-	public void setName(String name)
+	public RequiredServiceInfo setName(String name)
 	{
 		this.name = name;
+		return this;
 	}
 
 	/**
@@ -221,9 +222,10 @@ public class RequiredServiceInfo
 	 *  Set the type.
 	 *  @param type The type to set.
 	 */
-	public void setType(ClassInfo type)
+	public RequiredServiceInfo setType(ClassInfo type)
 	{
 		this.type = type;
+		return this;
 	}
 	
 //	/**
@@ -257,9 +259,10 @@ public class RequiredServiceInfo
 	 *  Set the max number of services.
 	 *  @param max The max number to set.
 	 */
-	public void setMax(int max)
+	public RequiredServiceInfo setMax(int max)
 	{
 		this.max = max;
+		return this;
 	}
 	
 	/**
@@ -275,9 +278,10 @@ public class RequiredServiceInfo
 	 *  Set the min number of services.
 	 *  @param min The min number to set.
 	 */
-	public void setMin(int min)
+	public RequiredServiceInfo setMin(int min)
 	{
 		this.min = min;
+		return this;
 	}
 
 	/**
@@ -293,29 +297,32 @@ public class RequiredServiceInfo
 	 *  Set the binding.
 	 *  @param binding The binding to set.
 	 */
-	public void setDefaultBinding(RequiredServiceBinding binding)
+	public RequiredServiceInfo setDefaultBinding(RequiredServiceBinding binding)
 	{
 		this.binding = binding;
+		return this;
 	}
 	
 	/**
 	 *  Add an interceptor.
 	 *  @param interceptor The interceptor.
 	 */
-	public void addInterceptor(UnparsedExpression interceptor)
+	public RequiredServiceInfo addInterceptor(UnparsedExpression interceptor)
 	{
 		if(interceptors==null)
 			interceptors = new ArrayList<UnparsedExpression>();
 		interceptors.add(interceptor);
+		return this;
 	}
 	
 	/**
 	 *  Remove an interceptor.
 	 *  @param interceptor The interceptor.
 	 */
-	public void removeInterceptor(UnparsedExpression interceptor)
+	public RequiredServiceInfo removeInterceptor(UnparsedExpression interceptor)
 	{
 		interceptors.remove(interceptor);
+		return this;
 	}
 	
 	/**
@@ -341,9 +348,10 @@ public class RequiredServiceInfo
 	 *  Set the nfproperties.
 	 *  @param nfproperties The nfproperties to set.
 	 */
-	public void setNFRProperties(List<NFRPropertyInfo> nfproperties)
+	public RequiredServiceInfo setNFRProperties(List<NFRPropertyInfo> nfproperties)
 	{
 		this.nfproperties = nfproperties;
+		return this;
 	}
 
 	/**
@@ -359,9 +367,10 @@ public class RequiredServiceInfo
 	 *  Set the tags.
 	 *  @param tags The tags to set
 	 */
-	public void setTags(Collection<String> tags)
+	public RequiredServiceInfo setTags(Collection<String> tags)
 	{
 		this.tags = tags;
+		return this;
 	}
 //	
 //	/**

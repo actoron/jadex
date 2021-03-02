@@ -1249,7 +1249,9 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		else if(event.getService() instanceof IServiceIdentifier)
 		{
 			IService service = getServiceProxy((IServiceIdentifier)event.getService(), info);
-			event.setService(service);
+			// can null when service is not available any more
+			if(service!=null)
+				event.setService(service);
 		}
 		
 		return event;
@@ -1281,7 +1283,8 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		
 		// else service event -> just return event, as desired by user (specified in query return type)
 		
-		ret = addRequiredServiceProxy(ret, info);
+		if(ret!=null)
+			ret = addRequiredServiceProxy(ret, info);
 		
 		return ret;
 	}

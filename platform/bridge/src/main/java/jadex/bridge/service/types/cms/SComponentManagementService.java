@@ -2503,8 +2503,8 @@ public class SComponentManagementService
 	// w: initinfos 
 	protected static void cleanup(IComponentIdentifier cid, Exception exception)
 	{
-		if(cid.toString().indexOf("Sokrates")!=-1)
-			System.out.println("Terminating component: "+cid.getName());
+		//if(cid.toString().indexOf("Sokrates")!=-1)
+		//	System.out.println("Terminating component: "+cid.getName());
 		
 		IPlatformComponentAccess comp = null;
 		IPlatformComponentAccess pad = null;

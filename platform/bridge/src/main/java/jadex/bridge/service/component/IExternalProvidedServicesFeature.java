@@ -10,6 +10,8 @@ import jadex.commons.future.IFuture;
  */
 public interface IExternalProvidedServicesFeature
 {
+	// todo: change signature of addService to return the service or sid!
+	
 	/**
 	 *  Add a service to the container.
 	 *  The service is started, if the container is already running.
@@ -17,7 +19,6 @@ public interface IExternalProvidedServicesFeature
 	 *  @param info The provided service info.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
-//	public void addService(IInternalService service, ProvidedServiceInfo info);
 	public IFuture<Void> addService(String name, Class<?> type, Object service);
 
 	/**
