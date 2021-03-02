@@ -67,6 +67,13 @@ public interface IJCCWebService
 	public IFuture<Boolean> isPlatformAvailable(IComponentIdentifier cid);
 	
 	/**
+	 *  Get the configuration for web clients.
+	 *  
+	 *  @return Configuration for web clients.
+	 */
+	public IFuture<Map<String, Object>> getWebClientConfiguration();
+	
+	/**
 	 *  Login to the webjcc.
 	 *  @param platformpass The platform password.
 	 *  @return True if logged in.

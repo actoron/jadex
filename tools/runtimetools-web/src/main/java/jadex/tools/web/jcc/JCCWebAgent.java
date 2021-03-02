@@ -78,6 +78,9 @@ public class JCCWebAgent implements IJCCWebService
 	@AgentArgument
 	protected boolean loginsecurity;
 	
+	@AgentArgument
+	protected boolean footer = false;
+	
 	/**
 	 *  Wait for the IWebPublishService and then publish the resources.
 	 *  @param pubser The publish service.
@@ -462,6 +465,20 @@ public class JCCWebAgent implements IJCCWebService
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the configuration for web clients.
+	 *  
+	 *  @return Configuration for web clients.
+	 */
+	public IFuture<Map<String, Object>> getWebClientConfiguration()
+	{
+		Map<String, Object> conf = new HashMap<>();
+		
+		conf.put("footer", footer);
+		
+		return new Future<Map<String, Object>>(conf);
 	}
 	
 	/**

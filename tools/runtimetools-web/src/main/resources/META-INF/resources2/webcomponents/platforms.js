@@ -100,7 +100,7 @@ class PlatformsElement extends BaseElement
 	asyncRender() 
 	{
 		return html`
-			<div class="actwtable section">
+			<div class="section">
 				<div>
 					<div class="head">
 						<h1 class="m-0 p-0 inline" id="HConnectedPlatforms">${this.app.lang.t('Connected Platforms')}</h1>
@@ -111,10 +111,11 @@ class PlatformsElement extends BaseElement
 					</p>
 				</div>
 
-				<div class="jumbotron jumbotron-fluid m-0 p-3">
+				<!-- <div class="jumbotron jumbotron-fluid m-0 p-3"> -->
+				<div class="m-0">
 					<div class="row">
 						<div class="col-12" >
-					<table>
+					<table class="actwtable col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 pr-0 pl-0">
 						<tbody>
 							<tr>
 								<th>Name</th>

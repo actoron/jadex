@@ -95,8 +95,7 @@ class AppElement extends BaseElement
 			<div style="height:100%" class="d-flex flex-column">
 			<nav class="navbar navbar-expand-lg navbar-custom navbar-fixed-top">
 				<div class="navbar-brand mr-auto">
-		 			<img src="images/jadex_logo_ac.png" width="200px"/>
-					<a class="p-0 m-0" href="#">WebJCC</a>
+		 			<a class="p-0 m-0" href="#"><img src="images/jadex_logo_ac_new_webjcc.png" width="200px"/></a>
 					<img class="p-0 m-0" @click="${this.switchLanguage}" src="${this.app.lang.getFlagUrl()}" />
 				</div>
 				<!--

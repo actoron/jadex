@@ -158,6 +158,8 @@ export class BaseElement extends LitElement
 	// todo: why does caching (above) not work :-(
 	loadStyle(url)
 	{
+		
+		console.log("###########LOADING STY " + url);
 		var self = this;
 		var ret = null;
 		
@@ -320,6 +322,7 @@ export class BaseElement extends LitElement
 	
 	loadServiceStyle(stylepath)
     {
+		console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!load style ' + stylepath);
 		return this.loadStyle(this.getResourceUrl(stylepath));
     }
 	

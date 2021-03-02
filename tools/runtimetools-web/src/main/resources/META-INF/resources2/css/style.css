@@ -2,6 +2,86 @@
     height: 100vh;
 }
 
+.navbar {
+	/*font-family: 'Open Sans', sans-serif;
+    color:#f2f2f2;*/
+	padding: 20px;
+	background: linear-gradient(to bottom, #ffffff, #ffffff 10%, #ffffff 10%, #ffffff 90%, #2a6699 90%);
+}
+
+#content {
+	padding: 20px;
+}
+
+table.actwtable {
+    border-collapse: separate;
+	border-spacing: 0px;
+}
+
+.actwtable th, .actwtable td {
+  border-right: 1px solid #2a6699;
+  border-bottom: 1px solid #2a6699;
+    padding: 3px 4px;
+}
+
+.actwtable tr th:first-child, .actwtable tr td:first-child {
+  border-left: 1px solid #2a6699;
+}
+
+.actwtable tr:first-child th, .actwtable tr:first-child td {
+  border-top: 1px solid #2a6699;
+}
+
+.actwtable th{
+    background-color: #2a6699;
+    color:	white;
+    font-weight: 700;
+    text-align:	center;
+}
+
+.actwtable th a:link, .actwtable th a:visited {
+    color:	white;
+}
+.actwtable caption, .actwtable th, .actwtable td{
+    font-size: 1em;
+}
+
+.actwtable tr:first-child td:first-child, .actwtable tr:first-child th:first-child {
+	border-top-left-radius: 6px;
+}
+.actwtable tr:last-child td:last-child, .actwtable tr:last-child th:last-child {
+	border-bottom-right-radius: 6px;
+}
+.actwtable tr:first-child td:last-child, .actwtable tr:first-child th:last-child {
+	border-top-right-radius: 6px;
+}
+.actwtable tr:last-child td:first-child, .actwtable tr:last-child th:first-child {
+	border-bottom-left-radius: 6px;
+}
+
+.btn{
+	/*
+	background-color: #1f79a0;
+	border-color: #73b4d0;
+	border-radius: 6px;
+	line-height: 1.5;
+	padding: 3px 3px;
+	*/
+	background-color:#2a6699;
+	border-radius:6px 6px 6px 6px;
+	font-size:16px;
+	font-weight:bold;
+	font-weight:600;
+	padding-top:10px;
+	padding-bottom:10px;
+	border: 0px;
+	
+	color: #fff;
+	margin-top:5px;
+	display: block;
+	width:100%;
+}
+
 .w100 {
 	width: 100%;
 }
@@ -22,20 +102,6 @@
 
 .flexcellgrow {
 	flex:1;
-}
-
-.navbar-custom {
-    /*color: #FFFFFF;*/
-    background-color: rgb(95,95,95);
-}
-
-.jumbotron {
-    /*height: 100vh;*/
-    /*padding-top: 10px !important;/
-    /*background-image: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);*/
-    /*background-image: linear-gradient(45deg, #EEEEEE 0%, white 100%);*/
-    /*background-color: #4B589D;*/
-    /*background-color: #f8f9fa!important;*/
 }
 
 @media (max-width: 768px) {
@@ -94,7 +160,7 @@ fieldset, label {
 body{ 
     /*padding-top: 100px;*/
 	height: 100%;
-	padding: 20px; 
+	padding: 0px; 
 	padding-bottom: 60px;
 	/*background-color: #cfcfcf!important;*/
 }
