@@ -408,8 +408,8 @@ public class ServiceHandler implements InvocationHandler
 		 */
 		public Checker()
 		{
-			this(5*1000); // default one minute
-			//this(60*1000); // default one minute
+			//this(5*1000); // default one minute
+			this(60*1000); // default one minute
 		}
 		
 		/**

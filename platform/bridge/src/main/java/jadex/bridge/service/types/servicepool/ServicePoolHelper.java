@@ -3,6 +3,7 @@ package jadex.bridge.service.types.servicepool;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -21,9 +22,9 @@ public class ServicePoolHelper
 	{
 		Future<Integer> ret = new Future<Integer>();
 		IServiceIdentifier sid = service.getServiceId();
-		ia.searchService(new ServiceQuery<IServicePoolService>(IServicePoolService.class).setProvider(sid.getProviderId()))
+		ia.searchService(new ServiceQuery<IServicePoolService>(IServicePoolService.class).setProvider(sid.getProviderId()).setScope(ServiceScope.GLOBAL))
 			.then(ps -> ps.getFreeCapacity(sid.getServiceType().getType(ia.getClassLoader())).delegate(ret))
-			.catchEx(ex -> ret.setResult(-1));
+			.catchEx(ex -> { ex.printStackTrace(); ret.setResult(-1); });
 		return ret;
 	}
 	
@@ -38,7 +39,7 @@ public class ServicePoolHelper
 		IServiceIdentifier sid = service.getServiceId();
 		ia.searchService(new ServiceQuery<IServicePoolService>(IServicePoolService.class).setProvider(sid.getProviderId()))
 			.then(ps -> ps.getMaxCapacity(sid.getServiceType().getType(ia.getClassLoader())).delegate(ret))
-			.catchEx(ex -> ret.setResult(-1));
+			.catchEx(ex -> { ex.printStackTrace(); ret.setResult(-1); });
 		return ret;
 	}
 	
