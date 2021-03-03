@@ -29,7 +29,8 @@ public @interface ProvidedService
 	/** 
 	 *  The visibility scope.
 	 */
-	public ServiceScope scope() default ServiceScope.GLOBAL;
+	//public ServiceScope scope() default ServiceScope.GLOBAL;
+	public ServiceScope scope() default ServiceScope.DEFAULT;
 	
 	/**
 	 *  The service implementation.

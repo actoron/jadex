@@ -57,6 +57,9 @@ public class AreaData
 	/** The chunk count, i.e. how many intermediate results per part. */
 	protected int chunkcount;
 	
+	/** The retrycnt. */
+	protected int retrycnt;
+	
 	/**
 	 *  Create an empty area data.
 	 */
@@ -583,6 +586,22 @@ public class AreaData
 	public Object getId()
 	{
 		return toString();
+	}
+
+	/**
+	 * @return the retrycnt
+	 */
+	public int getRetryCount()
+	{
+		return retrycnt;
+	}
+
+	/**
+	 * @param retrycnt the retrycnt to set
+	 */
+	public void setRetryCount(int retrycnt)
+	{
+		this.retrycnt = retrycnt;
 	}
 
 	// /**

@@ -37,7 +37,7 @@ import jadex.micro.annotation.ProvidedServices;
 @Agent
 @Service
 @Arguments(@Argument(name="serviceinfos", clazz=PoolServiceInfo[].class, description="The array of service pool infos."))
-@ProvidedServices(@ProvidedService(type=IServicePoolService.class))
+@ProvidedServices(@ProvidedService(type=IServicePoolService.class, scope=ServiceScope.GLOBAL))
 public class ServicePoolAgent implements IServicePoolService
 {
 	//-------- attributes --------

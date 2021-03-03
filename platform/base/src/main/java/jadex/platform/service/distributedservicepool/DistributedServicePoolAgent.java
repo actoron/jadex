@@ -11,14 +11,29 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.servicepool.IServicePoolService;
+import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 
-@Agent
+/**
+ *  The distributed service pool allows for management of distributed services via a common facade, i.e.  
+ *  the pool uses a user specified service query to find workers. Workers can also be service service pools.
+ *  The strategy to distribute work is a round robin version, i.e. each worker will be given a task.
+ *  getFreeCapacity() from IServicePoolService is used to find out if a pool can be used. If it has no capacity
+ *  the next worker will be checked. If no worker with free capacity can be found after having asked all of them,
+ *  just the next worker will be used. (Second-chance clock-page verfahren) 
+ *
+ */
+
+@Agent//(autoprovide = Boolean3.TRUE)
+@ProvidedServices(@ProvidedService(type=IDistributedServicePoolService.class, scope=ServiceScope.GLOBAL))
 @Service
 @Arguments(
 {
@@ -26,7 +41,7 @@ import jadex.micro.annotation.Arguments;
 	@Argument(name="publishinfo", clazz=PublishInfo.class, description="The info for service publication as e.g. rest."),
 	@Argument(name="scope", clazz=ServiceScope.class, description="The publication scope.")
 })
-public class DistributedServicePoolAgent
+public class DistributedServicePoolAgent implements IDistributedServicePoolService
 {
 	//-------- attributes --------
 	
@@ -34,6 +49,7 @@ public class DistributedServicePoolAgent
 	@Agent
 	protected IInternalAccess agent;
 	
+	/** The service handler for proxy service. */
 	protected ServiceHandler handler;
 	
 	/**

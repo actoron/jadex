@@ -54,6 +54,9 @@ public class GenerateService implements IGenerateService
 	/** The current calculator count (for selecting the next). */
 	protected int curcalc;
 	
+	/** The number of maximum retries for calculations. */
+	protected int maxretries = 1;
+	
 	//-------- constructors --------
 	
 	/**
@@ -197,7 +200,7 @@ public class GenerateService implements IGenerateService
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("ex in perform tasks: "+exception);
+				//System.out.println("ex in perform tasks: "+exception);
 				ret.setExceptionIfUndone(exception);
 			}
 			
@@ -265,7 +268,7 @@ public class GenerateService implements IGenerateService
 		
 		for(Iterator<AreaData> it=tasks.iterator(); it.hasNext(); )
 		{
-			performTask(it.next(), ad);
+			performTask(it.next(), ad).catchEx(ex -> ad.getResult().setExceptionIfUndone(ex));
 		}
 		
 		// finished parts are added via ad.taskFinished(part);
@@ -349,12 +352,20 @@ public class GenerateService implements IGenerateService
 							
 							public void exceptionOccurred(Exception e)
 							{
-								System.out.println("ex");
-								System.out.println("exception during task execution: "+e);
+								System.out.println("exception during task execution: "+e+" "+task);
 								
 								// retry 
 								// todo: abort after some tries
-								performTask(task, alda).delegate(ret);
+								if(alda.isRetry() && task.getRetryCount()<maxretries)
+								{
+									System.out.println("retrying task after delay: "+task);
+									task.setRetryCount(task.getRetryCount()+1);
+									agent.waitForDelay(5000).then(t -> performTask(task, alda).delegate(ret)).catchEx(ret);
+								}
+								else
+								{
+									ret.setException(e);
+								}
 							}
 						});
 						
@@ -686,6 +697,14 @@ public class GenerateService implements IGenerateService
 		public boolean	isRetry()
 		{
 			return retry;
+		}
+
+		/**
+		 * @param retry the retry to set
+		 */
+		public void setRetry(boolean retry)
+		{
+			this.retry = retry;
 		}
 	}
 }
