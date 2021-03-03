@@ -137,7 +137,7 @@ public class ServiceHandler implements InvocationHandler
 				invokeService(service, callinfo);
 			}).catchEx(ex ->
 			{
-				System.out.println("No service to process call: "+queue.size()+" "+activeservices.size());
+				//System.out.println("No service to process call: "+queue.size()+" "+activeservices.size());
 				callinfo.getRet().setException(ex);
 				processQueue(fid);
 			});

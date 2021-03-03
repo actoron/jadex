@@ -5,6 +5,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.Boolean3;
@@ -25,7 +26,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  Calculate agent allows calculating the colors of an area using a calculate service.
  */
 @Description("Agent offering a calculate service.")
-@ProvidedServices({@ProvidedService(type=ICalculateService.class, implementation=@Implementation(CalculateService.class))})
+@ProvidedServices(@ProvidedService(type=ICalculateService.class, scope=ServiceScope.GLOBAL, implementation=@Implementation(CalculateService.class)))
 @Agent(synchronous=Boolean3.FALSE)
 public class CalculateAgent
 {

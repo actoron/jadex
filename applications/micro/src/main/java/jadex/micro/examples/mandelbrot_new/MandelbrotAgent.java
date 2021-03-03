@@ -36,8 +36,11 @@ import jadex.micro.annotation.Imports;
 			@NameValue(name="scope", value="jadex.bridge.service.ServiceScope.GLOBAL")
 		}),
 		@Component(type="Display"),
-		@Component(type="DistributedPool", arguments = @NameValue(name="serviceinfo",
-			value="new ServiceQuery(ICalculateService.class).setScope(ServiceScope.GLOBAL)")),
+		@Component(type="DistributedPool", arguments = 
+		{
+			@NameValue(name="serviceinfo", value="new ServiceQuery(ICalculateService.class).setScope(ServiceScope.GLOBAL)"),
+			@NameValue(name="scope", value="ServiceScope.GLOBAL")	
+		})
 	}),
 	@Configuration(name="pools", components={
 		@Component(type="Generator"),
@@ -47,14 +50,20 @@ import jadex.micro.annotation.Imports;
 			@NameValue(name="scope", value="jadex.bridge.service.ServiceScope.GLOBAL")
 		}),
 		@Component(type="Display"),
-		@Component(type="DistributedPool", arguments = @NameValue(name="serviceinfo",
-			value="new ServiceQuery(ICalculateService.class).setScope(ServiceScope.GLOBAL)")),
+		@Component(type="DistributedPool", arguments = 
+		{
+			@NameValue(name="serviceinfo", value="new ServiceQuery(ICalculateService.class).setScope(ServiceScope.GLOBAL)"),
+			@NameValue(name="scope", value="ServiceScope.GLOBAL")	
+		})
 	}),
 	@Configuration(name="nocalcs", components={
 		@Component(type="Generator"),
 		@Component(type="Display"),
-		@Component(type="DistributedPool", arguments = @NameValue(name="serviceinfo",
-			value="new ServiceQuery(ICalculateService.class).setScope(ServiceScope.GLOBAL)")),
+		@Component(type="DistributedPool", arguments = 
+		{
+			@NameValue(name="serviceinfo", value="new ServiceQuery(ICalculateService.class).setScope(ServiceScope.GLOBAL)"),
+			@NameValue(name="scope", value="ServiceScope.GLOBAL")	
+		})
 	})
 })
 @Agent
