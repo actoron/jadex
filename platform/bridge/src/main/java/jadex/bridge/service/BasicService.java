@@ -19,10 +19,12 @@ import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.component.impl.NFPropertyComponentFeature;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -35,6 +37,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.javaparser.SJavaParser;
 
 /**
  *  Basic service provide a simple default isValid() implementation
@@ -621,9 +624,31 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 *  Create a new service identifier for the own component.
 	 */
 	public static IServiceIdentifier createServiceIdentifier(IInternalAccess provider, String servicename, 
-		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, ServiceScope scope)
+		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, ProvidedServiceInfo info)
 	{
-		return new ServiceIdentifier(provider, servicetype, servicename!=null? servicename: generateServiceName(servicetype), rid, scope);
+		Boolean	unrestricted	= isUnrestrictedByConfig(provider, info);
+		ServiceScope	scope	= info!=null ? info.getScope() : null;
+		return new ServiceIdentifier(provider, servicetype, servicename!=null? servicename: generateServiceName(servicetype), rid, scope, unrestricted);
+	}
+	
+	/**
+	 *  Check if the service is defined as unrestricted in the provided service configuration, i.e., dynamically (not statically on annotation/type level).
+	 *  @return null if no unrestricted config setting exists (i.e. type level is checked elsewhere). 
+	 */
+	protected static Boolean	isUnrestrictedByConfig(IInternalAccess component, ProvidedServiceInfo info)
+	{
+		Boolean	ret	= null;
+		if(info!=null && info.getProperties()!=null)
+		{
+			for(UnparsedExpression exp: info.getProperties())
+			{
+				if(exp.getName().equals(Security.UNRESTRICTED))
+				{
+					ret	= (Boolean) SJavaParser.getParsedValue(exp, component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
+				}
+			}
+		}
+		return ret;
 	}
 	
 	/**

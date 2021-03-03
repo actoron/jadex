@@ -173,7 +173,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 					component.getClassLoader(), component.getModel().getAllImports()))+":virtual", info.getType().getType(component.getClassLoader(), component.getModel().getAllImports()));
 				IServiceIdentifier sid = BasicService.createServiceIdentifier(component, 
 					rsi.getName(), rsi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()),
-					BasicServiceInvocationHandler.class, component.getModel().getResourceIdentifier(), info.getScope());
+					BasicServiceInvocationHandler.class, component.getModel().getResourceIdentifier(), info);
 				final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
 					component, sid, rsi, impl.getBinding(), component.getClassLoader(), Starter.isRealtimeTimeout(component.getId()));
 				
@@ -218,8 +218,8 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 //						 todo: remove this? currently the level cannot be turned on due to missing interceptor
 						boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
 						final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
-							component, ser, info.getName(), type, info.getImplementation().getProxytype(), ics, 
-							moni, info, info.getScope());
+							component, ser, info.getName(), type, ics,
+							moni, info);
 						
 						addService(proxy, info);
 					}
@@ -973,7 +973,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	public IFuture<Void> addService(String name, Class<?> type, Object service)
 	{
-		return addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, null, null);
+		return addService(name, type, null, service, null);
 	}
 	
 	/**
@@ -986,7 +986,9 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	public IFuture<Void> addService(String name, Class<?> type, Object service, String proxytype)
 	{
-		return addService(name, type, proxytype, null, service, null, null);
+		ProvidedServiceImplementation	impl	= proxytype!=null ? new ProvidedServiceImplementation(null, null, proxytype, null, null) : null;
+		ProvidedServiceInfo info = proxytype!=null ? new ProvidedServiceInfo(name, type, impl, null, null, null): null;
+		return addService(name, type, null, service, info);
 	}
 	
 	// todo:
@@ -1012,9 +1014,22 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	public IFuture<Void> addService(String name, Class<?> type, Object service, PublishInfo pi, ServiceScope scope)
 	{
-		ProvidedServiceInfo psi = pi!=null? new ProvidedServiceInfo(null, type, null, null, pi, null): null;
-		return addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, psi, scope);
+		ProvidedServiceInfo psi = pi!=null || scope!=null ? new ProvidedServiceInfo(null, type, null, scope, pi, null): null;
+		return addService(name, type, service, psi);
 	}
+	
+	/**
+	 *  Add a service to the platform. 
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
+	 *  @param type The public service interface.
+	 *  @param info The config settings.
+	 */
+	public IFuture<Void> addService(String name, Class<?> type, Object service, ProvidedServiceInfo info)
+	{
+		return addService(name, type, null, service, info);
+	}
+
 	
 	/**
 	 *  Sets the tags of a service.
@@ -1268,8 +1283,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 	 *  @param service The service.
 	 *  @param proxytype The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public IFuture<Void> addService(final String name, final Class<?> type, final String proxytype, 
-		final IServiceInvocationInterceptor[] ics, final Object service, final ProvidedServiceInfo info, ServiceScope scope)
+	public IFuture<Void> addService(final String name, final Class<?> type, final IServiceInvocationInterceptor[] ics, final Object service, final ProvidedServiceInfo info)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -1281,8 +1295,9 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 		
 		boolean moni = elm!=null && !PublishEventLevel.OFF.equals(elm); 
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
-			getInternalAccess(), service, name, type, proxytype, ics, moni, 
-			info, ServiceScope.DEFAULT.equals(scope) && info!=null? info.getScope() : scope);
+			getInternalAccess(), service, name, type, ics, moni, info); 
+		// TODO: was this DEFAULT handling (commented out below) used somewhere?
+//			info, ServiceScope.DEFAULT.equals(scope) && info!=null? info.getScope() : scope);
 		
 		addService(proxy, info);
 		initService(proxy).addResultListener(new DelegationResultListener<Void>(ret));

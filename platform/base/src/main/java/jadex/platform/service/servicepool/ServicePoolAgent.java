@@ -1,15 +1,19 @@
 package jadex.platform.service.servicepool;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -21,10 +25,9 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.ProvidedServices;
 
 /**
  *  The service pool agent can be used to handle services in a pooled manner.
@@ -37,7 +40,7 @@ import jadex.micro.annotation.ProvidedServices;
 @Agent
 @Service
 @Arguments(@Argument(name="serviceinfos", clazz=PoolServiceInfo[].class, description="The array of service pool infos."))
-@ProvidedServices(@ProvidedService(type=IServicePoolService.class))
+//@ProvidedServices(@ProvidedService(type=IServicePoolService.class))
 public class ServicePoolAgent implements IServicePoolService
 {
 	//-------- attributes --------
@@ -45,9 +48,12 @@ public class ServicePoolAgent implements IServicePoolService
 	/** The agent. */
 	@Agent
 	protected IInternalAccess agent;
-	
+		
 	/** The registered service types. */
 	protected Map<Class<?>, ServiceHandler> servicetypes;
+	
+	@AgentArgument
+	protected ServiceScope	scope;
 	
 	//-------- interface methods --------
 	
@@ -59,13 +65,20 @@ public class ServicePoolAgent implements IServicePoolService
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void> ret = new Future<Void>();
-
-		PoolServiceInfo[] psis = (PoolServiceInfo[])agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("serviceinfos");
 		
-		if(psis!=null)
+		Object psis = (PoolServiceInfo[])agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("serviceinfos");
+		
+		if(psis instanceof PoolServiceInfo[])
 		{
-			CounterResultListener<Void> lis = new CounterResultListener<Void>(psis.length, true, new DelegationResultListener<Void>(ret));
-			for(PoolServiceInfo psi: psis)
+			CounterResultListener<Void> lis = new CounterResultListener<Void>(((PoolServiceInfo[])psis).length + 1, true, new DelegationResultListener<Void>(ret));
+			
+			// Add pool service
+			ProvidedServiceInfo	info	= new ProvidedServiceInfo(null, IServicePoolService.class, null, scope, null,
+				// Publish unrestricted when global.
+				ServiceScope.GLOBAL.equals(scope) ? Collections.singletonList(new UnparsedExpression(Security.UNRESTRICTED, "true")): null);
+			agent.getFeature(IProvidedServicesFeature.class).addService(null, IServicePoolService.class, this, info).addResultListener(lis);
+			
+			for(PoolServiceInfo psi: (PoolServiceInfo[])psis)
 			{
 				IPoolStrategy str = psi.getPoolStrategy()==null? getDefaultStrategy(): (IPoolStrategy)psi.getPoolStrategy();
 				CreationInfo ci = psi.getArguments()!=null? new CreationInfo(psi.getArguments()): null;
@@ -77,7 +90,7 @@ public class ServicePoolAgent implements IServicePoolService
 		}
 		else
 		{
-			ret.setResult(null);
+			ret.setException(new IllegalArgumentException("A PoolServiceInfo[] array must be provided in 'serviceinfos' argument."));
 		}
 		
 		return ret;

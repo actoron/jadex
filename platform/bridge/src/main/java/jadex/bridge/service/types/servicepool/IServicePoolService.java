@@ -2,7 +2,6 @@ package jadex.bridge.service.types.servicepool;
 
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
-import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.IPoolStrategy;
@@ -14,7 +13,7 @@ import jadex.commons.future.IFuture;
  *  to the pool.
  */
 @Service
-@Security(roles=Security.UNRESTRICTED)
+//@Security(roles=Security.UNRESTRICTED)
 public interface IServicePoolService
 {
 //	/** The pool broadcast flag. */

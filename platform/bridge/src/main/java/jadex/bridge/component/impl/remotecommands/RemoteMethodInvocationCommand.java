@@ -2,13 +2,12 @@ package jadex.bridge.component.impl.remotecommands;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteCommand;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.IProvidedServicesFeature;
@@ -332,7 +331,6 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 	
 	/**
 	 *  Method to provide the required security level.
-	 *  Overridden by subclasses.
 	 */
 	public static Security getSecurityLevel(IInternalAccess access, MethodInfo method, IServiceIdentifier sid)
 	{
@@ -343,6 +341,16 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 //		if(SEARCHMETHOD.equals(m0) && ((ServiceQuery<?>)args[0]).getServiceType()!=null)
 //		{
 //			level	=  ((ServiceQuery<?>)args[0]).getServiceType().getType(access.getClassLoader()).getAnnotation(Security.class);
+//		}
+		
+//		// For service call -> check for instance settings in provided service description
+//		if(level==null && sid!=null)
+//		{
+//			Object service	= access.getFeature(IProvidedServicesFeature.class).getProvidedService(sid);
+//			if(service instanceof IService)
+//			{
+//				((IService)service).
+//			}
 //		}
 		
 		// For service call -> look for annotation in impl class hierarchy
