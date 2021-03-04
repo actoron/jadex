@@ -48,15 +48,15 @@ public class TerminableProviderAgent implements ITerminableService
 		System.out.println(agent.getId()+": getResult1 "+delay);
 		final TerminableFuture<String> ret = new TerminableFuture<String>(new TerminationTestCommand());
 
-		agent.getFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-//				System.out.println(agent.getComponentIdentifier()+": getResult3");
-				ret.setResultIfUndone("result");
-				return null;
-			}
-		});
+//		agent.getFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				System.out.println(agent.getId()+": getResult2");
+//				ret.setResultIfUndone("result");
+//				return null;
+//			}
+//		});
 		
 		return ret;
 	}
@@ -70,7 +70,7 @@ public class TerminableProviderAgent implements ITerminableService
 	{
 		final TerminableIntermediateFuture<String> ret = new TerminableIntermediateFuture<String>(new TerminationTestCommand());
 		
-		System.out.println("getResult invoked");
+		System.out.println("getResults invoked, waiting 2x for "+delay/2);
 		new IComponentStep<Void>()
 		{
 			@Override
@@ -83,7 +83,7 @@ public class TerminableProviderAgent implements ITerminableService
 				{
 					if(cnt==3)
 					{
-						ret.setFinished();
+//						ret.setFinished();
 					}
 					else
 					{

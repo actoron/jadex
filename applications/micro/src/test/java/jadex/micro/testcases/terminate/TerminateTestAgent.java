@@ -223,6 +223,7 @@ public class TerminateTestAgent extends TestAgent
 			}
 		});
 		fut.terminate();
+		System.out.println(agent.getId()+": testTerminate1b");
 
 		final Future<TestReport>	ret	= new Future<TestReport>();
 		final TestReport tr = new TestReport("#"+testno, "Tests if terminating future works");
