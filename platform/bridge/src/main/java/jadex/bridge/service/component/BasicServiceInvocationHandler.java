@@ -28,7 +28,6 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.CheckIndex;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.CheckState;
@@ -46,7 +45,6 @@ import jadex.bridge.service.component.interceptors.MethodCallListenerInterceptor
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.component.interceptors.PrePostConditionInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
-import jadex.bridge.service.component.interceptors.TracingInterceptor;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -557,8 +555,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 *  Static method for creating a standard service proxy for a provided service.
 	 */
 	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, Object service, 
-		String name, Class<?> type, String proxytype, IServiceInvocationInterceptor[] ics, 
-		boolean monitoring, ProvidedServiceInfo info, ServiceScope scope)
+		String name, Class<?> type, IServiceInvocationInterceptor[] ics, 
+		boolean monitoring, ProvidedServiceInfo info)
 	{
 		IServiceIdentifier sid = null;
 		
@@ -575,17 +573,19 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		
 		if(service instanceof IInternalService)
 		{
-			sid = BasicService.createServiceIdentifier(ia, name, type, service.getClass(), ia.getModel().getResourceIdentifier(), scope);
+			sid = BasicService.createServiceIdentifier(ia, name, type, service.getClass(), ia.getModel().getResourceIdentifier(), info);
 			((IInternalService)service).setServiceIdentifier(sid);
 		}
 			
 		
 //		if(type.getName().indexOf("IServiceCallService")!=-1)
 //			System.out.println("hijijij");
+		String proxytype	= info!=null && info.getImplementation()!=null && info.getImplementation().getProxytype()!=null
+			? info.getImplementation().getProxytype() : BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED;
 		
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
-			BasicServiceInvocationHandler handler = createProvidedHandler(name, ia, type, service, info, scope);
+			BasicServiceInvocationHandler handler = createProvidedHandler(name, ia, type, service, info);
 			if(sid==null)
 			{
 				Object ser = handler.getService();
@@ -636,7 +636,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	/**
 	 *  Create a basic invocation handler for a provided service.
 	 */
-	protected static BasicServiceInvocationHandler createProvidedHandler(String name, IInternalAccess ia, Class<?> type, Object service, ProvidedServiceInfo info, ServiceScope scope)
+	protected static BasicServiceInvocationHandler createProvidedHandler(String name, IInternalAccess ia, Class<?> type, Object service, ProvidedServiceInfo info)
 	{
 //		if(type.getName().indexOf("ITestService")!=-1 && ia.getComponentIdentifier().getName().startsWith("Global"))
 //			System.out.println("gaga");
@@ -699,7 +699,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			Class<?> serclass = service.getClass();
 
 			BasicService mgmntservice = new BasicService(ia.getId(), type, serclass, null);
-			mgmntservice.setServiceIdentifier(BasicService.createServiceIdentifier(ia, name, type, service.getClass(), ia.getModel().getResourceIdentifier(), scope));
+			mgmntservice.setServiceIdentifier(BasicService.createServiceIdentifier(ia, name, type, service.getClass(), ia.getModel().getResourceIdentifier(), info));
 			serprops.putAll(mgmntservice.getPropertyMap());
 			mgmntservice.setPropertyMap(serprops);
 			
