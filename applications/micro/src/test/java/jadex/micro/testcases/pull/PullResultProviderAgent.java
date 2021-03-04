@@ -1,6 +1,7 @@
 package jadex.micro.testcases.pull;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.ICommand;
 import jadex.commons.future.IPullIntermediateFuture;
@@ -19,7 +20,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=IPullResultService.class))
+@ProvidedServices(@ProvidedService(type=IPullResultService.class, scope=ServiceScope.GLOBAL))
 @Description("Agent that provides a service with intermediate results")
 public class PullResultProviderAgent implements IPullResultService
 {

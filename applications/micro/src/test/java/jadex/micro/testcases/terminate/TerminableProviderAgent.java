@@ -4,6 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -23,7 +24,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=ITerminableService.class))
+@ProvidedServices(@ProvidedService(type=ITerminableService.class, scope=ServiceScope.GLOBAL))
 @Description("Agent that provides a service with terminable future results")
 public class TerminableProviderAgent implements ITerminableService
 {

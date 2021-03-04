@@ -5,6 +5,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.ICommand;
 import jadex.commons.future.Future;
@@ -29,7 +30,7 @@ import jadex.micro.annotation.ProvidedServices;
  * 
  */
 @Agent
-@ProvidedServices(@ProvidedService(type=ITestService.class))
+@ProvidedServices(@ProvidedService(type=ITestService.class, scope=ServiceScope.GLOBAL))
 @Service
 public class ProviderAgent implements ITestService
 {

@@ -30,7 +30,7 @@ import jadex.micro.annotation.Results;
 @Agent
 @Arguments(@Argument(name="selfkill", clazz=boolean.class))
 @RequiredServices(@RequiredService(name = "MessageService", type = IMessageService.class, scope = ServiceScope.GLOBAL))
-@ProvidedServices(@ProvidedService(type = IMessageService.class, name = "MessageService", implementation = @Implementation(MessageService.class)))
+@ProvidedServices(@ProvidedService(type = IMessageService.class, scope=ServiceScope.GLOBAL, name = "MessageService", implementation = @Implementation(MessageService.class)))
 @Results(@Result(name="found", clazz=IServiceIdentifier[].class))
 public class FirstAgent
 {

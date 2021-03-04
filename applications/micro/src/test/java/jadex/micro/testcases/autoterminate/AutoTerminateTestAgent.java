@@ -15,6 +15,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.InitInfo;
@@ -40,7 +41,7 @@ import jadex.micro.testcases.TestAgent;
  */
 @Service
 @Agent
-@ProvidedServices(@ProvidedService(type=IAutoTerminateService.class))
+@ProvidedServices(@ProvidedService(type=IAutoTerminateService.class, scope=ServiceScope.GLOBAL))
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class AutoTerminateTestAgent extends	TestAgent implements IAutoTerminateService
 {
