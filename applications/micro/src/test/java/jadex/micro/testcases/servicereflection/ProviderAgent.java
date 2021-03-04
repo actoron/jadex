@@ -1,5 +1,6 @@
 package jadex.micro.testcases.servicereflection;
 
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -12,7 +13,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=IExampleService.class))
+@ProvidedServices(@ProvidedService(type=IExampleService.class, scope=ServiceScope.GLOBAL))
 public class ProviderAgent implements IExampleService
 {
 //	@Agent

@@ -9,6 +9,7 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
@@ -24,7 +25,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Agent that provides a service with a stream.
  */
-@ProvidedServices(@ProvidedService(type=IStreamService.class))
+@ProvidedServices(@ProvidedService(type=IStreamService.class, scope=ServiceScope.GLOBAL))
 @Results(@Result(name="testcases", clazz=List.class))
 @Service(IStreamService.class)
 @Agent
