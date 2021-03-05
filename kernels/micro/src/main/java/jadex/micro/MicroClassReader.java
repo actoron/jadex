@@ -752,8 +752,6 @@ public class MicroClassReader
 //							configinfo.setPersistable(config.persistable().toBoolean());
 						if(configinfo.getSuspend()==null)
 							configinfo.setSuspend(config.suspend().toBoolean());
-						if(configinfo.getScope()==null && !ServiceScope.GLOBAL.equals(config.scope()))
-							configinfo.setScope(config.scope());
 							
 						NameValue[] argvals = config.arguments();
 						for(int j=0; j<argvals.length; j++)
