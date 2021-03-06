@@ -563,35 +563,10 @@ public class MicroClassReader
 				
 				for(int i=0; i<vals.length; i++)
 				{
-					Implementation im = vals[i].implementation();
-					Value[] inters = im.interceptors();
-					UnparsedExpression[] interceptors = null;
-					if(inters.length>0)
-					{
-						interceptors = new UnparsedExpression[inters.length];
-						for(int j=0; j<inters.length; j++)
-						{
-							interceptors[j] = new UnparsedExpression(null, inters[j].clazz(), inters[j].value(), null);
-						}
-					}
-					
-					ProvidedServiceImplementation impl = createImplementation(im, clazz);
-					
-					Publish p = vals[i].publish();
-					NameValue[] props = p.properties();
-					UnparsedExpression[] exps = SNameValue.createUnparsedExpressions(props);
-					
-					PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(), p.multi(), Object.class.equals(p.mapping())? null: p.mapping(), exps);
-					
-					props = vals[i].properties();
-					List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(SNameValue.createUnparsedExpressions(props))) : null;
-					
-					ProvidedServiceInfo psis = new ProvidedServiceInfo(vals[i].name().length()>0? 
-						vals[i].name(): null, vals[i].type(), impl, vals[i].scope(), pi, serprops);
-				
 					if(vals[i].name().length()==0 || !psers.containsKey(vals[i].name()))
 					{
-						psers.put(vals[i].name().length()==0? ("#"+cnt++): vals[i].name(), psis);
+						ProvidedServiceInfo psi = createProvidedServiceInfo(vals[i]);
+						psers.put(vals[i].name().length()==0? ("#"+cnt++): vals[i].name(), psi);
 					}
 				}
 			}
@@ -772,29 +747,7 @@ public class MicroClassReader
 						{
 							if(!configinfo.hasProvidedService(provs[j].name()))
 							{
-								Implementation im = provs[j].implementation();
-								Value[] inters = im.interceptors();
-								UnparsedExpression[] interceptors = null;
-								if(inters.length>0)
-								{
-									interceptors = new UnparsedExpression[inters.length];
-									for(int k=0; k<inters.length; k++)
-									{
-										interceptors[k] = new UnparsedExpression(null, inters[k].clazz(), inters[k].value(), null);
-									}
-								}
-								RequiredServiceBinding bind = null;//createBinding(im.binding());
-								ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
-									im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
-								Publish p = provs[j].publish();
-								PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(), p.multi(),
-									p.mapping(), SNameValue.createUnparsedExpressions(p.properties()));
-								
-								NameValue[] props = provs[j].properties();
-								List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(SNameValue.createUnparsedExpressions(props))) : null;
-								
-								ProvidedServiceInfo psi = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl,  provs[j].scope(), pi, serprops);
-		//						configinfo.setProvidedServices(psis);
+								ProvidedServiceInfo psi = createProvidedServiceInfo(provs[j]);
 								configinfo.addProvidedService(psi);
 							}
 						}
@@ -1230,10 +1183,43 @@ public class MicroClassReader
 			for(Class<?> iface: serifaces)
 			{
 				ProvidedServiceImplementation impl = new ProvidedServiceImplementation(null, "$pojoagent!=null? $pojoagent: $component", Implementation.PROXYTYPE_DECOUPLED, null, null);
-				ProvidedServiceInfo psi = new ProvidedServiceInfo(null, iface, impl, null, null, null);
+				ProvidedServiceInfo psi = new ProvidedServiceInfo(null, iface, impl);
 				modelinfo.addProvidedService(psi);
 			}
 		}
+	}
+
+	/**
+	 *  Create info from annotation.
+	 */
+	protected static ProvidedServiceInfo createProvidedServiceInfo(ProvidedService prov)
+	{
+		Implementation im = prov.implementation();
+		Value[] inters = im.interceptors();
+		UnparsedExpression[] interceptors = null;
+		if(inters.length>0)
+		{
+			interceptors = new UnparsedExpression[inters.length];
+			for(int k=0; k<inters.length; k++)
+			{
+				interceptors[k] = new UnparsedExpression(null, inters[k].clazz(), inters[k].value(), null);
+			}
+		}
+		RequiredServiceBinding bind = null;//createBinding(im.binding());
+		ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
+			im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
+		Publish p = prov.publish();
+		PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(), p.multi(),
+			p.mapping(), SNameValue.createUnparsedExpressions(p.properties()));
+		
+		UnparsedExpression	scopeexpression	= prov.scopeexpression()!=null && prov.scopeexpression().length()>0
+				? new UnparsedExpression("scopeexpression", ServiceScope.class, prov.scopeexpression(), null) : null;
+
+				NameValue[] props = prov.properties();
+		List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(SNameValue.createUnparsedExpressions(props))) : null;
+		
+		ProvidedServiceInfo psi = new ProvidedServiceInfo(prov.name().length()>0? prov.name(): null, prov.type(), impl,  prov.scope(), scopeexpression, pi, serprops);
+		return psi;
 	}
 	
 	/**

@@ -74,7 +74,7 @@ public class ServicePoolAgent implements IServicePoolService
 			CounterResultListener<Void> lis = new CounterResultListener<Void>(((PoolServiceInfo[])psis).length + 1, true, new DelegationResultListener<Void>(ret));
 			
 			// Add pool service
-			ProvidedServiceInfo	info	= new ProvidedServiceInfo(null, IServicePoolService.class, null, scope, null,
+			ProvidedServiceInfo	info	= new ProvidedServiceInfo(null, IServicePoolService.class, null, scope, null, null,
 				// Publish unrestricted when global.
 				ServiceScope.GLOBAL.equals(scope) ? Collections.singletonList(new UnparsedExpression(Security.UNRESTRICTED, "true")): null);
 			agent.getFeature(IProvidedServicesFeature.class).addService(null, IServicePoolService.class, this, info).addResultListener(lis);

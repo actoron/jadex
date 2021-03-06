@@ -32,6 +32,11 @@ public @interface ProvidedService
 	//public ServiceScope scope() default ServiceScope.GLOBAL;
 	public ServiceScope scope() default ServiceScope.DEFAULT;
 	
+	/** 
+	 *  The scope expression to be evaluated on service initialization (only used when scope is set to {@see ServiceScope.EXPRESSION}).
+	 */
+	public String scopeexpression() default "";
+	
 	/**
 	 *  The service implementation.
 	 */

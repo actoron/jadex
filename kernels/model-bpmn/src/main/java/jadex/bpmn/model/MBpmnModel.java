@@ -303,7 +303,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 						+ "new Class[]{"+iface.getName()+".class"
 						+ "}, new jadex.bpmn.runtime.ProcessServiceInvocationHandler($component, \""+entry.getKey().getId()+"\"))";
 					ProvidedServiceImplementation psim = new ProvidedServiceImplementation(null, exp, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
-					ProvidedServiceInfo psi = new ProvidedServiceInfo("internal_"+iface.getName(), iface, psim, null, null, null);
+					ProvidedServiceInfo psi = new ProvidedServiceInfo("internal_"+iface.getName(), iface, psim);
 					modelinfo.addProvidedService(psi);
 				}
 			}
