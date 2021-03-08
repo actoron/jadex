@@ -1210,7 +1210,7 @@ public class MicroClassReader
 			im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
 		Publish p = prov.publish();
 		PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(), p.multi(),
-			p.mapping(), SNameValue.createUnparsedExpressions(p.properties()));
+			Object.class.equals(p.mapping())? null: p.mapping(), SNameValue.createUnparsedExpressions(p.properties()));
 		
 		UnparsedExpression	scopeexpression	= prov.scopeexpression()!=null && prov.scopeexpression().length()>0
 				? new UnparsedExpression("scopeexpression", ServiceScope.class, prov.scopeexpression(), null) : null;
