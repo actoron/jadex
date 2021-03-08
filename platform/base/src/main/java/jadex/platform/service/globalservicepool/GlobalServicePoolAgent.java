@@ -129,7 +129,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		{
 			info.setResourceIdentifier(agent.getModel().getResourceIdentifier());
 		}
-		ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null, ServiceScope.PARENT, null, null);
+		ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null, ServiceScope.PARENT, null, null, null);
 		info.setProvidedServiceInfos(new ProvidedServiceInfo[]{psi});
 		ser.addServiceType(servicetype,
 			new DefaultPoolStrategy(strategy.getWorkersPerProxy(), 35000, strategy.getWorkersPerProxy()),	// Is this correct???
@@ -138,7 +138,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 			public void customResultAvailable(Void result) 
 			{
 				// Add to global pool with magic targetresolver for intelligent proxy
-				ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null, null, null, null);
+				ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null);
 				List<UnparsedExpression> props = new ArrayList<UnparsedExpression>();
 				props.add(new UnparsedExpression(ITargetResolver.TARGETRESOLVER, GlobalServicePoolTargetResolver.class.getName()+".class"));
 				psi.setProperties(props);

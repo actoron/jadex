@@ -130,7 +130,7 @@ public class ReflectionInvocationAgent extends JunitAgentTest
 			System.out.println("platform local:"+agent.getId().getRoot()+" platform remote: "+platform);
 //			IService lser = (IService)agent.searchService(new ServiceQuery<>(ILibraryService.class).setSearchStart(platform.getId()).setScope(ServiceScope.PLATFORM)).get();
 //			System.out.println("libser: "+lser.getServiceId().getProviderId());
-			IService ser = (IService)agent.searchService(new ServiceQuery<>(new ClassInfo("jadex.bdiv3.testcases.servicereflection.INotVisibleService")).setSearchStart(platform.getId()).setScope(ServiceScope.PLATFORM)).get();
+			IService ser = (IService)agent.searchService(new ServiceQuery<>(new ClassInfo("jadex.bdiv3.testcases.servicereflection.INotVisibleService")).setSearchStart(platform.getId()).setScope(ServiceScope.PLATFORM).setOwner(platform.getId())).get();
 			Object result = ser.invokeMethod("add", null, new Object[]{1,2}, null).get();
 			System.out.println("Got result: "+result+" "+Arrays.toString(ser.getClass().getInterfaces()));
 			tr.setSucceeded(true);

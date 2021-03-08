@@ -89,8 +89,7 @@ public class ApplicationXMLReader extends ComponentXMLReader
 					if(!found)
 					{
 						mi.addProvidedService(new ProvidedServiceInfo(null, IEnvironmentService.class,
-							new ProvidedServiceImplementation(EnvironmentService.class, null, null, null, null),
-							null, null, null));
+							new ProvidedServiceImplementation(EnvironmentService.class, null, null, null, null)));
 					}
 				}
 				

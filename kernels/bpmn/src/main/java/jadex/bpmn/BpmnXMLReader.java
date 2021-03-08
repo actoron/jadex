@@ -1675,7 +1675,7 @@ public class BpmnXMLReader
 							}
 							
 							// todo: support publish
-							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim, null, null, null);
+							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim);
 							mi.addProvidedService(psi);
 							
 							if(table.getRowSize()>4)
@@ -1704,7 +1704,7 @@ public class BpmnXMLReader
 											psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null, null);
 										}
 										// todo: support publish
-										ci.addProvidedService(new ProvidedServiceInfo(name, type, psim, null, null, null));
+										ci.addProvidedService(new ProvidedServiceInfo(name, type, psim));
 									}
 								}
 							}

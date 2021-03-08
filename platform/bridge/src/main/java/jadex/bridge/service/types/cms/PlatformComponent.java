@@ -118,21 +118,21 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 //		_BROKEN.add("jadex.bdiv3.examples.booktrading.seller.SellerAgent");
 //		_BROKEN.add("jadex.micro.testcases.subscriptionlistener.SubscriptionListenerTestAgent");
 		
-		// Interleaved parent/child termination race condition
-		_BROKEN.add("jadex.micro.testcases.terminate.TerminableProviderAgent");
-		_BROKEN.add("jadex.micro.testcases.terminate.TerminateTestAgent");
-		_BROKEN.add("jadex.micro.testcases.terminate.TerminateIntermediateTestAgent");
-		
-		// Confirmed broken (sim blocker heisenbug!) 
-		_BROKEN.add("jadex.micro.testcases.blocking.BlockingTimeoutTestAgent");
-		_BROKEN.add("jadex.micro.testcases.blocking.SimpleBlockingTestAgent");
-		_BROKEN.add("jadex.micro.testcases.nflatency.NFLatencyTestAgent");
-		
-		// Todo: are these still broken?
-		_BROKEN.add("jadex.micro.testcases.nfcallreturn.NFCallReturnTestAgent");
-		_BROKEN.add("jadex.micro.testcases.nfmethodprop.NFMethodPropTestAgent");
-		_BROKEN.add("jadex.bdiv3.testcases.servicereflection.NotVisibleProviderAgent");
-		_BROKEN.add("jadex.micro.testcases.servicequeries.ServiceQueriesTestAgent");
+//		// Interleaved parent/child termination race condition
+//		_BROKEN.add("jadex.micro.testcases.terminate.TerminableProviderAgent");
+//		_BROKEN.add("jadex.micro.testcases.terminate.TerminateTestAgent");
+//		_BROKEN.add("jadex.micro.testcases.terminate.TerminateIntermediateTestAgent");
+//		
+//		// Confirmed broken (sim blocker heisenbug!) 
+//		_BROKEN.add("jadex.micro.testcases.blocking.BlockingTimeoutTestAgent");
+//		_BROKEN.add("jadex.micro.testcases.blocking.SimpleBlockingTestAgent");
+//		_BROKEN.add("jadex.micro.testcases.nflatency.NFLatencyTestAgent");
+//		
+//		// Todo: are these still broken?
+//		_BROKEN.add("jadex.micro.testcases.nfcallreturn.NFCallReturnTestAgent");
+//		_BROKEN.add("jadex.micro.testcases.nfmethodprop.NFMethodPropTestAgent");
+//		_BROKEN.add("jadex.bdiv3.testcases.servicereflection.NotVisibleProviderAgent");
+//		_BROKEN.add("jadex.micro.testcases.servicequeries.ServiceQueriesTestAgent");
 	}
 	
 	//-------- attributes --------

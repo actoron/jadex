@@ -116,6 +116,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 				ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()), 
 					new ProvidedServiceImplementation(cs[i].getImplementation()), 
 					cs[i].getScope()!=null? cs[i].getScope(): psi.getScope(),
+					cs[i].getScopeExpression()!=null? cs[i].getScopeExpression(): psi.getScopeExpression(),
 					cs[i].getPublish()!=null? cs[i].getPublish(): psi.getPublish(), 
 					cs[i].getProperties()!=null? cs[i].getProperties() : psi.getProperties());
 				sermap.put(key, newpsi);
@@ -131,6 +132,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()), 
 				pinfos[i].getImplementation()!=null? new ProvidedServiceImplementation(pinfos[i].getImplementation()): psi.getImplementation(), 
 				pinfos[i].getScope()!=null? pinfos[i].getScope(): psi.getScope(),
+				pinfos[i].getScopeExpression()!=null? pinfos[i].getScopeExpression(): psi.getScopeExpression(),
 				pinfos[i].getPublish()!=null? pinfos[i].getPublish(): psi.getPublish(), 
 				pinfos[i].getProperties()!=null? pinfos[i].getProperties() : psi.getProperties());
 			sermap.put(key, newpsi);
@@ -149,7 +151,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			impl.setValue("$component.getExternalAccess()");
 			// platform external access service will be published network wide, all others only on platform
 			ProvidedServiceInfo psi= new ProvidedServiceInfo("externalaccessservice", IExternalAccess.class, impl, 
-				getComponent().getId().equals(getComponent().getId().getRoot())? ServiceScope.NETWORK: ServiceScope.PLATFORM, null, null);
+				getComponent().getId().equals(getComponent().getId().getRoot())? ServiceScope.NETWORK: ServiceScope.PLATFORM, null, null, null);
 			sermap.put("externalaccessservice", psi);
 		}
 		
@@ -158,10 +160,17 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 		// Instantiate service objects
 		for(ProvidedServiceInfo info: sermap.values())
 		{
-			// support scopeexp="..." or sufficient when custom scope in manual addService(...)?
-//				ServiceScope scope = info.getScope();
-//				scope = (String)SJavaParser.evaluateExpressionPotentially(scope, component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
-//				info.setScope(scope);
+			// Evaluate and replace scope expression, if any.
+			ServiceScope scope = info.getScope();
+			if(ServiceScope.EXPRESSION.equals(scope))
+			{
+				scope = (ServiceScope)SJavaParser.getParsedValue(info.getScopeExpression(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
+				info.setScope(scope);
+				System.out.println("expression scope '"
+					+ (info.getScopeExpression()!=null ? info.getScopeExpression().getValue() : "")
+					+ "': "+scope);
+			}
+				
 			final Future<Void> fut = new Future<>();
 			bar.addFuture(fut);
 			
@@ -987,7 +996,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 	public IFuture<Void> addService(String name, Class<?> type, Object service, String proxytype)
 	{
 		ProvidedServiceImplementation	impl	= proxytype!=null ? new ProvidedServiceImplementation(null, null, proxytype, null, null) : null;
-		ProvidedServiceInfo info = proxytype!=null ? new ProvidedServiceInfo(name, type, impl, null, null, null): null;
+		ProvidedServiceInfo info = proxytype!=null ? new ProvidedServiceInfo(name, type, impl): null;
 		return addService(name, type, null, service, info);
 	}
 	
@@ -1014,7 +1023,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	public IFuture<Void> addService(String name, Class<?> type, Object service, PublishInfo pi, ServiceScope scope)
 	{
-		ProvidedServiceInfo psi = pi!=null || scope!=null ? new ProvidedServiceInfo(null, type, null, scope, pi, null): null;
+		ProvidedServiceInfo psi = pi!=null || scope!=null ? new ProvidedServiceInfo(null, type, null, scope, null, pi, null): null;
 		return addService(name, type, service, psi);
 	}
 	

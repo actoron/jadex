@@ -4,7 +4,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
 /**
- *  An example service interface that is used from micro tests and not naturally visible.
+ *  An example service interface that is used reflectively from micro tests without the interface class in the classpath.
  */
 @Service
 public interface INotVisibleService

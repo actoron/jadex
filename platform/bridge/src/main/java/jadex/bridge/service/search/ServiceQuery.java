@@ -339,6 +339,9 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery<T> setScope(ServiceScope scope)
 	{
+		if(ServiceScope.EXPRESSION.equals(scope))
+			throw new IllegalArgumentException("Cannot use scope 'expression' directly.");
+
 		this.scope = scope!=null?scope:ServiceScope.DEFAULT;
 		return this;
 	}
