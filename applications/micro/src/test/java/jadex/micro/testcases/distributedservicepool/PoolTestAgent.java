@@ -1,49 +1,72 @@
-package jadex.micro.testcases.maxresults;
+package jadex.micro.testcases.distributedservicepool;
 
 import java.util.Collection;
 import java.util.Map;
 
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IPullIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Properties;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
+import jadex.micro.annotation.Component;
+import jadex.micro.annotation.ComponentType;
+import jadex.micro.annotation.ComponentTypes;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.TestAgent;
 
-/**
- *  Test if the max count is received from intermediate future with limited results.
- */
+
 @Agent
-@Service
-@RequiredServices(@RequiredService(name="testser", type=ITestService.class, scope=ServiceScope.GLOBAL))
-//@ComponentTypes(@ComponentType(name="provider", filename="jadex.micro.testcases.maxresults.ProviderAgent.class"))
-//@Configurations(@Configuration(name="default", components=@Component(type="provider")))
-@Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
-//@Properties(@NameValue(name = "test.timeout", value = "300000"))
-public class UserAgent extends TestAgent
+@Imports(
 {
-	protected int tstcnt = 3;
+	"jadex.platform.service.distributedservicepool.*",
+	"jadex.bridge.service.*",
+	"jadex.bridge.service.search.*"
+})
+@ComponentTypes(
+{
+	@ComponentType(name="Worker", clazz=WorkerAgent.class),
+	@ComponentType(name="DistributedPool", filename = "jadex/platform/service/distributedservicepool/DistributedServicePoolAgent.class")
+})
+@Configurations(
+{
+	@Configuration(name="pool", components={
+		//@Component(type="Worker"),
+		@Component(type="DistributedPool", arguments = 
+		{
+			@NameValue(name="serviceinfo",
+				value="new ServiceQuery(ITestService.class).setScope(ServiceScope.GLOBAL)"),
+			@NameValue(name="checkdelay", value="4000l")
+		})
+	})
+})
+@Service
+@Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
+public class PoolTestAgent extends TestAgent
+{
+	protected int tstcnt = 1;
 	
 	/**
 	 *  The test count.
@@ -52,6 +75,18 @@ public class UserAgent extends TestAgent
 	{
 		return tstcnt*2;
 	}
+	
+	/**
+     * Returns the platform config.
+     * Can be overridden to apply special settings. 
+     */
+    public IPlatformConfiguration getConfig() 
+    {
+    	// It is important to turn off simulation also for local test!
+    	// The distri pool will search globally using intermediate future which
+    	// is not supported by the simulation blockers
+        return STest.getDefaultTestConfig(getClass()).getExtendedPlatformConfiguration().setSimulation(false);
+    }
 	
 	/**
 	 *  Perform the tests.
@@ -160,7 +195,7 @@ public class UserAgent extends TestAgent
 		IResultListener<Map<String, Object>> reslis = new DelegationResultListener<Map<String,Object>>(resfut);
 		
 //		System.out.println("root: "+root+" "+SUtil.arrayToString(root.getAddresses()));
-		createComponent(ProviderAgent.class.getName()+".class", root, reslis)
+		createComponent(WorkerAgent.class.getName()+".class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
@@ -169,7 +204,7 @@ public class UserAgent extends TestAgent
 				{
 					public void exceptionOccurred(Exception exception)
 					{
-						TestReport tr = new TestReport("#"+testno, "Tests if max works.");
+						TestReport tr = new TestReport("#"+testno, "Test .");
 						tr.setFailed(exception);
 						super.intermediateResultAvailable(tr);
 						super.finished();
@@ -196,192 +231,81 @@ public class UserAgent extends TestAgent
 		
 		IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		ITestService ser = (ITestService)agent.getFeature(IRequiredServicesFeature.class).getService("testser").get();
+		final TestReport tr = new TestReport("#"+testno, "Test if pool revives broken service");
 		
-		Future<Void> barrier = new Future<>();
-		int[] cnt = new int[1];
+		Collection<ITestService> sers = agent.searchServices(new ServiceQuery<ITestService>(ITestService.class)).get();
 		
-		IIntermediateFuture<String> fut1 = ser.getInfos();
-		fut1.addResultListener(new IIntermediateResultListener<String>() 
+		// todo: how to identify pool or worker (tagging workers or tagging pools)
+		ITestService ser = null;
+		for(ITestService s: sers)
 		{
-			final TestReport tr = new TestReport("#"+testno, "Test if intermediate future max works");
-			int max = -1;
-			int maxcnt;
-			int rescnt;
-			
-			public void exceptionOccurred(Exception exception) 
+			if(((IService)s).getServiceId().toString().indexOf("Distributed")!=-1)
 			{
-				System.out.println("ex: "+exception);
+				ser = s;
+				break;
 			}
-			
-			public void resultAvailable(Collection<String> result) 
-			{
-				System.out.println("result: "+result);
-			}
-			
-			public void maxResultCountAvailable(int max) 
-			{
-				System.out.println("max rec: "+max);
-				this.max = max;
-				this.maxcnt++;
-			}
-			
-			public void intermediateResultAvailable(String result) 
-			{
-//				System.out.println("ires: "+result);
-				this.rescnt++;
-			}
-			
-			public void finished() 
-			{
-				System.out.println("fini 1");
-				
-				if(this.max!=-1 && this.rescnt==this.max && this.maxcnt==1)
-				{
-					tr.setSucceeded(true);
-				}
-				else if(this.max==-1)
-				{
-					tr.setFailed("No max value received.");
-				}
-				else if(this.rescnt!=this.max)
-				{
-					tr.setFailed("Wrong number of results received: "+rescnt+", expecting: "+max);
-				}
-				else
-				{
-					tr.setFailed("Received max value n times: "+this.maxcnt);
-				}
-				ret.addIntermediateResult(tr);
-			
-				if(++cnt[0]==tstcnt)
-					barrier.setResult(null);
-			}
-		});
+		}
 		
-		IPullIntermediateFuture<String> fut2 = ser.pullInfos();
-		fut2.pullIntermediateResult();
-		fut2.addResultListener(new IIntermediateResultListener<String>() 
+		try
 		{
-			final TestReport tr = new TestReport("#"+testno+1, "Test if pull intermediate future max works");
-			int max = -1;
-			int maxcnt;
-			int rescnt;
-			
-			public void exceptionOccurred(Exception exception) 
-			{
-				System.out.println("ex: "+exception);
-			}
-			
-			public void resultAvailable(Collection<String> result) 
-			{
-				System.out.println("result: "+result);
-			}
-			
-			public void maxResultCountAvailable(int max) 
-			{
-				System.out.println("max rec: "+max);
-				this.max = max;
-				this.maxcnt++;
-			}
-			
-			public void intermediateResultAvailable(String result) 
-			{
-//				System.out.println("ires pull: "+result);
-				this.rescnt++;
-
-				// Todo: how to signal to stop pulling when future is done?
-				if(!fut2.isDone())
-					fut2.pullIntermediateResult();
-			}
-			
-			public void finished() 
-			{
-				System.out.println("fini 2");
-				
-				if(this.max!=-1 && this.rescnt==this.max && this.maxcnt==1)
-				{
-					tr.setSucceeded(true);
-				}
-				else if(this.max==-1)
-				{
-					tr.setFailed("No max value received.");
-				}
-				else if(this.rescnt!=this.max)
-				{
-					tr.setFailed("Wrong number of results received: "+rescnt+", expecting: "+max);
-				}
-				else
-				{
-					tr.setFailed("Received max value n times: "+this.maxcnt);
-				}
-				ret.addIntermediateResult(tr);
-				
-				if(++cnt[0]==tstcnt)
-					barrier.setResult(null);
-			}
-		});
+			ser.ok().get();
+		}
+		catch(Exception e)
+		{
+			System.out.println("got exception on ok: "+e);
+		}
 		
-		IIntermediateFuture<String> fut3 = ser.subscribeToInfos();
-		fut3.addResultListener(new IIntermediateResultListener<String>() 
+		for(int i=0; i<3; i++)
 		{
-			final TestReport tr = new TestReport("#"+testno+1, "Test if subscription future max fails");
-			
-			public void exceptionOccurred(Exception exception) 
+			try
 			{
-				tr.setFailed(exception);
-				
-//				if(exception instanceof UnsupportedOperationException)
-//				{
-//					System.out.println("fini 3: "+exception);
-//					
-//					tr.setSucceeded(true);
-//				}
-//				else
-//				{
-//					tr.setFailed(exception);
-//				}
-				
-				cont();
+				ser.ex().get();
 			}
-			
-			public void resultAvailable(Collection<String> result) 
+			catch(Exception e)
 			{
+				System.out.println("got exception on ex: "+e);
+			}
+		}
+		
+		for(int i=0; i<5; i++)
+		{
+			try
+			{
+				ser.ok().get();
 				tr.setSucceeded(true);
-				//tr.setFailed("No exception: "+result);
-				
-				cont();
+				break;
 			}
-			
-			public void maxResultCountAvailable(int max) 
+			catch(Exception e)
 			{
+				System.out.println("got exception on ok2: "+e);
 			}
-			
-			public void intermediateResultAvailable(String result) 
-			{
-			}
-			
-			public void finished() 
-			{
-				tr.setSucceeded(true);
-//				tr.setFailed("No exception");
-				
-				cont();
-			}
-			
-			void cont()
-			{
-				ret.addIntermediateResult(tr);
-				
-				if(++cnt[0]==tstcnt)
-					barrier.setResult(null);
-			}
-		});
+			agent.waitForDelay(5000).get();
+		}
 		
-		barrier.get();
+		if(!tr.isFinished())
+			tr.setFailed("Not revived service");
+		
+		ret.addIntermediateResult(tr);
 		ret.setFinished();
+			
+		System.out.println("XXXXXX test fini: "+tr);
 		
 		return ret;
 	}
-			
+	
+	public static void main(String[] args)
+	{
+		//new RequiredServiceInfo(ITestService.class).setDefaultBinding(new RequiredServiceBinding(ServiceScope.APPLICATION_GLOBAL));
+	
+		IExternalAccess platform = Starter.createPlatform(PlatformConfigurationHandler.getDefault()).get();
+		CreationInfo ci = new CreationInfo().setFilenameClass(PoolTestAgent.class);
+		platform.createComponent(ci).get();
+	}
+	
+	/*@OnEnd
+	public void end(Exception e)
+	{
+		e.printStackTrace();
+		System.out.println("end");
+	}*/
 }
