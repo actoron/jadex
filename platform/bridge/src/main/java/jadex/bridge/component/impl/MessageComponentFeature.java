@@ -692,6 +692,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				byte[] bheader = serialserv.encode(header, component, header);
 				byte[] body = serialserv.encode(header, component, message);
 				final ISecurityService secserv = getSecurityService();
+				//System.out.println("doSendMsg: "+header+" "+component+" "+message);
 				secserv.encryptAndSign(header, bheader).addResultListener(
 					component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<byte[], Void>((Future<Void>) ret)
 				{

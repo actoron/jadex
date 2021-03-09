@@ -19,6 +19,7 @@ public enum ServiceScope
 	/** 
 	 *  Marker for using a separate expression in required/provided service annotations.
 	 *  This scope can not be used at runtime, e.g. for service queries.
+	 *  Concrete scope expression is given in further scopeexpression attribute.
 	 */
 	EXPRESSION,
 

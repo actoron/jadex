@@ -635,7 +635,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 *  Check if the service is defined as unrestricted in the provided service configuration, i.e., dynamically (not statically on annotation/type level).
 	 *  @return null if no unrestricted config setting exists (i.e. type level is checked elsewhere). 
 	 */
-	protected static Boolean	isUnrestrictedByConfig(IInternalAccess component, ProvidedServiceInfo info)
+	protected static Boolean isUnrestrictedByConfig(IInternalAccess component, ProvidedServiceInfo info)
 	{
 		Boolean	ret	= null;
 		if(info!=null && info.getProperties()!=null)
@@ -644,7 +644,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 			{
 				if(exp.getName().equals(Security.UNRESTRICTED))
 				{
-					ret	= (Boolean) SJavaParser.getParsedValue(exp, component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
+					ret	= (Boolean)SJavaParser.getParsedValue(exp, component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
 				}
 			}
 		}
