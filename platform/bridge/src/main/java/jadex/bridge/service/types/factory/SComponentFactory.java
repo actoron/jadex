@@ -869,6 +869,7 @@ public class SComponentFactory
 	public static Collection<IFilter<Object>> scanForKernelFilters(List<URL> urls)
 	{
 		List<IFilter<Object>> ret = new ArrayList<IFilter<Object>>();
+		urls = new ArrayList<URL>(urls);
 		
 //		System.out.println("urls2: "+urls2.size());
 //		for(URL u: urls2)
@@ -1015,6 +1016,8 @@ public class SComponentFactory
 			{
 				ret.addIntermediateResult(it.next());
 			}
+			// Set finished not really necessary due to max
+			ret.setFinishedIfUndone();
 			return ret;
 		}
 		else if(models instanceof IFuture)
@@ -1030,15 +1033,19 @@ public class SComponentFactory
 			{
 				ls.getAllURLs().then(urls ->
 				{
+					//System.out.println("urls are: "+urls);
 					getComponentModelsAsStream(component, urls.toArray(new URL[urls.size()])).next(res ->
 					{
 						ret.addIntermediateResult(res);
 						allres.add(res);
+						//System.out.println("ires: "+res);
 					})
-					.max(max -> ret.setMaxResultCount(max))
+					.max(max -> {/*System.out.println("max: "+max);*/ ret.setMaxResultCount(max);})
 					.finished(v ->
 					{
 						Starter.putPlatformValue(component.getId().getRoot(), Starter.DATA_COMPONENTMODELS, allres);
+						ret.setFinishedIfUndone();
+						//System.out.println("fini");
 					})
 					.catchEx(ret);
 				})
@@ -1063,7 +1070,7 @@ public class SComponentFactory
 		//System.out.println("getComponentModelsAsStream: "+l.size());
 		final int cnt[] = new int[1];
 		
-		//System.out.println("max to: "+urllist.size());
+		//System.out.println("max to: "+urllist.size()+" "+urllist);
 		ret.setMaxResultCount(urllist.size());
 		
 		IComponentStep<List<String[]>> step = new IComponentStep<List<String[]>>()
@@ -1071,28 +1078,44 @@ public class SComponentFactory
 			public IFuture<List<String[]>> execute(IInternalAccess ia)
 			{
 				Future<List<String[]>> ret = new Future<>();
+				List<String[]> res = new ArrayList<String[]>();
 				
-				URL[] url = new URL[]{it.next()};
+				URL u = it.next();
+				URL[] url = new URL[]{u};
 				
 				IFilter<Object>[] filters = getKernelFilters(component, urllist).toArray(new IFilter[0]);
 				IFilter fil = new ComposedFilter(filters, ComposedFilter.OR);
 
-				Set<SClassReader.ClassFileInfo> cis = SReflect.scanForClassFileInfos(url, null, fil);
-				
-				List<String[]> res = cis.stream().map(a -> new String[]{a.getFilename(), a.getClassInfo().getClassName()}).collect(Collectors.toList());
-				
+				try
+				{
+					Set<SClassReader.ClassFileInfo> cis = SReflect.scanForClassFileInfos(url, null, fil);
+					res = cis.stream().map(a -> new String[]{a.getFilename(), a.getClassInfo().getClassName()}).collect(Collectors.toList());
+				}
+				catch(Exception e)
+				{
+					System.out.println("scan class file infos: "+e);
+				}
+					
 				//IIntermediateFuture<String> fut = scanForFilesAsync(url[0], mff);
 				//fut.next(er -> res.add(new String[]{er, er}))
 				//	.finished(v -> ret.setResult(res))
 				//	.catchEx(ex -> ret.setException(ex));
 				
-				String[] res2 = SReflect.scanForFiles(url, fil);
+				String[] res2 = SUtil.EMPTY_STRING_ARRAY;
+				try
+				{
+					res2 = SReflect.scanForFiles(url, fil);
+				}
+				catch(Exception e)
+				{
+					System.out.println("scan files: "+e);
+				}
 				
 				for(String r: res2)
 					res.add(new String[]{r, r});
-				
-				if(res.size()>0)
-					System.out.println("found for: "+url[0]+" "+res.size());
+			
+				//if(res.size()>0)
+				//	System.out.println("found for: "+url[0]+" "+res.size());
 				
 				ret.setResult(res);
 				
@@ -1104,6 +1127,7 @@ public class SComponentFactory
 		{
 			public void resultAvailable(List<String[]> res)
 			{
+				//System.out.println("resa: "+it.hasNext()+" "+urllist+" "+urllist.size());
 				ret.addIntermediateResult(res);
 				if(it.hasNext())
 				{

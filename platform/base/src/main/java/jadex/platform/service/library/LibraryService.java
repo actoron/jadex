@@ -146,7 +146,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	protected Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> rids;
 	
 	/** The non-managed urls (cached for speed). */
-//	protected Set<URL>	nonmanaged;
 	protected Set<URI>	nonmanaged;
 	
 	
@@ -610,7 +609,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		if(nonmanaged==null)
 		{
 			nonmanaged	= new LinkedHashSet<URI>();
-			collectClasspathURLs(baseloader, nonmanaged, new HashSet<String>());
+			Set<URL> urls = SUtil.collectClasspathURLs(baseloader);
+			for(URL url: urls)
+				try{ nonmanaged.add(url.toURI());} catch (Exception e) {System.out.println("url problem: "+e); }
 		}
 		return nonmanaged;
 	}
@@ -1403,6 +1404,10 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				}
 			}
 		});
+		
+		URL[] u = getAllURLs().get().toArray(new URL[0]);
+		System.out.println("urls are: "+SUtil.arrayToString(u));
+		
 		return ret;
 	}
 
@@ -1449,7 +1454,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 	/**
 	 *  Collect all URLs belonging to a class loader.
-	 */
+	 * /
 	protected void	collectClasspathURLs(ClassLoader classloader, Set<URI> set, Set<String> jarnames)
 	{
 		assert classloader!=null;
@@ -1484,7 +1489,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		}
 		
 //		System.out.println("non man: "+classloader+" "+set+" "+jarnames);
-	}
+	}*/
 	
 	/**
 	 *  Get the name of a jar file without extension and version info.
