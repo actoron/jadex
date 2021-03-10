@@ -8,5 +8,4 @@ import jadex.platform.service.ISystemService;
 @Agent(autostart=Boolean3.TRUE, name="chat", autoprovide=Boolean3.TRUE)
 public class SystemChatAgent extends ChatAgent implements ISystemService
 {
-
 }

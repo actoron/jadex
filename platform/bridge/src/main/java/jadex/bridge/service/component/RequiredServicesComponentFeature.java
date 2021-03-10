@@ -1395,4 +1395,14 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		return query.getSearchStart()!=null && query.getSearchStart().getRoot()!=getComponent().getId().getRoot()
 			|| !query.getScope().isLocal();
 	}
+	
+	/**
+	 *  Get a service query for a required service info (as defined in the agent under that name).
+	 *  @param name The name.
+	 *  @return The service query.
+	 */
+	public ServiceQuery<?> getServiceQuery(String name)
+	{
+		return getServiceQuery(getServiceInfo(name));
+	}
 }

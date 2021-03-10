@@ -1,5 +1,7 @@
 package jadex.bridge.service.types.chat;
 
+import java.util.Collection;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -50,8 +52,14 @@ public interface IChatGuiService
 	/**
 	 *  Search for available chat services.
 	 *  @return The currently available remote services.
+	 * /
+	public IIntermediateFuture<IChatService> findUsers();*/
+	
+	/**
+	 *  Get available chat users.
+	 *  @return The currently available remote services.
 	 */
-	public IIntermediateFuture<IChatService> findUsers();
+	public IFuture<Collection<IChatService>> getUsers();
 	
 	/**
 	 *  Post a message.
@@ -76,14 +84,14 @@ public interface IChatGuiService
 	/**
 	 *  Get a snapshot of the currently managed file transfers.
 	 */
-	public IIntermediateFuture<TransferInfo>	getFileTransfers();
+	public IIntermediateFuture<TransferInfo> getFileTransfers();
 	
 	/**
 	 *  Send a local file to the target component.
 	 *  @param filename	The file name.
 	 *  @param cid	The id of a remote chat component.
 	 */
-	public IFuture<Void>	sendFile(String filename, IComponentIdentifier cid);
+	public IFuture<Void> sendFile(String filename, IComponentIdentifier cid);
 
 	/**
 	 *  Send a file to the target component via bytes.
@@ -97,17 +105,17 @@ public interface IChatGuiService
 	 *  @param id	The transfer id. 
 	 *  @param filename	The location of the file (possibly changed by user). 
 	 */
-	public IFuture<Void>	acceptFile(String id, String filename);
+	public IFuture<Void> acceptFile(String id, String filename);
 	
 	/**
 	 *  Reject a waiting file transfer.
-	 *  @param id	The transfer id. 
+	 *  @param id The transfer id. 
 	 */
-	public IFuture<Void>	rejectFile(String id);
+	public IFuture<Void> rejectFile(String id);
 	
 	/**
 	 *  Cancel an ongoing file transfer.
-	 *  @param id	The transfer id. 
+	 *  @param id The transfer id. 
 	 */
-	public IFuture<Void>	cancelTransfer(String id);
+	public IFuture<Void> cancelTransfer(String id);
 }
