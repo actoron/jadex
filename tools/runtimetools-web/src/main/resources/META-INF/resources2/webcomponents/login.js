@@ -29,7 +29,7 @@ export class LoginElement extends BaseElement
 	{
 		let pass = localStorage.getItem("platformpassword")
 		console.log("session store pass " + pass);
-		if (pass)
+		if(pass)
 			this.login(pass);
 	}
 	
@@ -39,7 +39,7 @@ export class LoginElement extends BaseElement
 		let self = this;
 		//console.log("connnnn----")
 		
-		// turn on to cintinuously check if we are stll logged in
+		// turn on to continuously check if we are still logged in
 		//this.checkLoggedIn();
 		
 		/*super.init().then(()=>
@@ -113,9 +113,11 @@ export class LoginElement extends BaseElement
 			//self.loggedin = true;
 			self.app.login.setLogin(true);
 			
-			if (typeof(Storage) !== undefined) {
+			if(typeof(Storage) !== undefined) 
+			{
 				let checkbox = self.shadowRoot.getElementById("rememberpassword");
-				if (checkbox.checked) {
+				if(checkbox.checked) 
+				{
 					localStorage.setItem("platformpassword", pass);
 					checkbox.checked = false
 				}

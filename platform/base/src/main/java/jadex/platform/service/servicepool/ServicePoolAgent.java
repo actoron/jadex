@@ -53,6 +53,7 @@ public class ServicePoolAgent implements IServicePoolService
 	/** The registered service types. */
 	protected Map<Class<?>, ServiceHandler> servicetypes;
 	
+	/** This is the scope for the meta pool service. */
 	@AgentArgument
 	protected ServiceScope	scope;
 	
@@ -73,7 +74,7 @@ public class ServicePoolAgent implements IServicePoolService
 		{
 			CounterResultListener<Void> lis = new CounterResultListener<Void>(((PoolServiceInfo[])psis).length + 1, true, new DelegationResultListener<Void>(ret));
 			
-			// Add pool service
+			// Add meta pool service
 			ProvidedServiceInfo	info	= new ProvidedServiceInfo(null, IServicePoolService.class, null, scope, null, null,
 				// Publish unrestricted when global.
 				ServiceScope.GLOBAL.equals(scope) ? Collections.singletonList(new UnparsedExpression(Security.UNRESTRICTED, "true")): null);

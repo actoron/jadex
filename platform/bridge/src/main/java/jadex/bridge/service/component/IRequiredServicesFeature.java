@@ -151,4 +151,11 @@ public interface IRequiredServicesFeature extends IExternalRequiredServicesFeatu
 	 */
 	public IService getServiceProxy(IServiceIdentifier sid, RequiredServiceInfo info);
 	
+	/**
+	 *  Get a service query for a required service info (as defined in the agent under that name).
+	 *  @param name The name.
+	 *  @return The service query.
+	 */
+	public ServiceQuery<?> getServiceQuery(String name);
+	
 }

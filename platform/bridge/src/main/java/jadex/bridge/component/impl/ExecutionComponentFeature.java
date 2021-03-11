@@ -2295,6 +2295,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public <T> void addSimulationBlocker(IFuture<T> remotefuture)
 	{
+		//Thread.dumpStack();
+		
 		if (SSimulation.isSimulating(component))
 		{
 			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since

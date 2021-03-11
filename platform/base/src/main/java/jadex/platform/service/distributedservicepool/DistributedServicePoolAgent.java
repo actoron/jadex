@@ -11,8 +11,6 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.servicepool.IServicePoolService;
-import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -31,7 +29,6 @@ import jadex.micro.annotation.ProvidedServices;
  *  just the next worker will be used. (Second-chance clock-page verfahren) 
  *
  */
-
 @Agent//(autoprovide = Boolean3.TRUE)
 @ProvidedServices(@ProvidedService(type=IDistributedServicePoolService.class, scope=ServiceScope.GLOBAL))
 @Service
@@ -39,7 +36,8 @@ import jadex.micro.annotation.ProvidedServices;
 {
 	@Argument(name="serviceinfo", clazz=ServiceQuery.class, description="The service pool info."),
 	@Argument(name="publishinfo", clazz=PublishInfo.class, description="The info for service publication as e.g. rest."),
-	@Argument(name="scope", clazz=ServiceScope.class, description="The publication scope.")
+	@Argument(name="scope", clazz=ServiceScope.class, description="The publication scope."),
+	@Argument(name="checkdelay", defaultvalue="60000l", clazz=long.class, description="Delay between rechecking if a service is valid again after having failed and excluded")
 })
 public class DistributedServicePoolAgent implements IDistributedServicePoolService
 {
@@ -72,9 +70,14 @@ public class DistributedServicePoolAgent implements IDistributedServicePoolServi
 		{
 			addServiceType(query, pi, scope).delegate(ret);
 
+			//IIntermediateFuture<IService> fut = (IIntermediateFuture)agent.searchServices(query);
+			
 			ISubscriptionIntermediateFuture<ServiceEvent> fut = (ISubscriptionIntermediateFuture)agent.addQuery(query);
 				fut.next(event ->
 			{
+				//if(!((IService)event).getServiceId().getProviderId().equals(agent.getId()))
+				//	handler.addService((IService)event);
+				
 				//System.out.println("event: "+event);
 				if(event.getType()==ServiceEvent.SERVICE_ADDED)
 				{

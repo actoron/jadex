@@ -15,7 +15,7 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
 /**
- * 
+ *  Agent has methods withd different return futures and uses setMaxResultCount().
  */
 @Agent
 @Service

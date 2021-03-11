@@ -150,7 +150,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 			
 			public void exceptionOccurred(Exception exception)
 			{
-//				System.out.println("tests failed: "+agent.getComponentIdentifier());
+				System.out.println("tests failed: "+agent.getId());
 				
 				exception.printStackTrace();
 				

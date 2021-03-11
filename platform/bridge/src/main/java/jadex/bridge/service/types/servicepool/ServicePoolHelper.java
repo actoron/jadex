@@ -24,7 +24,10 @@ public class ServicePoolHelper
 		IServiceIdentifier sid = service.getServiceId();
 		ia.searchService(new ServiceQuery<IServicePoolService>(IServicePoolService.class).setProvider(sid.getProviderId()).setScope(ServiceScope.GLOBAL))
 			.then(ps -> ps.getFreeCapacity(sid.getServiceType().getType(ia.getClassLoader())).delegate(ret))
-			.catchEx(ex -> { ex.printStackTrace(); ret.setResult(-1); });
+			.catchEx(ex -> { 
+				//ex.printStackTrace(); 
+				ret.setResult(-1); 
+			});
 		return ret;
 	}
 	
@@ -39,7 +42,10 @@ public class ServicePoolHelper
 		IServiceIdentifier sid = service.getServiceId();
 		ia.searchService(new ServiceQuery<IServicePoolService>(IServicePoolService.class).setProvider(sid.getProviderId()))
 			.then(ps -> ps.getMaxCapacity(sid.getServiceType().getType(ia.getClassLoader())).delegate(ret))
-			.catchEx(ex -> { ex.printStackTrace(); ret.setResult(-1); });
+			.catchEx(ex -> { 
+				//ex.printStackTrace(); 
+				ret.setResult(-1); 
+			});
 		return ret;
 	}
 	

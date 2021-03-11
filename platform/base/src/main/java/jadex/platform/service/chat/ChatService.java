@@ -8,14 +8,13 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
@@ -34,6 +33,7 @@ import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
@@ -59,8 +59,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -95,14 +93,17 @@ public class ChatService implements IChatService, IChatGuiService
 	protected String status;
 	
 	/** The currently managed file transfers. */
-	protected Map<String, Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>>	transfers;
-	protected Map<String, Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>>	transfers2;
+	protected Map<String, Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>> transfers;
+	protected Map<String, Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>> transfers2;
 	
 	/** Flag to avoid duplicate initialization/shutdown due to duplicate use of implementation. */
-	protected boolean	running;
+	protected boolean running;
 	
 	/** The image. */
 	protected byte[] image;
+	
+	/** The chatservices. */
+	protected Set<IChatService> chatservices;
 	
 	//-------- initialization methods --------
 	
@@ -119,6 +120,7 @@ public class ChatService implements IChatService, IChatGuiService
 		{
 			running	= true;
 			status	= STATE_AWAY;	// Changes to idle only when a gui is connected.
+			chatservices = new HashSet<IChatService>();
 			
 			final PropProvider pp = new PropProvider();
 			agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, ServiceScope.PLATFORM))
@@ -159,12 +161,12 @@ public class ChatService implements IChatService, IChatGuiService
 				public void proceed()
 				{
 					if(nick==null)
-						nick	= SUtil.createPlainRandomId("user", 3);
-					transfers	= new LinkedHashMap<String, Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>>();
-					transfers2	= new LinkedHashMap<String, Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>>();
+						nick = SUtil.createPlainRandomId("user", 3);
+					transfers = new LinkedHashMap<String, Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>>();
+					transfers2 = new LinkedHashMap<String, Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>>();
 					
 					// Search and post status in background for not delaying platform startup.
-					IIntermediateFuture<IChatService>	chatfut	= agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
+					/*IIntermediateFuture<IChatService> chatfut = agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
 					chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
 					{
 						public void intermediateResultAvailable(IChatService chat)
@@ -179,7 +181,23 @@ public class ChatService implements IChatService, IChatGuiService
 						{
 							// ignore...
 						}
-					});
+					});*/
+					
+					ISubscriptionIntermediateFuture<ServiceEvent<IChatService>> fut = (ISubscriptionIntermediateFuture)agent.addQuery(agent.getServiceQuery("chatservices").setEventMode());
+					fut.next(event ->
+					{
+						if(event.getType()==ServiceEvent.SERVICE_ADDED)
+						{
+							event.getService().status(nick, STATE_IDLE, null);
+							chatservices.add(event.getService());
+							publishEvent(ChatEvent.TYPE_USER, nick, agent.getId(), event, false, null);
+						}
+						else if(event.getType()==ServiceEvent.SERVICE_REMOVED)
+						{
+							chatservices.remove(event.getService());
+							publishEvent(ChatEvent.TYPE_USER, nick, agent.getId(), event, false, null);
+						}
+					}).catchEx(ex -> ex.printStackTrace());
 					
 					ret.setResult(null);
 				}
@@ -218,8 +236,8 @@ public class ChatService implements IChatService, IChatGuiService
 			}
 			
 //			agent.getLogger().severe("shutdown1 publish state dead: "+agent);
-			final Future<Void> done	= new Future<Void>();
-			IIntermediateFuture<IChatService>	chatfut	= agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
+			//final Future<Void> done	= new Future<Void>();
+			/*IIntermediateFuture<IChatService>	chatfut	= agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
 			chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
 			{
 				public void intermediateResultAvailable(IChatService chat)
@@ -236,7 +254,11 @@ public class ChatService implements IChatService, IChatGuiService
 //					agent.getLogger().severe("shutdown1b publish state dead: "+agent+"\n"+SUtil.getExceptionStacktrace(exception));
 					done.setResultIfUndone(null);
 				}
-			});
+			});*/
+			for(IChatService chat: chatservices)
+			{
+				chat.status(nick, STATE_DEAD, null);
+			}
 			
 			agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, ServiceScope.PLATFORM))
 				.addResultListener(new IResultListener<ISettingsService>()
@@ -271,9 +293,10 @@ public class ChatService implements IChatService, IChatGuiService
 				
 				public void proceed()
 				{
+					ret.setResult(null);
 					// Only wait 2 secs for sending status before terminating the agent.
 					// Hack!!! clock service / timeout result listener unreliable during shutdown.
-					Timer	timer	= new Timer(true);
+					/*Timer	timer	= new Timer(true);
 					timer.schedule(new TimerTask()
 					{
 						@Override
@@ -282,7 +305,7 @@ public class ChatService implements IChatService, IChatGuiService
 							done.setResultIfUndone(null);
 						}
 					}, 2000);
-					done.addResultListener(new DelegationResultListener<Void>(ret));
+					done.addResultListener(new DelegationResultListener<Void>(ret));*/
 					
 //					// TODO: TimeoutResultListener unreliable during platform shutdown
 //					done.addResultListener(new TimeoutResultListener<Void>(2000, agent.getExternalAccess(),
@@ -304,7 +327,7 @@ public class ChatService implements IChatService, IChatGuiService
 	/**
 	 *  Get the "semi-qualified" sub name for settings.
 	 */
-	protected String	getSubname()
+	protected String getSubname()
 	{
 		String	subname	= null;
 		IComponentIdentifier	cid	= agent.getId();
@@ -322,7 +345,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 *  Post a message
 	 *  @param text The text message.
 	 */
-	public IFuture<Void>	message(String nick, String text, boolean privatemessage)
+	public IFuture<Void> message(String nick, String text, boolean privatemessage)
 	{
 //		System.out.println("Timeout: "+ServiceCall.getInstance().getTimeout()+", "+ServiceCall.getInstance().isRealtime());
 		boolean	published	= publishEvent(ChatEvent.TYPE_MESSAGE, nick, ServiceCall.getCurrentInvocation().getCaller(), text, privatemessage, null);
@@ -333,7 +356,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 *  Post a status change.
 	 *  @param status The new status.
 	 */
-	public IFuture<Void>	status(String nick, String status, byte[] image)
+	public IFuture<Void> status(String nick, String status, byte[] image)
 	{
 		publishEvent(ChatEvent.TYPE_STATECHANGE, nick, ServiceCall.getCurrentInvocation().getCaller(), status, false, image);
 		return IFuture.DONE;
@@ -342,7 +365,7 @@ public class ChatService implements IChatService, IChatGuiService
 	/**
 	 *  Get the current status.
 	 */
-	public IFuture<String>	getStatus()
+	public IFuture<String> getStatus()
 	{
 		return new Future<String>(status);
 	}
@@ -424,7 +447,7 @@ public class ChatService implements IChatService, IChatGuiService
 	/**
 	 *  Set the user name.
 	 */
-	public IFuture<Void>	setNickName(String nick)
+	public IFuture<Void> setNickName(String nick)
 	{
 		this.nick	= nick;
 		// Publish new nickname
@@ -435,7 +458,7 @@ public class ChatService implements IChatService, IChatGuiService
 	/**
 	 *  Get the user name.
 	 */
-	public IFuture<String>	getNickName()
+	public IFuture<String> getNickName()
 	{
 		return new Future<String>(nick);
 	}
@@ -443,7 +466,7 @@ public class ChatService implements IChatService, IChatGuiService
 	/**
 	 *  Set the image.
 	 */
-	public IFuture<Void>	setImage(byte[] image)
+	public IFuture<Void> setImage(byte[] image)
 	{
 		this.image = image;
 		// Publish new image
@@ -454,7 +477,7 @@ public class ChatService implements IChatService, IChatGuiService
 	/**
 	 *  Get the image.
 	 */
-	public IFuture<byte[]>	getImage()
+	public IFuture<byte[]> getImage()
 	{
 		return new Future<byte[]>(image);
 	}
@@ -463,7 +486,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 *  Subscribe to events from the chat service.
 	 *  @return A future publishing chat events as intermediate results.
 	 */
-	public ISubscriptionIntermediateFuture<ChatEvent>	subscribeToEvents()
+	public ISubscriptionIntermediateFuture<ChatEvent> subscribeToEvents()
 	{
 //		final SubscriptionIntermediateFuture<ChatEvent>	ret	= new SubscriptionIntermediateFuture<ChatEvent>();
 		final SubscriptionIntermediateFuture<ChatEvent>	ret	= (SubscriptionIntermediateFuture<ChatEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
@@ -487,7 +510,7 @@ public class ChatService implements IChatService, IChatGuiService
 	/**
 	 *  Search for available chat services.
 	 *  @return The currently available remote services.
-	 */
+	 * /
 	public IIntermediateFuture<IChatService> findUsers()
 	{
 		IIntermediateFuture<IChatService> ret = agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
@@ -499,7 +522,7 @@ public class ChatService implements IChatService, IChatGuiService
 //			}
 //		});
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Post a message.
@@ -579,46 +602,27 @@ public class ChatService implements IChatService, IChatGuiService
 		}
 		else //if(receivers.length==0)
 		{
-			final IIntermediateFuture<IChatService> ifut = agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
-			
-			ifut.addResultListener(new IntermediateDelegationResultListener<IChatService>(ret)
+			int[] cnt = new int[1];
+			cnt[0] = chatservices.size();
+			for(IChatService chat: chatservices)
 			{
-				boolean	finished;
-				int cnt;
-				public void customIntermediateResultAvailable(final IChatService chat)
+				chat.message(nick, text, false).addResultListener(new IResultListener<Void>()
 				{
-					cnt++;
-					chat.message(nick, text, false).addResultListener(new IResultListener<Void>()
+					public void resultAvailable(Void result)
 					{
-						public void resultAvailable(Void result)
-						{
-							ret.addIntermediateResultIfUndone(chat);	// Might be called after concurrent exception in service search!
-							
-							if(--cnt==0 && finished)
-							{
-								ret.setFinished();
-							}
-						}
+						ret.addIntermediateResultIfUndone(chat);	// Might be called after concurrent exception in service search!
 						
-						public void exceptionOccurred(Exception exception)
-						{
-							if(--cnt==0 && finished)
-							{
-								ret.setFinished();
-							}
-						}
-					});
-				}
-				
-				public void finished()
-				{
-					finished	= true;
-					if(finished && cnt==0)
-					{
-						ret.setFinished();
+						if(--cnt[0]==0)
+							ret.setFinished();
 					}
-				}
-			});
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						if(--cnt[0]==0)
+							ret.setFinished();
+					}
+				});
+			}
 		}
 		
 		return ret;
@@ -657,11 +661,9 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	public IIntermediateFuture<IChatService> status(final String status, final byte[] image, IComponentIdentifier[] receivers)
 	{
-		final IntermediateFuture<IChatService>	ret	= new IntermediateFuture<IChatService>();
+		final IntermediateFuture<IChatService> ret = new IntermediateFuture<IChatService>();
 		if(status!=null)
-		{
 			this.status	= status;
-		}
 		
 		if(receivers!=null && receivers.length>0)
 		{
@@ -727,44 +729,27 @@ public class ChatService implements IChatService, IChatGuiService
 		}
 		else //if(receivers.length==0)
 		{
-			final IIntermediateFuture<IChatService> ifut = agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
-			ifut.addResultListener(new IntermediateDelegationResultListener<IChatService>(ret)
+			int[] cnt = new int[1];
+			cnt[0] = chatservices.size();
+			for(IChatService chat: chatservices)
 			{
-				boolean	finished;
-				int cnt	= 0;
-				public void customIntermediateResultAvailable(final IChatService chat)
+				chat.status(nick, status, image).addResultListener(new IResultListener<Void>()
 				{
-					cnt++;
-					chat.status(nick, status, image).addResultListener(new IResultListener<Void>()
+					public void resultAvailable(Void result)
 					{
-						public void resultAvailable(Void result)
-						{
-							ret.addIntermediateResultIfUndone(chat);	// Might be called after concurrent exception in service search!
-							
-							if(--cnt==0 && finished)
-							{
-								ret.setFinishedIfUndone();
-							}
-						}
+						ret.addIntermediateResultIfUndone(chat);	// Might be called after concurrent exception in service search!
 						
-						public void exceptionOccurred(Exception exception)
-						{
-							if(--cnt==0 && finished)
-							{
-								ret.setFinishedIfUndone();
-							}
-						}
-					});
-				}
-				public void finished()
-				{
-					finished	= true;
-					if(finished && cnt==0)
-					{
-						ret.setFinishedIfUndone();
+						if(--cnt[0]==0)
+							ret.setFinishedIfUndone();
 					}
-				}
-			});
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						if(--cnt[0]==0)
+							ret.setFinishedIfUndone();
+					}
+				});
+			}
 		}
 		
 		return ret;
@@ -1199,17 +1184,12 @@ public class ChatService implements IChatService, IChatGuiService
 	 *  @param cid	The component ID.
 	 *  @param value The event value.
 	 */
-	protected boolean	publishEvent(String type, String nick, IComponentIdentifier cid, Object value, boolean privatemessage, byte[] image)
+	protected boolean publishEvent(String type, String nick, IComponentIdentifier cid, Object value, boolean privatemessage, byte[] image)
 	{
-//		if(cid==null)
-//		{
-//			Thread.dumpStack();
-//		}
-//		
 		boolean	ret	= false;
 		if(subscribers!=null && cid!=null)	// Hack!!! why is cid null?
 		{
-			ChatEvent	ce	= new ChatEvent(type, nick, cid, value, privatemessage, image);
+			ChatEvent ce = new ChatEvent(type, nick, cid, value, privatemessage, image);
 			for(Iterator<SubscriptionIntermediateFuture<ChatEvent>> it=subscribers.iterator(); it.hasNext(); )
 			{
 				if(it.next().addIntermediateResultIfUndone(ce))
@@ -1223,9 +1203,7 @@ public class ChatService implements IChatService, IChatGuiService
 			}
 			
 			if(subscribers.isEmpty())
-			{
 				subscribers	= null;
-			}
 		}
 		return ret;
 	}
@@ -1554,6 +1532,15 @@ public class ChatService implements IChatService, IChatGuiService
 			}
 			return new Future<Properties>(props);
 		}
+	}
+	
+	/**
+	 *  Get available chat users.
+	 *  @return The currently available remote services.
+	 */
+	public IFuture<Collection<IChatService>> getUsers()
+	{
+		return new Future<Collection<IChatService>>(chatservices);
 	}
 	
 }

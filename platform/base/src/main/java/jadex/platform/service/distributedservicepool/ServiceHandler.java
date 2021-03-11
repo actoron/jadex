@@ -72,7 +72,8 @@ public class ServiceHandler implements InvocationHandler
 		this.activeservices = new LinkedHashMap<IService, Integer>();
 		this.queue = new LinkedList<CallInfo>();
 		this.start = 0;
-		this.checker = new Checker();
+		long delay = (long)component.getArguments().get("checkdelay");
+		this.checker = new Checker(delay);
 	}
 	
 	//-------- methods --------
@@ -82,6 +83,8 @@ public class ServiceHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable
 	{
+		//System.out.println("invoke: "+method);
+		
 //		if(ServiceCall.getCurrentInvocation()==null)
 //			System.out.println("null");
 //		else
@@ -115,6 +118,8 @@ public class ServiceHandler implements InvocationHandler
 	 */
 	protected void processQueue(String id)
 	{
+		//System.out.println("procQueue: "+id+" "+queue.size());
+		
 		if(id==null)
 			id = SUtil.createUniqueId();
 		if(procid==null)
@@ -159,6 +164,8 @@ public class ServiceHandler implements InvocationHandler
 	{
 		Future<IService> ret = new Future<>();
 		
+		//System.out.println("getNextService: "+activeservices+" "+checker.services);
+		
 		// has services
 		if(activeservices.size()>0)
 		{
@@ -166,7 +173,7 @@ public class ServiceHandler implements InvocationHandler
 			findFreeService(new ArrayList<IService>(activeservices.keySet()), start, 0)
 				.then(tup -> 
 			{
-				System.out.println("Found service: "+start+" "+tup.getSecondEntity()+" "+tup.getFirstEntity());
+				//System.out.println("Found service: "+start+" "+tup.getSecondEntity()+" "+tup.getFirstEntity());
 				start = tup.getSecondEntity();
 				ret.setResult(tup.getFirstEntity());
 			})
@@ -188,6 +195,8 @@ public class ServiceHandler implements InvocationHandler
 	{
 		assert component.getFeature(IExecutionFeature.class).isComponentThread();
 				
+		//System.out.println("invokeService");
+		
 		ServiceCall call = callinfo.getCall();
 		Method method = callinfo.getMethod();
 		Future<Object> ret = callinfo.getRet();
@@ -275,6 +284,8 @@ public class ServiceHandler implements InvocationHandler
 			ret = true;
 		}
 		
+		//System.out.println("Worker error? "+ret+" "+ex);
+		
 		return ret;
 	}
 	
@@ -298,11 +309,13 @@ public class ServiceHandler implements InvocationHandler
 			int cnt = activeservices.get(service);
 			if(cnt++>=maxfails)
 			{
+				System.out.println("Worker deactivated: "+service);
 				ret = true;
 			}
 			else
 			{
-				activeservices.put(service, Integer.valueOf(cnt+1));
+				System.out.println("Worker fail count: "+cnt);
+				activeservices.put(service, cnt);
 			}
 		}
 		return ret;
@@ -318,6 +331,8 @@ public class ServiceHandler implements InvocationHandler
 	 */
 	protected IFuture<Tuple2<IService, Integer>> findFreeService(List<IService> services, int pos, int tried)
 	{
+		//System.out.println("findFreeService");
+		
 		Future<Tuple2<IService, Integer>> ret = new Future<>();
 		boolean takeany = false;
 		
@@ -337,7 +352,7 @@ public class ServiceHandler implements InvocationHandler
 			int fpos = pos;
 			ServicePoolHelper.getFreeCapacity(component, (IService)service).then(cap ->
 			{
-				System.out.println("capa: "+cap+" "+service);
+				System.out.println("capacity of worker: "+cap+" "+service);
 				if(cap>0)
 				{
 					ret.setResult(new Tuple2<IService, Integer>(service, fpos+1));
@@ -408,8 +423,8 @@ public class ServiceHandler implements InvocationHandler
 		 */
 		public Checker()
 		{
-			//this(5*1000); // default one minute
-			this(60*1000); // default one minute
+			this(5*1000); // default one minute
+			//this(60*1000); // default one minute
 		}
 		
 		/**
@@ -417,6 +432,7 @@ public class ServiceHandler implements InvocationHandler
 		 */
 		public Checker(long delay)
 		{
+			//System.out.println("checker with delay: "+delay);
 			this.delay = delay;
 			this.services = new HashMap<IService, Tuple2<Integer,Long>>();
 		}
@@ -427,6 +443,8 @@ public class ServiceHandler implements InvocationHandler
 		 */
 		public void checkServices(CallInfo call)
 		{
+			//System.out.println("checkServices: "+call);
+			
 			for(IService service: services.keySet())
 			{
 				checkService(service, call);
@@ -438,6 +456,8 @@ public class ServiceHandler implements InvocationHandler
 		 */
 		public void checkService(IService service, CallInfo call)
 		{
+			//System.out.println("checkService: "+service);
+			
 			Tuple2<Integer, Long> info = services.get(service);
 			
 			long now = System.currentTimeMillis();
@@ -450,7 +470,7 @@ public class ServiceHandler implements InvocationHandler
 					service.isValid().then(v -> 
 					{
 						services.put(service, new Tuple2<Integer, Long>(cnt+1, now));
-						//System.out.println("valid: "+service);
+						//System.out.println("valid: "+service+" "+(cnt+1));
 					})
 					.catchEx(ex ->
 					{
@@ -460,6 +480,7 @@ public class ServiceHandler implements InvocationHandler
 				}
 				else
 				{
+					System.out.println("reactivating service: "+service);
 					services.remove(service);
 					// reactivate but immediate deactivate when next call fails
 					activeservices.put(service, maxfails-1);

@@ -19,6 +19,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Inet4Address;
@@ -38,6 +39,7 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.Provider;
@@ -1799,21 +1801,19 @@ public class SUtil
 	/**
 	 *  Collect all URLs belonging to a class loader.
 	 */
-	protected static void	collectClasspathURLs(ClassLoader classloader, Set<URL> set, Set<String> jarnames)
+	protected static void collectClasspathURLs(ClassLoader classloader, Set<URL> set, Set<String> jarnames)
 	{
 		assert classloader!=null;
 		
 		if(classloader.getParent()!=null)
-		{
 			collectClasspathURLs(classloader.getParent(), set, jarnames);
-		}
 		
 		if(classloader instanceof URLClassLoader)
 		{
 			URL[] urls = ((URLClassLoader)classloader).getURLs();
 			for(int i=0; i<urls.length; i++)
 			{
-				String	name	= SUtil.getFile(urls[i]).getName();
+				String name = SUtil.getFile(urls[i]).getName();
 				if(name.endsWith(".jar"))
 				{
 					String jarname	= getJarName(name);
@@ -1827,41 +1827,58 @@ public class SUtil
 				collectManifestURLs(urls[i], set, jarnames);
 			}
 		}
-		
-//		else
-//		{
-//			try
-//			{
-//				// Hack for java 9 -> Doesn't work -> not accessible :(
-//				Field	ucpf	= SReflect.getField(classloader.getClass(), "ucp");
-//				ucpf.setAccessible(true);
-//				Object	ucp	=	ucpf.get(classloader);
-//				Field	pathf	= SReflect.getField(ucp.getClass(), "path");
-//				pathf.setAccessible(true);
-//				@SuppressWarnings("unchecked")
-//				List<File>	path	= (List<File>)pathf.get(ucp);
-//				for(File f: path)
-//				{
-//					String	name	= f.getName();
-//					if(name.endsWith(".jar"))
-//					{
-//						String jarname	= getJarName(name);
-//						jarnames.add(jarname);
-//					}
-//				}
-//				
-//				for(File f: path)
-//				{
-//					set.add(f.toURI().toURL());
-//					collectManifestURLs(f.toURI().toURL(), set, jarnames);
-//				}
-//
-//			}
-//			catch(Throwable t)
-//			{
-//				t.printStackTrace();
-//			}
-//		}
+		else if(ClassLoader.getSystemClassLoader().equals(classloader))
+		{
+			String classpath = System.getProperty("java.class.path");
+			String[] entries = classpath.split(File.pathSeparator);
+			for(int i = 0; i < entries.length; i++) 
+			{
+				try
+				{
+					URL url = Paths.get(entries[i]).toAbsolutePath().toUri().toURL();
+					set.add(url);
+				}
+				catch(MalformedURLException e)
+				{
+					System.out.println("url problem: "+entries[i]);
+				}
+			}
+			//System.out.println("found for system classloader: "+set);
+		}
+		/*else
+		{
+			try
+			{
+				// Hack for java 9 -> Doesn't work -> not accessible :(
+				Field ucpf = SReflect.getField(classloader.getClass(), "ucp");
+				ucpf.setAccessible(true);
+				Object ucp = ucpf.get(classloader);
+				Field pathf = SReflect.getField(ucp.getClass(), "path");
+				pathf.setAccessible(true);
+				@SuppressWarnings("unchecked")
+				List<File>	path	= (List<File>)pathf.get(ucp);
+				for(File f: path)
+				{
+					String name = f.getName();
+					if(name.endsWith(".jar"))
+					{
+						String jarname	= getJarName(name);
+						jarnames.add(jarname);
+					}
+				}
+				
+				for(File f: path)
+				{
+					set.add(f.toURI().toURL());
+					collectManifestURLs(f.toURI().toURL(), set, jarnames);
+				}
+
+			}
+			catch(Throwable t)
+			{
+				t.printStackTrace();
+			}
+		}*/
 	}
 	
 	/**
