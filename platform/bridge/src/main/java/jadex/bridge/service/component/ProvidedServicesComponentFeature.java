@@ -166,9 +166,9 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			{
 				scope = (ServiceScope)SJavaParser.getParsedValue(info.getScopeExpression(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
 				info	= new ProvidedServiceInfo(info.getName(), info.getType(), info.getImplementation(), scope, info.getScopeExpression(), info.getPublish(), info.getProperties(), info.isSystemService());
-				System.out.println("expression scope '"
-					+ (info.getScopeExpression()!=null ? info.getScopeExpression().getValue() : "")
-					+ "': "+scope);
+//				System.out.println("expression scope '"
+//					+ (info.getScopeExpression()!=null ? info.getScopeExpression().getValue() : "")
+//					+ "': "+scope);
 			}
 				
 			final Future<Void> fut = new Future<>();
