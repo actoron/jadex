@@ -24,6 +24,7 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -41,8 +42,9 @@ import jadex.micro.annotation.ProvidedServices;
 	@Argument(name="serviceinfos", clazz=PoolServiceInfo[].class, description="The array of service pool infos."),
 	@Argument(name="scope", clazz=ServiceScope.class, description="The provided scope for the meta pool service.")
 })
+@Imports("jadex.bridge.service.annotation.Security")
 @ProvidedServices(@ProvidedService(type=IServicePoolService.class, scope=ServiceScope.EXPRESSION, scopeexpression="$args.scope",
-	security=@Security(roles= "{%$args.scope.isGlobal() ? Security.UNRESTRICTED : Security.TRUSTED}")))
+	security=@Security(roles= "%{$args.scope.isGlobal() ? Security.UNRESTRICTED : Security.TRUSTED}")))
 public class ServicePoolAgent implements IServicePoolService
 {
 	//-------- attributes --------

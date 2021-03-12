@@ -628,7 +628,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	public static IServiceIdentifier createServiceIdentifier(IInternalAccess provider, String servicename, 
 		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, ProvidedServiceInfo info)
 	{
-//		if(servicetype.getName().indexOf("ISuperpeerService")!=-1)
+//		if(servicetype.getName().indexOf("IServicePool")!=-1)
 //			System.out.println("sdjhvkl");
 		Security	security	= getSecurityLevel(provider, info, serviceimpl, servicetype, null, null);
 		Set<String>	roles	= ServiceIdentifier.getRoles(security, provider);
