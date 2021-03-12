@@ -62,7 +62,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.impl.remotecommands.RemoteMethodInvocationCommand;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
@@ -564,7 +564,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					ServiceCall.getOrCreateNextInvocation().setProperty("callid", fcallid);
 	
 					// Check security
-					RemoteMethodInvocationCommand.isUnrestricted(service.getServiceId(), component, new MethodInfo(mi.getMethod()))
+					BasicService.isUnrestricted(service.getServiceId(), component, mi.getMethod())
 					.then((Boolean unres) ->
 					{
 						try

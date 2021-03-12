@@ -122,7 +122,7 @@ public class SRemoteGui
 							sis[i] = service.getServiceId();
 							pis[i]	= new ProvidedServiceInfo(service.getServiceId().getServiceName(), 
 //								service.getId().getServiceType(), null, null);
-								sis[i].getServiceType().getType(ia.getClassLoader(), ia.getModel().getAllImports()), null, sis[i].getScope(), null, null, null);
+								sis[i].getServiceType().getType(ia.getClassLoader(), ia.getModel().getAllImports()), null, sis[i].getScope(), null, null, null, null);
 						}
 						
 						ret.setResult(new Object[]{pis, ris, sis});

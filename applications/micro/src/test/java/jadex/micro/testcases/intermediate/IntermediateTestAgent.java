@@ -21,7 +21,6 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.simulation.SSimulation;
-import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -122,7 +121,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 	 */
 	protected IFuture<TestReport> testLocal(int testno, long delay, int max)
 	{
-		return performTest(agent.getId().getRoot(), testno, delay, max);
+		return performTest(agent.getId().getRoot(), null, testno, delay, max);
 	}
 	
 	/**
@@ -160,7 +159,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 					{
 						public void customResultAvailable(Void result)
 						{
-							performTest(platform.getId(), testno, delay, max)
+							performTest(platform.getId(), platform, testno, delay, max)
 							.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 						{
 							public void customResultAvailable(final TestReport result)
@@ -188,7 +187,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 	 *  - invoke the service
 	 *  - wait with intermediate listener for results 
 	 */
-	protected IFuture<TestReport> performTest(final IComponentIdentifier root, final int testno, final long delay, final int max)
+	protected IFuture<TestReport> performTest(final IComponentIdentifier root, IExternalAccess platform, final int testno, final long delay, final int max)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 
@@ -210,7 +209,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 //				System.out.println("Using rid: "+rid);
 		final boolean	local	= root.equals(agent.getId().getRoot());
 		CreationInfo	ci	= new CreationInfo(rid);
-		agent.getExternalAccess(local ? agent.getId() : root).createComponent(ci.setFilename("jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class"))
+		(local ? agent.getExternalAccess() : platform).createComponent(ci.setFilename("jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class"))
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)

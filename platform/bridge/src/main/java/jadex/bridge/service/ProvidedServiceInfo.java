@@ -4,6 +4,7 @@ import java.util.List;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.annotation.Security;
 import jadex.commons.SReflect;
 
 
@@ -35,6 +36,9 @@ public class ProvidedServiceInfo
 	/** The scope expression (if any). */
 	protected UnparsedExpression scopeexpression;
 	
+	/** The security settings (empty roles if unset). */
+	protected Security security;
+	
 	/** The service properties. */
 	protected List<UnparsedExpression> properties;
 	
@@ -56,7 +60,7 @@ public class ProvidedServiceInfo
 	 */
 	public ProvidedServiceInfo(String name, ClassInfo type, ProvidedServiceImplementation implementation)
 	{
-		this(name, type, implementation, null, null, null, null, false);
+		this(name, type, implementation, null, null, null, null, null, false);
 	}
 	
 	/**
@@ -64,21 +68,21 @@ public class ProvidedServiceInfo
 	 */
 	public ProvidedServiceInfo(String name, Class<?> type, ProvidedServiceImplementation implementation)
 	{
-		this(name, type, implementation, null, null, null, null);
+		this(name, type, implementation, null, null, null, null, null);
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public ProvidedServiceInfo(String name, Class<?> type, ProvidedServiceImplementation implementation, ServiceScope scope, UnparsedExpression scopeexpression, PublishInfo publish, List<UnparsedExpression> properties)
+	public ProvidedServiceInfo(String name, Class<?> type, ProvidedServiceImplementation implementation, ServiceScope scope, UnparsedExpression scopeexpression, Security security, PublishInfo publish, List<UnparsedExpression> properties)
 	{
-		this(name, type!=null? new ClassInfo(SReflect.getClassName(type)): null, implementation, scope, scopeexpression, publish, properties, ServiceIdentifier.isSystemService(type));
+		this(name, type!=null? new ClassInfo(SReflect.getClassName(type)): null, implementation, scope, scopeexpression, security, publish, properties, ServiceIdentifier.isSystemService(type));
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public ProvidedServiceInfo(String name, ClassInfo type, ProvidedServiceImplementation implementation, ServiceScope scope, UnparsedExpression scopeexpression, PublishInfo publish, List<UnparsedExpression> properties, boolean systemservice)
+	public ProvidedServiceInfo(String name, ClassInfo type, ProvidedServiceImplementation implementation, ServiceScope scope, UnparsedExpression scopeexpression, Security security, PublishInfo publish, List<UnparsedExpression> properties, boolean systemservice)
 	{
 		this.name = name;
 		this.implementation = implementation;
@@ -86,6 +90,7 @@ public class ProvidedServiceInfo
 		this.properties = properties;
 		this.scope = scope;
 		this.scopeexpression = scopeexpression;
+		this.security = security;
 		this.systemservice = systemservice;
 		setType(type);
 	}
@@ -222,6 +227,24 @@ public class ProvidedServiceInfo
 	public void setScope(ServiceScope scope)
 	{
 		this.scope = scope;
+	}
+	
+	/**
+	 *  Get the security settings.
+	 *  @return The security settings.
+	 */
+	public Security getSecurity()
+	{
+		return security;
+	}
+
+	/**
+	 *  Set the security settings.
+	 *  @param security The new security settings.
+	 */
+	public void setSecurity(Security security)
+	{
+		this.security = security;
 	}
 	
 	/**

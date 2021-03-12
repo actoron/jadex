@@ -42,8 +42,8 @@ public class VisibilityTestAgent extends JunitAgentTest
 //		Starter.createProxy(agent.getExternalAccess(), plat).get();
 //		Starter.createProxy(plat, agent.getExternalAccess()).get();
 		final IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get();
-		TestAgent.createComponent(agent, FirstAgent.class.getName()+".class", null, null, plat.getId(), null).get();
-		TestAgent.createComponent(agent, SecondAgent.class.getName()+".class", null, null, plat.getId(), null).get();
+		TestAgent.createComponent(agent, FirstAgent.class.getName()+".class", null, null, plat.getId(), plat, null).get();
+		TestAgent.createComponent(agent, SecondAgent.class.getName()+".class", null, null, plat.getId(), plat, null).get();
 		
 		Map<String,Object> args = new HashMap<String, Object>();
 		args.put("selfkill", Boolean.TRUE);

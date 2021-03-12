@@ -1,15 +1,12 @@
 package jadex.platform.service.servicepool;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnInit;
@@ -25,9 +22,11 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Imports;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 
 /**
  *  The service pool agent can be used to handle services in a pooled manner.
@@ -39,9 +38,13 @@ import jadex.micro.annotation.Arguments;
  */
 @Agent
 @Service
-@Arguments(@Argument(name="serviceinfos", clazz=PoolServiceInfo[].class, description="The array of service pool infos."))
-//@ProvidedServices(@ProvidedService(type=IServicePoolService.class))
-//@ProvidedServices(@ProvidedService(type=IServicePoolService.class, scope=ServiceScope.GLOBAL))
+@Arguments({
+	@Argument(name="serviceinfos", clazz=PoolServiceInfo[].class, description="The array of service pool infos."),
+	@Argument(name="scope", clazz=ServiceScope.class, description="The provided scope for the meta pool service.")
+})
+@Imports("jadex.bridge.service.annotation.Security")
+@ProvidedServices(@ProvidedService(type=IServicePoolService.class, scope=ServiceScope.EXPRESSION, scopeexpression="$args.scope",
+	security=@Security(roles= "%{$args.scope.isGlobal() ? Security.UNRESTRICTED : Security.TRUSTED}")))
 public class ServicePoolAgent implements IServicePoolService
 {
 	//-------- attributes --------
@@ -52,10 +55,6 @@ public class ServicePoolAgent implements IServicePoolService
 		
 	/** The registered service types. */
 	protected Map<Class<?>, ServiceHandler> servicetypes;
-	
-	/** This is the scope for the meta pool service. */
-	@AgentArgument
-	protected ServiceScope	scope;
 	
 	//-------- interface methods --------
 	
@@ -72,14 +71,7 @@ public class ServicePoolAgent implements IServicePoolService
 		
 		if(psis instanceof PoolServiceInfo[])
 		{
-			CounterResultListener<Void> lis = new CounterResultListener<Void>(((PoolServiceInfo[])psis).length + 1, true, new DelegationResultListener<Void>(ret));
-			
-			// Add meta pool service
-			ProvidedServiceInfo	info	= new ProvidedServiceInfo(null, IServicePoolService.class, null, scope, null, null,
-				// Publish unrestricted when global.
-				ServiceScope.GLOBAL.equals(scope) ? Collections.singletonList(new UnparsedExpression(Security.UNRESTRICTED, "true")): null);
-			agent.getFeature(IProvidedServicesFeature.class).addService(null, IServicePoolService.class, this, info).addResultListener(lis);
-			
+			CounterResultListener<Void> lis = new CounterResultListener<Void>(((PoolServiceInfo[])psis).length, true, new DelegationResultListener<Void>(ret));			
 			for(PoolServiceInfo psi: (PoolServiceInfo[])psis)
 			{
 				IPoolStrategy str = psi.getPoolStrategy()==null? getDefaultStrategy(): (IPoolStrategy)psi.getPoolStrategy();

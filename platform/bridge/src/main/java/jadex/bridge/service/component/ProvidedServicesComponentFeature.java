@@ -117,6 +117,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 					new ProvidedServiceImplementation(cs[i].getImplementation()), 
 					cs[i].getScope()!=null? cs[i].getScope(): psi.getScope(),
 					cs[i].getScopeExpression()!=null? cs[i].getScopeExpression(): psi.getScopeExpression(),
+					cs[i].getSecurity()!=null? cs[i].getSecurity(): psi.getSecurity(),
 					cs[i].getPublish()!=null? cs[i].getPublish(): psi.getPublish(), 
 					cs[i].getProperties()!=null? cs[i].getProperties() : psi.getProperties());
 				sermap.put(key, newpsi);
@@ -133,6 +134,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 				pinfos[i].getImplementation()!=null? new ProvidedServiceImplementation(pinfos[i].getImplementation()): psi.getImplementation(), 
 				pinfos[i].getScope()!=null? pinfos[i].getScope(): psi.getScope(),
 				pinfos[i].getScopeExpression()!=null? pinfos[i].getScopeExpression(): psi.getScopeExpression(),
+				pinfos[i].getSecurity()!=null? pinfos[i].getSecurity(): psi.getSecurity(),
 				pinfos[i].getPublish()!=null? pinfos[i].getPublish(): psi.getPublish(), 
 				pinfos[i].getProperties()!=null? pinfos[i].getProperties() : psi.getProperties());
 			sermap.put(key, newpsi);
@@ -151,7 +153,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			impl.setValue("$component.getExternalAccess()");
 			// platform external access service will be published network wide, all others only on platform
 			ProvidedServiceInfo psi= new ProvidedServiceInfo("externalaccessservice", IExternalAccess.class, impl, 
-				getComponent().getId().equals(getComponent().getId().getRoot())? ServiceScope.NETWORK: ServiceScope.PLATFORM, null, null, null);
+				getComponent().getId().equals(getComponent().getId().getRoot())? ServiceScope.NETWORK: ServiceScope.PLATFORM, null, null, null, null);
 			sermap.put("externalaccessservice", psi);
 		}
 		
@@ -165,7 +167,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			if(ServiceScope.EXPRESSION.equals(scope))
 			{
 				scope = (ServiceScope)SJavaParser.getParsedValue(info.getScopeExpression(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
-				info	= new ProvidedServiceInfo(info.getName(), info.getType(), info.getImplementation(), scope, info.getScopeExpression(), info.getPublish(), info.getProperties(), info.isSystemService());
+				info	= new ProvidedServiceInfo(info.getName(), info.getType(), info.getImplementation(), scope, info.getScopeExpression(), info.getSecurity(), info.getPublish(), info.getProperties(), info.isSystemService());
 //				System.out.println("expression scope '"
 //					+ (info.getScopeExpression()!=null ? info.getScopeExpression().getValue() : "")
 //					+ "': "+scope);
@@ -1024,7 +1026,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	public IFuture<Void> addService(String name, Class<?> type, Object service, PublishInfo pi, ServiceScope scope)
 	{
-		ProvidedServiceInfo psi = pi!=null || scope!=null ? new ProvidedServiceInfo(null, type, null, scope, null, pi, null): null;
+		ProvidedServiceInfo psi = pi!=null || scope!=null ? new ProvidedServiceInfo(null, type, null, scope, null, null, pi, null): null;
 		return addService(name, type, service, psi);
 	}
 	

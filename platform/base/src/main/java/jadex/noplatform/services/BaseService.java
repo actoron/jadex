@@ -2,7 +2,6 @@ package jadex.noplatform.services;
 
 import java.util.Map;
 
-import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -10,16 +9,12 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.FutureReturnType;
 import jadex.bridge.service.annotation.Raw;
-import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
-import jadex.commons.Tuple2;
-import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.concurrent.JavaThreadPool;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 

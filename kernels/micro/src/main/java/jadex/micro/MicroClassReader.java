@@ -56,6 +56,7 @@ import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.OnStart;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Tag;
 import jadex.bridge.service.annotation.Tags;
@@ -1215,10 +1216,13 @@ public class MicroClassReader
 		UnparsedExpression	scopeexpression	= prov.scopeexpression()!=null && prov.scopeexpression().length()>0
 				? new UnparsedExpression("scopeexpression", ServiceScope.class, prov.scopeexpression(), null) : null;
 
-				NameValue[] props = prov.properties();
+		// Only keep security settings explicitly set in @ProvidedService annotation (default: empty roles)
+		Security	security	= prov.security().roles().length>0 ? prov.security() : null;
+		
+		NameValue[] props = prov.properties();
 		List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(SNameValue.createUnparsedExpressions(props))) : null;
 		
-		ProvidedServiceInfo psi = new ProvidedServiceInfo(prov.name().length()>0? prov.name(): null, prov.type(), impl,  prov.scope(), scopeexpression, pi, serprops);
+		ProvidedServiceInfo psi = new ProvidedServiceInfo(prov.name().length()>0? prov.name(): null, prov.type(), impl,  prov.scope(), scopeexpression, security, pi, serprops);
 		return psi;
 	}
 	

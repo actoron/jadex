@@ -45,10 +45,10 @@ public class AuthenticateTestAgent extends TestAgent
 	// Define expected test results for scenarios (un=unrestricted, cus=custom/role, def=default).
 	protected static boolean[][]	tests	= new boolean[][]
 	{
-		// Annot.:		un		def		cus		cus2	def		cus		un		def
-		new boolean[] {true,	false,	false,	false,	false,	false,	true,	false},
-		new boolean[] {true,	true,	false,	false,	true,	false,	true,	true},
-		new boolean[] {true,	true,	true,	true,	true,	true,	true,	true}
+		// method annos basic: un, def, cus, 	cus2 |	overriding: def, cus, un,	def
+		new boolean[] {true,	false,	false,	false,		false,	false,	true,	false},	// platform 1: shared network=false
+		new boolean[] {true,	true,	false,	false,		true,	false,	true,	true},	// platform 2: net=true, custom role=false
+		new boolean[] {true,	true,	true,	true,		true,	true,	true,	true}	// platform 3: net=true, cus=true
 	};
 
 	@Override
@@ -460,5 +460,5 @@ public class AuthenticateTestAgent extends TestAgent
 //			}
 //		});
 //		return ret;
-//	}
+//	}	
 }

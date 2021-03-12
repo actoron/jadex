@@ -54,6 +54,7 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 				.setSimul(false)
 				.setSimulation(false)
 				.setDebugFutures(true)
+//			.setValue("debugservices", true)
 			.setValue("security.debug", true);
 			
 		CLIENTCONF	= baseconf.clone()

@@ -1,8 +1,7 @@
 package jadex.micro.testcases;
 
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
@@ -52,7 +51,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	@Agent
 	protected IInternalAccess agent;
 	
-	protected Set<IExternalAccess>	platforms	= new LinkedHashSet<IExternalAccess>();
+	protected Map<IComponentIdentifier, IExternalAccess>	platforms	= new LinkedHashMap<>();
 	
 	
 	/**
@@ -72,10 +71,10 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 		
 		if(((IPlatformComponentAccess)agent).getPlatformComponent().debug)
 		{
-			agent.getLogger().severe("cleanup1 killing platforms"+platforms);
+			agent.getLogger().severe("cleanup1 killing platforms"+platforms.keySet());
 		}
 		FutureBarrier<Map<String, Object>>	inner	= new FutureBarrier<Map<String,Object>>();
-		for(final IExternalAccess platform: platforms)
+		for(final IExternalAccess platform: platforms.values())
 		{
 			inner.addFuture(platform.killComponent());
 		}
@@ -233,7 +232,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				platforms.add(result);
+				platforms.put(result.getId(), result);
 				super.customResultAvailable(result);
 			}
 		}));
@@ -255,6 +254,15 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	protected IFuture<IComponentIdentifier> createComponent(final String filename, final Map<String, Object> args, 
 		final String config, final IComponentIdentifier root, final IResultListener<Map<String,Object>> reslis)
 	{
+		return createComponent(filename, args, config, root, null, reslis);
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<IComponentIdentifier> createComponent(final String filename, final Map<String, Object> args, 
+		final String config, final IComponentIdentifier root, IExternalAccess platform, final IResultListener<Map<String,Object>> reslis)
+	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
 //		IResourceIdentifier	rid	= new ResourceIdentifier(
@@ -264,7 +272,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 		ci.setArguments(args);
 		ci.setConfiguration(config);
 		ci.setFilename(filename);
-		IFuture<IExternalAccess> cmsfut = agent.getExternalAccess(local? agent.getId(): root).createComponent(ci);
+		IFuture<IExternalAccess> cmsfut = (local ? agent.getExternalAccess() : platform!=null? platform :platforms.get(root)).createComponent(ci);
 		cmsfut.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)
@@ -287,7 +295,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	 *
 	 */
 	public static IFuture<IComponentIdentifier> createComponent(final IInternalAccess agent, final String filename, final Map<String, Object> args,
-		final String config, final IComponentIdentifier root, final IResultListener<Map<String,Object>> reslis)
+		final String config, final IComponentIdentifier root, IExternalAccess platform, final IResultListener<Map<String,Object>> reslis)
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 
@@ -296,7 +304,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 		ci.setArguments(args);
 		ci.setConfiguration(config);
 		ci.setFilename(filename);
-		IFuture<IExternalAccess> cmsfut = agent.getExternalAccess(local? agent.getId(): root).createComponent(ci);
+		IFuture<IExternalAccess> cmsfut = (local? agent.getExternalAccess(): platform).createComponent(ci);
 		cmsfut.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)
@@ -346,7 +354,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 			public void customResultAvailable(final IExternalAccess exta)
 			{
 				if(manualremove)
-					platforms.remove(exta);
+					platforms.remove(exta.getId());
 				
 				ret.setResult(exta);
 				

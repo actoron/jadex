@@ -1,13 +1,12 @@
 package jadex.bridge.component.impl.remotecommands;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteCommand;
-import jadex.bridge.service.IService;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.IProvidedServicesFeature;
@@ -16,7 +15,6 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.registry.IRemoteRegistryService;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.MethodInfo;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -26,19 +24,6 @@ import jadex.commons.future.IFuture;
  */
 public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteCommand	implements IRemoteCommand<T>, ISecuredRemoteCommand
 {
-	private static final Security DEFAULT_SYSTEM_SECURITY = new Security()
-	{
-		public Class<? extends Annotation> annotationType()
-		{
-			return Security.class;
-		}
-		
-		public String[] roles()
-		{
-			return new String[] { Security.ADMIN };
-		}
-	};
-	
 	//-------- attributes --------
 	
 	/** The target id. */
@@ -247,201 +232,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 	@Override
 	public Security	getSecurityLevel(IInternalAccess access)
 	{
-		return getSecurityLevel(access, method, target instanceof IServiceIdentifier? (IServiceIdentifier)target: null);
-		
-		/*Security level = null;
-		Method m0 = method.getMethod(access.getClassLoader());
-		
-//		// Special case for service search -> use security settings of service type, if any (hack???) -> changed IRemoteRegistryService to unrestricted instead
-//		if(SEARCHMETHOD.equals(m0) && ((ServiceQuery<?>)args[0]).getServiceType()!=null)
-//		{
-//			level	=  ((ServiceQuery<?>)args[0]).getServiceType().getType(access.getClassLoader()).getAnnotation(Security.class);
-//		}
-		
-		// For service call -> look for annotation in impl class hierarchy
-		if(level==null && target instanceof IServiceIdentifier)
-		{
-			IServiceIdentifier	sid	= (IServiceIdentifier)target;
-			Object	impl	= access.getFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(sid);
-			Class<?>	implclass	= impl!=null ? impl.getClass() : null;
-			
-			// Precedence: hierarchy before specificity (e.g. class annotation in subclass wins over method annotation in superclass)
-			while(level==null && implclass!=null)
-			{
-				// Todo: cache for speed?
-				Method declmeth = SReflect.getDeclaredMethod0(implclass, m0.getName(), m0.getParameterTypes());
-				if (declmeth != null)
-				{
-					level = declmeth.getAnnotation(Security.class);
-				}
-				
-				if(level==null)
-				{
-					level	= implclass.getAnnotation(Security.class);
-				}
-				
-				implclass	= implclass.getSuperclass();
-			}
-			
-			// Default to interface if not specified in impl.
-			if(level==null)
-			{
-				// Specificity: method before class
-				level = m0.getAnnotation(Security.class);
-				Class<?> type = sid.getServiceType().getType(access.getClassLoader());
-				
-				if(level==null && type != null)
-				{
-					type = SReflect.getDeclaringInterface(type, m0.getName(), m0.getParameterTypes());
-					
-					if (type != null)
-					{
-						Method declmeth = null;
-						try
-						{
-							declmeth = type.getDeclaredMethod(m0.getName(), m0.getParameterTypes());
-						}
-						catch (Exception e)
-						{
-							// Should not happen, we know the method is there...
-						}
-						level = declmeth.getAnnotation(Security.class);
-						if (level == null)
-							level = type.getAnnotation(Security.class);
-					}
-				}
-				
-				if(level==null && access.getDescription().isSystemComponent())
-				{
-					level = DEFAULT_SYSTEM_SECURITY;
-				}
-			}
-		}
-		
-		// Default: use method annotation, if any.
-		else if(level==null)
-		{
-			level = m0.getAnnotation(Security.class);
-		}
-		
-		// level==null -> disallow direct access to components (overridden by TRUSTED platform)
-		
-		return level;*/
-	}
-	
-	/**
-	 *  Method to provide the required security level.
-	 */
-	public static Security getSecurityLevel(IInternalAccess access, MethodInfo method, IServiceIdentifier sid)
-	{
-		Security level = null;
-		Method m0 = method.getMethod(access.getClassLoader());
-		
-//		// Special case for service search -> use security settings of service type, if any (hack???) -> changed IRemoteRegistryService to unrestricted instead
-//		if(SEARCHMETHOD.equals(m0) && ((ServiceQuery<?>)args[0]).getServiceType()!=null)
-//		{
-//			level	=  ((ServiceQuery<?>)args[0]).getServiceType().getType(access.getClassLoader()).getAnnotation(Security.class);
-//		}
-		
-//		// For service call -> check for instance settings in provided service description
-//		if(level==null && sid!=null)
-//		{
-//			Object service	= access.getFeature(IProvidedServicesFeature.class).getProvidedService(sid);
-//			if(service instanceof IService)
-//			{
-//				((IService)service).
-//			}
-//		}
-		
-		// For service call -> look for annotation in impl class hierarchy
-		if(level==null && sid!=null)
-		{
-			Object impl = access.getFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(sid);
-			Class<?> implclass = impl!=null ? impl.getClass() : null;
-			
-			// Precedence: hierarchy before specificity (e.g. class annotation in subclass wins over method annotation in superclass)
-			while(level==null && implclass!=null)
-			{
-				// Todo: cache for speed?
-				Method declmeth = SReflect.getDeclaredMethod0(implclass, m0.getName(), m0.getParameterTypes());
-				if(declmeth != null)
-				{
-					level = declmeth.getAnnotation(Security.class);
-				}
-				
-				if(level==null)
-				{
-					level	= implclass.getAnnotation(Security.class);
-				}
-				
-				implclass	= implclass.getSuperclass();
-			}
-			
-			// Default to interface if not specified in impl.
-			if(level==null)
-			{
-				// Specificity: method before class
-				level = m0.getAnnotation(Security.class);
-				Class<?> type = sid.getServiceType().getType(access.getClassLoader());
-				
-				if(level==null && type != null)
-				{
-					type = SReflect.getDeclaringInterface(type, m0.getName(), m0.getParameterTypes());
-					
-					if(type != null)
-					{
-						Method declmeth = null;
-						try
-						{
-							declmeth = type.getDeclaredMethod(m0.getName(), m0.getParameterTypes());
-						}
-						catch (Exception e)
-						{
-							// Should not happen, we know the method is there...
-						}
-						level = declmeth.getAnnotation(Security.class);
-						if (level == null)
-							level = type.getAnnotation(Security.class);
-					}
-				}
-				
-				if(level==null && access.getDescription().isSystemComponent())
-				{
-					level = DEFAULT_SYSTEM_SECURITY;
-				}
-			}
-		}
-		
-		// Default: use method annotation, if any.
-		else if(level==null)
-		{
-			level = m0.getAnnotation(Security.class);
-		}
-		
-		// level==null -> disallow direct access to components (overridden by TRUSTED platform)
-		
-		return level;
-	}
-	
-	/**
-	 *  todo: move to some security class
-	 *  Check if a service method is unrestricted.
-	 *  Schedules on component to check this.
-	 * @param sid The service id.
-	 * @param component The internal access.
-	 * @param mi The method info.
-	 * @return True, if is unrestricted.
-	 */
-	public static IFuture<Boolean> isUnrestricted(IServiceIdentifier sid, IInternalAccess component, MethodInfo mi)
-	{
-		IComponentIdentifier cid = sid.getProviderId();
-		return component.getExternalAccess(cid).scheduleStep((IInternalAccess access) -> 
-		{
-			Security sec = RemoteMethodInvocationCommand.getSecurityLevel(access, mi, sid);
-			String[] rs = sec==null? SUtil.EMPTY_STRING_ARRAY: sec.roles();
-			boolean unres = SUtil.arrayToSet(rs).contains(Security.UNRESTRICTED);
-			return new Future<Boolean>(unres? Boolean.TRUE: Boolean.FALSE);
-		});
+		return BasicService.getSecurityLevel(access, null, null, null, method.getMethod(access.getClassLoader()), target instanceof IServiceIdentifier? (IServiceIdentifier)target: null);
 	}
 	
 	/**

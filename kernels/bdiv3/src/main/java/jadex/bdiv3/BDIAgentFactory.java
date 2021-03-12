@@ -51,9 +51,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgentFactory;
 import jadex.micro.annotation.Agent;
-import jadex.micro.features.impl.MicroExecutionComponentFeature;
 import jadex.micro.features.impl.MicroInjectionComponentFeature;
-import jadex.micro.features.impl.MicroLifecycleComponentFeature;
 import jadex.micro.features.impl.MicroPojoComponentFeature;
 import jadex.micro.features.impl.MicroServiceInjectionComponentFeature;
 

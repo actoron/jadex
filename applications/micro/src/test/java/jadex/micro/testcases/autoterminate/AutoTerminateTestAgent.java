@@ -20,7 +20,6 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.InitInfo;
 import jadex.bridge.service.types.cms.SComponentManagementService;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -205,7 +204,7 @@ public class AutoTerminateTestAgent extends	TestAgent implements IAutoTerminateS
 //                {
 //                    public void customResultAvailable(ITransportComponentIdentifier cid)
 //                    {
-						createComponent(filename, null, config, exta.getId(), reslis)
+						createComponent(filename, null, config, exta.getId(), exta, reslis)
 							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 //                    }
 //                });
