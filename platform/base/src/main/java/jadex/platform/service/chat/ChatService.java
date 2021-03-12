@@ -512,6 +512,12 @@ public class ChatService implements IChatService, IChatGuiService
 			}
 		});
 		
+		if(subscribers.size()==1)
+		{
+			// Set own status to idle after first gui connected
+			status(STATE_IDLE, null, (IComponentIdentifier[])null);
+		}
+		
 		return ret;		
 	}
 	

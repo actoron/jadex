@@ -1225,7 +1225,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						{
 							ServiceEvent<IChatService> event = (ServiceEvent<IChatService>)ce.getValue();
 							
-							System.out.println("user event: "+event);
+							//System.out.println("user event: "+event);
 							
 							if(event.getType()==ServiceEvent.SERVICE_ADDED)
 							{
@@ -1234,17 +1234,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							}
 							else if(event.getType()==ServiceEvent.SERVICE_REMOVED)
 							{
-								// todo: 
-								// received proxy
-								try
-								{
-									IServiceIdentifier sid = (IServiceIdentifier)event.getService();
-									setUserState(sid.getProviderId(), Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, ce.getNick(), ce.getImage());
-								}
-								catch(Exception e)
-								{
-									e.printStackTrace();
-								}
+								IServiceIdentifier sid = (IServiceIdentifier)event.getService();
+								setUserState(sid.getProviderId(), Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, ce.getNick(), ce.getImage());
 							}
 						}
 					}
@@ -1339,7 +1330,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	protected void setAway(boolean away)
 	{
-		System.out.println("away: "+away);
+		//System.out.println("away: "+away);
 		
 		if(away!=this.away)
 		{
@@ -1606,8 +1597,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	{
 		if(cid==null)
 			throw new NullPointerException();
-		if(away!=null && away)
-			System.out.println("setUserState "+cid+", "+online+" "+away);
+		//if(away!=null && away)
+		//	System.out.println("setUserState "+cid+", "+online+" "+away);
 		
 		// Called on component thread.
 		SwingUtilities.invokeLater(new Runnable()

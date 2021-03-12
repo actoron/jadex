@@ -66,9 +66,7 @@ public class ChatUser
 	public ChatUser(IComponentIdentifier cid)
 	{
 		if(cid==null)
-		{
 			throw new NullPointerException();
-		}
 		this.cid	= cid;
 		this.nick = "unknown";
 		this.messages	= new HashSet<Integer>();
@@ -91,7 +89,7 @@ public class ChatUser
 			ret	= new ImageIcon(GrayFilter.createDisabledImage(image));
 		}*/
 		
-		System.out.println("cid: "+cid+" away: "+away);
+		//System.out.println("cid: "+cid+" away: "+away);
 		
 		List<Icon>	ics	= new ArrayList<Icon>();
 		ics.add(ret);
