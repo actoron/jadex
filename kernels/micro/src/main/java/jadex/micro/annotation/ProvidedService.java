@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.types.publish.IPublishService;
 
 /**
@@ -36,6 +37,11 @@ public @interface ProvidedService
 	 *  The scope expression to be evaluated on service initialization (only used when scope is set to {@see ServiceScope.EXPRESSION}).
 	 */
 	public String scopeexpression() default "";
+	
+	/** 
+	 *  Override security settings from service interface or implementation.
+	 */
+	public Security security() default @Security(roles={});
 	
 	/**
 	 *  The service implementation.

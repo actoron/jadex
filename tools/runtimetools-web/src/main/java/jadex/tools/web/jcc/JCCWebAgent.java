@@ -15,7 +15,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
-import jadex.bridge.component.impl.remotecommands.RemoteMethodInvocationCommand;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
@@ -417,7 +417,8 @@ public class JCCWebAgent implements IJCCWebService
 		final Future<Object> ret = (Future<Object>)SFuture.getFuture(rtype);
 		final String callid = ServiceCall.getCurrentInvocation()==null? null: (String)ServiceCall.getCurrentInvocation().getProperty("callid");
 		
-		RemoteMethodInvocationCommand.isUnrestricted(ser.getServiceId(), agent, new MethodInfo(methodname, argtypes, servicetype.getTypeName()))
+		BasicService.isUnrestricted(ser.getServiceId(), agent,
+			new MethodInfo(methodname, argtypes, servicetype.getTypeName()).getMethod(agent.getClassLoader()))
 			.addResultListener(new ExceptionDelegationResultListener<Boolean, Object>(ret)
 		{
 			@Override

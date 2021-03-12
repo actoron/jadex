@@ -562,7 +562,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		ci.setFilename(model);
 		
 		ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{
-			new ProvidedServiceInfo(null, IComponentFactory.class, null, ServiceScope.PARENT, null, null, null)});
+			new ProvidedServiceInfo(null, IComponentFactory.class, null, ServiceScope.PARENT, null, null, null, null)});
 		
 		//System.out.println("create factory: "+model+" "+kernels);
 

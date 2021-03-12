@@ -129,12 +129,12 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 	{
 		disableLocalSimulationMode().get();
 		final Future<TestReport[]> ret = new Future<TestReport[]>();
-		performTestA(agent.getId().getRoot(), testno, delay, max)
+		performTestA(agent.getId().getRoot(), null, testno, delay, max)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 		{
 			public void customResultAvailable(final TestReport result1)
 			{
-				performTestB(agent.getId().getRoot(), testno+1, delay, max)
+				performTestB(agent.getId().getRoot(), null, testno+1, delay, max)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 				{
 					public void customResultAvailable(final TestReport result2)
@@ -181,12 +181,12 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 					{
 						public void customResultAvailable(Void result)
 						{
-							performTestA(platform.getId(), testno, delay, max)
+							performTestA(platform.getId(), platform, testno, delay, max)
 								.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 							{
 								public void customResultAvailable(final TestReport result1)
 								{
-									performTestB(platform.getId(), testno+1, delay, max)
+									performTestB(platform.getId(), platform, testno+1, delay, max)
 										.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 									{
 										public void customResultAvailable(final TestReport result2)
@@ -223,7 +223,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 	 *  - invoke the service
 	 *  - wait with intermediate listener for results 
 	 */
-	protected IFuture<TestReport> performTestA(final IComponentIdentifier root, final int testno, final long delay, final int max)
+	protected IFuture<TestReport> performTestA(final IComponentIdentifier root, IExternalAccess platform, final int testno, final long delay, final int max)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 
@@ -246,7 +246,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 //		System.out.println("Using rid: "+rid);
 		final boolean	local	= root.equals(agent.getId().getRoot());
 		CreationInfo ci	= new CreationInfo(rid).setFilename(PullResultProviderAgent.class.getName()+".class");
-		agent.getExternalAccess(local ? agent.getId() : root).createComponent(ci)
+		(local ? agent.getExternalAccess() : platform).createComponent(ci)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)
@@ -323,7 +323,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 	 *  - invoke the service
 	 *  - wait with intermediate listener for results 
 	 */
-	protected IFuture<TestReport> performTestB(final IComponentIdentifier root, final int testno, final long delay, final int max)
+	protected IFuture<TestReport> performTestB(final IComponentIdentifier root, IExternalAccess platform,  final int testno, final long delay, final int max)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 
@@ -346,7 +346,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		final boolean	local	= root.equals(agent.getId().getRoot());
 		CreationInfo	ci	= new CreationInfo(rid).setFilename(PullResultProviderAgent.class.getName()+".class");
 		System.out.println("create: "+rid);
-		agent.getExternalAccess(local ? agent.getId() : root).createComponent(ci)
+		(local ? agent.getExternalAccess() : platform).createComponent(ci)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)

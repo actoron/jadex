@@ -34,6 +34,7 @@ import jadex.bridge.component.impl.RemoteExecutionComponentFeature;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnInit;
@@ -852,6 +853,16 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 	public IServiceIdentifier getServiceId()
 	{
 		return sid;
+	}
+	
+	/**
+	 *  Get the service type info.
+	 *  @return The service type info, if any.
+	 */
+	// used for checking @provided security settings at runtime
+	public ProvidedServiceInfo getServiceInfo()
+	{
+		return null;
 	}
 	
 	/**

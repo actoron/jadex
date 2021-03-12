@@ -8,13 +8,9 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.LocalResourceIdentifier;
-import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -142,28 +138,28 @@ public class TerminateTestAgent extends TestAgent
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 
 		// Start service agent
-		IResourceIdentifier	rid	= new ResourceIdentifier(
-			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
+//		IResourceIdentifier	rid	= new ResourceIdentifier(
+//			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 		
-		agent.getExternalAccess(root).createComponent(new CreationInfo(rid).setFilename("jadex/micro/testcases/terminate/TerminableProviderAgent.class"))
-			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
+		createComponent("jadex/micro/testcases/terminate/TerminableProviderAgent.class", root, null)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
 		{	
-			public void customResultAvailable(final IExternalAccess exta)
+			public void customResultAvailable(final IComponentIdentifier id)
 			{
 				ret.addResultListener(new IResultListener<Collection<TestReport>>()
 				{
 					public void resultAvailable(Collection<TestReport> result)
 					{
-						agent.getExternalAccess(exta.getId()).killComponent();
+						agent.getExternalAccess(id).killComponent();
 					}
 					public void exceptionOccurred(Exception exception)
 					{
-						agent.getExternalAccess(exta.getId()).killComponent();
+						agent.getExternalAccess(id).killComponent();
 					}
 				});
 				
 //						System.out.println("cid is: "+cid);
-				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITerminableService.class).setProvider(exta.getId()))
+				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITerminableService.class).setProvider(id))
 					.addResultListener(new ExceptionDelegationResultListener<ITerminableService, Collection<TestReport>>(ret)
 				{
 					public void customResultAvailable(final ITerminableService service)

@@ -177,7 +177,7 @@ public class ServiceHandler implements InvocationHandler
 //		ci.setParent(component.getId());
 		ci.setImports(component.getModel().getAllImports());
 		// Worker services are exposed with scope parent only to hinder others finding directly the worker services
-		ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, ServiceScope.PARENT, null, null, null)});
+		ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, ServiceScope.PARENT, null, null, null, null)});
 		ci.setFilename(componentname);
 		
 		component.createComponent(ci)
