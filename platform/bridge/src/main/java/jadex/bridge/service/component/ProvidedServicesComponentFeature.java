@@ -165,10 +165,10 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			if(ServiceScope.EXPRESSION.equals(scope))
 			{
 				scope = (ServiceScope)SJavaParser.getParsedValue(info.getScopeExpression(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
-				info.setScope(scope);
-				System.out.println("expression scope '"
-					+ (info.getScopeExpression()!=null ? info.getScopeExpression().getValue() : "")
-					+ "': "+scope);
+				info	= new ProvidedServiceInfo(info.getName(), info.getType(), info.getImplementation(), scope, info.getScopeExpression(), info.getPublish(), info.getProperties(), info.isSystemService());
+//				System.out.println("expression scope '"
+//					+ (info.getScopeExpression()!=null ? info.getScopeExpression().getValue() : "")
+//					+ "': "+scope);
 			}
 				
 			final Future<Void> fut = new Future<>();
@@ -191,13 +191,14 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			}
 			else
 			{
+				final ProvidedServiceInfo	finfo	= info;
 				createServiceImplementation(info, getComponent().getFetcher())
 					.then(ser ->
 				{
 					// Implementation may null to disable service in some configurations.
 					if(ser!=null)
 					{
-						UnparsedExpression[] ins = info.getImplementation().getInterceptors();
+						UnparsedExpression[] ins = finfo.getImplementation().getInterceptors();
 						IServiceInvocationInterceptor[] ics = null;
 						if(ins!=null)
 						{
@@ -222,15 +223,15 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 							}
 						}
 						
-						final Class<?> type = info.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
+						final Class<?> type = finfo.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
 						PublishEventLevel elm = component.getDescription().getMonitoring()!=null? component.getDescription().getMonitoring(): null;
 //						 todo: remove this? currently the level cannot be turned on due to missing interceptor
 						boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
 						final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
-							component, ser, info.getName(), type, ics,
-							moni, info);
+							component, ser, finfo.getName(), type, ics,
+							moni, finfo);
 						
-						addService(proxy, info);
+						addService(proxy, finfo);
 					}
 					fut.setResult(null);
 					
