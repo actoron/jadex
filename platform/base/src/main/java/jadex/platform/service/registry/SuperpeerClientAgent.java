@@ -284,6 +284,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		AtomicInteger	track	= new AtomicInteger(1);
 		boolean	foundsuperpeer	= false;
 		
+		if(debug(query))
+			System.out.println(agent+" searchServices() using networks "+getQueryNetworks(query)+": "+query);
 //		for(String networkname: getSearchableNetworks(query))
 		for(String networkname : getQueryNetworks(query))
 		{
@@ -335,11 +337,19 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						}
 					});
 				}
-				
 				// else not connected -> ignore
+				else
+				{
+					if(debug(query))
+						System.out.println(agent+" searchServices() no superpeer connected for network "+networkname+", "+query);
+				}				
 			}
-			
 			// else ignore unknown network
+			else
+			{
+				if(debug(query))
+					System.out.println(agent+" searchServices() unknown network "+networkname+", "+query);
+			}
 			
 			// TODO: allow selective/hybrid polling fallback for unknown/unconnected networks?			
 		}
