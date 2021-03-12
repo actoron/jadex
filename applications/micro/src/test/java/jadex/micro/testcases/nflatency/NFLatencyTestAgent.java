@@ -131,7 +131,7 @@ public class NFLatencyTestAgent extends TestAgent
 								{
 									System.out.println("sec");
 								});
-								performTest(result.getId(), testno, false)
+								performTest(platform.getId(), testno, false)
 									.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 							}
 							public void exceptionOccurred(Exception exception)

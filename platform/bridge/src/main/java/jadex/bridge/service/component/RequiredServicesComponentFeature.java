@@ -1246,7 +1246,8 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			IService service = addRequiredServiceProxy((IService)event.getService(), info);
 			event.setService(service);
 		}
-		else if(event.getService() instanceof IServiceIdentifier)
+		else if(event.getService() instanceof IServiceIdentifier
+			&& event.getType()!=ServiceEvent.SERVICE_REMOVED)
 		{
 			IService service = getServiceProxy((IServiceIdentifier)event.getService(), info);
 			// can null when service is not available any more

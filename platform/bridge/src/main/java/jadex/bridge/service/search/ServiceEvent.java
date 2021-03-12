@@ -1,5 +1,7 @@
 package jadex.bridge.service.search;
 
+import jadex.bridge.service.IService;
+
 /**
  *  Service event used if the service registry is used in event mode.
  *
@@ -40,6 +42,9 @@ public class ServiceEvent<T>
 		
 		this.service = service;
 		this.type = eventtype;
+		
+		if(eventtype==SERVICE_REMOVED && service instanceof IService)
+			System.out.println("here");
 	}
 
 	/**
@@ -80,6 +85,8 @@ public class ServiceEvent<T>
 	public void setService(T service)
 	{
 		this.service = service;
+		if(this.type==SERVICE_REMOVED && service instanceof IService)
+			System.out.println("here");
 	}
 
 	/**

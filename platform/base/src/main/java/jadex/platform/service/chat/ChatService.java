@@ -26,6 +26,7 @@ import jadex.bridge.IOutputConnection;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnStart;
@@ -194,7 +195,16 @@ public class ChatService implements IChatService, IChatGuiService
 						}
 						else if(event.getType()==ServiceEvent.SERVICE_REMOVED)
 						{
-							chatservices.remove(event.getService());
+							// Remove event comes with sid instead of proxy
+							for(IChatService chat: chatservices)
+							{
+								if(((IService)chat).getServiceId().equals(event.getService()))
+								{
+									chatservices.remove(chat);
+									break;
+								}
+							}
+							//chatservices.remove(event.getService());
 							publishEvent(ChatEvent.TYPE_USER, nick, agent.getId(), event, false, null);
 						}
 					}).catchEx(ex -> ex.printStackTrace());
@@ -348,7 +358,7 @@ public class ChatService implements IChatService, IChatGuiService
 	public IFuture<Void> message(String nick, String text, boolean privatemessage)
 	{
 //		System.out.println("Timeout: "+ServiceCall.getInstance().getTimeout()+", "+ServiceCall.getInstance().isRealtime());
-		boolean	published	= publishEvent(ChatEvent.TYPE_MESSAGE, nick, ServiceCall.getCurrentInvocation().getCaller(), text, privatemessage, null);
+		boolean	published = publishEvent(ChatEvent.TYPE_MESSAGE, nick, ServiceCall.getCurrentInvocation().getCaller(), text, privatemessage, null);
 		return published ? IFuture.DONE : new Future<Void>(new RuntimeException("No GUI, message was discarded."));
 	}
 
@@ -492,9 +502,7 @@ public class ChatService implements IChatService, IChatGuiService
 		final SubscriptionIntermediateFuture<ChatEvent>	ret	= (SubscriptionIntermediateFuture<ChatEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
 
 		if(subscribers==null)
-		{
 			subscribers	= new LinkedHashSet<SubscriptionIntermediateFuture<ChatEvent>>();
-		}
 		subscribers.add(ret);
 		ret.setTerminationCommand(new TerminationCommand()
 		{
@@ -635,7 +643,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		final Future<IChatService> ret = new Future<IChatService>();
 		
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class).setProvider(rec))
+		agent.searchService(new ServiceQuery<>(IChatService.class).setProvider(rec))
 			.addResultListener(new DelegationResultListener<IChatService>(ret)
 		{
 			public void customResultAvailable(final IChatService chat)

@@ -788,7 +788,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		if(query.isEventMode())
 		{
 			ServiceEvent<IServiceIdentifier> event = new ServiceEvent<>(ser, eventtype);
-			((TerminableIntermediateFuture<ServiceEvent<IServiceIdentifier>>) queryinfo.getFuture()).addIntermediateResultIfUndone(event);
+			((TerminableIntermediateFuture<ServiceEvent<IServiceIdentifier>>)queryinfo.getFuture()).addIntermediateResultIfUndone(event);
 		}
 		else if(ServiceEvent.SERVICE_ADDED==eventtype)
 		{

@@ -202,14 +202,14 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	protected JTextPane chatarea;
 		
 	/** The user table. */
-	protected JTable	usertable;
+	protected JTable usertable;
 	protected UserTableModel usermodel;
 	
 	/** The typing state. */
 	protected boolean	typing;
 
 	/** The away state. */
-	protected boolean	away;
+	protected boolean away;
 
 	/** The download table. */
 	protected JTable dtable;
@@ -224,7 +224,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	protected ISubscriptionIntermediateFuture<ChatEvent> subscription;
 	
 	/** The refresh timer. */
-	protected Timer refreshtimer;
+	//protected Timer refreshtimer;
 	
 	/** The away timer. */
 	protected Timer awaytimer;
@@ -245,7 +245,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	protected Map<String, String> notificationsounds;
 	
 	/** The file chooser (created on demand, if local). */
-	protected JFileChooser	filechooser;
+	protected JFileChooser filechooser;
 
 	/** The remote file chooser (created on demand, if remote). */
 	protected RemoteFileChooser	rfilechooser;
@@ -254,13 +254,13 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	protected Map<TransferInfo, JComponent>	dialogs;
 	
 	/** The message counter to differentiate sent messages. */
-	protected int	reqcnt;
+	protected int reqcnt;
 	
 	/** The timer for the flashing chat icon. */
-	protected Timer	icontimer;
+	protected Timer icontimer;
 	
 	/** Flag to indicate that a sound is playing. */
-	protected boolean	playing;
+	protected boolean playing;
 
 	//-------- constructors --------
 	
@@ -278,7 +278,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		this.dialogs = new HashMap<TransferInfo, JComponent>();
 		usermodel = new UserTableModel();
 
-		final Future<Void>	ret	= new Future<Void>();
+		final Future<Void> ret = new Future<Void>();
 		
 		super.init(jcc, service).addResultListener(new DelegationResultListener<Void>(ret)
 		{
@@ -1027,7 +1027,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					public void update()
 					{
 						setAway(false);
-						boolean	newtyping	= tf.getText().length()!=0;
+						boolean	newtyping = tf.getText().length()!=0;
 						if(newtyping!=typing)
 						{
 							typing	= newtyping;
@@ -1234,8 +1234,17 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							}
 							else if(event.getType()==ServiceEvent.SERVICE_REMOVED)
 							{
-								IServiceIdentifier sid = (IServiceIdentifier)event.getService();
-								setUserState(sid.getProviderId(), Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, ce.getNick(), ce.getImage());
+								// todo: 
+								// received proxy
+								try
+								{
+									IServiceIdentifier sid = (IServiceIdentifier)event.getService();
+									setUserState(sid.getProviderId(), Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, ce.getNick(), ce.getImage());
+								}
+								catch(Exception e)
+								{
+									e.printStackTrace();
+								}
 							}
 						}
 					}
@@ -1330,6 +1339,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	protected void setAway(boolean away)
 	{
+		System.out.println("away: "+away);
+		
 		if(away!=this.away)
 		{
 			this.away	= away;
@@ -1337,15 +1348,13 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		}
 
 		if(awaytimer!=null)
-		{
 			awaytimer.stop();
-		}
 		
 		if(!away)
 		{
 			if(awaytimer==null)
 			{
-				awaytimer	= new Timer(300000, new ActionListener()
+				awaytimer = new Timer(300000, new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
 					{
@@ -1427,18 +1436,12 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	public IFuture<Void> shutdown()
 	{
 		Future<Void>	ret	= new Future<Void>();
-		if(refreshtimer!=null)
-		{
-			refreshtimer.stop();
-		}
 		if(awaytimer!=null)
-		{
 			awaytimer.stop();
-		}
 		if(icontimer!=null)
 		{
 			icontimer.stop();
-			icontimer	= null;
+			icontimer = null;
 		}
 		super.shutdown().addResultListener(new DelegationResultListener<Void>(ret)
 		{
@@ -1456,13 +1459,13 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 *  Send a message.
 	 *  @param text The text.
 	 */
-	public IFuture<Void>	tell(final String text)
+	public IFuture<Void> tell(final String text)
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
 		// Remember known/target users to determine send failures.
 		final Set<ChatUser>	sendusers	= new HashSet<ChatUser>();
-		final int id	= ++reqcnt;
+		final int id = ++reqcnt;
 		
 		int[] sels = usertable.getSelectedRows();
 		IComponentIdentifier[] recs = new IComponentIdentifier[sels.length];
@@ -1470,7 +1473,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		{
 			for(int i=0; i<sels.length; i++)
 			{
-				ChatUser	cu	= (ChatUser)usertable.getModel().getValueAt(sels[i], 0);
+				ChatUser cu = (ChatUser)usertable.getModel().getValueAt(sels[i], 0);
 				cu.addMessage(id);
 				sendusers.add(cu);
 				recs[i] = cu.getComponentIdentifier();
@@ -1491,7 +1494,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		{
 			public void customIntermediateResultAvailable(final IChatService chat)
 			{
-				ChatUser	cu	= usermodel.getUser(((IService)chat).getServiceId().getProviderId());
+				ChatUser cu = usermodel.getUser(((IService)chat).getServiceId().getProviderId());
 				if(cu!=null)
 				{
 					sendusers.remove(cu);
@@ -1603,7 +1606,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	{
 		if(cid==null)
 			throw new NullPointerException();
-//		System.out.println("setUserState "+cid+", "+online);
+		if(away!=null && away)
+			System.out.println("setUserState "+cid+", "+online+" "+away);
 		
 		// Called on component thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -1879,12 +1883,12 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						final JButton but	= new JButton(ChatPlugin.getStatusIcon(false));
 						scomp	= but;
 						assert icontimer==null;
-						icontimer	= new Timer(500, new ActionListener()
+						icontimer = new Timer(500, new ActionListener()
 						{
 							boolean	star;
 							public void actionPerformed(ActionEvent e)
 							{
-								star	= !star;
+								star = !star;
 								but.setIcon(ChatPlugin.getStatusIcon(star));
 							}
 						});
