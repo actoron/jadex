@@ -42,6 +42,7 @@ import jadex.bridge.service.types.registry.SlidingCuckooFilter;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Boolean3;
+import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -190,6 +191,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		AtomicInteger	track	= new AtomicInteger(1);
 		boolean	foundsuperpeer	= false;
 		
+		if(debug(query))
+			System.out.println(agent+" searchService() using networks "+SUtil.arrayToString(getQueryNetworks(query))+": "+query);
+		
 //		for(String networkname: getSearchableNetworks(query))
 		for(String networkname : getQueryNetworks(query))
 		{
@@ -198,6 +202,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			{
 				if(manager.superpeer!=null)
 				{
+					if(debug(query))
+						System.out.println(agent+" searchService() at superpeer "+manager.superpeer+": "+query);
+					
 					foundsuperpeer	= true;
 					// Todo: remember searches for termination? -> more efficient to just let searches run out an ignore result?
 					track.incrementAndGet();
@@ -207,6 +214,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						@Override
 						public void exceptionOccurred(Exception exception)
 						{
+							if(debug(query))
+								System.out.println(agent+" searchService() at superpeer "+manager.superpeer+" failed: "+exception+", "+query);
+
 							// Forward exception only of last finished future...
 							if(track.decrementAndGet()==0)
 							{
@@ -217,6 +227,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						@Override
 						public void resultAvailable(IServiceIdentifier result)
 						{
+							if(debug(query))
+								System.out.println(agent+" searchService() at superpeer "+manager.superpeer+" succeeded: "+result+", "+query);
+
 							// Forward result if first
 							ret.setResultIfUndone(result);
 						}
@@ -224,9 +237,18 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				}
 				
 				// else not connected -> ignore
+				else
+				{
+					if(debug(query))
+						System.out.println(agent+" searchService() no superpeer connected for network "+networkname+", "+query);
+				}				
 			}
-			
 			// else ignore unknown network
+			else
+			{
+				if(debug(query))
+					System.out.println(agent+" searchService() unknown network "+networkname+", "+query);
+			}
 			
 			// TODO: allow selective/hybrid polling fallback for unknown/unconnected networks?			
 		}
@@ -285,7 +307,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		boolean	foundsuperpeer	= false;
 		
 		if(debug(query))
-			System.out.println(agent+" searchServices() using networks "+getQueryNetworks(query)+": "+query);
+			System.out.println(agent+" searchServices() using networks "+SUtil.arrayToString(getQueryNetworks(query))+": "+query);
 //		for(String networkname: getSearchableNetworks(query))
 		for(String networkname : getQueryNetworks(query))
 		{
