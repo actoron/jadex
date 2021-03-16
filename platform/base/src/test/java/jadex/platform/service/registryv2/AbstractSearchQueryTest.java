@@ -32,7 +32,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 	//-------- attributes --------
 	
 	/** Do client and provider see each other via awareness? */
-	protected boolean	awa;
+	protected boolean awa;
 	
 	/** Client configuration for platform used for searching. */
 	protected IPlatformConfiguration	clientconf;
@@ -91,12 +91,14 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("2) start provider platform, wait for service");
 			pro1	= createPlatform(proconf);
 			ITestService	svc	= results.getNextIntermediateResult();
+			ITestService	svc2	= results.getNextIntermediateResult();
 			Assert.assertEquals(""+svc, pro1.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 			
 			// 3) start provider platform, wait for service -> test if awa fallback works with two platforms 
 			System.out.println("3) start provider platform, wait for service");
 			pro2	= createPlatform(proconf);
 			svc	= results.getNextIntermediateResult();
+			svc2 = results.getNextIntermediateResult();
 			Assert.assertEquals(""+svc, pro2.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 		}
 		else
@@ -106,7 +108,9 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			pro1	= createPlatform(proconf);
 			pro2	= createPlatform(proconf);
 			waitForRegistryClient(client, true);
-			Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
+			Collection<ITestService> col = results.getIntermediateResults();
+			System.out.println("found: "+col.size());
+			Assert.assertEquals(2, new LinkedHashSet<>(col).size());
 		}
 
 		//-------- Tests with SP if any --------
@@ -125,9 +129,13 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			}
 			else
 			{
-				// -> should now receive the two services from query.
-				Set<IComponentIdentifier>	providers1	= new LinkedHashSet<>();
-				ITestService	svc	= results.getNextIntermediateResult();
+				// -> should now receive the four services from query.
+				Set<IComponentIdentifier> providers1 = new LinkedHashSet<>();
+				ITestService svc = results.getNextIntermediateResult();
+				providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
+				svc	= results.getNextIntermediateResult();
+				providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
+				svc	= results.getNextIntermediateResult();
 				providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
 				svc	= results.getNextIntermediateResult();
 				providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
@@ -141,15 +149,22 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			// 5) add second query -> wait for two services (test if works when already SP)
 			System.out.println("5) add second query");
 			ISubscriptionIntermediateFuture<ITestService>	results2	= client.addQuery(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL));
-			Set<IComponentIdentifier>	providers1	= new LinkedHashSet<>();
-			ITestService	svc	= results2.getNextIntermediateResult();
+			
+			Set<IComponentIdentifier> providers1 = new LinkedHashSet<>();
+			ITestService svc = results2.getNextIntermediateResult();
 			providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
 			svc	= results2.getNextIntermediateResult();
 			providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
-			Set<IComponentIdentifier>	providers2	= new LinkedHashSet<>();
+			svc	= results2.getNextIntermediateResult();
+			providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
+			svc	= results2.getNextIntermediateResult();
+			providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
+			
+			Set<IComponentIdentifier> providers2 = new LinkedHashSet<>();
 			providers2.add(pro1.getId());
 			providers2.add(pro2.getId());
 			waitForRegistryClient(client, false);
+			
 			Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results2.getIntermediateResults()));
 			Assert.assertEquals(providers1, providers2);
 			
@@ -158,17 +173,25 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			IExternalAccess	pro3	= createPlatform(proconf);
 			svc	= results.getNextIntermediateResult();
 			Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
+			svc	= results.getNextIntermediateResult();
+			Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
+			svc	= results2.getNextIntermediateResult();
+			Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 			svc	= results2.getNextIntermediateResult();
 			Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 	
 			// 7) kill SP, start provider platform, wait for service on both queries
 			System.out.println("7) kill SP, start remote platform, wait for service on both queries");
 			removePlatform(sp);
-			IExternalAccess	pro4	= createPlatform(proconf);
+			IExternalAccess	pro4 = createPlatform(proconf);
 			if(awa)
 			{
 				// -> test if re-fallback to awa works for queries
 				svc	= results.getNextIntermediateResult();
+				Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
+				svc	= results.getNextIntermediateResult();
+				Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
+				svc	= results2.getNextIntermediateResult();
 				Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 				svc	= results2.getNextIntermediateResult();
 				Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
@@ -177,8 +200,10 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			{
 				// -> test if disconnection from SP works (new services not found)
 				waitForRegistryClient(client, true);
-				Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
-				Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results2.getIntermediateResults()));
+				Collection<ITestService> col1 = results.getIntermediateResults();
+				Collection<ITestService> col2 = results2.getIntermediateResults();
+				Assert.assertEquals(1, new LinkedHashSet<>(col1).size());
+				Assert.assertEquals(1, new LinkedHashSet<>(col2).size());
 			}
 		}
 	}
@@ -220,20 +245,35 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.err.println("2a) start provider platform, search for service");
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			System.err.println("2a) start provider platform, search for service");
-			Assert.assertEquals(""+result, 1, result.size());
+			Assert.assertEquals(""+result, 2, result.size()); // global + network provider
 			
 			// 3) start provider platform, search for service -> test if awa fallback works with two platforms 
 			System.out.println("3) start provider platform, search for service");
 			pro2	= createPlatform(proconf);
 			waitForRegistryWithProvider(client, pro2, true);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals(""+result, 2, result.size());
+			Assert.assertEquals(""+result, 4, result.size());
+			
+			// 3b) search without scope (must deliver scope and network services
+			for(ITestService ser: result)
+			{
+				ITestService ts = null;
+				try
+				{
+					ts	= client.searchService(new ServiceQuery<>(ITestService.class).setProvider(((IService)ser).getServiceId().getProviderId())).get();
+				}
+				catch(Exception e)
+				{
+					System.out.println("exception: "+e);
+				}
+				Assert.assertNotEquals(ts, null);
+			}
 			
 			// 4) kill one provider platform, search for service -> test if platform is removed from awareness
 			System.out.println("4) kill one provider platform, search for service");
 			removePlatform(pro1);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals(""+result, 1, result.size());
+			Assert.assertEquals(""+result, 2, result.size());
 		}
 		else
 		{
@@ -241,11 +281,13 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("2/3/4) start provider platforms, wait for services");
 			pro1	= createPlatform(proconf);
 			pro2	= createPlatform(proconf);
+			waitForRegistryClient(client, true);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals(0, result.size());
+			System.out.println("found: "+result.size());
+			Assert.assertEquals(2, result.size());
 			removePlatform(pro1);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals(0, result.size());
+			Assert.assertEquals(1, result.size());
 		}
 
 		//-------- Tests with SP if any --------
@@ -259,7 +301,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitForRegistryWithProvider(client, pro2, false);
 			waitALittle(client);	// Hack for timeout in CI Pipeline!?
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals(client.toString()+": "+result, 1, result.size());
+			Assert.assertEquals(client.toString()+": "+result, 2, result.size());
 			
 			// 6) start provider platform, wait for connection, search for service -> test if search works for new platform and existing SP
 			System.out.println("6) start provider platform, search for service");
@@ -267,7 +309,22 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitForSuperpeerConnections(sp, pro1);
 			waitForRegistryClient(client, false);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals("found: "+result+", new platform: "+pro1.getId(), 2, result.size());
+			Assert.assertEquals("found: "+result+", new platform: "+pro1.getId(), 4, result.size());
+			
+			// 6b) search without scope (must deliver scope and network services
+			for(ITestService ser: result)
+			{
+				ITestService ts = null;
+				try
+				{
+					ts	= client.searchService(new ServiceQuery<>(ITestService.class).setProvider(((IService)ser).getServiceId().getProviderId())).get();
+				}
+				catch(Exception e)
+				{
+					System.out.println("exception: "+e);
+				}
+				Assert.assertNotEquals(ts, null);
+			}
 			
 			// 7) kill one provider platform, search for service -> test if remote disconnection and service removal works
 			System.out.println("7) kill provider platform"+pro1.getId()+", search for service");
@@ -277,7 +334,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitALittle(client);
 			waitALittle(client);	// two waits for disconnection, because contimeout = 2* WAITFACTOR
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals(""+result, 1, result.size());
+			Assert.assertEquals(""+result, 2, result.size());
 	
 			// 8) kill SP, search for service -> test if re-fallback to awa works
 			System.out.println("8) kill SP, search for service");
@@ -285,10 +342,10 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitALittle(client);
 			waitALittle(client);	// two waits for disconnection, because contimeout = 2* WAITFACTOR
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals(""+result, awa?1:0, result.size());
+			Assert.assertEquals(""+result, awa? 2: 1, result.size());
 		}
 	}
-
+	
 	/**
 	 *  Wait to allow remote platform/registry interaction.
 	 *  The idea is that the registry is roughly FCFS so

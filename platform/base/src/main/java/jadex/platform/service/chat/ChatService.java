@@ -663,6 +663,13 @@ public class ChatService implements IChatService, IChatGuiService
 					}
 				});
 			}
+			
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("service not found: "+rec);
+				super.exceptionOccurred(exception);
+			}
 		});
 		
 		return ret;
@@ -1128,6 +1135,13 @@ public class ChatService implements IChatService, IChatGuiService
 		IFuture<IChatService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class).setProvider(cid));
 		fut.addResultListener(new ExceptionDelegationResultListener<IChatService, Void>(ret)
 		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("service not found: "+cid);
+				super.exceptionOccurred(exception);
+			}
+			
 			public void customResultAvailable(IChatService cs)
 			{
 				final long size = data.length;

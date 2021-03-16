@@ -1406,7 +1406,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		});
 		
 		URL[] u = getAllURLs().get().toArray(new URL[0]);
-		System.out.println("urls are: "+SUtil.arrayToString(u));
+		//System.out.println("urls are: "+SUtil.arrayToString(u));
 		
 		return ret;
 	}

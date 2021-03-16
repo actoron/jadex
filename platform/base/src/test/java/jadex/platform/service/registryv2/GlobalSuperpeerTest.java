@@ -63,6 +63,7 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 //			.setValue("rt.debug", true);
 		
 		PROCONF	= baseconf.clone()
+			.addComponent(GlobalProviderAgent.class)
 			.addComponent(NetworkProviderAgent.class)
 			.addComponent(LocalProviderAgent.class)
 			.setPlatformName("GlobalSuperpeerTestProvider_*");

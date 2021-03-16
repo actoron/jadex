@@ -41,6 +41,7 @@ public class LocalSuperpeerTest	extends AbstractSearchQueryTest
 		
 		PROCONF	= baseconf.clone();
 		PROCONF.addComponent(GlobalProviderAgent.class);
+		PROCONF.addComponent(NetworkProviderAgent.class);
 		PROCONF.addComponent(LocalProviderAgent.class);
 		PROCONF.setPlatformName("provider_*");
 		
