@@ -32,8 +32,7 @@ public class RestrictedServiceTestAgent extends TestAgent implements IInheriting
 		TestReport tr = new TestReport("Restricted Service Test", "Tests if restricted service is not marked as unrestricted.");
 		
 		ServiceQuery<IInheritingService> query = new ServiceQuery<>(IInheritingService.class);
-		query.setScope(ServiceScope.GLOBAL);
-		query.setProvider(agent.getId());
+		query.setScope(ServiceScope.PLATFORM);
 		
 		agent.searchService(query, 0).then((rserv) ->
 		{
