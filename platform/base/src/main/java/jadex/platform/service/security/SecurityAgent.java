@@ -642,7 +642,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		String rplat = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot().toString();
 		final ICryptoSuite cs = currentcryptosuites.get(rplat);
 		if(cs != null && !isSecurityMessage(header) && !cs.isExpiring())
-			return new Future<byte[]>(cs.encryptAndSign(content));
+			return checkReceiverAndEncrypt(header, content, cs, null);
 		
 		return agent.scheduleStep(new IComponentStep<byte[]>()
 		{
@@ -686,7 +686,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					
 					if (cs != null)
 					{
-						ret.setResult(cs.encryptAndSign(content));
+						checkReceiverAndEncrypt(header, content, cs, ret);
 					}
 					else
 					{
@@ -719,7 +719,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						{
 							public void customResultAvailable(ICryptoSuite result) throws Exception
 							{
-								ret.setResultIfUndone(result.encryptAndSign(content));
+								checkReceiverAndEncrypt(header, content, result, ret);
+								//ret.setResultIfUndone(result.encryptAndSign(content));
+								//ret.setResultIfUndone(result.encryptAndSign(content));
 							}
 						});
 					}
@@ -1607,6 +1609,30 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public IComponentIdentifier getComponentIdentifier()
 	{
 		return agent.getId();
+	}
+	
+	/**
+	 *  Checks receiver authorization and, if so, encrypts the message. Otherwise, an exception is issued.
+	 *  
+	 *  @param header Message header. 
+	 *  @param content Message content.
+	 *  @param cs The cryptosuite negotiated with receiver.
+	 *  @param resultfuture Optional result future if it already exist, if null a future is created.
+	 *  @return Result future containing encrypted message or exception.
+	 */
+	protected Future<byte[]> checkReceiverAndEncrypt(IMsgHeader header, byte[] content, ICryptoSuite cs, Future<byte[]> resultfuture)
+	{
+		//TODO: Implement receiver authorization here.
+		Future<byte[]> ret = resultfuture != null ? resultfuture : new Future<>();
+		//ISecurityInfo recinfo = cs.getSecurityInfos();
+		//if (isReceiverAuthorized(header, cs.getSecurityInfos()))
+			ret.setResultIfUndone(cs.encryptAndSign(content));
+		/*else
+		{
+			String rplat = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot().toString();
+			ret.setException(new SecurityException("Receiving platform " + rplat + " not authorized to receive message."));
+		}*/
+		return ret;
 	}
 	
 	// -------- Cleanup
