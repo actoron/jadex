@@ -311,7 +311,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			Assert.assertEquals("found: "+result+", new platform: "+pro1.getId(), 4, result.size());
 			
-			// 6b) search without scope (must deliver scope and network services
+			// 6b) search without scope (must deliver scope and network services)
 			for(ITestService ser: result)
 			{
 				ITestService ts = null;

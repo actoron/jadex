@@ -104,8 +104,8 @@ public class SRemoteGui
 				try
 				{
 					final RequiredServiceInfo[]	ris	= ia.getFeature0(IRequiredServicesFeature.class)==null? null: ((IInternalRequiredServicesFeature)ia.getFeature(IRequiredServicesFeature.class)).getServiceInfos();
-					ProvidedServiceInfo[]	pis	= null;
-					IServiceIdentifier[]	sis	= null;
+					ProvidedServiceInfo[] pis = null;
+					IServiceIdentifier[] sis = null;
 					
 					ServiceQuery<IService>	query	= new ServiceQuery<IService>((Class<IService>)null).setProvider(ia.getId());
 					Collection<IService>	result	= ia.getFeature0(IRequiredServicesFeature.class)==null? null: (ia.getFeature(IRequiredServicesFeature.class)).searchLocalServices(query);

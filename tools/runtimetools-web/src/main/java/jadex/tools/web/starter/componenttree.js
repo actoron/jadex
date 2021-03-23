@@ -9,13 +9,22 @@ class ComponentTree extends BaseElement
 		return { cid: { type: String }};
 	}
 	
+	postInit()
+	{
+		// make details dragable
+		this.dragElement(this.shadowRoot.getElementById("details"));
+	}
+	
 	init() 
 	{
+		console.log("component tree");
+		
 		this.typemap = null;
 		this.treedata = {};
+		this.treedata["#"] = {};
 		this.treeid = "componenttree";
-		
-		console.log("component tree");
+		this.info = null;
+
 		// fixed types
 		var cloud = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/cloud.png';
 		var applications = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/applications.png';
@@ -68,10 +77,10 @@ class ComponentTree extends BaseElement
 						function getChildData(id)
 						{					
 							// get child ids			
-							var children = self.treedata[id+"_children"];
+							var children = self.getChildData(id);
 							
 							// create array with child data
-							var data = [];
+							/*var data = [];
 							if(children!=null)
 							{
 								for(var i=0; i<children.length; i++)
@@ -84,7 +93,7 @@ class ComponentTree extends BaseElement
 									else
 										console.log("ERR: not found: "+children[i]);
 								}
-							}
+							}*/
 							//if(data.length==0)
 							//	data = null;
 							
@@ -92,7 +101,7 @@ class ComponentTree extends BaseElement
 							
 							// problem: js tree changes data structures :-( give jstree only a clone?
 							//return Object.assign({}, data)
-							return JSON.parse(JSON.stringify(data));
+							return JSON.parse(JSON.stringify(children));
 							//return data;
 						}
 						
@@ -123,6 +132,39 @@ class ComponentTree extends BaseElement
 							cb.call(this, data);
 						}
 						
+						//console.log("loading node: "+node.id);
+						// create nfproperty container nodes with nfproperty children
+						function createNFChildren(node, res, vals, refreshcmd)
+						{
+							//console.log("createNFChildren: "+node.id+" "+(refreshcmd!=null));
+							
+							if(res!=null && Object.keys(res).length>0)
+							{
+								var nfid = node.id+"_nfprops";
+								//var ch = [];
+								
+								// parent node nfprops
+								var nfpropsnode =  {"id": nfid, "text": "Non-functional Properties", "type": "nfproperties", "children": true};
+								self.addChildData(node.id, nfpropsnode)
+								
+								for(var nfname in res)
+								{
+									var nfprop = res[nfname];
+									var val = vals!=null? vals[nfname]: null;
+									nfprop.val = val;
+									if(nfprop.dynamic && refreshcmd)
+										nfprop.refreshcmd = refreshcmd;
+									var txt = val!=null? nfprop.name+": "+val: nfprop.name;
+									var nfnode = {"id": nfid+"_"+nfprop.name, "text": txt, 
+										"type": nfprop.dynamic? "nfproperty_dynamic": "nfproperty", "children": false,
+										"refreshcmd": nfprop.dynamic? refreshcmd: null, "propname": nfprop.name, info: nfprop};
+									//ch.push(nfnode);
+									self.addChildData(nfid, nfnode);
+									//console.log("nfprop: "+nfname+" "+nfprop.dynamic+" "+nfnode.refreshcmd);
+								}
+							}
+						}
+						
 						// load initial state via component descriptions
 						if("#"===node.id)
 						{
@@ -143,333 +185,291 @@ class ComponentTree extends BaseElement
 								cb.call(this, data);
 							});
 						}
-						// when loading other nodes, component desriptions are availble via treedata
-						// nodeid = {nodevalues} for tree
-						// nodeid_children = [ids] for children ids
-						else if(node.type==="nfproperties")
+						// provided service node
+						else if(node.type==="provided")
 						{
-							cont();
-						}
-						else
-						{
-							//console.log("loading node: "+node.id);
-							// create nfproperty container nodes with nfproperty children
-							function createNFChildren(node, res, vals, refreshcmd)
+							// look for nf props (only possible children)
+							// sid is saved in node data 
+							
+							// args IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req
+							var sid = encodeURIComponent(JSON.stringify(node.original.sid));
+							//console.log("SID: "+sid);
+							axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0=null&args_1='+sid, self.transform)
+							.then(function(resp)
 							{
-								//console.log("createNFChildren: "+node.id+" "+(refreshcmd!=null));
+								//console.log("nf prov props:"+resp.data);		
+							
+								var res = resp.data;
 								
 								if(res!=null && Object.keys(res).length>0)
 								{
-									var nfid = node.id+"_nfprops";
-									//var ch = [];
-									var chids = [];
-									
-									for(var nfname in res)
+									axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0=null&args_1='+JSON.stringify(node.original.sid), self.transform)
+									.then(function(resp)
 									{
-										var nfprop = res[nfname];
-										var val = vals!=null? vals[nfname]: null;
-										var txt = val!=null? nfprop.name+": "+val: nfprop.name;
-										var nfnode = {"id": nfid+"_"+nfprop.name, "text": txt, 
-											"type": nfprop.dynamic? "nfproperty_dynamic": "nfproperty", "children": false,
-											"refreshcmd": nfprop.dynamic? refreshcmd: null, "propname": nfprop.name};
-										//ch.push(nfnode);
-										self.treedata[nfnode.id] = nfnode;
-										chids.push(nfnode.id);
-										//console.log("nfprop: "+nfname+" "+nfprop.dynamic+" "+nfnode.refreshcmd);
-									}
-									
-									// parent node nfprops
-									self.treedata[nfid] = {"id": nfid, "text": "Non-functional Properties", "type": "nfproperties", "children": true};//, "children": ch};
-									self.treedata[nfid+"_children"] = chids;
-									
-									// Add the nfprops node to the parent as child
-									var key = node.id+"_children";
-									var children = self.treedata[key];
-									if(children==null)
+										function refresh(node) 
+										{
+											axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0=null'
+												+"&args_1="+JSON.stringify(node.original.sid)+"&args_2=null&args_3=null&args_4="+node.original.propname, self.transform)
+											.then(function(resp)
+											{
+												//console.log("refresh nfnode: "+node);
+												var res = resp.data;
+												var val = res[node.original.propname];
+												var txt = node.original.propname+": "+val;
+												
+												console.log("refresh nfnode: "+node+" "+val);
+												
+												// store new data also in node info
+												self.treedata[node.id].info.val = res[node.original.propname];
+												
+												self.getTree(self.treeid).jstree('rename_node', node, txt);
+												self.refreshDetails(node);
+											})
+											.catch(function(e)
+											{
+												console.log("err in refresh nfnode: "+node);
+											});
+										}
+										
+										var vals = resp.data;
+										createNFChildren(node, res, vals, refresh);	
+										cont();
+									})
+									.catch(function(e)
 									{
-										children = [];
-										self.treedata[key] = children;
-									}
-									if(children.indexOf(nfid)===-1)
-										children.push(nfid);
+										console.log("getNFProps err: "+e);
+										createNFChildren(node, res);	
+										cont();
+									});
 								}
-							}
-							
-							// provided service node
-							if(node.type==="provided")
-							{
-								// look for nf props (only possible children)
-								// sid is saved in node data 
-								
-								// args IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req
-								var sid = encodeURIComponent(JSON.stringify(node.original.sid));
-								//console.log("SID: "+sid);
-								axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0=null&args_1='+sid, self.transform)
-								.then(function(resp)
+								else
 								{
-									//console.log("nf prov props:"+resp.data);		
-								
-									var res = resp.data;
-									
-									if(res!=null && Object.keys(res).length>0)
-									{
-										axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0=null&args_1='+JSON.stringify(node.original.sid), self.transform)
-										.then(function(resp)
-										{
-											function refresh(node) 
-											{
-												axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0=null'
-													+"&args_1="+JSON.stringify(node.original.sid)+"&args_2=null&args_3=null&args_4="+node.original.propname, self.transform)
-												.then(function(resp)
-												{
-													//console.log("refresh nfnode: "+node);
-													var res = resp.data;
-													var val = res[node.original.propname];
-													var txt = node.original.propname+": "+val;
-													self.getTree(self.treeid).jstree('rename_node', node, txt);
-												})
-												.catch(function(e)
-												{
-													console.log("err in refresh nfnode: "+node);
-												});
-											}
-											
-											var vals = resp.data;
-											createNFChildren(node, res, vals, refresh);	
-											cont();
-										})
-										.catch(function(e)
-										{
-											console.log("getNFProps err: "+e);
-											createNFChildren(node, res);	
-											cont();
-										});
-									}
-									else
-									{
-										console.log("nonfprops");
-										cont();
-									}
-								})
-								.catch(function(e)
-								{
-									console.log("getNF exception: "+e);
+									console.log("nonfprops");
 									cont();
-								});
-							}
-							// required service node
-							else if(node.type==="required")
+								}
+							})
+							.catch(function(e)
 							{
-								// look for nf props (only possible children)
-								// cid is saved in node data 
-								
-								// args IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req
-								axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
-								.then(function(resp)
-								{
-									//console.log("nf req props:"+resp.data);		
-									
-									var res = resp.data;
-									
-									if(res!=null && Object.keys(res).length>0)
-									{
-										axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
-										.then(function(resp)
-										{
-											function refresh(node) 
-											{
-												axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.original.cid
-													+"&args_1=null&args_2=null&args_3=true&args_4="+node.original.propname, self.transform)
-												.then(function(resp)
-												{
-													//console.log("refresh nfnode: "+node);
-													var res = resp.data;
-													var val = res[node.original.propname];
-													var txt = node.original.propname+": "+val;
-													self.getTree(self.treeid).jstree('rename_node', node, txt);
-												})
-												.catch(function(e)
-												{
-													console.log("err in refresh nfnode: "+node);
-												});
-											}
-											
-											var vals = resp.data;
-											createNFChildren(node, res, vals, refresh);	
-											cont();
-										})
-										.catch(function(e)
-										{
-											createNFChildren(node, res);	
-											cont();
-										});
-									}
-									else
-									{
-										cont();
-									}
-								})
-								.catch(function(e)
-								{
-									console.log("getNF exception: "+e);
-									cont();
-								});
-							}
-							// component nodes 
-							else if(node.type!=="system" && node.type!=="applications" && node.type!=="cloud")
-							{
-								// possible children are
-								// a) nfprops
-								// b) services
-								// c) subcomponents
-								// searches parallel and waits for barrier via Promise.all()
-								
-								// https://stackoverflow.com/questions/31069453/creating-a-es6-promise-without-starting-to-resolve-it
-								// can fail
-								var promc = loadComponentChildData(node.id);
-
-								// nfresolve and serresolve are always called (also on err)
-								var nfresolve = null;
-								var promnf = new Promise(function(r, e)
-								{
-									nfresolve = r;
-								});
-								
-								var serresolve = null;
-								var promser = new Promise(function(r, e)
-								{
-									serresolve = r;
-								});
-								
-								Promise.all([promnf, promser, promc]).then(function(res)
-								{
-									cont();
-								})
-								.catch(e => 
-								{
-									console.log("err: "+e);
-									cont();	
-								});
-								
-								axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.id, self.transform)
-								.then(function(resp)
-								{
-									//console.log("nf props:"+resp.data);	
-
-									var res = resp.data;
-									
-									if(res!=null && Object.keys(res).length>0)
-									{
-										var cid = node.id;
-										axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.id, self.transform)
-										.then(function(resp)
-										{
-											var vals = resp.data;
-											
-											function refresh(node) 
-											{
-												axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+cid
-													+"&args_1=null&args_2=null&args_3=null&args_4="+node.original.propname, self.transform)
-												.then(function(resp)
-												{
-													//console.log("refresh nfnode: "+node);
-													var res = resp.data;
-													var val = res[node.original.propname];
-													var txt = node.original.propname+": "+val;
-													self.getTree(self.treeid).jstree('rename_node', node, txt);
-												})
-												.catch(function(e)
-												{
-													console.log("err in refresh nfnode: "+e);
-												});
-											}
-											
-											createNFChildren(node, res, vals, refresh);	
-											nfresolve(null);
-										})
-										.catch(function(e)
-										{
-											console.log("err is: "+e);
-											createNFChildren(node, res);	
-											nfresolve(null);
-										});
-									}
-									else
-									{
-										nfresolve(null);
-									}
-								})
-								.catch(function(e)
-								{
-									console.log("getNF exception: "+e);
-									//promnf.resolve(null);
-									nfresolve(null);
-								});
-								
-								axios.get(self.getMethodPrefix()+'&methodname=getServiceInfos&args_0='+node.id, self.transform)
-								.then(function(resp)
-								{
-									//console.log("service infos: "+resp.data);
-									
-									var res = resp.data;
-									
-									if(res[0].length>0 || res[1].length>0)
-									{
-										var serid = node.id+"_services";
-		
-										var ch = [];
-										
-										// provided
-										for(var i=0; i<res[0].length; i++)
-										{
-											var psid = serid+"_"+res[0][i].name;
-											var txt = res[0][i].type.value.split(".");
-											txt = txt[txt.length-1];
-											//console.log("sid: "+res[2][i]);
-											var psnode = {"id": psid, "text": txt, "type": "provided", "children": true, "sid": res[2][i]};
-											ch.push(psnode);
-										}
-										
-										// required
-										for(var i=0; i<res[1].length; i++)
-										{
-											var rsid = serid+"_"+res[1].name;
-											var txt = res[1][i].type.value.split(".");
-											var mult = res[1][i].multiple;
-											txt = txt[txt.length-1];
-											var rsnode = {"id": rsid, "text": txt, "type": mult? "required_multiple": "required", "children": true, "cid": node.id};
-											ch.push(rsnode);
-										}
-										
-										self.treedata[serid] = {"id": serid, "text": "Services", "type": "services", "children": ch};
-										
-										var key = node.id+"_children";
-										var children = self.treedata[key];
-										if(children==null)
-										{
-											children = [];
-											self.treedata[key] = children;
-										}
-										if(children.indexOf(serid)===-1)
-											children.push(serid);
-									}
-									
-									serresolve(null);
-									//promser.resolve(null);
-								})
-								.catch(function(e)
-								{
-									console.log("Err loading services for: "+node.id);
-									serresolve(null);
-									//promser.resolve(null);
-								});
-							}
-							else
-							{
-								cont();									
-							}
+								console.log("getNF exception: "+e);
+								cont();
+							});
 						}
-				    }
+						// required service node
+						else if(node.type==="required")
+						{
+							// look for nf props (only possible children)
+							// cid is saved in node data 
+							
+							// args IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req
+							axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
+							.then(function(resp)
+							{
+								//console.log("nf req props:"+resp.data);		
+								
+								var res = resp.data;
+								
+								if(res!=null && Object.keys(res).length>0)
+								{
+									axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
+									.then(function(resp)
+									{
+										function refresh(node) 
+										{
+											axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.original.cid
+												+"&args_1=null&args_2=null&args_3=true&args_4="+node.original.propname, self.transform)
+											.then(function(resp)
+											{
+												//console.log("refresh nfnode: "+node);
+												var res = resp.data;
+												var val = res[node.original.propname];
+												var txt = node.original.propname+": "+val;
+												
+												console.log("refresh nfnode: "+node+" "+val);
+												
+												// store new data also in node info
+												self.treedata[node.id].info.val = res[node.original.propname];
+
+												self.getTree(self.treeid).jstree('rename_node', node, txt);
+												self.refreshDetails(node);
+											})
+											.catch(function(e)
+											{
+												console.log("err in refresh nfnode: "+node);
+											});
+										}
+										
+										var vals = resp.data;
+										createNFChildren(node, res, vals, refresh);	
+										cont();
+									})
+									.catch(function(e)
+									{
+										createNFChildren(node, res);	
+										cont();
+									});
+								}
+								else
+								{
+									cont();
+								}
+							})
+							.catch(function(e)
+							{
+								console.log("getNF exception: "+e);
+								cont();
+							});
+						}
+						// component nodes 
+						else if(node.type==="default" || node.type==="platform")
+						//else if(node.type!=="system" && node.type!=="applications" && node.type!=="cloud")
+						{
+							//console.log("loading comp node: "+node.type+" "+node.id);
+							// possible children are
+							// a) nfprops
+							// b) services
+							// c) subcomponents
+							// searches parallel and waits for barrier via Promise.all()
+							
+							// https://stackoverflow.com/questions/31069453/creating-a-es6-promise-without-starting-to-resolve-it
+							// can fail
+							var promc = loadComponentChildData(node.id);
+
+							// nfresolve and serresolve are always called (also on err)
+							var nfresolve = null;
+							var promnf = new Promise(function(r, e)
+							{
+								nfresolve = r;
+							});
+							
+							var serresolve = null;
+							var promser = new Promise(function(r, e)
+							{
+								serresolve = r;
+							});
+							
+							Promise.all([promnf, promser, promc]).then(function(res)
+							{
+								cont();
+							})
+							.catch(e => 
+							{
+								console.log("err: "+e);
+								cont();	
+							});
+							
+							axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.id, self.transform)
+							.then(function(resp)
+							{
+								//console.log("nf props:"+resp.data);	
+
+								var res = resp.data;
+								
+								if(res!=null && Object.keys(res).length>0)
+								{
+									var cid = node.id;
+									axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.id, self.transform)
+									.then(function(resp)
+									{
+										var vals = resp.data;
+										
+										function refresh(node) 
+										{
+											axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+cid
+												+"&args_1=null&args_2=null&args_3=null&args_4="+node.original.propname, self.transform)
+											.then(function(resp)
+											{
+												var res = resp.data;
+												var val = res[node.original.propname];
+												var txt = node.original.propname+": "+val;
+												
+												console.log("refresh nfnode: "+node+" "+val);
+
+												// store new data also in node info
+												self.treedata[node.id].info.val = res[node.original.propname];
+
+												self.getTree(self.treeid).jstree('rename_node', node, txt);
+												self.refreshDetails(node);
+											})
+											.catch(function(e)
+											{
+												console.log("err in refresh nfnode: "+e);
+											});
+										}
+										
+										createNFChildren(node, res, vals, refresh);	
+										nfresolve(null);
+									})
+									.catch(function(e)
+									{
+										console.log("err is: "+e);
+										createNFChildren(node, res);	
+										nfresolve(null);
+									});
+								}
+								else
+								{
+									nfresolve(null);
+								}
+							})
+							.catch(function(e)
+							{
+								console.log("getNF exception: "+e);
+								//promnf.resolve(null);
+								nfresolve(null);
+							});
+							
+							axios.get(self.getMethodPrefix()+'&methodname=getServiceInfos&args_0='+node.id, self.transform)
+							.then(function(resp)
+							{
+								//console.log("service infos: "+resp.data);
+								
+								var res = resp.data;
+								
+								if(res[0].length>0 || res[1].length>0)
+								{
+									var serid = node.id+"_services";
+	
+									var sernode = {"id": serid, "text": "Services", "type": "services", "children": true};
+									self.addChildData(node.id, sernode);
+									
+									// provided
+									for(var i=0; i<res[0].length; i++)
+									{
+										var psid = serid+"_"+res[0][i].name;
+										var txt = res[0][i].type.value.split(".");
+										txt = txt[txt.length-1];
+										//console.log("sid: "+res[2][i]);
+										var psnode = {"id": psid, "text": txt, "type": "provided", "children": true, "sid": res[2][i], "info": res[0][i]};
+										self.addChildData(serid, psnode);
+									}
+									
+									// required
+									for(var i=0; i<res[1].length; i++)
+									{
+										var rsid = serid+"_"+res[1].name;
+										var txt = res[1][i].type.value.split(".");
+										var mult = res[1][i].multiple;
+										txt = txt[txt.length-1];
+										var rsnode = {"id": rsid, "text": txt, "type": mult? "required_multiple": "required", "children": true, "cid": node.id, "info": res[1][i]};
+										self.addChildData(serid, rsnode);
+									}
+								}
+								
+								serresolve(null);
+								//promser.resolve(null);
+							})
+							.catch(function(e)
+							{
+								console.log("Err loading services for: "+node.id);
+								serresolve(null);
+								//promser.resolve(null);
+							});
+						}
+						else
+						{
+							cont();									
+						}
+					}
 				},
 				'sort': function(a, b) 
 				{
@@ -542,6 +542,18 @@ class ComponentTree extends BaseElement
 			    }
 			})});
 			
+			self.getTree(self.treeid).on("select_node.jstree", function(evt, data)
+			{
+				self.refreshDetails(data.node);
+			});
+			
+			/*self.getTree(self.treeid).bind("dblclick.jstree", function (event) 
+			{
+   				var node = $(event.target).closest("li");
+  				var data = node.data("jstree");
+				console.log("dclick: "+data);
+			});*/
+			
 			/*self.getTree(self.treeid).on('refresh.jstree', function (event) 
 			{
 				console.log("refreshed tree: "+event);
@@ -589,6 +601,78 @@ class ComponentTree extends BaseElement
 			
 			//self.refresh();
 		});
+	}
+	
+	// when node is selected
+	refreshDetails(node)
+	{
+		console.log("selected: "+node+" "+node.type);
+				
+		var self = this;
+		var type = node.type;
+		var info = self.treedata[node.id].info;
+		var created = false;
+		
+		if(type=="default") 
+		{
+			self.info = {type: type};
+			self.info.heading = "Component Details";
+			self.info.name = info.name.name;
+			self.info.ctype = info.type;
+			self.info.model = info.modelName;
+			self.info.creator = info.creator.name;
+			self.info.system = info.systemComponent;
+			self.info.state = info.state;
+			self.info.monitoring = info.monitoring.value;
+			created = true;
+		}
+		else if(type=="required")
+		{
+			self.info = {type: type};
+			self.info.heading = "Required Service Details";
+			self.info.name = info.name;
+			self.info.type = info.type.value;
+			self.info.min = info.min;
+			self.info.max = info.max;
+			self.info.tags = info.tags.toString();
+			self.info.searchscope = info.defaultBinding?.scope?.value;
+			self.info.proxytype = info.defaultBinding?.proxytype;
+			created = true;
+		}
+		else if(type=="provided")
+		{
+			self.info = {type: type};
+			self.info.heading = "Provided Service Details";
+			self.info.name = info.name;
+			self.info.type = info.type.value;
+			self.info.scope = info.scope.value;
+			self.info.systemservice = info.systemService;
+			created = true;
+		}
+		else if(type.startsWith("nfproperty"))
+		{
+			self.info = {type: type};
+			self.info.heading = "Non-Functional Property Details";
+			self.info.name = info.name;
+			self.info.type = info.type.value;
+			self.info.dynamic = info.dynamic;
+			if(info.unit)
+				self.info.unit = info.unit.value;
+			if(info.updateRate && info.updateRate!=-1)
+				self.info.updateRate = info.updateRate;
+			self.info.value = info.val;
+			created = true;
+		}
+		
+		if(created)
+		{
+			if(info?.refreshcmd)
+				self.info.refreshcmd = info.refreshcmd; //(node) => {info.refreshcmd(node); self.refreshDetails(node)};
+			if(info!=null)
+				self.info.node = node;
+		}
+		
+		self.requestUpdate();
 	}
 	
 	killComponent(cid)
@@ -756,10 +840,8 @@ class ComponentTree extends BaseElement
 
 				//console.log(cid+" "+type+" "+icon);
 				
-				//if(createnode)
-				//	self.createNode(treeid, lastname, names[i], name, 'last', type, icon);
-				//else
-					self.createNodeData(names[i], name, type, icon, lastname);
+				self.createNodeData(names[i], name, type, icon, lastname, 
+					i+1<names.length? null: component);
 			}
 			//else
 			//	console.log("not creating: "+names[i]);
@@ -779,55 +861,17 @@ class ComponentTree extends BaseElement
 			&& type!=="services";
 	}
 	
-	// createNode(parent, id, text, position), position 'first' or 'last'
-	/*createNode(treeid, parent_node_id, new_node_id, new_node_text, position, type, icon)//, donefunc) 
-	{
-		console.log("parent="+parent_node_id+" child="+new_node_id+" childtext="+new_node_text);
-		console.log("create node: "+new_node_id);
-		var n = {"text": new_node_text, "id": new_node_id}; //"children": true  "state": {"opened": false}
-		if(type!=null)
-			n.type = type;
-		if(icon!=null)
-			n.icon = icon;
-		this.getTree(self.treeid).jstree('create_node', '#'+parent_node_id, n, 'last');	
-	}*/
-		
-	createNodeData(id, name, type, icon, parent)
+	createNodeData(id, name, type, icon, parent, info)
 	{
 		//console.log("create node data: "+id+" "+name+" "+type+" "+parent);
 		var paid = parent==null || parent.length==0? "#": parent;
 		// must use _parent as parent is already used by jstree
-		this.treedata[id] = {"id": id, "text": name, "type": type, "icon": icon, "children": true, "_parent": paid}; // "original": {'hello': true}
-		var key = parent==null || parent.length==0? "#_children": parent+"_children";
-		var children = this.treedata[key];
-		if(children==null)
-		{
-			children = [];
-			this.treedata[key] = children;
-		}
-		if(children.indexOf(id)===-1)
-		{
-			children.push(id);
-			//console.log("added to parent: "+id+" "+parent);
-		}
-		else
-		{
-			//console.log("not added to parent: "+id+" "+parent);
-		}
+		var node = {"id": id, "text": name, "type": type, "icon": icon, "children": true, "_parent": paid, "info": info}; // "original": {'hello': true}
+		var key = parent==null || parent.length==0? "#": parent;
+		
+		this.addChildData(key, node);
 	}
 		
-	/*deleteNode(treeid, nodeid)
-	{
-		console.log("remove node: "+nodeid);
-		this.getTree(treeid).jstree("delete_node", nodeid);
-		//var apps4 = this.getTree(treeid).jstree().get_node(this.cid+'_Services');
-		var apps = this.getTree(treeid).jstree().get_node('Applications');
-		if(apps!=false && apps.children.length==0)
-			this.getTree(treeid).jstree("delete_node", "Applications");
-			
-		// todo: remove node from parents children
-	}*/
-	
 	deleteNodeData(treeid, nodeid)
 	{
 		// delete a component node:
@@ -841,14 +885,14 @@ class ComponentTree extends BaseElement
 		//console.log("remove node data: "+nodeid);
 		this.removeChildDataFromParent(treeid, nodeid);
 		delete this.treedata[nodeid];
-		delete this.treedata[nodeid+"_children"];
+		//delete this.treedata[nodeid].children;
 
-		var ac = this.treedata["Applications_children"];
+		var ac = this.getChildData("Applications");
 		if(ac==null || ac.length==0)
 		{
 			this.removeChildDataFromParent(treeid, "Applications");
 			delete this.treedata["Applications"];
-			delete this.treedata["Applications_children"]
+			//delete this.treedata["Applications_children"]
 		}
 	}
 	
@@ -859,7 +903,7 @@ class ComponentTree extends BaseElement
 		//this.getTree(treeid).jstree().get_parent(nodeid);
 		if(paid!=null)
 		{
-			var pachilds = this.treedata[paid+"_children"];
+			var pachilds = this.treedata[paid].children;
 			if(pachilds!=null)
 			{
 				var i = pachilds.indexOf(nodeid);
@@ -927,7 +971,7 @@ class ComponentTree extends BaseElement
 					// when last app has been deleted or first app has been created -> root refresh 
 					
 					var hasapp = self.getTree(self.treeid).jstree().get_node("Applications")!=false;
-					var ac = self.treedata["Applications_children"];
+					var ac = self.getChildData("Applications");
 					var shouldhaveapp = ac!=null && ac.length>0;
 					
 					if(hasapp!=shouldhaveapp)
@@ -949,7 +993,131 @@ class ComponentTree extends BaseElement
 			);
 		}
 	}
+	
+	getProps()
+	{
+		var ret = [];
+		if(this.info!=null)
+		{
+			ret = Object.keys(this.info).sort();
+			// remove all commands
+			for(var i=ret.length-1; i>=0; i--)
+			{
+				if(ret[i].toLowerCase().endsWith("cmd") 
+					|| ret[i].toLowerCase()==="node"
+					|| ret[i].toLowerCase()==="heading"
+				)
+				{
+					ret.splice(i, 1);
+				}
+			}
+		}
+		return ret;
+	}
+	
+	getChildIds(id)
+	{
+		if(this.treedata[id]==null)
+			console.log("node not found: "+id);
+			
+		var cids = this.treedata[id]?._children;
+		return cids;
+	}
+	
+	getChildData(id)
+	{
+		if(this.treedata[id]==null)
+			console.log("node not found: "+id);
+			
+		var cids = this.treedata[id]?._children;
+		var ret = null;
+		if(cids!=null)
+		{
+			ret = [];
+			for(var cid of cids)
+			{
+				ret.push(this.treedata[cid]);
+			}
+		}
+		return ret;
+	}
+	
+	setChildData(id, data)
+	{
+		if(this.treedata[id]==null)
+			console.log("node not found: "+id);
+		
+		var ids = [];
+		for(var d of data)
+		{
+			c.push(d.id);
+			this.treedata[d.id] = d;
+		}
+		this.treedata[id]._children = ids;
+	}
+	
+	addChildData(id, data)
+	{
+		if(this.treedata[id]==null)
+			console.log("node not found: "+id);
+			
+		var cids = this.treedata[id]._children;
+		if(cids==null)
+		{
+			cids = [];
+			this.treedata[id]._children = cids;
+		}
+		this.treedata[data.id] = data;
+		if(cids.indexOf(data.id)==-1)
+			cids.push(data.id);
+	}
+	
+	// methods for making dragable the details element
+	dragElement(element) 
+	{
+		var x1 = 0;
+		var y1 = 0;
+		var x2 = 0; 
+		var y2 = 0;
+	    
+		var elementDrag = function(e) 
+		{
+	    	e = e || window.event;
+	    	e.preventDefault();
+	    	x1 = x2 - e.clientX;
+	    	y1 = y2 - e.clientY;
+	    	x2 = e.clientX;
+	    	y2 = e.clientY;
+			//console.log("to: "+x2+" "+y2);
+	    	// set the element's new position:
+			var y = parseInt(element.style.top) || 0;
+	    	var x = parseInt(element.style.left) || 0;
+			element.style.top = y-y1+"px";
+	    	element.style.left = x-x1+"px";
+ 		}
 
+  		var closeDragElement = function() 
+		{
+    		// stop moving when mouse button is released:
+    		document.onmouseup = null;
+    		document.onmousemove = null;
+  		}
+
+		var dragMouseDown = function(e) 
+		{
+	    	e = e || window.event;
+	    	e.preventDefault();
+			x2 = e.clientX;
+	    	y2 = e.clientY;
+			//console.log("from: "+x2+" "+y2);
+	    	document.onmouseup = closeDragElement;
+	    	// call a function whenever the cursor moves:
+	    	document.onmousemove = elementDrag;
+	  	}
+
+		element.onmousedown = dragMouseDown;
+	}
+	
 	static get styles() 
 	{
 	    return css`
@@ -973,7 +1141,6 @@ class ComponentTree extends BaseElement
 	    	.navbar-custom .nav-item:hover .nav-link {
 	    		color: #ffffff;
 	    	}
-	    	
 	    	.w100 {
 				width: 100%;
 			}
@@ -989,22 +1156,45 @@ class ComponentTree extends BaseElement
 	  			0% { transform: rotate(0deg); }
 	  			100% { transform: rotate(360deg); }
 			}
+			.dragable {
+				position: absolute;
+			  	z-index: 9;
+			  	background-color: #00000011;
+			  	border: 1px solid #d3d3d3;
+			}
 	    `;
 	}
 	
-	asyncRender() {
+	asyncRender() 
+	{
+		console.log("render componenttree called");
 		return html`
 			<div class="container-fluid m-0 p-0">
 				<div class="row m-0 p-0">
-					<div class="col-12 m-0 p-0">
+					<div class="col-8 m-0 p-0">
 						<div id="componenttree"></div>
 					</div>
+					<div id="details" class="dragable col-4 ${this.info!=null? 'visible': 'hidden'}">
+						<div class="row">
+							<div class="col">
+								<h3>${this.info!=null? this.info.heading: ""}</h3>
+							</div>
+						</div>
+						<dl class="row">
+							${this.getProps().map(propname => html`
+								<dt class="col-5">${propname.charAt(0).toUpperCase() + propname.slice(1)}</dt>
+								<dd class="col-7 text-wrap text-break">${this.info[propname]}</dd>
+							`)}
+						</dl>
+						<div class="${this.info?.refreshcmd!=null? 'visible': 'hidden'}">
+							<button type="button" class="btn btn-success" @click="${e => this.info.refreshcmd(this.info.node)}">${this.app.lang.t('Refresh')}</button>
+						</div>
+					</div>
 				</div>
-			</div>
+			</div>	
 		`;
 	}
 }
-
 
 if(customElements.get('jadex-componenttree') === undefined)
 	customElements.define('jadex-componenttree', ComponentTree);
