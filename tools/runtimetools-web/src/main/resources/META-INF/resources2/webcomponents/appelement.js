@@ -126,12 +126,10 @@ class AppElement extends BaseElement
 				<div class="row p-0">
 					<div class="col">
 						<div class="alert m-0 p-0 ${(this.message.type=='error'? 'alert-danger': 'alert-info')}">
+							<div class="close" @click="${e => this.clearMessage()}"></div>
 							<div class="row p-1 m-1">
-								<div class="col-10 p-0 align-self-center">
+								<div class="col-12 p-0 align-self-center">
 									${this.message.text}
-								</div>
-								<div class="col-2 p-0 m-0">
-									<button type="button" class="float-right btn btn-primary" @click="${e => this.clearMessage()}">Close</button>
 								</div>
 							</div>
 						</div>

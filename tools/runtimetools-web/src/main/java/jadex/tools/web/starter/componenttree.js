@@ -179,7 +179,7 @@ class ComponentTree extends BaseElement
 								cb.call(this, data);
 							}).catch(err=>
 							{
-								//console.log(err);
+								console.log(err);
 								var data = getChildData(node.id);
 								//console.log("out2: "+node+" "+mycnt);
 								cb.call(this, data);
@@ -606,7 +606,7 @@ class ComponentTree extends BaseElement
 	// when node is selected
 	refreshDetails(node)
 	{
-		console.log("selected: "+node+" "+node.type);
+		//console.log("selected: "+node+" "+node.type);
 				
 		var self = this;
 		var type = node.type;
@@ -1006,6 +1006,7 @@ class ComponentTree extends BaseElement
 				if(ret[i].toLowerCase().endsWith("cmd") 
 					|| ret[i].toLowerCase()==="node"
 					|| ret[i].toLowerCase()==="heading"
+					|| ret[i].toLowerCase()==="hidden"
 				)
 				{
 					ret.splice(i, 1);
@@ -1158,7 +1159,6 @@ class ComponentTree extends BaseElement
 			}
 			.dragable {
 				position: absolute;
-			  	z-index: 9;
 			  	background-color: #00000011;
 			  	border: 1px solid #d3d3d3;
 			}
@@ -1167,14 +1167,14 @@ class ComponentTree extends BaseElement
 	
 	asyncRender() 
 	{
-		console.log("render componenttree called");
 		return html`
 			<div class="container-fluid m-0 p-0">
 				<div class="row m-0 p-0">
 					<div class="col-8 m-0 p-0">
 						<div id="componenttree"></div>
 					</div>
-					<div id="details" class="dragable col-4 ${this.info!=null? 'visible': 'hidden'}">
+					<div id="details" class="m-0 p-0 dragable col-4 ${this.info!=null? 'visible': 'hidden'}">
+						<div class="close" @click="${e => {this.info=null; this.requestUpdate();}}"></div>
 						<div class="row">
 							<div class="col">
 								<h3>${this.info!=null? this.info.heading: ""}</h3>

@@ -316,3 +316,34 @@ z-index: 1;
 .hidden {
 	display: none;
 }
+
+.close {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	width: 16px;
+	height: 16px;
+	opacity: 0.3;
+	z-index: 1;
+}
+
+.close:hover {
+	opacity: 1;
+}
+
+.close:before, .close:after {
+	position: absolute;
+	left: 8px;
+	content: ' ';
+	height: 17px;
+	width: 2px;
+	background-color: #333;
+}
+
+.close:before {
+	transform: rotate(45deg);
+}
+
+.close:after {
+	transform: rotate(-45deg);
+}
