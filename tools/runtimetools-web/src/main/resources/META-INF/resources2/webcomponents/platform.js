@@ -57,6 +57,13 @@ class PlatformElement extends CidElement
 			self.requestUpdate();
 		};
 		this.checkPlatform(10000);
+		
+		
+		//"../webcomponents/login.js"
+	}
+	
+	postInit()
+	{
 		this.loadPluginInfos().then(function()
     	{
     		self.loaded = true;
@@ -64,14 +71,14 @@ class PlatformElement extends CidElement
     			self.showPlugin2({ "name" : self.plugin });
     		else if(self.plugins.length > 0)
     			self.showPlugin2(self.getPlugins()[0].name);
+			resolve();
     	}).catch(function(err) 
 		{
 			self.createErrorMessage("Could not load plugins", err);
 			console.log("err: "+err);
-			throw err;
+			//throw err;
+			reject(err);
 		});
-		
-		"../webcomponents/login.js"
 	}
 	
 	/*init() 
@@ -127,6 +134,7 @@ class PlatformElement extends CidElement
 
 		let self = this;
 		
+		console.log('?????????? Loading plugin ' + name + ' value is ' + this.plugins[name].unrestricted + ' i am loggedin ' + this.app.login.isLoggedIn());
 		if(!this.plugins[name].unrestricted && !this.app.login.isLoggedIn())
 		{
 			let html = "<jadex-restricted></jadex-restricted>";

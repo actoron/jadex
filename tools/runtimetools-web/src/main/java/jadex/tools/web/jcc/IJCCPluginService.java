@@ -1,6 +1,5 @@
 package jadex.tools.web.jcc;
 
-import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
@@ -9,7 +8,6 @@ import jadex.commons.future.IFuture;
  *  Must be extended by all JCC plugin interfaces and services.
  */
 @Service
-@Security(roles=Security.UNRESTRICTED)
 public interface IJCCPluginService
 {
 	/**
