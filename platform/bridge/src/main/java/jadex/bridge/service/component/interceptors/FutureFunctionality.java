@@ -1,15 +1,11 @@
 package jadex.bridge.service.component.interceptors;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.logging.Logger;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -672,35 +668,35 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	/** The future functionality. */
 	protected FutureFunctionality func;
 	
-	//-------- debugging --------
-	ISubscriptionIntermediateFuture<?> mysrc;
-	List<Object>	myresults	= new ArrayList<>();
-	@Override
-	public String toString()
-	{
-		return super.toString() + "(storeforfirst="+storeforfirst+", src="+mysrc+", results="+results+", ownresults="+ownresults+", myresults="+myresults+")";
-	}
-	@Override
-	protected void	storeResult(Object result, boolean scheduled)
-	{
-		if((""+result).contains("IMarkerService"))
-		{
-			try
-			{
-				myresults.add(result);
-				super.storeResult(result, scheduled);
-			}
-			finally
-			{
-				Logger.getLogger(getClass().getName()).info("storeResult: "+this+", "+result+", "+IComponentIdentifier.LOCAL.get());
-			}
-		}
-		else
-		{
-			super.storeResult(result, scheduled);
-		}
-	}
-	//-------- debugging end --------
+//	//-------- debugging --------
+//	ISubscriptionIntermediateFuture<?> mysrc;
+//	List<Object>	myresults	= new ArrayList<>();
+//	@Override
+//	public String toString()
+//	{
+//		return super.toString() + "(storeforfirst="+storeforfirst+", src="+mysrc+", results="+results+", ownresults="+ownresults+", myresults="+myresults+")";
+//	}
+//	@Override
+//	protected void	storeResult(Object result, boolean scheduled)
+//	{
+//		if((""+result).contains("IMarkerService"))
+//		{
+//			try
+//			{
+//				myresults.add(result);
+//				super.storeResult(result, scheduled);
+//			}
+//			finally
+//			{
+//				Logger.getLogger(getClass().getName()).info("storeResult: "+this+", "+result+", "+IComponentIdentifier.LOCAL.get());
+//			}
+//		}
+//		else
+//		{
+//			super.storeResult(result, scheduled);
+//		}
+//	}
+//	//-------- debugging end --------
 
 	
 	/**
@@ -759,11 +755,11 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	@Override
 	protected boolean	doAddIntermediateResult(Object result, boolean undone)
 	{
-		if((""+result).contains("IMarkerService"))
-//			|| (""+result).contains("PartDataChunk"))
-		{
-			Logger.getLogger(getClass().getName()).info("add: "+this+", "+result+", "+IComponentIdentifier.LOCAL.get());
-		}
+//		if((""+result).contains("IMarkerService"))
+////			|| (""+result).contains("PartDataChunk"))
+//		{
+//			Logger.getLogger(getClass().getName()).info("add: "+this+", "+result+", "+IComponentIdentifier.LOCAL.get());
+//		}
 		try
 		{
 			result = func.handleIntermediateResult(result);
