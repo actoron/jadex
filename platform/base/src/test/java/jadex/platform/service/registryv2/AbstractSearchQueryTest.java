@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -93,6 +92,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			ITestService	svc	= results.getNextIntermediateResult();
 			ITestService	svc2	= results.getNextIntermediateResult();
 			Assert.assertEquals(""+svc, pro1.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
+			Assert.assertEquals(""+svc2, pro1.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 			
 			// 3) start provider platform, wait for service -> test if awa fallback works with two platforms 
 			System.out.println("3) start provider platform, wait for service");
@@ -100,17 +100,17 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			svc	= results.getNextIntermediateResult();
 			svc2 = results.getNextIntermediateResult();
 			Assert.assertEquals(""+svc, pro2.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
+			Assert.assertEquals(""+svc2, pro2.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 		}
 		else
 		{
-			// -> test if platforms don't see each other without SP.
+			// without SP -> test that platform finds no / only global services.
 			System.out.println("2/3) start provider platforms, wait for services");
 			pro1	= createPlatform(proconf);
 			pro2	= createPlatform(proconf);
 			waitForRegistryClient(client, true);
 			Collection<ITestService> col = results.getIntermediateResults();
-			System.out.println("found: "+col.size());
-			Assert.assertEquals(2, new LinkedHashSet<>(col).size());
+			Assert.assertEquals(col.toString(), sspconf==null ? 0 : 2, col.size());
 		}
 
 		//-------- Tests with SP if any --------
@@ -155,15 +155,20 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
 			svc	= results2.getNextIntermediateResult();
 			providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
-			svc	= results2.getNextIntermediateResult();
-			providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
-			svc	= results2.getNextIntermediateResult();
-			providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
 			
 			Set<IComponentIdentifier> providers2 = new LinkedHashSet<>();
 			providers2.add(pro1.getId());
 			providers2.add(pro2.getId());
-			waitForRegistryClient(client, false);
+			
+			if(sspconf!=null)	// if ssp exists wait for the two global services also
+			{
+				svc	= results2.getNextIntermediateResult();
+				providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
+				svc	= results2.getNextIntermediateResult();
+				providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
+				providers2.add(pro1.getId());
+				providers2.add(pro2.getId());
+			}
 			
 			Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results2.getIntermediateResults()));
 			Assert.assertEquals(providers1, providers2);
@@ -173,20 +178,35 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			IExternalAccess	pro3	= createPlatform(proconf);
 			svc	= results.getNextIntermediateResult();
 			Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
-			svc	= results.getNextIntermediateResult();
-			Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 			svc	= results2.getNextIntermediateResult();
 			Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
-			svc	= results2.getNextIntermediateResult();
-			Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
+			
+			if(sspconf!=null)	// if ssp exists wait for the two global services also
+			{
+				svc	= results.getNextIntermediateResult();
+				Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
+				svc	= results2.getNextIntermediateResult();
+				Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
+			}
 	
 			// 7) kill SP, start provider platform, wait for service on both queries
 			System.out.println("7) kill SP, start remote platform, wait for service on both queries");
 			removePlatform(sp);
+			if(awa && sspconf==null)
+			{
+				// After fallback to awa -> now global services are found (hack???)
+				svc	= results.getNextIntermediateResult();
+//				svc	= results.getNextIntermediateResult();
+				svc	= results2.getNextIntermediateResult();
+				svc	= results2.getNextIntermediateResult();
+				svc	= results2.getNextIntermediateResult();
+			}
+			
 			IExternalAccess	pro4 = createPlatform(proconf);
 			if(awa)
 			{
 				// -> test if re-fallback to awa works for queries
+				waitForRegistryClient(client, true);
 				svc	= results.getNextIntermediateResult();
 				Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 				svc	= results.getNextIntermediateResult();
@@ -299,9 +319,9 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			IExternalAccess	sp	= createPlatform(spconf);
 			waitForSuperpeerConnections(sp, client, pro2);
 			waitForRegistryWithProvider(client, pro2, false);
-			waitALittle(client);	// Hack for timeout in CI Pipeline!?
+//			waitALittle(client);	// Hack for timeout in CI Pipeline!?
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals(client.toString()+": "+result, 2, result.size());
+			Assert.assertEquals(client.toString()+": "+result, sspconf==null ? 1:2, result.size());
 			
 			// 6) start provider platform, wait for connection, search for service -> test if search works for new platform and existing SP
 			System.out.println("6) start provider platform, search for service");
@@ -309,7 +329,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitForSuperpeerConnections(sp, pro1);
 			waitForRegistryClient(client, false);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals("found: "+result+", new platform: "+pro1.getId(), 4, result.size());
+			Assert.assertEquals("found: "+result+", new platform: "+pro1.getId(), sspconf==null ? 2 : 4, result.size());
 			
 			// 6b) search without scope (must deliver scope and network services)
 			for(ITestService ser: result)
@@ -334,7 +354,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitALittle(client);
 			waitALittle(client);	// two waits for disconnection, because contimeout = 2* WAITFACTOR
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals(""+result, 2, result.size());
+			Assert.assertEquals(""+result, sspconf==null ? 1 : 2, result.size());
 	
 			// 8) kill SP, search for service -> test if re-fallback to awa works
 			System.out.println("8) kill SP, search for service");
@@ -354,7 +374,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 	 */
 	protected void waitForRegistryClient(IExternalAccess client, boolean global)
 	{
-		Logger.getLogger(getClass().getName()).info("waitForRegistryClient0: "+client+", "+true);
+//		Logger.getLogger(getClass().getName()).info("waitForRegistryClient0: "+client+", "+true);
 		// Can only use global when ssp available. Otherwise uses awa fallback via network.
 		global	= global && sspconf!=null;
 		
@@ -365,7 +385,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		do
 		{
 			found	= ((IService)sub.getNextIntermediateResult()).getServiceId().getProviderId();
-			Logger.getLogger(getClass().getName()).info("Found marker: "+found+"; expecting: "+agent.getId()+", "+agent.getId().equals(found));
+//			Logger.getLogger(getClass().getName()).info("Found marker: "+found+"; expecting: "+agent.getId()+", "+agent.getId().equals(found));
 		}
 		while(!agent.getId().equals(found));
 			

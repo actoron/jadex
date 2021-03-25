@@ -95,6 +95,10 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	@AgentArgument
 	protected boolean awaonly;
 
+	/** Sent global services also to network SPs. */
+	@AgentArgument
+	protected boolean spcache	= false;
+	
 	/** Debug connection issues of polling mode for any of the named services (boolean or string with comma separated unqualified service interface names). */
 	@AgentArgument
 	protected Object debugservices;
@@ -695,7 +699,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		// If networks set, but query has global scope -> add global network
 		if(ret!=null)
 		{
-			if (ServiceScope.GLOBAL.equals(query.getScope()) ||
+			if (ServiceScope.COMPONENT_ONLY.equals(query.getScope()) ||	// Hack??? query should have provider instead searchstart+scope in setProvider?
+				ServiceScope.GLOBAL.equals(query.getScope()) ||
 				ServiceScope.APPLICATION_GLOBAL.equals(query.getScope()))
 			{
 				Set<String> retset = new LinkedHashSet<>(Arrays.asList(ret));
@@ -704,11 +709,12 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			}
 		}
 		
-		// If networks not set -> use all connections but exclude global unless global scope
+		// If networks not set -> use all connections but exclude global unless global scope or specific provider (scope=component only)
 		else
 		{
 			Set<String> retset;
 			if(connections.containsKey(SecurityAgent.GLOBAL_NETWORK_NAME)
+				&& !ServiceScope.COMPONENT_ONLY.equals(query.getScope())	// Hack??? query should have provider instead searchstart+scope in setProvider?
 				&& !ServiceScope.GLOBAL.equals(query.getScope())
 				&& !ServiceScope.APPLICATION_GLOBAL.equals(query.getScope()))
 			{
@@ -934,8 +940,10 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 										public void intermediateResultAvailable(final ServiceEvent<IServiceIdentifier> event)
 										{
 											if(global && event.getService().getScope().isGlobal()
-												|| !global && !event.getService().getScope().isLocal())	// TODO: hack!!! global vs network should be exclusive???
-//												|| !global && RequiredServiceInfo.isNetworkScope(event.getService().getScope()))
+												// spcache==true -> global services also sent to network SPs
+												|| spcache && !global && !event.getService().getScope().isLocal()
+												// spcache==false -> global vs network is exclusive
+												|| !spcache&& !global && event.getService().getScope().isNetwork())
 											{
 												agent.scheduleStep(new IComponentStep<Void>()
 												{

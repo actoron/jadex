@@ -53,9 +53,10 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 			.getExtendedPlatformConfiguration()
 				.setSimul(false)
 				.setSimulation(false)
-				.setDebugFutures(true)
-//			.setValue("debugservices", true)
-			.setValue("security.debug", true);
+//				.setDebugFutures(true)
+			.setValue("debugservices", "ITestService")
+//			.setValue("security.debug", true)
+			;
 			
 		CLIENTCONF	= baseconf.clone()
 			.setPlatformName("GlobalSuperpeerTestClient_*");
