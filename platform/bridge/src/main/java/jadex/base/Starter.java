@@ -358,21 +358,37 @@ public class Starter
 
 	/**
 	 *  Get a boolean value from args (otherwise return default value passed as arg).
+	 *  Any non-boolean, non-null value (e.g. a string) is also considered 'true'. 
 	 *  @param args The args map.
 	 *  @param argname The argument name.
-	 *  @param def The default value.
-	 *  @return The args value.
+	 *  @param conf The platform config.
+	 *  @return The arg value.
 	 */
-	public static boolean getBooleanValueWithArgs(Map<String, Object> args, String argname, boolean def)
+	public static boolean getBooleanValueWithArgs(Map<String, Object> args, String argname, IPlatformConfiguration conf)
 	{
-		boolean ret = def;
+		Object val	= null;
 		if(args!=null)
 		{
-			Object val = args.get(argname);
-			if(val!=null && val instanceof Boolean)
-				ret = ((Boolean)val).booleanValue();
+			val = args.get(argname);
 		}
-		return ret;
+		
+		if(val==null)
+		{
+			val	= conf.getValue(argname, null);
+			if(val instanceof String)
+			{
+				try
+				{
+					val = SJavaParser.evaluateExpression((String)val, null);
+				}
+				catch(Exception e)
+				{
+//					System.out.println("Argument parse exception using as string: " + argname + " \"" + val + "\"");
+				}
+			}
+		}
+		
+		return val instanceof Boolean ? (Boolean)val : val!=null;
 	}
 	
 	/**
@@ -405,11 +421,11 @@ public class Starter
 //		IRootComponentConfiguration rootconf = config.getRootConfig();
 		
 		// pass configuration parameters to static fields:
-		MethodInvocationInterceptor.DEBUG = getBooleanValueWithArgs(args, "debugservices", config.getExtendedPlatformConfiguration().getDebugServices());
-		ExecutionComponentFeature.DEBUG = getBooleanValueWithArgs(args, "debugsteps", config.getExtendedPlatformConfiguration().getDebugSteps());
-		Future.NO_STACK_COMPACTION	= getBooleanValueWithArgs(args, "nostackcompaction", config.getExtendedPlatformConfiguration().getNoStackCompaction());
+		MethodInvocationInterceptor.DEBUG = getBooleanValueWithArgs(args, "debugservices", config);
+		ExecutionComponentFeature.DEBUG = getBooleanValueWithArgs(args, "debugsteps", config);
+		Future.NO_STACK_COMPACTION	= getBooleanValueWithArgs(args, "nostackcompaction", config);
 //		Future.NO_STACK_COMPACTION	= true;
-		Future.DEBUG = getBooleanValueWithArgs(args, "debugfutures", config.getExtendedPlatformConfiguration().getDebugFutures()); 
+		Future.DEBUG = getBooleanValueWithArgs(args, "debugfutures", config); 
 		
 //		new FastClasspathScanner(new String[]
 //		      {"com.xyz.widget", "com.xyz.gizmo" })  // Whitelisted package prefixes
