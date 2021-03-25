@@ -108,7 +108,8 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("2/3) start provider platforms, wait for services");
 			pro1	= createPlatform(proconf);
 			pro2	= createPlatform(proconf);
-			waitForRegistryClient(client, true);
+			waitForRegistryWithProvider(client, pro1, true);
+			waitForRegistryWithProvider(client, pro2, true);
 			Collection<ITestService> col = results.getIntermediateResults();
 			Assert.assertEquals(col.toString(), sspconf==null ? 0 : 2, col.size());
 		}
@@ -194,7 +195,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			removePlatform(sp);
 			if(awa && sspconf==null)
 			{
-				// After fallback to awa -> now global services are found (hack???)
+				// After fallback to awa -> global services are now found (hack???)
 				svc	= results.getNextIntermediateResult();
 //				svc	= results.getNextIntermediateResult();
 				svc	= results2.getNextIntermediateResult();
@@ -219,7 +220,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			else
 			{
 				// -> test if disconnection from SP works (new services not found)
-				waitForRegistryClient(client, true);
+				waitForRegistryWithProvider(client, pro4, true);
 				Collection<ITestService> col1 = results.getIntermediateResults();
 				Collection<ITestService> col2 = results2.getIntermediateResults();
 				Assert.assertEquals(1, new LinkedHashSet<>(col1).size());
@@ -301,7 +302,8 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("2/3/4) start provider platforms, wait for services");
 			pro1	= createPlatform(proconf);
 			pro2	= createPlatform(proconf);
-			waitForRegistryClient(client, true);
+			waitForRegistryWithProvider(client, pro1, true);
+			waitForRegistryWithProvider(client, pro2, true);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			System.out.println("found: "+result.size());
 			Assert.assertEquals(2, result.size());
