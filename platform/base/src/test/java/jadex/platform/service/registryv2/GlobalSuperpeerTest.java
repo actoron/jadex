@@ -54,7 +54,7 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 				.setSimul(false)
 				.setSimulation(false)
 //				.setDebugFutures(true)
-			.setValue("debugservices", "ITestService")
+//			.setValue("debugservices", "ITestService")
 //			.setValue("security.debug", true)
 			;
 			
