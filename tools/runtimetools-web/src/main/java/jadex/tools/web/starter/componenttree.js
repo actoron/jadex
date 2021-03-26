@@ -1073,17 +1073,17 @@ class ComponentTree extends BaseElement
 			cids.push(data.id);
 	}
 	
-	// methods for making dragable the details element
+	// methods for making dragable an element
 	dragElement(element) 
 	{
 		var x1 = 0;
 		var y1 = 0;
 		var x2 = 0; 
 		var y2 = 0;
-	    
-		var elementDrag = function(e) 
+
+		var moved = e =>
 		{
-	    	e = e || window.event;
+			e = e || window.event;
 	    	e.preventDefault();
 	    	x1 = x2 - e.clientX;
 	    	y1 = y2 - e.clientY;
@@ -1091,32 +1091,41 @@ class ComponentTree extends BaseElement
 	    	y2 = e.clientY;
 			//console.log("to: "+x2+" "+y2);
 	    	// set the element's new position:
-			var y = parseInt(element.style.top) || 0;
-	    	var x = parseInt(element.style.left) || 0;
-			element.style.top = y-y1+"px";
-	    	element.style.left = x-x1+"px";
- 		}
+			//var y = parseInt(element.style.top) || 0;
+	    	//var x = parseInt(element.style.left) || 0;
+			element.style.top = element.offsetTop-y1+"px";
+	    	element.style.left = element.offsetLeft-x1+"px";
+		}
 
-  		var closeDragElement = function() 
+		var md = e => 
 		{
-    		// stop moving when mouse button is released:
-    		document.onmouseup = null;
-    		document.onmousemove = null;
-  		}
+			//console.log("offsetx: "+e.offsetX+" "+e.clientX);
+			
+			if(element.offsetWidth-e.offsetX < 20 && element.offsetHeight-e.offsetY < 20)
+			{
+				//console.log("at resize border");
+				return;
+	    	}
 
-		var dragMouseDown = function(e) 
-		{
-	    	e = e || window.event;
+			e = e || window.event;
 	    	e.preventDefault();
 			x2 = e.clientX;
 	    	y2 = e.clientY;
 			//console.log("from: "+x2+" "+y2);
-	    	document.onmouseup = closeDragElement;
-	    	// call a function whenever the cursor moves:
-	    	document.onmousemove = elementDrag;
+			
+			// clean up document mouse listeners after mouse released
+			document.addEventListener("mouseup", e =>
+			{
+				document.removeEventListener("mouseup", this);
+				document.removeEventListener("mousemove", moved);
+			});
+			
+			// watch now for movements
+			document.addEventListener("mousemove", moved);
 	  	}
 
-		element.onmousedown = dragMouseDown;
+		// listen on mouse clicks on that element
+		element.addEventListener("mousedown", md);
 	}
 	
 	static get styles() 
@@ -1158,9 +1167,16 @@ class ComponentTree extends BaseElement
 	  			100% { transform: rotate(360deg); }
 			}
 			.dragable {
+				padding: 10px;
 				position: absolute;
+				top: 0px;
+				left: 70%;
+				width: 30%;
 			  	background-color: #00000011;
 			  	border: 1px solid #d3d3d3;
+				z-axis: 1;
+		 		resize: both;
+    			overflow: hidden;
 			}
 	    `;
 	}
@@ -1170,28 +1186,26 @@ class ComponentTree extends BaseElement
 		return html`
 			<div class="container-fluid m-0 p-0">
 				<div class="row m-0 p-0">
-					<div class="col-8 m-0 p-0">
+					<div class="col m-0 p-0">
 						<div id="componenttree"></div>
-					</div>
-					<div id="details" class="m-0 p-0 dragable col-4 ${this.info!=null? 'visible': 'hidden'}">
-						<div class="close" @click="${e => {this.info=null; this.requestUpdate();}}"></div>
-						<div class="row">
-							<div class="col">
-								<h3>${this.info!=null? this.info.heading: ""}</h3>
-							</div>
-						</div>
-						<dl class="row">
-							${this.getProps().map(propname => html`
-								<dt class="col-5">${propname.charAt(0).toUpperCase() + propname.slice(1)}</dt>
-								<dd class="col-7 text-wrap text-break">${this.info[propname]}</dd>
-							`)}
-						</dl>
-						<div class="${this.info?.refreshcmd!=null? 'visible': 'hidden'}">
-							<button type="button" class="btn btn-success" @click="${e => this.info.refreshcmd(this.info.node)}">${this.app.lang.t('Refresh')}</button>
-						</div>
 					</div>
 				</div>
 			</div>	
+			<div id="details" class="dragable ${this.info!=null? 'visible': 'hidden'}">
+				<div class="close" @click="${e => {this.info=null; this.requestUpdate();}}"></div>
+				<div>
+					<h4>${this.info!=null? this.info.heading: ""}</h4>
+				</div>
+				<dl class="row">
+					${this.getProps().map(propname => html`
+						<dt class="col-5">${propname.charAt(0).toUpperCase() + propname.slice(1)}</dt>
+						<dd class="col-7 text-wrap text-break">${this.info[propname]}</dd>
+					`)}
+				</dl>
+				<div class="${this.info?.refreshcmd!=null? 'visible': 'hidden'}">
+					<button type="button" class="btn btn-success" @click="${e => this.info.refreshcmd(this.info.node)}">${this.app.lang.t('Refresh')}</button>
+				</div>
+			</div>
 		`;
 	}
 }
