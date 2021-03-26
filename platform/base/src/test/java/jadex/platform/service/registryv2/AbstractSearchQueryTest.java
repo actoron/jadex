@@ -353,11 +353,17 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("7) kill provider platform"+pro1.getId()+", search for service");
 			removePlatform(pro1);
 			waitForRegistryClient(client, false);
-			waitALittle(client);	// Hack for timeout in CI Pipeline!?
-			waitALittle(client);
-			waitALittle(client);	// two waits for disconnection, because contimeout = 2* WAITFACTOR
-			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals(""+result, sspconf==null && !SuperpeerClientAgent.SPCACHE ? 1 : 2, result.size());
+			int	num	= sspconf==null && !SuperpeerClientAgent.SPCACHE ? 1 : 2;	// expected number of remaining services
+			// retry at most 10 times until old services expunged from registry
+			// hack!!! should only be 2*WAITFACTOR but leads to heisenbugs?
+			for(int i=0; i<=10; i++)
+			{
+				if(i>0) waitALittle(client);
+				result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
+				if(result.size()<=num) break;
+				System.out.println("7"+(char)('a'+i)+") results: "+result.size());
+			}
+			Assert.assertEquals(""+result, num, result.size());
 	
 			// 8) kill SP, search for service -> test if re-fallback to awa works
 			System.out.println("8) kill SP, search for service");
