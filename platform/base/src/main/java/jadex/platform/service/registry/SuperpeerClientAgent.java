@@ -76,6 +76,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	/** The fallback polling search rate as factor of the default remote timeout. */
 	public static final double	POLLING_RATE	= 0.33333333;	// 30*0.333.. secs  -> 10 secs.
 	
+	/** The default value for the SP cache argument. */
+	public static final boolean	SPCACHE	= false;
+	
 	//-------- attributes --------
 	
 	/** The agent. */
@@ -97,7 +100,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 
 	/** Sent global services also to network SPs. */
 	@AgentArgument
-	protected boolean spcache	= false;
+	protected boolean spcache	= SPCACHE;
 	
 	/** Debug connection issues of polling mode for any of the named services (boolean or string with comma separated unqualified service interface names). */
 	@AgentArgument

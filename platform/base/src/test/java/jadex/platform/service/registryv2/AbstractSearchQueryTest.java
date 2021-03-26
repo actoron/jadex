@@ -21,6 +21,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.platform.service.registry.SuperpeerClientAgent;
 
 /**
  *  Test basic search and query managing functionality with a client and some providers.
@@ -161,7 +162,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			providers2.add(pro1.getId());
 			providers2.add(pro2.getId());
 			
-			if(sspconf!=null)	// if ssp exists wait for the two global services also
+			if(sspconf!=null || SuperpeerClientAgent.SPCACHE)	// wait for the two global services also
 			{
 				svc	= results2.getNextIntermediateResult();
 				providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
@@ -182,7 +183,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			svc	= results2.getNextIntermediateResult();
 			Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 			
-			if(sspconf!=null)	// if ssp exists wait for the two global services also
+			if(sspconf!=null || SuperpeerClientAgent.SPCACHE)	// wait for the two global services also
 			{
 				svc	= results.getNextIntermediateResult();
 				Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
@@ -193,7 +194,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			// 7) kill SP, start provider platform, wait for service on both queries
 			System.out.println("7) kill SP, start remote platform, wait for service on both queries");
 			removePlatform(sp);
-			if(awa && sspconf==null)
+			if(awa && sspconf==null && !SuperpeerClientAgent.SPCACHE)
 			{
 				// After fallback to awa -> global services are now found (hack???)
 				svc	= results.getNextIntermediateResult();
@@ -323,7 +324,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitForRegistryWithProvider(client, pro2, false);
 //			waitALittle(client);	// Hack for timeout in CI Pipeline!?
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals(client.toString()+": "+result, sspconf==null ? 1:2, result.size());
+			Assert.assertEquals(client.toString()+": "+result, sspconf==null && !SuperpeerClientAgent.SPCACHE ? 1:2, result.size());
 			
 			// 6) start provider platform, wait for connection, search for service -> test if search works for new platform and existing SP
 			System.out.println("6) start provider platform, search for service");
@@ -331,7 +332,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitForSuperpeerConnections(sp, pro1);
 			waitForRegistryClient(client, false);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals("found: "+result+", new platform: "+pro1.getId(), sspconf==null ? 2 : 4, result.size());
+			Assert.assertEquals("found: "+result+", new platform: "+pro1.getId(), sspconf==null && !SuperpeerClientAgent.SPCACHE ? 2 : 4, result.size());
 			
 			// 6b) search without scope (must deliver scope and network services)
 			for(ITestService ser: result)
@@ -352,11 +353,11 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("7) kill provider platform"+pro1.getId()+", search for service");
 			removePlatform(pro1);
 			waitForRegistryClient(client, false);
-//			waitALittle(client);	// Hack for timeout in CI Pipeline!?
+			waitALittle(client);	// Hack for timeout in CI Pipeline!?
 			waitALittle(client);
 			waitALittle(client);	// two waits for disconnection, because contimeout = 2* WAITFACTOR
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals(""+result, sspconf==null ? 1 : 2, result.size());
+			Assert.assertEquals(""+result, sspconf==null && !SuperpeerClientAgent.SPCACHE ? 1 : 2, result.size());
 	
 			// 8) kill SP, search for service -> test if re-fallback to awa works
 			System.out.println("8) kill SP, search for service");
