@@ -30,12 +30,13 @@ public class BPMNStartElementsTest //extends TestCase
 		
 		CreationInfo ci = new CreationInfo();
 		ci.setConfiguration("Case A");
+		ci.setSuspend(true);
 		
 		IExternalAccess exta = platform.createComponent(ci.setFilename("jadex.bpmn.testcases.StartElements.bpmn2")).get();
+		IFuture<Map<String, Object>> fresults = exta.waitForTermination();
+		exta.resumeComponent();
+		Map<String, Object> results = fresults.get();
 		
-//		new Future<>().get(-1);
-		
-		Map<String, Object> results = exta.waitForTermination().get();
 		if (!("A".equals(results.get("result"))))
 		{
 			throw new RuntimeException("BPMN start elements tests: Results do not match, expected A, got " + results.get("result") + ".");
@@ -43,10 +44,23 @@ public class BPMNStartElementsTest //extends TestCase
 		
 		ci = new CreationInfo();
 		ci.setConfiguration("Case B");
-		results = platform.createComponent(ci.setFilename("jadex.bpmn.testcases.StartElements.bpmn2")).get().waitForTermination().get();
+		exta = platform.createComponent(ci.setFilename("jadex.bpmn.testcases.StartElements.bpmn2")).get();
+		fresults = exta.waitForTermination();
+		exta.resumeComponent();
+		results = fresults.get();
+
 		if (!("B".equals(results.get("result"))))
 		{
 			throw new RuntimeException("BPMN start elements tests: Results do not match, expected B, got " + results.get("result") + ".");
+		}
+	}
+	
+	public static void main(String[] args)
+	{
+		while(true)
+		{
+			new BPMNStartElementsTest().testStartActivities();
+			System.out.print(".");
 		}
 	}
 }
