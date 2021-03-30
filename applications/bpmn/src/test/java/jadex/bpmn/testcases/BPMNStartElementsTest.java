@@ -44,6 +44,7 @@ public class BPMNStartElementsTest //extends TestCase
 		
 		ci = new CreationInfo();
 		ci.setConfiguration("Case B");
+		ci.setSuspend(true);
 		exta = platform.createComponent(ci.setFilename("jadex.bpmn.testcases.StartElements.bpmn2")).get();
 		fresults = exta.waitForTermination();
 		exta.resumeComponent();
