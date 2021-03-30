@@ -1,7 +1,7 @@
 # Using Services
 
 So far we have explored how BDI can be used to define the internal behaviour of an agent.
-In this part we move on towards multi-agent scenarios and show how a BDI agents can be designed to interact with each other. The typical way for realizing interactions with active components is using [services](../../services/services.md)).
+In this part we move on towards multi-agent scenarios and show how BDI agents can be designed to interact with each other. The typical way for realizing interactions with active components is using [services](../../services/services.md)).
 
 A service is defined by an interface that determines the available methods and a service implementation that can be either a separate class of just part of the agent itself.
 For further details please have a look at the  [services section](../../services/services.md)).
@@ -235,13 +235,13 @@ Again, start both agents. Now try out if internal as well as internet translatio
 **Note:** If no translations show up, make sure that your TranslationBDI agent as well as your UserBDI agent **are referencing the same service interface** ("f2.ITranslationService") in their imports!
 
 <x-hint title="Plan-service-mapping restrictions">
-Please note that when mapping plan to a service interface only one plan is executed and no retries are performed.
+Please note that when mapping plans to a service interface only one plan is executed and no retries are performed.
 If this is required, we need to map the service to a goal and not a plan as described in the next exercise.
 </x-hint>
 
 # F3 - Goal Delegation
 
-Sometimes, mapping a service call to goal is more appropriate than a plan. This is the case if the BDI means-end reasong should be used for executing the service call.
+Sometimes, mapping a service call to goal is more appropriate than a plan. This is the case if the BDI means-end reasoning should be used for executing the service call.
 Another advantage of a service to goal mapping is that it allows for goal delegation between different agents.
 This means we can just create a translation goal in the user agent and dispatch it.
 The goal will automatically be forwarded (as service call) to the translation agent which will reify the call to a goal and try to achieve it.
