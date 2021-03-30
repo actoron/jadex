@@ -704,29 +704,32 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			//System.out.println("adding termination listener for: "+component.getId());
 			final Future<Map<String, Object>> ret = new Future<>();
-			try
+			SComponentManagementService.listenToComponent(component.getId(), component).addResultListener(new IntermediateExceptionDelegationResultListener<CMSStatusEvent, Map<String, Object>>(ret)
 			{
-				SComponentManagementService.listenToComponent(component.getId(), component).addResultListener(new IntermediateExceptionDelegationResultListener<CMSStatusEvent, Map<String, Object>>(ret)
+				public void intermediateResultAvailable(CMSStatusEvent result)
 				{
-					public void intermediateResultAvailable(CMSStatusEvent result)
+					if(result instanceof CMSStatusEvent.CMSTerminatedEvent)
 					{
-						if(result instanceof CMSStatusEvent.CMSTerminatedEvent)
-						{
-							CMSStatusEvent.CMSTerminatedEvent termev = (CMSStatusEvent.CMSTerminatedEvent)result;
-							if(termev.getException() != null)
-								ret.setException(termev.getException());
-							else
-								ret.setResult(termev.getResults());
-						}
+						CMSStatusEvent.CMSTerminatedEvent termev = (CMSStatusEvent.CMSTerminatedEvent)result;
+						if(termev.getException() != null)
+							ret.setException(termev.getException());
+						else
+							ret.setResult(termev.getResults());
 					}
-				});
-			}
-			catch(IllegalStateException ise)
-			{
-				ret.setException((Exception)new ComponentTerminatedException(getInternalAccess().getId(),
-					"Component probably already terminated. Consider starting the component in suspended state and only resume after waitForTermination() was called.")
-						.initCause(ise));
-			}
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					if(exception instanceof IllegalStateException)
+					{
+						exception 	= (Exception)new ComponentTerminatedException(getInternalAccess().getId(),
+							"Component probably already terminated. Consider starting the component in suspended state and only resume after waitForTermination() was called.")
+								.initCause(exception);
+					}
+					super.exceptionOccurred(exception);
+				}
+			});
 			return ret;
 		}
 		else
