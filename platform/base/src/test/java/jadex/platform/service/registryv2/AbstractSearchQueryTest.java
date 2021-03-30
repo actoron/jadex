@@ -350,7 +350,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			}
 			
 			// 7) kill one provider platform, search for service -> test if remote disconnection and service removal works
-			System.out.println("7) kill provider platform"+pro1.getId()+", search for service");
+			System.out.println("7) kill provider platform "+pro1.getId()+", search for service");
 			removePlatform(pro1);
 			waitForRegistryClient(client, false);
 			int	num	= sspconf==null && !SuperpeerClientAgent.SPCACHE ? 1 : 2;	// expected number of remaining services
@@ -361,7 +361,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 				if(i>0) waitALittle(client);
 				result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 				if(result.size()<=num) break;
-				System.out.println("7"+(char)('a'+i)+") results: "+result.size());
+				System.out.println("7"+(char)('a'+i)+") results: "+result.size()+", "+result);
 			}
 			Assert.assertEquals(""+result, num, result.size());
 	
