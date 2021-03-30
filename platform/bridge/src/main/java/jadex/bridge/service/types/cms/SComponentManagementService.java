@@ -230,6 +230,7 @@ public class SComponentManagementService
      *  Add a component listener for a specific component.
      *  The listener is registered for component changes.
      *  @param cid	The component to be listened.
+     *  @throws IllegalStateException when the component is not found.
      */
     public static ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(final IComponentIdentifier cid, IInternalAccess agent)
     {
