@@ -52,12 +52,12 @@ public class BlockedPlatformSearchTest extends AbstractInfrastructureTest
 		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
 		
 		CLIENTCONF	= baseconf.clone();
-		CLIENTCONF.setPlatformName("client_*");
+		CLIENTCONF.setPlatformName("client");
 		
 		PROCONF	= baseconf.clone();
 		PROCONF.addComponent(GlobalProviderAgent.class);
 		PROCONF.addComponent(LocalProviderAgent.class);
-		PROCONF.setPlatformName("provider_*");
+		PROCONF.setPlatformName("provider");
 	}
 	
 	//-------- test methods --------

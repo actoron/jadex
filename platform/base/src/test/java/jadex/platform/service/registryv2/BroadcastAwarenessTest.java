@@ -69,13 +69,13 @@ public class BroadcastAwarenessTest	extends AbstractSearchQueryTest
 		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
 		
 		CLIENTCONF	= baseconf.clone();
-		CLIENTCONF.setPlatformName("client_*");
+		CLIENTCONF.setPlatformName("client");
 		
 		PROCONF	= baseconf.clone();
 		PROCONF.addComponent(GlobalProviderAgent.class);
 		PROCONF.addComponent(NetworkProviderAgent.class);
 		PROCONF.addComponent(LocalProviderAgent.class);
-		PROCONF.setPlatformName("provider_*");
+		PROCONF.setPlatformName("provider");
 	}
 	
 	//-------- constructors --------

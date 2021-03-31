@@ -37,17 +37,17 @@ public class LocalSuperpeerTest	extends AbstractSearchQueryTest
 
 		
 		CLIENTCONF	= baseconf.clone();
-		CLIENTCONF.setPlatformName("client_*");
+		CLIENTCONF.setPlatformName("client");
 		
 		PROCONF	= baseconf.clone();
 		PROCONF.addComponent(GlobalProviderAgent.class);
 		PROCONF.addComponent(NetworkProviderAgent.class);
 		PROCONF.addComponent(LocalProviderAgent.class);
-		PROCONF.setPlatformName("provider_*");
+		PROCONF.setPlatformName("provider");
 		
 		SPCONF	= baseconf.clone();
 		SPCONF.addComponent(SuperpeerRegistryAgent.class);
-		SPCONF.setPlatformName("SP_*");
+		SPCONF.setPlatformName("SP");
 	}
 
 	//-------- constructors --------

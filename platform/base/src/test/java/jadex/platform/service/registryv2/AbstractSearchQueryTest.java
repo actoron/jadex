@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -383,7 +384,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 	 */
 	protected void waitForRegistryClient(IExternalAccess client, boolean global)
 	{
-//		Logger.getLogger(getClass().getName()).info("waitForRegistryClient0: "+client+", "+true);
+		Logger.getLogger(getClass().getName()).info("waitForRegistryClient0: "+client+", "+true);
 		// Can only use global when ssp available. Otherwise uses awa fallback via network.
 		global	= global && sspconf!=null;
 		
@@ -394,7 +395,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		do
 		{
 			found	= ((IService)sub.getNextIntermediateResult()).getServiceId().getProviderId();
-//			Logger.getLogger(getClass().getName()).info("Found marker: "+found+"; expecting: "+agent.getId()+", "+agent.getId().equals(found));
+			Logger.getLogger(getClass().getName()).info("Found marker: "+found+"; expecting: "+agent.getId()+", "+agent.getId().equals(found));
 		}
 		while(!agent.getId().equals(found));
 			

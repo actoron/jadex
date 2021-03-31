@@ -515,7 +515,8 @@ public class Starter
 				String pfname = args!=null && args.containsKey(IPlatformConfiguration.PLATFORM_NAME)? (String)args.get(IPlatformConfiguration.PLATFORM_NAME): config.getPlatformName();
 //				Object pfname = config.getValue(RootComponentConfiguration.PLATFORM_NAME);
 //				rootConfig.setValue(RootComponentConfiguration.PLATFORM_NAME, pfname);
-				final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname: null);
+				final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname: null,
+					Boolean.TRUE.equals(config.getValue("uniquename", model)));
 				
 				if(IComponentIdentifier.LOCAL.get()==null)
 					IComponentIdentifier.LOCAL.set(cid);
@@ -751,11 +752,15 @@ public class Starter
 		return ret;
 	}
 	
+	/** Counters for generating unique names of platforms. */
+	protected static Map<String, Integer>	UNIQUENAMES	= new HashMap<>();
+	
 	/**
 	 *  Internal method to create a component identifier.
 	 *  @param pfname The platform name.
+	 *  @param unique	When true, keeps track of already created names and creates a name that is unique in this VM.
 	 */
-	public static IComponentIdentifier createPlatformIdentifier(String pfname)
+	public static IComponentIdentifier createPlatformIdentifier(String pfname, boolean unique)
 	{
 		// Build platform name.
 		String	platformname	= null; 
@@ -784,28 +789,50 @@ public class Starter
 		{
 			platformname = "platform_*";
 		}
-		Random	rnd	= new Random();
-		StringBuffer	buf	= new StringBuffer();
-		StringTokenizer	stok	= new StringTokenizer(platformname, "*+", true);
-		while(stok.hasMoreTokens())
+		
+		if(unique)
 		{
-			String	tok	= stok.nextToken();
-			if(tok.equals("+"))
+			Integer	num;
+			synchronized(UNIQUENAMES)
 			{
-				buf.append(Integer.toString(rnd.nextInt(36), 36));
+				num	= UNIQUENAMES.get(platformname);
+				if(num==null)
+				{
+					num	= 0;
+				}
+				else
+				{
+					num++;
+				}
+				UNIQUENAMES.put(platformname, num);
 			}
-			else if(tok.equals("*"))
-			{
-				buf.append(Integer.toString(rnd.nextInt(36), 36));
-				buf.append(Integer.toString(rnd.nextInt(36), 36));
-				buf.append(Integer.toString(rnd.nextInt(36), 36));
-			}
-			else
-			{
-				buf.append(tok);
-			}
+			platformname	+= "_$"+num;
 		}
-		platformname = SUtil.intern(buf.toString());
+		else
+		{
+			Random	rnd	= new Random();
+			StringBuffer	buf	= new StringBuffer();
+			StringTokenizer	stok	= new StringTokenizer(platformname, "*+", true);
+			while(stok.hasMoreTokens())
+			{
+				String	tok	= stok.nextToken();
+				if(tok.equals("+"))
+				{
+					buf.append(Integer.toString(rnd.nextInt(36), 36));
+				}
+				else if(tok.equals("*"))
+				{
+					buf.append(Integer.toString(rnd.nextInt(36), 36));
+					buf.append(Integer.toString(rnd.nextInt(36), 36));
+					buf.append(Integer.toString(rnd.nextInt(36), 36));
+				}
+				else
+				{
+					buf.append(tok);
+				}
+			}
+			platformname = SUtil.intern(buf.toString());
+		}
 		
 		// Create an instance of the component.
 		return new ComponentIdentifier(platformname).getRoot();
@@ -1592,7 +1619,7 @@ public class Starter
 	{
 		try
 		{
-			IComponentIdentifier pcid = Starter.createPlatformIdentifier(null);
+			IComponentIdentifier pcid = Starter.createPlatformIdentifier(null, false);
 			IThreadPool threadpool = new JavaThreadPool(true);
 			Class<IExecutionService> esc = SReflect.findClass("jadex.noplatform.services.ExecutionService", null, Starter.class.getClassLoader());
 			Constructor<IExecutionService> ces = esc.getConstructor(new Class[]{IComponentIdentifier.class, IThreadPool.class});
