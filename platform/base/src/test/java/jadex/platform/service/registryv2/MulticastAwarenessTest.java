@@ -42,9 +42,10 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 		for(int i=0; i<10; i++)
 		{
 			port	= SSecurity.getSecureRandom().nextInt(Short.MAX_VALUE*2-1023)+1024;  // random value from 1024 to 2^16-1
-			try(MulticastSocket	recvsocket = new MulticastSocket(port))
+			try
 			{
-				break;
+				@SuppressWarnings({ "unused", "resource" })	// Hack!!! do not close socket to keep port available for test
+				MulticastSocket	recvsocket = new MulticastSocket(port);
 			}
 			catch(IOException se)
 			{
