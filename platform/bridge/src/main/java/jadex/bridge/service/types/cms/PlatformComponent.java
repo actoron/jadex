@@ -26,6 +26,7 @@ import java.util.logging.SimpleFormatter;
 
 import jadex.base.Starter;
 import jadex.bridge.ComponentResultListener;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -833,7 +834,21 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		if(exception==null && e!=null)
 			this.exception	= e;
 //		IComponentManagementService cms = this.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
-		IFuture<Map<String, Object>> ret = this.killComponent(getId());
+		Future<Map<String, Object>> ret = new Future<Map<String,Object>>(); 
+		this.killComponent(getId()).addResultListener(new DelegationResultListener<Map<String,Object>>(ret)
+		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				if(exception instanceof IllegalStateException)
+				{
+					exception 	= (Exception)new ComponentTerminatedException(getInternalAccess().getId(),
+						"Component probably already terminated. Consider starting the component in suspended state and only resume after waitForTermination() was called.")
+							.initCause(exception);
+				}
+				super.exceptionOccurred(exception);
+			}
+		});
 		return ret;
 //		if(getComponentIdentifier().getParent()==null)
 //		{
