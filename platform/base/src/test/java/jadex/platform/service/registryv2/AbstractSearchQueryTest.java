@@ -394,6 +394,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		IComponentIdentifier	found;
 		do
 		{
+			// TODO: use listener instead of blocking API to exclude API as heisenbug cause
 			found	= ((IService)sub.getNextIntermediateResult()).getServiceId().getProviderId();
 			Logger.getLogger(getClass().getName()).info("Found marker: "+found+"; expecting: "+agent.getId()+", "+agent.getId().equals(found));
 		}

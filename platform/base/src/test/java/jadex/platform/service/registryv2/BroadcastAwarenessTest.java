@@ -60,6 +60,7 @@ public class BroadcastAwarenessTest	extends AbstractSearchQueryTest
 		baseconf.setValue("intravmawareness", false);
 		baseconf.setValue("broadcastawareness", true);
 		baseconf.setValue("broadcastawareness.port", port);
+		baseconf.setValue("debugservices", "IMarkerService");
 //		baseconf.setValue("superpeerclient.debugservices", "ITestService");
 		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*3));
 		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
