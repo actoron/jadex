@@ -46,6 +46,7 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 			{
 				@SuppressWarnings({ "unused", "resource" })	// Hack!!! do not close socket to keep port available for test
 				MulticastSocket	recvsocket = new MulticastSocket(port);
+				break;
 			}
 			catch(IOException se)
 			{
