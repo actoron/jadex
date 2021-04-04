@@ -221,15 +221,16 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	
 	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithEvents(CreationInfo info)
 	{
-		Object component = info!=null? info.getPojo(): null;
-		if(component==null && (info==null || info.getFilename()==null))
-			return new SubscriptionIntermediateFuture<>(new RuntimeException("Component must not null."));
+		try
+		{
+			info = PlatformComponent.prepare(info);
+		}
+		catch(Exception e)
+		{
+			return new SubscriptionIntermediateFuture<>(e);
+		}
 		
-		info = PlatformComponent.prepare(info);
-		
-		ISubscriptionIntermediateFuture<CMSStatusEvent> ret = SComponentManagementService.createComponent(info, info.getName(), info.getFilename(), getInternalAccess());
-		
-		return ret;
+		return SComponentManagementService.createComponent(info, info.getName(), info.getFilename(), getInternalAccess());
 	}
 	
 	/**

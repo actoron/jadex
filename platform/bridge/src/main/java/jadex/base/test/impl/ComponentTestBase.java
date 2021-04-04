@@ -13,9 +13,11 @@ import jadex.base.test.IAbortableTestSuite;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.SUtil;
@@ -131,12 +133,14 @@ public class ComponentTestBase extends TestCase
 			}
 			 
 			//System.out.println("Creating component: "+System.currentTimeMillis()+" "+filename);
-			IFuture<IExternalAccess> fut = platform.createComponent(new CreationInfo(rid).setFilename(filename));
+			IFuture<IExternalAccess> fut = platform.createComponent(new CreationInfo(rid).setFilename(filename).setSuspend(true));
 			componentStarted(fut);
 			fut.addResultListener(new IResultListener<IExternalAccess>()
 			{
 				public void resultAvailable(IExternalAccess result)
 				{
+					result.resumeComponent();
+					
 					//System.out.println("Created component: "+System.currentTimeMillis()+" "+filename);
 					cid[0] = result.getId();
 					
