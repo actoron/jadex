@@ -708,7 +708,7 @@ public class TransportAddressAgent implements ITransportAddressService
 				expiration = System.currentTimeMillis() + CACHE_VALIDITY_DUR;
 			else
 			{
-				currentwaittime += currentwaittime;
+				//currentwaittime += currentwaittime;
 				currentwaittime = Math.min(currentwaittime, MAX_CACHE_INVALIDITY_DUR);
 				expiration = System.currentTimeMillis() + (long) currentwaittime;
 			}
