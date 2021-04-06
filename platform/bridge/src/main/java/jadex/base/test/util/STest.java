@@ -1,7 +1,5 @@
 package jadex.base.test.util;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.bridge.IExternalAccess;
@@ -24,9 +22,6 @@ public class STest
     	testnetwork_pass = "key:" + new String(Base64.encodeNoPadding(key), SUtil.UTF8);
     }
     
-    /** Counter for unique platform numbers. */
-	static AtomicInteger	platno	= new AtomicInteger(0);
-
     /**
      *  Get local (no communication) test configuration using a unique platform name derived from the test name.
      *  Attention: The name is unique and the config can not be reused for multiple platforms!
@@ -40,8 +35,8 @@ public class STest
     {
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
         // Don't use testcase name as platform name, it contains slashes and clashes with path management.
-		//config.setPlatformName(test+"-"+platno.getAndIncrement());
-		config.setPlatformName("test"+"-"+platno.getAndIncrement());
+		config.setPlatformName("test");
+		config.setValue("uniquename", true);
 
         // Do not use multi factory as it is much too slow now :(
 //		config.setValue("kernel_multi", true);

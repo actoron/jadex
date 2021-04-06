@@ -231,8 +231,8 @@ public interface IExternalExecutionFeature extends IExternalComponentFeature
 	public IFuture<IComponentDescription> getDescription(IComponentIdentifier cid);
 	
 	/**
-	 *  Get the component description.
-	 *  @return	The component description.
+	 *  Get the component descriptions.
+	 *  @return	The component descriptions.
 	 */
 	// Todo: hack??? should be internal to CMS!?
 	public IFuture<IComponentDescription[]> getDescriptions();

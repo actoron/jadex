@@ -76,33 +76,10 @@ class ComponentTree extends BaseElement
 						
 						function getChildData(id)
 						{					
-							// get child ids			
 							var children = self.getChildData(id);
-							
-							// create array with child data
-							/*var data = [];
-							if(children!=null)
-							{
-								for(var i=0; i<children.length; i++)
-								{
-									var node = self.treedata[children[i]];
-									//if(node.children===undefined)
-									//	node.children=true;
-									if(node!=null)
-										data.push(node);
-									else
-										console.log("ERR: not found: "+children[i]);
-								}
-							}*/
-							//if(data.length==0)
-							//	data = null;
-							
-							//console.log("loading node: "+id);//+" "+JSON.stringify(data));
-							
 							// problem: js tree changes data structures :-( give jstree only a clone?
-							//return Object.assign({}, data)
+							//console.log("children of: "+id+" "+children.length);
 							return JSON.parse(JSON.stringify(children));
-							//return data;
 						}
 						
 						function loadComponentChildData(cid)
@@ -604,27 +581,62 @@ class ComponentTree extends BaseElement
 	}
 	
 	// when node is selected
+	// creates a 'global' info object from node details as saved in treedata
+	// jstree node data cannot contain user data
+	// the info object is then read by the details/property panel
 	refreshDetails(node)
 	{
-		//console.log("selected: "+node+" "+node.type);
-				
 		var self = this;
+		
+		//console.log("selected: "+node+" "+node.type);
+		if(self.treedata[node.id]==null)
+		{
+			self.info=null;
+			self.requestUpdate();
+			return;
+		}	
+		
 		var type = node.type;
 		var info = self.treedata[node.id].info;
 		var created = false;
 		
 		if(type=="default") 
 		{
-			self.info = {type: type};
-			self.info.heading = "Component Details";
-			self.info.name = info.name.name;
-			self.info.ctype = info.type;
-			self.info.model = info.modelName;
-			self.info.creator = info.creator.name;
-			self.info.system = info.systemComponent;
-			self.info.state = info.state;
-			self.info.monitoring = info.monitoring.value;
+			var cci = (info) =>
+			{
+				self.info = {type: type};
+				self.info.heading = "Component Details";
+				self.info.name = info.name.name;
+				self.info.ctype = info.type;
+				self.info.model = info.modelName;
+				self.info.creator = info.creator.name;
+				self.info.system = info.systemComponent;
+				self.info.state = info.state;
+				self.info.monitoring = info.monitoring.value;
+			}
+			cci(info);
 			created = true;
+			
+			var infocopy = self.info;
+			var load = n =>
+			{
+				return new Promise(function(r, e)
+				{
+					//console.log("refresh: "+info.name.name);
+					axios.get(self.getMethodPrefix()+'&methodname=getComponentDescription&arg0='+info.name.name, self.transform).then(function(resp)
+					{
+						//console.log("desc is: "+resp.data);
+						var oldcmd = self.info.refreshcmd;
+						var info = resp.data;
+						if(infocopy===self.info)
+						{
+							cci(info);
+							self.info.refreshcmd = oldcmd;
+						}
+					}).catch(e => console.log(e));
+				});
+			}
+			self.info.refreshcmd = load;
 		}
 		else if(type=="required")
 		{
@@ -637,6 +649,8 @@ class ComponentTree extends BaseElement
 			self.info.tags = info.tags.toString();
 			self.info.searchscope = info.defaultBinding?.scope?.value;
 			self.info.proxytype = info.defaultBinding?.proxytype;
+			if(info.refreshcmd)
+				self.info.refreshcmd = info.refreshcmd;
 			created = true;
 		}
 		else if(type=="provided")
@@ -647,6 +661,8 @@ class ComponentTree extends BaseElement
 			self.info.type = info.type.value;
 			self.info.scope = info.scope.value;
 			self.info.systemservice = info.systemService;
+			if(info.refreshcmd)
+				self.info.refreshcmd = info.refreshcmd;
 			created = true;
 		}
 		else if(type.startsWith("nfproperty"))
@@ -661,13 +677,13 @@ class ComponentTree extends BaseElement
 			if(info.updateRate && info.updateRate!=-1)
 				self.info.updateRate = info.updateRate;
 			self.info.value = info.val;
+			if(info.refreshcmd)
+				self.info.refreshcmd = info.refreshcmd;
 			created = true;
 		}
 		
 		if(created)
 		{
-			if(info?.refreshcmd)
-				self.info.refreshcmd = info.refreshcmd; //(node) => {info.refreshcmd(node); self.refreshDetails(node)};
 			if(info!=null)
 				self.info.node = node;
 		}
@@ -872,7 +888,7 @@ class ComponentTree extends BaseElement
 		this.addChildData(key, node);
 	}
 		
-	deleteNodeData(treeid, nodeid)
+	deleteNodeData(nodeid)
 	{
 		// delete a component node:
 		// a) delete the node data itself delete this.treedata[nodeid];
@@ -883,27 +899,27 @@ class ComponentTree extends BaseElement
 		// f) delete Applications from Applications parent 
 		
 		//console.log("remove node data: "+nodeid);
-		this.removeChildDataFromParent(treeid, nodeid);
+		this.removeChildDataFromParent(nodeid);
 		delete this.treedata[nodeid];
 		//delete this.treedata[nodeid].children;
 
 		var ac = this.getChildData("Applications");
 		if(ac==null || ac.length==0)
 		{
-			this.removeChildDataFromParent(treeid, "Applications");
+			this.removeChildDataFromParent("Applications");
 			delete this.treedata["Applications"];
 			//delete this.treedata["Applications_children"]
 		}
 	}
 	
-	removeChildDataFromParent(treeid, nodeid)
+	removeChildDataFromParent(nodeid)
 	{
 		var removed = false;
-		var paid = this.treedata[nodeid]._parent;
+		var paid = this.treedata[nodeid]?._parent;
 		//this.getTree(treeid).jstree().get_parent(nodeid);
 		if(paid!=null)
 		{
-			var pachilds = this.treedata[paid].children;
+			var pachilds = this.treedata[paid]?._children
 			if(pachilds!=null)
 			{
 				var i = pachilds.indexOf(nodeid);
@@ -911,7 +927,7 @@ class ComponentTree extends BaseElement
 				{
     				pachilds.splice(i, 1);
 					removed = true;
-					//console.log("removed: "+nodeid);
+					console.log("removed: "+nodeid);
 				}
 			}
 		}
@@ -957,7 +973,13 @@ class ComponentTree extends BaseElement
 					{
 						try
 						{
-							self.deleteNodeData(self.treeid, event.componentDescription.name.name);
+							//console.log("delete a node");
+							self.deleteNodeData(event.componentDescription.name.name);
+							if(self.info?.node?.id===event.componentDescription.name.name)
+							{
+								self.info = null;
+								self.requestUpdate();
+							}
 						}
 						catch(ex)
 						{
@@ -1073,17 +1095,17 @@ class ComponentTree extends BaseElement
 			cids.push(data.id);
 	}
 	
-	// methods for making dragable the details element
+	// methods for making dragable an element
 	dragElement(element) 
 	{
 		var x1 = 0;
 		var y1 = 0;
 		var x2 = 0; 
 		var y2 = 0;
-	    
-		var elementDrag = function(e) 
+
+		var moved = e =>
 		{
-	    	e = e || window.event;
+			e = e || window.event;
 	    	e.preventDefault();
 	    	x1 = x2 - e.clientX;
 	    	y1 = y2 - e.clientY;
@@ -1091,32 +1113,41 @@ class ComponentTree extends BaseElement
 	    	y2 = e.clientY;
 			//console.log("to: "+x2+" "+y2);
 	    	// set the element's new position:
-			var y = parseInt(element.style.top) || 0;
-	    	var x = parseInt(element.style.left) || 0;
-			element.style.top = y-y1+"px";
-	    	element.style.left = x-x1+"px";
- 		}
+			//var y = parseInt(element.style.top) || 0;
+	    	//var x = parseInt(element.style.left) || 0;
+			element.style.top = element.offsetTop-y1+"px";
+	    	element.style.left = element.offsetLeft-x1+"px";
+		}
 
-  		var closeDragElement = function() 
+		var md = e => 
 		{
-    		// stop moving when mouse button is released:
-    		document.onmouseup = null;
-    		document.onmousemove = null;
-  		}
+			//console.log("offsetx: "+e.offsetX+" "+e.clientX);
+			
+			if(element.offsetWidth-e.offsetX < 20 && element.offsetHeight-e.offsetY < 20)
+			{
+				//console.log("at resize border");
+				return;
+	    	}
 
-		var dragMouseDown = function(e) 
-		{
-	    	e = e || window.event;
+			e = e || window.event;
 	    	e.preventDefault();
 			x2 = e.clientX;
 	    	y2 = e.clientY;
 			//console.log("from: "+x2+" "+y2);
-	    	document.onmouseup = closeDragElement;
-	    	// call a function whenever the cursor moves:
-	    	document.onmousemove = elementDrag;
+			
+			// clean up document mouse listeners after mouse released
+			document.addEventListener("mouseup", e =>
+			{
+				document.removeEventListener("mouseup", this);
+				document.removeEventListener("mousemove", moved);
+			});
+			
+			// watch now for movements
+			document.addEventListener("mousemove", moved);
 	  	}
 
-		element.onmousedown = dragMouseDown;
+		// listen on mouse clicks on that element
+		element.addEventListener("mousedown", md);
 	}
 	
 	static get styles() 
@@ -1158,9 +1189,16 @@ class ComponentTree extends BaseElement
 	  			100% { transform: rotate(360deg); }
 			}
 			.dragable {
+				padding: 10px;
 				position: absolute;
+				top: 0px;
+				left: 70%;
+				width: 30%;
 			  	background-color: #00000011;
 			  	border: 1px solid #d3d3d3;
+				z-axis: 1;
+		 		resize: both;
+    			overflow: hidden;
 			}
 	    `;
 	}
@@ -1170,28 +1208,26 @@ class ComponentTree extends BaseElement
 		return html`
 			<div class="container-fluid m-0 p-0">
 				<div class="row m-0 p-0">
-					<div class="col-8 m-0 p-0">
+					<div class="col m-0 p-0">
 						<div id="componenttree"></div>
-					</div>
-					<div id="details" class="m-0 p-0 dragable col-4 ${this.info!=null? 'visible': 'hidden'}">
-						<div class="close" @click="${e => {this.info=null; this.requestUpdate();}}"></div>
-						<div class="row">
-							<div class="col">
-								<h3>${this.info!=null? this.info.heading: ""}</h3>
-							</div>
-						</div>
-						<dl class="row">
-							${this.getProps().map(propname => html`
-								<dt class="col-5">${propname.charAt(0).toUpperCase() + propname.slice(1)}</dt>
-								<dd class="col-7 text-wrap text-break">${this.info[propname]}</dd>
-							`)}
-						</dl>
-						<div class="${this.info?.refreshcmd!=null? 'visible': 'hidden'}">
-							<button type="button" class="btn btn-success" @click="${e => this.info.refreshcmd(this.info.node)}">${this.app.lang.t('Refresh')}</button>
-						</div>
 					</div>
 				</div>
 			</div>	
+			<div id="details" class="dragable ${this.info!=null? 'visible': 'hidden'}">
+				<div class="close" @click="${e => {this.info=null; this.requestUpdate();}}"></div>
+				<div>
+					<h4>${this.info!=null? this.info.heading: ""}</h4>
+				</div>
+				<dl class="row">
+					${this.getProps().map(propname => html`
+						<dt class="col-5">${propname.charAt(0).toUpperCase() + propname.slice(1)}</dt>
+						<dd class="col-7 text-wrap text-break">${this.info[propname]}</dd>
+					`)}
+				</dl>
+				<div class="${this.info?.refreshcmd!=null? 'visible': 'hidden'}">
+					<button type="button" class="btn btn-success" @click="${e => this.info.refreshcmd(this.info.node)}">${this.app.lang.t('Refresh')}</button>
+				</div>
+			</div>
 		`;
 	}
 }

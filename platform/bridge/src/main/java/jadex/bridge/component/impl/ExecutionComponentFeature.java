@@ -717,6 +717,18 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 							ret.setResult(termev.getResults());
 					}
 				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					if(exception instanceof IllegalStateException)
+					{
+						exception 	= (Exception)new ComponentTerminatedException(getInternalAccess().getId(),
+							"Component probably already terminated. Consider starting the component in suspended state and only resume after waitForTermination() was called.")
+								.initCause(exception);
+					}
+					super.exceptionOccurred(exception);
+				}
 			});
 			return ret;
 		}

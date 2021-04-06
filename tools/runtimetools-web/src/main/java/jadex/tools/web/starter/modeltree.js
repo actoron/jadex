@@ -131,7 +131,7 @@ class ModelTree extends CidElement
 				},
 				function(max)
 				{
-					console.log("received max value: "+max);
+					//console.log("received max value: "+max);
 					self.progressmax = max;
 				});
 				

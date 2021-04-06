@@ -230,6 +230,7 @@ public class SComponentManagementService
      *  Add a component listener for a specific component.
      *  The listener is registered for component changes.
      *  @param cid	The component to be listened.
+     *  @throws IllegalStateException when the component is not found.
      */
     public static ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(final IComponentIdentifier cid, IInternalAccess agent)
     {
@@ -1593,6 +1594,7 @@ public class SComponentManagementService
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.
 	 *  @param cid	The component to destroy.
+     *  @throws IllegalStateException when the component is not found.
 	 */
 	public static IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid, IInternalAccess agent)
 	{
@@ -1618,7 +1620,11 @@ public class SComponentManagementService
 		{
 			if(debug(agent))
 				agent.getLogger().severe("destroy2: "+cid);
-			CmsComponentState compstate = state.getComponent(cid);
+    		CmsComponentState compstate = state.getComponent(cid);
+    		if(compstate == null)
+    		{
+    			return new Future<>(new IllegalStateException("Component not found: " + cid));
+    		}
 			contains = compstate.getCleanupFuture() != null;
 			tmp = contains? (Future<Map<String, Object>>)compstate.getCleanupFuture(): new Future<Map<String, Object>>();
 	//		System.out.println("destroy0: "+cid+" "+cfs.containsKey(cid)+" "+tmp.isDone());

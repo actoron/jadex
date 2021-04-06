@@ -290,6 +290,17 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	}
 	
 	/**
+	 *  Get the component description.
+	 *  @return The component description.
+	 */
+	public IFuture<IComponentDescription> getComponentDescription(IComponentIdentifier cid)
+	{
+		//System.out.println("getCompDescs start");
+		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
+		return ea.getDescriptionAsync();
+	}
+	
+	/**
 	 *  Get the child component descriptions.
 	 *  @param parent The component id of the parent.
 	 *  @return The component descriptions.

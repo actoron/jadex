@@ -60,6 +60,7 @@ public class BroadcastAwarenessTest	extends AbstractSearchQueryTest
 		baseconf.setValue("intravmawareness", false);
 		baseconf.setValue("broadcastawareness", true);
 		baseconf.setValue("broadcastawareness.port", port);
+		baseconf.setValue("debugservices", "IMarkerService");
 //		baseconf.setValue("superpeerclient.debugservices", "ITestService");
 		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*3));
 		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
@@ -69,13 +70,13 @@ public class BroadcastAwarenessTest	extends AbstractSearchQueryTest
 		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
 		
 		CLIENTCONF	= baseconf.clone();
-		CLIENTCONF.setPlatformName("client_*");
+		CLIENTCONF.setPlatformName("client");
 		
 		PROCONF	= baseconf.clone();
 		PROCONF.addComponent(GlobalProviderAgent.class);
 		PROCONF.addComponent(NetworkProviderAgent.class);
 		PROCONF.addComponent(LocalProviderAgent.class);
-		PROCONF.setPlatformName("provider_*");
+		PROCONF.setPlatformName("provider");
 	}
 	
 	//-------- constructors --------

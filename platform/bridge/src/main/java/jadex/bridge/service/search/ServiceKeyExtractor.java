@@ -133,7 +133,17 @@ public class ServiceKeyExtractor implements IKeyExtractor<IServiceIdentifier>
 		else if(KEY_TYPE_NETWORKS.equals(keytype))
 		{
 			if(!serv.isUnrestricted())
-				ret = serv.getNetworkNames()==null? null: new HashSet<String>(serv.getNetworkNames());
+			{
+				if(serv.getNetworkNames()!=null)
+				{
+					// Hack!!! service identifier should be immutable but isn't
+					synchronized(serv.getNetworkNames())
+					{
+						ret	= new HashSet<String>(serv.getNetworkNames());
+					}
+				}
+				// else ret	= null;
+			}
 			else
 				ret = new SetWrapper<String>(IKeyExtractor.MATCH_ALWAYS);
 		}

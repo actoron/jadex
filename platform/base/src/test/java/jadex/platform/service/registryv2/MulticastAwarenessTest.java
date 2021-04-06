@@ -42,8 +42,10 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 		for(int i=0; i<10; i++)
 		{
 			port	= SSecurity.getSecureRandom().nextInt(Short.MAX_VALUE*2-1023)+1024;  // random value from 1024 to 2^16-1
-			try(MulticastSocket	recvsocket = new MulticastSocket(port))
+			try
 			{
+				@SuppressWarnings({ "unused", "resource" })	// Hack!!! do not close socket to keep port available for test
+				MulticastSocket	recvsocket = new MulticastSocket(port);
 				break;
 			}
 			catch(IOException se)
@@ -58,6 +60,7 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 		baseconf.setValue("intravmawareness", false);
 		baseconf.setValue("multicastawareness", true);
 		baseconf.setValue("multicastawareness.port", port);
+		baseconf.setValue("debugservices", "IMarkerService");
 		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*3));
 		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
 
@@ -66,13 +69,13 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
 		
 		CLIENTCONF	= baseconf.clone();
-		CLIENTCONF.setPlatformName("client_*");
+		CLIENTCONF.setPlatformName("client");
 		
 		PROCONF	= baseconf.clone();
 		PROCONF.addComponent(GlobalProviderAgent.class);
 		PROCONF.addComponent(NetworkProviderAgent.class);
 		PROCONF.addComponent(LocalProviderAgent.class);
-		PROCONF.setPlatformName("provider_*");
+		PROCONF.setPlatformName("provider");
 	}
 	
 	//-------- constructors --------
@@ -102,5 +105,20 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 		
 		Collection<IComponentIdentifier>	found	= pawa.searchPlatforms().get();
 		assertEquals(found.toString(), 2, found.size());
+	}
+
+	//-------- heisenbug test --------
+	
+	public static void main(String[] args)
+	{
+		MulticastAwarenessTest	test	= new MulticastAwarenessTest();
+		test.setup();
+		while(true)
+		{
+			System.out.print(".");
+			IExternalAccess	client	= test.createPlatform(test.clientconf);
+			test.waitForRegistryClient(client, true);
+			client.killComponent().get();
+		}
 	}
 }

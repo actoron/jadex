@@ -25,7 +25,9 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import jadex.base.Starter;
+import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentResultListener;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -833,7 +835,21 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		if(exception==null && e!=null)
 			this.exception	= e;
 //		IComponentManagementService cms = this.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
-		IFuture<Map<String, Object>> ret = this.killComponent(getId());
+		Future<Map<String, Object>> ret = new Future<Map<String,Object>>(); 
+		this.killComponent(getId()).addResultListener(new DelegationResultListener<Map<String,Object>>(ret)
+		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				if(exception instanceof IllegalStateException)
+				{
+					exception 	= (Exception)new ComponentTerminatedException(getInternalAccess().getId(),
+						"Component probably already terminated. Consider starting the component in suspended state and only resume after waitForTermination() was called.")
+							.initCause(exception);
+				}
+				super.exceptionOccurred(exception);
+			}
+		});
 		return ret;
 //		if(getComponentIdentifier().getParent()==null)
 //		{
@@ -1326,18 +1342,18 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 */
 	public IFuture<IExternalAccess> createComponent(CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
 	{
-		// todo: parameter for name
-		
-		Object component = info!=null? info.getPojo(): null;
-		if(component==null && (info==null || info.getFilename()==null))
-			return new Future<>(new RuntimeException("Component must not null."));
+		try
+		{
+			info = prepare(info);
+		}
+		catch(Exception e)
+		{
+			return new Future<>(e);
+		}
 		
 		final Future<IExternalAccess> ret = new Future<>();
 		
-		info = prepare(info);
-		
-		IFuture<IComponentIdentifier> fut = SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, resultlistener, getInternalAccess());
-		
+		IFuture<IComponentIdentifier> fut = SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, resultlistener, getInternalAccess());		
 		fut.addResultListener(new ComponentResultListener<>(new IResultListener<IComponentIdentifier>()
 		{
 			@Override
@@ -1351,7 +1367,17 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			public void resultAvailable(IComponentIdentifier result)
 			{
 //				System.out.println("created: "+result);
-				ret.setResult(getExternalAccess(result));
+				try
+				{
+					IExternalAccess	ea	= getExternalAccess(result); 
+					ret.setResult(ea);
+				}
+				catch(Exception e)
+				{
+					ret.setException( e instanceof ComponentNotFoundException
+						? new ComponentTerminatedException(result, "Component probably already terminated. Consider starting the component in suspended state and only resume after waitForTermination() was called.")
+						: e);
+				}
 			}
 		}, getExternalAccess()));
 		
@@ -1364,13 +1390,14 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 */
 	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(CreationInfo info)
 	{
-		// todo: resultlistener for results?!
-		
-		Object component = info!=null? info.getPojo(): null;
-		if(component==null && (info==null || info.getFilename()==null))
-			return new SubscriptionIntermediateFuture<>(new RuntimeException("Component must not null."));
-		
-		info = prepare(info);
+		try
+		{
+			info = prepare(info);
+		}
+		catch(Exception e)
+		{
+			return new SubscriptionIntermediateFuture<>(e);
+		}
 		
 		return SComponentManagementService.createComponent(info, info.getName(), info.getFilename(), getInternalAccess());
 	}
@@ -1384,16 +1411,17 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 */
 	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(CreationInfo info)
 	{
-		// todo: resultlistener for results?!
+		try
+		{
+			info = prepare(info);
+		}
+		catch(Exception e)
+		{
+			return new Tuple2Future<>(new RuntimeException(e));
+		}
 		
 //		System.out.println("tuplecreate: "+info.getFilename());
-		
-		Object component = info!=null? info.getPojo(): null;
-		if(component==null && (info==null || info.getFilename()==null))
-			return new Tuple2Future<IComponentIdentifier, Map<String, Object>>(new RuntimeException("Component must not null."));
 				
-		info = prepare(info);
-		
 		return SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, getInternalAccess());
 	}
 	
@@ -1402,31 +1430,32 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 *  @param component The pojo or filename
 	 *  @param info The creation info. 
 	 *  @return The creation info.
+	 *  @throw Exception when the info is lacking important information (e.g. no POJO or model name)
 	 */
-	public static CreationInfo prepare(CreationInfo info)
+	public static CreationInfo prepare(CreationInfo info)	throws Exception
 	{
-		if(info==null)
-			info = new CreationInfo();
+		if(info==null || (info.getPojo()==null && info.getFilename()==null))
+			throw new IllegalArgumentException("Either pojo or filename must be set in creation info: "+info);
+
 //		if(info.getParent()==null)
 //			info.setParent(getId());
 		
-		Object component = info.getPojo();
 		String modelname = null;
 		
-		if(component instanceof String)
+//		if(component instanceof String)
+//		{
+//			modelname = (String)component;
+//			info.setFilename(modelname);
+//		}
+		if(info.getPojo() instanceof Class<?>)
 		{
-			modelname = (String)component;
+			modelname = ((Class<?>)info.getPojo()).getName()+".class";
 			info.setFilename(modelname);
 		}
-		else if(component instanceof Class<?>)
+		else if(info.getPojo()!=null)
 		{
-			modelname = ((Class<?>)component).getName()+".class";
-			info.setFilename(modelname);
-		}
-		else if(component != null)
-		{
-			modelname = component.getClass().getName()+".class";
-			info.addArgument("__pojo", component); // hack?! use constant
+			modelname = info.getPojo().getClass().getName()+".class";
+			info.addArgument("__pojo", info.getPojo()); // hack?! use constant
 			info.setFilename(modelname);
 		}
 		
