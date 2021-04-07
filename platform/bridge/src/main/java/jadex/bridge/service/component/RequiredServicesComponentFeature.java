@@ -98,7 +98,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	public IFuture<Void> init()
 	{
 		ServiceQuery<ISearchQueryManagerService> query = new ServiceQuery<>(ISearchQueryManagerService.class);
-		UnresolvedServiceInvocationHandler h = new UnresolvedServiceInvocationHandler(component, query);
+		//UnresolvedServiceInvocationHandler h = new UnresolvedServiceInvocationHandler(component, query);
 		//sqms = (ISearchQueryManagerService) ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{IService.class, ISearchQueryManagerService.class}, h);
 		
 		sqms = searchLocalService(new ServiceQuery<>(query).setMultiplicity(0));
