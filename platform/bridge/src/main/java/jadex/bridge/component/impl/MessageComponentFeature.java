@@ -483,7 +483,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		if(transports.size()==0)
 		{
 			RuntimeException re = new RuntimeException("No message transport available: "+component.getId()+" "+header);
-			re.printStackTrace();
+//			re.printStackTrace();
 			ret.setException(re);
 		}
 		else

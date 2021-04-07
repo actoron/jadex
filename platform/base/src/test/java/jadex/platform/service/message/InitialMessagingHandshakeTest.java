@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
@@ -31,20 +32,25 @@ import jadex.platform.service.transport.intravm.IntravmTransportAgent;
 public class InitialMessagingHandshakeTest
 {
 	static final long	SEND_TIMEOUT	= 3000;
+	IFuture<IExternalAccess>	fsender;
+	IFuture<IExternalAccess>	freceiver;
 
+	/**
+	 *  Test that message sending eventually works when the receiver platform initially has no transport.
+	 */
 	@Test
 	public void	testRecoveryFromMissingReceiverTransport()
 	{
 		// Sender platform without awareness
     	IPlatformConfiguration senderconf = STest.getRealtimeTestConfig(getClass());
     	senderconf.setValue("intravmawareness", false);
-    	IFuture<IExternalAccess>	fsender	= Starter.createPlatform(senderconf);
+    	fsender	= Starter.createPlatform(senderconf);
 		
 		// Receiver platform without awareness and (initially) without transport
     	IPlatformConfiguration receiverconf = STest.getRealtimeTestConfig(getClass());
     	receiverconf.setValue("intravmawareness", false);
     	receiverconf.setValue("intravm", false);
-    	IFuture<IExternalAccess>	freceiver	= Starter.createPlatform(receiverconf);
+    	freceiver	= Starter.createPlatform(receiverconf);
     	
     	IExternalAccess	sender	= fsender.get();
     	IExternalAccess	receiver	= freceiver.get();
@@ -68,10 +74,36 @@ public class InitialMessagingHandshakeTest
     	List<TransportAddress>	addresses	= receiver.searchService(new ServiceQuery<>(ITransportAddressService.class)).get().getAddresses(receiver.getId()).get();
     	String	address	= "intravm://"+receiver.getId()+"@"+addresses.get(0).getAddress();
     	System.out.println("address: "+address);
-    	catalog.scheduleStep(ia -> ((CatalogAwarenessAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).addPlatform(address));
+    	catalog.scheduleStep(ia -> ((CatalogAwarenessAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).addPlatform(address)).get();
     	sendForRecovery(sender, receiver.getId());
 	}
 
+	/**
+	 *  Test that message sending eventually works when the sender platform initially has no transport.
+	 */
+	@Test
+	public void	testRecoveryFromMissingSenderTransport()
+	{
+		// Receiver platform ready to receive
+    	IPlatformConfiguration receiverconf = STest.getRealtimeTestConfig(getClass());
+    	freceiver	= Starter.createPlatform(receiverconf);
+    	
+		// Sender platform without transport
+    	IPlatformConfiguration senderconf = STest.getRealtimeTestConfig(getClass())
+       		.setValue("intravm", false);
+    	fsender	= Starter.createPlatform(senderconf);
+
+    	IExternalAccess	sender	= fsender.get();
+    	IExternalAccess	receiver	= freceiver.get();
+    	
+    	// No transport on sender -> should fail immediately due to "No message transport available"
+		sendForFailure("Send without sender transport", sender, receiver.getId());
+    	
+    	// Start transport on sender and retry -> should eventually succeed.
+    	sender.addComponent(new IntravmTransportAgent()).get();
+    	sendForRecovery(sender, receiver.getId());
+	}
+	
 	/**
 	 *  Check that message sending fails immediately.
 	 *  @param msg	Test case explanation for printout.
@@ -123,5 +155,20 @@ public class InitialMessagingHandshakeTest
 		}
 		
 		fail("Sending did not recover after "+((System.nanoTime()-start)/1000000)/1000.0+" seconds");
+	}
+	
+	@After
+	public void	tearDown()
+	{
+		try
+		{
+			fsender.then(ea -> ea.killComponent().get()).get();
+		}
+		catch(Throwable e) {}
+		try
+		{
+			freceiver.then(ea -> ea.killComponent().get()).get();
+		}
+		catch(Throwable e) {}
 	}
 }
