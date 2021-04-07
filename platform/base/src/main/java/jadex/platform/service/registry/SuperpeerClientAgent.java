@@ -26,7 +26,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnEnd;
-import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.RemoteMethodInvocationHandler;
@@ -107,7 +107,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	protected Object debugservices;
 	
 	/** The managed connections for each network. */
-	protected Map<String, NetworkManager> connections;
+	protected Map<String, NetworkManager> connections	= new LinkedHashMap<>();
 	
 	//@AgentServiceQuery
 	//@AgentServiceSearch
@@ -119,14 +119,13 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	/**
 	 *  Find and connect to super peers.
 	 */
-	//@AgentCreated
-	@OnInit
+	@OnStart	// wait for complete platform init (including transports) before starting sp connections
+//	@OnInit
 	protected IFuture<Void>	init()
 	{
 		//System.out.println("superpeerclient agent started: "+agent.getId());
 		
 		Future<Void>	ret	= new Future<>();
-		connections	= new LinkedHashMap<>();
 		
 //		if(pollingrate!=POLLING_RATE)
 //			System.out.println(agent+" using polling rate: "+pollingrate);
@@ -157,14 +156,14 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							connections.get(network).startSuperpeerSearch();
 						}
 						
-						ret.setResult(null);
+//						ret.setResult(null);	// don't complete future in start() -> would terminate component
 					}
 				});
 			}
 		}
 		else
 		{
-			ret.setResult(null);
+//			ret.setResult(null);	// don't complete future in start() -> would terminate component
 		}
 		
 		return ret;
