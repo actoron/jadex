@@ -208,7 +208,7 @@ public class TransportAddressAgent implements ITransportAddressService
 			ret.setResult(addrs);
 			
 			if (freshness.get(platformid) == null ||
-				freshness.get(platformid).getExpirationTime() > System.currentTimeMillis())
+				freshness.get(platformid).getExpirationTime() < System.currentTimeMillis())
 			{
 				final Future<List<TransportAddress>> fret = new Future<List<TransportAddress>>();
 				
@@ -708,7 +708,7 @@ public class TransportAddressAgent implements ITransportAddressService
 				expiration = System.currentTimeMillis() + CACHE_VALIDITY_DUR;
 			else
 			{
-				//currentwaittime += currentwaittime;
+				currentwaittime += currentwaittime;
 				currentwaittime = Math.min(currentwaittime, MAX_CACHE_INVALIDITY_DUR);
 				expiration = System.currentTimeMillis() + (long) currentwaittime;
 			}
