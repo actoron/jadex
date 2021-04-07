@@ -107,9 +107,7 @@ public class NFLatencyTestAgent extends TestAgent
 		disableLocalSimulationMode().get();
 		
 //		createPlatform(null)
-		IPlatformConfiguration config = STest.getDefaultTestConfig(getClass());
-		config.getExtendedPlatformConfiguration().setSimul(false);
-		config.getExtendedPlatformConfiguration().setSimulation(false);
+		IPlatformConfiguration config = STest.getRealtimeTestConfig(getClass());
 		createPlatform(config, null).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{

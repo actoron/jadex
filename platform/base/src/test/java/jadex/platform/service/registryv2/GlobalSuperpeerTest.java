@@ -40,7 +40,7 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		AbstractAuthenticationSecret clientsecret = AbstractAuthenticationSecret.fromKeyPair(ca, true);
 		AbstractAuthenticationSecret serversecret = AbstractAuthenticationSecret.fromKeyPair(cert, false, ca);
 		
-		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(GlobalSuperpeerTest.class)
+		IPlatformConfiguration	baseconf	= STest.getRealtimeTestConfig(GlobalSuperpeerTest.class)
 			.setValue("superpeerclient.awaonly", false)
 			.setValue("superpeerclient.contimeout", WAITFACTOR*2)
 			.setValue("intravmawareness", false)
@@ -50,10 +50,7 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 			.setValue("platformurls", "intravm://GlobalSuperpeerTestSSP@localhost:"+sspport)
 			.setNetworkNames(SecurityAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name)
 			.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass)
-			// Remote only -> no simulation please
-			.getExtendedPlatformConfiguration()
-				.setSimul(false)
-				.setSimulation(false)
+//			.getExtendedPlatformConfiguration()
 //				.setDebugFutures(true)
 //			.setValue("debugservices", "ITestService")
 //			.setValue("security.debug", true)

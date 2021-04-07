@@ -55,7 +55,7 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 		}
 		System.out.println("MulticastAwarenessTest custom port: "+port);
 
-		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(MulticastAwarenessTest.class);
+		IPlatformConfiguration	baseconf	= STest.getRealtimeTestConfig(MulticastAwarenessTest.class);
 		baseconf.setValue("superpeerclient.awaonly", true);
 		baseconf.setValue("intravmawareness", false);
 		baseconf.setValue("multicastawareness", true);
@@ -63,10 +63,6 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 		baseconf.setValue("debugservices", "IMarkerService");
 		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*3));
 		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
-
-		// Remote only -> no simulation please
-		baseconf.getExtendedPlatformConfiguration().setSimul(false);
-		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
 		
 		CLIENTCONF	= baseconf.clone();
 		CLIENTCONF.setPlatformName("client");

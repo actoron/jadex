@@ -55,7 +55,7 @@ public class BroadcastAwarenessTest	extends AbstractSearchQueryTest
 		}
 		System.out.println("BroadcastAwarenessTest custom port: "+port);
 		
-		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(BroadcastAwarenessTest.class);
+		IPlatformConfiguration	baseconf	= STest.getRealtimeTestConfig(BroadcastAwarenessTest.class);
 		baseconf.setValue("superpeerclient.awaonly", true);
 		baseconf.setValue("intravmawareness", false);
 		baseconf.setValue("broadcastawareness", true);
@@ -65,10 +65,6 @@ public class BroadcastAwarenessTest	extends AbstractSearchQueryTest
 		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*3));
 		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
 
-		// Remote only -> no simulation please
-		baseconf.getExtendedPlatformConfiguration().setSimul(false);
-		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
-		
 		CLIENTCONF	= baseconf.clone();
 		CLIENTCONF.setPlatformName("client");
 		

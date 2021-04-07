@@ -38,9 +38,7 @@ public class StreamUserAgent extends TestAgent
 {
 	public IPlatformConfiguration getConfig()
 	{
-		IPlatformConfiguration ret = STest.getDefaultTestConfig(getClass());
-		ret.getExtendedPlatformConfiguration().setSimul(false);
-		ret.getExtendedPlatformConfiguration().setSimulation(false);
+		IPlatformConfiguration ret = STest.getRealtimeTestConfig(getClass());
 		
 //		// For debugging heisenbug
 //		ret.setLogging(true);

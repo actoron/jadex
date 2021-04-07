@@ -113,6 +113,16 @@ public class STest
     	return getDefaultTestConfig(test.getName());
     }
     
+    /**
+     *  Get a default (remote) test configuration without simulation enabled.
+     */
+    public static IPlatformConfiguration getRealtimeTestConfig(Class<?> test)
+    {
+    	return getDefaultTestConfig(test)
+    		.getExtendedPlatformConfiguration().setSimul(false)
+			.getExtendedPlatformConfiguration().setSimulation(false);
+    }
+    
     public static void terminatePlatform(IExternalAccess platform) 
     {
         platform.killComponent().get();

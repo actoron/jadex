@@ -168,9 +168,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 //				"-gui", "false", "-simulation", "false", "-simul", "false", "-printsecret", "false",
 //				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
 //			}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
-			IPlatformConfiguration conf = STest.getDefaultTestConfig(getClass());
-			conf.getExtendedPlatformConfiguration().setSimul(false);
-			conf.getExtendedPlatformConfiguration().setSimulation(false);
+			IPlatformConfiguration conf = STest.getRealtimeTestConfig(getClass());
 			Starter.createPlatform(conf).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<IExternalAccess, TestReport[]>(ret)
 			{

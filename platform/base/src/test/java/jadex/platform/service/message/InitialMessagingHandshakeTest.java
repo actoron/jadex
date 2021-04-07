@@ -5,7 +5,6 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -13,6 +12,7 @@ import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.util.STest;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IPojoComponentFeature;
@@ -24,6 +24,7 @@ import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.IFuture;
 import jadex.platform.service.awareness.CatalogAwarenessAgent;
+import jadex.platform.service.transport.intravm.IntravmTransportAgent;
 
 /**
  *  Try to test robustness of the initial messaging handshake when a new platform is not yet inited. 
@@ -31,90 +32,98 @@ import jadex.platform.service.awareness.CatalogAwarenessAgent;
 @Ignore
 public class InitialMessagingHandshakeTest
 {
+	static final long	SEND_TIMEOUT	= 3000;
+
 	@Test
-	public void	testInitialMessagingHandshake()
+	public void	testRecoveryFromMissingReceiverTransport()
 	{
-		long	send_timeout	= 3000;
-		
 		// Sender platform without awareness
-    	IPlatformConfiguration senderconf = STest.getDefaultTestConfig(getClass());
+    	IPlatformConfiguration senderconf = STest.getRealtimeTestConfig(getClass());
     	senderconf.setValue("intravmawareness", false);
-    	IFuture<IExternalAccess>	sender	= Starter.createPlatform(senderconf);
+    	IFuture<IExternalAccess>	fsender	= Starter.createPlatform(senderconf);
 		
 		// Receiver platform without awareness and (initially) without transport
-    	IPlatformConfiguration receiverconf = STest.getDefaultTestConfig(getClass());
+    	IPlatformConfiguration receiverconf = STest.getRealtimeTestConfig(getClass());
     	receiverconf.setValue("intravmawareness", false);
     	receiverconf.setValue("intravm", false);
-//    	receiverconf.setLogging(true);
-    	IFuture<IExternalAccess>	receiver	= Starter.createPlatform(receiverconf);
+    	IFuture<IExternalAccess>	freceiver	= Starter.createPlatform(receiverconf);
+    	
+    	IExternalAccess	sender	= fsender.get();
+    	IExternalAccess	receiver	= freceiver.get();
     	
     	// No transport on receiver -> should fail immediately due to "No transport addresses"
-    	try
-    	{
-    		sendMessage(sender.get(), receiver.get()).get(send_timeout);
-    		fail("Sending unexpectedly succeeded.");
-    	}
-    	catch(Exception e)
-    	{
-    		assertFalse("Exception shouldn't be CTE: "+SUtil.getExceptionStacktrace(e), e instanceof ComponentTerminatedException);
-    		assertFalse("Exception shouldn't be timeout: "+SUtil.getExceptionStacktrace(e), e instanceof TimeoutException);
-    	}
+		sendForFailure("Send without receiver transport", sender, receiver.getId());
     	
     	// Start transport on receiver and retry
     	// No receiver addresses known by sender -> should still fail immediately due to "No transport addresses"
-    	IntravmTestTransportAgent	intravm	= new IntravmTestTransportAgent();
-    	receiver.get().addComponent(intravm);
-    	intravm.initing().get();
-    	try
-    	{
-    		sendMessage(sender.get(), receiver.get()).get(send_timeout);
-    		fail("Sending unexpectedly succeeded.");
-    	}
-    	catch(Exception e)
-    	{
-    		Assert.assertFalse("Exception shouldn't be CTE: "+SUtil.getExceptionStacktrace(e), e instanceof ComponentTerminatedException);
-    		Assert.assertFalse("Exception shouldn't be timeout: "+SUtil.getExceptionStacktrace(e), e instanceof TimeoutException);
-    	}
-    	
+    	IntravmTransportAgent	intravm	= new IntravmTransportAgent();
+    	receiver.addComponent(intravm).get();
+		sendForFailure("Send without receiver address", sender, receiver.getId());
+
     	// Start catalog awareness on sender and retry -> should still fail immediately due to "No transport addresses"
-    	IExternalAccess	catalog	= sender.get().createComponent(new CreationInfo()
+    	IExternalAccess	catalog	= sender.createComponent(new CreationInfo()
     		.setFilenameClass(CatalogAwarenessAgent.class)
     		.addArgument("platformurls", "")).get();
+		sendForFailure("Send with empty catalog", sender, receiver.getId());
+    	
+		// Add address to catalog and retry -> should eventually succeed.
+    	List<TransportAddress>	addresses	= receiver.searchService(new ServiceQuery<>(ITransportAddressService.class)).get().getAddresses(receiver.getId()).get();
+    	String	address	= "intravm://"+receiver.getId()+"@"+addresses.get(0).getAddress();
+    	System.out.println("address: "+address);
+    	catalog.scheduleStep(ia -> ((CatalogAwarenessAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).addPlatform(address));
+    	sendForRecovery(sender, receiver.getId());
+	}
+
+	/**
+	 *  Check that message sending fails immediately.
+	 *  @param msg	Test case explanation for printout.
+	 *  @param sender	The sender platform access.
+	 *  @param receiver	The receiver id.
+	 */
+	protected void sendForFailure(String msg, IExternalAccess sender, IComponentIdentifier receiver)
+	{
+		long	start	= System.nanoTime();
     	try
     	{
-    		sendMessage(sender.get(), receiver.get()).get(send_timeout);
+    		sender.scheduleStep(ia -> ia.getFeature(IMessageFeature.class).sendMessage("Hi!", receiver))
+    			.get(SEND_TIMEOUT);
     		fail("Sending unexpectedly succeeded.");
     	}
     	catch(Exception e)
     	{
-    		Assert.assertFalse("Exception shouldn't be CTE: "+SUtil.getExceptionStacktrace(e), e instanceof ComponentTerminatedException);
-    		Assert.assertFalse("Exception shouldn't be timeout: "+SUtil.getExceptionStacktrace(e), e instanceof TimeoutException);
+    		System.out.println("Expecting failure: "+msg+" took "+((System.nanoTime()-start)/1000000)/1000.0+" seconds: "+e);
+    		assertFalse("Exception shouldn't be CTE: "+SUtil.getExceptionStacktrace(e), e instanceof ComponentTerminatedException);
+    		assertFalse("Exception shouldn't be timeout: "+SUtil.getExceptionStacktrace(e), e instanceof TimeoutException);
     	}
-    	
-    	// Add receiver to catalog and retry -> should now work.
-    	intravm.kickoff().get();
-    	intravm.doReturn();
-    	
-    	List<TransportAddress>	addresses	= receiver.get().searchService(new ServiceQuery<>(ITransportAddressService.class)).get().getAddresses(receiver.get().getId()).get();
-    	String	address	= "intravm://"+receiver.get().getId()+"@"+addresses.get(0).getAddress();
-    	System.out.println("address: "+address);
-    	catalog.scheduleStep(ia -> ((CatalogAwarenessAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).addPlatform(address));
-    	try
-    	{
-    		sendMessage(sender.get(), receiver.get()).get(send_timeout);
-    	}
-    	catch(Exception e)
-    	{
-    		Assert.fail("Unexpected exception: "+SUtil.getExceptionStacktrace(e));
-    	}
-
 	}
-	
+
 	/**
-	 *  Try sending a message from one platform to another.
+	 *  Check that message sending works eventually when retrying.
+	 *  @param sender	The sender platform access.
+	 *  @param receiver	The receiver id.
 	 */
-	protected IFuture<Void>	sendMessage(IExternalAccess sender, IExternalAccess receiver)
+	protected void sendForRecovery(IExternalAccess sender, IComponentIdentifier receiver)
 	{
-		return sender.scheduleStep(ia -> ia.getFeature(IMessageFeature.class).sendMessage("Hi!", receiver.getId()));
+		long	start	= System.nanoTime();
+		while((System.nanoTime()-start)/1000000.0<Starter.getScaledDefaultTimeout(sender.getId(), 2))
+		{
+	    	try
+	    	{
+	    		sender.scheduleStep(ia -> ia.getFeature(IMessageFeature.class).sendMessage("Hi!", receiver))
+	    			.get(SEND_TIMEOUT);
+	    		System.out.println("Sending succeeded after "+((System.nanoTime()-start)/1000000)/1000.0+" seconds.");
+	    		return;
+	    	}
+	    	catch(Exception e)
+	    	{
+	    		System.out.println("Temporary send failure after "+((System.nanoTime()-start)/1000000)/1000.0+" seconds: "+e);
+	    		assertFalse("Exception shouldn't be CTE: "+SUtil.getExceptionStacktrace(e), e instanceof ComponentTerminatedException);
+	    		assertFalse("Exception shouldn't be timeout: "+SUtil.getExceptionStacktrace(e), e instanceof TimeoutException);
+	    	}
+	    	
+	    	sender.waitForDelay(SEND_TIMEOUT).get();
+		}
+		
+		fail("Sending did not recover after "+((System.nanoTime()-start)/1000000)/1000.0+" seconds");
 	}
 }
