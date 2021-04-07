@@ -1756,13 +1756,13 @@ public class RemoteReferenceModule
 	{
 		if(processors==null)
 		{
-			processors = Collections.synchronizedList(Traverser.getDefaultProcessors());
+			List<ITraverseProcessor> newprocs = Collections.synchronizedList(Traverser.getDefaultProcessors());
 			// Problem: if micro agent implements a service it cannot
 			// be determined if the service or the agent should be transferred.
 			// Per default a service is assumed.
 
 			// All proxies?!
-			processors.add(processors.size()-1, new ImmutableProcessor()
+			newprocs.add(newprocs.size()-1, new ImmutableProcessor()
 			{
 				@Override
 				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
@@ -1771,7 +1771,7 @@ public class RemoteReferenceModule
 				}
 			});
 			
-			processors.add(processors.size()-1, new ITraverseProcessor()
+			newprocs.add(newprocs.size()-1, new ITraverseProcessor()
 			{
 				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 				{
@@ -1785,7 +1785,7 @@ public class RemoteReferenceModule
 			});
 			
 			// Insert before FieldProcessor that is always applicable
-			processors.add(processors.size()-1, new ITraverseProcessor()
+			newprocs.add(newprocs.size()-1, new ITraverseProcessor()
 			{
 				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 				{
@@ -1800,7 +1800,7 @@ public class RemoteReferenceModule
 			});
 			
 			// Add processor for streams
-			processors.add(processors.size()-1, new ITraverseProcessor()
+			newprocs.add(newprocs.size()-1, new ITraverseProcessor()
 			{
 				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 				{
@@ -1836,7 +1836,7 @@ public class RemoteReferenceModule
 			});
 			
 			// Add processor for streams
-			processors.add(processors.size()-1, new ITraverseProcessor()
+			newprocs.add(newprocs.size()-1, new ITraverseProcessor()
 			{
 				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 				{
@@ -1869,6 +1869,8 @@ public class RemoteReferenceModule
 					return ocon;
 				}
 			});
+			
+			processors = newprocs;
 		}
 		
 //		return new ArrayList(processors);
