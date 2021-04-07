@@ -761,6 +761,24 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		}
 	}
 	
+	/**
+	 *  Fetch the SP connection (if any) to a specific remote platform for debugging purposes.
+	 */
+	public ISubscriptionIntermediateFuture<Void>	getSPConnection(IComponentIdentifier platform)
+	{
+		if(connections!=null)
+		{
+			for(NetworkManager manager: connections.values())
+			{
+				if(manager!=null && manager.superpeer!=null && ((IService)manager.superpeer).getServiceId().getProviderId().getRoot().equals(platform))
+				{
+					return manager.connection;
+				}
+			}
+		}
+		return null;
+	}
+	
 	//-------- helper classes --------
 	
 	/**

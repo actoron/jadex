@@ -1,9 +1,12 @@
 package jadex.platform.service.registryv2;
 
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -12,13 +15,19 @@ import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -80,8 +89,13 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		System.out.println("1) start client platform and add query");
 		IExternalAccess	client	= createPlatform(clientconf);
 		ISubscriptionIntermediateFuture<ITestService>	results	= client.addQuery(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL));
-		waitALittle(client);
-		Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
+		
+		// Skip empty test to avoid unconditional wait -> wrong results here  will also be detected later
+//		waitALittle(client);
+//		Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
+		
+		// platform id -> sids
+		Map<IComponentIdentifier, Set<IServiceIdentifier>>	resultmap	= new LinkedHashMap<>();
 		
 		//-------- Tests with awareness fallback only (no SP) --------
 		
@@ -91,29 +105,32 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			// 2) start provider platform, wait for service -> test if awa fallback works with one platform, also checks local duplicate removal over time
 			System.out.println("2) start provider platform, wait for service");
 			pro1	= createPlatform(proconf);
-			ITestService	svc	= results.getNextIntermediateResult();
-			ITestService	svc2	= results.getNextIntermediateResult();
-			Assert.assertEquals(""+svc, pro1.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
-			Assert.assertEquals(""+svc2, pro1.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
+			addAndCheckResult(resultmap, results.getNextIntermediateResult(), pro1.getId());
+			addAndCheckResult(resultmap, results.getNextIntermediateResult(), pro1.getId());
 			
 			// 3) start provider platform, wait for service -> test if awa fallback works with two platforms 
 			System.out.println("3) start provider platform, wait for service");
 			pro2	= createPlatform(proconf);
-			svc	= results.getNextIntermediateResult();
-			svc2 = results.getNextIntermediateResult();
-			Assert.assertEquals(""+svc, pro2.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
-			Assert.assertEquals(""+svc2, pro2.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
+			addAndCheckResult(resultmap, results.getNextIntermediateResult(), pro2.getId());
+			addAndCheckResult(resultmap, results.getNextIntermediateResult(), pro2.getId());
 		}
 		else
 		{
-			// without SP -> test that platform finds no / only global services.
-			System.out.println("2/3) start provider platforms, wait for services");
+			// without SP -> test that platform finds only global services.
+			System.out.println("2) start provider platform, wait for service");
 			pro1	= createPlatform(proconf);
+			if(sspconf!=null)
+			{
+				addAndCheckResult(resultmap, results.getNextIntermediateResult(), pro1.getId());
+			}
+			
+			// without SP -> test that platform finds only global services.
+			System.out.println("3) start provider platform, wait for service");
 			pro2	= createPlatform(proconf);
-			waitForRegistryWithProvider(client, pro1, true);
-			waitForRegistryWithProvider(client, pro2, true);
-			Collection<ITestService> col = results.getIntermediateResults();
-			Assert.assertEquals(col.toString(), sspconf==null ? 0 : 2, col.size());
+			if(sspconf!=null)
+			{
+				addAndCheckResult(resultmap, results.getNextIntermediateResult(), pro2.getId());
+			}
 		}
 
 		//-------- Tests with SP if any --------
@@ -123,73 +140,61 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			// 4) start SP, wait for connection from provider platforms and client platform 
 			System.out.println("4) start SP, wait for connection from provider platforms and client platform");
 			IExternalAccess	sp	= createPlatform(spconf);
-			waitForSuperpeerConnections(sp, client, pro1, pro2);
-			waitForRegistryClient(client, false);
-			if(awa)
+			
+			// when not found with awa -> should now receive the two network services and (if no ssp) the two global services from query.
+			if(!awa)
 			{
-				// -> should get no service; test if duplicate removal works with SP
-				Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
+				addAndCheckResult(resultmap, results.getNextIntermediateResult(), pro1.getId(), pro2.getId());
+				addAndCheckResult(resultmap, results.getNextIntermediateResult(), pro1.getId(), pro2.getId());
+				if(sspconf==null)
+				{
+					addAndCheckResult(resultmap, results.getNextIntermediateResult(), pro1.getId(), pro2.getId());
+					addAndCheckResult(resultmap, results.getNextIntermediateResult(), pro1.getId(), pro2.getId());
+				}
+				
+				Assert.assertEquals("Should find two services: "+resultmap.get(pro1.getId()), 2, resultmap.get(pro1.getId()).size());
+				Assert.assertEquals("Should find two services: "+resultmap.get(pro2.getId()), 2, resultmap.get(pro2.getId()).size());
 			}
 			else
 			{
-				// -> should now receive the four services from query.
-				Set<IComponentIdentifier> providers1 = new LinkedHashSet<>();
-				ITestService svc = results.getNextIntermediateResult();
-				providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
-				svc	= results.getNextIntermediateResult();
-				providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
-				svc	= results.getNextIntermediateResult();
-				providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
-				svc	= results.getNextIntermediateResult();
-				providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
-				Set<IComponentIdentifier>	providers2	= new LinkedHashSet<>();
-				providers2.add(pro1.getId());
-				providers2.add(pro2.getId());
-				Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
-				Assert.assertEquals(providers1, providers2);
+				// wait for connection to make sure that awa is off
+				waitForSuperpeerConnections(sp, client);
 			}
 			
 			// 5) add second query -> wait for two services (test if works when already SP)
 			System.out.println("5) add second query");
 			ISubscriptionIntermediateFuture<ITestService>	results2	= client.addQuery(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL));
+			Map<IComponentIdentifier, Set<IServiceIdentifier>>	resultmap2	= new LinkedHashMap<>();
 			
-			Set<IComponentIdentifier> providers1 = new LinkedHashSet<>();
-			ITestService svc = results2.getNextIntermediateResult();
-			providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
-			svc	= results2.getNextIntermediateResult();
-			providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
+			addAndCheckResult(resultmap2, results2.getNextIntermediateResult(), pro1.getId(), pro2.getId());
+			addAndCheckResult(resultmap2, results2.getNextIntermediateResult(), pro1.getId(), pro2.getId());
 			
-			Set<IComponentIdentifier> providers2 = new LinkedHashSet<>();
-			providers2.add(pro1.getId());
-			providers2.add(pro2.getId());
-			
-			if(sspconf!=null || SuperpeerClientAgent.SPCACHE)	// wait for the two global services also
+			// no more awa -> should find global services only when SSP available or global services cached in local SP
+			if(sspconf!=null || SuperpeerClientAgent.SPCACHE)
 			{
-				svc	= results2.getNextIntermediateResult();
-				providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
-				svc	= results2.getNextIntermediateResult();
-				providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
-				providers2.add(pro1.getId());
-				providers2.add(pro2.getId());
+				addAndCheckResult(resultmap2, results2.getNextIntermediateResult(), pro1.getId(), pro2.getId());
+				addAndCheckResult(resultmap2, results2.getNextIntermediateResult(), pro1.getId(), pro2.getId());
+				
+				Assert.assertEquals("Should find two services: "+resultmap2.get(pro1.getId()), 2, resultmap2.get(pro1.getId()).size());
+				Assert.assertEquals("Should find two services: "+resultmap2.get(pro2.getId()), 2, resultmap2.get(pro2.getId()).size());
 			}
-			
-			Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results2.getIntermediateResults()));
-			Assert.assertEquals(providers1, providers2);
+			else
+			{
+				Assert.assertEquals("Should find one service: "+resultmap2.get(pro1.getId()), 1, resultmap2.get(pro1.getId()).size());
+				Assert.assertEquals("Should find one service: "+resultmap2.get(pro2.getId()), 1, resultmap2.get(pro2.getId()).size());
+			}
 			
 			// 6) start provider platform, wait for service in both queries -> test if works for existing queries (before and after SP)
 			System.out.println("6) start remote platform, wait for service in both queries");
 			IExternalAccess	pro3	= createPlatform(proconf);
-			svc	= results.getNextIntermediateResult();
-			Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
-			svc	= results2.getNextIntermediateResult();
-			Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
+			addAndCheckResult(resultmap, results.getNextIntermediateResult(), pro3.getId());
+			addAndCheckResult(resultmap2, results2.getNextIntermediateResult(), pro3.getId());
 			
-			if(sspconf!=null || SuperpeerClientAgent.SPCACHE)	// wait for the two global services also
+			// no more awa -> should find global services only when SSP available or global services cached in local SP
+			if(sspconf!=null || SuperpeerClientAgent.SPCACHE)
 			{
-				svc	= results.getNextIntermediateResult();
-				Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
-				svc	= results2.getNextIntermediateResult();
-				Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
+				addAndCheckResult(resultmap, results.getNextIntermediateResult(), pro3.getId());
+				addAndCheckResult(resultmap2, results2.getNextIntermediateResult(), pro3.getId());
 			}
 	
 			// 7) kill SP, start provider platform, wait for service on both queries
@@ -197,37 +202,61 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			removePlatform(sp);
 			if(awa && sspconf==null && !SuperpeerClientAgent.SPCACHE)
 			{
-				// After fallback to awa -> global services are now found (hack???)
-				svc	= results.getNextIntermediateResult();
-//				svc	= results.getNextIntermediateResult();
-				svc	= results2.getNextIntermediateResult();
-				svc	= results2.getNextIntermediateResult();
-				svc	= results2.getNextIntermediateResult();
+				// After fallback to awa -> third global service is now found on first query
+				addAndCheckResult(resultmap, results.getNextIntermediateResult(), pro3.getId());
+				
+				// After fallback to awa -> all global services are now found on second query
+				addAndCheckResult(resultmap2, results2.getNextIntermediateResult(), pro1.getId(), pro2.getId(), pro3.getId());
+				addAndCheckResult(resultmap2, results2.getNextIntermediateResult(), pro1.getId(), pro2.getId(), pro3.getId());
+				addAndCheckResult(resultmap2, results2.getNextIntermediateResult(), pro1.getId(), pro2.getId(), pro3.getId());
+				
+				// All six services should be found in second query
+				Assert.assertEquals("Should find two services: "+resultmap2.get(pro1.getId()), 2, resultmap2.get(pro1.getId()).size());
+				Assert.assertEquals("Should find two services: "+resultmap2.get(pro2.getId()), 2, resultmap2.get(pro2.getId()).size());
+				Assert.assertEquals("Should find two services: "+resultmap2.get(pro3.getId()), 2, resultmap2.get(pro3.getId()).size());
 			}
 			
 			IExternalAccess	pro4 = createPlatform(proconf);
 			if(awa)
 			{
 				// -> test if re-fallback to awa works for queries
-				waitForRegistryClient(client, true);
-				svc	= results.getNextIntermediateResult();
-				Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
-				svc	= results.getNextIntermediateResult();
-				Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
-				svc	= results2.getNextIntermediateResult();
-				Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
-				svc	= results2.getNextIntermediateResult();
-				Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
+				addAndCheckResult(resultmap, results.getNextIntermediateResult(), pro4.getId());
+				addAndCheckResult(resultmap, results.getNextIntermediateResult(), pro4.getId());
+				addAndCheckResult(resultmap2, results2.getNextIntermediateResult(), pro4.getId());
+				addAndCheckResult(resultmap2, results2.getNextIntermediateResult(), pro4.getId());
+				Assert.assertEquals("Should find two services: "+resultmap.get(pro4.getId()), 2, resultmap.get(pro4.getId()).size());
+				Assert.assertEquals("Should find two services: "+resultmap2.get(pro4.getId()), 2, resultmap2.get(pro4.getId()).size());
 			}
-			else
+			else if(sspconf!=null)
 			{
-				// -> test if disconnection from SP works (new services not found)
-				waitForRegistryWithProvider(client, pro4, true);
-				Collection<ITestService> col1 = results.getIntermediateResults();
-				Collection<ITestService> col2 = results2.getIntermediateResults();
-				Assert.assertEquals(1, new LinkedHashSet<>(col1).size());
-				Assert.assertEquals(1, new LinkedHashSet<>(col2).size());
+				// -> test if disconnection from SP works (only global services found in SSP)
+				addAndCheckResult(resultmap, results.getNextIntermediateResult(), pro4.getId());
+				addAndCheckResult(resultmap2, results2.getNextIntermediateResult(), pro4.getId());
+				Assert.assertEquals("Should find one service: "+resultmap.get(pro4.getId()), 1, resultmap.get(pro4.getId()).size());
+				Assert.assertEquals("Should find one service: "+resultmap2.get(pro4.getId()), 1, resultmap2.get(pro4.getId()).size());
 			}
+			// else not supported, class requires at least awa or ssp to work properly
+		}
+	}
+
+	/**
+	 *  Collect and test a query result.
+	 *  @param resultmap	collected platform id -> set of service ids.
+	 *  @param svc	The newly found service.
+	 */
+	protected void addAndCheckResult(Map<IComponentIdentifier, Set<IServiceIdentifier>> resultmap, ITestService svc, IComponentIdentifier... ids)
+	{
+		IServiceIdentifier	sid	= ((IService)svc).getServiceId();
+		IComponentIdentifier	cid	= sid.getProviderId().getRoot();
+		if(!resultmap.containsKey(cid))
+		{
+			resultmap.put(cid, new LinkedHashSet<>());
+		}
+		Assert.assertTrue("Service should not be received twice: "+resultmap.get(cid)+", "+sid, resultmap.get(cid).add(sid));
+		
+		if(ids.length>0)
+		{
+			Assert.assertTrue("Service should be from patform(s): "+Arrays.asList(ids), Arrays.asList(ids).contains(cid));
 		}
 	}
 	
@@ -368,9 +397,31 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 	
 			// 8) kill SP, search for service -> test if re-fallback to awa works
 			System.out.println("8) kill SP, search for service");
+			IFuture<Void>	conlost	= client.getExternalAccess(new ComponentIdentifier("superpeerclient", client.getId())).scheduleStep(ia ->
+			{
+				// Wait until SP connection is lost on client.
+				Future<Void>	ret	= new Future<>();
+				SuperpeerClientAgent	sca	= (SuperpeerClientAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
+				sca.getSPConnection(sp.getId()).addResultListener(new IntermediateDefaultResultListener<Void>()
+				{
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						System.out.println("SP connection ended: "+exception);
+						ret.setResult(null);
+					}
+					
+					@Override
+					public void finished()
+					{
+						System.out.println("SP connection ended.");
+						ret.setResult(null);
+					}
+				});
+				return ret;
+			});
 			removePlatform(sp);
-			waitALittle(client);
-			waitALittle(client);	// two waits for disconnection, because contimeout = 2* WAITFACTOR
+			conlost.get();
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			Assert.assertEquals(""+result, awa? 2: 1, result.size());
 		}
