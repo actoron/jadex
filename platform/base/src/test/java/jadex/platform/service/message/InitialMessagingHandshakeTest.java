@@ -5,7 +5,6 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
@@ -29,7 +28,6 @@ import jadex.platform.service.transport.intravm.IntravmTransportAgent;
 /**
  *  Try to test robustness of the initial messaging handshake when a new platform is not yet inited. 
  */
-@Ignore
 public class InitialMessagingHandshakeTest
 {
 	static final long	SEND_TIMEOUT	= 3000;
