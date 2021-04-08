@@ -189,6 +189,11 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 	 */
 	protected IFuture<TestReport> performTest(final IComponentIdentifier root, IExternalAccess platform, final int testno, final long delay, final int max)
 	{
+		IResourceIdentifier	rid	= new ResourceIdentifier(
+				new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
+//					System.out.println("Using rid: "+rid);
+		final boolean	local	= root.equals(agent.getId().getRoot());
+		TestReport tr = new TestReport("#"+testno, "Tests if "+(local?"local":"remote")+" intermediate results work");
 		final Future<TestReport> ret = new Future<TestReport>();
 
 		final Future<TestReport> res = new Future<TestReport>();
@@ -197,17 +202,12 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
 				tr.setFailed(exception);
 				super.resultAvailable(tr);
 			}
 		});
 		
 		// Start service agent
-		IResourceIdentifier	rid	= new ResourceIdentifier(
-			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
-//				System.out.println("Using rid: "+rid);
-		final boolean	local	= root.equals(agent.getId().getRoot());
 		CreationInfo	ci	= new CreationInfo(rid);
 		(local ? agent.getExternalAccess() : platform).createComponent(ci.setFilename("jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class"))
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
@@ -230,18 +230,17 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 							{
 								if(start[0]==null)
 								{
-									start[0] = 	local || SSimulation.isBisimulating(agent) ? clock.getTime() : System.currentTimeMillis();
+									start[0] = 	local || SSimulation.isBisimulating(agent) ? clock.getTime() : (System.nanoTime()/1000000);
 								}
 //													System.out.println("intermediateResultAvailable: "+result);
 							}
 							public void finished()
 							{
-								long needed = (local || SSimulation.isBisimulating(agent) ? clock.getTime() : System.currentTimeMillis())-start[0].longValue();
+								long needed = (local || SSimulation.isBisimulating(agent) ? clock.getTime() : (System.nanoTime()/1000000))-start[0].longValue();
 //															System.out.println("finished: "+needed);
-								TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
 								long expected = delay*(max-1);
 								// deviation can happen because receival of results is measured
-//										System.out.println("Results did arrive in (needed/expected): ("+needed+" / "+expected+")");
+								System.out.println("Results did arrive in (needed/expected): ("+needed+" / "+expected+")");
 								
 								if(needed*1.1>=expected) // 10% deviation allowed
 								{
@@ -249,7 +248,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 								}
 								else
 								{
-									tr.setReason("Results did arrive too fast (in bunch at the end (needed/expected): ("+needed+" / "+expected);
+									tr.setReason("Results did arrive too fast (in bunch at the end (needed/expected): ("+needed+" / "+expected+")");
 								}
 								agent.getExternalAccess(exta.getId()).killComponent();
 								ret.setResult(tr);
