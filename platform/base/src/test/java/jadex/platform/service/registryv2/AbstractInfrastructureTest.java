@@ -136,7 +136,7 @@ public abstract class AbstractInfrastructureTest
 //		System.out.println("Waiting for cids: " + Arrays.toString(platformids.toArray()));
 		while(!platformids.isEmpty())
 		{
-			long timeout = Starter.getDefaultTimeout(sp.getId().getRoot());
+			long timeout = Starter.getScaledDefaultTimeout(sp.getId().getRoot(), 3);
 			if (timeout <= 0)
 				timeout = 30000;
 //			System.err.println("waitForSuperpeerConnections0: Waiting for next cid, remaining: " +this+", "+connected+", "+ Arrays.toString(platformids.toArray())+", "+Thread.currentThread());
