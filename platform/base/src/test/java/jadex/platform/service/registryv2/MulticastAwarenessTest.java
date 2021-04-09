@@ -60,7 +60,7 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 		baseconf.setValue("intravmawareness", false);
 		baseconf.setValue("multicastawareness", true);
 		baseconf.setValue("multicastawareness.port", port);
-		baseconf.setValue("debugservices", "IMarkerService");
+//		baseconf.setValue("debugservices", "IMarkerService");
 		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*3));
 		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
 		

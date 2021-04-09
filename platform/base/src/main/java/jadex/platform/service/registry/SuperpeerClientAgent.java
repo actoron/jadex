@@ -1193,6 +1193,12 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		/** The auxiliary futures as received from superpeers. */
 		protected Collection<ITerminableIntermediateFuture<T>> futures;
 		
+		/** The last polling interval or 0 for first. */
+		protected long polltime;
+		
+		/** State counter to check if new search should be started after wait. */
+		protected int	state;
+		
 		//-------- constructors --------
 		
 		/**
@@ -1364,6 +1370,14 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							
 							SubscriptionIntermediateFuture rawfut = retfut;
 							rawfut.addIntermediateResultIfUndone(res);
+							
+							// Reset search backoff and when something was found after at least one polling interval has passed
+							if(polltime>getNextPollingInterval(0))
+							{
+								polltime	= 0;
+								scheduleSearch(networknames);
+							}
+							// else NOP -> avoid unnecessary waitFors when many results are available at once
 						}
 						
 						@Override
@@ -1384,20 +1398,64 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							// Ignore
 						}
 					});
+					
+					// Schedule next search
+					scheduleSearch(networknames);
 				}
-				
-				// immediately schedule next search to start even when previous search takes longer than polling rate
-				agent.getFeature(IExecutionFeature.class)
-					.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), pollingrate), new IComponentStep<Void>()
-				{
-					@Override
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						updateQuery(networknames);
-						return IFuture.DONE;
-					}
-				}, true);
 			}
+		}
+		
+		/**
+		 *  Get the next polling interval given the previous one.
+		 */
+		public long	getNextPollingInterval(long prev)
+		{
+			// Exponential polling time backoff: start with 1/64 and double after each step until normal polling time is reached.
+			long	defpolltime	= Starter.getScaledDefaultTimeout(agent.getId(), pollingrate);
+			long next;
+			if(prev==0)
+			{
+				next	= defpolltime/64;
+			}
+			else
+			{
+				next	= Math.min(defpolltime, prev*2);
+			}
+			return next;
+		}
+		
+		/**
+		 *  Schedule the next search based on polling time with exponential backoff.
+		 *  The search is only performed when during wait no new results are found (which causes backoff to be reset and another search to be started).
+		 */
+		protected void scheduleSearch(String[] networknames)
+		{
+			long	nextpoll	= getNextPollingInterval(polltime);
+			if(debug(query))
+			{
+				System.out.println(this.hashCode()+": Scheduling in "+nextpoll+" for "+SUtil.arrayToString(networknames)+": "+query);
+			}
+			
+			// immediately schedule next search to start even when previous search takes longer than polling rate
+			int	fstate	= ++state;
+			agent.getFeature(IExecutionFeature.class)
+				.waitForDelay(nextpoll, new IComponentStep<Void>()
+			{
+				@Override
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					if(state==fstate)
+					{
+						polltime	= nextpoll;
+						if(debug(query))
+						{
+							System.out.println(QueryManager.this.hashCode()+": Executing after "+polltime+" for "+SUtil.arrayToString(networknames)+": "+query);
+						}
+						updateQuery(networknames);
+					}
+					return IFuture.DONE;
+				}
+			}, true);
 		}
 	}	
 }

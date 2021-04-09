@@ -25,10 +25,9 @@ public class LocalSuperpeerTest	extends AbstractSearchQueryTest
 	static
 	{
 		IPlatformConfiguration	baseconf	= STest.getRealtimeTestConfig(LocalSuperpeerTest.class);
-		baseconf.setValue("debugservices", "IMarkerService");
+//		baseconf.setValue("debugservices", "ITestService");
 		baseconf.setValue("superpeerclient.awaonly", false);
 		baseconf.setValue("superpeerclient.contimeout", WAITFACTOR*2);
-		baseconf.setValue("superpeerclient.pollingrate", WAITFACTOR*0.3333); // -> 30 sec * 0.1 * 0.3333 ~= 1 sec
 //		baseconf.setLogging(true);
 //		baseconf.setValue("rt.debug", true);
 		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);

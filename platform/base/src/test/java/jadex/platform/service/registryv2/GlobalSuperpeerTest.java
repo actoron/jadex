@@ -46,13 +46,12 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 			.setValue("intravmawareness", false)
 			.setValue("catalogawareness", true)
 			.setValue("rt", true)
-			.setValue("debugservices", "IMarkerService")
 			.setValue("platformurls", "intravm://GlobalSuperpeerTestSSP@localhost:"+sspport)
 			.setNetworkNames(SecurityAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name)
 			.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass)
 //			.getExtendedPlatformConfiguration()
 //				.setDebugFutures(true)
-//			.setValue("debugservices", "ITestService")
+//			.setValue("debugservices", "ITestService, ISuperpeerService")
 //			.setValue("security.debug", true)
 			;
 			
