@@ -1,13 +1,14 @@
 package jadex.platform.service.registryv2;
 
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -19,6 +20,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.awareness.IAwarenessService;
 import jadex.commons.SUtil;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.security.SSecurity;
 
 /**
@@ -93,14 +95,19 @@ public class BroadcastAwarenessTest	extends AbstractSearchQueryTest
 	@Test
 	public void	testBareAwareness()
 	{
+		// Start client and fetch awa service.
 		IExternalAccess	client	= createPlatform(CLIENTCONF);		
-		createPlatform(PROCONF);	
-		createPlatform(PROCONF);
-		
 		IAwarenessService	pawa	= client.searchService(new ServiceQuery<>(IAwarenessService.class)).get();
 		assertTrue("Found broadcast awareness? "+pawa, pawa.toString().toLowerCase().contains("broadcast"));
 		
-		Collection<IComponentIdentifier>	found	= pawa.searchPlatforms().get();
-		assertEquals(found.toString(), 2, found.size());
+		// Start providers and check that they can be found
+		IExternalAccess	pro1	= createPlatform(PROCONF);	
+		IExternalAccess	pro2	= createPlatform(PROCONF);
+		Set<IComponentIdentifier>	platforms	= new LinkedHashSet<IComponentIdentifier>(Arrays.asList(pro1.getId(), pro2.getId()));
+		IIntermediateFuture<IComponentIdentifier>	results	= pawa.searchPlatforms();
+		IComponentIdentifier	result	= results.getNextIntermediateResult();
+		assertTrue("Found provider platform? "+platforms+", "+result, platforms.remove(result));
+		result	= results.getNextIntermediateResult();
+		assertTrue("Found provider platform? "+platforms+", "+result, platforms.remove(result));
 	}
 }
