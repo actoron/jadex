@@ -9,6 +9,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
@@ -1181,4 +1184,29 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 
         return ret;
     }*/
+	
+	/**
+	 *  Return a stream of the results of this future.
+	 */
+	public Stream<E>	asStream()
+	{
+//		// First try: doesn't handle finished
+//		return Stream.generate(() -> getNextIntermediateResult());
+		
+		// TODO: spliterator characteristics and parallel!?
+		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<E>()
+		{
+			@Override
+			public boolean hasNext()
+			{
+				return hasNextIntermediateResult();
+			}
+
+			@Override
+			public E next()
+			{
+				return getNextIntermediateResult();
+			}
+		}, 0), false);
+	}
 }

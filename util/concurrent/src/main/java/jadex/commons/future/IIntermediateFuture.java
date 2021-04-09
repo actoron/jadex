@@ -3,6 +3,7 @@ package jadex.commons.future;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 import jadex.commons.functional.Consumer;
 
@@ -190,4 +191,9 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 	 *  @return True result intermediate future.
 	 */
 	//public <R> IIntermediateFuture<R> flatMapAsync(Function<E, IIntermediateFuture<R>> function);
+
+	/**
+	 *  Return a stream of the results of this future.
+	 */
+	public Stream<E>	asStream();
 }
