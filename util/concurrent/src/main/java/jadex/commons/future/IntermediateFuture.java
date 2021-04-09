@@ -1187,8 +1187,23 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	
 	/**
 	 *  Return a stream of the results of this future.
+	 *  Although this method itself is non-blocking,
+	 *  all terminal stream methods (e.g. forEach) will block until the future is finished!
 	 */
 	public Stream<E>	asStream()
+	{
+		return asStream(UNSET, false);
+	}
+
+	/**
+	 *  Return a stream of the results of this future.
+	 *  Use the given timeout settings when waiting for elements in the stream.
+	 *  Although this method itself is non-blocking,
+	 *  all terminal stream methods (e.g. forEach) will block until the future is finished!
+	 *  @param timeout The timeout in millis.
+	 *  @param realtime Flag, if wait should be realtime (in constrast to simulation time).
+	 */
+	public Stream<E>	asStream(long timeout, boolean realtime)
 	{
 //		// First try: doesn't handle finished
 //		return Stream.generate(() -> getNextIntermediateResult());
@@ -1199,13 +1214,13 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 			@Override
 			public boolean hasNext()
 			{
-				return hasNextIntermediateResult();
+				return hasNextIntermediateResult(timeout, realtime);
 			}
 
 			@Override
 			public E next()
 			{
-				return getNextIntermediateResult();
+				return getNextIntermediateResult(timeout, realtime);
 			}
 		}, 0), false);
 	}

@@ -2,8 +2,8 @@ package jadex.micro.testcases.futureasstream;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
-import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.ServiceScope;
@@ -33,6 +33,7 @@ public class FutureAsStreamTestAgent extends TestAgent	implements	IFutureAsStrea
 	{
 		String	result	= "result-"+Math.random();
 		results.add(result);
+		System.out.println("callback executed: "+result);
 		return new Future<>(result);
 	}
 	
@@ -50,9 +51,14 @@ public class FutureAsStreamTestAgent extends TestAgent	implements	IFutureAsStrea
 		IExternalAccess	provider	= platform.addComponent(new FutureAsStreamProviderAgent()).get();
 		IFutureAsStreamTestService	testservice	= agent.searchService(new ServiceQuery<>(IFutureAsStreamTestService.class).setScope(ServiceScope.GLOBAL)).get();
 		
-		// Use blocking (a.k.a. terminal) forEach
-		List<String>	results2	= new ArrayList<String>();		
-		testservice.getSomeResults().asStream().limit(3).forEach(results2::add);
+		// Some non-blocking operations on the stream (doesn't trigger processing)
+		List<String>	results2	= new ArrayList<String>();
+		Stream<String>	stream	= testservice.getSomeResults().asStream().limit(3);
+		
+		// Blocking forEach (a.k.a. terminal operation)
+		System.out.println("before forEach");
+		stream.forEach(results2::add);
+		System.out.println("after forEach");
 		
 		// cleanup to avoid interference of local provide with remote test
 		provider.killComponent().get();
