@@ -39,7 +39,9 @@ public class FutureAsStreamProviderAgent implements IFutureAsStreamTestService
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				results.addIntermediateResult(callback.getNextResult().get());
+				String	str	= callback.getNextResult().get();
+				System.out.println("getSomeResults: "+str);
+				results.addIntermediateResult(str);
 				return agent.waitForDelay(1000, this);
 			}
 		};

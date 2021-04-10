@@ -1,7 +1,5 @@
 package jadex.micro.testcases.futureasstream;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Stream;
 
 import jadex.base.test.TestReport;
@@ -26,14 +24,15 @@ public class FutureAsStreamTestAgent extends TestAgent	implements	IFutureAsStrea
 {
 	//-------- callback service --------
 	
-	protected List<String>	results;
+	protected String	results;
 	
 	@Override
 	public IFuture<String> getNextResult()
 	{
-		String	result	= "result-"+Math.random();
-		results.add(result);
-		System.out.println("callback executed: "+result);
+		double	num	= Math.random();
+		String	result	= "result_"+num;
+		results	+= Math.round(num);
+		System.out.println("getNextResult: "+result);
 		return new Future<>(result);
 	}
 	
@@ -47,27 +46,39 @@ public class FutureAsStreamTestAgent extends TestAgent	implements	IFutureAsStrea
 	 */
 	protected IFuture<TestReport> test(IExternalAccess platform, boolean local)
 	{
-		results	= new ArrayList<String>();
+		results	= "";
 		IExternalAccess	provider	= platform.addComponent(new FutureAsStreamProviderAgent()).get();
-		IFutureAsStreamTestService	testservice	= agent.searchService(new ServiceQuery<>(IFutureAsStreamTestService.class).setScope(ServiceScope.GLOBAL)).get();
+		IExternalAccess	filter	= platform.addComponent(new FutureAsStreamFilterAgent()).get();
+		IFutureAsStreamFilterService	testservice	= agent.searchService(new ServiceQuery<>(IFutureAsStreamFilterService.class).setScope(ServiceScope.GLOBAL)).get();
 		
 		// Some non-blocking operations on the stream (doesn't trigger processing)
-		List<String>	results2	= new ArrayList<String>();
-		Stream<String>	stream	= testservice.getSomeResults().asStream().limit(3);
+		Stream<String>	stream	= testservice.filterResults().asStream().limit(3);
+		
+		// Non-blocking peek (a.k.a. intermediate operation)
+		System.out.println("before peek");
+		stream	= stream.peek(str -> System.out.println("peek: "+str));
+		agent.waitForDelay(2500).get();
+		System.out.println("after peek");
 		
 		// Blocking forEach (a.k.a. terminal operation)
 		System.out.println("before forEach");
-		stream.forEach(results2::add);
+		String[]	results2	= new String[]{""};
+		stream.forEach(str -> 
+		{
+			System.out.println("forEach: "+str);
+			results2[0]	+= str;
+		});
 		System.out.println("after forEach");
 		
 		// cleanup to avoid interference of local provide with remote test
+		filter.killComponent().get();
 		provider.killComponent().get();
 		
-		return new Future<TestReport>(results.equals(results2)
+		return new Future<TestReport>(results.equals(results2[0])
 			? new TestReport(local?"#1":"#2", local?"local":"remote", true, null)
-			: new TestReport(local?"#1":"#2", local?"local":"remote", false, "Results do not match: "+results+", "+results2));
+			: new TestReport(local?"#1":"#2", local?"local":"remote", false, "Results do not match: "+results+", "+results2[0]));
 	}
-//	
+	
 //	@Override
 //	public IPlatformConfiguration getConfig()
 //	{
