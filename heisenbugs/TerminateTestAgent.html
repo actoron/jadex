@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class jadex.micro.testcases.terminate.TerminateTestAgent</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class jadex.micro.testcases.terminate.TerminateTestAgent</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/jadex.micro.testcases.terminate.html">jadex.micro.testcases.terminate</a> &gt; TerminateTestAgent</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">1</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">22.349s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox failures" id="successRate">
+<div class="percent">0%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Failed tests</a>
+</li>
+<li>
+<a href="#tab1">Tests</a>
+</li>
+<li>
+<a href="#tab2">Standard output</a>
+</li>
+<li>
+<a href="#tab3">Standard error</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Failed tests</h2>
+<div class="test">
+<a name="jadex.micro.testcases.terminate.TerminateTestAgent"></a>
+<h3 class="failures">jadex.micro.testcases.terminate.TerminateTestAgent</h3>
+<span class="code">
+<pre>junit.framework.AssertionFailedError: Number of testcases do not match. Expected 4 but was 2.
+	at jadex.base.test.impl.ComponentTestBase.checkTestResults(ComponentTestBase.java:263)
+	at jadex.base.test.impl.ComponentTestBase.runBare(ComponentTestBase.java:184)
+	at jadex.base.test.impl.ComponentTestLazyPlatform.runBare(ComponentTestLazyPlatform.java:98)
+	at jadex.base.test.impl.JunitAgentTest.runBare(JunitAgentTest.java:73)
+	at junit.framework.TestResult$1.protect(TestResult.java:122)
+	at junit.framework.TestResult.runProtected(TestResult.java:142)
+	at junit.framework.TestResult.run(TestResult.java:125)
+	at junit.framework.TestCase.run(TestCase.java:129)
+	at junit.framework.TestSuite.runTest(TestSuite.java:255)
+	at junit.framework.TestSuite.run(TestSuite.java:250)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:84)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecutor.runTestClass(JUnitTestClassExecutor.java:110)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecutor.execute(JUnitTestClassExecutor.java:58)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecutor.execute(JUnitTestClassExecutor.java:38)
+	at org.gradle.api.internal.tasks.testing.junit.AbstractJUnitTestClassProcessor.processTestClass(AbstractJUnitTestClassProcessor.java:62)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:51)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:94)
+	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:119)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:182)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:164)
+	at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:414)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.ManagedExecutorImpl$1.run(ManagedExecutorImpl.java:48)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:56)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+</pre>
+</span>
+</div>
+</div>
+<div id="tab1" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="failures">jadex.micro.testcases.terminate.TerminateTestAgent</td>
+<td class="failures">22.349s</td>
+<td class="failures">failed</td>
+</tr>
+</table>
+</div>
+<div id="tab2" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>ADDBLOCKER: jadex.commons.future.Future@528ce5f7
+ADDBLOCKER: jadex.commons.future.Future@1793e3d1
+ADDBLOCKER: jadex.commons.future.Future@2c792799
+ADDBLOCKER: jadex.commons.future.Future@308a3e41
+ADDBLOCKER: jadex.commons.future.Future@692856cd
+ADDBLOCKER: jadex.commons.future.Future@b1dfffb
+ADDBLOCKER: jadex.commons.future.Future@c6ea734
+ADDBLOCKER: jadex.commons.future.Future@7cf04d28
+ADDBLOCKER: jadex.commons.future.Future@3c6eb565
+ADDBLOCKER: jadex.commons.future.Future@63d1f13c
+Using test timeout: 120000 1618048541784 C:\Users\Alex\Checkouts\jadex\applications\micro\build\classes\java\test\jadex\micro\testcases\terminate\TerminateTestAgent.class
+TerminateTestAgent@test_$9: testTerminate1
+TerminateTestAgent@test_$9: testTerminate1b
+TerminableProviderAgent@TerminateTestAgent:test_$9: getResult1 12000
+TerminableProviderAgent@TerminateTestAgent:test_$9: getResult2 null
+TerminateTestAgent@test_$9: testTerminate3
+TerminateTestAgent@test_$9: testTerminate4
+TerminateTestAgent@test_$9: testTerminateAction1
+TerminableProviderAgent@TerminateTestAgent:test_$9: getResult1 12000
+TerminableProviderAgent@TerminateTestAgent:test_$9: getResult2 jadex.commons.future.IntermediateFuture@38c50d17
+TerminateTestAgent@test_$9: testTerminateAction3
+TerminateTestAgent@test_$9: testTerminateAction4
+ADDBLOCKER: jadex.commons.future.Future@39565e02
+ADDBLOCKER: jadex.commons.future.Future@12d74eb8
+ADDBLOCKER: jadex.commons.future.Future@5c97a1dc
+ADDBLOCKER: jadex.commons.future.Future@5d538100
+tests failed: TerminateTestAgent@test_$9
+</pre>
+</span>
+</div>
+<div id="tab3" class="tab">
+<h2>Standard error</h2>
+<span class="code">
+<pre>java.lang.Exception: Stack trace
+	at java.base/java.lang.Thread.dumpStack(Thread.java:1387)
+	at jadex.bridge.service.search.ServiceNotFoundException.printStackTrace(ServiceNotFoundException.java:20)
+	at jadex.micro.testcases.TestAgent$3.exceptionOccurred(TestAgent.java:154)
+	at jadex.bridge.ComponentResultListener.exceptionOccurred(ComponentResultListener.java:330)
+	at jadex.bridge.ComponentResultListener.exceptionOccurredIfUndone(ComponentResultListener.java:353)
+	at jadex.commons.future.Future$1.execute(Future.java:772)
+	at jadex.commons.future.Future$1.execute(Future.java:764)
+	at jadex.commons.future.Future.executeNotification(Future.java:697)
+	at jadex.commons.future.Future.doStartScheduledNotifications(Future.java:668)
+	at jadex.commons.future.Future.startScheduledNotifications(Future.java:621)
+	at jadex.commons.future.Future.resume(Future.java:487)
+	at jadex.commons.future.Future.doSetException(Future.java:344)
+	at jadex.bridge.service.component.interceptors.DelegatingTerminableDelegationFuture.access$101(FutureFunctionality.java:979)
+	at jadex.bridge.service.component.interceptors.DelegatingTerminableDelegationFuture.doSetException(FutureFunctionality.java:1027)
+	at jadex.commons.future.Future.setExceptionIfUndone(Future.java:367)
+	at jadex.commons.future.DelegationResultListener.exceptionOccurred(DelegationResultListener.java:146)
+	at jadex.commons.future.DelegationResultListener.exceptionOccurredIfUndone(DelegationResultListener.java:187)
+	at jadex.commons.future.Future$1.execute(Future.java:772)
+	at jadex.commons.future.Future$1.execute(Future.java:764)
+	at jadex.bridge.service.component.interceptors.DecouplingReturnInterceptor$1$1$2.execute(DecouplingReturnInterceptor.java:106)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1447)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+jadex.bridge.service.search.ServiceNotFoundException: ServiceQuery(servicetype=jadex.micro.testcases.terminate.ITerminableService, multiplicity=1, searchstart=TerminableProviderAgent@test_$10, networknames=[test], scope=COMPONENT_ONLY, owner=TerminateTestAgent@test_$9)
+	at jadex.platform.service.registry.SuperpeerClientAgent$3.finished(SuperpeerClientAgent.java:283)
+	at jadex.commons.future.IntermediateFuture$3.execute(IntermediateFuture.java:410)
+	at jadex.commons.future.IntermediateFuture$3.execute(IntermediateFuture.java:388)
+	at jadex.commons.future.Future.executeNotification(Future.java:697)
+	at jadex.commons.future.Future.doStartScheduledNotifications(Future.java:668)
+	at jadex.commons.future.Future.startScheduledNotifications(Future.java:621)
+	at jadex.commons.future.Future.resume(Future.java:487)
+	at jadex.commons.future.Future.doSetException(Future.java:344)
+	at jadex.commons.future.Future.setExceptionIfUndone(Future.java:367)
+	at jadex.commons.future.ExceptionDelegationResultListener.exceptionOccurred(ExceptionDelegationResultListener.java:107)
+	at jadex.commons.future.ExceptionDelegationResultListener.exceptionOccurredIfUndone(ExceptionDelegationResultListener.java:132)
+	at jadex.bridge.ComponentResultListener$8.execute(ComponentResultListener.java:286)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1447)
+	at jadex.platform.service.execution.SyncExecutionService$1$1.execute(SyncExecutionService.java:211)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+Apr. 10, 2021 11:56:01 VORM. remoteregistry@test_$10 jadex.bridge.component.impl.ExecutionComponentFeature execute
+SEVERE: Component step failed: jadex.platform.service.transport.AbstractTransportAgent$12$2@7f54928e
+java.lang.NullPointerException
+	at jadex.bridge.component.impl.MessageComponentFeature.messageArrived(MessageComponentFeature.java:386)
+	at jadex.platform.service.transport.AbstractTransportAgent$12$2.execute(AbstractTransportAgent.java:1017)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1447)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at jadex.platform.service.execution.AsyncExecutionService$1.run(AsyncExecutionService.java:109)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+Apr. 10, 2021 11:56:01 VORM. remoteregistry@test_$10 jadex.bridge.component.impl.ExecutionComponentFeature execute
+SEVERE: Component step failed: jadex.platform.service.transport.AbstractTransportAgent$12$2@57e7cba0
+java.lang.NullPointerException
+	at jadex.bridge.component.impl.MessageComponentFeature.messageArrived(MessageComponentFeature.java:386)
+	at jadex.platform.service.transport.AbstractTransportAgent$12$2.execute(AbstractTransportAgent.java:1017)
+	at jadex.bridge.component.impl.ExecutionComponentFeature.execute(ExecutionComponentFeature.java:1447)
+	at jadex.commons.concurrent.Executor.code(Executor.java:299)
+	at jadex.commons.concurrent.Executor.run(Executor.java:126)
+	at jadex.platform.service.execution.AsyncExecutionService$1.run(AsyncExecutionService.java:109)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+junit.framework.AssertionFailedError: Number of testcases do not match. Expected 4 but was 2.
+	at jadex.base.test.impl.ComponentTestBase.checkTestResults(ComponentTestBase.java:263)
+	at jadex.base.test.impl.ComponentTestBase.runBare(ComponentTestBase.java:184)
+	at jadex.base.test.impl.ComponentTestLazyPlatform.runBare(ComponentTestLazyPlatform.java:98)
+	at jadex.base.test.impl.JunitAgentTest.runBare(JunitAgentTest.java:73)
+	at junit.framework.TestResult$1.protect(TestResult.java:122)
+	at junit.framework.TestResult.runProtected(TestResult.java:142)
+	at junit.framework.TestResult.run(TestResult.java:125)
+	at junit.framework.TestCase.run(TestCase.java:129)
+	at junit.framework.TestSuite.runTest(TestSuite.java:255)
+	at junit.framework.TestSuite.run(TestSuite.java:250)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:84)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecutor.runTestClass(JUnitTestClassExecutor.java:110)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecutor.execute(JUnitTestClassExecutor.java:58)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecutor.execute(JUnitTestClassExecutor.java:38)
+	at org.gradle.api.internal.tasks.testing.junit.AbstractJUnitTestClassProcessor.processTestClass(AbstractJUnitTestClassProcessor.java:62)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:51)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:94)
+	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:119)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:182)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:164)
+	at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:414)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.ManagedExecutorImpl$1.run(ManagedExecutorImpl.java:48)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:56)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 6.5</a> at 10.04.2021, 11:57:43</p>
+</div>
+</div>
+</body>
+</html>

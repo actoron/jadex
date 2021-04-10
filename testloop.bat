@@ -8,7 +8,7 @@
 )
 
 call gradlew clean -PbuildDir=%BUILD_DIR%
-@rem set jadex_timeout=60000
+set jadex_timeout=60000
 :test_loop
 CMD /C gradlew -Pdist=publishdists test -x javadoc --continue -PbuildDir=%BUILD_DIR%
 

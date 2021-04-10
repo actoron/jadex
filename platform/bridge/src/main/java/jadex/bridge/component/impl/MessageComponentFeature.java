@@ -327,14 +327,16 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				// Check first to avoid creating an exception.
 				if(!ret.isDone())
 				{
-					ret.setExceptionIfUndone(new TimeoutException("Timeout occured by " + component.getId().toString() + " while sending message to " + header.getProperty(IMsgHeader.RECEIVER))// rplat)
+					@SuppressWarnings("serial")
+					Exception	ex	= new TimeoutException("Timeout occured by " + component.getId().toString() + " while sending message to " + header.getProperty(IMsgHeader.RECEIVER))// rplat)
 					{
 						@Override
 						public void printStackTrace()
 						{
 							super.printStackTrace();
 						}
-					});
+					};
+					ret.setExceptionIfUndone(ex);
 				}
 				return IFuture.DONE;
 			}
@@ -383,7 +385,10 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		{
 //			System.out.println("Received message: "+header);
 			
-			getSecurityService().decryptAndAuth((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), bodydata).addResultListener(
+			ISecurityService	secserv	= getSecurityService();
+			IComponentIdentifier	sender	= (IComponentIdentifier)header.getProperty(IMsgHeader.SENDER);
+			IFuture<Tuple2<ISecurityInfo,byte[]>>	fut	= secserv.decryptAndAuth(sender, bodydata);
+			fut.addResultListener(
 				component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Tuple2<ISecurityInfo,byte[]>>()
 			{
 				public void resultAvailable(Tuple2<ISecurityInfo, byte[]> result)
@@ -1577,7 +1582,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			@SuppressWarnings("unchecked")
 			Class<? extends IMessagePreprocessor<Object>> pclazz	= (Class<? extends IMessagePreprocessor<Object>>)
 				Class.forName(clazz.getName()+"Preprocessor", true, clazz.getClassLoader());
-			ret	= pclazz.newInstance();
+			ret	= pclazz.getDeclaredConstructor().newInstance();
 		}
 		catch(ClassNotFoundException e)
 		{

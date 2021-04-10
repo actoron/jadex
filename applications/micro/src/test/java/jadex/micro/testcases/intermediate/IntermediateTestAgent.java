@@ -98,12 +98,14 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 //			}
 //		}));
 		
-		testLocal(1, 100, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+		long	delay	= Starter.getScaledDefaultTimeout(agent.getId().getRoot(), 0.01);
+		
+		testLocal(1, delay, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
-				testRemote(2, 100, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+				testRemote(2, delay, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{

@@ -51,7 +51,7 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 			.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass)
 //			.getExtendedPlatformConfiguration()
 //				.setDebugFutures(true)
-//			.setValue("debugservices", "ITestService, ISuperpeerService")
+			.setValue("debugservices", "ITestService")
 //			.setValue("security.debug", true)
 			;
 			

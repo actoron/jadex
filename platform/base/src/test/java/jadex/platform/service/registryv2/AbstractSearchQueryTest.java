@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -322,17 +321,28 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		else
 		{
 			// -> test if platforms don't see each other without SP.
-			System.out.println("2/3/4) start provider platforms, wait for services");
+			System.out.println("2/3) start provider platforms, wait for services");
 			pro1	= createPlatform(proconf);
 			pro2	= createPlatform(proconf);
 			waitForRegistryWithProvider(client, pro1, true);
 			waitForRegistryWithProvider(client, pro2, true);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			System.out.println("found: "+result.size());
-			Assert.assertEquals(2, result.size());
+			Assert.assertEquals(sspconf!=null?2:0, result.size());
+			
+			// 4) kill one provider platform, search for service -> test if platform is removed from global registry (if any)
+			System.out.println("4) kill one provider platform, search for service");
 			removePlatform(pro1);
-			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals(1, result.size());
+			// retry at most 10 times until services are expunged
+			int num=sspconf!=null?1:0;
+			for(int i=0; i<=10; i++)
+			{
+				if(i>0) waitALittle(client);
+				result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
+				if(result.size()<=num) break;
+				System.out.println("4"+(char)('a'+i)+") results: "+result.size()+", "+result);
+			}
+			Assert.assertEquals(client.toString()+": "+result, num, result.size());
 		}
 
 		//-------- Tests with SP if any --------
@@ -394,9 +404,9 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			removePlatform(pro1);
 			waitForRegistryClient(client, false);
 			num	= sspconf==null && !SuperpeerClientAgent.SPCACHE ? 1 : 2;	// expected number of remaining services
-			// retry at most 10 times until old services expunged from registry
+			// retry at most 100 times until old services expunged from registry
 			// hack!!! should only be 2*WAITFACTOR but leads to heisenbugs?
-			for(int i=0; i<=10; i++)
+			for(int i=0; i<=100; i++)
 			{
 				if(i>0) waitALittle(client);
 				result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
