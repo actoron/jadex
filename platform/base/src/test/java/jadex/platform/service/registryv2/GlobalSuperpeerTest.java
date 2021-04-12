@@ -120,5 +120,27 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		IExternalAccess	client	= createPlatform(CLIENTCONF);
 		waitForSuperpeerConnections(relay, client);
 	}
+
+	public static void main(String[] args)
+	{
+		int	i	= 0;
+		try
+		{
+			for(i=1; ;i++)
+			{
+				System.out.println("Test run "+i);
+				GlobalSuperpeerTest	gst	= new GlobalSuperpeerTest();
+				gst.setup();
+				gst.testServices();
+				gst.tearDown();
+			}
+		}
+		catch(Throwable t)
+		{
+			System.out.println("Test run failed: "+i);
+			t.printStackTrace();
+			System.exit(0);
+		}
+	}
 }
 

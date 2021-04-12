@@ -404,9 +404,9 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			removePlatform(pro1);
 			waitForRegistryClient(client, false);
 			num	= sspconf==null && !SuperpeerClientAgent.SPCACHE ? 1 : 2;	// expected number of remaining services
-			// retry at most 100 times until old services expunged from registry
+			// retry at most 20 times until old services expunged from registry
 			// hack!!! should only be 2*WAITFACTOR but leads to heisenbugs?
-			for(int i=0; i<=100; i++)
+			for(int i=0; i<=20; i++)
 			{
 				if(i>0) waitALittle(client);
 				result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
