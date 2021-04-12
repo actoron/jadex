@@ -3,10 +3,17 @@ package jadex.platform.service.registryv2;
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
+import jadex.base.Starter;
 import jadex.base.test.util.STest;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.security.PemKeyPair;
 import jadex.commons.security.SSecurity;
+import jadex.platform.service.registry.SuperpeerRegistryAgent;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 
@@ -51,7 +58,8 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 			.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass)
 //			.getExtendedPlatformConfiguration()
 //				.setDebugFutures(true)
-			.setValue("debugservices", "ITestService")
+//			.setValue("superpeer.debugservices", "ITestService")
+			.setValue("superpeer.debugservices", true)
 //			.setValue("security.debug", true)
 			;
 			
@@ -121,26 +129,42 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		waitForSuperpeerConnections(relay, client);
 	}
 
-	public static void main(String[] args)
+	@Test
+	public void testProviderDisconnection()
 	{
-		int	i	= 0;
-		try
+		// Start SSP, SP and provider and wait for connections.
+		IExternalAccess	ssp	= createPlatform(RELAYCONF);
+		IExternalAccess	sp	= createPlatform(SPCONF);
+		IExternalAccess	provider	= createPlatform(PROCONF);
+		waitForSuperpeerConnections(ssp, provider);
+		waitForSuperpeerConnections(sp, provider);
+		
+		// Listen to disconnection event of provider platform at SSP.
+		Future<Void>	ssp_disconnected	= new Future<>();
+		ssp.getExternalAccess(new ComponentIdentifier("superpeer", ssp.getId())).scheduleStep(ia ->
 		{
-			for(i=1; ;i++)
-			{
-				System.out.println("Test run "+i);
-				GlobalSuperpeerTest	gst	= new GlobalSuperpeerTest();
-				gst.setup();
-				gst.testServices();
-				gst.tearDown();
-			}
-		}
-		catch(Throwable t)
+			SuperpeerRegistryAgent	spr	= (SuperpeerRegistryAgent) ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
+			spr.whenDisconnected(new ComponentIdentifier("superpeerclient", provider.getId())).addResultListener(new DelegationResultListener<Void>(ssp_disconnected));
+			return IFuture.DONE;
+		});
+		// Listen to disconnection event of provider platform at SP.
+		Future<Void>	sp_disconnected	= new Future<>();
+		sp.getExternalAccess(new ComponentIdentifier("superpeer", sp.getId())).scheduleStep(ia ->
 		{
-			System.out.println("Test run failed: "+i);
-			t.printStackTrace();
-			System.exit(0);
-		}
+			SuperpeerRegistryAgent	spr	= (SuperpeerRegistryAgent) ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
+			spr.whenDisconnected(new ComponentIdentifier("superpeerclient", provider.getId())).addResultListener(new DelegationResultListener<Void>(sp_disconnected));
+			return IFuture.DONE;
+		});
+		
+		// Shutdown provider to trigger disconnections
+		double	contimeout	= (double) PROCONF.getValue("superpeerclient.contimeout", null);
+		long	timeout	= Starter.getScaledDefaultTimeout(provider.getId(), contimeout*2);
+		removePlatform(provider);
+
+		System.out.println("Waiting for provider->ssp disconnection: "+timeout);
+		ssp_disconnected.get(timeout);
+		System.out.println("Waiting for provider->sp disconnection: "+timeout);
+		sp_disconnected.get(timeout);
 	}
 }
 

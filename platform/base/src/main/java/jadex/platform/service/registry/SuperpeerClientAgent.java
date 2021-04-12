@@ -740,6 +740,16 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	 */
 	protected boolean	debug(ServiceQuery<?> query)
 	{
+		return debug(debugservices, query!=null ? query.toString(): null);
+	}
+	
+	/**
+	 *  Check if an event should be debugged.
+	 *  @param debugservices	The debug marker (e.g. boolean for any event or comma-separated list of service names.
+	 *  @param event	The event description for debugging matching (i.e. String.contains()) services, or null for debugging only when true.
+	 */
+	public static boolean	debug(Object debugservices, String event)
+	{
 		if(debugservices==null)
 		{
 			return false;
@@ -748,12 +758,11 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		{
 			return (boolean)debugservices;
 		}
-		else if(debugservices instanceof String)
+		else if(debugservices instanceof String && event!=null)
 		{
-			// String comparison: one of the comma separated strings in <debugservices> contained in <query.toString()>
-			String	squery	= query.toString();
+			// String comparison: one of the comma separated strings in <debugservices> contained in <event> string
 			return Arrays.stream(((String)debugservices).split(","))
-				.anyMatch(s -> squery.indexOf(s.trim())!=-1);
+				.anyMatch(s -> event.indexOf(s.trim())!=-1);
 		}
 		else
 		{
