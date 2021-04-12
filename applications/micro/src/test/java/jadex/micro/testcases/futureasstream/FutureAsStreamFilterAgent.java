@@ -32,25 +32,25 @@ public class FutureAsStreamFilterAgent implements IFutureAsStreamFilterService
 	@Override
 	public IIntermediateFuture<String> filterResults()
 	{
+		IIntermediateFuture<String>	future	= provider.getSomeResults();
+		Stream<String>	instream	= future.asStream();
+
 		// Take string containing random value between 0..1 and convert to "0" or "1". 
-		Stream<String>	results	=
-			provider.getSomeResults()
-			.asStream()
+		Stream<String>	outstream	= instream
 			.peek(str -> System.out.println("filterResults0: "+str))
-			.map(str -> str.replaceAll("[^\\d.]", ""))	// Strip all non-digits but keep decimal point
 			.map(numstr -> Double.parseDouble(numstr))	// To double
 			.map(num -> Math.round(num))				// To nearest long
 			.map(num -> num.toString())					// back to string
 			.peek(str -> System.out.println("filterResults1: "+str));
 
-		return streamToFuture(results);
+		return streamToFuture(outstream);
 	}
 
 	/**
 	 *  Create an intermediate future for a stream.
 	 *  The results are pulled from the stream using the agent thread i.e. the agent will be blocked when waiting for stream results.
 	 *  Safe to use (but somewhat useless) for finished streams.
-	 *  Also safe to use for streams, created eith IntermediateFuture.asStream().
+	 *  Also safe to use for streams, created with IntermediateFuture.asStream().
 	 *  Not safe to use for other kinds of infinite streams!
 	 */
 	protected IntermediateFuture<String> streamToFuture(Stream<String> results)

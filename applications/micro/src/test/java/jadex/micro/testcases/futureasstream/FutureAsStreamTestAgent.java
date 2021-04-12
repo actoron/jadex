@@ -30,7 +30,7 @@ public class FutureAsStreamTestAgent extends TestAgent	implements	IFutureAsStrea
 	public IFuture<String> getNextResult()
 	{
 		double	num	= Math.random();
-		String	result	= "result_"+num;
+		String	result	= Double.toString(num);
 		results	+= Math.round(num);
 		System.out.println("getNextResult: "+result);
 		return new Future<>(result);
