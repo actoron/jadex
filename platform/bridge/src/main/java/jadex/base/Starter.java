@@ -875,7 +875,7 @@ public class Starter
 				// must have : if both are presents otherwise all is configname
 				if(!comp.endsWith(")"))
 				{
-					throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>)[:<args>]]) : "+components.get(i));
+					throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>[:<args>])] : "+components.get(i));
 				}
 
 				int i3 = comp.indexOf(":");

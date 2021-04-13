@@ -315,7 +315,7 @@ public class MicroClassReader
 //				Boolean	persist	= val.persistable().toBoolean();
 				Boolean	keep	= val.keepalive().toBoolean();
 				
-				modelinfo.setInstanceName(!"".equals(val.name()) ? val.name() : null);
+				modelinfo.setNameHint(!"".equals(val.name()) ? val.name() : null);
 				modelinfo.addPredecessors(val.predecessors());
 				modelinfo.addSuccessors(val.successors());
 				
