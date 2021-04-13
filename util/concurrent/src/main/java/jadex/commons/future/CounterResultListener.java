@@ -1,6 +1,5 @@
 package jadex.commons.future;
 
-
 /**
  *  Counter result listener for counting a specified number of resultAvailable calls.
  */
@@ -26,8 +25,8 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	/** The undone flag. */
 	protected boolean undone;
 
-	/** Listener that is called on intermediate results. */
-	protected IFunctionalResultListener<E>	intermediateResultListener;
+//	/** Listener that is called on intermediate results. */
+//	protected Consumer<E>	intermediateResultListener;
 	
 	//-------- constructors --------
 	
@@ -261,10 +260,10 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	 */
 	public void intermediateResultAvailable(E result)
 	{
-		if(intermediateResultListener != null)
-		{
-			intermediateResultListener.resultAvailable(result);
-		}
+//		if(intermediateResultListener != null)
+//		{
+//			intermediateResultListener.accept(result);
+//		}
 	}
 	
 	/**

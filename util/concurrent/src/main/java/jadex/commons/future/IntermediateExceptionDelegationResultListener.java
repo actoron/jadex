@@ -2,6 +2,7 @@ package jadex.commons.future;
 
 
 import java.util.Collection;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
@@ -19,13 +20,13 @@ public class IntermediateExceptionDelegationResultListener<E, T> implements IInt
 	protected boolean undone;
 	
 	/** Custom functional result listener */
-	protected IFunctionalResultListener<E> irlistener;
+	protected Consumer<E> irlistener;
 	
 	/** Custom functional finished listener */
-	protected IFunctionalResultListener<Void> flistener;
+	protected Runnable flistener;
 	
 	/** Custom functional result count listener. */
-	protected IFunctionalIntermediateResultCountListener clistener;
+	protected Consumer<Integer> clistener;
 	
 //	protected DebugException	ex;
 	
@@ -40,8 +41,8 @@ public class IntermediateExceptionDelegationResultListener<E, T> implements IInt
 	 * @param flistener Functional finished listener. Can be
 	 *        <code>null</code>.
 	 */
-	public IntermediateExceptionDelegationResultListener(Future<T> future, IFunctionalResultListener<E> irlistener, 
-		IFunctionalResultListener<Void> flistener, IFunctionalIntermediateResultCountListener clistener)
+	public IntermediateExceptionDelegationResultListener(Future<T> future, Consumer<E> irlistener, 
+		Runnable flistener, Consumer<Integer> clistener)
 	{
 		this(future);
 		this.irlistener = irlistener;
@@ -121,7 +122,7 @@ public class IntermediateExceptionDelegationResultListener<E, T> implements IInt
 	public void intermediateResultAvailable(E result) 
 	{
 		if(irlistener != null)
-			irlistener.resultAvailable(result);
+			irlistener.accept(result);
 	}
 	
 	/**
@@ -134,7 +135,7 @@ public class IntermediateExceptionDelegationResultListener<E, T> implements IInt
     public void finished() 
     {
 		if(flistener != null)
-			flistener.resultAvailable(null);
+			flistener.run();
     }
 	
 	/**
@@ -168,7 +169,7 @@ public class IntermediateExceptionDelegationResultListener<E, T> implements IInt
 	public void maxResultCountAvailable(int max) 
 	{
 		if(clistener!=null)
-			clistener.maxResultCountAvailable(max);
+			clistener.accept(max);
 	}
 	
 	/**

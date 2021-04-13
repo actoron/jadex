@@ -1,5 +1,6 @@
 package jadex.commons.future;
 
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 
@@ -18,7 +19,7 @@ public class DelegationResultListener<E> implements IResultListener<E>, IFutureC
 	protected boolean undone;
 
 	/** Custom functional result listener */
-	protected IFunctionalResultListener<E>	customResultListener;
+	protected Consumer<E>	customResultListener;
 	
 //	protected DebugException	ex;
 	
@@ -37,7 +38,7 @@ public class DelegationResultListener<E> implements IResultListener<E>, IFutureC
 	 * @param future The delegation target.
 	 * @param customResultListener Custom result listener that overwrites the delegation behaviour.
 	 */
-	public DelegationResultListener(Future<E> future, IFunctionalResultListener<E> customResultListener)
+	public DelegationResultListener(Future<E> future, Consumer<E> customResultListener)
 	{
 		this(future, false, customResultListener);
 	}
@@ -48,7 +49,7 @@ public class DelegationResultListener<E> implements IResultListener<E>, IFutureC
 	 * @param undone use undone methods.
 	 * @param customResultListener Custom result listener that overwrites the delegation behaviour.
 	 */
-	public DelegationResultListener(Future<E> future, boolean undone, IFunctionalResultListener<E> customResultListener)
+	public DelegationResultListener(Future<E> future, boolean undone, Consumer<E> customResultListener)
 	{
 		this(future, undone);
 		this.customResultListener = customResultListener;
@@ -119,7 +120,7 @@ public class DelegationResultListener<E> implements IResultListener<E>, IFutureC
 	{
 		if(customResultListener != null)
 		{
-			customResultListener.resultAvailable(result);
+			customResultListener.accept(result);
 		}
 		else
 		{

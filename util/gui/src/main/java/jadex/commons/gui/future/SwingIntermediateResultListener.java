@@ -4,16 +4,9 @@
 package jadex.commons.gui.future;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-import javax.swing.SwingUtilities;
-
-import jadex.bridge.service.types.simulation.SSimulation;
-import jadex.commons.SReflect;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFunctionalExceptionListener;
-import jadex.commons.future.IFunctionalIntermediateResultCountListener;
-import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IIntermediateResultListener;
@@ -45,7 +38,7 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 	 * 
 	 * @param intermediateListener The intermediate listener.
 	 */
-	public SwingIntermediateResultListener(final IFunctionalResultListener<E> intermediateListener)
+	public SwingIntermediateResultListener(final Consumer<E> intermediateListener)
 	{
 		this(intermediateListener, null);
 	}
@@ -57,7 +50,7 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 	 * @param flistener The finished listener, called when no more
 	 *        intermediate results will arrive.
 	 */
-	public SwingIntermediateResultListener(final IFunctionalResultListener<E> ilistener, final IFunctionalResultListener<Void> flistener)
+	public SwingIntermediateResultListener(final Consumer<E> ilistener, final Consumer<Void> flistener)
 	{
 		this(ilistener, flistener, null, null);
 	}
@@ -70,25 +63,25 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 	 *        intermediate results will arrive.
 	 * @param elistener The listener that is called on exceptions.
 	 */
-	public SwingIntermediateResultListener(final IFunctionalResultListener<E> ilistener, final IFunctionalResultListener<Void> flistener, 
-		final IFunctionalExceptionListener elistener, final IFunctionalIntermediateResultCountListener clistener)
+	public SwingIntermediateResultListener(final Consumer<E> ilistener, final Consumer<Void> flistener, 
+		final Consumer<Exception> elistener, final Consumer<Integer> clistener)
 	{
 		this(new IntermediateDefaultResultListener<E>()
 		{
 			public void intermediateResultAvailable(E result)
 			{
-				ilistener.resultAvailable(result);
+				ilistener.accept(result);
 			}
 			public void finished()
 			{
 				if(flistener != null) 
-					flistener.resultAvailable(null);
+					flistener.accept(null);
 			}
 			public void exceptionOccurred(Exception exception)
 			{
 				if(elistener != null) 
 				{
-					elistener.exceptionOccurred(exception);
+					elistener.accept(exception);
 				} 
 				else 
 				{
@@ -98,7 +91,7 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 			public void maxResultCountAvailable(int max) 
 			{
 				if(clistener!=null)
-					clistener.maxResultCountAvailable(max);
+					clistener.accept(max);
 			}
 		});
 	}

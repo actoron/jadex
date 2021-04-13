@@ -31,7 +31,6 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
