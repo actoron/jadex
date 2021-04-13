@@ -24,6 +24,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -65,6 +66,19 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 	 */
 	public AbstractSearchQueryTest(boolean awa, IPlatformConfiguration clientconf, IPlatformConfiguration proconf, IPlatformConfiguration spconf, IPlatformConfiguration sspconf)
 	{
+		if(clientconf==null)
+		{
+			throw new IllegalArgumentException("Clientconf is required.");
+		}
+		else if(proconf==null)
+		{
+			throw new IllegalArgumentException("Proconf is required.");
+		}
+		else if(!awa && sspconf==null)
+		{
+			throw new IllegalArgumentException("Either awa or ssp required for platform discovery!");
+		}
+		
 		this.awa	= awa;
 		this.clientconf	= clientconf;
 		this.proconf	= proconf;
@@ -268,10 +282,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 	public void	testServices()
 	{
 		// SSP is optional (TODO: support ssp started after client)
-		if(sspconf!=null)
-		{
-			createPlatform(sspconf);
-		}
+		IExternalAccess	ssp	= sspconf!=null ? createPlatform(sspconf) : null;
 		
 		//-------- Tests with awareness fallback only (no SP) --------
 		
@@ -320,7 +331,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			Assert.assertEquals(""+result, 2, result.size());
 		}
-		else
+		else	// if sspconf!=null
 		{
 			// -> test if platforms don't see each other without SP.
 			System.out.println("2/3) start provider platforms, wait for services");
@@ -329,22 +340,13 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitForRegistryWithProvider(client, pro1, true);
 			waitForRegistryWithProvider(client, pro2, true);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			System.out.println("found: "+result.size());
-			Assert.assertEquals(sspconf!=null?2:0, result.size());
+			Assert.assertEquals(2, result.size());
 			
 			// 4) kill one provider platform, search for service -> test if platform is removed from global registry (if any)
 			System.out.println("4) kill one provider platform, search for service");
-			removePlatform(pro1);
-			// retry at most 10 times until services are expunged
-			int num=sspconf!=null?1:0;
-			for(int i=0; i<=10; i++)
-			{
-				if(i>0) waitALittle(client);
-				result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-				if(result.size()<=num) break;
-				System.out.println("4"+(char)('a'+i)+") results: "+result.size()+", "+result);
-			}
-			Assert.assertEquals(client.toString()+": "+result, num, result.size());
+			waitForProviderDisconnection(pro1, false, ssp);
+			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
+			Assert.assertEquals(client.toString()+": "+result, 1, result.size());
 		}
 
 		//-------- Tests with SP if any --------
@@ -376,7 +378,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitForRegistryClient(client, false);
 			num	= sspconf==null && !SuperpeerClientAgent.SPCACHE ? 2 : 4;
 			// retry at most 10 times until services are found
-			// hack? pro2 services should be in registry after waitForRegistryWithProvider
+			// hack? pro1 services should be in registry after waitForRegistryWithProvider
 			for(int i=0; i<=10; i++)
 			{
 				if(i>0) waitALittle(client);
@@ -403,18 +405,9 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			
 			// 7) kill one provider platform, search for service -> test if remote disconnection and service removal works
 			System.out.println("7) kill provider platform "+pro1.getId()+", search for service");
-			removePlatform(pro1);
-			waitForRegistryClient(client, false);
+			waitForProviderDisconnection(pro1, false, sp, ssp);
 			num	= sspconf==null && !SuperpeerClientAgent.SPCACHE ? 1 : 2;	// expected number of remaining services
-			// retry at most 20 times until old services expunged from registry
-			// hack!!! should only be 2*WAITFACTOR but leads to heisenbugs?
-			for(int i=0; i<=20; i++)
-			{
-				if(i>0) waitALittle(client);
-				result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-				if(result.size()<=num) break;
-				System.out.println("7"+(char)('a'+i)+") results: "+result.size()+", "+result);
-			}
+			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			Assert.assertEquals(""+result, num, result.size());
 	
 			// 8) kill SP, search for service -> test if re-fallback to awa works
@@ -449,77 +442,42 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		}
 	}
 	
-	//-------- test sp discponnection --------
-	
-	@Test
-	public void testProviderDisconnection()
-	{		
-		if(spconf!=null)
-		{
-			// Start SSP, SP and provider and wait for connections.
-			IExternalAccess	ssp	= sspconf!=null ? createPlatform(sspconf) : null;
-			IExternalAccess	sp	= createPlatform(spconf);
-			// Connection timeout, i.e. wait time after which the SP should notice that the provider is gone.
-			long	contimeout	= Starter.getScaledDefaultTimeout(sp.getId(), (double) proconf.getValue("superpeerclient.contimeout", null));
-	
-			// Shutdown superpeerclient of provider first to trigger clean disconnection (i.e. before transport shutdown)
-			// -> wait for less then contimeout, as disconnection should work immediately		
-			doTestProviderDisconnection(ssp, sp, "superpeerclient", contimeout/2);
-	
-			// Shutdown transport of provider first to trigger dirty disconnection (i.e. SP is not informed of superpeerclient shutdown)
-			// -> wait for more then contimeout, as disconnection should require timeout		
-			doTestProviderDisconnection(ssp, sp, "intravm", contimeout*2);
-		}
-	}
-
-	/**
-	 *  Do the actual disconnection test
-	 */
-	protected void doTestProviderDisconnection(IExternalAccess ssp, IExternalAccess sp, String tokill, long timeout)
-	{
-		// Listen to disconnection event of provider platform at SP and SSP.
-		IExternalAccess	provider	= createPlatform(proconf);
-		Future<Void> ssp_disconnected = null;
-		if(ssp!=null)
-		{
-			waitForSuperpeerConnections(ssp, provider);
-			ssp_disconnected = getSPDisconnection(ssp, provider);
-		}
-		waitForSuperpeerConnections(sp, provider);
-		Future<Void> sp_disconnected = getSPDisconnection(sp, provider);
-		
-		if(tokill!=null)
-		{
-			System.out.println("Killing "+tokill+"agent of provider...");
-			provider.killComponents(new ComponentIdentifier(tokill, provider.getId())).get();
-		}
-		removePlatform(provider);
-		if(ssp_disconnected!=null)
-		{
-			System.out.println("Waiting for provider->ssp disconnection: "+timeout);
-			ssp_disconnected.get(timeout);
-		}
-		System.out.println("Waiting for provider->sp disconnection: "+timeout);
-		sp_disconnected.get(timeout);
-	}
-
-	/**
-	 *  Add hook to SP to wait for provider disconnection event.
-	 */
-	protected Future<Void> getSPDisconnection(IExternalAccess sp, IExternalAccess provider)
-	{
-		Future<Void>	ssp_disconnected	= new Future<>();
-		sp.getExternalAccess(new ComponentIdentifier("superpeer", sp.getId())).scheduleStep(ia ->
-		{
-			SuperpeerRegistryAgent	spr	= (SuperpeerRegistryAgent) ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
-			spr.whenDisconnected(new ComponentIdentifier("superpeerclient", provider.getId())).addResultListener(new DelegationResultListener<Void>(ssp_disconnected));
-			return IFuture.DONE;
-		});
-		return ssp_disconnected;
-	}
-
 	//-------- helper methods --------
 	
+	/**
+	 *  Kill a provider and wait for disconnection at super peers.
+	 */
+	protected void waitForProviderDisconnection(IExternalAccess provider, boolean dirty, IExternalAccess... sps)
+	{
+		// Listen to disconnection event of provider platform at SP and SSP.
+		FutureBarrier<Void> disconnecteds = new FutureBarrier<Void>();
+		for(IExternalAccess sp: sps)
+		{
+			if(sp!=null)	// allow null sp (e.g. ssp)
+			{
+				waitForSuperpeerConnections(sp, provider);
+				Future<Void>	disconnected	= new Future<>();
+				disconnecteds.addFuture(disconnected);
+				sp.getExternalAccess(new ComponentIdentifier("superpeer", sp.getId())).scheduleStep(ia ->
+				{
+					SuperpeerRegistryAgent	spr	= (SuperpeerRegistryAgent) ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
+					spr.whenDisconnected(new ComponentIdentifier("superpeerclient", provider.getId())).addResultListener(new DelegationResultListener<Void>(disconnected));
+					return IFuture.DONE;
+				});
+			}
+		}
+		
+		String	tokill	= dirty ? "intramvm" : "superpeerclient";
+		System.out.println("Killing "+tokill+"agent of provider...");
+		provider.killComponents(new ComponentIdentifier(tokill, provider.getId())).get();
+		removePlatform(provider);
+		
+		// Connection timeout, i.e. wait time after which the SP should notice that the provider is gone.
+		long	timeout	= 3 * Starter.getScaledDefaultTimeout(provider.getId(), (double) proconf.getValue("superpeerclient.contimeout", null));
+		System.out.println("Waiting for provider->sp disconnection: "+timeout);
+		disconnecteds.waitFor().get(timeout);
+	}
+
 	/**
 	 *  Wait to allow remote platform/registry interaction.
 	 *  The idea is that the registry is roughly FCFS so

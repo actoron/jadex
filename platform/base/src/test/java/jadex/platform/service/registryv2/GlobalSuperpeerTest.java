@@ -124,5 +124,24 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		IExternalAccess	client	= createPlatform(CLIENTCONF);
 		waitForSuperpeerConnections(relay, client);
 	}
-}
 
+	/**
+	 *  Test that dirty disconnection also works ove relay
+	 */
+	@Test
+	@Ignore
+	public void testProviderDisconnection()
+	{		
+		if(spconf!=null)
+		{
+			// Start SSP, SP and provider and wait for connections.
+			IExternalAccess	ssp	= sspconf!=null ? createPlatform(sspconf) : null;
+			IExternalAccess	sp	= createPlatform(spconf);
+	
+			// Shutdown transport of provider first to trigger dirty disconnection (i.e. SP is not informed of superpeerclient shutdown)
+			// -> disconnection should happen when no-timeout forward commands fail eventually
+			IExternalAccess	provider	= createPlatform(proconf);
+			waitForProviderDisconnection(provider, true, ssp, sp);
+		}
+	}
+}
