@@ -3,9 +3,8 @@ package jadex.commons.future;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
-
-import jadex.commons.functional.Consumer;
 
 /**
  *  Future that support intermediate results.

@@ -1,9 +1,7 @@
 package jadex.commons.future;
 
-import jadex.commons.ICommand;
-import jadex.commons.functional.BiFunction;
-import jadex.commons.functional.Consumer;
-import jadex.commons.functional.Function;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 
 /**

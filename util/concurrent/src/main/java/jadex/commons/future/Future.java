@@ -8,19 +8,18 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 import jadex.commons.DebugException;
 import jadex.commons.ErrorException;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.Tuple3;
-import jadex.commons.functional.BiFunction;
-import jadex.commons.functional.Consumer;
-import jadex.commons.functional.Function;
 
 /**
  *  Future that includes mechanisms for callback notification.
