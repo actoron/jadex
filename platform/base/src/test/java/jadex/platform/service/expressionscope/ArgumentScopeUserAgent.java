@@ -18,7 +18,7 @@ import jadex.micro.annotation.RequiredServices;
 public class ArgumentScopeUserAgent
 {
 	@OnService(requiredservice = @RequiredService(type=IExpressionScopeService.class, scope=ServiceScope.EXPRESSION, scopeexpression="$args.attrscope"))
-	IExpressionScopeService	attrscope;
+	IFuture<IExpressionScopeService>	attrscope;
 	
 	/**
 	 *  Try to find services.
@@ -36,7 +36,7 @@ public class ArgumentScopeUserAgent
 		}
 		try
 		{
-			agent.getService("jadex.platform.service.expressionscope.IExpressionScopeService").get();
+			attrscope.get();
 		}
 		catch(ServiceNotFoundException snfe)
 		{

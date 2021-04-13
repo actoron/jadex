@@ -60,17 +60,16 @@ public class ExpressionScopeTest
 	{
 		IExternalAccess	platform	= Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get();
 		// ArgumentScopeUserAgent searches for services and stores scope from ServiceNotFoundException as result 
-		ServiceScope	testscope	= ServiceScope.COMPONENT_ONLY;
 		IExternalAccess	argagent	= platform.createComponent(new CreationInfo()
 			.setFilenameClass(ArgumentScopeUserAgent.class)
-			.addArgument("typescope", testscope)
-			.addArgument("attrscope", testscope)
+			.addArgument("typescope", ServiceScope.COMPONENT_ONLY)
+			.addArgument("attrscope", ServiceScope.COMPONENT)
 			.setSuspend(true)
 		).get();
 		IFuture<Map<String, Object>>	results	= argagent.waitForTermination();
 		argagent.resumeComponent().get();
 		Map<String, Object>	resmap	= results.get();
-		assertEquals(testscope, resmap.get("typescope"));
-		assertEquals(testscope, resmap.get("attrscope"));
+		assertEquals(ServiceScope.COMPONENT_ONLY, resmap.get("typescope"));
+		assertEquals(ServiceScope.COMPONENT, resmap.get("attrscope"));
 	}
 }
