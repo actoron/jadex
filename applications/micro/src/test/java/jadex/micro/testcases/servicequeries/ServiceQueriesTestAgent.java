@@ -55,10 +55,11 @@ public class ServiceQueriesTestAgent extends TestAgent
 		IRequiredServicesFeature rsf = agent.getFeature(IRequiredServicesFeature.class);
 		
 		// Create user as subcomponent -> should be able to find the service with publication scope application 
+		final int[] num = new int[]{0};
 		final int cnt = 3;
 		IComponentIdentifier[] cids = new IComponentIdentifier[cnt];
 		
-		final TestReport tr = new TestReport("#1", "Test if services can be found by query");
+		final TestReport tr = new TestReport(local?"#1":"#2", "Test if "+(local?"local":"remote")+" services can be found by query");
 		
 		try
 		{
@@ -66,18 +67,17 @@ public class ServiceQueriesTestAgent extends TestAgent
 				new ServiceQuery<>(IExampleService.class, local? ServiceScope.APPLICATION: ServiceScope.GLOBAL));
 			queryfut.addResultListener(new IntermediateEmptyResultListener<IExampleService>()
 			{
-				int num = 0;
 				public void exceptionOccurred(Exception exception)
 				{
 					if(exception instanceof FutureTerminatedException)
 					{
-						if(num==cnt)
+						if(num[0]==cnt)
 						{
 							tr.setSucceeded(true);
 						}
 						else
 						{
-							tr.setFailed("Wrong number of results: expected "+cnt+" but was "+num);
+							tr.setFailed("Wrong number of results: expected "+cnt+" but was "+num[0]);
 						}
 					}
 					else
@@ -97,7 +97,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 //					System.out.println("thread: " + IComponentIdentifier.LOCAL.get() +" on comp thread: " + agent.getFeature0(IExecutionFeature.class).isComponentThread());
 					if(platform.getId().getRoot().equals(((IService)result).getServiceId().getProviderId().getRoot()))
 					{
-						num++;
+						num[0]++;
 					}
 					else
 					{
@@ -125,7 +125,11 @@ public class ServiceQueriesTestAgent extends TestAgent
 			// Wait some time and then terminate query
 			
 			long start = System.currentTimeMillis();
-			agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledDefaultTimeout(agent.getId().getRoot(), local? 0.1: 0.9), true).get();
+			int	loop	= 100;
+			for(int i=0; i<loop && num[0]<cnt; i++)
+			{
+				agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledDefaultTimeout(agent.getId().getRoot(), 1.0/loop), true).get();
+			}
 			System.out.println("wait dur: "+(System.currentTimeMillis()-start));
 			
 			queryfut.terminate();

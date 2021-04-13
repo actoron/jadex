@@ -461,7 +461,14 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 				sp.getExternalAccess(new ComponentIdentifier("superpeer", sp.getId())).scheduleStep(ia ->
 				{
 					SuperpeerRegistryAgent	spr	= (SuperpeerRegistryAgent) ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
-					spr.whenDisconnected(new ComponentIdentifier("superpeerclient", provider.getId())).addResultListener(new DelegationResultListener<Void>(disconnected));
+					spr.whenDisconnected(new ComponentIdentifier("superpeerclient", provider.getId())).addResultListener(new DelegationResultListener<Void>(disconnected)
+					{
+						public void	exceptionOccurred(Exception e)
+						{
+							System.out.println("Ignoring disconnection exception: "+e);
+							disconnected.setResult(null);
+						}
+					});
 					return IFuture.DONE;
 				});
 			}

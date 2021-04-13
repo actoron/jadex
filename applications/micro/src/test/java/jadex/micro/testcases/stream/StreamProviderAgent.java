@@ -189,10 +189,10 @@ public class StreamProviderAgent implements IStreamService
 			{
 				con.write(new byte[]{(byte)cnt[0]});
 				size[0]++;
-				if(cnt[0]++<50)
+				if(++cnt[0]<getWriteLength())
 				{
 					agent.getFeature(IExecutionFeature.class)
-						.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 5.0/3000), this);
+						.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 5.0/30000), this);
 				}
 				else
 				{
@@ -203,7 +203,7 @@ public class StreamProviderAgent implements IStreamService
 			}
 		};
 		agent.getFeature(IExecutionFeature.class)
-			.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.0/30), step);
+			.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.0/300), step);
 		
 		return ret;
 	}
@@ -213,6 +213,6 @@ public class StreamProviderAgent implements IStreamService
 	 */
 	public static long getWriteLength()
 	{
-		return 51;
+		return 20;
 	}
 }
