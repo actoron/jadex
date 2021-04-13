@@ -286,6 +286,7 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 		Con con = establishedconnections.get(header.getReceiver().getRoot());
 		if(con != null)
 		{
+//			System.out.println(agent+" sending to "+header.getReceiver()+" using "+con);
 			impl.sendMessage(con, bheader, body).addResultListener(new DelegationResultListener<>(ret));
 		}
 		else
@@ -298,6 +299,7 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 					Con con = establishedconnections.get(receiverpf);
 					if (con != null && !ret.isDone())
 					{
+//						System.out.println(agent+" sending to "+header.getReceiver()+" using "+con);
 						impl.sendMessage(con, bheader, body).addResultListener(new DelegationResultListener<>(ret));
 					}
 					else

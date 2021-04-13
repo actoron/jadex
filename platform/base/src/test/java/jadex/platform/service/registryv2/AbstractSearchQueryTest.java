@@ -22,6 +22,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -31,6 +32,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.platform.service.registry.SuperpeerClientAgent;
+import jadex.platform.service.registry.SuperpeerRegistryAgent;
 
 /**
  *  Test basic search and query managing functionality with a client and some providers.
@@ -446,6 +448,77 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			Assert.assertEquals(""+result, awa? 2: 1, result.size());
 		}
 	}
+	
+	//-------- test sp discponnection --------
+	
+	@Test
+	public void testProviderDisconnection()
+	{		
+		if(spconf!=null)
+		{
+			// Start SSP, SP and provider and wait for connections.
+			IExternalAccess	ssp	= sspconf!=null ? createPlatform(sspconf) : null;
+			IExternalAccess	sp	= createPlatform(spconf);
+			// Connection timeout, i.e. wait time after which the SP should notice that the provider is gone.
+			long	contimeout	= Starter.getScaledDefaultTimeout(sp.getId(), (double) proconf.getValue("superpeerclient.contimeout", null));
+	
+			// Shutdown superpeerclient of provider first to trigger clean disconnection (i.e. before transport shutdown)
+			// -> wait for less then contimeout, as disconnection should work immediately		
+			doTestProviderDisconnection(ssp, sp, "superpeerclient", contimeout/2);
+	
+			// Shutdown transport of provider first to trigger dirty disconnection (i.e. SP is not informed of superpeerclient shutdown)
+			// -> wait for more then contimeout, as disconnection should require timeout		
+			doTestProviderDisconnection(ssp, sp, "intravm", contimeout*2);
+		}
+	}
+
+	/**
+	 *  Do the actual disconnection test
+	 */
+	protected void doTestProviderDisconnection(IExternalAccess ssp, IExternalAccess sp, String tokill, long timeout)
+	{
+		// Listen to disconnection event of provider platform at SP and SSP.
+		IExternalAccess	provider	= createPlatform(proconf);
+		Future<Void> ssp_disconnected = null;
+		if(ssp!=null)
+		{
+			waitForSuperpeerConnections(ssp, provider);
+			ssp_disconnected = getSPDisconnection(ssp, provider);
+		}
+		waitForSuperpeerConnections(sp, provider);
+		Future<Void> sp_disconnected = getSPDisconnection(sp, provider);
+		
+		if(tokill!=null)
+		{
+			System.out.println("Killing "+tokill+"agent of provider...");
+			provider.killComponents(new ComponentIdentifier(tokill, provider.getId())).get();
+		}
+		removePlatform(provider);
+		if(ssp_disconnected!=null)
+		{
+			System.out.println("Waiting for provider->ssp disconnection: "+timeout);
+			ssp_disconnected.get(timeout);
+		}
+		System.out.println("Waiting for provider->sp disconnection: "+timeout);
+		sp_disconnected.get(timeout);
+	}
+
+	/**
+	 *  Add hook to SP to wait for provider disconnection event.
+	 */
+	protected Future<Void> getSPDisconnection(IExternalAccess sp, IExternalAccess provider)
+	{
+		Future<Void>	ssp_disconnected	= new Future<>();
+		sp.getExternalAccess(new ComponentIdentifier("superpeer", sp.getId())).scheduleStep(ia ->
+		{
+			SuperpeerRegistryAgent	spr	= (SuperpeerRegistryAgent) ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
+			spr.whenDisconnected(new ComponentIdentifier("superpeerclient", provider.getId())).addResultListener(new DelegationResultListener<Void>(ssp_disconnected));
+			return IFuture.DONE;
+		});
+		return ssp_disconnected;
+	}
+
+	//-------- helper methods --------
 	
 	/**
 	 *  Wait to allow remote platform/registry interaction.
