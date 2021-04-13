@@ -27,6 +27,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.component.UnresolvedServiceInvocationHandler;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
@@ -128,8 +129,8 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 					{
 						// Uses required service info to search service
 						
-						RequiredServiceInfo	info = infos[j].getRequiredServiceInfo()!=null? infos[j].getRequiredServiceInfo(): model.getService(sername);				
-						ServiceQuery<Object> query = ServiceQuery.getServiceQuery(component, info);
+						RequiredServiceInfo	info = infos[j].getRequiredServiceInfo()!=null? infos[j].getRequiredServiceInfo(): model.getService(sername);
+						ServiceQuery<Object> query = ((RequiredServicesComponentFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceQuery(info);
 												
 						// if query
 						if(infos[j].getQuery()!=null && infos[j].getQuery().booleanValue())
@@ -573,12 +574,12 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 		{
 			if(multiple)
 			{
-				IFuture	ifut = component.searchServices(ServiceQuery.getServiceQuery(component, info));
+				IFuture	ifut = component.searchServices(((RequiredServicesComponentFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceQuery(info));
 				sfut = ifut;
 			}
 			else
 			{
-				IFuture	ifut = component.searchService(ServiceQuery.getServiceQuery(component, info));
+				IFuture	ifut = component.searchService(((RequiredServicesComponentFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceQuery(info));
 				sfut = ifut;
 			}
 		}
@@ -691,13 +692,13 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 									{
 										component.getLogger().warning("Field injection failed: "+e);
 										lis2.exceptionOccurred(e);
-									}	
 								}
+									}	
 								else if(infos[j].isLazy() && !multiple)
 								{
 									RequiredServiceInfo rsi = ((IInternalRequiredServicesFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceInfo(sername);
 									Class<?> clz = rsi.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
-									ServiceQuery<Object> query = ServiceQuery.getServiceQuery(component, info);
+									ServiceQuery<Object> query = ((RequiredServicesComponentFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceQuery(info);
 									
 									UnresolvedServiceInvocationHandler h = new UnresolvedServiceInvocationHandler(component, query);
 									Object proxy = ProxyFactory.newProxyInstance(component.getClassLoader(), new Class[]{IService.class, clz}, h);

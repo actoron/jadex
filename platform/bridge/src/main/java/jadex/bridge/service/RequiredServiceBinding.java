@@ -3,10 +3,8 @@ package jadex.bridge.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
-import jadex.bridge.service.types.cms.CreationInfo;
 
 /**
  *  Required service binding information.
@@ -33,6 +31,9 @@ public class RequiredServiceBinding
 
 	/** The search scope. */
 	protected ServiceScope scope;
+		
+	/** The scope expression (if any). */
+	protected UnparsedExpression scopeexpression;
 	
 //	/** The create flag. */
 //	protected boolean create;
@@ -55,14 +56,6 @@ public class RequiredServiceBinding
 	 */
 	public RequiredServiceBinding()
 	{
-	}
-	
-	/**
-	 *  Create a new binding. 
-	 */
-	public RequiredServiceBinding(ServiceScope scope)
-	{
-		this(null, scope);
 	}
 	
 	/**
@@ -196,6 +189,25 @@ public class RequiredServiceBinding
 	public RequiredServiceBinding setScope(ServiceScope scope)
 	{
 		this.scope = scope;
+		return this;
+	}
+	
+	/**
+	 *  Get the scope expression.
+	 *  @return The scope expression.
+	 */
+	public UnparsedExpression getScopeExpression()
+	{
+		return scopeexpression;
+	}
+
+	/**
+	 *  Set the scope expression.
+	 *  @param expression The scope expression to set.
+	 */
+	public RequiredServiceBinding setScopeExpression(UnparsedExpression expression)
+	{
+		this.scopeexpression = expression;
 		return this;
 	}
 	

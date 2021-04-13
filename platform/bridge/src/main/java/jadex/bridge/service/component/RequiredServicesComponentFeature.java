@@ -59,6 +59,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
+import jadex.javaparser.SJavaParser;
 
 /**
  *  Feature for provided services.
@@ -783,7 +784,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 					{
 						if(query.getMultiplicity().getFrom()!=0)
 						{
-							throw new ServiceNotFoundException(query.toString());
+							throw new ServiceNotFoundException(query);
 						}
 					}
 					return result;
@@ -806,7 +807,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			}
 			else
 			{
-				ret.setException(new ServiceNotFoundException(query.toString()));
+				ret.setException(new ServiceNotFoundException(query));
 			}
 		}
 		
@@ -829,7 +830,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		IServiceIdentifier sid = ServiceRegistry.getRegistry(getInternalAccess()).searchService(query);
 		
 		if(sid==null && query.getMultiplicity().getFrom()>0)
-			throw new ServiceNotFoundException(query.toString());
+			throw new ServiceNotFoundException(query);
 				
 		// Fetches service and wraps result in proxy, if required. 
 		@SuppressWarnings("unchecked")
@@ -1201,8 +1202,17 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	/**
 	 * When searching for declared service -> map required service declaration to service query.
 	 */
-	protected <T> ServiceQuery<T> getServiceQuery(RequiredServiceInfo info)
+	public <T> ServiceQuery<T> getServiceQuery(RequiredServiceInfo info)
 	{
+		// Evaluate and replace scope expression, if any.
+		ServiceScope scope = info.getDefaultBinding()!=null ? info.getDefaultBinding().getScope() : null;
+		if(ServiceScope.EXPRESSION.equals(scope))
+		{
+			scope = (ServiceScope)SJavaParser.getParsedValue(info.getDefaultBinding().getScopeExpression(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
+			info	= new RequiredServiceInfo(info.getName(), info.getType(), info.getMin(), info.getMax(),
+				new RequiredServiceBinding(info.getDefaultBinding()).setScope(scope),
+				info.getNFRProperties(), info.getTags());
+		}
 		return ServiceQuery.getServiceQuery(getComponent().getInternalAccess(), info);
 	}
 	

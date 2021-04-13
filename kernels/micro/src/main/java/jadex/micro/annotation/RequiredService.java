@@ -71,6 +71,11 @@ public @interface RequiredService
 	 */
 	public int max() default UNDEFINED;
 
+	/** 
+	 *  The scope expression to be evaluated on initialization (only used when scope is set to {@see ServiceScope.EXPRESSION}).
+	 */
+	public String scopeexpression() default "";
+	
 //	/**
 //	 *  The binding.
 //	 */
@@ -100,5 +105,5 @@ public @interface RequiredService
 	 *  The interceptors.
 	 */
 	@Deprecated
-	public Value[] interceptors() default {};	
+	public Value[] interceptors() default {};
 }

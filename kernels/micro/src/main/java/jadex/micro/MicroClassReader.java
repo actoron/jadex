@@ -1833,9 +1833,12 @@ public class MicroClassReader
 	 */
 	public static RequiredServiceBinding createBinding(RequiredService rq)
 	{
+		UnparsedExpression	scopeexpression	= rq.scopeexpression()!=null && rq.scopeexpression().length()>0
+				? new UnparsedExpression("scopeexpression", ServiceScope.class, rq.scopeexpression(), null) : null;
+
 		return new RequiredServiceBinding(null, null, null,
 			rq.scope(), createUnparsedExpressions(rq.interceptors()),
-			rq.proxytype());
+			rq.proxytype()).setScopeExpression(scopeexpression);
 	}
 	
 	/**

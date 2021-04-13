@@ -2,6 +2,8 @@ package jadex.platform.service.expressionscope;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Map;
+
 import org.junit.Test;
 
 import jadex.base.Starter;
@@ -10,6 +12,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 /**
  *  Test searching and providing services with dynamic scope.
@@ -17,10 +20,12 @@ import jadex.commons.future.Future;
 public class ExpressionScopeTest
 {
 	@Test
-	public void	testPojoExpressionScopes()
+	public void	testProvidedExpressionScopes()
 	{
 		ServiceScope	testscope	= ServiceScope.COMPONENT_ONLY;
-		IExternalAccess	platform	= Starter.createPlatform(STest.getDefaultTestConfig(getClass()).setLogging(true)).get();
+		IExternalAccess	platform	= Starter.createPlatform(STest.getDefaultTestConfig(getClass())
+//			.setLogging(true)
+		).get();
 		
 		IExternalAccess	argagent	= platform.createComponent(new CreationInfo()
 			.setFilenameClass(ArgumentScopeProviderAgent.class)
@@ -46,5 +51,26 @@ public class ExpressionScopeTest
 		IExternalAccess	defagent	= platform.addComponent(new PojoScopeProviderAgent(null)).get();
 		ServiceScope	defscope	= defagent.scheduleStep(ia -> new Future<>(ia.getProvidedService("ess").getServiceId().getScope())).get();
 		assertEquals("Test default scope from null value.", ServiceScope.PLATFORM, defscope);
+		
+		platform.killComponent().get();
+	}
+
+	@Test
+	public void	testRequiredExpressionScopes()
+	{
+		IExternalAccess	platform	= Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get();
+		// ArgumentScopeUserAgent searches for services and stores scope from ServiceNotFoundException as result 
+		ServiceScope	testscope	= ServiceScope.COMPONENT_ONLY;
+		IExternalAccess	argagent	= platform.createComponent(new CreationInfo()
+			.setFilenameClass(ArgumentScopeUserAgent.class)
+			.addArgument("typescope", testscope)
+			.addArgument("attrscope", testscope)
+			.setSuspend(true)
+		).get();
+		IFuture<Map<String, Object>>	results	= argagent.waitForTermination();
+		argagent.resumeComponent().get();
+		Map<String, Object>	resmap	= results.get();
+		assertEquals(testscope, resmap.get("typescope"));
+		assertEquals(testscope, resmap.get("attrscope"));
 	}
 }
