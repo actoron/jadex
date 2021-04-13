@@ -505,7 +505,8 @@ public class GenerateService implements IGenerateService
 	 */
 	protected IFuture<ICalculateService> getCalculateService()
 	{
-		Collection<ICalculateService> sers = agent.searchLocalServices(new ServiceQuery<ICalculateService>(ICalculateService.class));
+		ServiceQuery<ICalculateService>	query	= new ServiceQuery<ICalculateService>(ICalculateService.class);
+		Collection<ICalculateService> sers = agent.searchLocalServices(query);
 		
 		// todo: how to identify pool or worker (tagging workers or tagging pools)
 		ICalculateService ser = null;
@@ -523,7 +524,7 @@ public class GenerateService implements IGenerateService
 	
 		//System.out.println("selected calculator: "+ser);
 		
-		return ser!=null? new Future<ICalculateService>(ser): new Future<ICalculateService>(new ServiceNotFoundException("ICalculateService"));
+		return ser!=null? new Future<ICalculateService>(ser): new Future<ICalculateService>(new ServiceNotFoundException(query));
 	}
 	
 	/**

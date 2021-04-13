@@ -280,14 +280,14 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				@Override
 				public void finished()
 				{
-					ret.setExceptionIfUndone(new ServiceNotFoundException(query.toString()));
+					ret.setExceptionIfUndone(new ServiceNotFoundException(query));
 				}
 			});
 //			snapshotSearchRemoteServices(query).thenAccept(services ->
 //			{
 //				// improve code path to allow for early cancellation
 //				if(services.size() == 0)
-//					ret.setExceptionIfUndone(new ServiceNotFoundException(query.toString()));
+//					ret.setExceptionIfUndone(new ServiceNotFoundException(query));
 //				else
 //					ret.setResultIfUndone(services.iterator().next());
 //			});
@@ -295,7 +295,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		
 		else if(track.decrementAndGet()==0)
 		{
-			ret.setExceptionIfUndone(new ServiceNotFoundException(query.toString()));
+			ret.setExceptionIfUndone(new ServiceNotFoundException(query));
 		}
 		
 		return ret;

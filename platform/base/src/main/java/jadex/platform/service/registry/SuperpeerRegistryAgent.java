@@ -210,7 +210,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 		}
 		
 		return ret==null && query.getMultiplicity().getFrom()!=0
-			? new Future<>(new ServiceNotFoundException(query.toString()))
+			? new Future<>(new ServiceNotFoundException(query))
 		    : new Future<>(ret);
 	}
 	

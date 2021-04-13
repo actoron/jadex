@@ -182,7 +182,7 @@ public class ServiceHandler implements InvocationHandler
 		// no service found
 		else 
 		{
-			ret.setException(new ServiceNotFoundException(null));
+			ret.setException(new ServiceNotFoundException((String)null));
 		}
 		
 		return ret;
