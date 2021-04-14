@@ -1155,7 +1155,10 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 
 				localquery.terminate();
 				if(!connection.isDone())
+				{
+					agent.getLogger().info("Terminating super peer connection for network "+networkname+" from super peer: "+superpeer);
 					connection.terminate();
+				}
 
 				localquery	= null;				
 				connection	= null;

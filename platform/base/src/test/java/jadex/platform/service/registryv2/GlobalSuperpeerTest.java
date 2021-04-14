@@ -66,13 +66,14 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 			.addComponent(GlobalProviderAgent.class)
 			.addComponent(NetworkProviderAgent.class)
 			.addComponent(LocalProviderAgent.class)
-			.setPlatformName("GlobalSuperpeerTestProvider");
+			.setPlatformName("GlobalSuperpeerTestProvider")
+			.setLogging(true);
 		
 		SPCONF	= baseconf.clone()
 			.setValue("superpeer", true)
 			.setPlatformName("GlobalSuperpeerTestSP");
 //		SPCONF.setValue("rt.debug", true);
-//		SPCONF.setLogging(true);
+		SPCONF.setLogging(true);
 		
 		RELAYCONF	= baseconf.clone()
 			.setValue("superpeer", true)
