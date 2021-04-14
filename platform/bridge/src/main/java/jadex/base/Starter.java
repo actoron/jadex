@@ -1246,8 +1246,9 @@ public class Starter
 	 */
 	public static long getDefaultTimeout(IComponentIdentifier platform)
 	{
-		return platform!=null && hasPlatformValue(platform, DATA_DEFAULT_TIMEOUT)
-			? ((Long)getPlatformValue(platform, DATA_DEFAULT_TIMEOUT)).longValue()
+		Long	platform_timeout	= platform!=null ? (Long)getPlatformValue(platform, DATA_DEFAULT_TIMEOUT) : null;
+		return  platform_timeout!=null
+			? platform_timeout.longValue()
 			: SUtil.DEFTIMEOUT;
 	}
 

@@ -8,9 +8,9 @@
 )
 
 call gradlew clean -PbuildDir=%BUILD_DIR%
-set jadex_timeout=60000
+set jadex_timeout=180000
 :test_loop
-CMD /C gradlew -Pdist=publishdists test -x javadoc --continue -PbuildDir=%BUILD_DIR%
+CMD /C gradlew -Pdist=publishdists test -x javadoc --continue --no-daemon -PbuildDir=%BUILD_DIR%
 
 @set builderror=%ERRORLEVEL%
 @if "%builderror%" NEQ "0" (

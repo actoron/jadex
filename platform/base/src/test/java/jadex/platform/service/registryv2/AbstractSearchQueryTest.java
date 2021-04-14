@@ -461,26 +461,27 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 				sp.getExternalAccess(new ComponentIdentifier("superpeer", sp.getId())).scheduleStep(ia ->
 				{
 					SuperpeerRegistryAgent	spr	= (SuperpeerRegistryAgent) ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
-					spr.whenDisconnected(new ComponentIdentifier("superpeerclient", provider.getId())).addResultListener(new DelegationResultListener<Void>(disconnected)
-					{
-						public void	exceptionOccurred(Exception e)
-						{
-							System.out.println("Ignoring disconnection exception: "+e);
-							disconnected.setResult(null);
-						}
-					});
+					spr.whenDisconnected(new ComponentIdentifier("superpeerclient", provider.getId())).addResultListener(new DelegationResultListener<Void>(disconnected));
+//					{
+//						public void	exceptionOccurred(Exception e)
+//						{
+//							System.out.println("Ignoring disconnection exception: "+e);
+//							disconnected.setResult(null);
+//						}
+//					});
 					return IFuture.DONE;
-				});
+				}).get();
 			}
 		}
+		
+		// Connection timeout, i.e. wait time after which the SP should notice that the provider is gone.
+		long	timeout	= 3 * Starter.getScaledDefaultTimeout(provider.getId(), (double) proconf.getValue("superpeerclient.contimeout", null));
 		
 		String	tokill	= dirty ? "intramvm" : "superpeerclient";
 		System.out.println("Killing "+tokill+"agent of provider...");
 		provider.killComponents(new ComponentIdentifier(tokill, provider.getId())).get();
 		removePlatform(provider);
 		
-		// Connection timeout, i.e. wait time after which the SP should notice that the provider is gone.
-		long	timeout	= 3 * Starter.getScaledDefaultTimeout(provider.getId(), (double) proconf.getValue("superpeerclient.contimeout", null));
 		System.out.println("Waiting for provider->sp disconnection: "+timeout);
 		disconnecteds.waitFor().get(timeout);
 	}
