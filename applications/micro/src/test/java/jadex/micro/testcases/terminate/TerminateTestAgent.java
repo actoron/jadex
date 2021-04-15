@@ -2,6 +2,7 @@ package jadex.micro.testcases.terminate;
 
 import java.util.Collection;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -288,5 +289,12 @@ public class TerminateTestAgent extends TestAgent
 			}
 		});
 		return ret;
+	}
+	
+	@Override
+	public IPlatformConfiguration getConfig()
+	{
+		return super.getConfig().
+			setValue("debugservices", "ITerminableService");
 	}
 }

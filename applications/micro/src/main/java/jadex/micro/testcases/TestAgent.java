@@ -154,7 +154,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 				exception.printStackTrace();
 				
 				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
-				ret.setResult(null);
+				ret.setException(exception);
 //				agent.killComponent()	
 			}
 		}));
