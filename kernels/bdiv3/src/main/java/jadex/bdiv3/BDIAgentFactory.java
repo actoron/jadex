@@ -211,7 +211,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public IFuture<Void> startService()
 	{
-		libservice	= provider.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		libservice	= provider.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 		libservice.addLibraryServiceListener(libservicelistener);	// TODO: wait for future?
 		return BDIAgentFactory.super.startService();
 	}
@@ -470,7 +470,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	protected ILibraryService getLibraryService()
 	{
-		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 	}
 	
 	/**

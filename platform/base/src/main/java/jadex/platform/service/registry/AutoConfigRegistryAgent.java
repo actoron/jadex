@@ -588,7 +588,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		ISuperpeerService spser=null;
 		try
 		{
-			spser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerService.class, ServiceScope.PLATFORM));
+			spser = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISuperpeerService.class, ServiceScope.PLATFORM));
 		}
 		catch(ServiceNotFoundException e)
 		{
@@ -596,7 +596,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		
 		if(spser==null)
 		{
-//			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			CreationInfo ci = new CreationInfo().setName("spreg").setFilename(SuperpeerRegistryAgent.class.getName()+".class");
 			
 			agent.createComponent(ci).addResultListener(new IResultListener<IExternalAccess>()
@@ -628,7 +628,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	public IFuture<Void> makeRegistryClient()
 	{
 		Future<Void> ret = new Future<>();
-		ISuperpeerService sps = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerService.class).setMultiplicity(0));
+		ISuperpeerService sps = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISuperpeerService.class).setMultiplicity(0));
 		if (sps != null)
 		{
 			agent.getExternalAccess(((IService)sps).getServiceId().getProviderId()).killComponent().addResultListener(new IResultListener<Map<String,Object>>()
@@ -659,7 +659,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 //		IPeerRegistrySynchronizationService pser = null;
 //		try
 //		{
-//			pser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IPeerRegistrySynchronizationService.class, ServiceScope.PLATFORM));
+//			pser = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IPeerRegistrySynchronizationService.class, ServiceScope.PLATFORM));
 //		}
 //		catch(Exception e)
 //		{
@@ -667,7 +667,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 //		
 //		if(pser==null)
 //		{
-//			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
 //			cms.createComponent("peerreg",PeerRegistrySynchronizationAgent.class.getName()+".class", null).
 //				addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 //			{
@@ -704,7 +704,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		boolean ret = false;
 		try
 		{
-			ISuperpeerService spser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerService.class, ServiceScope.PLATFORM));
+			ISuperpeerService spser = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISuperpeerService.class, ServiceScope.PLATFORM));
 			ret = spser!=null;
 		}
 		catch(ServiceNotFoundException e)

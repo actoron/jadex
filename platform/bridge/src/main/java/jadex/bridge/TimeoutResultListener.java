@@ -199,7 +199,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				IClockService clock	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+				IClockService clock	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class));
 				
 				synchronized(TimeoutResultListener.this)
 				{

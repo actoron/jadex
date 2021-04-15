@@ -284,7 +284,7 @@ public class SComponentFactory
 		});
 	}
 	
-//	Collection<IComponentFactory> facs = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>( IComponentFactory.class, ServiceScope.PLATFORM));
+//	Collection<IComponentFactory> facs = agent.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>( IComponentFactory.class, ServiceScope.PLATFORM));
 //	FactoryFilter facfilter = new FactoryFilter(filename, null, rid);
 //	
 //	SFilter.applyFilter(facs, facfilter).addResultListener(new IResultListener<Collection<IComponentFactory>>()
@@ -673,7 +673,7 @@ public class SComponentFactory
 			public IFuture<Object> execute(final IInternalAccess ia)
 			{
 				final Future<Object> ret = new Future<Object>();
-				Collection<IComponentFactory> result	= ia.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
+				Collection<IComponentFactory> result	= ia.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>(IComponentFactory.class));
 				boolean found = false;
 				if(result!=null)
 				{
@@ -750,7 +750,7 @@ public class SComponentFactory
 	 */
 	public static IFuture<IComponentFactory> getFactory(final FactoryFilter filter, IInternalAccess ia)
 	{
-		Collection<IComponentFactory> facs = ia.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
+		Collection<IComponentFactory> facs = ia.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>(IComponentFactory.class));
 		//System.out.println("getFactory: "+facs);
 		if(facs!=null && facs.size()>0)
 		{

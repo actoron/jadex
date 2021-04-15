@@ -1527,7 +1527,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		final Future<ITimer> ret = new Future<ITimer>();
 		if(timeout>-1)
 		{
-			IClockService	cs	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+			IClockService	cs	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class));
 			ITimedObject to	= new ITimedObject()
 			{
 				public void timeEventOccurred(long currenttime)
@@ -1591,7 +1591,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //	{
 //		final Future<ITimer> ret = new Future<ITimer>();
 //		
-//		IClockService cs = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
+//		IClockService cs = getComponent().getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
 //		ITimedObject	to	=  	new ITimedObject()
 //		{
 //			public void timeEventOccurred(long currenttime)

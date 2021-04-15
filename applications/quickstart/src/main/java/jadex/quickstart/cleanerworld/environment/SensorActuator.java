@@ -262,7 +262,7 @@ public class SensorActuator
 		else
 		{
 			// Wait for clock ticks and move the cleaner. (asynchronous!)
-			final IClockService	clock	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+			final IClockService	clock	= agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class));
 			clock.createTickTimer(new ITimedObject()
 			{
 				long lasttime	= clock.getTime();
@@ -381,7 +381,7 @@ public class SensorActuator
 		final Future<Void>	reached	= new Future<>();
 		
 		// Wait for clock ticks and recharge the cleaner. (asynchronous!)
-		final IClockService	clock	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+		final IClockService	clock	= agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class));
 		clock.createTickTimer(new ITimedObject()
 		{
 			long lasttime	= clock.getTime();

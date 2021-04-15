@@ -19,7 +19,7 @@ But if you still need the adresses Jadex uses to contact a given component (or m
 Either add it to your required services or use ```SServiceProvider```:
 
 ```java
-ITransportAddressService tas = access.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class, ServiceScope.PLATFORM));
+ITransportAddressService tas = access.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( ITransportAddressService.class, ServiceScope.PLATFORM));
 String[] addrs = tas.getPlatformAddresses(cid).get();
 ```
 

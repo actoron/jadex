@@ -68,7 +68,7 @@ public class JCCWebAgent implements IJCCWebService
 	{
 		//getPlatforms();
 		
-		//IWebPublishService wps = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IWebPublishService.class));
+		//IWebPublishService wps = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IWebPublishService.class));
 		//return wps.publishResources("[http://localhost:8080/]", "META-INF/resources2");
 	}*/
 	
@@ -176,7 +176,7 @@ public class JCCWebAgent implements IJCCWebService
 		Map<String, Integer> es = new HashMap<>();
 		Map<String, String> res2 = new LinkedHashMap<>();
 		
-		Collection<IJCCPluginService> pluginsers = agent.searchLocalServices(new ServiceQuery<IJCCPluginService>(IJCCPluginService.class, ServiceScope.PLATFORM));
+		Collection<IJCCPluginService> pluginsers = agent.getLocalServices(new ServiceQuery<IJCCPluginService>(IJCCPluginService.class, ServiceScope.PLATFORM));
 		
 		for(IJCCPluginService ser: pluginsers)
 		{
@@ -243,7 +243,7 @@ public class JCCWebAgent implements IJCCWebService
 		// search local plugin services
 		List<JCCWebPluginInfo> res = new ArrayList<>();
 		
-		Collection<IJCCPluginService> pluginsers = agent.searchLocalServices(new ServiceQuery<IJCCPluginService>(IJCCPluginService.class, ServiceScope.PLATFORM));
+		Collection<IJCCPluginService> pluginsers = agent.getLocalServices(new ServiceQuery<IJCCPluginService>(IJCCPluginService.class, ServiceScope.PLATFORM));
 		
 		for(IJCCPluginService service: pluginsers)
 		{

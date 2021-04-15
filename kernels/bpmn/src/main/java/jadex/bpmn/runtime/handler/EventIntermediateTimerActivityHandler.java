@@ -32,7 +32,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	{
 		final Future<ITimer> wifuture = new Future<ITimer>(); 
 		IClockService cs = Starter.getClockService(instance);
-		//IClockService cs = instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+		//IClockService cs = instance.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class));
 		ITimedObject to	= new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)

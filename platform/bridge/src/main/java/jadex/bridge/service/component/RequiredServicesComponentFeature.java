@@ -102,7 +102,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		//UnresolvedServiceInvocationHandler h = new UnresolvedServiceInvocationHandler(component, query);
 		//sqms = (ISearchQueryManagerService) ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{IService.class, ISearchQueryManagerService.class}, h);
 		
-		sqms = searchLocalService(new ServiceQuery<>(query).setMultiplicity(0));
+		sqms = getLocalService(new ServiceQuery<>(query).setMultiplicity(0));
 		if(sqms == null)
 		{
 			delayedremotequeries = new ArrayList<>();
@@ -346,7 +346,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		if(info==null)
 		{
 			// Convenience case: switch to search when type not declared
-			return searchLocalService(new ServiceQuery<>(type));
+			return getLocalService(new ServiceQuery<>(type));
 		}
 		else
 		{
@@ -367,7 +367,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		if(info==null)
 		{
 			// Convenience case: switch to search when type not declared
-			return searchLocalService(new ServiceQuery<>(type).setMultiplicity(Multiplicity.ZERO_ONE));
+			return getLocalService(new ServiceQuery<>(type).setMultiplicity(Multiplicity.ZERO_ONE));
 		}
 		else
 		{
@@ -400,7 +400,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		if(info==null)
 		{
 			// Convenience case: switch to search when type not declared
-			return searchLocalServices(new ServiceQuery<>(type));
+			return getLocalServices(new ServiceQuery<>(type));
 		}
 		else
 		{
@@ -427,7 +427,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 *  @param query The search query.
 	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
-	public <T> T searchLocalService(ServiceQuery<T> query)
+	public <T> T getLocalService(ServiceQuery<T> query)
 	{
 		return resolveLocalService(query, ServiceQuery.createServiceInfo(query));
 	}
@@ -448,7 +448,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 *  @param query The search query.
 	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
 	 */
-	public <T> Collection<T> searchLocalServices(ServiceQuery<T> query)
+	public <T> Collection<T> getLocalServices(ServiceQuery<T> query)
 	{
 		return resolveLocalServices(query, ServiceQuery.createServiceInfo(query));
 	}
@@ -765,7 +765,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		// If not found -> try to find remotely
 		else if(isRemote(query) && sqms != null)
 		{
-//			ISearchQueryManagerService sqms = searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+//			ISearchQueryManagerService sqms = getLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 //			if(sqms!=null)
 //			{
 			
@@ -852,7 +852,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 //			System.out.println("here");
 		
 		// Check if remote
-//		ISearchQueryManagerService sqms = isRemote(query) ? searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE)) : null;
+//		ISearchQueryManagerService sqms = isRemote(query) ? getLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE)) : null;
 //		if(isRemote(query) && sqms==null)
 //		{
 //			getComponent().getLogger().warning("No ISearchQueryManagerService found for remote search: "+query);
@@ -1066,7 +1066,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		//System.out.println("query: "+query);
 		
 		// Query remote
-//		ISearchQueryManagerService sqms = searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+//		ISearchQueryManagerService sqms = getLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 //		if(isRemote(query) && sqms==null)
 //		{
 //			return new SubscriptionIntermediateFuture<>(new IllegalStateException("No ISearchQueryManagerService found for remote query: "+query));

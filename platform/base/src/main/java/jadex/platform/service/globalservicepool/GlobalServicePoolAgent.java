@@ -119,7 +119,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		// Create one service manager per service type
 		GlobalPoolServiceManager manager = new GlobalPoolServiceManager(agent, servicetype, componentmodel, info, strategy);
 		managers.put(servicetype, manager);
-		IServicePoolService ser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IServicePoolService.class));
+		IServicePoolService ser = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IServicePoolService.class));
 		// todo: fix if more than one service type should be supported by one worker (not intended)
 		if(info==null)
 		{
@@ -162,7 +162,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 	public IFuture<Void> removeServiceType(final Class<?> servicetype)
 	{
 		final Future<Void> ret = new Future<Void>();
-		IServicePoolService ser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IServicePoolService.class));
+		IServicePoolService ser = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IServicePoolService.class));
 		managers.remove(servicetype);
 		ser.removeServiceType(servicetype).addResultListener(new DelegationResultListener<Void>(ret)
 		{
@@ -236,8 +236,8 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
-			IService poolser = (IService)agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IServicePoolService.class));
-			IService ser = (IService)agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype).setProvider(poolser.getServiceId().getProviderId()));
+			IService poolser = (IService)agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IServicePoolService.class));
+			IService ser = (IService)agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(servicetype).setProvider(poolser.getServiceId().getProviderId()));
 			return method.invoke(ser, args);
 		}
 	}

@@ -140,7 +140,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 		{
 			public void customResultAvailable(Void result)
 			{
-				libservice	= provider.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+				libservice	= provider.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 				loader = new BDIXModelLoader();
 				
 				libservicelistener = new ILibraryServiceListener()

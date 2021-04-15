@@ -179,7 +179,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 			ret.setResult(null);
 		}
 		
-//		ISettingsService settings = access.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(0));
+//		ISettingsService settings = access.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(0));
 //		if(settings!=null)
 //		{
 //			settings.registerPropertiesProvider("simulationservice", SimulationService.this)

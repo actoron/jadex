@@ -129,7 +129,7 @@ public class GlobalPoolServiceManager
 		
 		// Check if service is available in global pool itself
 		@SuppressWarnings("unchecked")
-		Collection<IService> ownsers = (Collection<IService>) component.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(servicetype));
+		Collection<IService> ownsers = (Collection<IService>) component.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>(servicetype));
 //		Collection<IService> ownsers = (Collection<IService>)SServiceProvider.getLocalServices(component, servicetype);
 		if(ownsers!=null)
 		{
@@ -669,7 +669,7 @@ public class GlobalPoolServiceManager
 		
 		final Future<ITimer> ret = new Future<ITimer>();
 		
-		IClockService cs = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
+		IClockService cs = component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
 		ret.setResult(cs.createTimer(delay, to));
 		
 		return ret;

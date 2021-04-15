@@ -457,7 +457,7 @@ public class PlatformAgent
 	protected void addQueryForPlatformProxies()
 	{
 		// No query when no search query manager service
-		if(agent.searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE))==null)
+		if(agent.getLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE))==null)
 		{
 			return;
 		}

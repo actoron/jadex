@@ -1391,7 +1391,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		{
 			public void customResultAvailable(Void result) 
 			{
-				ISettingsService settings	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+				ISettingsService settings	= component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 				if(settings!=null)
 				{
 					settings.registerPropertiesProvider(LIBRARY_SERVICE, LibraryService.this)
@@ -1421,7 +1421,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 //		System.out.println("shut");
 		final Future<Void>	saved	= new Future<Void>();
-		ISettingsService settings	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+		ISettingsService settings	= component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 		if(settings!=null)
 		{
 			settings.deregisterPropertiesProvider(LIBRARY_SERVICE)

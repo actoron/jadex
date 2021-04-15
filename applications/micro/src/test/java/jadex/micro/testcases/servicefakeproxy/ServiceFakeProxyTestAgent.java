@@ -117,7 +117,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 		boolean local = component.getId().getRoot().equals(providerid.getRoot());
 		if(local)
 		{
-			ret = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( servicetype).setProvider(providerid));
+			ret = component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( servicetype).setProvider(providerid));
 		}
 		else
 		{

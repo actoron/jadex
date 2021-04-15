@@ -1814,7 +1814,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 	 */
 	public long getTime()
 	{
-		return getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class)).getTime();
+		return getComponent().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class)).getTime();
 	}
 
 	/**

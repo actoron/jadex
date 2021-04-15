@@ -220,7 +220,7 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public long getTime()
 	{
-		return agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class)).getTime();
+		return agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class)).getTime();
 	}
 
 	/**

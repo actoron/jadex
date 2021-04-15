@@ -129,7 +129,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 //		}
 
 		// Start listening thread.
-		IDaemonThreadPoolService dtps = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IDaemonThreadPoolService.class));
+		IDaemonThreadPoolService dtps = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IDaemonThreadPoolService.class));
 		dtps.executeForever(new Receiver(recvsocket, true));
 		// Also listen for single-cast response messages -> TODO: use NIO to spare one thread
 		dtps.executeForever(new Receiver(sendsocket, false));
@@ -309,7 +309,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	protected IFuture<Void> sendInfo(final String address, final int port)
 	{
 		final Future<Void> ret = new Future<Void>();
-		//tas = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITransportAddressService.class));
+		//tas = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ITransportAddressService.class));
 		tas.getAddresses().addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Void>(ret)
 		{
 			@Override

@@ -87,7 +87,7 @@ public class RestInvocationHelper
 										 			  final Class<?> resttype,
 										 			  final boolean inurlparams)
 	{
-		IDaemonThreadPoolService tp = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDaemonThreadPoolService.class, ServiceScope.PLATFORM));
+		IDaemonThreadPoolService tp = component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IDaemonThreadPoolService.class, ServiceScope.PLATFORM));
 		final Future<String> ret = new Future<String>();
 		final IExternalAccess exta = component.getExternalAccess();
 		Runnable runnable = new Runnable()

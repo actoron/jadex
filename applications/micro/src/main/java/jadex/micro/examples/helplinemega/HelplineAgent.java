@@ -63,7 +63,7 @@ public class HelplineAgent	implements IHelpline
 	public IFuture<Void>	addInformation(String info)
 	{
 		// Create and store information record.
-		InformationEntry	entry	= new InformationEntry(person, info, agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
+		InformationEntry	entry	= new InformationEntry(person, info, agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 		infos.add(entry);
 
 		// forward information to other interested services.

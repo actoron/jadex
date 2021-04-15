@@ -324,7 +324,7 @@ public class AuthenticateTestAgent extends TestAgent
 //	{
 //		final Future<TestReport> ret = new Future<TestReport>();
 //		
-//		final ISecurityService	sec	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISecurityService.class));
+//		final ISecurityService	sec	= agent.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( ISecurityService.class));
 //		
 //		sec.addRole(agent.getComponentIdentifier().getPlatformPrefix(), "testuser")
 //			.addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)

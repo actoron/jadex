@@ -63,7 +63,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 		final Map<String, Object>	fparams	= params;
 		
 		// Todo: allow injecting service binding from outside?
-		IInternalProcessEngineService ipes = instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
+		IInternalProcessEngineService ipes = instance.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
 		
 		final IExternalAccess	exta	= instance.getExternalAccess();
 		final String	actid	= activity.getId();
@@ -130,7 +130,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 				{
 					public void customResultAvailable(final String id)
 					{
-						IInternalProcessEngineService ipes = instance.getFeature0(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
+						IInternalProcessEngineService ipes = instance.getFeature0(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
 						
 						System.out.println("Cancel event matcher1: "+instance.getId());
 						

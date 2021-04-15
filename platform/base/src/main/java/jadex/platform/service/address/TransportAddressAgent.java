@@ -385,7 +385,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	protected void updateFromLocalAwareness(IComponentIdentifier platformid)
 	{
 		IAwarenessManagementService awa = agent.getFeature(IRequiredServicesFeature.class)
-			.searchLocalService(new ServiceQuery<>(IAwarenessManagementService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+			.getLocalService(new ServiceQuery<>(IAwarenessManagementService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 		if(awa!=null)
 		{
 			DiscoveryInfo info = awa.getCachedPlatformInfo(platformid).get();
@@ -454,7 +454,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		
 		try
 		{
-			Collection<IAwarenessService> awas = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IAwarenessService.class));
+			Collection<IAwarenessService> awas = agent.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>(IAwarenessService.class));
 			for (IAwarenessService awa : awas)
 			{
 				try

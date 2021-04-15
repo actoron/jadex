@@ -113,7 +113,7 @@ public class NFMethodPropertyProvider extends NFPropertyProvider implements INFM
 		
 		if(getParentId()!=null)
 		{
-//			IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//			IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			getInternalAccess().getExternalAccessAsync(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
 			{
 				public void customResultAvailable(IExternalAccess component) 

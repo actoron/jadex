@@ -1035,7 +1035,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		
 		final Future<Void> res = new Future<Void>();
 		final List<CreationInfo> cinfos = new ArrayList<CreationInfo>();
-//		IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//		IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
 		// NOTE: in current implementation application waits for subcomponents
 		// to be finished and cms implements a hack to get the external
 		// access of an uninited parent.
@@ -1342,7 +1342,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 					if(mon.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 					{
 //						desc.getCause()
-						long time = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class)).getTime();
+						long time = getComponent().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class)).getTime();
 						MonitoringEvent me = new MonitoringEvent(desc.getName(), desc.getCreationTime(), 
 							MonitoringEvent.TYPE_COMPONENT_DISPOSED, time, PublishEventLevel.COARSE);
 						me.setProperty("details", desc);

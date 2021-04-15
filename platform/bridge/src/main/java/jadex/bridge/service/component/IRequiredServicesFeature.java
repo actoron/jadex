@@ -57,23 +57,23 @@ public interface IRequiredServicesFeature extends IExternalRequiredServicesFeatu
 	 */
 	public <T> Collection<T> getLocalServices(Class<T> type);
 	
-	//-------- methods for searching --------
-	
 	/**
-	 *  Search for matching services and provide first result.
+	 *  Lookup matching services and provide first result.
 	 *  Synchronous method only for locally available services.
 	 *  @param query	The search query.
 	 *  @return The corresponding service or ServiceNotFoundException when not found.
 	 */
-	public <T> T searchLocalService(ServiceQuery<T> query);
+	public <T> T getLocalService(ServiceQuery<T> query);
 	
 	/**
-	 *  Search for all matching services.
+	 *  Lookup all matching services.
 	 *  Synchronous method only for locally available services.
 	 *  @param query	The search query.
 	 *  @return A collection of services.
 	 */
-	public <T> Collection<T> searchLocalServices(ServiceQuery<T> query);
+	public <T> Collection<T> getLocalServices(ServiceQuery<T> query);
+	
+	//-------- methods for searching --------
 	
 	/**
 	 *  Performs a sustained search for a service. Attempts to find a service

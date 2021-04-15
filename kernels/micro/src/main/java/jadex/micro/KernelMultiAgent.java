@@ -449,7 +449,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 				IExternalAccess exta = agent.getExternalAccess((IComponentIdentifier)k);
 				ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
 				q.setProvider(exta.getId());
-				final IComponentFactory fac = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(q);
+				final IComponentFactory fac = agent.getFeature(IRequiredServicesFeature.class).getLocalService(q);
 				
 				fac.isLoadable(model, imports, rid).addResultListener(new IResultListener<Boolean>()
 				{
@@ -610,7 +610,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 				IComponentFactory fac = null;
 				try
 				{
-					fac = rf.searchLocalService(q);
+					fac = rf.getLocalService(q);
 					//System.out.println("created factory1.8");
 				}
 				catch(Exception e)
@@ -1024,7 +1024,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	{
 		ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
 		q.setExcludeOwner(true);
-		Collection<IComponentFactory> ret = SUtil.notNull(agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(q));
+		Collection<IComponentFactory> ret = SUtil.notNull(agent.getFeature(IRequiredServicesFeature.class).getLocalServices(q));
 		//System.out.println("facts: "+ret);
 		return ret;
 	}

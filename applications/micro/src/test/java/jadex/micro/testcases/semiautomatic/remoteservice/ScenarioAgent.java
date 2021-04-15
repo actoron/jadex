@@ -34,7 +34,7 @@ public class ScenarioAgent
 	@OnStart
 	public IFuture<Void> executeBody()
 	{
-//		ILibraryService ls = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM));
+//		ILibraryService ls = agent.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM));
 //		System.out.println("ls:"+ls);
 		
 		IFuture<ILibraryService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ILibraryService.class, ServiceScope.PLATFORM));

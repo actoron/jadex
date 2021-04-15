@@ -142,7 +142,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
     {
         final Future<Void> ret = new Future<Void>();
 
-        ILibraryService ls = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+        ILibraryService ls = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
         ls.getClassLoader(info.getResourceIdentifier()).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 		{
         	public void customResultAvailable(ClassLoader cl) throws Exception
@@ -211,7 +211,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        	                            else
 	        	                            {
 	        	                            	 IExternalAccess exta = getComponent(info).get();
-	        	                            	 IService service = (IService)agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype).setProvider(exta.getId()));
+	        	                            	 IService service = (IService)agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(servicetype).setProvider(exta.getId()));
 	        	                            	 return method.invoke(service, args);
 	        	                            }
 	        	                        }
@@ -267,7 +267,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
         else
         {
         	components.put(info.getFilename(), ret);
-//          final IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//          final IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
 //            if(info.getParent()==null)
 //            	info.setParent(agent.getId());
             agent.createComponent(info).addResultListener(new IResultListener<IExternalAccess>()

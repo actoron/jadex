@@ -62,7 +62,7 @@ public class ShortMessageAgent
 		
 		final Collection<User> receivers = new HashSet<User>(recs);
 		
-		final IUserService us = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IUserService.class, ServiceScope.COMPONENT_ONLY));
+		final IUserService us = component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IUserService.class, ServiceScope.COMPONENT_ONLY));
 		
 		component.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IClientService.class))
 			.addResultListener(new IntermediateEmptyResultListener<IClientService>()
