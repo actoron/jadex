@@ -1880,15 +1880,15 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public void sendSecurityHandshakeMessage(final IComponentIdentifier receiver, BasicSecurityMessage message)
 	{
 		message.setMessageId(SUtil.createUniqueId());
-		//System.out.println("sending handshake message to: "+agent+" "+receiver+" "+message.getMessageId());
+		if(debug)
+			System.out.println("sendSecurityHandshakeMessage0: sending handshake message to: "+agent+" "+receiver+" "+message.getMessageId());
 		sendSecurityMessage(receiver, message).addResultListener(new IResultListener<Void>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
 				if(debug)
 				{
-					System.out.println("Failure send message to and removing suite for: "+receiver.getRoot().toString()+" "+message.getMessageId());
-					exception.printStackTrace();
+					System.out.println("sendSecurityHandshakeMessage1: Failure send message to and removing suite for: "+receiver.getRoot().toString()+" "+message.getMessageId()+"\n"+SUtil.getExceptionStacktrace(exception));
 				}
 				
 				//System.out.println("Removing Handshake " + receiver.getRoot().toString()+" "+message.getMessageId());
@@ -1912,7 +1912,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			
 			public void resultAvailable(Void result)
 			{	
-				//System.out.println("sent handshake message to: "+agent+" "+receiver+" "+message.getMessageId());
+				if(debug)
+					System.out.println("sendSecurityHandshakeMessage2: sent handshake message to: "+agent+" "+receiver+" "+message.getMessageId());
 			}
 		});
 	}
@@ -1928,14 +1929,16 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		hstate.setExpirationTime(System.currentTimeMillis() + handshaketimeout);
 		hstate.setConversationId(convid);
 		hstate.setResultFuture(new Future<ICryptoSuite>());
-		//System.out.println("Init handhake " +agent+" "+cid+" "+convid+" "+handshaketimeout);
+		if(debug)
+			System.out.println("initializeHandshake0 " +agent+" "+cid+" "+convid+" "+handshaketimeout);
 		
 		initializingcryptosuites.put(cid.toString(), hstate);
 		
 		String[] csuites = allowedcryptosuites.keySet().toArray(new String[allowedcryptosuites.size()]);
 		InitialHandshakeMessage ihm = new InitialHandshakeMessage(agent.getId(), convid, csuites);
 		ComponentIdentifier rsec = new ComponentIdentifier("security@" + cid);
-		//System.out.println("Security Handshake " + convid + " " + agent.getId().getRoot() + " -> " + rsec.getRoot() + " Phase: 0 Step: 0 "+initializingcryptosuites+" "+System.identityHashCode(initializingcryptosuites));
+		if(debug)
+			System.out.println("initializeHandshake1 " + convid + " " + agent.getId().getRoot() + " -> " + rsec.getRoot() + " Phase: 0 Step: 0 "+initializingcryptosuites+" "+System.identityHashCode(initializingcryptosuites));
 		sendSecurityHandshakeMessage(rsec, ihm);
 	}
 	

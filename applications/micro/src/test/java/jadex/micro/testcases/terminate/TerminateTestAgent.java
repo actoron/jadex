@@ -294,7 +294,9 @@ public class TerminateTestAgent extends TestAgent
 	@Override
 	public IPlatformConfiguration getConfig()
 	{
-		return super.getConfig().
-			setValue("debugservices", "ITerminableService");
+		return super.getConfig()
+			.setValue("debugservices", "ITerminableService")
+			.setValue("security.debug", true)
+			.setValue("platformname", "TerminateTest");
 	}
 }
