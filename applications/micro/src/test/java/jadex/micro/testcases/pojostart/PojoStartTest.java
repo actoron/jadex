@@ -1,5 +1,8 @@
 package jadex.micro.testcases.pojostart;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import jadex.base.Starter;
@@ -12,6 +15,19 @@ import jadex.micro.testcases.pojostart.PojoStartAgent.StaticInnerPojoAgent;
  */
 public class PojoStartTest
 {
+	IExternalAccess platform;
+	
+	@Before
+	public void	setup()
+	{
+		platform = Starter.createPlatform(STest.getRealtimeTestConfig(getClass())).get();
+	}
+	
+	@After
+	public void	tearDown()
+	{
+		platform.killComponent().get();
+	}
 	
 	/**
 	 *  Test pojo agent creation.
@@ -19,29 +35,32 @@ public class PojoStartTest
 	@Test
 	public void testPojoCreation()
 	{
-		long timeout	= 3000;
-		IExternalAccess platform = Starter.createPlatform(STest.getLocalTestConfig(getClass())).get(timeout, true);
-		
 		// simple pojo
 		PojoStartAgent	pojo	= new PojoStartAgent();
-		platform.addComponent(pojo).get(timeout, true);
-		pojo.started.get(timeout);
+		platform.addComponent(pojo).get();
+		pojo.started.get();
 		
 		// dynamic inner pojo
 		pojo	= pojo.new InnerPojoAgent();
-		platform.addComponent(pojo).get(timeout, true);
-		pojo.started.get(timeout);
+		platform.addComponent(pojo).get();
+		pojo.started.get();
 		
 		// static inner pojo
 		pojo	= new StaticInnerPojoAgent();
-		platform.addComponent(pojo).get(timeout, true);
-		pojo.started.get(timeout);
-		
-		// anonymous pojo not supported?
-//		pojo	= new PojoStartAgent() {};
-//		platform.addComponent(pojo).get(timeout, true);
-//		pojo.started.get(timeout);
-
+		platform.addComponent(pojo).get();
+		pojo.started.get();
 	}
 
+	/**
+	 *  Test anonymous pojo agent creation.
+	 */
+	@Test
+	@Ignore
+	// anonymous pojo not supported due to missing @Agent annotation?
+	public void testAnonymousPojoCreation()
+	{
+		PojoStartAgent	pojo	= new PojoStartAgent() {};
+		platform.addComponent(pojo).get();
+		pojo.started.get();
+	}
 }

@@ -31,7 +31,6 @@ import jadex.platform.service.transport.intravm.IntravmTransportAgent;
  */
 public class InitialMessagingHandshakeTest
 {
-	static final long	SEND_TIMEOUT	= 3000;
 	IFuture<IExternalAccess>	fsender;
 	IFuture<IExternalAccess>	freceiver;
 
@@ -115,8 +114,7 @@ public class InitialMessagingHandshakeTest
 		long	start	= System.nanoTime();
     	try
     	{
-    		sender.scheduleStep(ia -> ia.getFeature(IMessageFeature.class).sendMessage("Hi!", receiver))
-    			.get(SEND_TIMEOUT);
+    		sender.scheduleStep(ia -> ia.getFeature(IMessageFeature.class).sendMessage("Hi!", receiver)).get();
     		fail("Sending unexpectedly succeeded.");
     	}
     	catch(Exception e)
@@ -139,8 +137,7 @@ public class InitialMessagingHandshakeTest
 		{
 	    	try
 	    	{
-	    		sender.scheduleStep(ia -> ia.getFeature(IMessageFeature.class).sendMessage("Hi!", receiver))
-	    			.get(SEND_TIMEOUT);
+	    		sender.scheduleStep(ia -> ia.getFeature(IMessageFeature.class).sendMessage("Hi!", receiver)).get();
 	    		System.out.println("Sending succeeded after "+((System.nanoTime()-start)/1000000)/1000.0+" seconds.");
 	    		return;
 	    	}
@@ -151,7 +148,7 @@ public class InitialMessagingHandshakeTest
 	    		assertFalse("Exception shouldn't be timeout: "+SUtil.getExceptionStacktrace(e), e instanceof TimeoutException);
 	    	}
 	    	
-	    	sender.waitForDelay(SEND_TIMEOUT).get();
+	    	sender.waitForDelay(Starter.getScaledDefaultTimeout(sender.getId(), 0.01)).get();
 		}
 		
 		fail("Sending did not recover after "+((System.nanoTime()-start)/1000000)/1000.0+" seconds");
