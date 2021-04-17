@@ -109,7 +109,7 @@ public class PlatformsTest //extends TestCase
 			
 			long start = System.currentTimeMillis();
 			IExternalAccess	platform = (IExternalAccess)Starter.createPlatform(args).get(timeout);
-			timeout = Starter.getDefaultTimeout(platform.getId());
+//			timeout = Starter.getDefaultTimeout(platform.getId());
 			starttimes[i] = System.currentTimeMillis()-start;
 //			System.out.println("Started platform: "+i);
 			
