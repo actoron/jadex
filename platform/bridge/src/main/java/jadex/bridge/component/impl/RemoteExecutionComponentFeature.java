@@ -478,20 +478,20 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 								fc.setResultCount(counter++);
 //								System.out.println(getComponent()+" sending forward command: "+remote+", "+msg+", "+command);
 								IFuture<Void>	fut	= sendRxMessage(remote, rxid, fc);
-								fut.addResultListener(new IResultListener<Void>()
-								{
-									@Override
-									public void resultAvailable(Void result)
-									{
-										System.out.println(getComponent()+" successfully sent forward command: "+remote+", "+msg+", "+command);
-									}
-									
-									@Override
-									public void exceptionOccurred(Exception exception)
-									{
-										System.out.println(getComponent()+" sending forward command failed: "+remote+", "+msg+", "+command+", "+exception);
-									}
-								});
+//								fut.addResultListener(new IResultListener<Void>()
+//								{
+//									@Override
+//									public void resultAvailable(Void result)
+//									{
+//										System.out.println(getComponent()+" successfully sent forward command: "+remote+", "+msg+", "+command);
+//									}
+//									
+//									@Override
+//									public void exceptionOccurred(Exception exception)
+//									{
+//										System.out.println(getComponent()+" sending forward command failed: "+remote+", "+msg+", "+command+", "+exception);
+//									}
+//								});
 
 								if(term!=null)
 								{
