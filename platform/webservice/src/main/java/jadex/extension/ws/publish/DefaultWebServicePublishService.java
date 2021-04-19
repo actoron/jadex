@@ -77,7 +77,7 @@ public class DefaultWebServicePublishService implements IPublishService
 		IService service = (IService) component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(serviceid.getServiceType(), pi.getPublishScope(), null)).get();
 		
 		ClassLoader cl = null;
-		ILibraryService ls = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM));
+		ILibraryService ls = component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM));
 		if (serviceid.getProviderId().getPlatformName().equals(component.getId().getPlatformName()))
 		{
 			// Local publish, get the component's classloader.

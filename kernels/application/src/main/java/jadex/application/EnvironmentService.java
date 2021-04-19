@@ -116,7 +116,7 @@ public class EnvironmentService	implements IEnvironmentService
 	 */
 	public static IFuture<Object> getSpace(IInternalAccess component, final String name)
 	{
-		IEnvironmentService es	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IEnvironmentService.class));
+		IEnvironmentService es	= component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IEnvironmentService.class));
 		return es.getSpace(name);
 	}
 }

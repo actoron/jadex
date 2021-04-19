@@ -254,7 +254,7 @@ public class Starter
 //				args.put("component", remotecid);
 //				CreationInfo ci = new CreationInfo(args);
 //				ci.setDaemon(true);
-//				IComponentManagementService	cms	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
+//				IComponentManagementService	cms	= ia.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 //				cms.createComponent(platformname, "jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
 //				return IFuture.DONE;
 //			}

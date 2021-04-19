@@ -90,7 +90,7 @@ public class CreateComponentTask implements ITask
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-//		IComponentManagementService cms	= instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//		IComponentManagementService cms	= instance.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
 		String name = (String)context.getParameterValue("name");
 		String model = (String)context.getParameterValue("model");
 		String config = (String)context.getParameterValue("configuration");

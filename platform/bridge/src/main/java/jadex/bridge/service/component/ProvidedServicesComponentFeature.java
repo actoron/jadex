@@ -1275,7 +1275,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 		}
 		else
 		{
-			ILibraryService ls = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+			ILibraryService ls = getComponent().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 			ls.getClassLoader(sid.getResourceIdentifier())
 				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Class<?>>(ret)
 			{

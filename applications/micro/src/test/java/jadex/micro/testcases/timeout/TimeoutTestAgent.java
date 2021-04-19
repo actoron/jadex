@@ -192,7 +192,7 @@ public class TimeoutTestAgent extends TestAgent
 			{
 				// Use clock (i.e. sim time) for local and real time for remote
 				final long start = agent.getId().getRoot().equals(cid.getRoot())
-					? agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class)).getTime()
+					? agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class)).getTime()
 					: System.currentTimeMillis();
 					
 				// create a service call meta object and set the timeout
@@ -226,7 +226,7 @@ public class TimeoutTestAgent extends TestAgent
 						{
 							// Use clock (i.e. sim time) for local and real time for remote
 							long end = agent.getId().getRoot().equals(cid.getRoot())
-								? agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class)).getTime()
+								? agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class)).getTime()
 								: System.currentTimeMillis();
 							long diff = end - (start+to);
 							if(to==Timeout.NONE || diff>=0 && diff<Starter.getScaledDefaultTimeout(agent.getId(), 1.0/15)) // 2 secs max overdue delay? ignore diff when deftimeout==-1

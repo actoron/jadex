@@ -108,7 +108,7 @@ public class SRemoteGui
 					IServiceIdentifier[] sis = null;
 					
 					ServiceQuery<IService>	query	= new ServiceQuery<IService>((Class<IService>)null).setProvider(ia.getId());
-					Collection<IService>	result	= ia.getFeature0(IRequiredServicesFeature.class)==null? null: (ia.getFeature(IRequiredServicesFeature.class)).searchLocalServices(query);
+					Collection<IService>	result	= ia.getFeature0(IRequiredServicesFeature.class)==null? null: (ia.getFeature(IRequiredServicesFeature.class)).getLocalServices(query);
 					if(result!=null)
 					{
 						pis	= new ProvidedServiceInfo[result.size()];
@@ -425,7 +425,7 @@ public class SRemoteGui
 				try
 				{
 					final URL	url	= SUtil.toURL(filename);
-					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 					ls.getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, Tuple2<URL, IResourceIdentifier>>(ret)
 					{
 						public void customResultAvailable(List<IResourceIdentifier> rids)
@@ -535,7 +535,7 @@ public class SRemoteGui
 				final Future<Void>	ret	= new Future<Void>();
 				try
 				{
-					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 					try
 					{
 						ls.removeURL(null, SUtil.toURL(path));
@@ -1091,7 +1091,7 @@ public class SRemoteGui
 												{
 													if(model!=null && model.getReport()==null)
 													{
-														ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+														ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 														ls.getClassLoader(model.getResourceIdentifier())
 															.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Boolean>(ret)
 														{
@@ -1160,7 +1160,7 @@ public class SRemoteGui
 				final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 				try
 				{
-					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 					ls.getClassLoader(modelrid).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Map<String, Object>>(ret)
 					{
 						public void customResultAvailable(ClassLoader cl)
@@ -1225,7 +1225,7 @@ public class SRemoteGui
 				try
 				{
 					final URL	url	= SUtil.toURL(filename);
-					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 					if(!tl)
 					{
 						// todo: workspace=true?

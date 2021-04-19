@@ -411,6 +411,6 @@ public class MessagePerformanceAgent
 	 */
 	public IFuture<Long> getTime()
 	{
-		return new Future<Long>(new Long(agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM)).getTime()));
+		return new Future<Long>(new Long(agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM)).getTime()));
 	}
 }

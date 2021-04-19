@@ -191,7 +191,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 
 			thread.setWaiting(true);
 			
-//			IComponentManagementService cms = instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//			IComponentManagementService cms = instance.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			// Todo: If remote remember subprocess and kill on cancel.
 
 			final CreationInfo	info = thread.hasPropertyValue("creation info")? 

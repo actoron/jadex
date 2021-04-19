@@ -53,7 +53,7 @@ public class ComponentPlanBody extends AbstractPlanBody
 //		rplan.setLifecycleState(RPlan.PlanLifecycleState.BODY);
 //		// Todo: should also set processing state and RPLANS thread local?
 //		
-////		IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+////		IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
 //		CreationInfo ci = new CreationInfo(ia.getId());
 //		ci.setFilename(component);
 //		

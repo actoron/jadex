@@ -29,7 +29,7 @@ public class ServicesPlan extends Plan
 		waitFor(500);
 		
 		// Call service internally
-		IPrintHelloService phs = getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(
+		IPrintHelloService phs = getAgent().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(
 			IPrintHelloService.class, ServiceScope.COMPONENT_ONLY));
 		phs.printHello();
 		

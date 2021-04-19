@@ -281,7 +281,7 @@ public class HelplinePanel extends JPanel
 				final Future<IHelpline>	ret	= new Future<IHelpline>();
 				try
 				{
-					IHelpline	helpline	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class).setProvider(new ComponentIdentifier(person, ia.getId())));
+					IHelpline	helpline	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IHelpline.class).setProvider(new ComponentIdentifier(person, ia.getId())));
 					ret.setResult(helpline);
 				}
 				catch(ServiceNotFoundException snfe)
@@ -293,7 +293,7 @@ public class HelplinePanel extends JPanel
 						@Override
 						public void customResultAvailable(IExternalAccess access)
 						{
-							IHelpline	helpline	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IHelpline.class).setProvider(access.getId()));
+							IHelpline	helpline	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IHelpline.class).setProvider(access.getId()));
 							if(helpline==null)
 							{
 								exceptionOccurred(new RuntimeException("No service after creation for "+person));

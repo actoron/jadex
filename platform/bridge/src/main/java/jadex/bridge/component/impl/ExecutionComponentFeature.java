@@ -763,7 +763,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			if(parenta==null)
 			{
 				// Todo w/o proxy???
-//				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
 				IExternalAccess exta = getComponent().getExternalAccess(getComponent().getId().getParent());
 				// raw because called from scheduleStep also on external thread.
 				exta.scheduleStep(new IComponentStep<Void>()
@@ -2321,7 +2321,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(0));
+						ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(0));
 						if (simserv != null)
 						{
 							Future<Void> blocker = new Future<>();

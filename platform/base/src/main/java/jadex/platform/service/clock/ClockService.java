@@ -330,7 +330,7 @@ public class ClockService extends BasicService implements IClockService
 		final Future<Void> ret = new Future<Void>();
 
 		threadpool = ((IInternalRequiredServicesFeature)component.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
-//		ISettingsService settings = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISettingsService.class, ServiceScope.PLATFORM));
+//		ISettingsService settings = component.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( ISettingsService.class, ServiceScope.PLATFORM));
 
 //		System.out.println("clock: "+ServiceCall.get);
 		
@@ -347,7 +347,7 @@ public class ClockService extends BasicService implements IClockService
 				{
 					public void customResultAvailable(Void result)
 					{
-//						ISettingsService settings = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(0));
+//						ISettingsService settings = component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(0));
 //						if(settings!=null)
 //						{
 //							settings.registerPropertiesProvider("clockservice", ClockService.this)
@@ -402,7 +402,7 @@ public class ClockService extends BasicService implements IClockService
 		{
 			public void customResultAvailable(Void result)
 			{
-//				ISettingsService	settings	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
+//				ISettingsService	settings	= component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISettingsService.class));
 //				settings.deregisterPropertiesProvider("clockservice")
 //					.addResultListener(new DelegationResultListener<Void>(ret)
 //				{

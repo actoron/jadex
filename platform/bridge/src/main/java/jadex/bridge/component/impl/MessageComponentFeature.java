@@ -297,6 +297,9 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		Tuple2<ITransportService, Integer> cachedtransport = getTransportCache(component.getId().getRoot()).get(rplat);
 		if(cachedtransport != null)
 		{
+			if(getComponent().getId().toString().indexOf("TerminateTest")!=-1)
+				System.out.println("sendToTransports: sending msg with: "+cachedtransport.getFirstEntity());
+			
 			//if(isSecurityMessage(header))
 			//	System.out.println("sending sec msg with: "+cachedtransport.getFirstEntity());
 			cachedtransport.getFirstEntity().sendMessage(header, encheader, encryptedbody).addResultListener(execfeat.createResultListener(new IResultListener<Integer>()
@@ -482,6 +485,9 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		Future<Void> ret = new Future<>();
 		Collection<ITransportService> transports = getAllTransports();
 		
+		if(getComponent().getId().toString().indexOf("TerminateTest")!=-1)
+			System.out.println("sendToAllTransports0: sending sec msg with all: "+transports);
+		
 		//if(isSecurityMessage(header))
 		//	System.out.println("sending sec msg with all: "+transports);
 		
@@ -496,11 +502,15 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			int[]	cnt	= new int[]{transports.size()};
 			for(final ITransportService transport : transports)
 			{
+				if(getComponent().getId().toString().indexOf("TerminateTest")!=-1)
+					System.out.println("sendToAllTransports1: sending msg with: "+transport);
 //				component.getLogger().info("sending msg with0: "+transport);
 				transport.sendMessage(header, encheader, encryptedbody).addResultListener(execfeat.createResultListener(new IResultListener<Integer>()
 				{
 					public void resultAvailable(Integer result)
 					{
+						if(getComponent().getId().toString().indexOf("TerminateTest")!=-1)
+							System.out.println("sendToAllTransports2: sent msg with: "+transport+", "+result);
 //						component.getLogger().info("sending msg with1: "+transport);
 						// Successful sent, check if transport cache needs to be updated (to speedup further sending)
 						Map<IComponentIdentifier, Tuple2<ITransportService, Integer>> cache = getTransportCache(platformid);
@@ -514,6 +524,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	
 					public void exceptionOccurred(Exception exception)
 					{
+						if(getComponent().getId().toString().indexOf("TerminateTest")!=-1)
+							System.out.println("sendToAllTransports3: sending msg failed with: "+transport+"\n"+SUtil.getExceptionStacktrace(exception));
 //						component.getLogger().info("sending msg with2: "+transport);
 						cnt[0]--;
 						
@@ -522,6 +534,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 					
 						if(cnt[0]==0)
 						{
+							if(getComponent().getId().toString().indexOf("TerminateTest")!=-1)
+								System.out.println("sendToAllTransports4: Finally failed to send message: "+transport);
 							component.getLogger().warning("Finally failed to send message: "+exception);
 							ret.setExceptionIfUndone(exception);
 						}

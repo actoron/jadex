@@ -397,7 +397,7 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 		{
 			public void customResultAvailable(IComponentDescription desc)
 			{
-				ILibraryService	ls	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM));
+				ILibraryService	ls	= component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM));
 				ls.getClassLoader(desc.getResourceIdentifier())
 					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 				{

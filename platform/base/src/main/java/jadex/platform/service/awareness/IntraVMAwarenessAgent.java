@@ -101,7 +101,7 @@ public class IntraVMAwarenessAgent implements IAwarenessService
 			{
 				public IFuture<List<TransportAddress>> execute(IInternalAccess ia)
 				{
-					ITransportAddressService tas = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class));
+					ITransportAddressService tas = ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( ITransportAddressService.class));
 					return tas.getAddresses();
 				}
 			});

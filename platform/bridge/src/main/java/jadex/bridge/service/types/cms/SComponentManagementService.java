@@ -371,7 +371,7 @@ public class SComponentManagementService
 	{
 		final Future<Tuple2<String, ClassLoader>> ret = new Future<Tuple2<String, ClassLoader>>();
 		
-		ILibraryService libservice = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+		ILibraryService libservice = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 		// Hack!!! May be null on platform init
 		
 		final IInternalAccess pad = getParentComponent(cinfo, agent);
@@ -547,13 +547,13 @@ public class SComponentManagementService
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							ret.setException(new ServiceNotFoundException("No component factory found for: "+model));
+							ret.setException((Exception) new ServiceNotFoundException("No component factory found for: "+model).initCause(exception));
 						}
 					});
 				}
 				else
 				{
-					ret.setException(new ServiceNotFoundException("No component factory found for: "+model));
+					ret.setException((Exception) new ServiceNotFoundException("No component factory found for: "+model).initCause(exception));
 				}
 			}
 		});
@@ -2076,7 +2076,7 @@ public class SComponentManagementService
 						
 	//					Cause cause = curcause;
 						// todo: how to do platform init so that clock is always available?
-						IClockService cs = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(
+						IClockService cs = agent.getFeature(IRequiredServicesFeature.class).getLocalService(
 							new ServiceQuery<>(IClockService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 	//					final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master!=null ? master.booleanValue() : false,
 	//						daemon!=null ? daemon.booleanValue() : false, autosd!=null ? autosd.booleanValue() : false, sync!=null ? sync.booleanValue() : false,

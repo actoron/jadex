@@ -49,16 +49,14 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.ComposedFilter;
 import jadex.commons.FileFilter;
 import jadex.commons.IFilter;
 import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SClassReader.ClassInfo;
-import jadex.commons.collection.MultiCollection;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -286,7 +284,7 @@ public class SComponentFactory
 		});
 	}
 	
-//	Collection<IComponentFactory> facs = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>( IComponentFactory.class, ServiceScope.PLATFORM));
+//	Collection<IComponentFactory> facs = agent.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>( IComponentFactory.class, ServiceScope.PLATFORM));
 //	FactoryFilter facfilter = new FactoryFilter(filename, null, rid);
 //	
 //	SFilter.applyFilter(facs, facfilter).addResultListener(new IResultListener<Collection<IComponentFactory>>()
@@ -675,7 +673,7 @@ public class SComponentFactory
 			public IFuture<Object> execute(final IInternalAccess ia)
 			{
 				final Future<Object> ret = new Future<Object>();
-				Collection<IComponentFactory> result	= ia.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
+				Collection<IComponentFactory> result	= ia.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>(IComponentFactory.class));
 				boolean found = false;
 				if(result!=null)
 				{
@@ -752,22 +750,22 @@ public class SComponentFactory
 	 */
 	public static IFuture<IComponentFactory> getFactory(final FactoryFilter filter, IInternalAccess ia)
 	{
-		Collection<IComponentFactory> facs = ia.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
+		Collection<IComponentFactory> facs = ia.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>(IComponentFactory.class));
 		//System.out.println("getFactory: "+facs);
 		if(facs!=null && facs.size()>0)
 		{
-			return doFindFactory(reorderMultiFactory(facs).iterator(), filter);
+			return doFindFactory(reorderMultiFactory(facs).iterator(), filter, facs);
 		}
 		else
 		{
-			return new Future<IComponentFactory>(new ServiceNotFoundException(""+filter));
+			return new Future<IComponentFactory>(new ServiceNotFoundException("facs="+facs+", filter="+filter));
 		}
 	}
 	
 	/**
 	 *  Find a matching factory in the given iterator.
 	 */
-	protected static IFuture<IComponentFactory>	doFindFactory(Iterator<IComponentFactory> facs, FactoryFilter filter)
+	protected static IFuture<IComponentFactory>	doFindFactory(Iterator<IComponentFactory> facs, FactoryFilter filter, Collection<IComponentFactory> allfacs)
 	{
 		if(facs.hasNext())
 		{
@@ -782,7 +780,7 @@ public class SComponentFactory
 				}
 				else
 				{
-					return doFindFactory(facs, filter);
+					return doFindFactory(facs, filter, allfacs);
 				}
 			}
 			else
@@ -800,7 +798,7 @@ public class SComponentFactory
 						}
 						else
 						{
-							doFindFactory(facs, filter).addResultListener(new DelegationResultListener<>(ret));
+							doFindFactory(facs, filter, allfacs).addResultListener(new DelegationResultListener<>(ret));
 						}
 					}
 				});
@@ -809,7 +807,7 @@ public class SComponentFactory
 		}
 		else
 		{
-			return new Future<>(new ServiceNotFoundException(""+filter));
+			return new Future<IComponentFactory>(new ServiceNotFoundException("facs="+allfacs+", filter="+filter));
 		}
 	}
 	

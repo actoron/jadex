@@ -1277,7 +1277,7 @@ public class SServiceProvider
 ////				{
 ////					IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type.getType(component.getClassLoader())): new DelegationResultListener<T>(ret);
 ////					
-////					IRemoteServiceManagementService rms	= component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IRemoteServiceManagementService.class, ServiceScope.PLATFORM));
+////					IRemoteServiceManagementService rms	= component.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IRemoteServiceManagementService.class, ServiceScope.PLATFORM));
 ////					IFuture<T> fut = rms.getServiceProxy(component.getComponentIdentifier(), cid, type, scope, null);
 ////					fut.addResultListener(new ComponentResultListener<T>(lis, component));
 ////				}
@@ -1577,7 +1577,7 @@ public class SServiceProvider
 //				if(access==null)
 //				{
 ////					System.out.println("comp is: "+component+" prov: "+providerid);
-////					IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+////					IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
 //
 //					if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
 //					{

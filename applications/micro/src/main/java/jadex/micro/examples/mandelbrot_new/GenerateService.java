@@ -506,7 +506,7 @@ public class GenerateService implements IGenerateService
 	protected IFuture<ICalculateService> getCalculateService()
 	{
 		ServiceQuery<ICalculateService>	query	= new ServiceQuery<ICalculateService>(ICalculateService.class);
-		Collection<ICalculateService> sers = agent.searchLocalServices(query);
+		Collection<ICalculateService> sers = agent.getLocalServices(query);
 		
 		// todo: how to identify pool or worker (tagging workers or tagging pools)
 		ICalculateService ser = null;

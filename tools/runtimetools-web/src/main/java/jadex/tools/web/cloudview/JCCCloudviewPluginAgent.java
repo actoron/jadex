@@ -43,7 +43,7 @@ public class JCCCloudviewPluginAgent extends JCCPluginAgent implements IJCCCloud
 	public IFuture<Map<String, String[]>> getPlatformNetworks(String cid)
 	{
 		final Future<Map<String, String[]>> ret = new Future<>();
-		IJCCWebService ws = agent.searchLocalService(new ServiceQuery<>(IJCCWebService.class));
+		IJCCWebService ws = agent.getLocalService(new ServiceQuery<>(IJCCWebService.class));
 		ServiceCall.getOrCreateNextInvocation().setTimeout(1000);
 		ITerminableIntermediateFuture<IExternalAccess> pffut = agent.searchServices(new ServiceQuery<>(IExternalAccess.class, ServiceScope.GLOBAL).setServiceTags(IExternalAccess.PLATFORM));
 		pffut.addResultListener(new IResultListener<Collection<IExternalAccess>>()

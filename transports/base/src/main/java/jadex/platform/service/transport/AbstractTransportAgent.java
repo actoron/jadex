@@ -236,7 +236,10 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 			openportret.setResult(null);
 		}
 		
-		return IFuture.DONE;
+//		return IFuture.DONE;
+		
+		// Init is only complete when platform is ready to receive messages
+		return openportret;
 	}
 	
 	//@AgentKilled

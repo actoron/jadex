@@ -57,7 +57,7 @@ public class Pheromone	extends LocationObject	implements IPheromone
 		{
 			throw new IllegalStateException("Pheromone needs to be created on agent thread.");
 		}
-		this.clock	= ExecutionComponentFeature.LOCAL.get().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+		this.clock	= ExecutionComponentFeature.LOCAL.get().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class));
 		this.creation	= clock.getTime();
 	}
 

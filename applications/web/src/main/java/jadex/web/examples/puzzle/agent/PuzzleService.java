@@ -149,7 +149,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 		
 		final IGoal	goal	= agent.getFeature(IBDIXAgentFeature.class).getGoalbase().createGoal("makemove");
 		goal.getParameter("board").setValue(board);	// It is safe to use the board object, as it is passed as a copy to the service automatically.
-		long time = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM)).getTime();
+		long time = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM)).getTime();
 		goal.getParameter("deadline").setValue(timeout!=-1 ? time+timeout : -1);
 		
 		agent.getFeature(IBDIXAgentFeature.class).getGoalbase().dispatchTopLevelGoal(goal)

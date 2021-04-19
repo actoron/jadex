@@ -214,7 +214,7 @@ public class LocalHostAwarenessAgent implements IAwarenessService
 	 */
 	protected void postInfo()
 	{
-		//ITransportAddressService tas = agent.searchLocalService(new ServiceQuery<ITransportAddressService>(ITransportAddressService.class, ServiceScope.PLATFORM));
+		//ITransportAddressService tas = agent.getLocalService(new ServiceQuery<ITransportAddressService>(ITransportAddressService.class, ServiceScope.PLATFORM));
 		List<TransportAddress> addrs = tas.getAddresses().get();
 		
 		long leasetime = (Long)agent.getArguments().get("leasetime");

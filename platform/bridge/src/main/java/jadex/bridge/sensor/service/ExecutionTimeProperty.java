@@ -49,7 +49,7 @@ public class ExecutionTimeProperty extends TimedProperty
 		{
 			this.sid = service.getServiceId();
 		
-			clock = comp.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+			clock = comp.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class));
 		
 			if(ProxyFactory.isProxyClass(service.getClass()))
 			{

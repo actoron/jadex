@@ -88,7 +88,7 @@ public class StatusAgent implements IStatusService
 	{
 		final IntermediateFuture<PlatformData>	ret	= new IntermediateFuture<PlatformData>();
 		FutureBarrier<Collection<PlatformData>>	fubar	= new FutureBarrier<Collection<PlatformData>>();
-		for(ITransportInfoService tis: agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITransportInfoService.class)))
+		for(ITransportInfoService tis: agent.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>(ITransportInfoService.class)))
 		{
 			IIntermediateFuture<PlatformData>	fut	= tis.getConnections();
 			fut.addResultListener(new IntermediateDelegationResultListener<PlatformData>(ret)
@@ -171,7 +171,7 @@ public class StatusAgent implements IStatusService
 		});
 		
 		// TODO: Use query for dynamically added transports
-		for(final ITransportInfoService tis: agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITransportInfoService.class)))
+		for(final ITransportInfoService tis: agent.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>(ITransportInfoService.class)))
 		{
 			System.out.println("subscribing: "+tis);
 			ISubscriptionIntermediateFuture<PlatformData>	fut	= tis.subscribeToConnections();
@@ -269,7 +269,7 @@ public class StatusAgent implements IStatusService
 	 */
 	public ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>>	subscribeToServices()
 	{
-		ISuperpeerService	sps	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerService.class));
+		ISuperpeerService	sps	= agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISuperpeerService.class));
 		return sps.addQuery(new ServiceQuery<>((Class<IServiceIdentifier>)null)
 			.setEventMode()
 			.setOwner(agent.getId())
@@ -283,7 +283,7 @@ public class StatusAgent implements IStatusService
 	// No intermediate for easier REST?
 	public IFuture<Collection<Map<String, Object>>>	getMemInfo()
 	{
-		Collection<IMemstatService>	stats	= agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IMemstatService.class, ServiceScope.PLATFORM));
+		Collection<IMemstatService>	stats	= agent.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>(IMemstatService.class, ServiceScope.PLATFORM));
 		FutureBarrier<Map<String, Object>>	fubar	= new FutureBarrier<Map<String,Object>>();
 		for(IMemstatService stat: stats)
 		{

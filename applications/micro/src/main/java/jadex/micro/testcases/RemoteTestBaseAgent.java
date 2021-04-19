@@ -126,7 +126,7 @@ public class RemoteTestBaseAgent  extends JunitAgentTest
 			{
 	    		public IFuture<Void> execute(IInternalAccess ia)
 	    		{
-	    			ISimulationService simserv = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class)); 
+	    			ISimulationService simserv = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISimulationService.class)); 
 	    			simserv.pause().addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
 	    			{
 	    				public void customResultAvailable(Void result) throws Exception

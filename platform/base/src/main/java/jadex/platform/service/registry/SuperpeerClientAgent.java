@@ -132,7 +132,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		
 		if(!awaonly)
 		{
-			//ISecurityService	secser	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISecurityService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+			//ISecurityService	secser	= agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISecurityService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 			//if(secser!=null)
 			{
 				// Use all networks to include networks with public key only, e.g. global network
@@ -439,7 +439,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		
 		// Check for awareness service
 		Collection<IAwarenessService>	awas	= agent.getFeature(IRequiredServicesFeature.class)
-			.searchLocalServices(new ServiceQuery<>(IAwarenessService.class));
+			.getLocalServices(new ServiceQuery<>(IAwarenessService.class));
 		if(!awas.isEmpty())
 		{
 			// Count awa search + platform searches (+ async filtering, if any).
@@ -584,7 +584,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 //		
 //		// Check for awareness service
 //		Collection<IAwarenessService> pawas = agent.getFeature(IRequiredServicesFeature.class)
-//			.searchLocalServices(new ServiceQuery<>(IAwarenessService.class));
+//			.getLocalServices(new ServiceQuery<>(IAwarenessService.class));
 //		Set<IComponentIdentifier> platforms = new HashSet<IComponentIdentifier>();
 //		
 //		FutureBarrier<Void> pfbar = new FutureBarrier<Void>();

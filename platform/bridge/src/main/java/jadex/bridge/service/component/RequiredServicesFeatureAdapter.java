@@ -149,9 +149,9 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	 *  @param query	The search query.
 	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
-	public <T> T searchLocalService(ServiceQuery<T> query)
+	public <T> T getLocalService(ServiceQuery<T> query)
 	{
-		return delegate.searchLocalService(query);
+		return delegate.getLocalService(query);
 	}
 	
 	/**
@@ -170,9 +170,9 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	 *  @param query	The search query.
 	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
 	 */
-	public <T> Collection<T> searchLocalServices(ServiceQuery<T> query)
+	public <T> Collection<T> getLocalServices(ServiceQuery<T> query)
 	{
-		return delegate.searchLocalServices(query);
+		return delegate.getLocalServices(query);
 	}
 	
 	/**

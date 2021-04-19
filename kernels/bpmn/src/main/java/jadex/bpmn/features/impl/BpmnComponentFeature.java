@@ -260,7 +260,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 						
 						final Tuple2<MSubProcess, MActivity> fevtsubentry = new Tuple2<MSubProcess, MActivity>(evtsubentry.getKey(), mact);
 						final IExternalAccess exta = getComponent().getExternalAccess();
-						IInternalProcessEngineService	ipes	= getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
+						IInternalProcessEngineService	ipes	= getComponent().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
 						IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, getComponent().getModel().getAllImports(), params, false, new IResultCommand<IFuture<Void>, Object>()
 						{
 							public IFuture<Void> execute(final Object event)

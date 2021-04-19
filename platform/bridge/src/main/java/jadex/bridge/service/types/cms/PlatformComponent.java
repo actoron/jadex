@@ -834,7 +834,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		// Only remember first exception.
 		if(exception==null && e!=null)
 			this.exception	= e;
-//		IComponentManagementService cms = this.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
+//		IComponentManagementService cms = this.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 		Future<Map<String, Object>> ret = new Future<Map<String,Object>>(); 
 		this.killComponent(getId()).addResultListener(new DelegationResultListener<Map<String,Object>>(ret)
 		{
@@ -1236,7 +1236,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		}
 		else
 		{
-//			IComponentManagementService cms = getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//			IComponentManagementService cms = getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			// Can use the parent resource identifier as child must depend on parent
 			
 			SComponentFactory.loadModel(getExternalAccess(), filename, getModel().getResourceIdentifier())
