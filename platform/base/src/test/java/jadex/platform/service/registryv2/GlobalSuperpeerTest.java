@@ -66,14 +66,14 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 			.addComponent(GlobalProviderAgent.class)
 			.addComponent(NetworkProviderAgent.class)
 			.addComponent(LocalProviderAgent.class)
-			.setPlatformName("GlobalSuperpeerTestProvider")
-			.setLogging(true);
+			.setPlatformName("GlobalSuperpeerTestProvider");
+//			.setLogging(true);
 		
 		SPCONF	= baseconf.clone()
 			.setValue("superpeer", true)
 			.setPlatformName("GlobalSuperpeerTestSP");
 //		SPCONF.setValue("rt.debug", true);
-		SPCONF.setLogging(true);
+//		SPCONF.setLogging(true);
 		
 		RELAYCONF	= baseconf.clone()
 			.setValue("superpeer", true)
@@ -125,13 +125,31 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		IExternalAccess	client	= createPlatform(CLIENTCONF);
 		waitForSuperpeerConnections(relay, client);
 	}
-
+	
 	/**
-	 *  Test that dirty disconnection also works ove relay
+	 *  Test that clean disconnection works over relay
 	 */
 	@Test
-	@Ignore
-	public void testProviderDisconnection()
+	public void testProviderCleanDisconnection()
+	{		
+		if(spconf!=null)
+		{
+			// Start SSP, SP and provider and wait for connections.
+			IExternalAccess	ssp	= sspconf!=null ? createPlatform(sspconf) : null;
+			IExternalAccess	sp	= createPlatform(spconf);
+	
+			// Shutdown transport of provider first to trigger dirty disconnection (i.e. SP is not informed of superpeerclient shutdown)
+			// -> disconnection should happen when no-timeout forward commands fail eventually
+			IExternalAccess	provider	= createPlatform(proconf);
+			waitForProviderDisconnection(provider, false, ssp, sp);
+		}
+	}
+
+	/**
+	 *  Test that dirty disconnection works over relay
+	 */
+	@Test
+	public void testProviderDirtyDisconnection()
 	{		
 		if(spconf!=null)
 		{
