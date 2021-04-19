@@ -1035,6 +1035,30 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	}
 	
 	/**
+     *  Called when the future is done (finished or exception occurred).
+     *  Exception parameter will be set if the cause was an exception, null otherwise.
+     *  
+     *  @param consumer Called future is done.
+     *  @return The future for chaining.
+     */
+	public IIntermediateFuture<? extends E> done(Consumer<? super Exception> consumer)
+	{
+		addResultListener(new IntermediateEmptyResultListener<E>()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				consumer.accept(exception);
+			}
+			
+			public void finished() 
+			{
+				consumer.accept(null);
+			}
+		});
+		return this;
+	}
+	
+	/**
 	 *  Implements async loop and applies a an async function to each element.
 	 *  @param function The function.
 	 *  @return True result intermediate future.

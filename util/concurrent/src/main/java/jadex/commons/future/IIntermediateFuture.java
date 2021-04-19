@@ -169,6 +169,15 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
      *  @return The future for chaining.
      */
 	public IIntermediateFuture<? extends E> finished(Consumer<Void> function);
+	
+	/**
+     *  Called when the future is done (finished or exception occurred).
+     *  Exception parameter will be set if the cause was an exception, null otherwise.
+     *  
+     *  @param function Called future is done.
+     *  @return The future for chaining.
+     */
+	public IIntermediateFuture<? extends E> done(Consumer<? super Exception> function);
     
     /**
 	 *  Implements async loop and applies a an async function to each element.
