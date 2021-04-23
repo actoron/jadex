@@ -57,7 +57,7 @@ public class BroadcastAwarenessTest	extends AbstractSearchQueryTest
 		}
 		System.out.println("BroadcastAwarenessTest custom port: "+port);
 		
-		IPlatformConfiguration	baseconf	= STest.getRealtimeTestConfig(BroadcastAwarenessTest.class);
+		IPlatformConfiguration	baseconf	= STest.createRealtimeTestConfig(BroadcastAwarenessTest.class);
 		baseconf.setValue("superpeerclient.awaonly", true);
 		baseconf.setValue("intravmawareness", false);
 		baseconf.setValue("broadcastawareness", true);

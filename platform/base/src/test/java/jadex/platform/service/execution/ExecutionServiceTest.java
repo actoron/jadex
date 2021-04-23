@@ -19,7 +19,7 @@ public class ExecutionServiceTest
 	@Test
 	public void	testSimpleExecution()
 	{
-		IExternalAccess	platform	= Starter.createPlatform(STest.getRealtimeTestConfig(getClass())).get();
+		IExternalAccess	platform	= Starter.createPlatform(STest.createRealtimeTestConfig(getClass())).get();
 		IExecutionService	exe	= platform.searchService( new ServiceQuery<>( IExecutionService.class, ServiceScope.PLATFORM)).get();
 		
 		final List<String>	list	= new ArrayList<String>();		

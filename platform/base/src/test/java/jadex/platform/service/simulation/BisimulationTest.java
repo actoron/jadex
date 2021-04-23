@@ -30,7 +30,7 @@ public class BisimulationTest
 	@Test
 	public void test()
 	{
-		IPlatformConfiguration	config	= STest.getDefaultTestConfig(getClass());
+		IPlatformConfiguration	config	= STest.createDefaultTestConfig(getClass());
 		config.setValue("bisimulation", true);
 		
 		// Run test on first platform such that clock cannot advance
@@ -45,7 +45,7 @@ public class BisimulationTest
 			// Start other platforms
 			for(int i=1; i<3; i++)
 			{
-				IPlatformConfiguration	config2	= STest.getDefaultTestConfig(getClass());
+				IPlatformConfiguration	config2	= STest.createDefaultTestConfig(getClass());
 				config2.setValue("bisimulation", true);
 				IFuture<IExternalAccess>	fp2	= Starter.createPlatform(config2);
 				IExternalAccess	p2	= fp2.get();

@@ -45,7 +45,7 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		AbstractAuthenticationSecret clientsecret = AbstractAuthenticationSecret.fromKeyPair(ca, true);
 		AbstractAuthenticationSecret serversecret = AbstractAuthenticationSecret.fromKeyPair(cert, false, ca);
 		
-		IPlatformConfiguration	baseconf	= STest.getRealtimeTestConfig(GlobalSuperpeerTest.class)
+		IPlatformConfiguration	baseconf	= STest.createRealtimeTestConfig(GlobalSuperpeerTest.class)
 			.setValue("superpeerclient.awaonly", false)
 			.setValue("superpeerclient.contimeout", WAITFACTOR*2)
 			.setValue("intravmawareness", false)

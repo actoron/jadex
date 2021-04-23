@@ -21,7 +21,7 @@ public class RemoteReference2Test
 	@Test
 	public void	testRemoteReference()
 	{
-		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(getClass());
+		IPlatformConfiguration	baseconf	= STest.createDefaultTestConfig(getClass());
 		// Use larger timeout so we can reduce default timeout on build slave
 		long timeout = Starter.getScaledDefaultTimeout(null, 5);
 		

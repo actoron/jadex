@@ -23,7 +23,7 @@ public class ExpressionScopeTest
 	public void	testProvidedExpressionScopes()
 	{
 		ServiceScope	testscope	= ServiceScope.COMPONENT_ONLY;
-		IExternalAccess	platform	= Starter.createPlatform(STest.getDefaultTestConfig(getClass())
+		IExternalAccess	platform	= Starter.createPlatform(STest.createDefaultTestConfig(getClass())
 //			.setLogging(true)
 		).get();
 		
@@ -58,7 +58,7 @@ public class ExpressionScopeTest
 	@Test
 	public void	testRequiredExpressionScopes()
 	{
-		IExternalAccess	platform	= Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get();
+		IExternalAccess	platform	= Starter.createPlatform(STest.createDefaultTestConfig(getClass())).get();
 		// ArgumentScopeUserAgent searches for services and stores scope from ServiceNotFoundException as result 
 		IExternalAccess	argagent	= platform.createComponent(new CreationInfo()
 			.setFilenameClass(ArgumentScopeUserAgent.class)

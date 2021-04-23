@@ -27,7 +27,7 @@ public class RelayTransportTest
 		s.close();
 		
 		// Start platform with published status agent gui
-		IPlatformConfiguration	config	= STest.getDefaultTestConfig(getClass())
+		IPlatformConfiguration	config	= STest.createDefaultTestConfig(getClass())
 			.setValue("intravmawareness", false)
 			.setValue("intravm", false)
 			.setSuperpeer(true)

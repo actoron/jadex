@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -25,30 +26,25 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 
 /**
  *  Implements passive awareness via shared memory.
+ *  Mainly used for robust local testing.
  */
 @Service
 @Agent(autoprovide = Boolean3.TRUE, autostart=Boolean3.FALSE)
 public class IntraVMAwarenessAgent implements IAwarenessService
-{
-	//-------- constants --------
-	
-	/** Read-write lock for discoveries map. */
-	protected static final ReadWriteLock disclock = new ReentrantReadWriteLock(false);
-	
-	/** The started discovery agents. */
-	protected static final Map<IComponentIdentifier, IntraVMAwarenessAgent> discoveries	= new HashMap<IComponentIdentifier, IntraVMAwarenessAgent>();
-	
+{	
 	//-------- attributes --------
 	
 	/** The agent. */
 	@Agent
 	protected IInternalAccess agent;
 	
-//	/** The subscriptions. */
-//	protected Set<SubscriptionIntermediateFuture<IComponentIdentifier>>	subscriptions = new HashSet<SubscriptionIntermediateFuture<IComponentIdentifier>>();
+	/** The data holder (to be injected from outside to be shared across multiple platforms). */
+	@AgentArgument
+	protected AwarenessData data;
 	
 	//-------- agent lifecycle --------
 
@@ -59,12 +55,11 @@ public class IntraVMAwarenessAgent implements IAwarenessService
 	//@OnStart
 	public void	start() throws Exception
 	{
-		IComponentIdentifier pfid = agent.getId().getRoot();
-		disclock.writeLock().lock();
-//		for(IntraVMAwarenessAgent otheragent: discoveries.values())
-//			otheragent.announceNewPlatform(pfid);
-		discoveries.put(pfid, this);
-		disclock.writeLock().unlock();
+		if(data==null)
+		{
+			throw new IllegalArgumentException(getClass().getSimpleName()+" requires an argument 'data' of type "+AwarenessData.class.getName());
+		}
+		data.register(this);
 	}
 	
 	/**
@@ -74,9 +69,7 @@ public class IntraVMAwarenessAgent implements IAwarenessService
 	//@OnEnd
 	public void shutdown()	throws Exception
 	{
-		disclock.writeLock().lock();
-		discoveries.remove(agent.getId().getRoot());
-		disclock.writeLock().unlock();
+		data.deregister(this);
 	}
 	
 	//-------- IAwarenessService interface --------
@@ -89,10 +82,7 @@ public class IntraVMAwarenessAgent implements IAwarenessService
 	 */
 	public IFuture<List<TransportAddress>> getPlatformAddresses(IComponentIdentifier platformid)
 	{
-		IntraVMAwarenessAgent remote = null;
-		disclock.readLock().lock();
-		remote = discoveries.get(platformid);
-		disclock.readLock().unlock();
+		IntraVMAwarenessAgent remote = data.getAgentForId(platformid);
 		
 		if(remote!=null)
 		{
@@ -111,79 +101,75 @@ public class IntraVMAwarenessAgent implements IAwarenessService
 			return new Future<List<TransportAddress>>(Collections.emptyList());
 		}
 	}
-	
+
 	/**
 	 *  Try to find other platforms and finish after timeout.
 	 *  Immediately returns known platforms and concurrently issues a new search, waiting for replies until the timeout.
 	 */
 	public IIntermediateFuture<IComponentIdentifier> searchPlatforms()
 	{
-		disclock.readLock().lock();
-		HashSet<IComponentIdentifier> result = new HashSet<IComponentIdentifier>(discoveries.keySet());
-		disclock.readLock().unlock();
-		result.remove(agent.getId().getRoot());
+		Set<IComponentIdentifier> result = data.getPlatforms();
+		result.remove(agent.getId().getRoot());	// remove own platform from list
 		return new IntermediateFuture<IComponentIdentifier>(result);
 	}
 	
-	/**
-	 *  Try to find other platforms while providing a quick answer.
-	 *  Services should respond to a call as close to instantaneous as possible, but
-	 *  with an upper bound of less than 1 second.
-	 *  Issues a new search, but answers using known platforms. On first request
-	 */
-//	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast()
-//	{
-//		disclock.readLock().lock();
-//		HashSet<IComponentIdentifier> result = new HashSet<IComponentIdentifier>(discoveries.keySet());
-//		disclock.readLock().unlock();
-//		result.remove(agent.getId().getRoot());
-//		return new Future<Set<IComponentIdentifier>>(result);
-//	}
+	//-------- helper classes --------
 	
-//	/**
-//	 *  Immediately return known platforms and continuously publish newly found platforms.
-//	 *  Does no active searching.
-//	 */
-//	public ISubscriptionIntermediateFuture<IComponentIdentifier> subscribeToNewPlatforms()
-//	{
-//		SubscriptionIntermediateFuture<IComponentIdentifier> sub = new SubscriptionIntermediateFuture<IComponentIdentifier>();
-//		sub.setTerminationCommand(new TerminationCommand()
-//		{
-//			@Override
-//			public void terminated(Exception reason)
-//			{
-//				subscriptions.remove(sub);
-//			}
-//		});
-//		subscriptions.add(sub);
-//		
-//		// Add initial results
-//		disclock.readLock().lock();
-//		for(IComponentIdentifier platform : discoveries.keySet())
-//		{
-//			sub.addIntermediateResult(platform);
-//		}
-//		disclock.readLock().unlock();
-//
-//		return sub;
-//	}	
-//	
-//	//-------- helper methods --------
-//	
-//	/**
-//	 *  Receive info about a new platform, called with remote thread.
-//	 *  @param newplatform The new platform.
-//	 */
-//	protected void announceNewPlatform(final IComponentIdentifier newplatform)
-//	{
-//		agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
-//		{
-//			public IFuture<Void> execute(IInternalAccess ia)
-//			{
-//				for (SubscriptionIntermediateFuture<IComponentIdentifier> listener : subscriptions)
-//					listener.addIntermediateResultIfUndone(newplatform);
-//				return IFuture.DONE;
-//			}
-//		});
-//	}
+	/**
+	 *  Shared data structure across connected awareness agents.
+	 */
+	public static class AwarenessData
+	{
+		/** Read-write lock for discoveries map. */
+		protected ReadWriteLock disclock = new ReentrantReadWriteLock(false);
+		
+		/** The started discovery agents. */
+		protected Map<IComponentIdentifier, IntraVMAwarenessAgent> discoveries	= new HashMap<IComponentIdentifier, IntraVMAwarenessAgent>();
+		
+		/**
+		 *  Register a platform via its awareness agent.
+		 */
+		protected void	register(IntraVMAwarenessAgent agent)
+		{
+			IComponentIdentifier pfid = agent.agent.getId().getRoot();
+			disclock.writeLock().lock();
+			discoveries.put(pfid, agent);
+			disclock.writeLock().unlock();
+		}
+		
+		/**
+		 *  Deregister a previously registered platform.
+		 */
+		protected void	deregister(IntraVMAwarenessAgent agent)
+		{
+			IComponentIdentifier pfid = agent.agent.getId().getRoot();
+			disclock.writeLock().lock();
+			discoveries.remove(pfid);
+			disclock.writeLock().unlock();
+		}
+		
+		/**
+		 *  Lookup the target agent for a platform id.
+		 *  @return The previously registered agent if found or nulöl otherwise.
+		 */
+		protected IntraVMAwarenessAgent getAgentForId(IComponentIdentifier platformid)
+		{
+			IntraVMAwarenessAgent remote = null;
+			disclock.readLock().lock();
+			remote = discoveries.get(platformid);
+			disclock.readLock().unlock();
+			return remote;
+		}
+		
+		/**
+		 *  Get the currently registered platform ids.
+		 */
+		protected Set<IComponentIdentifier> getPlatforms()
+		{
+			disclock.readLock().lock();
+			HashSet<IComponentIdentifier> result = new HashSet<IComponentIdentifier>(discoveries.keySet());
+			disclock.readLock().unlock();
+			return result;
+		}
+	}
 }

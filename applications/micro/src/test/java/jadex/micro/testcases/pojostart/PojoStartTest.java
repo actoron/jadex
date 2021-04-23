@@ -20,7 +20,7 @@ public class PojoStartTest
 	@Before
 	public void	setup()
 	{
-		platform = Starter.createPlatform(STest.getRealtimeTestConfig(getClass())).get();
+		platform = Starter.createPlatform(STest.createRealtimeTestConfig(getClass())).get();
 	}
 	
 	@After

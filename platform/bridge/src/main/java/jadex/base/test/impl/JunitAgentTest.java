@@ -33,7 +33,7 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
     public JunitAgentTest(String component) 
     {
         super(extendWithClassIfNeeded(component), null);
-        this.config = STest.getDefaultTestConfig(getClass());
+        this.config = STest.createDefaultTestConfig(getClass());
     }
 
     /**

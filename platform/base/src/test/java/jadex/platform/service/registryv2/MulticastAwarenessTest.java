@@ -59,7 +59,7 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 		}
 		System.out.println("MulticastAwarenessTest custom port: "+port);
 
-		IPlatformConfiguration	baseconf	= STest.getRealtimeTestConfig(MulticastAwarenessTest.class);
+		IPlatformConfiguration	baseconf	= STest.createRealtimeTestConfig(MulticastAwarenessTest.class);
 		baseconf.setValue("superpeerclient.awaonly", true);
 		baseconf.setValue("intravmawareness", false);
 		baseconf.setValue("multicastawareness", true);

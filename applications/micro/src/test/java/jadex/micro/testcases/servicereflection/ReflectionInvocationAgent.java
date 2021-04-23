@@ -122,8 +122,7 @@ public class ReflectionInvocationAgent extends JunitAgentTest
 			File[]	dirs	= SUtil.findOutputDirs("applications/bdiv3", true);
 			System.out.println(agent+" outputs: "+Arrays.toString(dirs));
 			IPlatformConfiguration	config	= getConfig().clone()
-				.setValue("libpath", dirs)
-				.setLogging(true);
+				.setValue("libpath", dirs);
 			platform3 = Starter.createPlatform(config).get();
 //			ILibraryService libser = platform.searchService(new ServiceQuery<ILibraryService>(ILibraryService.class)).get();
 //			libser.addURL(parid, url).get();
@@ -161,13 +160,6 @@ public class ReflectionInvocationAgent extends JunitAgentTest
 		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 	}
 
-	@Override
-	public IPlatformConfiguration getConfig()
-	{
-		return super.getConfig()
-			.setLogging(true);
-	}
-	
 //	@Override
 //	public void setConfig(IPlatformConfiguration config)
 //	{

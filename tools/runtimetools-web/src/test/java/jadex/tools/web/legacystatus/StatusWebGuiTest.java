@@ -31,7 +31,7 @@ public class StatusWebGuiTest
 		s.close();
 		
 		// Start platform with published status agent gui
-		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(getClass());
+		IPlatformConfiguration	baseconf	= STest.createDefaultTestConfig(getClass());
 		IPlatformConfiguration	webguiconf	= baseconf
 			.setSuperpeer(true)
 			.getExtendedPlatformConfiguration().setRsPublish(true)
