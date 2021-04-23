@@ -263,18 +263,18 @@ public class SComponentFactory
 								fac.loadModel(model, null, rid).addResultListener(new DelegationResultListener<IModelInfo>(ret));
 							}
 							
-							public void exceptionOccurred(Exception exception)
-							{
-								if(exception instanceof ServiceNotFoundException)
-								{
-									System.out.println("No factory found: "+model+" "+rid);
-									ret.setResult(null);
-								}
-								else
-								{
-									super.exceptionOccurred(exception);
-								}
-							}
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								if(exception instanceof ServiceNotFoundException)
+//								{
+//									System.out.println("No factory found: "+model+" "+rid);
+//									ret.setResult(null);
+//								}
+//								else
+//								{
+//									super.exceptionOccurred(exception);
+//								}
+//							}
 						}));
 					}
 				});
