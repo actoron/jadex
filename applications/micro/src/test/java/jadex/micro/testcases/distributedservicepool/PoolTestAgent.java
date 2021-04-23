@@ -8,13 +8,11 @@ import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -86,7 +84,7 @@ public class PoolTestAgent extends TestAgent
     	// It is important to turn off simulation also for local test!
     	// The distri pool will search globally using intermediate future which
     	// is not supported by the simulation blockers
-        return STest.getDefaultTestConfig(getClass()).getExtendedPlatformConfiguration().setSimulation(false);
+        return super.getConfig().getExtendedPlatformConfiguration().setSimulation(false);
     }
 	
 	/**

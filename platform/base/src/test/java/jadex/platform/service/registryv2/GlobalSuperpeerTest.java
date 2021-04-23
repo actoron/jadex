@@ -1,5 +1,9 @@
 package jadex.platform.service.registryv2;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -47,9 +51,15 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 			.setValue("intravmawareness", false)
 			.setValue("catalogawareness", true)
 			.setValue("rt", true)
-			.setValue("platformurls", "intravm://GlobalSuperpeerTestSSP@localhost:"+sspport)
-			.setNetworkNames(SecurityAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name)
-			.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass)
+			.setValue("platformurls", "intravm://GlobalSuperpeerTestSSP@localhost:"+sspport);
+		
+		List<String>	networks	= new ArrayList<>(Arrays.asList(baseconf.getNetworkNames()));
+		networks.add(0, SecurityAgent.GLOBAL_NETWORK_NAME);
+		List<String>	secrets	= new ArrayList<>(Arrays.asList(baseconf.getNetworkSecrets()));
+		secrets.add(0, clientsecret.toString());
+
+		baseconf.setNetworkNames(networks.toArray(new String[networks.size()]))
+			.setNetworkSecrets(secrets.toArray(new String[secrets.size()]))
 //			.getExtendedPlatformConfiguration()
 //				.setDebugFutures(true)
 //			.setValue("superpeer.debugservices", "ITestService")

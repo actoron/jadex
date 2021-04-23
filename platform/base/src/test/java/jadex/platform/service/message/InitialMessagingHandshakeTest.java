@@ -40,15 +40,17 @@ public class InitialMessagingHandshakeTest
 	@Test
 	public void	testRecoveryFromMissingReceiverTransport()
 	{
+    	IPlatformConfiguration baseconf = STest.getRealtimeTestConfig(getClass());
+    	
 		// Sender platform without awareness
-    	IPlatformConfiguration senderconf = STest.getRealtimeTestConfig(getClass());
-    	senderconf.setValue("intravmawareness", false);
+    	IPlatformConfiguration senderconf = baseconf.clone()
+    		.setValue("intravmawareness", false);
     	fsender	= Starter.createPlatform(senderconf);
 		
 		// Receiver platform without awareness and (initially) without transport
-    	IPlatformConfiguration receiverconf = STest.getRealtimeTestConfig(getClass());
-    	receiverconf.setValue("intravmawareness", false);
-    	receiverconf.setValue("intravm", false);
+    	IPlatformConfiguration receiverconf = baseconf.clone()
+    		.setValue("intravmawareness", false)
+    		.setValue("intravm", false);
     	freceiver	= Starter.createPlatform(receiverconf);
     	
     	IExternalAccess	sender	= fsender.get();
@@ -83,12 +85,14 @@ public class InitialMessagingHandshakeTest
 	@Test
 	public void	testRecoveryFromMissingSenderTransport()
 	{
+    	IPlatformConfiguration baseconf = STest.getRealtimeTestConfig(getClass());
+    	
 		// Receiver platform ready to receive
-    	IPlatformConfiguration receiverconf = STest.getRealtimeTestConfig(getClass());
+    	IPlatformConfiguration receiverconf = baseconf.clone();
     	freceiver	= Starter.createPlatform(receiverconf);
     	
 		// Sender platform without transport
-    	IPlatformConfiguration senderconf = STest.getRealtimeTestConfig(getClass())
+    	IPlatformConfiguration senderconf = baseconf.clone()
        		.setValue("intravm", false);
     	fsender	= Starter.createPlatform(senderconf);
 

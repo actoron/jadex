@@ -31,16 +31,17 @@ public class StatusWebGuiTest
 		s.close();
 		
 		// Start platform with published status agent gui
-		IPlatformConfiguration	config	= STest.getDefaultTestConfig(getClass())
-				.setSuperpeer(true)
-				.getExtendedPlatformConfiguration().setRsPublish(true)
-				.setValue("jettyrspublish", true)
-				.setValue("status", true)
-				.setValue("status.port", port);
+		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(getClass());
+		IPlatformConfiguration	webguiconf	= baseconf
+			.setSuperpeer(true)
+			.getExtendedPlatformConfiguration().setRsPublish(true)
+			.setValue("jettyrspublish", true)
+			.setValue("status", true)
+			.setValue("status.port", port);
 //			config.setLogging(true);
 //			config.setValue("nanorspublish", false);
 		
-		IExternalAccess	platform	= Starter.createPlatform(config).get();
+		IExternalAccess	platform	= Starter.createPlatform(webguiconf).get();
 		
 		// TODO: Wait for publish service...?
 		
@@ -50,7 +51,7 @@ public class StatusWebGuiTest
 		assertEquals(file, http);
 		
 		// Start second platform and send message so that one connection exists
-		IExternalAccess	dummy	= Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get();
+		IExternalAccess	dummy	= Starter.createPlatform(baseconf).get();
 		dummy.scheduleStep(ia -> ia.getFeature(IMessageFeature.class).sendMessage("huhu", platform.getId())).get();
 		// Check that platforms can be retrieved.
 //		String	con	= getUrlContent(new URL("http://localhost:"+port+"/status/subscribeToConnections"));	// TODO: why empty initial response and how to handle (x-jadex-callid...)

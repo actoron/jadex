@@ -187,7 +187,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				if(debug)
 					getComponent().getLogger().severe("shutdown1: "+this);
 				
-				doCleanup(new StepAborted());
+				doCleanup(new StepAborted(getComponent().getId()));
 				
 				if(debug)
 					getComponent().getLogger().severe("shutdown2: "+this);

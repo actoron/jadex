@@ -2,10 +2,8 @@ package jadex.micro.testcases.stream;
 
 import java.util.Map;
 
-import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
@@ -36,16 +34,16 @@ import jadex.micro.testcases.TestAgent;
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class StreamUserAgent extends TestAgent
 {
-	public IPlatformConfiguration getConfig()
-	{
-		IPlatformConfiguration ret = STest.getRealtimeTestConfig(getClass());
-		
-//		// For debugging heisenbug
-//		ret.setLogging(true);
-//		ret.setValue("security.debug", true);
-		
-		return ret;
-	}
+//	public IPlatformConfiguration getConfig()
+//	{
+//		IPlatformConfiguration ret = STest.getRealtimeTestConfig(getClass());
+//		
+////		// For debugging heisenbug
+////		ret.setLogging(true);
+////		ret.setValue("security.debug", true);
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  The test count.
@@ -156,7 +154,8 @@ public class StreamUserAgent extends TestAgent
 //			}
 //		}));
 		
-		IExternalAccess platform = createPlatform(getConfig(), null).get();
+//		IExternalAccess platform = createPlatform(getConfig(), null).get();
+		IExternalAccess platform = setupRemotePlatform(false).get();
 		performTests(testno, platform.getId(), tc)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
 		{

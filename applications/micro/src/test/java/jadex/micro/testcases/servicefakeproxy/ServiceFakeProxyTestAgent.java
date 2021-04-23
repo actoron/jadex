@@ -84,7 +84,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 			
 			disableLocalSimulationMode().get();
 			
-			IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get();
+			IExternalAccess plat = Starter.createPlatform(getConfig()).get();
 			
 			createProxies(plat).get();
 			// awareness is disabled in testsuite

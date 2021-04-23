@@ -1,8 +1,9 @@
 package jadex.base.test.util;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
-import jadex.bridge.IExternalAccess;
 import jadex.commons.Base64;
 import jadex.commons.SUtil;
 
@@ -11,17 +12,6 @@ import jadex.commons.SUtil;
  */
 public class STest 
 {
-    // one time network pass for this vm.
-    public static final String	testnetwork_name	= "test";
-    //public static final String	testnetwork_pass	= SUtil.createUniqueId();
-    public static final String	testnetwork_pass;
-    static
-    {
-    	byte[] key = new byte[32];
-    	SUtil.getSecureRandom().nextBytes(key);
-    	testnetwork_pass = "key:" + new String(Base64.encodeNoPadding(key), SUtil.UTF8);
-    }
-    
     /**
      *  Get local (no communication) test configuration using a unique platform name derived from the test name.
      *  Attention: The name is unique and the config can not be reused for multiple platforms!
@@ -73,14 +63,15 @@ public class STest
     	return getLocalTestConfig(test.getName());
     }
 
+    protected static final AtomicInteger	NETNO	= new AtomicInteger(0);
     
     /**
-     *  Get the test configuration using a unique platform name derived from the test name.
+     *  Get the test configuration using a unique platform name derived from the test class.
      *  Attention: The name is unique and the config can not be reused for multiple platforms!
-     *  @param test	The test name.
+     *  @param test	The test class.
      *  @return The default configuration with a unique platform name.
      */
-    public static IPlatformConfiguration getDefaultTestConfig(String test)
+    public static IPlatformConfiguration getDefaultTestConfig(Class<?> test)
     {
     	IPlatformConfiguration config = getLocalTestConfig(test);
     	
@@ -90,6 +81,13 @@ public class STest
         config.setValue("intravm", true);
         config.setValue("security.handshaketimeoutscale", 0.2);
         config.getExtendedPlatformConfiguration().setSecurity(true);
+        
+        // Create and set a one time network/pass for this config.
+        String	testnetwork_name	= "testnet"+NETNO.incrementAndGet();
+        String	testnetwork_pass;
+    	byte[] key = new byte[32];
+    	SUtil.getSecureRandom().nextBytes(key);
+    	testnetwork_pass = "key:" + new String(Base64.encodeNoPadding(key), SUtil.UTF8);
 		config.setNetworkNames(new String[] { testnetwork_name });
 		config.setNetworkSecrets(new String[] { testnetwork_pass });
 		
@@ -103,17 +101,6 @@ public class STest
     }
     
     /**
-     *  Get the test configuration using a unique platform name derived from the test class.
-     *  Attention: The name is unique and the config can not be reused for multiple platforms!
-     *  @param test	The test class.
-     *  @return The default configuration with a unique platform name.
-     */
-    public static IPlatformConfiguration getDefaultTestConfig(Class<?> test)
-    {
-    	return getDefaultTestConfig(test.getName());
-    }
-    
-    /**
      *  Get a default (remote) test configuration without simulation enabled.
      */
     public static IPlatformConfiguration getRealtimeTestConfig(Class<?> test)
@@ -121,10 +108,5 @@ public class STest
     	return getDefaultTestConfig(test)
     		.getExtendedPlatformConfiguration().setSimul(false)
 			.getExtendedPlatformConfiguration().setSimulation(false);
-    }
-    
-    public static void terminatePlatform(IExternalAccess platform) 
-    {
-        platform.killComponent().get();
     }
 }

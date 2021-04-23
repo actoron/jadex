@@ -7,7 +7,6 @@ import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -21,7 +20,6 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
-import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -126,8 +124,8 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	@OnStart
 	public IFuture<Void> body()
 	{
-		ISecurityService ss = agent.getLocalService(ISecurityService.class);
-		ss.setNetwork(STest.testnetwork_name, STest.testnetwork_pass).get();
+//		ISecurityService ss = agent.getLocalService(ISecurityService.class);
+//		ss.setNetwork(STest.testnetwork_name, STest.testnetwork_pass).get();
 		
 //		agent.getLogger().severe("Testagent start: "+agent.getComponentDescription());
 		final Future<Void> ret = new Future<Void>();
@@ -212,7 +210,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	 */
 	protected IFuture<IExternalAccess> createPlatform(final String[] args)
 	{
-		return createPlatform(STest.getDefaultTestConfig(getClass()), args);
+		return createPlatform(getConfig().clone(), args);
 	}
 	
 	/**
@@ -343,10 +341,15 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 		final Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
 		
 		disableLocalSimulationMode().get();
+//		
+////		agent.getLogger().severe("Testagent setup remote platform: "+agent.getComponentDescription());
+//		IPlatformConfiguration conf = STest.getRealtimeTestConfig(getClass());
+//		//conf.getExtendedPlatformConfiguration().setDebugFutures(true);
 		
-//		agent.getLogger().severe("Testagent setup remote platform: "+agent.getComponentDescription());
-		IPlatformConfiguration conf = STest.getRealtimeTestConfig(getClass());
-		//conf.getExtendedPlatformConfiguration().setDebugFutures(true);
+		IPlatformConfiguration conf = getConfig().clone()
+    		.getExtendedPlatformConfiguration().setSimul(false)
+			.getExtendedPlatformConfiguration().setSimulation(false);
+
 		createPlatform(conf, null).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess exta)

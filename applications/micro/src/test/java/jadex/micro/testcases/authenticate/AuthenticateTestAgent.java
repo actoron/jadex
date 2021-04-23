@@ -8,7 +8,6 @@ import java.util.Map;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
@@ -121,7 +120,7 @@ public class AuthenticateTestAgent extends TestAgent
 	{
 		disableLocalSimulationMode().get();
 		
-		IPlatformConfiguration	conf	= STest.getDefaultTestConfig(getClass());
+		IPlatformConfiguration	conf	= getConfig().clone();
 		
 		// Not default visibility means test unrestricted access -> don't use test network.
 		if(!def)
@@ -158,7 +157,7 @@ public class AuthenticateTestAgent extends TestAgent
 								{
 //									System.out.println("is compo:"+agent.isComponentThread());
 									
-									result.addRole(STest.testnetwork_name, "custom")
+									result.addRole(conf.getNetworkNames()[0], "custom")
 										.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 									{
 										@Override

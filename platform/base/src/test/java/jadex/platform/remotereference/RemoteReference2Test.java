@@ -13,7 +13,7 @@ import jadex.bridge.service.search.ServiceQuery;
 /**
  *  Test if a remote references are correctly transferred and mapped back.
  */
-public class RemoteReference2Test //extends TestCase
+public class RemoteReference2Test
 {
 	/**
 	 *  Run the test.
@@ -21,17 +21,18 @@ public class RemoteReference2Test //extends TestCase
 	@Test
 	public void	testRemoteReference()
 	{
+		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(getClass());
 		// Use larger timeout so we can reduce default timeout on build slave
 		long timeout = Starter.getScaledDefaultTimeout(null, 5);
 		
 		// Start platform1 used for remote access.
-		final IExternalAccess	platform1	= Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get(timeout);
+		final IExternalAccess	platform1	= Starter.createPlatform(baseconf).get(timeout);
 		timeout	= Starter.getDefaultTimeout(platform1.getId());
 		
 		// Start platform2 with services.
-		IPlatformConfiguration	config2	= STest.getDefaultTestConfig(getClass());
-		config2.addComponent(SearchServiceProviderAgent.class);		
-		config2.addComponent(LocalServiceProviderAgent.class);		
+		IPlatformConfiguration	config2	= baseconf.clone()
+			.addComponent(SearchServiceProviderAgent.class)
+			.addComponent(LocalServiceProviderAgent.class);
 		IExternalAccess	platform2	= Starter.createPlatform(config2).get(timeout);
 		
 		// Find local service with direct remote search.

@@ -2,11 +2,9 @@ package jadex.micro.testcases.intermediate;
 
 import java.util.Collection;
 
-import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -26,13 +24,12 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-import jadex.micro.testcases.RemoteTestBaseAgent;
+import jadex.micro.testcases.TestAgent;
 
 /**
  *  The invoker agent tests if intermediate results are directly delivered 
@@ -42,7 +39,7 @@ import jadex.micro.testcases.RemoteTestBaseAgent;
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Description("The invoker agent tests if intermediate results are directly " +
 	"delivered back to the invoker in local and remote case.")
-public class IntermediateTestAgent extends RemoteTestBaseAgent
+public class IntermediateTestAgent extends TestAgent
 {
 	//-------- attributes --------
 	
@@ -56,31 +53,14 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 	 */
 	//@AgentBody
 	@OnStart
-	public void body()
+	public IFuture<Void> body()
 	{
 		final Testcase tc = new Testcase();
 		tc.setTestCount(2);	
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 		
 		
-		final Future<TestReport> ret = new Future<TestReport>();
-		ret.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<TestReport>()
-		{
-			public void resultAvailable(TestReport result)
-			{
-//				System.out.println("tests finished");
-
-				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
-				agent.killComponent();		
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println(agent.getFeature(IExecutionFeature.class).isComponentThread()+" "+agent.getId());
-				
-				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
-				agent.killComponent();			
-			}
-		}));
+		final Future<Void> ret = new Future<>();
 			
 //		testLocal().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
 //		{
@@ -100,12 +80,12 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 		
 		long	delay	= Starter.getScaledDefaultTimeout(agent.getId().getRoot(), 0.01);
 		
-		testLocal(1, delay, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+		testLocal(1, delay, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
-				testRemote(2, delay, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+				testRemote(2, delay, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
@@ -115,6 +95,8 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 				}));
 			}
 		}));
+		
+		return ret;
 	}
 	
 	/**
@@ -146,11 +128,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 //				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
 //			})
 			
-			disableLocalSimulationMode().get();
-			
-			IPlatformConfiguration	config	= STest.getDefaultTestConfig(getClass());
-			config.getExtendedPlatformConfiguration().setSimulation(false);	// No simulaton, because we need to measure in real time
-			Starter.createPlatform(config)
+			setupRemotePlatform(true)
 				.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 			{

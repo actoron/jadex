@@ -3,10 +3,8 @@ package jadex.micro.testcases.nflatency;
 import java.util.Collection;
 import java.util.Map;
 
-import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -104,11 +102,7 @@ public class NFLatencyTestAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		disableLocalSimulationMode().get();
-		
-//		createPlatform(null)
-		IPlatformConfiguration config = STest.getRealtimeTestConfig(getClass());
-		createPlatform(config, null).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
+		setupRemotePlatform(false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)

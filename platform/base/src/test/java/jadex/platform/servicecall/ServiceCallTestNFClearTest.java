@@ -2,8 +2,6 @@ package jadex.platform.servicecall;
 
 import static org.junit.Assert.assertNotEquals;
 
-import java.util.Map;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -13,7 +11,6 @@ import org.junit.rules.TestName;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.util.STest;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -24,7 +21,6 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -65,7 +61,7 @@ public class ServiceCallTestNFClearTest
 
 //		String pid = SUtil.createPlainRandomId(name.getMethodName(), 3) + "-*";
 
-//		IPlatformConfiguration	config	= STest.getDefaultTestConfig(getClass());
+		IPlatformConfiguration	config	= STest.getDefaultTestConfig(getClass());
 //		config.getExtendedPlatformConfiguration().setDebugFutures(true);
 //		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimal();
 ////		config.setLogging(true);
@@ -79,9 +75,9 @@ public class ServiceCallTestNFClearTest
 //		config.setAwareness(false);
 //		config.getExtendedPlatformConfiguration().setTcpTransport(true);
 
-		platform1 = Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get(timeout);
+		platform1 = Starter.createPlatform(config).get(timeout);
 
-		platform2 = Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get(timeout);
+		platform2 = Starter.createPlatform(config).get(timeout);
 
 //		createProxies(platform1, platform2);
 

@@ -5,19 +5,15 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.test.IAbortableTestSuite;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ServiceCall;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.SUtil;
@@ -133,7 +129,10 @@ public class ComponentTestBase extends TestCase
 			}
 			 
 			//System.out.println("Creating component: "+System.currentTimeMillis()+" "+filename);
-			IFuture<IExternalAccess> fut = platform.createComponent(new CreationInfo(rid).setFilename(filename).setSuspend(true));
+			CreationInfo	ci	= new CreationInfo(rid).setFilename(filename).setSuspend(true);
+			if(filename!=null && filename.endsWith(getClass().getSimpleName()+".class"))
+				ci.setPojo(this);	// Hack??? add self as POJO when test is agent to be started
+			IFuture<IExternalAccess> fut = platform.createComponent(ci);
 			componentStarted(fut);
 			fut.addResultListener(new IResultListener<IExternalAccess>()
 			{

@@ -7,7 +7,6 @@ import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
-import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -41,7 +40,7 @@ public class VisibilityTestAgent extends JunitAgentTest
 //		final IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig()).get();
 //		Starter.createProxy(agent.getExternalAccess(), plat).get();
 //		Starter.createProxy(plat, agent.getExternalAccess()).get();
-		final IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get();
+		final IExternalAccess plat = Starter.createPlatform(getConfig().clone()).get();
 		TestAgent.createComponent(agent, FirstAgent.class.getName()+".class", null, null, plat.getId(), plat, null).get();
 		TestAgent.createComponent(agent, SecondAgent.class.getName()+".class", null, null, plat.getId(), plat, null).get();
 		
