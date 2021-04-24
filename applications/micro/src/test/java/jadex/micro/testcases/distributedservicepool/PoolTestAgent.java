@@ -42,7 +42,8 @@ import jadex.micro.testcases.TestAgent;
 {
 	"jadex.platform.service.distributedservicepool.*",
 	"jadex.bridge.service.*",
-	"jadex.bridge.service.search.*"
+	"jadex.bridge.service.search.*",
+	"jadex.base.Starter"
 })
 @ComponentTypes(
 {
@@ -57,7 +58,7 @@ import jadex.micro.testcases.TestAgent;
 		{
 			@NameValue(name="serviceinfo",
 				value="new ServiceQuery(ITestService.class).setScope(ServiceScope.GLOBAL)"),
-			@NameValue(name="checkdelay", value="4000l")
+			@NameValue(name="checkdelay", value="Starter.getScaledDefaultTimeout(null, 0.02)")
 		})
 	})
 })
@@ -278,7 +279,7 @@ public class PoolTestAgent extends TestAgent
 			{
 				System.out.println("got exception on ok2: "+e);
 			}
-			agent.waitForDelay(5000).get();
+			agent.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId().getRoot(), 0.03)).get();
 		}
 		
 		if(!tr.isFinished())
