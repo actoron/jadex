@@ -756,7 +756,7 @@ public class SComponentFactory
 		{
 			String	initialfacs	= facs.toString();
 			facs	= reorderMultiFactory(facs);
-			return doFindFactory(facs.iterator(), filter, facs, initialfacs, "");
+			return doFindFactory(facs.iterator(), filter, facs, initialfacs, null);
 		}
 		else
 		{
@@ -772,7 +772,6 @@ public class SComponentFactory
 		if(facs.hasNext())
 		{
 			IComponentFactory fac = facs.next();
-			String ftestedfacs	= testedfacs==null ? fac.toString() : testedfacs+","+fac.toString();
 			IFuture<Boolean> match = filter.filter(fac);
 			if(match.isDone())
 			{
@@ -783,7 +782,7 @@ public class SComponentFactory
 				}
 				else
 				{
-					return doFindFactory(facs, filter, allfacs, initialfacs, ftestedfacs);
+					return doFindFactory(facs, filter, allfacs, initialfacs, testedfacs==null ? fac.toString() : testedfacs+", "+fac.toString());
 				}
 			}
 			else
@@ -801,7 +800,7 @@ public class SComponentFactory
 						}
 						else
 						{
-							doFindFactory(facs, filter, allfacs, initialfacs, ftestedfacs).addResultListener(new DelegationResultListener<>(ret));
+							doFindFactory(facs, filter, allfacs, initialfacs, (testedfacs==null ? fac.toString() : testedfacs+", "+fac.toString())+"="+result).addResultListener(new DelegationResultListener<>(ret));
 						}
 					}
 				});
@@ -810,7 +809,7 @@ public class SComponentFactory
 		}
 		else
 		{
-			return new Future<IComponentFactory>(new ServiceNotFoundException("allfacs="+allfacs+", initialfacs="+initialfacs+", testedfacs=("+testedfacs+"), filter="+filter));
+			return new Future<IComponentFactory>(new ServiceNotFoundException("allfacs="+allfacs+", initialfacs="+initialfacs+", testedfacs=["+testedfacs+"], filter="+filter.getClass()+", "+filter));
 		}
 	}
 	

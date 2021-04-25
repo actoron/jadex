@@ -541,7 +541,7 @@ public class SComponentManagementService
 							}
 							else
 							{
-								ret.setException(new ServiceNotFoundException("No component factory found for: "+model));
+								ret.setException((Exception) new ServiceNotFoundException("No component factory found for: "+model).initCause(exception));
 							}
 						}
 						

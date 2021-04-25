@@ -44,6 +44,7 @@ import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -351,10 +352,12 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 				if(ci!=null)
 				{
 					String	modeltype	= getLoadableType(ci);
+					System.out.println("isLoadable0: "+model+", "+modeltype);
 					ret.setResult(modeltype!=null);
 				}
 				else
 				{
+					System.out.println("isLoadable1: "+model);
 					ret.setResult(false);
 				}
 			}
@@ -362,6 +365,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
+				System.out.println("isLoadable2: "+model+"\n"+SUtil.getExceptionStacktrace(exception));
 				ret.setResult(false);
 			}
 		});

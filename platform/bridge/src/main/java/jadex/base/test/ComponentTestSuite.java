@@ -164,7 +164,9 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	 */
 	public ComponentTestSuite(File[][] roots, String[] tests, String[] excludes) throws Exception
 	{
-		this(roots, tests, excludes, true, true, true);
+//		this(roots, tests, excludes, true, true, true);
+		// only load tests for tracking down heisenbug (todo change back)
+		this(roots, tests, excludes, false, true, false);
 //		this(roots, tests, excludes, true, false, false);
 	}
 	
