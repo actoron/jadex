@@ -9,7 +9,7 @@ import java.util.logging.Logger;
  *  The default listener for just printing out result information.
  *  Is used as fallback when no other listener is available.
  */
-public abstract class IntermediateDefaultResultListener<E>	extends DefaultResultListener<Collection<E>>	implements IIntermediateResultListener<E>
+public class IntermediateDefaultResultListener<E>	extends DefaultResultListener<Collection<E>> implements IIntermediateResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -83,5 +83,9 @@ public abstract class IntermediateDefaultResultListener<E>	extends DefaultResult
 			intermediateResultAvailable(it.next());
 		}
 		finished();
+	}
+	
+	public void maxResultCountAvailable(int max) 
+	{
 	}
 }

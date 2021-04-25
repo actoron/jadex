@@ -136,6 +136,44 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
 		intermediateResultAvailable(result);
 	}
 	
+	@Override
+	public void maxResultCountAvailable(int max) 
+	{
+    	if(!component.getFeature(IExecutionFeature.class).isComponentThread())
+		{
+			try
+			{
+				component.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						((IIntermediateResultListener<E>)listener).maxResultCountAvailable(max);
+						return IFuture.DONE;
+					}
+					
+					public String toString()
+					{
+						return "maxResultCountAvailable()_#"+this.hashCode();
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(component.getId(), new Runnable()
+				{
+					public void run()
+					{
+						listener.exceptionOccurred(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			((IIntermediateResultListener<E>)listener).maxResultCountAvailable(max);
+		}
+	}
+	
 	/**
      *  Declare that the future is finished.
 	 *  This method is only called for intermediate futures,

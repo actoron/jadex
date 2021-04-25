@@ -7,6 +7,7 @@ import java.util.Map;
 import jadex.base.SRemoteGui;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IServiceIdentifier;
@@ -23,8 +24,9 @@ import jadex.commons.MethodInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -43,7 +45,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	 */
 	public IFuture<String> getPluginName()
 	{
-		return new Future<String>("starter");
+		return new Future<String>("Starter");
 	}
 	
 	/**
@@ -61,13 +63,23 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	 */
 	public String getPluginUIPath()
 	{
-		return "jadex/tools/web/starter/starter.tag";
+		//return "jadex/tools/web/starter/starter.tag";
+		return "jadex/tools/web/starter/starter.js";
+	}
+	
+	/**
+	 *  Get the plugin icon.
+	 *  @return The plugin icon.
+	 */
+	public IFuture<byte[]> getPluginIcon()
+	{
+		return loadResource("jadex/tools/web/starter/images/starter.png");
 	}
 	
 	/**
 	 *  Get all startable component models.
 	 *  @return The file names of the component models.
-	 */
+	 * /
 	public IFuture<Collection<String[]>> getComponentModels(final IComponentIdentifier cid)
 	{
 		Future<Collection<String[]>> ret = new Future<>();
@@ -80,11 +92,144 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		else
 		{
 			agent.searchService(new ServiceQuery<ILibraryService>(ILibraryService.class).setPlatform(cid).setScope(ServiceScope.PLATFORM))
-				.thenAccept(libs -> {libs.getComponentModels().delegate(ret);}).exceptionally(ret);
+				.then(libs -> {libs.getComponentModels().delegate(ret);}).catchEx(ret);
 		}
 		
 		return ret;
+	}*/
+	
+	/**
+	 *  Get all startable component models.
+	 *  @return The file names of the component models.
+	 */
+	public ISubscriptionIntermediateFuture<Collection<String[]>> getComponentModelsAsStream(IComponentIdentifier cid)
+	{
+		final SubscriptionIntermediateFuture<Collection<String[]>> ret = new SubscriptionIntermediateFuture<>();
+		if(cid==null || cid.hasSameRoot(cid))
+		{
+			SComponentFactory.getComponentModelsAsStream(agent).addResultListener(new IIntermediateResultListener<Collection<String[]>>()
+			{
+				public void intermediateResultAvailable(Collection<String[]> result)
+				{
+					ret.addIntermediateResult(result);
+				}
+				
+				public void resultAvailable(Collection<Collection<String[]>> result)
+				{
+					for(Collection<String[]> res: result)
+					{
+						intermediateResultAvailable(res);
+					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setException(exception);
+				}
+				
+			    public void finished()
+			    {
+			    	ret.setFinished();
+			    }
+			    
+			    public void maxResultCountAvailable(int max)
+			    {
+			    	ret.setMaxResultCount(max);
+			    	//System.out.println("max count is: "+max);
+			    }
+			});
+		}
+		else
+		{
+			agent.getExternalAccess(cid).scheduleStep(ia ->
+			{
+				SComponentFactory.getComponentModelsAsStream(ia).addResultListener(new IIntermediateResultListener<Collection<String[]>>()
+				{
+					public void intermediateResultAvailable(Collection<String[]> result)
+					{
+						ret.addIntermediateResult(result);
+					}
+					
+					public void resultAvailable(Collection<Collection<String[]>> result)
+					{
+						for(Collection<String[]> res: result)
+						{
+							intermediateResultAvailable(res);
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setException(exception);
+					}
+					
+				    public void finished()
+				    {
+				    	ret.setFinished();
+				    }
+				    
+				    public void maxResultCountAvailable(int max)
+				    {
+				    	ret.setMaxResultCount(max);
+				    	//System.out.println("max count is: "+max);
+				    }
+				});
+				return IFuture.DONE;
+			}).catchEx(ret);
+		}
+			
+		return ret;
 	}
+	
+	/*public ISubscriptionIntermediateFuture<String[]> getComponentModelsAsStream(IComponentIdentifier cid)
+	{
+		final SubscriptionIntermediateFuture<String[]> ret = new SubscriptionIntermediateFuture<>();
+		//if(cid==null || cid.hasSameRoot(cid))
+		//{
+			ILibraryService ls = agent.getLocalService(ILibraryService.class);
+			ls.getComponentModelsAsStream().addResultListener(new IIntermediateResultListener<Collection<String[]>>()
+			{
+				public void intermediateResultAvailable(Collection<String[]> result)
+				{
+					for(String[] res: result)
+					{
+						ret.addIntermediateResult(res);
+					}
+				}
+				
+				public void resultAvailable(Collection<Collection<String[]>> result)
+				{
+					for(Collection<String[]> res: result)
+					{
+						intermediateResultAvailable(res);
+					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setException(exception);
+				}
+				
+			    public void finished()
+			    {
+			    	ret.setFinished();
+			    }
+			    
+			    public void maxResultCountAvailable(int max)
+			    {
+			    	ret.setMaxResultCount(max);
+			    	System.out.println("max count is: "+max);
+			    }
+			});
+		/*}
+		else
+		{
+			agent.searchService(new ServiceQuery<ILibraryService>(ILibraryService.class).setPlatform(cid).setScope(ServiceScope.PLATFORM))
+				.thenAccept(libs -> {libs.getComponentModels().delegate(ret);}).exceptionally(ret);
+		}* /
+			
+		return ret;
+	}*/
 	
 	/**
 	 *  Create a component for a model.
@@ -109,13 +254,28 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	}
 	
 	/**
+	 *  Kill a component.
+	 *  @param cid The component id.
+	 *  @return The component id.
+	 */
+	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier id, IComponentIdentifier cid)
+	{
+		return agent.getExternalAccess(id).killComponent();
+	}
+
+	
+	/**
 	 *  Load a component model.
 	 *  @param filename The filename.
 	 *  @return The component model.
 	 */
 	public IFuture<IModelInfo> loadComponentModel(String filename, IComponentIdentifier cid)
 	{
-		return SComponentFactory.loadModel(cid!=null? agent.getExternalAccess(cid): agent, filename, null);
+		IFuture<IModelInfo> ret =  SComponentFactory.loadModel(cid!=null? agent.getExternalAccess(cid): agent, filename, null);
+		//IModelInfo m = ret.get();
+		//if(m==null)
+		//	System.out.println("Loading: "+filename+" "+m);
+		return ret;
 	}
 	
 	/**
@@ -128,6 +288,41 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
 		return ea.getDescriptions();
 	}
+	
+	/**
+	 *  Get the component description.
+	 *  @return The component description.
+	 */
+	public IFuture<IComponentDescription> getComponentDescription(IComponentIdentifier cid)
+	{
+		//System.out.println("getCompDescs start");
+		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
+		return ea.getDescriptionAsync();
+	}
+	
+	/**
+	 *  Get the child component descriptions.
+	 *  @param parent The component id of the parent.
+	 *  @return The component descriptions.
+	 */
+	public IFuture<IComponentDescription[]> getChildComponentDescriptions(IComponentIdentifier cid, IComponentIdentifier parent)
+	{
+		final Future<IComponentDescription[]> ret = new Future<IComponentDescription[]>();
+		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
+		ea.getChildren(null, parent).then(cids -> 
+		{
+			FutureBarrier<IComponentDescription> barrier = new FutureBarrier<IComponentDescription>();
+			for(int i=0; i<cids.length; i++)
+			{
+				IFuture<IComponentDescription>fut = ea.getDescription(cids[i]);
+				barrier.addFuture(fut);
+			}
+			barrier.waitForResults().then(descs -> ret.setResult(descs==null? null: descs.toArray(new IComponentDescription[cids.length])))
+				.catchEx(ex -> ret.setException(ex));
+		});
+		return ret;
+	}
+
 	
 	/**
 	 * Get a default icon for a file type.
@@ -289,7 +484,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		
 		if(name!=null)
 		{
-			getNFValue(cid, sid, mi, req, name).thenAccept(val ->
+			getNFValue(cid, sid, mi, req, name).then(val ->
 			{
 				res.put(name, val);
 				ret.setResult(res);
@@ -312,14 +507,14 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 						if(valfut!=null)
 						{
 							bar.addFuture(valfut);
-							valfut.thenAccept(val -> 
+							valfut.then(val -> 
 							{
 								res.put(meti.getName(), val);
 							});
 						}
 					});
 					
-					bar.waitFor().thenAccept(Void -> ret.setResult(res)).exceptionally(ret);
+					bar.waitFor().then(Void -> ret.setResult(res)).catchEx(ret);
 				}
 			};
 			
@@ -328,11 +523,11 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 			{
 				if(mi!=null)
 				{
-					ea.getRequiredMethodNFPropertyMetaInfos(sid, mi).thenAccept(mis -> getvals.execute(mis));
+					ea.getRequiredMethodNFPropertyMetaInfos(sid, mi).then(mis -> getvals.execute(mis));
 				}
 				else
 				{
-					ea.getRequiredNFPropertyMetaInfos(sid).thenAccept(mis -> getvals.execute(mis));
+					ea.getRequiredNFPropertyMetaInfos(sid).then(mis -> getvals.execute(mis));
 				}
 			}
 			// provided services and methods
@@ -340,17 +535,17 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 			{
 				if(mi!=null)
 				{
-					ea.getMethodNFPropertyMetaInfos(sid, mi).thenAccept(mis -> getvals.execute(mis));
+					ea.getMethodNFPropertyMetaInfos(sid, mi).then(mis -> getvals.execute(mis));
 				}
 				else
 				{
-					ea.getNFPropertyMetaInfos(sid).thenAccept(mis -> getvals.execute(mis));
+					ea.getNFPropertyMetaInfos(sid).then(mis -> getvals.execute(mis));
 				}
 			}
 			// components
 			else if(ea!=null)
 			{
-				ea.getNFPropertyMetaInfos().thenAccept(mis -> getvals.execute(mis));
+				ea.getNFPropertyMetaInfos().then(mis -> getvals.execute(mis));
 			}
 			else
 			{

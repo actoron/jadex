@@ -84,7 +84,7 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 	{
 		Future<String> ret = new Future<>();
 		
-		getValue().thenAccept(v ->
+		getValue().then(v ->
 		{
 			NFPropertyMetaInfo mi = getMetaInfo();
 			ClassInfo ci = mi.getUnit();
@@ -108,7 +108,7 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 			// return raw value as string
 			if(!ret.isDone())
 				ret.setResult(""+v);
-		}).exceptionally(ret);
+		}).catchEx(ret);
 	
 		return ret;
 	}

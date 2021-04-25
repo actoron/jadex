@@ -161,6 +161,21 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			public void handleBackwardCommand(Object info)
 			{
 				sendRxMessage(target, rxid, new RemoteBackwardCommand<T>(info));
+//				// ignore backward failures and wait for forward failure (i.e. timeout)  
+//					.addResultListener(new IResultListener<Void>()
+//				{
+//					@Override
+//					public void resultAvailable(Void result)
+//					{
+//						System.out.println(getComponent()+" sent successful backward command: "+info);
+//					}
+//					
+//					@Override
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						System.out.println(getComponent()+" sending backward command failed: "+info+", "+exception);
+//					}
+//				});
 			}
 			
 			// cleanup on finished:
@@ -196,9 +211,24 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 				@Override
 				public void timeoutOccurred(TimeoutException te)
 				{
+//					System.out.println(getComponent()+" remote timeout triggered: "+ftimeout+", "+command);
 					ret.setExceptionIfUndone(te);
 				}
-			};			
+				
+//				@Override
+//				protected synchronized void initTimer()
+//				{
+//					System.out.println(getComponent()+" (re)scheduling remote timeout: "+ftimeout+", "+command);
+//					super.initTimer();
+//				}
+//				
+//				@Override
+//				public synchronized void cancel()
+//				{
+//					System.out.println(getComponent()+" cancelling remote timeout: "+ftimeout+", "+command);
+//					super.cancel();
+//				}
+			};
 			ret.addResultListener(trl);
 		}
 		
@@ -367,7 +397,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 							{
 								public void exceptionOccurred(Exception exception)
 								{
-									((ITerminableFuture)retfut).terminate();
+									((ITerminableFuture)retfut).terminate(exception);
 									incommands.remove(rxid);
 								}
 								
@@ -446,18 +476,45 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 							{
 								RemoteForwardCmdCommand fc = new RemoteForwardCmdCommand(command);
 								fc.setResultCount(counter++);
+//								System.out.println(getComponent()+" sending forward command: "+remote+", "+msg+", "+command);
 								IFuture<Void>	fut	= sendRxMessage(remote, rxid, fc);
+//								fut.addResultListener(new IResultListener<Void>()
+//								{
+//									@Override
+//									public void resultAvailable(Void result)
+//									{
+//										System.out.println(getComponent()+" successfully sent forward command: "+remote+", "+msg+", "+command);
+//									}
+//									
+//									@Override
+//									public void exceptionOccurred(Exception exception)
+//									{
+//										System.out.println(getComponent()+" sending forward command failed: "+remote+", "+msg+", "+command+", "+exception);
+//									}
+//								});
+
 								if(term!=null)
 								{
 									fut.addResultListener(term);
 								}
+							}
+							
+							public void maxResultCountAvailable(int max) 
+							{
 							}
 						}));
 					}
 					else
 					{
 						// Not allowed -> send back exception.
-						RemoteResultCommand<?> rc = new RemoteResultCommand(new SecurityException("Command "+msg.getClass()+" not allowed."), null);
+						String errormsg = "Command "+msg.getClass()+" not allowed.";
+						if (msg instanceof RemoteMethodInvocationCommand)
+						{
+							RemoteMethodInvocationCommand rmic = ((RemoteMethodInvocationCommand) msg);
+							errormsg = "Method invocation command "+rmic.getMethod()+" not allowed.";
+							
+						}
+						RemoteResultCommand<?> rc = new RemoteResultCommand(new SecurityException(errormsg), null);
 						sendRxMessage(remote, rxid, rc);	
 					}
 				}
@@ -572,7 +629,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 				if(msg instanceof ISecuredRemoteCommand)
 				{
 					Set<String>	secroles = ServiceIdentifier.getRoles(((ISecuredRemoteCommand)msg).getSecurityLevel(getInternalAccess()), getInternalAccess());
-					
+					//System.out.println("secroles " + (secroles != null ? Arrays.toString(secroles.toArray()) : "null") + " " + secinfos);
 					// No service roles and trusted role is ok.
 					if (secroles == null && secinfos.getRoles().contains(Security.TRUSTED))
 					{
@@ -580,11 +637,11 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					}
 					
 					// Custom role match is ok
-					else if(!Collections.disjoint(secroles, secinfos.getRoles()))
+					else if(!Collections.disjoint(secroles == null ? Collections.emptySet() : secroles, secinfos.getRoles()))
 						trusted	= true;
 					
 					// Always allow 'unrestricted' access
-					else if(secroles.contains(Security.UNRESTRICTED))
+					else if(secroles != null && secroles.contains(Security.UNRESTRICTED))
 					{
 						trusted	= true;
 					}

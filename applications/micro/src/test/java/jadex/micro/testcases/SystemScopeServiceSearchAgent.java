@@ -43,7 +43,7 @@ public class SystemScopeServiceSearchAgent extends JunitAgentTest
 		TestReport tr1 = new TestReport("#1", "Test if system service can be found without scope with SServiceProvider");
 		try
 		{
-			ILibraryService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+			ILibraryService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 			System.out.println("Found: "+cms);
 			tr1.setSucceeded(true);
 		}

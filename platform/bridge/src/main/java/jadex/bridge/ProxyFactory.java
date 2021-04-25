@@ -22,7 +22,7 @@ public class ProxyFactory
     	if(loader==null)
     		throw new IllegalArgumentException("Classloader must not null");
     	
-    	if(useasm && !SReflect.isAndroid())
+    	if(useasm)// && !SReflect.isAndroid())
     	{
     		try
     		{

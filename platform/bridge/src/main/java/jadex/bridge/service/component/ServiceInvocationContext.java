@@ -425,6 +425,12 @@ public class ServiceInvocationContext
 //		if(SReflect.isSupertype(IFuture.class, getMethod().getReturnType()) && !(result instanceof Future))
 //			System.out.println("haeaeaeaeaeae");
 		
+//		if(getMethod().getName().equals("getRegisteredClients"))
+//		{
+//			System.err.println("setResult of getRegisteredClients call: "+result+", "+IComponentIdentifier.LOCAL.get()+", "+Thread.currentThread());
+//			Thread.dumpStack();
+//		}
+		
 		this.result.set(used.size()-1, result);
 	}
 
@@ -449,7 +455,7 @@ public class ServiceInvocationContext
 		{
 //			if(method.getName().equals("shutdownService") && sid.toString().indexOf("Context")!=-1 && sid.getProviderId().getParent()==null)
 //			if(method.getName().indexOf("performSteps")!=-1)
-//				System.out.println("invoke before: "+method.getName()+" "+interceptor+", "+platform.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
+//				System.out.println("invoke before: "+method.getName()+" "+interceptor+", "+platform.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 			IFuture<Void> fut = interceptor.execute(this);
 			if(fut.isDone())
 			{

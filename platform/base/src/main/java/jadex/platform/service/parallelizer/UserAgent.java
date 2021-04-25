@@ -14,10 +14,9 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -66,7 +65,7 @@ public class UserAgent
 				final Set<String>	todo	= new HashSet<String>(Arrays.asList(tasks));
 				
 				paser.doParallel(tasks)
-					.addResultListener(new IIntermediateResultListener<String>()
+					.addResultListener(new IntermediateEmptyResultListener<String>()
 				{
 					public void intermediateResultAvailable(String result)
 					{

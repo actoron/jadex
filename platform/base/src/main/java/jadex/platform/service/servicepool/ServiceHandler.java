@@ -43,6 +43,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 
 /**
  *  The service handler is used as service implementation for proxy services.
@@ -176,7 +177,7 @@ public class ServiceHandler implements InvocationHandler
 //		ci.setParent(component.getId());
 		ci.setImports(component.getModel().getAllImports());
 		// Worker services are exposed with scope parent only to hinder others finding directly the worker services
-		ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, ServiceScope.PARENT, null, null)});
+		ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, ServiceScope.PARENT, null, null, null, null)});
 		ci.setFilename(componentname);
 		
 		component.createComponent(ci)
@@ -368,12 +369,8 @@ public class ServiceHandler implements InvocationHandler
 			// Must reschedule on component thread as it has no required service proxy
 			if(res instanceof IIntermediateFuture)
 			{
-				IIntermediateResultListener lis = component.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<Object>()
+				IIntermediateResultListener lis = component.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<Object>()
 				{
-					public void intermediateResultAvailable(Object result)
-					{
-					}
-					
 					public void finished()
 					{
 						boolean	remove	= strategy.taskFinished(); 
@@ -551,6 +548,15 @@ public class ServiceHandler implements InvocationHandler
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the strategy.
+	 *  @return The strategy.
+	 */
+	public IPoolStrategy getStrategy() 
+	{
+		return strategy;
 	}
 
 	/**

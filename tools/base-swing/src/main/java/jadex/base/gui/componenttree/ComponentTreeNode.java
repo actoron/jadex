@@ -2,7 +2,6 @@ package jadex.base.gui.componenttree;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -34,9 +33,9 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
@@ -376,21 +375,24 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 						});
 					}
 				}
-				fubar.waitFor().addResultListener(v->
+				fubar.waitFor().then(v->
 				{
 					ready[0]	= true;
 					if(ready[0] &&  ready[1])
 					{
 						ret.setResult(children);
-					}					
+					}	
 				});
 			}
 			
-			@Override
 			public void exceptionOccurred(Exception exception)
 			{
 //				System.out.println("searchChildren 1 end ex: ");
-				exception.printStackTrace();
+				// If a platform is added manually and we lack access,
+				// a security exception may be thrown. This is normal
+				// behavior and can be ignored.
+				if (!(exception instanceof SecurityException))
+					exception.printStackTrace();
 			}
 		}));
 		
@@ -453,57 +455,64 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 						ea.getNFPropertyNames()
 //							((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyNames()
 							.addResultListener(new SwingResultListener<String[]>(new IResultListener<String[]>()
+							{
+								public void resultAvailable(String[] names)
+								{
+		//								System.out.println("nfprops ready");
+									if(names!=null && names.length>0)
+									{
+										NFPropertyContainerNode cn = (NFPropertyContainerNode)getModel().getNode(getId()+NFPropertyContainerNode.NAME);
+										if(cn==null)
+											cn = new NFPropertyContainerNode(null, null, ComponentTreeNode.this, getModel(), getTree(), ea, null, null, null);
+										children.add(0, cn);
+										cont(ea);
+		//											final NFPropertyContainerNode node = cn;
+		//											
+		//											final List<ISwingTreeNode>	results	= new ArrayList<ISwingTreeNode>();
+		//											Iterator<String> it = SReflect.getIterator(names);
+										
+		//											createNFPropertyNodes(it, results, ea, rootea, cn).addResultListener(new IResultListener<Void>()
+		//											{
+		//												public void resultAvailable(Void result)
+		//												{
+		//													Collections.sort(results, new java.util.Comparator<ISwingTreeNode>()
+		//													{
+		//														public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
+		//														{
+		//															String si1 = ((NFPropertyNode)t1).getMetaInfo().getName();
+		//															String si2 = ((NFPropertyNode)t2).getMetaInfo().getName();
+		//															return si1.compareTo(si2);
+		//														}
+		//													});
+		//													
+		//													node.setChildren(results);
+		//													cont(ea, node, results);
+		//												}
+		//												
+		//												public void exceptionOccurred(Exception exception)
+		//												{
+		//													cont(ea, null, null);
+		//												}
+		//											});
+									}
+									else
+									{
+										cont(ea);
+									}
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									cont(ea);
+								}
+							})
 						{
-							public void resultAvailable(String[] names)
-							{
-//								System.out.println("nfprops ready");
-								if(names!=null && names.length>0)
-								{
-									NFPropertyContainerNode cn = (NFPropertyContainerNode)getModel().getNode(getId()+NFPropertyContainerNode.NAME);
-									if(cn==null)
-										cn = new NFPropertyContainerNode(null, null, ComponentTreeNode.this, getModel(), getTree(), ea, null, null, null);
-									children.add(0, cn);
-									cont(ea);
-//											final NFPropertyContainerNode node = cn;
-//											
-//											final List<ISwingTreeNode>	results	= new ArrayList<ISwingTreeNode>();
-//											Iterator<String> it = SReflect.getIterator(names);
-									
-//											createNFPropertyNodes(it, results, ea, rootea, cn).addResultListener(new IResultListener<Void>()
-//											{
-//												public void resultAvailable(Void result)
-//												{
-//													Collections.sort(results, new java.util.Comparator<ISwingTreeNode>()
-//													{
-//														public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
-//														{
-//															String si1 = ((NFPropertyNode)t1).getMetaInfo().getName();
-//															String si2 = ((NFPropertyNode)t2).getMetaInfo().getName();
-//															return si1.compareTo(si2);
-//														}
-//													});
-//													
-//													node.setChildren(results);
-//													cont(ea, node, results);
-//												}
-//												
-//												public void exceptionOccurred(Exception exception)
-//												{
-//													cont(ea, null, null);
-//												}
-//											});
-								}
-								else
-								{
-									cont(ea);
-								}
+							public void customExceptionOccurred(Exception exception) {
+								// Access may fail due to security restrictions
+								if (!(exception instanceof SecurityException))
+									super.customExceptionOccurred(exception);
 							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								cont(ea);
-							}
-						}));
+						});
 					}
 					
 					public void cont(final IExternalAccess ea)
@@ -696,17 +705,12 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 		assert cmslistener==null;
 		CMSUpdateHandler	cmshandler	= (CMSUpdateHandler)getTree().getClientProperty(CMSUpdateHandler.class);
 		this.cmslistener	= cmshandler.addCMSListener(cid);
-		cmslistener.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+		cmslistener.addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 		{
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
 				System.out.println("Exception occurred: "+exception);
-			}
-
-			@Override
-			public void resultAvailable(Collection<CMSStatusEvent> result)
-			{
 			}
 
 			@Override
@@ -814,11 +818,6 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 						}
 					});
 				}				
-			}
-
-			@Override
-			public void finished()
-			{
 			}
 		});
 	}

@@ -570,5 +570,15 @@ public class CreationInfo
 		this.pojo = pojo;
 		return this;
 	}
+
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	@Override
+	public String toString()
+	{
+		return "CreationInfo(name=" + name + ", filename=" + filename + ")";
+	}
 	
 }

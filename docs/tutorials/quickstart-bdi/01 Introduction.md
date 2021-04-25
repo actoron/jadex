@@ -8,7 +8,7 @@ The easiest way to start with the Cleanerworld scenario is to import the Jadex e
 
 ### Fetching the Project Files
 
-Download the [jadex-example-project.zip](https://download.actoron.com/nightlies/oss/jadex-example-project.zip) and extract the contents to a directory of your choice.
+Download the [jadex-example-project.zip](https://www.activecomponents.org/forward.html?type=distribution&path=jadex-example-project.zip) and extract the contents to a directory of your choice.
 
 ### Importing the Project
 
@@ -83,7 +83,7 @@ Try placing/removing waste around the moving cleaner to understand the differenc
 world view and the cleaners local (incomplete and possibly incorrect) knowledge.
 
 More details about the sensor/actuator object can be found in the
-[Javadoc](https://download.actoron.com/docs/nightlies/latest/javadoc/index.html?jadex/quickstart/cleanerworld/environment/SensorActuator.html).
+[Javadoc](https://www.activecomponents.org/forward.html?type=javadoc&path=index.html?jadex/quickstart/cleanerworld/environment/SensorActuator.html).
 
 The simple cleaner is just a starting point that does not perceive anything and just moves randomly:
 

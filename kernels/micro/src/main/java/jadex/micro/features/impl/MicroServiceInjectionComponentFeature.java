@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +26,8 @@ import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.component.UnresolvedServiceInvocationHandler;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
@@ -39,14 +38,12 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.MicroModel;
 import jadex.micro.MicroModel.ServiceInjectionInfo;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.features.IMicroServiceInjectionFeature;
 
 /**
@@ -125,15 +122,15 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 	
 					String sername = (String)SJavaParser.evaluateExpressionPotentially(sernames[i], component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
 							
-					//if("secser".equals(sername))
-					//	System.out.println("sdbgjh");
+					//if(sername!=null && sername.indexOf("calc")!=-1)
+					//	System.out.println("calc");
 					
 					for(int j=0; j<infos.length; j++)
 					{
 						// Uses required service info to search service
 						
-						RequiredServiceInfo	info = infos[j].getRequiredServiceInfo()!=null? infos[j].getRequiredServiceInfo(): model.getService(sername);				
-						ServiceQuery<Object> query = ServiceQuery.getServiceQuery(component, info);
+						RequiredServiceInfo	info = infos[j].getRequiredServiceInfo()!=null? infos[j].getRequiredServiceInfo(): model.getService(sername);
+						ServiceQuery<Object> query = ((RequiredServicesComponentFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceQuery(info);
 												
 						// if query
 						if(infos[j].getQuery()!=null && infos[j].getQuery().booleanValue())
@@ -152,7 +149,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 							final int fj = j;
 							
 							// Invokes methods for each intermediate result
-							sfut.addResultListener(new IIntermediateResultListener<Object>()
+							sfut.addResultListener(new IntermediateEmptyResultListener<Object>()
 							{
 								boolean first = true;
 								public void intermediateResultAvailable(final Object result)
@@ -190,10 +187,6 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 								public void resultAvailable(Collection<Object> result)
 								{
 									finished();
-								}
-								
-								public void finished()
-								{
 								}
 								
 								public void exceptionOccurred(Exception e)
@@ -551,6 +544,12 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 					}
 					return IFuture.DONE;
 				}
+				
+				@Override
+				public String toString()
+				{
+					return m.getDeclaringClass().getName()+"."+m.getName()+(args!=null?SUtil.arrayToString(args):"[]");
+				}
 			});
 		}
 		else
@@ -575,12 +574,12 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 		{
 			if(multiple)
 			{
-				IFuture	ifut = component.searchServices(ServiceQuery.getServiceQuery(component, info));
+				IFuture	ifut = component.searchServices(((RequiredServicesComponentFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceQuery(info));
 				sfut = ifut;
 			}
 			else
 			{
-				IFuture	ifut = component.searchService(ServiceQuery.getServiceQuery(component, info));
+				IFuture	ifut = component.searchService(((RequiredServicesComponentFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceQuery(info));
 				sfut = ifut;
 			}
 		}
@@ -693,13 +692,13 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 									{
 										component.getLogger().warning("Field injection failed: "+e);
 										lis2.exceptionOccurred(e);
-									}	
 								}
+									}	
 								else if(infos[j].isLazy() && !multiple)
 								{
 									RequiredServiceInfo rsi = ((IInternalRequiredServicesFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceInfo(sername);
 									Class<?> clz = rsi.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
-									ServiceQuery<Object> query = ServiceQuery.getServiceQuery(component, info);
+									ServiceQuery<Object> query = ((RequiredServicesComponentFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceQuery(info);
 									
 									UnresolvedServiceInvocationHandler h = new UnresolvedServiceInvocationHandler(component, query);
 									Object proxy = ProxyFactory.newProxyInstance(component.getClassLoader(), new Class[]{IService.class, clz}, h);

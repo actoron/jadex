@@ -14,8 +14,8 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -62,10 +62,10 @@ public class ShortMessageAgent
 		
 		final Collection<User> receivers = new HashSet<User>(recs);
 		
-		final IUserService us = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IUserService.class, ServiceScope.COMPONENT_ONLY));
+		final IUserService us = component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IUserService.class, ServiceScope.COMPONENT_ONLY));
 		
 		component.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IClientService.class))
-			.addResultListener(new IIntermediateResultListener<IClientService>()
+			.addResultListener(new IntermediateEmptyResultListener<IClientService>()
 		{
 			public void intermediateResultAvailable(IClientService service)
 			{

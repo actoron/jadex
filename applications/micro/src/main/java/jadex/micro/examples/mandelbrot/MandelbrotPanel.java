@@ -14,13 +14,10 @@ import jadex.commons.gui.SGUI;
 /**
  * 
  */
-public class MandelbrotPanel extends JPanel implements IAppGui
+public class MandelbrotPanel extends JPanel //implements IAppGui
 {
 	/** The agent. */
 	protected IExternalAccess agent;
-	
-	/** The service. */
-	protected IMandelbrotService service;
 	
 	/** The display panel. */
 	protected DisplayPanel dispanel;
@@ -37,22 +34,11 @@ public class MandelbrotPanel extends JPanel implements IAppGui
 	/**
 	 * 
 	 */
-	public IFuture<Void> init(IExternalAccess agent, IService service)
+	public IFuture<Void> init(IExternalAccess agent)
 	{
 		this.agent = agent;
-		this.service = (IMandelbrotService)service;
-		
-		dispanel = new DisplayPanel(agent, this.service);
-		
+		this.dispanel = new DisplayPanel(agent);
 		this.add(dispanel, BorderLayout.CENTER);
-		return IFuture.DONE;
-	}
-	
-	/**
-	 * 
-	 */
-	public IFuture<Void> shutdown()
-	{
 		return IFuture.DONE;
 	}
 	

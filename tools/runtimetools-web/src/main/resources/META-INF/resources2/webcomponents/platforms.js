@@ -1,62 +1,132 @@
-import { LitElement, html, css } from 'lit-element';
+let { LitElement, html, css } = modLoad('lit-element');
+let { BaseElement } = modLoad('base-element');
 
-class PlatformsElement extends LitElement {
-
+class PlatformsElement extends BaseElement 
+{
 	reversed = false;
 	platforms = [];
-	serverdown = false;
+	connected = false;
+	termcmd = null;
+	comconn = false;
 	
-	constructor() {
-		super();
-		
-		console.log("platforms");
-		
+	static get properties() 
+	{
+		var ret = {};
+		if(super.properties!=null)
+		{
+			for(let key in super.properties)
+				ret[key]=super.properties[key];
+		}
+		ret['reversed'] = {attribute: false, type: Boolean};
+		ret['platforms'] = {attribute: false};
+		ret['connected'] = {attribute: false, type: Boolean};
+		return ret;
+	}
+	
+	init()
+	{
+		this.app.lang.listeners.add(this);
+		console.log('platforms')
+	}
+	
+	connectedCallback() 
+	{
+		this.comconn = true;
+		//console.log("connected platforms: "+this.comconn);
+		super.connectedCallback();
+		this.subscribe(5000);
+	}
+	
+	disconnectedCallback()
+	{
+		//console.log("disconnected platforms: "+this.comconn);
+		this.comconn = false;
+		this.terminateSubscription();
+	}
+	
+	terminateSubscription()
+	{
+		if(this.termcmd!=null)
+			this.termcmd().then(() => {/*console.log("Terminated subscription.")*/})
+				.catch(() => {console.log("Could not terminate subscription")});
+	}
+	
+	subscribe(interval)
+	{
 		var self = this;
 		
-		jadex.getIntermediate('webjcc/subscribeToPlatforms',
+		this.terminateSubscription();
+			
+		var tc = jadex.getIntermediate('webjcc/subscribeToPlatforms',
 			function(resp)
 			{
-				console.log(resp.data.service);
+				//console.log("Set up subscription");
 				self.updatePlatform(resp.data.service.name, resp.data.service.type);
-				//return this.PROMISE_DONE;
+				self.connected = true;
+				self.termcmd = tc;
 			},
 			function(err)
 			{
-				console.log("Err: "+JSON.stringify(err));
-				self.serverdown = true;
+				console.log("Could not reach Jadex webjcc.");
+				if(err!=null && err.response!=null && err.response.status==401)
+				{
+					self.createErrorMessage("Login required to WebJCC platform (use platform secret)");
+				}
+				else
+				{
+					self.createErrorMessage("Could not reach Jadex WebJCC platform", err);
+				}
+				//console.log("Err: "+JSON.stringify(err));
+				self.connected = false;
+				self.platforms = [];
 				self.requestUpdate();
-				//return this.PROMISE_DONE;
+				
+				setTimeout(function()
+				{
+					if(self.comconn)
+					{
+						console.log("Retrying Jadex webjcc connection...");
+						self.subscribe(interval);
+					}
+					else
+					{
+						console.log("Subcribe terminated due to component disconnect");
+					}
+				}, interval);
 			}
 		);
 	}
 	
-	/*static get styles() {
-	    return css`
-	    	:host {
-	    		color: green;
-	    	}
-	    `;
-	}*/
-	
-	render() {
+	asyncRender() 
+	{
 		return html`
-			<link rel="stylesheet" href="css/style.css">
-			<div class="actwtable section">
+			<div class="section">
 				<div>
-					<h3 id="HConnectedPlatforms">Connected Platforms</h3>
-					<p>This page shows a self-updating list of remote platforms known to this Jadex platform.</p>
+					<div class="head">
+						<h1 class="m-0 p-0 inline" id="HConnectedPlatforms">${this.app.lang.t('Connected Platforms')}</h1>
+						<span id="connected" class="dot fl ${this.connected? "green": "red"}"></span>
+					</div>
+					<p>
+						${this.app.lang.t('This page shows a self-updating list of remote platforms known to this Jadex platform.')}
+					</p>
 				</div>
-				<table>
-					<tbody>
-						<tr>
-							<th>Name</th>
-							<!-- <th>Connected</th> 
-							<th>Protocol</th>-->
-						</tr>
-						
-						${this.platforms.map((p) => html`<tr><td><a href="#/platform/${p}">${p}</a></td></tr>`)}
-					</tbody>
-				</table>
+
+				<!-- <div class="jumbotron jumbotron-fluid m-0 p-3"> -->
+				<div class="m-0">
+					<div class="row">
+						<div class="col-12" >
+					<table class="actwtable col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 pr-0 pl-0">
+						<tbody>
+							<tr>
+								<th>Name</th>
+								<!-- <th>${this.app.lang.t("Connected")}</th> 
+								<th>Protocol</th>-->
+							</tr>
+							
+							${this.platforms.map((p) => html`<tr><td><a href="#/platform/${p}">${p}</a></td></tr>`)}
+						</tbody>
+					</table>
+				</div>
 			</div>
 		`;
 	}
@@ -80,7 +150,7 @@ class PlatformsElement extends LitElement {
 	
 	updatePlatform(platform, rem)
 	{
-		console.log("updatePlatform: "+platform+" "+rem);
+		//console.log("updatePlatform: "+platform+" "+rem);
 		
 		var	found = false;
 		
@@ -102,101 +172,30 @@ class PlatformsElement extends LitElement {
 		this.requestUpdate();
 	}
 	
+	static get styles() 
+	{
+	    return css`
+			.inline {
+				display:inline
+			}
+	    	.dot {
+				display: inline-block;
+				border-radius: 50%;
+   				width: 20px; /* CSS can't align width to height (of H3 here) :-( */
+				height: 20px;
+			}
+			.red {
+				background-color: red;
+			}
+			.green {
+				background-color: green;
+			}
+	    `;
+	}
+	
 }
 
-customElements.define('jadex-platforms', PlatformsElement);
-
-
-/*<platforms>
-
-	<div class="actwtable section">
-		<div if="{lang=='en'}">
-			<h3 id="HConnectedPlatforms">Connected Platforms</h3>
-			<p>This page shows a self-updating list of remote platforms known to this Jadex platform.</p>
-		</div>
-		<div if="{lang=='de'}">
-			<h3 id="HConnectedPlatforms">Verbundene Plattformen</h3>
-			<p>Diese Seite zeigt eine selbst-aktualisiernde Liste von Jadex-Plattformen.</p>
-		</div>
-		<table class="{down: serverdown}">
-			<tbody>
-				<tr>
-					<th>Name</th>
-					<!-- <th>Connected</th> 
-					<th>Protocol</th>-->
-				</tr>
-				
-				<tr each="{x in orderBy(platforms)}"> <!-- class="{connecting: !x.connected}" --> 
-					<td><a href="#/platform/{x}">{x}</a></td>
-					<!--  <td>{x.connected}</td>
-					<td>{x.protocol}</td> -->
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	
-	<script>
-		var self = this;
-		self.reversed = false;
-		self.platforms = [];
-		self.serverdown = false;
-	
-		// todo: order by name
-		orderBy(data) 
-		{ 
-			var order = self.reversed ? -1 : 1;
-			
-			var res = data.slice().sort(function(a, b) 
-			{ 
-				return a===b? 0: a > b? order: -order 
-			});
-			
-			/ *res.forEach(function(q) 
-			{ 
-				console.log(q); 
-			})* / 
-			return res; 
-		}
-		
-		function updatePlatform(platform, rem)
-		{
-			//console.log("updatePlatform: "+platform+" "+rem);
-			
-			var	found = false;
-			
-			var i;
-			for(i=0; i<self.platforms.length; i++)
-			{
-				found = self.platforms[i]===platform;
-				if(found)
-				{
-					if(rem)
-						self.platforms.splice(i, 1);
-					break;
-				}
-			}
-			
-			if(!found && !rem)
-				self.platforms.push(platform);
-			
-			self.update();
-		}
-		
-		self.getIntermediate('webjcc/subscribeToPlatforms',
-			function(resp)
-			{
-				updatePlatform(resp.data.service.name, resp.data.service.type);
-				//return this.PROMISE_DONE;
-			},
-			function(err)
-			{
-				console.log("Err: "+JSON.stringify(err));
-				self.serverdown = true;
-				self.update();
-				//return this.PROMISE_DONE;
-			});
-	</script>
-
-</platforms>*/
+if(customElements.get('jadex-platforms') === undefined)
+	customElements.define('jadex-platforms', PlatformsElement);
 
 

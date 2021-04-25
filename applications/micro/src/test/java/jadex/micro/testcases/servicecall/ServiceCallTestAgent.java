@@ -318,10 +318,11 @@ public class ServiceCallTestAgent extends TestAgent
 	public static void main(String[] args) throws Exception
 	{
 		// Start platform with agent.
-		IPlatformConfiguration	config1	= STest.getDefaultTestConfig(ServiceCallTestAgent.class);
+		ServiceCallTestAgent	scta	= new ServiceCallTestAgent();
+		IPlatformConfiguration	config1	= scta.getConfig();
 //		config1.setLogging(true);
 //		config1.setDefaultTimeout(-1);
-		config1.addComponent(ServiceCallTestAgent.class);
-		Starter.createPlatform(config1).get();
+		IExternalAccess	platform	= Starter.createPlatform(config1).get();
+		platform.addComponent(scta).get();
 	}
 }

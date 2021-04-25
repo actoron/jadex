@@ -12,9 +12,9 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import jadex.base.Starter;
@@ -42,7 +42,6 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.Breakpoint;
 import jadex.bridge.service.component.ComponentSuspendable;
-import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
@@ -55,6 +54,7 @@ import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
@@ -62,24 +62,23 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.DebugException;
-import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
-import jadex.commons.MutableObject;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
-import jadex.commons.Tuple3;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
-import jadex.commons.functional.Consumer;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
+import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ISuspendable;
-import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
+import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.ThreadLocalTransferHelper;
@@ -115,8 +114,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/** The current timer. */
 	protected List<ITimer> timers = new ArrayList<ITimer>();
 	
-	/** Retained listener notifications when switching threads due to blocking. */
-	protected Queue<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>>	notifications;
+//	/** Retained listener notifications when switching threads due to blocking. */
+//	protected Set<Future<?>>	notifications;
 	
 	/** Flag for testing double execution. */
 	protected volatile boolean executing;
@@ -145,6 +144,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/** The termination future (used in noplatform case). */
 	protected Future<Map<String, Object>> termfuture;
 	
+	/** Heisenbug debug flag cached for speed. */
+	protected boolean debug;
+	
 	//-------- constructors --------
 	
 	/**
@@ -154,6 +156,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		super(component, cinfo);
 		this.endagenda = new Future<Void>();
+		this.debug	= component instanceof IPlatformComponentAccess && ((IPlatformComponentAccess) component).getPlatformComponent().debug;
+		if(debug)
+		{
+			component.getLogger().severe("Enabled ExecutionComponentFeature debugging for "+component);
+		}
 	}
 	
 	/**
@@ -170,12 +177,20 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //			System.out.println("shut platform");
 		
 //		System.out.println("shutdown start: "+getComponent().getComponentIdentifier());
+		if(debug)
+			getComponent().getLogger().severe("shutdown0: "+this);
 		
 		endagenda.addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
-				doCleanup(new StepAborted());
+				if(debug)
+					getComponent().getLogger().severe("shutdown1: "+this);
+				
+				doCleanup(new StepAborted(getComponent().getId()));
+				
+				if(debug)
+					getComponent().getLogger().severe("shutdown2: "+this);
 				
 				super.customResultAvailable(result);
 			}
@@ -296,7 +311,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
 			if(endagenda.isDone() && prio<STEP_PRIORITY_IMMEDIATE)
 			{
-				ret.setException(new ComponentTerminatedException(getComponent().getId()));
+				if(debug)
+					getComponent().getLogger().severe("step aborted after termination: "+step);
+				ret.setExceptionIfUndone(new ComponentTerminatedException(getComponent().getId()));
 			}
 			else
 			{
@@ -325,9 +342,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			}
 		}
 
-		if(!ret.isDone())
+		try
 		{
-			wakeup();
+			if(!ret.isDone())
+				wakeup();
+		}
+		catch(Exception e)
+		{
+			// rare racecondition that component is terminated after synchronized block but before wakeup() call.
+			ret.setExceptionIfUndone(e);
 		}
 		
 		return ret;
@@ -335,15 +358,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	
 	/**
 	 * Repeats a ComponentStep periodically, until terminate() is called on result future or a failure occurs in a step.
-	 * @param initialDelay delay before first execution in milliseconds
+	 * @param initialdelay delay before first execution in milliseconds
 	 * @param delay delay between scheduled executions of the step in milliseconds
 	 * @param step The component step
 	 * @return The intermediate results
 	 */
 	@Override
-	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialDelay, long delay, IComponentStep<T> step)
+	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialdelay, long delay, IComponentStep<T> step)
 	{
-		return repeatStep(initialDelay, delay, step, false);
+		return repeatStep(initialdelay, delay, step, false);
 	}
 	
 	/**
@@ -353,53 +376,65 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 * values, requiring the addition of a listener within the same step the repeat
 	 * step was schedule.
 	 * 
-	 * @param initialDelay delay before first execution in milliseconds
+	 * @param initialdelay delay before first execution in milliseconds
 	 * @param delay delay between scheduled executions of the step in milliseconds
 	 * @param step The component step
 	 * @param ignorefailures Don't terminate repeating after a failed step.
 	 * @return The intermediate results
 	 */
 	@Override
-	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialDelay, final long delay, final IComponentStep<T> step, final boolean ignorefailures)
+	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialdelay, final long delay, final IComponentStep<T> step, final boolean ignorefailures)
 	{
-		final MutableObject<Boolean>	stillRepeating	= new MutableObject<Boolean>(true);
+		final boolean[] stillrepeating	= new boolean[1];
+		stillrepeating[0] = true;
 		
 		final SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<T>(new TerminationCommand()
 		{
 			@Override
 			public void terminated(Exception reason)
 			{
-				stillRepeating.set(Boolean.FALSE);
+				stillrepeating[0] = false;
 			}
-		}, false);
+		}, true);
 		
 		// schedule the initial step
-		waitForDelay(initialDelay, step)
+		waitForDelay(initialdelay, step)
 			.addResultListener(new IResultListener<T>()
 		{
 			@Override
 			public void resultAvailable(T result)
 			{
-				ret.addIntermediateResult(result);
-				proceed();
+				if(!ret.isDone())
+				{
+					ret.addIntermediateResult(result);
+					proceed();
+				}
 			}
 			
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				if(ignorefailures)
+				if(!ret.isDone())
 				{
-					proceed();
-				}
-				else
-				{
-					ret.setException(exception);
+					if(exception instanceof StepInvalidException || exception instanceof FutureTerminatedException)
+					{
+						stillrepeating[0] = false;
+						proceed();
+					}
+					else if(ignorefailures)
+					{
+						proceed();
+					}
+					else
+					{
+						ret.setException(exception);
+					}
 				}
 			}
 			
 			private void proceed()
 			{
-				if (Boolean.TRUE.equals(stillRepeating.get()))
+				if(stillrepeating[0])
 				{
 					// reschedule this step if we're still repeating
 					waitForDelay(delay, step)
@@ -669,7 +704,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			//System.out.println("adding termination listener for: "+component.getId());
 			final Future<Map<String, Object>> ret = new Future<>();
-			SComponentManagementService.listenToComponent(component.getId(), component).addResultListener(new IntermediateDefaultResultListener<CMSStatusEvent>()
+			SComponentManagementService.listenToComponent(component.getId(), component).addResultListener(new IntermediateExceptionDelegationResultListener<CMSStatusEvent, Map<String, Object>>(ret)
 			{
 				public void intermediateResultAvailable(CMSStatusEvent result)
 				{
@@ -681,6 +716,18 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						else
 							ret.setResult(termev.getResults());
 					}
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					if(exception instanceof IllegalStateException)
+					{
+						exception 	= (Exception)new ComponentTerminatedException(getInternalAccess().getId(),
+							"Component probably already terminated. Consider starting the component in suspended state and only resume after waitForTermination() was called.")
+								.initCause(exception);
+					}
+					super.exceptionOccurred(exception);
 				}
 			});
 			return ret;
@@ -716,7 +763,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			if(parenta==null)
 			{
 				// Todo w/o proxy???
-//				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
 				IExternalAccess exta = getComponent().getExternalAccess(getComponent().getId().getParent());
 				// raw because called from scheduleStep also on external thread.
 				exta.scheduleStep(new IComponentStep<Void>()
@@ -738,12 +785,18 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
+			if(endstepcnt!=-1 && debug)
+				getComponent().getLogger().severe("wakeup0: "+this);
+
 			IExecutionService exe = getExecutionService();
 			//IExecutionService exe = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
 			
 			// Do not use rescue thread for bisimulation of platform init/shutdown/zombie agents to avoid clock running out.
 			if(exe==null && SSimulation.isBisimulating(getInternalAccess()))
 			{
+				if(endstepcnt!=-1 && debug)
+					getComponent().getLogger().severe("wakeup1: "+this);
+				
 				try
 				{
 					Field f = Class.forName("jadex.platform.service.execution.BisimExecutionService")
@@ -758,21 +811,30 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				System.err.println(getInternalAccess()+" bisim exe is"+exe);
 			}
 
+			if(endstepcnt!=-1 && debug)
+				getComponent().getLogger().severe("wakeup2: "+this+", "+exe);
+
 			// Hack!!! service is found before it is started, grrr.
 			if(exe!=null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
 				if(bootstrap)
 				{
+					if(endstepcnt!=-1 && debug)
+						getComponent().getLogger().severe("wakeup3: "+this);
 					// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
 					available	= true;
 				}
 				else
 				{
+					if(endstepcnt!=-1 && debug)
+						getComponent().getLogger().severe("wakeup4: "+this);
 					exe.execute(ExecutionComponentFeature.this);
 				}
 			}
 			else
 			{
+				if(endstepcnt!=-1 && debug)
+					getComponent().getLogger().severe("wakeup5: "+this);
 //				System.err.println(getInternalAccess()+" rescue "+SSimulation.isBisimulating(getInternalAccess())+", "+Starter.getPlatformValue(getInternalAccess().getId().getRoot(), IClockService.BISIMULATION_CLOCK_FLAG));
 				available = false;
 				// Happens during platform bootstrapping -> execute on platform rescue thread.
@@ -964,9 +1026,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
-			// Retain listener notifications for new component thread.
-			assert notifications==null : getComponent()+", "+IComponentIdentifier.LOCAL.get();
-			notifications	= FutureHelper.removeStackedListeners();
+			// Perform scheduled notifications before blocking thread.
+			FutureHelper.notifyStackedListeners();
+			
+//			// Retain listener notifications for new component thread.
+//			assert notifications==null : getComponent()+", "+IComponentIdentifier.LOCAL.get();
+//			notifications	= FutureHelper.removeStackedListeners();
 //			if(notifications!=null && getComponent().toString().indexOf("IntermediateBlockingTest@")!=-1)
 //				System.err.println("setting notifications: "+getComponent());
 			
@@ -1021,7 +1086,14 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
 				if(endagenda.isDone())
 				{
-					throw new ThreadDeath();
+					throw new ThreadDeath()
+					{
+						@Override
+						public String toString()
+						{
+							return "java.lang.ThreadDeath("+component+")";
+						}
+					};
 				}
 			}
 			catch(ThreadDeath e)
@@ -1056,14 +1128,14 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				
 				afterBlock();
 				
-				// If no other thread for component in mean time, maybe there are notifications left -> readd
-				if(notifications!=null)
-				{
-//					if(getComponent().toString().indexOf("IntermediateBlockingTest@")!=-1)
-//						System.err.println("unsetting notifications2: "+getComponent());
-					FutureHelper.addStackedListeners(notifications);
-					notifications	= null;
-				}
+//				// If no other thread for component in mean time, maybe there are notifications left -> readd
+//				if(notifications!=null)
+//				{
+////					if(getComponent().toString().indexOf("IntermediateBlockingTest@")!=-1)
+////						System.err.println("unsetting notifications2: "+getComponent());
+//					FutureHelper.addStackedListeners(notifications);
+//					notifications	= null;
+//				}
 			}
 		}
 	}
@@ -1119,6 +1191,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public boolean execute()
 	{
+		if(endstepcnt!=-1 && debug)
+			getComponent().getLogger().severe("execute()0: "+getComponent().getId()+", "+IComponentIdentifier.LOCAL.get()+", endstepcnt="+endstepcnt+", stepcnt="+stepcnt);
+
 		synchronized(this)
 		{
 			if(executing)
@@ -1129,6 +1204,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			executing	= true;
 		}
 
+		if(endstepcnt!=-1 && debug)
+			getComponent().getLogger().severe("execute()1: "+getComponent().getId()+", "+IComponentIdentifier.LOCAL.get()+", endstepcnt="+endstepcnt+", stepcnt="+stepcnt);
 		// Todo: termination and exception!?
 //		// Note: wakeup() can be called from arbitrary threads (even when the
 //		// component itself is currently running. I.e. it cannot be ensured easily
@@ -1144,34 +1221,36 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	
 			ClassLoader cl = setExecutionState();
 			
-			// Process listener notifications from old component thread.
-//			boolean notifexecuted	= false;
-			if(notifications!=null)
-			{
-//				if(getComponent().toString().indexOf("IntermediateBlockingTest@")!=-1)
-//					System.err.println("unsetting notifications: "+getComponent());
-				FutureHelper.addStackedListeners(notifications);
-				notifications	= null;
-				
-				// Todo: termination and exception!?
-//				try
-//				{
-					FutureHelper.notifyStackedListeners();
-//					notifexecuted	= true;
-//				}
-//				catch(Exception e)
-//				{
-//					fatalError(e);
-//				}
-//				catch(StepAborted sa)
-//				{
-//				}
-//				catch(Throwable t)
-//				{
-//					fatalError(new RuntimeException(t));
-//				}
-
-			}
+//			// Process listener notifications from old component thread.
+////			boolean notifexecuted	= false;
+//			if(notifications!=null)
+//			{
+////				if(getComponent().toString().indexOf("IntermediateBlockingTest@")!=-1)
+////					System.err.println("unsetting notifications: "+getComponent());
+//				FutureHelper.addStackedListeners(notifications);
+//				notifications	= null;
+//				
+//				// Todo: termination and exception!?
+////				try
+////				{
+//					FutureHelper.notifyStackedListeners();
+////					notifexecuted	= true;
+////				}
+////				catch(Exception e)
+////				{
+////					fatalError(e);
+////				}
+////				catch(StepAborted sa)
+////				{
+////				}
+////				catch(Throwable t)
+////				{
+////					fatalError(new RuntimeException(t));
+////				}
+//
+//			}
+			if(endstepcnt!=-1 && debug)
+				getComponent().getLogger().severe("execute()2: "+getComponent().getId()+", "+IComponentIdentifier.LOCAL.get()+", endstepcnt="+endstepcnt+", stepcnt="+stepcnt);
 			
 //			boolean	again	= false;
 //			if(!breakpoint_triggered && !extexecuted  && !notifexecuted && (!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) || dostep))
@@ -1321,6 +1400,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			getComponent().suspendComponent(getComponent().getDescription().getName());
 		}
 		
+		if(endstepcnt!=-1 && debug)
+			getComponent().getLogger().severe("execute()3: "+getComponent().getId()+", "+IComponentIdentifier.LOCAL.get()+", endstepcnt="+endstepcnt+", stepcnt="+stepcnt+", "+step);
+
 		boolean	hasstep;
 		if(step!=null)
 		{
@@ -1357,13 +1439,24 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					step.getTransfer().afterSwitch();
 					
-//					if(getComponent().getId().getName().indexOf("Seller@BookTrading:")!=-1)
-//						System.out.println("executing: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+" "+new Date());
+					if(endstepcnt!=-1 && debug)
+						getComponent().getLogger().severe("execute()4: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState());
 					
-					stepfut	= step.getStep().execute(component);
-					
-//					if(getComponent().getId().getName().indexOf("Seller@BookTrading:")!=-1)
-//						System.out.println("executed: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+" "+new Date());
+					try
+					{
+						stepfut	= step.getStep().execute(component);
+
+						
+						if(endstepcnt!=-1 && debug)
+							getComponent().getLogger().severe("execute()5: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState());
+					}
+					catch(Throwable dummy)
+					{
+						if(endstepcnt!=-1 && debug)
+							getComponent().getLogger().severe("execute()6: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+"\n"+SUtil.getExceptionStacktrace(dummy));
+						
+						throw dummy;
+					}
 				}
 				else
 				{
@@ -1416,6 +1509,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				}
 				else if(ex instanceof ThreadDeath)
 				{
+					System.err.println("Thread death on component: "+component);
+					ex.printStackTrace();
+					
 					// Hard cleanup during kill.
 					resetExecutionState(cl);
 					throw (ThreadDeath)ex;
@@ -1470,7 +1566,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getFeature0(IMonitoringComponentFeature.class)!=null && 
 						getComponent().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 					{
-						stepfut.thenAccept(new Consumer<Object>()
+						stepfut.then(new Consumer<Object>()
 						{
 							@Override
 							public void accept(Object t)
@@ -1665,6 +1761,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				ret	= again || ret;
 			}
 		}
+		
+		if(endstepcnt!=-1 && debug)
+			getComponent().getLogger().severe("execute()7: endstepcnt="+endstepcnt+", ret="+ret+", endagenda.isDone()="+endagenda.isDone());
 		
 		if(endstepcnt!=-1 && !ret && !endagenda.isDone())
 		{
@@ -2024,7 +2123,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/**
 	 *  Execute a step of a suspended component.
 	 *  @param componentid The component identifier.
-	 *  @param listener Called when the step is finished (result will be the component description).
 	 */
 	public IFuture<Void> stepComponent(String stepinfo)
 	{
@@ -2209,6 +2307,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public <T> void addSimulationBlocker(IFuture<T> remotefuture)
 	{
+		//Thread.dumpStack();
+		
 		if (SSimulation.isSimulating(component))
 		{
 			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
@@ -2221,7 +2321,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(0));
+						ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(0));
 						if (simserv != null)
 						{
 							Future<Void> blocker = new Future<>();
@@ -2232,7 +2332,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 								public void resultAvailable(Void result)
 								{
 									@SuppressWarnings({ "rawtypes" })
-									IIntermediateResultListener rs = new IIntermediateResultListener()
+									IIntermediateResultListener rs = new IntermediateEmptyResultListener()
 									{
 										public void resultAvailable(Object result)
 										{
@@ -2241,9 +2341,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 										public void exceptionOccurred(Exception exception)
 										{
 											resultAvailable(null);
-										}
-										public void intermediateResultAvailable(Object result)
-										{
 										}
 										public void finished()
 										{

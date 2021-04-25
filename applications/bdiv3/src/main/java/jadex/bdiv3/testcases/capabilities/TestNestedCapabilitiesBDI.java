@@ -30,25 +30,25 @@ public class TestNestedCapabilitiesBDI
 		tc.addReport(tr1);
 		tc.addReport(tr2);
 		agent.getResults().put("testresults", tc);
-		mycapa.result.addResultListener(nil ->
+		mycapa.result.then(nil ->
 		{
 			tr1.setSucceeded(true);
 			checkFinished(agent);
-		}, ex ->
+		}).catchEx(ex ->
 		{
 			tr1.setFailed(ex);
 			checkFinished(agent);
 		});
-		mycapa.subcapa.result.addResultListener(nil ->
+		mycapa.subcapa.result.then(nil ->
 		{
 			tr2.setSucceeded(true);
 			checkFinished(agent);
-		}, ex ->
+		}).catchEx(ex ->
 		{
 			tr2.setFailed(ex);
 			checkFinished(agent);
 		});
-		agent.waitForDelay(500).addResultListener(nil ->
+		agent.waitForDelay(500).then(nil ->
 		{
 			mycapa.result.setException(new TimeoutException());
 			mycapa.subcapa.result.setException(new TimeoutException());

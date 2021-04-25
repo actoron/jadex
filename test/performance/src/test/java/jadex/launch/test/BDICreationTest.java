@@ -28,7 +28,7 @@ public class BDICreationTest //extends TestCase
 		long timeout	= -1;//BasicService.getDefaultTimeout();
 //		String projectroot = new String("jadex-integration-performance-test");
 //		System.out.println(resdir);
-		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(STest.getDefaultTestConfig(getClass()),
+		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(STest.createDefaultTestConfig(getClass()),
 			new String[]{
 //				"-platformname", "benchmarks_*", 
 ////			"-kernels", "\"micro\"",
@@ -38,7 +38,7 @@ public class BDICreationTest //extends TestCase
 //			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
 ////			"-componentfactory", "jadex.component.ComponentComponentFactory",
 ////			"-conf", "jadex.standalone.Platform.component.xml",
-//			"-printpass", "false"
+//			"-printsecret", "false"
 			}
 			).get(timeout);
 		

@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.cms;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
@@ -12,8 +13,8 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.base.Starter;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentCreationException;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.FactoryFilter;
@@ -83,6 +84,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.Tuple2Future;
@@ -228,6 +230,7 @@ public class SComponentManagementService
      *  Add a component listener for a specific component.
      *  The listener is registered for component changes.
      *  @param cid	The component to be listened.
+     *  @throws IllegalStateException when the component is not found.
      */
     public static ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(final IComponentIdentifier cid, IInternalAccess agent)
     {
@@ -368,7 +371,7 @@ public class SComponentManagementService
 	{
 		final Future<Tuple2<String, ClassLoader>> ret = new Future<Tuple2<String, ClassLoader>>();
 		
-		ILibraryService libservice = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+		ILibraryService libservice = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 		// Hack!!! May be null on platform init
 		
 		final IInternalAccess pad = getParentComponent(cinfo, agent);
@@ -544,13 +547,13 @@ public class SComponentManagementService
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							ret.setException(new ServiceNotFoundException("No component factory found for: "+model));
+							ret.setException((Exception) new ServiceNotFoundException("No component factory found for: "+model).initCause(exception));
 						}
 					});
 				}
 				else
 				{
-					ret.setException(new ServiceNotFoundException("No component factory found for: "+model));
+					ret.setException((Exception) new ServiceNotFoundException("No component factory found for: "+model).initCause(exception));
 				}
 			}
 		});
@@ -1088,7 +1091,6 @@ public class SComponentManagementService
 	/**
 	 *  Get the external access of a component.
 	 *  @param cid The component identifier.
-	 *  @param listener The result listener.
 	 */
 	public static IExternalAccess getExternalAccess(final IComponentIdentifier cid, IInternalAccess agent)
 	{
@@ -1461,6 +1463,8 @@ public class SComponentManagementService
 	 */
 	protected static void destroyComponent(final IComponentIdentifier cid,	final Future<Map<String, Object>> ret, IInternalAccess agent)
 	{
+		//System.out.println("destroy: "+cid);
+		
 		CmsState state = getState(cid);
 		InitInfo infos = state.getInitInfo(cid);
 		IPlatformComponentAccess comp = infos!=null ? infos.getComponent() : state.getAccess(cid);
@@ -1534,22 +1538,41 @@ public class SComponentManagementService
 							}
 						};
 						IResultListener<Void> lis = cid.getParent()==null? cc: createResultListener(agent, cc);
-						comp.shutdown().addResultListener(lis);
+						
+						// Debug hang on component termination:
+						IResultListener<Void> dummy	= new IResultListener<Void>() {
+							@Override
+							public void resultAvailable(Void result) {
+								agent.getLogger().info("Terminating component (result): "+cid.getName());
+								lis.resultAvailable(result);
+							}
+							@Override
+							public void exceptionOccurred(Exception exception) {
+								agent.getLogger().info("Terminating component (exception): "+cid.getName()
+									+ "\n"+SUtil.getExceptionStacktrace(exception));
+								lis.exceptionOccurred(exception);
+							}
+						};
+						
+						comp.shutdown().addResultListener(dummy);
 					}
 				}
 			};
 			
 			if(achildren != null && achildren.length > 0)
 			{
+				agent.getLogger().info("Terminating component structure (a): "+cid.getName()+", "+SUtil.arrayToString(achildren));
 				agent.getFeature(ISubcomponentsFeature.class).killComponents(achildren).addResultListener(new IResultListener<Collection<Tuple2<IComponentIdentifier, Map<String,Object>>>>()
 				{
 					public void resultAvailable(Collection<Tuple2<IComponentIdentifier, Map<String, Object>>> result)
 					{
+						agent.getLogger().info("Terminated component structure (1): "+cid.getName());
 						finishkill.run();
 					}
 					public void exceptionOccurred(Exception exception)
 					{
 //						exception.printStackTrace();
+						agent.getLogger().info("Terminated component structure (2): "+cid.getName()+", "+exception);
 						finishkill.run();
 						SComponentManagementService.exitDestroy(cid, desc, exception, null);
 					}
@@ -1557,6 +1580,7 @@ public class SComponentManagementService
 			}
 			else
 			{
+				agent.getLogger().info("Terminated component structure (3): "+cid.getName());
 				finishkill.run();
 			}
 		}			
@@ -1570,11 +1594,10 @@ public class SComponentManagementService
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.
 	 *  @param cid	The component to destroy.
+     *  @throws IllegalStateException when the component is not found.
 	 */
 	public static IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid, IInternalAccess agent)
 	{
-		if(cid.toString().indexOf("Sokrates")!=-1)
-			System.out.println("destroy: "+cid);
 //		if(cid.getParent()==null)
 //			System.out.println("---- !!!! ----- Killing platform ---- !!!! ----- "+cid.getName());
 //		System.out.println("Terminating component: "+cid.getName());
@@ -1591,9 +1614,17 @@ public class SComponentManagementService
 		Future<Map<String, Object>> tmp;
 		
 		CmsState state = getState(agent.getId());
+		if(debug(agent))
+			agent.getLogger().severe("destroy1: "+cid);
 		try(IAutoLock l = state.writeLock())
 		{
-			CmsComponentState compstate = state.getComponent(cid);
+			if(debug(agent))
+				agent.getLogger().severe("destroy2: "+cid);
+    		CmsComponentState compstate = state.getComponent(cid);
+    		if(compstate == null)
+    		{
+    			return new Future<>(new IllegalStateException("Component not found: " + cid));
+    		}
 			contains = compstate.getCleanupFuture() != null;
 			tmp = contains? (Future<Map<String, Object>>)compstate.getCleanupFuture(): new Future<Map<String, Object>>();
 	//		System.out.println("destroy0: "+cid+" "+cfs.containsKey(cid)+" "+tmp.isDone());
@@ -1618,20 +1649,28 @@ public class SComponentManagementService
 		final Future<Map<String, Object>> ret = tmp;
 		
 		if(!contains && !locked && inited)
+		{
+			if(debug(agent))
+				agent.getLogger().severe("destroy3: "+cid);
 			destroyComponent(cid, ret, agent);
+		}
+		if(debug(agent))
+		{
+			agent.getLogger().severe("destroy4 (contains, locked, inited): "+cid+" ("+contains+", "+locked+", "+inited+") "+IComponentIdentifier.LOCAL.get());
+		}
 
-		if(cid.toString().indexOf("Sokrates")!=-1)
+		if(debug(agent))
 		{
 			ret.addResultListener(new IResultListener<Map<String,Object>>()
 			{
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("destryCompo finished with ex: "+cid+" "+exception);
+					agent.getLogger().severe("destryCompo finished with ex: "+cid+" "+exception);
 				}
 				
 				public void resultAvailable(Map<String, Object> result)
 				{
-					System.out.println("destryCompo finished: "+cid);
+					agent.getLogger().severe("destryCompo finished: "+cid);
 				}
 			});
 		}
@@ -1855,7 +1894,7 @@ public class SComponentManagementService
 			IComponentIdentifier cid = component.getInternalAccess().getId();
 			
 			IArgumentsResultsFeature af = component.getInternalAccess().getFeature0(IArgumentsResultsFeature.class);
-			IResultListener<Collection<Tuple2<String, Object>>>	rl = new IIntermediateResultListener<Tuple2<String, Object>>()
+			IResultListener<Collection<Tuple2<String, Object>>>	rl = new IntermediateEmptyResultListener<Tuple2<String, Object>>()
 			{
 				public void exceptionOccurred(final Exception exception)
 				{
@@ -1943,7 +1982,6 @@ public class SComponentManagementService
 	 *  @param name The component name.
 	 *  @param model The model identifier (e.g. file name).
 	 *  @param info	The creation info, if any.
-	 *  @param listener The result listener (if any). Will receive the id of the component as result, when the component has been created.
 	 *  @param resultlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
 	// rw: cleanup futures, (loadModel), lock entries, init infos, components
@@ -2038,7 +2076,7 @@ public class SComponentManagementService
 						
 	//					Cause cause = curcause;
 						// todo: how to do platform init so that clock is always available?
-						IClockService cs = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(
+						IClockService cs = agent.getFeature(IRequiredServicesFeature.class).getLocalService(
 							new ServiceQuery<>(IClockService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 	//					final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master!=null ? master.booleanValue() : false,
 	//						daemon!=null ? daemon.booleanValue() : false, autosd!=null ? autosd.booleanValue() : false, sync!=null ? sync.booleanValue() : false,
@@ -2289,16 +2327,34 @@ public class SComponentManagementService
 						ret = method.invoke(feat, args);
 					}
 				}
-				catch(Exception e)
+				catch(Throwable e)
 				{
-					if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
+					if(e instanceof InvocationTargetException)
+					{
+						e	= ((InvocationTargetException) e).getTargetException();
+					}
+					
+					if(SReflect.isSupertype(Exception.class, e.getClass()) && SReflect.isSupertype(IFuture.class, method.getReturnType()))
 					{
 						ret = SFuture.getFuture(method.getReturnType());
-						((Future)ret).setException(e);
+						((Future)ret).setException((Exception) e);
 					}
 					else
 					{
-						throw e;
+						boolean found	= false;
+						Class<?>[]	extypes	= method.getExceptionTypes();
+						for(int i=0; !found && i<extypes.length; i++)
+						{
+							found	= SReflect.isSupertype(extypes[i], e.getClass());
+						}
+						if(found)
+						{
+							throw e;
+						}
+						else
+						{
+							throw SUtil.throwUnchecked(e);
+						}
 					}
 				}
 				return ret;
@@ -2379,6 +2435,11 @@ public class SComponentManagementService
 				ret.addIntermediateResultIfUndone(new CMSTerminatedEvent(SComponentManagementService.getDescription(mycid[0]), results, exception));
 				ret.setExceptionIfUndone(exception);
 			}
+			
+			public void maxResultCountAvailable(int max) 
+			{
+				ret.setMaxResultCount(max);
+			}
 		}, agent).addResultListener(new IResultListener<IComponentIdentifier>()
 		{
 			public void resultAvailable(IComponentIdentifier cid)
@@ -2448,8 +2509,8 @@ public class SComponentManagementService
 	// w: initinfos 
 	protected static void cleanup(IComponentIdentifier cid, Exception exception)
 	{
-		if(cid.toString().indexOf("Sokrates")!=-1)
-			System.out.println("Terminating component: "+cid.getName());
+		//if(cid.toString().indexOf("Sokrates")!=-1)
+		//	System.out.println("Terminating component: "+cid.getName());
 		
 		IPlatformComponentAccess comp = null;
 		IPlatformComponentAccess pad = null;
@@ -2685,5 +2746,13 @@ public class SComponentManagementService
 		{
 			return new Future<T>(new RuntimeException("Component not found to schedule: "+cid));
 		}
+	}
+	
+	/**
+	 *  Check if heisenbug debugging is requested for the agent.
+	 */
+	protected static boolean	debug(IInternalAccess agent)
+	{
+		return agent instanceof IPlatformComponentAccess && ((IPlatformComponentAccess) agent).getPlatformComponent().debug;
 	}
 }

@@ -7,8 +7,8 @@ import jadex.bridge.SFuture;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -38,7 +38,7 @@ public class PlayerAgent
 		
 		ITerminableIntermediateFuture<String> sub = ls.subscribeToLottery();
 		
-		sub.addIntermediateResultListener(new IIntermediateResultListener<String>()
+		sub.addResultListener(new IntermediateEmptyResultListener<String>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
@@ -53,6 +53,10 @@ public class PlayerAgent
 			public void intermediateResultAvailable(String item)
 			{
 //				System.out.println("Item offered: "+item);
+				
+				long delay = (long)(Math.random()*5000);
+				System.out.println("Thinking for "+(delay/1000.0)+" s :"+agent.getId());
+				agent.waitForDelay(delay).get();
 				
 				System.out.println(agent.getId()+": "+(ls.claimItem(item).get()? "I won item: ": "I did not win item: ")+item);
 			}

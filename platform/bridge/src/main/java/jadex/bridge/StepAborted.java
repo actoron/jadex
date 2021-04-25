@@ -5,4 +5,16 @@ package jadex.bridge;
  */
 public class StepAborted extends ThreadDeath 
 {
+	IComponentIdentifier	cid;
+	
+	public StepAborted(IComponentIdentifier cid)
+	{
+		this.cid	= cid;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return super.toString()+"("+cid+")";
+	}
 }

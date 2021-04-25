@@ -9,14 +9,14 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
@@ -25,7 +25,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Agent that provides a service with a stream.
  */
-@ProvidedServices(@ProvidedService(type=IStreamService.class))
+@ProvidedServices(@ProvidedService(type=IStreamService.class, scope=ServiceScope.GLOBAL))
 @Results(@Result(name="testcases", clazz=List.class))
 @Service(IStreamService.class)
 @Agent
@@ -147,7 +147,7 @@ public class StreamProviderAgent implements IStreamService
 		final Future<Long> ret = new Future<Long>();
 		
 		final long[] size = new long[1];
-		con.aread().addResultListener(new IIntermediateResultListener<byte[]>()
+		con.aread().addResultListener(new IntermediateEmptyResultListener<byte[]>()
 		{
 			public void resultAvailable(Collection<byte[]> result)
 			{
@@ -189,10 +189,10 @@ public class StreamProviderAgent implements IStreamService
 			{
 				con.write(new byte[]{(byte)cnt[0]});
 				size[0]++;
-				if(cnt[0]++<50)
+				if(++cnt[0]<getWriteLength())
 				{
 					agent.getFeature(IExecutionFeature.class)
-						.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 5.0/3000), this);
+						.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 5.0/30000), this);
 				}
 				else
 				{
@@ -203,7 +203,7 @@ public class StreamProviderAgent implements IStreamService
 			}
 		};
 		agent.getFeature(IExecutionFeature.class)
-			.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.0/30), step);
+			.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.0/300), step);
 		
 		return ret;
 	}
@@ -213,6 +213,6 @@ public class StreamProviderAgent implements IStreamService
 	 */
 	public static long getWriteLength()
 	{
-		return 51;
+		return 20;
 	}
 }

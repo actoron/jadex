@@ -38,7 +38,7 @@ public class RemoteReferenceParamAnnotationTest // extends TestCase
 		successIndicator = new Future<Boolean>();
 
 		platform1 = Starter.createPlatform(
-			new String[]{"-platformname", "testcases_*", "-saveonexit", "false", "-welcome", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
+			new String[]{"-platformname", "testcases_*", "-saveonexit", "false", "-welcome", "false", "-gui", "false", "-awareness", "false", "-printsecret", "false",
 				"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(timeout);
 		timeout	= Starter.getDefaultTimeout(platform1.getId());
 		
@@ -46,7 +46,7 @@ public class RemoteReferenceParamAnnotationTest // extends TestCase
 		ILocalService service1 = platform1.searchService( new ServiceQuery<>( ILocalService.class, ServiceScope.PLATFORM)).get(timeout);
 
 		platform2 = Starter.createPlatform(
-			new String[]{"-platformname", "testcases_*", "-saveonexit", "false", "-welcome", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
+			new String[]{"-platformname", "testcases_*", "-saveonexit", "false", "-welcome", "false", "-gui", "false", "-awareness", "false", "-printsecret", "false",
 				"-component", "jadex/launch/test/remotereference/SearchServiceProviderAgent.class"}).get(timeout);
 
 		// Connect platforms by creating proxy agents.

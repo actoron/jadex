@@ -22,11 +22,9 @@ dependencies
 	// Add transpors for testing
 	testImplementation project(':transports:intravm')
 	testImplementation project(':transports:tcp')
-	testImplementation project(':transports:relaytransport')
+	testImplementation project(':transports:relay')
 	
-	//testImplementation project(':transports:jadex-platform-extension-websockettransport')
-	// required for test suite (why?)
-	//testImplementation project(':kernels:jadex-kernel-component')
+	//testImplementation project(':transports:websocket')
 	
 	api 'javax.mail:mail:1.4.5'
 	api 'org.tukaani:xz:1.5'

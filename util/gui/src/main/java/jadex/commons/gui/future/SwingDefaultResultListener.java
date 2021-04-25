@@ -1,16 +1,12 @@
 package jadex.commons.gui.future;
 
 import java.awt.Component;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-import javax.swing.SwingUtilities;
-
-import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFunctionalExceptionListener;
-import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.gui.SGUI;
 
@@ -25,10 +21,10 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	protected Component parent;
 	
 	/** Custom result listener */
-	protected IFunctionalResultListener<E>	customResultListener;
+	protected Consumer<E>	customResultListener;
 	
 	/** Custom result listener */
-	protected IFunctionalExceptionListener	customExceptionListener;
+	protected Consumer<Exception>	customExceptionListener;
 	
 	//-------- constructors --------
 	
@@ -37,7 +33,7 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	 * 
 	 * @param listener The listener.
 	 */
-	public SwingDefaultResultListener(IFunctionalResultListener<E> customResultListener)
+	public SwingDefaultResultListener(Consumer<E> customResultListener)
 	{
 		this(customResultListener, null);
 	}
@@ -48,7 +44,7 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	 * @param customResultListener The custom result listener.
 	 * @param customExceptionListener The listener that is called on exceptions.
 	 */
-	public SwingDefaultResultListener(IFunctionalResultListener<E> customResultListener, IFunctionalExceptionListener customExceptionListener)
+	public SwingDefaultResultListener(Consumer<E> customResultListener, Consumer<Exception> customExceptionListener)
 	{
 		this(customResultListener, customExceptionListener, null);
 	}
@@ -61,7 +57,7 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	 * @param parent The parent component (when errors should be shown as
 	 *        dialog).
 	 */
-	public SwingDefaultResultListener(IFunctionalResultListener<E> customResultListener, IFunctionalExceptionListener customExceptionListener, Component parent)
+	public SwingDefaultResultListener(Consumer<E> customResultListener, Consumer<Exception> customExceptionListener, Component parent)
 	{
 		this(parent);
 		this.customResultListener = customResultListener;
@@ -140,7 +136,7 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	 */
 	public void customResultAvailable(E result) {
 		if (customResultListener != null) {
-			customResultListener.resultAvailable(result);
+			customResultListener.accept(result);
 		}
 	}
 	
@@ -151,7 +147,7 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	public void customExceptionOccurred(Exception exception)
 	{
 		if (customExceptionListener != null) {
-			customExceptionListener.exceptionOccurred(exception);
+			customExceptionListener.accept(exception);
 		} else {
 			if(parent!=null)
 			{

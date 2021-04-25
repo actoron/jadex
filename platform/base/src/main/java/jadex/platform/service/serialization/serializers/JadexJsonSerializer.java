@@ -3,9 +3,12 @@ package jadex.platform.service.serialization.serializers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +17,7 @@ import com.eclipsesource.json.JsonValue;
 
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.commons.Base64;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.IErrorReporter;
@@ -202,7 +206,8 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 			wr.write("{");
 			
 //			wr.writeClass(byte[].class);
-			wr.write("\"").write(JsonTraverser.CLASSNAME_MARKER).write("\":\"bytearray\",");
+			if(wr.isWriteClass())
+				wr.write("\"").write(JsonTraverser.CLASSNAME_MARKER).write("\":\"bytearray\",");
 			
 			if(wr.isWriteId())
 			{
@@ -211,8 +216,7 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 			}
 			
 			wr.write("\"__base64\":");
-			wr.write("\"" + Base64.encode((byte[]) object) + "\"");
-			
+			wr.write("\"" +new String(Base64.encode((byte[])object), SUtil.UTF8)+ "\"");
 			wr.write("}");
 			return object;
 		}
@@ -222,14 +226,16 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 	{
 		public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 		{
-			boolean ret = false;
+			Class<?> clazz = SReflect.getClass(type);
+			return object instanceof JsonObject && (SReflect.isSupertype(byte[].class, clazz) || SReflect.isSupertype(Byte[].class, clazz));
+			/*boolean ret = false;
 			if(object instanceof JsonObject)
 			{
 				JsonValue c = ((JsonObject)object).get(JsonTraverser.CLASSNAME_MARKER);
 				String cl = c!=null? c.asString(): null;
 				ret = "bytearray".equals(cl);
 			}
-			return ret;
+			return ret;*/
 		}
 
 		public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)

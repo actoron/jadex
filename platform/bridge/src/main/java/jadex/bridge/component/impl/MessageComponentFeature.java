@@ -45,7 +45,6 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.Tuple2;
-import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -298,6 +297,9 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		Tuple2<ITransportService, Integer> cachedtransport = getTransportCache(component.getId().getRoot()).get(rplat);
 		if(cachedtransport != null)
 		{
+			if(getComponent().getId().toString().indexOf("TerminateTest")!=-1)
+				System.out.println("sendToTransports: sending msg with: "+cachedtransport.getFirstEntity());
+			
 			//if(isSecurityMessage(header))
 			//	System.out.println("sending sec msg with: "+cachedtransport.getFirstEntity());
 			cachedtransport.getFirstEntity().sendMessage(header, encheader, encryptedbody).addResultListener(execfeat.createResultListener(new IResultListener<Integer>()
@@ -328,14 +330,16 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				// Check first to avoid creating an exception.
 				if(!ret.isDone())
 				{
-					ret.setExceptionIfUndone(new TimeoutException("Timeout occured by " + component.getId().toString() + " while sending message to " + header.getProperty(IMsgHeader.RECEIVER))// rplat)
+					@SuppressWarnings("serial")
+					Exception	ex	= new TimeoutException("Timeout occured by " + component.getId().toString() + " while sending message to " + header.getProperty(IMsgHeader.RECEIVER))// rplat)
 					{
 						@Override
 						public void printStackTrace()
 						{
 							super.printStackTrace();
 						}
-					});
+					};
+					ret.setExceptionIfUndone(ex);
 				}
 				return IFuture.DONE;
 			}
@@ -384,7 +388,10 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		{
 //			System.out.println("Received message: "+header);
 			
-			getSecurityService().decryptAndAuth((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), bodydata).addResultListener(
+			ISecurityService	secserv	= getSecurityService();
+			IComponentIdentifier	sender	= (IComponentIdentifier)header.getProperty(IMsgHeader.SENDER);
+			IFuture<Tuple2<ISecurityInfo,byte[]>>	fut	= secserv.decryptAndAuth(sender, bodydata);
+			fut.addResultListener(
 				component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Tuple2<ISecurityInfo,byte[]>>()
 			{
 				public void resultAvailable(Tuple2<ISecurityInfo, byte[]> result)
@@ -478,24 +485,33 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		Future<Void> ret = new Future<>();
 		Collection<ITransportService> transports = getAllTransports();
 		
+		if(getComponent().getId().toString().indexOf("TerminateTest")!=-1)
+			System.out.println("sendToAllTransports0: sending sec msg with all: "+transports);
+		
 		//if(isSecurityMessage(header))
 		//	System.out.println("sending sec msg with all: "+transports);
 		
 		if(transports.size()==0)
 		{
 			RuntimeException re = new RuntimeException("No message transport available: "+component.getId()+" "+header);
-			re.printStackTrace();
+//			re.printStackTrace();
 			ret.setException(re);
 		}
 		else
 		{
+			int[]	cnt	= new int[]{transports.size()};
 			for(final ITransportService transport : transports)
 			{
+				if(getComponent().getId().toString().indexOf("TerminateTest")!=-1)
+					System.out.println("sendToAllTransports1: sending msg with: "+transport);
+//				component.getLogger().info("sending msg with0: "+transport);
 				transport.sendMessage(header, encheader, encryptedbody).addResultListener(execfeat.createResultListener(new IResultListener<Integer>()
 				{
-					int cnt;
 					public void resultAvailable(Integer result)
 					{
+						if(getComponent().getId().toString().indexOf("TerminateTest")!=-1)
+							System.out.println("sendToAllTransports2: sent msg with: "+transport+", "+result);
+//						component.getLogger().info("sending msg with1: "+transport);
 						// Successful sent, check if transport cache needs to be updated (to speedup further sending)
 						Map<IComponentIdentifier, Tuple2<ITransportService, Integer>> cache = getTransportCache(platformid);
 						if(cache.get(rplat) == null || cache.get(rplat).getSecondEntity() < result)
@@ -508,14 +524,19 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	
 					public void exceptionOccurred(Exception exception)
 					{
-						cnt++;
+						if(getComponent().getId().toString().indexOf("TerminateTest")!=-1)
+							System.out.println("sendToAllTransports3: sending msg failed with: "+transport+"\n"+SUtil.getExceptionStacktrace(exception));
+//						component.getLogger().info("sending msg with2: "+transport);
+						cnt[0]--;
 						
 //						System.out.println("Transport failed: "+cnt+"/"+transports.size()+" "+exception);
 						//exception.printStackTrace();
 					
-						if(cnt==transports.size())
+						if(cnt[0]==0)
 						{
-							System.out.println("Finally failed to send message: "+exception);
+							if(getComponent().getId().toString().indexOf("TerminateTest")!=-1)
+								System.out.println("sendToAllTransports4: Finally failed to send message: "+transport);
+							component.getLogger().warning("Finally failed to send message: "+exception);
 							ret.setExceptionIfUndone(exception);
 						}
 					}
@@ -641,7 +662,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 //		if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
 //			throw new RuntimeException("wrooongMMMM");
-//		System.out.println("doSendMessage: "+header+", "+message);
+//		component.getLogger().info("doSendMessage: "+header+", "+message);
 		
 		final Future<Void> ret = new Future<Void>();
 
@@ -690,6 +711,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				byte[] bheader = serialserv.encode(header, component, header);
 				byte[] body = serialserv.encode(header, component, message);
 				final ISecurityService secserv = getSecurityService();
+				//System.out.println("doSendMsg: "+header+" "+component+" "+message);
 				secserv.encryptAndSign(header, bheader).addResultListener(
 					component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<byte[], Void>((Future<Void>) ret)
 				{
@@ -1574,7 +1596,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			@SuppressWarnings("unchecked")
 			Class<? extends IMessagePreprocessor<Object>> pclazz	= (Class<? extends IMessagePreprocessor<Object>>)
 				Class.forName(clazz.getName()+"Preprocessor", true, clazz.getClassLoader());
-			ret	= pclazz.newInstance();
+			ret	= pclazz.getDeclaredConstructor().newInstance();
 		}
 		catch(ClassNotFoundException e)
 		{

@@ -157,7 +157,7 @@ public class MinimalAgentCreationAgent
 			// If nested, use initial component to kill others
 //				else
 			{
-//				IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
+//				IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 				String	initial	= createPeerName(1, agent.getId());
 				IComponentIdentifier	cid	= new ComponentIdentifier(initial, agent.getId().getRoot());
 				agent.getExternalAccessAsync(cid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess>()
@@ -231,7 +231,7 @@ public class MinimalAgentCreationAgent
 	protected void killLastPeer(final int max, final long killstarttime, final double dur, final double pera, 
 		final long omem, final double upera)
 	{
-		IClockService cs = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
+		IClockService cs = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
 		long killend = cs.getTime();
 		System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
 		double killdur = ((double)killend-killstarttime)/1000.0;

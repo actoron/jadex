@@ -78,13 +78,10 @@ import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.NFRPropertyInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.nonfunctional.annotation.SNameValue;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Value;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
@@ -95,9 +92,7 @@ import jadex.micro.MicroClassReader;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Component;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.Publish;
 import jadex.micro.annotation.RequiredService;
 import jadex.rules.eca.EventType;
 
@@ -324,6 +319,51 @@ public class BDIClassReader extends MicroClassReader
 //					beliefnames.add(fields[i].getName());
 				}
 			}
+
+			// Find method beliefs
+			Method[] methods = clazz.getDeclaredMethods();
+			for(int i=0; i<methods.length; i++)
+			{
+				if(isAnnotationPresent(methods[i], Belief.class, cl))
+				{
+					Belief bel = getAnnotation(methods[i], Belief.class, cl);
+
+					String name = methods[i].getName().substring(methods[i].getName().startsWith("is") ? 2 : 3);
+					name = name.substring(0, 1).toLowerCase()+name.substring(1);
+
+					MBelief mbel = bdimodel.getCapability().getBelief(name);
+					if(mbel!=null)
+					{
+						if(methods[i].getName().startsWith("get") || methods[i].getName().startsWith("is"))
+						{
+							mbel.setGetter(new MethodInfo(methods[i]));
+						}
+						else
+						{
+							mbel.setSetter(new MethodInfo(methods[i]));
+						}
+					}
+					else
+					{
+						Set<EventType> rawevents = null;
+						if(bel.rawevents().length>0)
+						{
+							rawevents = new HashSet<EventType>();
+							RawEvent[] rawevs = bel.rawevents();
+							for(RawEvent rawev: rawevs)
+							{
+								rawevents.add(BDIAgentFeature.createEventType(rawev));
+							}
+						}
+
+						boolean	dynamic	= bel.dynamic() || bel.updaterate()>0;// || rawevents!=null || bel.beliefs().length>0;
+						bdimodel.getCapability().addBelief(new MBelief(new MethodInfo(methods[i]),
+							bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName(),
+							dynamic, bel.updaterate(), bel.beliefs().length==0? null: bel.beliefs(), rawevents));
+					}
+				}
+			}
+
 			
 			// Find external goals
 			if(isAnnotationPresent(clazz, Goals.class, cl))
@@ -353,8 +393,7 @@ public class BDIClassReader extends MicroClassReader
 				}
 			}
 			
-			// Find method plans or beliefs
-			Method[] methods = clazz.getDeclaredMethods();
+			// Find method plans
 			for(int i=0; i<methods.length; i++)
 			{
 				if(isAnnotationPresent(methods[i], Plan.class, cl))
@@ -362,44 +401,6 @@ public class BDIClassReader extends MicroClassReader
 //					System.out.println("found plan: "+methods[i].getName());
 					Plan p = getAnnotation(methods[i], Plan.class, cl);
 					getMPlan(bdimodel, p, new MethodInfo(methods[i]), null, cl, pubs);
-				}
-				else if(isAnnotationPresent(methods[i], Belief.class, cl))
-				{
-					Belief bel = getAnnotation(methods[i], Belief.class, cl);
-					
-					String name = methods[i].getName().substring(methods[i].getName().startsWith("is") ? 2 : 3);
-					name = name.substring(0, 1).toLowerCase()+name.substring(1);
-					
-					MBelief mbel = bdimodel.getCapability().getBelief(name);
-					if(mbel!=null)
-					{
-						if(methods[i].getName().startsWith("get") || methods[i].getName().startsWith("is"))
-						{
-							mbel.setGetter(new MethodInfo(methods[i]));
-						}
-						else
-						{
-							mbel.setSetter(new MethodInfo(methods[i]));
-						}
-					}
-					else
-					{
-						Set<EventType> rawevents = null;
-						if(bel.rawevents().length>0)
-						{
-							rawevents = new HashSet<EventType>();
-							RawEvent[] rawevs = bel.rawevents();
-							for(RawEvent rawev: rawevs)
-							{
-								rawevents.add(BDIAgentFeature.createEventType(rawev)); 
-							}
-						}
-						
-						boolean	dynamic	= bel.dynamic() || bel.updaterate()>0;// || rawevents!=null || bel.beliefs().length>0;
-						bdimodel.getCapability().addBelief(new MBelief(new MethodInfo(methods[i]), 
-							bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName(),
-							dynamic, bel.updaterate(), bel.beliefs().length==0? null: bel.beliefs(), rawevents));
-					}
 				}
 			}
 			
@@ -459,28 +460,7 @@ public class BDIClassReader extends MicroClassReader
 						ProvidedServiceInfo[] psis = new ProvidedServiceInfo[provs.length];
 						for(int j=0; j<provs.length; j++)
 						{
-							Implementation im = provs[j].implementation();
-							Value[] inters = im.interceptors();
-							UnparsedExpression[] interceptors = null;
-							if(inters.length>0)
-							{
-								interceptors = new UnparsedExpression[inters.length];
-								for(int k=0; k<inters.length; k++)
-								{
-									interceptors[k] = new UnparsedExpression(null, inters[k].clazz().getName(), inters[k].value(), null);
-								}
-							}
-							RequiredServiceBinding bind = null;//createBinding(im.binding());
-							ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
-								im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
-							Publish p = provs[j].publish();
-							PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(), p.multi(),
-								p.mapping(), SNameValue.createUnparsedExpressions(p.properties()));
-							
-							NameValue[] props = provs[j].properties();
-							List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(SNameValue.createUnparsedExpressions(props))) : null;
-							
-							psis[j] = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl, provs[j].scope(), pi, serprops);
+							psis[j] = createProvidedServiceInfo(provs[j]);
 							configinfo.setProvidedServices(psis);
 						}
 						
@@ -563,7 +543,7 @@ public class BDIClassReader extends MicroClassReader
 				BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
 			
 			// todo: allow specifying scope
-			modelinfo.addProvidedService(new ProvidedServiceInfo(null, key, psi, null, null, null, false));
+			modelinfo.addProvidedService(new ProvidedServiceInfo(null, key, psi));
 		}
 		
 		// Create enhanced classes if not already present.

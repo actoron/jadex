@@ -5,6 +5,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.ICommand;
 import jadex.commons.future.Future;
@@ -29,7 +30,7 @@ import jadex.micro.annotation.ProvidedServices;
  * 
  */
 @Agent
-@ProvidedServices(@ProvidedService(type=ITestService.class))
+@ProvidedServices(@ProvidedService(type=ITestService.class, scope=ServiceScope.GLOBAL))
 @Service
 public class ProviderAgent implements ITestService
 {
@@ -54,7 +55,7 @@ public class ProviderAgent implements ITestService
 	 */
 	public ITerminableFuture<Void> method2()
 	{
-		TerminableFuture<Void> ret = (TerminableFuture<Void>)SFuture.getNoTimeoutFuture(TerminableFuture.class, agent);
+		TerminableFuture<Void> ret = new TerminableFuture<Void>();
 //		System.out.println("Called tmethod2");
 		doCall(ret);
 		return ret;
@@ -65,7 +66,7 @@ public class ProviderAgent implements ITestService
 	 */
 	public IIntermediateFuture<Void> method3()
 	{
-		final IntermediateFuture<Void> ret = (IntermediateFuture<Void>)SFuture.getNoTimeoutFuture(IntermediateFuture.class, agent);
+		final IntermediateFuture<Void> ret = new IntermediateFuture<Void>();
 //		System.out.println("Called imethod3");
 		doCall(ret);
 		return ret;
@@ -76,7 +77,7 @@ public class ProviderAgent implements ITestService
 	 */
 	public ISubscriptionIntermediateFuture<Void> method4()
 	{
-		final SubscriptionIntermediateFuture<Void> ret = (SubscriptionIntermediateFuture<Void>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
+		final SubscriptionIntermediateFuture<Void> ret = new SubscriptionIntermediateFuture<Void>();
 //		System.out.println("Called smethod4");
 		doCall(ret);
 		return ret;
@@ -111,18 +112,16 @@ public class ProviderAgent implements ITestService
 	 */
 	protected void doCall(final Future<?> ret)
 	{
-//		SFuture.avoidCallTimeouts(ret, agent.getExternalAccess());
-		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		long to = sc.getTimeout();
-
-//		System.out.println("Timeout is: " + to);
-		
 		boolean realtime = sc.isRemoteCall(agent.getId());
 		
+		SFuture.avoidCallTimeouts(ret, agent.getExternalAccess(), to, 0.5, realtime);
+		
+		System.out.println("Timeout is: " + to);		
 		System.out.println(agent + " isRemote / Realtime: " + realtime);
 	
-		final long wait = to>0? to*2: 0;
+		final long wait = to>0? (long)(to*1.2): 0;
 		final long startwait = System.currentTimeMillis();
 //		System.out.println("waiting: "+wait+", "+System.currentTimeMillis());
 		agent.getFeature(IExecutionFeature.class).waitForDelay(wait, new IComponentStep<Void>()

@@ -26,13 +26,15 @@ public class WriteContextTask extends AbstractTask
 	 *  Execute the task.
 	 */
 	public void doExecute(ITaskContext context, IInternalAccess instance) throws Exception
-	{
+	{		
 		if(context.hasParameterValue("name"))
 		{
 			String name = (String)context.getParameterValue("name");
 			Object val = context.getParameterValue("value");
 			Object key = context.getParameterValue("key");
 			((IInternalBpmnComponentFeature)instance.getFeature(IBpmnComponentFeature.class)).setContextVariable(name, key, val);
+		
+			//System.out.println("write context task: "+instance.getId()+" "+name+" "+val);
 		}
 		
 		for(int i=0; ; i++)

@@ -1,10 +1,8 @@
 package jadex.platform.service.chat;
 
-
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
-import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -22,11 +20,11 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Description("This agent offers a chat service.")
 @ProvidedServices({
-	@ProvidedService(name="chat", type=IChatService.class, implementation=@Implementation(ChatService.class)),
+	@ProvidedService(name="chat", type=IChatService.class, implementation=@Implementation(ChatService.class), scope = ServiceScope.GLOBAL),
 	@ProvidedService(name="chatgui", scope=ServiceScope.PLATFORM, type=IChatGuiService.class, implementation=@Implementation(expression="$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"chat\")"))
 })
 @RequiredServices(
-	@RequiredService(name="chatservices", type=IChatService.class, scope=ServiceScope.GLOBAL) // multiple=true
+	@RequiredService(name="chatservices", type=IChatService.class, scope=ServiceScope.GLOBAL)
 )
 @Arguments(@Argument(name="nosave", clazz=boolean.class, description="Don't save settings."))
 @Agent

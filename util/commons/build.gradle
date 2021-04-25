@@ -4,3 +4,7 @@ dependencies
 {
 }
 
+javadoc {
+	// Do not include resources dir in javadoc classpath (not needed and generated version.properties breaks caching)
+	classpath =  sourceSets.main.output.classesDirs
+}

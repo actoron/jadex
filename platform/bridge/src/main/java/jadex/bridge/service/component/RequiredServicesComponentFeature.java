@@ -52,12 +52,14 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
+import jadex.javaparser.SJavaParser;
 
 /**
  *  Feature for provided services.
@@ -97,25 +99,17 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	public IFuture<Void> init()
 	{
 		ServiceQuery<ISearchQueryManagerService> query = new ServiceQuery<>(ISearchQueryManagerService.class);
-		UnresolvedServiceInvocationHandler h = new UnresolvedServiceInvocationHandler(component, query);
+		//UnresolvedServiceInvocationHandler h = new UnresolvedServiceInvocationHandler(component, query);
 		//sqms = (ISearchQueryManagerService) ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{IService.class, ISearchQueryManagerService.class}, h);
 		
-		sqms = searchLocalService(new ServiceQuery<>(query).setMultiplicity(0));
+		sqms = getLocalService(new ServiceQuery<>(query).setMultiplicity(0));
 		if(sqms == null)
 		{
 			delayedremotequeries = new ArrayList<>();
 			
 			ISubscriptionIntermediateFuture<ISearchQueryManagerService> sqmsfut = addQuery(query);
-			sqmsfut.addResultListener(new IIntermediateResultListener<ISearchQueryManagerService>()
+			sqmsfut.addResultListener(new IntermediateEmptyResultListener<ISearchQueryManagerService>()
 			{
-				public void resultAvailable(Collection<ISearchQueryManagerService> result)
-				{
-				}
-
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-
 				public void intermediateResultAvailable(ISearchQueryManagerService result)
 				{
 					//System.out.println("ISearchQueryManagerService "+result);
@@ -130,10 +124,6 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 						}
 						delayedremotequeries = null;
 					}
-				}
-
-				public void finished()
-				{
 				}
 			});
 		}
@@ -356,7 +346,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		if(info==null)
 		{
 			// Convenience case: switch to search when type not declared
-			return searchLocalService(new ServiceQuery<>(type));
+			return getLocalService(new ServiceQuery<>(type));
 		}
 		else
 		{
@@ -377,7 +367,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		if(info==null)
 		{
 			// Convenience case: switch to search when type not declared
-			return searchLocalService(new ServiceQuery<>(type).setMultiplicity(Multiplicity.ZERO_ONE));
+			return getLocalService(new ServiceQuery<>(type).setMultiplicity(Multiplicity.ZERO_ONE));
 		}
 		else
 		{
@@ -410,7 +400,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		if(info==null)
 		{
 			// Convenience case: switch to search when type not declared
-			return searchLocalServices(new ServiceQuery<>(type));
+			return getLocalServices(new ServiceQuery<>(type));
 		}
 		else
 		{
@@ -437,7 +427,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 *  @param query The search query.
 	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
-	public <T> T searchLocalService(ServiceQuery<T> query)
+	public <T> T getLocalService(ServiceQuery<T> query)
 	{
 		return resolveLocalService(query, ServiceQuery.createServiceInfo(query));
 	}
@@ -458,7 +448,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 *  @param query The search query.
 	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
 	 */
-	public <T> Collection<T> searchLocalServices(ServiceQuery<T> query)
+	public <T> Collection<T> getLocalServices(ServiceQuery<T> query)
 	{
 		return resolveLocalServices(query, ServiceQuery.createServiceInfo(query));
 	}
@@ -478,12 +468,8 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		
 		ISubscriptionIntermediateFuture<T> queryfut = addQuery(query);
 		
-		queryfut.addResultListener(new IIntermediateResultListener<T>()
+		queryfut.addResultListener(new IntermediateEmptyResultListener<T>()
 		{
-			public void resultAvailable(Collection<T> result)
-			{
-			}
-
 			public void exceptionOccurred(Exception exception)
 			{
 				ret.setExceptionIfUndone(exception);
@@ -494,10 +480,6 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 				ret.setResultIfUndone(result);
 				queryfut.terminate();
 			}
-
-			public void finished()
-			{
-			}
 		});
 		
 		long to = timeout;
@@ -505,7 +487,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		
 		if(to>0)
 		{
-			component.waitForDelay(timeout, true).thenAccept(done -> 
+			component.waitForDelay(timeout, true).then(done -> 
 			{
 				Multiplicity m = query.getMultiplicity();
 				if(m.getFrom()>0)
@@ -563,6 +545,11 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			{
 				ret.setFinishedIfUndone();
 			}
+			
+			public void maxResultCountAvailable(int max) 
+			{
+				ret.setMaxResultCount(max);
+			}
 		});
 		
 		long to = timeout;
@@ -570,7 +557,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		
 		if(to>0)
 		{
-			component.waitForDelay(timeout, true).thenAccept(done -> 
+			component.waitForDelay(timeout, true).then(done -> 
 			{
 				Exception e;
 				Multiplicity m = query.getMultiplicity();
@@ -737,6 +724,24 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	//-------- impl/raw methods --------
 	
 	/**
+	 * 
+	 * @param result
+	 * @param info
+	 * @return
+	 */
+	protected Object processResult(Object result, RequiredServiceInfo info)
+	{
+		if(result instanceof ServiceEvent)
+			return processServiceEvent((ServiceEvent)result, info);
+		else if(result instanceof IServiceIdentifier)
+			return getServiceProxy((IServiceIdentifier)result, info);
+		else if(result instanceof IService)
+			return addRequiredServiceProxy((IService)result, info);
+		else
+			return result;
+	}
+	
+	/**
 	 *  Search for matching services and provide first result.
 	 *  @param query The search query.
 	 *  @param info Used for required service proxy configuration -> null for no proxy.
@@ -753,14 +758,14 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		{
 			ret = new TerminableFuture<>();
 			@SuppressWarnings("unchecked")
-			T t = (T)createServiceProxy(sid, info);
+			T t = (T)getServiceProxy(sid, info);
 			ret.setResult(t);
 		}
 		
 		// If not found -> try to find remotely
 		else if(isRemote(query) && sqms != null)
 		{
-//			ISearchQueryManagerService sqms = searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+//			ISearchQueryManagerService sqms = getLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 //			if(sqms!=null)
 //			{
 			
@@ -773,7 +778,18 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 				@Override
 				public Object handleResult(Object result) throws Exception
 				{
-					return createServiceProxy(result, info);
+					// todo: remove after superpeer fix
+					result = processResult(result, info);
+					if(result==null)
+					{
+						if(query.getMultiplicity().getFrom()!=0)
+						{
+							throw new ServiceNotFoundException(query);
+						}
+					}
+					return result;
+					
+					//return processResult(result, info);
 				}
 			});
 			((IInternalExecutionFeature)component.getFeature(IExecutionFeature.class)).addSimulationBlocker(ret);
@@ -791,7 +807,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			}
 			else
 			{
-				ret.setException(new ServiceNotFoundException(query.toString()));
+				ret.setException(new ServiceNotFoundException(query));
 			}
 		}
 		
@@ -814,11 +830,11 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		IServiceIdentifier sid = ServiceRegistry.getRegistry(getInternalAccess()).searchService(query);
 		
 		if(sid==null && query.getMultiplicity().getFrom()>0)
-			throw new ServiceNotFoundException(query.toString());
+			throw new ServiceNotFoundException(query);
 				
 		// Fetches service and wraps result in proxy, if required. 
 		@SuppressWarnings("unchecked")
-		T ret = sid!=null ? (T)createServiceProxy(sid, info) : null;
+		T ret = sid!=null ? (T)getServiceProxy(sid, info) : null;
 		return ret;
 	}
 	
@@ -836,7 +852,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 //			System.out.println("here");
 		
 		// Check if remote
-//		ISearchQueryManagerService sqms = isRemote(query) ? searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE)) : null;
+//		ISearchQueryManagerService sqms = isRemote(query) ? getLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE)) : null;
 //		if(isRemote(query) && sqms==null)
 //		{
 //			getComponent().getLogger().warning("No ISearchQueryManagerService found for remote search: "+query);
@@ -905,7 +921,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 						if(max<0 || ++resultcnt[0]<=max)
 						{
 							scf.insert(result.toString());
-							return createServiceProxy(result, info);
+							return processResult(result, info);
 						}
 						else
 						{
@@ -1029,7 +1045,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		for(IServiceIdentifier result: results)
 		{
 			@SuppressWarnings("unchecked")
-			T service = (T)createServiceProxy(result, info);
+			T service = (T)getServiceProxy(result, info);
 			ret.add(service);
 		}
 		
@@ -1047,8 +1063,10 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		enhanceQuery(query, true);
 		SlidingCuckooFilter scf = new SlidingCuckooFilter();
 		
+		//System.out.println("query: "+query);
+		
 		// Query remote
-//		ISearchQueryManagerService sqms = searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+//		ISearchQueryManagerService sqms = getLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 //		if(isRemote(query) && sqms==null)
 //		{
 //			return new SubscriptionIntermediateFuture<>(new IllegalStateException("No ISearchQueryManagerService found for remote query: "+query));
@@ -1097,7 +1115,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 					if(max<0 || resultcnt[0]<=max)
 					{
 						scf.insert(result.toString());
-						return createServiceProxy(result, info);
+						return processResult(result, info);
 					}
 					else
 					{
@@ -1166,14 +1184,14 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		// Add remote results to future (functionality handles wrapping)
 		if(remotes!=null)
 		{
-			remotes.addIntermediateResultListener(
+			remotes.next(
 				result->
 				{
 					@SuppressWarnings("unchecked")
 					IntermediateFuture<T> fut = (IntermediateFuture<T>)ret[0];
 					fut.addIntermediateResultIfUndone(result);
-				},
-				exception -> {}); // Ignore exception (printed when no listener supplied)
+				})
+			.catchEx(exception -> {}); // Ignore exception (printed when no listener supplied)
 		}
 		
 		return ret[0];
@@ -1184,8 +1202,17 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	/**
 	 * When searching for declared service -> map required service declaration to service query.
 	 */
-	protected <T> ServiceQuery<T> getServiceQuery(RequiredServiceInfo info)
+	public <T> ServiceQuery<T> getServiceQuery(RequiredServiceInfo info)
 	{
+		// Evaluate and replace scope expression, if any.
+		ServiceScope scope = info.getDefaultBinding()!=null ? info.getDefaultBinding().getScope() : null;
+		if(ServiceScope.EXPRESSION.equals(scope))
+		{
+			scope = (ServiceScope)SJavaParser.getParsedValue(info.getDefaultBinding().getScopeExpression(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
+			info	= new RequiredServiceInfo(info.getName(), info.getType(), info.getMin(), info.getMax(),
+				new RequiredServiceBinding(info.getDefaultBinding()).setScope(scope),
+				info.getNFRProperties(), info.getTags());
+		}
 		return ServiceQuery.getServiceQuery(getComponent().getInternalAccess(), info);
 	}
 	
@@ -1222,47 +1249,77 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 *  User object is either event or service (with or without required proxy).
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected Object createServiceProxy(Object service, RequiredServiceInfo info)
+	protected ServiceEvent processServiceEvent(ServiceEvent event, RequiredServiceInfo info)
 	{
-		ServiceEvent event = null;
-		if (service instanceof ServiceEvent)
+		if(event.getService() instanceof IService)
 		{
-			event = (ServiceEvent) service;
-			service = event.getService();
+			IService service = addRequiredServiceProxy((IService)event.getService(), info);
+			event.setService(service);
+		}
+		else if(event.getService() instanceof IServiceIdentifier
+			&& event.getType()!=ServiceEvent.SERVICE_REMOVED)
+		{
+			IService service = getServiceProxy((IServiceIdentifier)event.getService(), info);
+			// can null when service is not available any more
+			if(service!=null)
+				event.setService(service);
 		}
 		
+		return event;
+	}
+	
+	/**
+	 *  Create the user-facing object from the received search or query result.
+	 *  Result may be service object, service identifier (local or remote), or event.
+	 *  User object is either event or service (with or without required proxy).
+	 */
+	@SuppressWarnings({"rawtypes", "unchecked" })
+	public IService getServiceProxy(IServiceIdentifier sid, RequiredServiceInfo info)
+	{
+		IService ret = null;
+		
 		// If service identifier -> find/create service object or proxy
-		if(service instanceof IServiceIdentifier)
+			
+		// Local component -> fetch local service object.
+		if(sid.getProviderId().getRoot().equals(getComponent().getId().getRoot()))
 		{
-			IServiceIdentifier sid = (IServiceIdentifier)service;
-			
-			// Local component -> fetch local service object.
-			if(sid.getProviderId().getRoot().equals(getComponent().getId().getRoot()))
-			{
-				service = ServiceRegistry.getRegistry(getInternalAccess()).getLocalService(sid); 			
-			}
-			
-			// Remote component -> create remote proxy
-			else
-			{
-				service = RemoteMethodInvocationHandler.createRemoteServiceProxy(getInternalAccess(), sid);
-			}
+			ret = ServiceRegistry.getRegistry(getInternalAccess()).getLocalService(sid); 			
+		}
+		
+		// Remote component -> create remote proxy
+		else
+		{
+			ret = RemoteMethodInvocationHandler.createRemoteServiceProxy(getInternalAccess(), sid);
 		}
 		
 		// else service event -> just return event, as desired by user (specified in query return type)
 		
+		if(ret!=null)
+			ret = addRequiredServiceProxy(ret, info);
+		
+		return ret;
+	}
 
+	/**
+	 * 
+	 * @param service
+	 * @param info
+	 */
+	protected IService addRequiredServiceProxy(IService service, RequiredServiceInfo info)
+	{
+		IService ret = service;
+		
 		// Add required service proxy if specified.
-		if(service instanceof IService && info!=null)
+		if(info!=null)
 		{
-			service = BasicServiceInvocationHandler.createRequiredServiceProxy(getInternalAccess(), 
-				(IService)service, null, info, info.getDefaultBinding(), Starter.isRealtimeTimeout(getComponent().getId()));
+			ret = BasicServiceInvocationHandler.createRequiredServiceProxy(getInternalAccess(), 
+				(IService)ret, null, info, info.getDefaultBinding(), Starter.isRealtimeTimeout(getComponent().getId()));
 			
 			// Check if no property provider has been created before and then create and init properties
-			if(!getComponent().getFeature(INFPropertyComponentFeature.class).hasRequiredServicePropertyProvider(((IService)service).getServiceId()))
+			if(!getComponent().getFeature(INFPropertyComponentFeature.class).hasRequiredServicePropertyProvider(ret.getServiceId()))
 			{
 				INFMixedPropertyProvider nfpp = getComponent().getFeature(INFPropertyComponentFeature.class)
-					.getRequiredServicePropertyProvider(((IService)service).getServiceId());
+					.getRequiredServicePropertyProvider(((IService)ret).getServiceId());
 				
 				List<NFRPropertyInfo> nfprops = info.getNFRProperties();
 				if(nfprops!=null && nfprops.size()>0)
@@ -1271,7 +1328,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 					{
 						MethodInfo mi = nfprop.getMethodInfo();
 						Class<?> clazz = nfprop.getClazz().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
-						INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getInternalAccess(), (IService)service, nfprop.getMethodInfo(), nfprop.getParameters());
+						INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getInternalAccess(), (IService)ret, nfprop.getMethodInfo(), nfprop.getParameters());
 						if(mi==null)
 						{
 							nfpp.addNFProperty(nfp);
@@ -1285,13 +1342,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			}
 		}
 		
-		if(event != null)
-		{
-			event.setService(service);
-			service = event;
-		}
-		
-		return service;
+		return ret;
 	}
 	
 
@@ -1354,5 +1405,15 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	{
 		return query.getSearchStart()!=null && query.getSearchStart().getRoot()!=getComponent().getId().getRoot()
 			|| !query.getScope().isLocal();
+	}
+	
+	/**
+	 *  Get a service query for a required service info (as defined in the agent under that name).
+	 *  @param name The name.
+	 *  @return The service query.
+	 */
+	public ServiceQuery<?> getServiceQuery(String name)
+	{
+		return getServiceQuery(getServiceInfo(name));
 	}
 }

@@ -869,10 +869,7 @@ public class JavaWriter
 			));
 			typeinfos.add(ti_bi);
 			
-			if(!SReflect.isAndroid()) 
-			{
-				typeinfos.addAll(STypeInfosAWT.getWriterTypeInfos());
-			}
+			typeinfos.addAll(STypeInfosAWT.getWriterTypeInfos());
 		}
 		catch(Exception e)
 		{

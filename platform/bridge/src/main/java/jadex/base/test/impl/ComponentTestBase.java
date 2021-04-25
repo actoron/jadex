@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.test.IAbortableTestSuite;
@@ -58,7 +56,7 @@ public class ComponentTestBase extends TestCase
 	 */
 	public ComponentTestBase() 
 	{
-		Logger.getLogger("ComponentTest").log(Level.SEVERE, "Empty ComponentTest Constructor called");
+		//Logger.getLogger("ComponentTest").log(Level.SEVERE, "Empty ComponentTest Constructor called");
 	}
 	
 	/**
@@ -130,26 +128,31 @@ public class ComponentTestBase extends TestCase
 				platform = createPlatform();
 			}
 			 
-			System.out.println("Creating component: "+System.currentTimeMillis()+" "+filename);
-			IFuture<IExternalAccess> fut = platform.createComponent(new CreationInfo(rid).setFilename(filename));
+			//System.out.println("Creating component: "+System.currentTimeMillis()+" "+filename);
+			CreationInfo	ci	= new CreationInfo(rid).setFilename(filename).setSuspend(true);
+			if(filename!=null && filename.endsWith(getClass().getSimpleName()+".class"))
+				ci.setPojo(this);	// Hack??? add self as POJO when test is agent to be started
+			IFuture<IExternalAccess> fut = platform.createComponent(ci);
 			componentStarted(fut);
 			fut.addResultListener(new IResultListener<IExternalAccess>()
 			{
 				public void resultAvailable(IExternalAccess result)
 				{
-					System.out.println("Created component: "+System.currentTimeMillis()+" "+filename);
+					result.resumeComponent();
+					
+					//System.out.println("Created component: "+System.currentTimeMillis()+" "+filename);
 					cid[0] = result.getId();
 					
 					result.waitForTermination().addResultListener(new IResultListener<Map<String,Object>>()
 					{
 						public void resultAvailable(Map<String, Object> result)
 						{
-							System.out.println("COMP FINI: "+cid[0]);
+							//System.out.println("COMP FINI: "+cid[0]);
 							finished.setResultIfUndone(result);
 						}
 						public void exceptionOccurred(Exception exception)
 						{
-							System.out.println("COMP FINI EX: "+cid[0]);
+							//System.out.println("COMP FINI EX: "+cid[0]);
 							finished.setExceptionIfUndone(exception);
 						}
 					});
@@ -161,28 +164,28 @@ public class ComponentTestBase extends TestCase
 				}
 			});
 			Map<String, Object>	res	= null;
-			try
-			{
-				System.out.println("WAIT FOR TESTCASE: "+cid[0]);
+//			try
+//			{
+				//System.out.println("WAIT FOR TESTCASE: "+cid[0]);
 				res	= finished.get();	// Timeout set by timer above -> no get timeout needed.
-				System.out.println("TESTCASE FINISHED: "+cid[0]);
-			}
-			catch(TimeoutException te)
-			{
-				System.out.println("TESTCASE TIMEOUT: "+cid[0]);
-				// Hack!! Allow timeout exception for start tests when not from test execution, e.g. termination timeout in EndStateAbort.
-				if(triggered[0])
-				{
-					throw te;
-				}
-			}
+				//System.out.println("TESTCASE FINISHED: "+cid[0]);
+//			}
+//			catch(TimeoutException te)
+//			{
+//				//System.out.println("TESTCASE TIMEOUT: "+cid[0]);
+//				// Hack!! Allow timeout exception for start tests when not from test execution, e.g. termination timeout in EndStateAbort.
+//				if(triggered[0])
+//				{
+//					throw te;
+//				}
+//			}
 		
 			checkTestResults(res);	// Do last -> throws exception on failure.
-			System.out.println("FINISHED runBare(): "+System.currentTimeMillis()+" "+filename);
+			//System.out.println("FINISHED runBare(): "+System.currentTimeMillis()+" "+filename);
 		}
 		catch(Throwable t2)
 		{
-			System.out.println("FAILED runBare(): "+System.currentTimeMillis()+" "+filename);
+			//System.out.println("FAILED runBare(): "+System.currentTimeMillis()+" "+filename);
 			t2.printStackTrace();
 			throw SUtil.throwUnchecked(t2);
 		}

@@ -16,6 +16,13 @@ public enum ServiceScope
 	 */
 	DEFAULT,
 
+	/** 
+	 *  Marker for using a separate expression in required/provided service annotations.
+	 *  This scope can not be used at runtime, e.g. for service queries.
+	 *  Concrete scope expression is given in further scopeexpression attribute.
+	 */
+	EXPRESSION,
+
 	/** None component scope (nothing will be searched, forces required service creation). */
 	NONE,
 
@@ -66,6 +73,7 @@ public enum ServiceScope
 		localscopes.add(APPLICATION);
 		localscopes.add(PLATFORM);
 		localscopes.add(PARENT);
+		localscopes.add(DEFAULT);
 		LOCAL_SCOPES = Collections.unmodifiableSet(localscopes);
 	}
 

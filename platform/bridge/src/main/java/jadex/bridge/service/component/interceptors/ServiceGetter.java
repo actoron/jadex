@@ -50,6 +50,10 @@ public class ServiceGetter<T>
 		this.component = component;
 		this.delay = delay;
 		this.type = type;
+		
+		if(ServiceScope.EXPRESSION.equals(scope))
+			throw new IllegalArgumentException("Cannot use scope 'expression' directly.");
+
 		this.scope = scope;
 	}
 	

@@ -1,0 +1,20 @@
+description 'Provides webservice support via Jetty.'
+
+//def jersey_version	= 2.11
+
+dependencies 
+{
+	api project(':platform:webservice')
+	api project(':platform:webservice-websocket')
+	
+	api 'org.eclipse.jetty:jetty-server:9.4.19.v20190610'
+	api 'org.eclipse.jetty.websocket:websocket-server:9.4.19.v20190610'
+	
+	// Last release compatible with Java 7
+	//api 'org.eclipse.jetty:jetty-server:9.2.13.v20150730'
+	
+	api	'org.glassfish.jersey.core:jersey-common:2.28'
+
+	testImplementation 'org.glassfish.jersey.core:jersey-client:2.28'
+	testImplementation 'org.glassfish.jersey.inject:jersey-hk2:2.28'
+}

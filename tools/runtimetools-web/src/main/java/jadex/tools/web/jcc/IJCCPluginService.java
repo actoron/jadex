@@ -23,6 +23,12 @@ public interface IJCCPluginService
 	public IFuture<String> getPluginName();
 	
 	/**
+	 *  Get the plugin icon.
+	 *  @return The plugin icon.
+	 */
+	public IFuture<byte[]> getPluginIcon();
+	
+	/**
 	 *  Get the plugin priority.
 	 *  @return The plugin priority.
 	 */

@@ -3,6 +3,7 @@ package jadex.micro.testcases.intermediate;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -18,7 +19,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=IIntermediateResultService.class))
+@ProvidedServices(@ProvidedService(type=IIntermediateResultService.class, scope=ServiceScope.GLOBAL))
 @Description("Agent that provides a service with intermediate results")
 public class IntermediateResultProviderAgent implements IIntermediateResultService
 {

@@ -46,13 +46,13 @@ public class InitiatorAgent extends TestAgent
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
-				if(SReflect.isAndroid()) 
+				/*if(SReflect.isAndroid()) 
 				{
 					tc.setTestCount(1);
 					ret.setResult(null);
 				} 
 				else 
-				{
+				{*/
 //					agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
 					testRemote(2).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 					{
@@ -65,7 +65,7 @@ public class InitiatorAgent extends TestAgent
 							ret.setResult(null);
 						}
 					}));
-				}
+				//}
 			}
 		}));
 		

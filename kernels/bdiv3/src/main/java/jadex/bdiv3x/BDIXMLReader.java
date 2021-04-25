@@ -545,7 +545,7 @@ public class BDIXMLReader extends ComponentXMLReader
 							BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
 						
 						// todo: allow specifying scope
-						model.addProvidedService(new ProvidedServiceInfo(null, key, psi, null, null, null, false));
+						model.addProvidedService(new ProvidedServiceInfo(null, key, psi));
 					}
 				}
 				

@@ -265,13 +265,13 @@ public class VmHacks
 	     */
 		public Class<?> defineClass(String name, byte[] b, int off, int len, ClassLoader loader, ProtectionDomain pd)
 	    {
-			if (hasNative())
+			if(hasNative())
 			{
 				return nativehelper.defineClass(name, b, loader);
 			}
-			else if (defineclass != null)
+			else if(defineclass != null)
 			{
-				return (Class<?>) defineclass.invoke(unsafeinstance, name, b, off, len, loader, pd == null ? loader.getClass().getProtectionDomain() : pd);
+				return (Class<?>)defineclass.invoke(unsafeinstance, name, b, off, len, loader, pd == null ? loader.getClass().getProtectionDomain() : pd);
 			}
 			else
 			{
@@ -458,7 +458,7 @@ public class VmHacks
 		 */
 		protected void init()
 		{
-			asm = !SReflect.isAndroid();
+			asm = true;//!SReflect.isAndroid();
 			
 			SecurityProviderStore.inject();
 			

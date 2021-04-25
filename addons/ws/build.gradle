@@ -4,7 +4,6 @@ dependencies
 {
 	api project(':applications:webservice')
 	api project(':platform:webservice')
-	api project(':platform:webservice-desktop')
-	api project(':platform:webservice-desktop-grizzly')
-	api project(':platform:webservice-desktop-jetty')
+	api project(':platform:webservice-grizzly')
+	api project(':platform:webservice-jetty')
 }

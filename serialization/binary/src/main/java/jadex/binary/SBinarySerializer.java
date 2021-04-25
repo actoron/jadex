@@ -50,7 +50,7 @@ public class SBinarySerializer
 		ENCODER_HANDLERS.add(new MultiCollectionCodec());
 		ENCODER_HANDLERS.add(new LRUCodec());
 		ENCODER_HANDLERS.add(new MapCodec());
-		if(!SReflect.isAndroid())
+		//if(!SReflect.isAndroid())
 		{
 			ENCODER_HANDLERS.add(new ColorCodec());
 			ENCODER_HANDLERS.add(new ImageCodec());

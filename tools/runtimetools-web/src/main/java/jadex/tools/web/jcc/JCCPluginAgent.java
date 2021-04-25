@@ -40,7 +40,16 @@ public abstract class JCCPluginAgent
 	public IFuture<String> getPluginComponent()
 	{
 		if(component==null)
-			component = internalLoadResource(getPluginUIPath());
+		{
+			try
+			{
+				component = internalLoadResource(getPluginUIPath());
+			}
+			catch(Exception e)
+			{
+				System.out.println("Cannot load plugin component string: "+e);
+			}
+		} 
 		
 		return new Future<String>(component);
 	}
@@ -55,6 +64,7 @@ public abstract class JCCPluginAgent
 		Scanner sc = null;
 		try
 		{
+			//System.out.println("LOAD " + name);
 			InputStream is = SUtil.getResource0(name, agent.getClassLoader());
 			sc = new Scanner(is);
 			ret = sc.useDelimiter("\\A").next();
@@ -63,7 +73,7 @@ public abstract class JCCPluginAgent
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 		finally
@@ -97,6 +107,7 @@ public abstract class JCCPluginAgent
 	 */
 	public IFuture<byte[]> loadResource(String filename)
 	{
+		//System.out.println("LOADRESOURCE!" + filename);
 		try
 		{
 		InputStream is = SUtil.getResource0(filename, agent.getClassLoader());
@@ -120,6 +131,12 @@ public abstract class JCCPluginAgent
 			return new Future<byte[]>(e);
 		}
 	}
+	
+	/**
+	 *  Get the plugin icon.
+	 *  @return The plugin icon.
+	 */
+	public abstract IFuture<byte[]> getPluginIcon();
 	
 	/**
 	 *  Get the plugin name.

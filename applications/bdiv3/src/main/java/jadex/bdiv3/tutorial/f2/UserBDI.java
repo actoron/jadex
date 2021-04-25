@@ -17,8 +17,8 @@ import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingResultListener;
@@ -67,7 +67,7 @@ public class UserBDI
 					{
 						// Search a translation service
 						agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITranslationService.class, ServiceScope.PLATFORM))
-							.addResultListener(new IIntermediateResultListener<ITranslationService>()
+							.addResultListener(new IntermediateEmptyResultListener<ITranslationService>()
 						{
 							public void intermediateResultAvailable(ITranslationService ts)
 							{

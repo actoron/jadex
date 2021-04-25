@@ -21,8 +21,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.rules.eca.annotations.Action;
 import jadex.rules.eca.annotations.Condition;
@@ -170,7 +170,7 @@ public class RuleSystem
 							
 							if(fut instanceof IIntermediateFuture)
 							{
-								((IIntermediateFuture<Object>)fut).addResultListener(new IIntermediateResultListener<Object>()
+								((IIntermediateFuture<Object>)fut).addResultListener(new IntermediateEmptyResultListener<Object>()
 								{
 									public void intermediateResultAvailable(Object result)
 									{

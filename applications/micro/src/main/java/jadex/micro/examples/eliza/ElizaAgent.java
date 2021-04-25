@@ -53,7 +53,7 @@ public class ElizaAgent
 	/** The gui service for controlling the inner chat component. */
 	//@AgentServiceSearch
 	@OnService
-	protected IChatGuiService	chat;
+	protected IChatGuiService chat;
 	
 	/** Each contact gets its own eliza conversation. */
 	protected Map<IComponentIdentifier, Tuple2<ElizaParse, Long>>	conversations;

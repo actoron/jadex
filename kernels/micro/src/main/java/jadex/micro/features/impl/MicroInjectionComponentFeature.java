@@ -151,7 +151,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 			final FieldInfo[]	pis	= holder.getParentInjections();
 			if(pis.length>0)
 			{
-//				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
 				IExternalAccess exta = component.getExternalAccess(component.getId().getParent());
 				final CounterResultListener<Void> lis = new CounterResultListener<Void>(pis.length, new DelegationResultListener<Void>(ret));
 				

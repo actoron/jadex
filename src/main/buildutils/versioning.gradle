@@ -46,7 +46,7 @@ Object fetchNextBuildNameFromGitTag()
 			patch++
 		buildname = createBuildname(version, patch, branchpatch, true)
 	}
-	
+	println 'Working on Jadex Version ' + buildname;
 	return buildname!=null ? buildname : createBuildname(version, patch, branchpatch, false);
 }
 
@@ -109,6 +109,7 @@ int getLatestPatchVersion(version, versionprops)
 	{
 		for(String tag: tags)
 		{
+			println 'checking tag> ' + tag;
 			if(tag.startsWith("tag: "+version+"."))
 			{
 				tag	= tag.substring(("tag: "+version+".").length())

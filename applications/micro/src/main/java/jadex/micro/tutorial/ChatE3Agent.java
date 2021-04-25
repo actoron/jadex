@@ -73,7 +73,7 @@ public class ChatE3Agent
 			public void exceptionOccurred(Exception exception)
 			{
 				System.out.println("exception, could not find appreg service: "+exception);
-//				IRegistryServiceE3 reg = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IRegistryServiceE3.class));
+//				IRegistryServiceE3 reg = agent.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IRegistryServiceE3.class));
 				IFuture<IRegistryServiceE3>	fut	= agent.getFeature(IRequiredServicesFeature.class).getService("regservice");
 				super.exceptionOccurred(exception);
 			}

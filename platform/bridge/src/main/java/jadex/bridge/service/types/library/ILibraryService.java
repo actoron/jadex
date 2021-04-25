@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.CheckNotNull;
@@ -16,6 +15,7 @@ import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /** 
  *  Interface for the Library Service. It provides a platform service
@@ -144,13 +144,15 @@ public interface ILibraryService
 	 */
 	public IFuture<List<URL>> getAllURLs();
 	
+	// -> moved to SComponentFactory
 	/**
 	 *  todo: support all component models
 	 *  
 	 *  Get all startable component models (currently only Java classes with @Agent).
 	 *  @return The file names of the component models.
-	 */
+	 * /
 	public IFuture<Collection<String[]>> getComponentModels();
+	public ISubscriptionIntermediateFuture<Collection<String[]>> getComponentModelsAsStream();*/
 	
 	//-------- listener methods --------
 	

@@ -52,10 +52,10 @@ public class ComplexBlockingTestAgent extends JunitAgentTest
 	{
 		IStepService	step	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IStepService.class)).get();
 		
-//		System.out.println("Calling perform steps: "+agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
+//		System.out.println("Calling perform steps: "+agent.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 		IIntermediateFuture<Integer>	first	= step.performSteps(3, 1000);
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
-//		System.out.println("Calling perform steps: "+agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
+//		System.out.println("Calling perform steps: "+agent.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 		IIntermediateFuture<Integer>	second	= step.performSteps(3, 1000);
 
 		final List<Integer>	steps	= new ArrayList<Integer>();

@@ -64,6 +64,7 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	 */
 	public void	init(ITransportHandler<HandlerHolder> handler)
 	{
+//		System.out.println(IComponentIdentifier.LOCAL.get()+": init "+this);
 		this.handler = handler;
 	}
 		
@@ -72,6 +73,7 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	 */
 	public void	shutdown()
 	{
+//		System.out.println(IComponentIdentifier.LOCAL.get()+": shutdown "+this);
 		active = false;
 		Object key;
 		synchronized(ports)
@@ -101,25 +103,28 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 			{
 				ret.setException(new IllegalArgumentException("Port must be greater or equal to zero: "+port));
 			}
-			else if(port==0)
-			{
-				// Find free port
-				while(ports.containsKey(++port));
-			}
-		
-		
-			if(ports.containsKey(port))
-			{
-				ret.setException(new IllegalArgumentException("Port already in use: "+port));
-			}
 			else
 			{
-				ports.put(port, this);
-				ret.setResult(port);
+				if(port==0)
+				{
+					// Find free port
+					while(ports.containsKey(++port));
+				}
+			
+			
+				if(ports.containsKey(port))
+				{
+					ret.setException(new IllegalArgumentException("Port already in use: "+port));
+				}
+				else
+				{
+					ports.put(port, this);
+					ret.setResult(port);
+				}
 			}
 		}
 		
-		return new Future<Integer>(port);
+		return ret;
 	}
 	
 	/**
@@ -180,14 +185,21 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	{
 		try
 		{
-			if(con.isActive())
+			if(!con.isActive())
 			{
-				con.target.handler.messageReceived(con.other, header, body);
-				return new Future<>(PRIORITY);
+//				System.out.println(IComponentIdentifier.LOCAL.get()+": failed sending message to "+con.target.handler.getAccess().getId());
+				return new Future<>(new ComponentTerminatedException(con.target.handler.getAccess().getId()));
 			}
+//			else if(!con.other.isActive())
+//			{
+//				System.out.println(IComponentIdentifier.LOCAL.get()+": failed sending message to "+con.other.target.handler.getAccess().getId());
+//				return new Future<>(new ComponentTerminatedException(con.other.target.handler.getAccess().getId()));
+//			}
 			else
 			{
-				return new Future<>(new ComponentTerminatedException(con.target.handler.getAccess().getId()));
+//				System.out.println(IComponentIdentifier.LOCAL.get()+": sending message to "+con.target.handler.getAccess().getId());
+				con.target.handler.messageReceived(con.other, header, body);
+				return new Future<>(PRIORITY);
 			}
 		}
 		catch (Exception e)
@@ -220,7 +232,14 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 		 */
 		protected boolean isActive()
 		{
+//			System.out.println(IComponentIdentifier.LOCAL.get()+": is target active "+target+", "+target.active);
 			return target.active;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return "IntraVMConnection(source="+other.target.handler.getAccess().getId()+", target="+target.handler.getAccess().getId()+")";
 		}
 	}
 }

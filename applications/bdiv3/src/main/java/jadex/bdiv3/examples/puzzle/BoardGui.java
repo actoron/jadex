@@ -117,7 +117,7 @@ public class BoardGui extends JFrame
 //				}
 //				else
 //				{
-					ia.waitForTermination().thenAccept(x->BoardGui.this.dispose());
+					ia.waitForTermination().then(x->BoardGui.this.dispose());
 //				}
 				
 				return IFuture.DONE;

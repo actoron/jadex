@@ -3,11 +3,14 @@ package jadex.commons.collection;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 import jadex.commons.ICommand;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 
 /**
@@ -29,6 +32,8 @@ public class PassiveLeaseTimeSet<E> implements ILeaseTimeSet<E>
 	@SuppressWarnings("serial")
 	protected PriorityQueue<E> entries = new PriorityQueue<E>(11, new Comparator<E>()
 	{
+		
+		
 		// could also use simple t1-t2 if Long.MAX_VALUE would be used for no leasetime. */
 		public int compare(E e1, E e2)
 		{
@@ -57,12 +62,39 @@ public class PassiveLeaseTimeSet<E> implements ILeaseTimeSet<E>
 	})
 	{
 		// Do not allow duplicates
+		private Set<E> set = new HashSet<>();
+		
 		public boolean add(E e) 
 		{
-	        if(contains(e))
+	        if(!set.add(e))
 	        	return false;
 	        return super.add(e);
 	    }
+		
+		public boolean remove(Object o)
+		{
+			set.remove(o);
+			return super.remove(o);
+		}
+		
+		public boolean addAll(Collection<? extends E> c)
+		{
+			boolean ret = set.addAll(c);
+			clear();
+			super.addAll(set);
+			return ret;
+		}
+		
+		public boolean removeAll(Collection<?> c)
+		{
+			set.removeAll(c);
+			return super.removeAll(c);
+		}
+		
+		public boolean contains(Object o)
+		{
+			return set.contains(o);
+		}
 	};
 	
 	/** The timestamps. */
@@ -341,10 +373,9 @@ public class PassiveLeaseTimeSet<E> implements ILeaseTimeSet<E>
 		{
 			long delta = -1;
 			
-			E first = entries.peek();
-			
-			if(first!=null)
+			if(!entries.isEmpty())
 			{
+				E first = entries.peek();
 				long etime = times.get(first).getFirstEntity().longValue();
 				Long lease = times.get(first).getSecondEntity();
 				if(etime>0)

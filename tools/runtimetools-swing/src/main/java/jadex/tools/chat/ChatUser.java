@@ -66,9 +66,7 @@ public class ChatUser
 	public ChatUser(IComponentIdentifier cid)
 	{
 		if(cid==null)
-		{
 			throw new NullPointerException();
-		}
 		this.cid	= cid;
 		this.nick = "unknown";
 		this.messages	= new HashSet<Integer>();
@@ -82,34 +80,28 @@ public class ChatUser
 	 */
 	public Icon	getIcon()
 	{
-		Icon	ret	= avatar!=null ? avatar : icons.getIcon("default_avatar");
+		Icon ret = avatar!=null ? avatar : icons.getIcon("default_avatar");
 		
-		if(System.currentTimeMillis()-lastupdate>15000)	// offline after 15 seconds.
+		/*if(System.currentTimeMillis()-lastupdate>15000)	// offline after 15 seconds.
 		{
 			BufferedImage image = new BufferedImage(ret.getIconWidth(), ret.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 	        ret.paintIcon(null, image.getGraphics(), 0, 0);
 			ret	= new ImageIcon(GrayFilter.createDisabledImage(image));
-		}
+		}*/
+		
+		//System.out.println("cid: "+cid+" away: "+away);
 		
 		List<Icon>	ics	= new ArrayList<Icon>();
 		ics.add(ret);
 		if(away)
-		{
 			ics.add(icons.getIcon("overlay_away"));
-		}
 		if(typing)
-		{
 			ics.add(icons.getIcon("overlay_typing"));
-		}
 		if(!messages.isEmpty())
-		{
 			ics.add(icons.getIcon("overlay_sending"));
-		}
 		
 		if(icons.size()>1)
-		{
 			ret	= new CombiIcon(ics.toArray(new Icon[ics.size()]));
-		}
 		
 		return ret;
 	}
@@ -136,7 +128,7 @@ public class ChatUser
 	 */
 	public void	setAway(boolean away)
 	{
-		this.away	= away;
+		this.away = away;
 		this.lastupdate	= System.currentTimeMillis();
 	}
 	

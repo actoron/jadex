@@ -11,11 +11,12 @@
     <jadex:modelname>ContractNet</jadex:modelname>
     <jadex:description>&lt;h1&gt;Contract Net&lt;/h1&gt;This process implements initiator and participant of a contract net interaction.</jadex:description>
     <jadex:package>jadex.bpmn.examples.contractnet</jadex:package>
-    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" master="" synchronous="false" monitoring="OFF" keepalive="false"/>
     <jadex:imports>
       <jadex:import>java.util.*</jadex:import>
       <jadex:import>jadex.commons.SUtil</jadex:import>
       <jadex:import>jadex.bridge.*</jadex:import>
+      <jadex:import>jadex.bridge.fipa.*</jadex:import>
     </jadex:imports>
     <jadex:arguments>
       <jadex:argument name="participants" type="String[]">
@@ -70,10 +71,10 @@
         <semantic:messageEventDefinition/>
         <semantic:extensionElements>
           <jadex:property name="performative">&quot;cfp&quot;</jadex:property>
-          <jadex:property name="receivers">participants</jadex:property>
           <jadex:property name="content">cfp</jadex:property>
           <jadex:property name="conversation_id">convid</jadex:property>
           <jadex:property name="protocol">&quot;fipa-contract-net&quot;</jadex:property>
+          <jadex:property name="receiver">participants</jadex:property>
         </semantic:extensionElements>
       </semantic:intermediateThrowEvent>
       <semantic:intermediateCatchEvent id="_MA2ycVapEd-1RJ7RXx1qjA">
@@ -88,7 +89,7 @@
           <jadex:class>jadex.bpmn.runtime.task.InvokeMethodTask</jadex:class>
           <jadex:parameter direction="in" name="object" type="java.lang.Object">proposals</jadex:parameter>
           <jadex:parameter direction="in" name="methodname" type="java.lang.String">&quot;add&quot;</jadex:parameter>
-          <jadex:parameter direction="in" name="param" type="java.lang.Object">new ParticipantProposal($event.getValue(&quot;sender&quot;), $event.getValue(&quot;content&quot;))</jadex:parameter>
+          <jadex:parameter direction="in" name="param" type="java.lang.Object">new ParticipantProposal($event.get(&quot;sender&quot;), $event.get(&quot;content&quot;))</jadex:parameter>
         </semantic:extensionElements>
       </semantic:task>
       <semantic:intermediateCatchEvent id="_NmBZcVapEd-1RJ7RXx1qjA">
@@ -97,7 +98,6 @@
         <semantic:messageEventDefinition/>
         <semantic:extensionElements>
           <jadex:property name="performative">&quot;propose&quot;</jadex:property>
-          <jadex:property name="sender">participants</jadex:property>
           <jadex:property name="conversation_id">convid</jadex:property>
         </semantic:extensionElements>
       </semantic:intermediateCatchEvent>
@@ -106,7 +106,6 @@
         <semantic:messageEventDefinition/>
         <semantic:extensionElements>
           <jadex:property name="performative">&quot;refuse&quot;</jadex:property>
-          <jadex:property name="sender">participants</jadex:property>
           <jadex:property name="conversation_id">convid</jadex:property>
         </semantic:extensionElements>
       </semantic:intermediateCatchEvent>
@@ -302,8 +301,8 @@
       <semantic:incoming>_3piJalT6Ed-32983CGnnJA</semantic:incoming>
       <semantic:outgoing>_5-1z6lT6Ed-32983CGnnJA</semantic:outgoing>
       <semantic:extensionElements>
-        <jadex:parameter direction="in" name="cfp" type="Object">msg.getValue(&quot;content&quot;)</jadex:parameter>
-        <jadex:parameter direction="in" name="initiator" type="IComponentIdentifier">msg.getValue(&quot;sender&quot;)</jadex:parameter>
+        <jadex:parameter direction="in" name="cfp" type="Object">msg.get(&quot;content&quot;)</jadex:parameter>
+        <jadex:parameter direction="in" name="initiator" type="IComponentIdentifier">msg.get(&quot;sender&quot;)</jadex:parameter>
         <jadex:parameter direction="out" name="proposal" type="Object"/>
         <jadex:property name="file">mpp</jadex:property>
         <jadex:subprocessexpressionref>mpp</jadex:subprocessexpressionref>
@@ -314,21 +313,11 @@
       <semantic:outgoing>_7gJOmVT6Ed-32983CGnnJA</semantic:outgoing>
       <semantic:outgoing>_-n97KFT6Ed-32983CGnnJA</semantic:outgoing>
     </semantic:exclusiveGateway>
-    <semantic:intermediateThrowEvent id="_FNYI4VT7Ed-32983CGnnJA">
-      <semantic:incoming>_7gJOmVT6Ed-32983CGnnJA</semantic:incoming>
-      <semantic:outgoing>_i2I9ilT7Ed-32983CGnnJA</semantic:outgoing>
-      <semantic:messageEventDefinition/>
-      <semantic:extensionElements>
-        <jadex:property name="message">msg.getMessageType().createReply(msg.getParameterMap())</jadex:property>
-        <jadex:property name="performative">&quot;propose&quot;</jadex:property>
-        <jadex:property name="content">proposal</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateThrowEvent>
     <semantic:subProcess name="Execute Request" id="_trpHcVT7Ed-32983CGnnJA">
       <semantic:incoming>_ts_LQVT7Ed-32983CGnnJA</semantic:incoming>
       <semantic:outgoing>_1XO6KlT7Ed-32983CGnnJA</semantic:outgoing>
       <semantic:extensionElements>
-        <jadex:parameter direction="in" name="proposal" type="Object">$event.getValue(&quot;content&quot;)</jadex:parameter>
+        <jadex:parameter direction="in" name="proposal" type="Object">$event.get(&quot;content&quot;)</jadex:parameter>
         <jadex:parameter direction="out" name="result" type="Object"/>
         <jadex:property name="file">erp</jadex:property>
         <jadex:subprocessexpressionref>erp</jadex:subprocessexpressionref>
@@ -378,7 +367,7 @@
       <semantic:outgoing>_GCv1OlT8Ed-32983CGnnJA</semantic:outgoing>
       <semantic:messageEventDefinition/>
       <semantic:extensionElements>
-        <jadex:property name="message">msg.getMessageType().createReply(msg.getParameterMap())</jadex:property>
+        <jadex:property name="message">SFipa.createReply(msg)</jadex:property>
         <jadex:property name="content">result</jadex:property>
         <jadex:property name="performative">&quot;inform&quot;</jadex:property>
       </semantic:extensionElements>
@@ -388,9 +377,9 @@
       <semantic:outgoing>_HOvuQVT8Ed-32983CGnnJA</semantic:outgoing>
       <semantic:messageEventDefinition/>
       <semantic:extensionElements>
-        <jadex:property name="message">msg.getMessageType().createReply(msg.getParameterMap())</jadex:property>
+        <jadex:property name="message">SFipa.createReply(msg)</jadex:property>
         <jadex:property name="performative">&quot;failure&quot;</jadex:property>
-        <jadex:property name="content">msg.getValue(&quot;content&quot;)</jadex:property>
+        <jadex:property name="content">msg.get(&quot;content&quot;)</jadex:property>
       </semantic:extensionElements>
     </semantic:intermediateThrowEvent>
     <semantic:intermediateThrowEvent id="_J5MEsVaQEd-1RJ7RXx1qjA">
@@ -398,9 +387,9 @@
       <semantic:outgoing>_eYyVYVaQEd-1RJ7RXx1qjA</semantic:outgoing>
       <semantic:messageEventDefinition/>
       <semantic:extensionElements>
-        <jadex:property name="message">msg.getMessageType().createReply(msg.getParameterMap())</jadex:property>
         <jadex:property name="performative">&quot;refuse&quot;</jadex:property>
-        <jadex:property name="content">msg.getValue(&quot;content&quot;)</jadex:property>
+        <jadex:property name="content">msg.get(&quot;content&quot;)</jadex:property>
+        <jadex:property name="message">SFipa.createReply(msg)</jadex:property>
       </semantic:extensionElements>
     </semantic:intermediateThrowEvent>
     <semantic:endEvent id="_GCv1MVT8Ed-32983CGnnJA">
@@ -410,13 +399,23 @@
       <semantic:incoming>_eYyVYVaQEd-1RJ7RXx1qjA</semantic:incoming>
       <semantic:incoming>_sgKN0VaSEd-1RJ7RXx1qjA</semantic:incoming>
     </semantic:endEvent>
+    <semantic:intermediateThrowEvent id="_FNYI4VT7Ed-32983CGnnJA">
+      <semantic:incoming>_7gJOmVT6Ed-32983CGnnJA</semantic:incoming>
+      <semantic:outgoing>_i2I9ilT7Ed-32983CGnnJA</semantic:outgoing>
+      <semantic:messageEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:property name="performative">&quot;propose&quot;</jadex:property>
+        <jadex:property name="content">proposal</jadex:property>
+        <jadex:property name="message">SFipa.createReply(msg)</jadex:property>
+      </semantic:extensionElements>
+    </semantic:intermediateThrowEvent>
     <semantic:sequenceFlow sourceRef="_wU91AVa6Ed-1RJ7RXx1qjA" targetRef="_uWrd8VT6Ed-32983CGnnJA" id="_wU91Cla6Ed-1RJ7RXx1qjA">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_uWrd8VT6Ed-32983CGnnJA" targetRef="_ooaMAVm6Ed-CVtZr0hfiVg" id="_3piJalT6Ed-32983CGnnJA">
       <semantic:extensionElements>
-        <jadex:parametermapping name="initiator">$event.getValue(&quot;sender&quot;)</jadex:parametermapping>
         <jadex:parametermapping name="msg">$event</jadex:parametermapping>
-        <jadex:parametermapping name="convid">$event.getValue(&quot;conversation_id&quot;)</jadex:parametermapping>
+        <jadex:parametermapping name="convid">$event.get(&quot;conversation_id&quot;)</jadex:parametermapping>
+        <jadex:parametermapping name="initiator">$event.get(&quot;sender&quot;)</jadex:parametermapping>
       </semantic:extensionElements>
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_ooaMAVm6Ed-CVtZr0hfiVg" targetRef="_5-1z4VT6Ed-32983CGnnJA" id="_5-1z6lT6Ed-32983CGnnJA">
@@ -425,8 +424,6 @@
       <semantic:conditionExpression>proposal!=null</semantic:conditionExpression>
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_5-1z4VT6Ed-32983CGnnJA" targetRef="_J5MEsVaQEd-1RJ7RXx1qjA" id="_-n97KFT6Ed-32983CGnnJA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_FNYI4VT7Ed-32983CGnnJA" targetRef="_i2I9gVT7Ed-32983CGnnJA" id="_i2I9ilT7Ed-32983CGnnJA">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_trpHcVT7Ed-32983CGnnJA" targetRef="_1XO6IVT7Ed-32983CGnnJA" id="_1XO6KlT7Ed-32983CGnnJA">
     </semantic:sequenceFlow>
@@ -452,6 +449,8 @@
     <semantic:sequenceFlow sourceRef="_3XYM8VT7Ed-32983CGnnJA" targetRef="_GCv1MVT8Ed-32983CGnnJA" id="_HOvuQVT8Ed-32983CGnnJA">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_J5MEsVaQEd-1RJ7RXx1qjA" targetRef="_GCv1MVT8Ed-32983CGnnJA" id="_eYyVYVaQEd-1RJ7RXx1qjA">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_FNYI4VT7Ed-32983CGnnJA" targetRef="_i2I9gVT7Ed-32983CGnnJA" id="_i2I9ilT7Ed-32983CGnnJA">
     </semantic:sequenceFlow>
     <semantic:extensionElements>
     </semantic:extensionElements>
@@ -546,9 +545,6 @@
       <bpmndi:BPMNShape bpmnElement="_5-1z4VT6Ed-32983CGnnJA">
         <dc:Bounds height="60.0" width="60.0" x="410.0" y="150.0"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_FNYI4VT7Ed-32983CGnnJA">
-        <dc:Bounds height="40.0" width="40.0" x="490.0" y="160.0"/>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="_trpHcVT7Ed-32983CGnnJA">
         <dc:Bounds height="100.0" width="160.0" x="1330.0" y="130.0"/>
       </bpmndi:BPMNShape>
@@ -577,6 +573,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="_GCv1MVT8Ed-32983CGnnJA">
         <dc:Bounds height="40.0" width="40.0" x="2053.0" y="18.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_FNYI4VT7Ed-32983CGnnJA">
+        <dc:Bounds height="40.0" width="40.0" x="570.0" y="160.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_M4SJulapEd-1RJ7RXx1qjA">
       </bpmndi:BPMNEdge>

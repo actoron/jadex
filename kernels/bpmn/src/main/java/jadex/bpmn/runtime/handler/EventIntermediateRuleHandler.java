@@ -63,13 +63,13 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 		final Map<String, Object>	fparams	= params;
 		
 		// Todo: allow injecting service binding from outside?
-		IInternalProcessEngineService ipes = instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
+		IInternalProcessEngineService ipes = instance.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
 		
 		final IExternalAccess	exta	= instance.getExternalAccess();
 		final String	actid	= activity.getId();
 		final String	procid	= thread.getId();
 		
-//				System.out.println("Adding event matcher: "+instance.getComponentIdentifier());
+//		System.out.println("Adding event matcher: "+instance.getComponentIdentifier());
 		
 		final IComponentIdentifier	cid	= instance.getId();
 		final IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, fupex, instance.getModel().getAllImports(), fparams, true, new IResultCommand<IFuture<Void>, Object>()
@@ -130,7 +130,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 				{
 					public void customResultAvailable(final String id)
 					{
-						IInternalProcessEngineService ipes = instance.getFeature0(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
+						IInternalProcessEngineService ipes = instance.getFeature0(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
 						
 						System.out.println("Cancel event matcher1: "+instance.getId());
 						

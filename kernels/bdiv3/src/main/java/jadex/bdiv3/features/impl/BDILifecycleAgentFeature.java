@@ -806,7 +806,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				
 				if(mbel.getUpdaterateValue(component)>0)
 				{
-					IClockService	cs	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+					IClockService	cs	= component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class));
 //					cs.createTimer(mbel.getUpdaterate(), new ITimedObject()
 					ITimedObject to = new ITimedObject()
 					{
@@ -932,7 +932,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							
 							if(mparam.getUpdaterateValue(component)>0)
 							{
-								IClockService	cs	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+								IClockService	cs	= component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class));
 								ITimedObject to = new ITimedObject()
 								{
 									ITimedObject self = this;

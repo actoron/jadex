@@ -3,10 +3,8 @@ package jadex.micro.testcases.nflatency;
 import java.util.Collection;
 import java.util.Map;
 
-import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -23,12 +21,11 @@ import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.TupleResult;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Properties;
@@ -105,13 +102,7 @@ public class NFLatencyTestAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		disableLocalSimulationMode().get();
-		
-//		createPlatform(null)
-		IPlatformConfiguration config = STest.getDefaultTestConfig(getClass());
-		config.getExtendedPlatformConfiguration().setSimul(false);
-		config.getExtendedPlatformConfiguration().setSimulation(false);
-		createPlatform(config, null).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
+		setupRemotePlatform(false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
@@ -128,14 +119,11 @@ public class NFLatencyTestAgent extends TestAgent
 						{
 							public void resultAvailable(IExternalAccess result)
 							{
-								result.waitForTermination().addResultListener(new IFunctionalResultListener<Map<String, Object>>()
+								result.waitForTermination().then(res ->
 								{
-									public void resultAvailable(Map<String, Object> result)
-									{
-										System.out.println("sec");
-									}
+									System.out.println("sec");
 								});
-								performTest(result.getId(), testno, false)
+								performTest(platform.getId(), testno, false)
 									.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 							}
 							public void exceptionOccurred(Exception exception)
@@ -212,7 +200,7 @@ public class NFLatencyTestAgent extends TestAgent
 		
 		
 		IIntermediateFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).getServices("aser");
-		fut.addResultListener(new IIntermediateResultListener<ITestService>()
+		fut.addResultListener(new IntermediateEmptyResultListener<ITestService>()
 		{
 			boolean called;
 			public void intermediateResultAvailable(ITestService result)

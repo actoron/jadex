@@ -1,42 +1,20 @@
-import { LitElement, html, css } from 'lit-element';
+let { LitElement, html, css } = modLoad('lit-element');
+let { BaseElement } = modLoad('base-element');
 
 // Defined as <jadex-privacy> tag
-class PrivacyElement extends LitElement {
-
-	constructor() {
-		super();
+class PrivacyElement extends BaseElement 
+{
+	init()
+	{
+		this.app.lang.listeners.add(this);
 	}
 	
-	static get styles() {
-	    return css`
-	    	/* Navbar styling. */
-	    	/* background color. */
-	    	.navbar-custom {
-	    		background-color: #aaaaaa;
-	    	}
-	    	/* brand and text color */
-	    	.navbar-custom .navbar-brand,
-	    	.navbar-custom .navbar-text {
-	    		color: rgba(255,255,255,.8);
-	    	}
-	    	/* link color */
-	    	.navbar-custom .navbar-nav .nav-link {
-	    		color: rgba(255,255,255,.5);
-	    	}
-	    	/* color of active or hovered links */
-	    	.navbar-custom .nav-item.active .nav-link,
-	    	.navbar-custom .nav-item:focus .nav-link,
-	    	.navbar-custom .nav-item:hover .nav-link {
-	    		color: #ffffff;
-	    	}
-	    `;
-	}
-	
-	render() {
+	asyncRender() 
+	{
 		return html`
 			<div class="jumbotron jumbotron-fluid m-3 p-3">
 				<div class="row">
-					<div class="col-12" if="{lang=='en'}">
+					<div class="col-12" class="${this.app.lang.getLanguage()? 'visible': 'hidden'}">
 						<h4>Privacy Policy</h4>
 	
 						<p>We are very delighted that you have shown interest in our enterprise. Data protection is of a particularly high priority for the management of the Actoron GmbH. The use of the Internet pages of the Actoron GmbH is possible without any indication of personal data; however, if a data subject wants to use special enterprise services via our website, processing of personal data could become necessary. If the processing of personal data is necessary and there is no statutory basis for such processing, we generally obtain consent from the data subject.</p>
@@ -239,7 +217,7 @@ class PrivacyElement extends LitElement {
 						<h4>12. Existence of automated decision-making</h4>
 						<p>As a responsible company, we do not use automatic decision-making or profiling.</p>
 					</div>
-					<div class="col-12" if="{lang=='de'}">
+					<div class="col-12" class="${!this.app.lang.getLanguage()? 'visible': 'hidden'}">
 			
 						<h4>Datenschutzerkl&auml;rung</h4>
 			
@@ -441,11 +419,7 @@ class PrivacyElement extends LitElement {
 			</div>
 		`;
 	}
-	
-	switchLanguage() {
-	    language.switchLanguage(); 
-	    this.requestUpdate(); // needs manual update as language.lang is not mapped to an attribute 
-	}
 }
 
-customElements.define('jadex-privacy', PrivacyElement);
+if(customElements.get('jadex-privacy') === undefined)
+	customElements.define('jadex-privacy', PrivacyElement);

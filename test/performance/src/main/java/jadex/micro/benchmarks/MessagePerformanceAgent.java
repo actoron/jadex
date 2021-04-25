@@ -37,8 +37,8 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.micro.annotation.Agent;
@@ -135,18 +135,21 @@ public class MessagePerformanceAgent
 					f.setVisible(true);
 					
 					agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IEchoService.class, ServiceScope.GLOBAL))
-						.addResultListener(new SwingIntermediateResultListener<IEchoService>(new IIntermediateResultListener<IEchoService>()
+						.addResultListener(new SwingIntermediateResultListener<IEchoService>(new IntermediateEmptyResultListener<IEchoService>()
 					{
 						boolean first = true;
+						
 						public void intermediateResultAvailable(IEchoService result)
 						{
 							reset();
 							selcb.addItem(((IService)result).getServiceId().getProviderId());
 						}
+						
 						public void finished()
 						{
 							reset();
 						}
+						
 						public void resultAvailable(Collection<IEchoService> result)
 						{
 							reset();
@@ -154,9 +157,6 @@ public class MessagePerformanceAgent
 							{
 								selcb.addItem(((IService)it.next()).getServiceId().getProviderId());
 							}
-						}
-						public void exceptionOccurred(Exception exception)
-						{
 						}
 						
 						protected void reset()
@@ -411,6 +411,6 @@ public class MessagePerformanceAgent
 	 */
 	public IFuture<Long> getTime()
 	{
-		return new Future<Long>(new Long(agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM)).getTime()));
+		return new Future<Long>(new Long(agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM)).getTime()));
 	}
 }

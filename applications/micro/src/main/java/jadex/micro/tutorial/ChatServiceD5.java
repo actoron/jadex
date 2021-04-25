@@ -63,7 +63,7 @@ public class ChatServiceD5 implements IChatService
 			}
 		});
 		
-//		ISimulationService	simserv	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+//		ISimulationService	simserv	= agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 //		if(simserv!=null)
 //		{
 //			FutureBarrier<Void>	fubar	= new FutureBarrier<>();

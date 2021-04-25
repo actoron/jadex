@@ -19,6 +19,42 @@ public interface IWebPublishService extends IPublishService
 	 */
 	public IFuture<Void> publishResources(String uri, String rootpath);
 	
+	/**
+	 *  Turn on or off the login security.
+	 *  If true one has to log in with platform secret before using published services.
+	 *  @param sec On or off.
+	 */
+	public IFuture<Void> setLoginSecurity(boolean sec);
+	
+	/**
+	 *  Test if a the web user is logged in.
+	 *  @param callid The callid of the request.
+	 *  @return True, if is logged in.
+	 */
+	public IFuture<Boolean> isLoggedIn(String callid);
+	
+	/**
+	 *  Log in to the platform.
+	 *  @param request The request.
+	 *  @param secret The platform secret.
+	 *  @return True, if login was successful.
+	 * /
+	public IFuture<Boolean> login(HttpServletRequest request, String secret);*/
+	
+	/**
+	 *  Logout from the platform.
+	 *  @param secret The platform secret.
+	 *  @return True, if login was successful.
+	 * /
+	public IFuture<Boolean> logout(HttpServletRequest request);*/
+	
+	/**
+	 *  Log in to the platform.
+	 *  @param platformpass The platform password.
+	 *  @return True, if login was successful.
+	 * /
+	public IFuture<Boolean> logIn(String platformpass);*/
+	
 	//-------- old (currently unsupported!) --------
 	
 //	/**

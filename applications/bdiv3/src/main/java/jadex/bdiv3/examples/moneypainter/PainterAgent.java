@@ -34,10 +34,10 @@ public class PainterAgent
 	public class GetOneEuro
 	{
 		public GetOneEuro(String from)
+		//public GetOneEuro()
 		{
-//			System.out.println("created goal: "+this);
-//			Thread.dumpStack();
-//			System.out.println("created painter goal: "+from);
+			//System.out.println("created goal: "+this);
+			//System.out.println("created painter goal: "+from);
 		}
 	} 
 	

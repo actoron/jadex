@@ -33,8 +33,8 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	@Agent
 	protected IInternalAccess agent;
 	
-	/** The plugin component string. */
-	protected String component;
+	///** The plugin component string. */
+	//protected String component;
 	
 	
 	/**
@@ -43,7 +43,7 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	 */
 	public IFuture<String> getPluginName()
 	{
-		return new Future<String>("security");
+		return new Future<String>("Security");
 	}
 	
 	/**
@@ -61,7 +61,17 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	 */
 	public String getPluginUIPath()
 	{
-		return "jadex/tools/web/security/security.tag";
+		//return "jadex/tools/web/security/security.tag";
+		return "jadex/tools/web/security/security.js";
+	}
+	
+	/**
+	 *  Get the plugin icon.
+	 *  @return The plugin icon.
+	 */
+	public IFuture<byte[]> getPluginIcon()
+	{
+		return loadResource("jadex/tools/web/security/security.png");
 	}
 	
 	/**
@@ -197,14 +207,15 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 		getSecurityService(cid)
 			.thenCompose((ISecurityService s) -> 
 			{
-				bar.addFuture(s.getPlatformSecret(agent.getId())
-					.thenAccept((String sec) -> ss.setPlatformSecret(sec)));
-				bar.addFuture(s.isPrintPlatformSecret()
-					.thenAccept((Boolean b) -> ss.setPrintSecret(b)));
-				bar.addFuture(s.isUsePlatformSecret()
-					.thenAccept((Boolean b) -> ss.setUseSecret(b)));
-				bar.addFuture(s.getAllKnownNetworks()
-					.thenAccept((MultiCollection<String, String> ns) ->
+				// todo: how to avoid cast to Future?
+				bar.addFuture((Future)s.getPlatformSecret(agent.getId())
+					.then((String sec) -> ss.setPlatformSecret(sec)));
+				bar.addFuture((Future)s.isPrintPlatformSecret()
+					.then((Boolean b) -> ss.setPrintSecret(b)));
+				bar.addFuture((Future)s.isUsePlatformSecret()
+					.then((Boolean b) -> ss.setUseSecret(b)));
+				bar.addFuture((Future)s.getAllKnownNetworks()
+					.then((MultiCollection<String, String> ns) ->
 					{
 //						List<Tuple2<String, String>> nets = ns.entrySet().stream().flatMap(mi-> 
 //							mi.getValue().stream().map(v->new Tuple2<String, String>(mi.getKey(), v))).collect(Collectors.toList());
@@ -213,22 +224,22 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 						ss.setNetworks(nets);
 					}));
 				
-				bar.addFuture(s.getRoleMap()
-					.thenAccept((Map<String, Set<String>> rs) ->
+				bar.addFuture((Future)s.getRoleMap()
+					.then((Map<String, Set<String>> rs) ->
 					{
 						List<String[]> nets = rs.entrySet().stream().flatMap(ri-> 
 							ri.getValue().stream().map(v->new String[]{ri.getKey(), v})).collect(Collectors.toList());
 						ss.setRoles(nets);
 					}));
 				
-				bar.addFuture(s.getNameAuthoritiesInfo()
-					.thenAccept((String[][] as) -> {ss.setNameAuthorities(Arrays.asList(as));}));
+				bar.addFuture((Future)s.getNameAuthoritiesInfo()
+					.then((String[][] as) -> {ss.setNameAuthorities(Arrays.asList(as));}));
 				
-				bar.addFuture(s.getTrustedPlatforms()
-					.thenAccept((Set<String> as) -> {ss.setTrustedPlatformNames(as);}));
+				bar.addFuture((Future)s.getTrustedPlatforms()
+					.then((Set<String> as) -> {ss.setTrustedPlatformNames(as);}));
 					
 				return bar.waitFor();
-			}).thenAccept((Void)->ret.setResult(ss));
+			}).then((Void)->ret.setResult(ss));
 		
 		return ret;
 	}

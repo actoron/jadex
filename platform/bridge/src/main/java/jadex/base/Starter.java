@@ -118,6 +118,10 @@ public class Starter
     /** The weak set of invoked init, start or shutdown methods - to not invoke twice. */
     public static String DATA_INVOKEDMETHODS = "INVOKEDMETHODS";
     
+    /** The cache of component models found by scanning available resources. */
+    public static String DATA_COMPONENTMODELS = "componentmodels";
+    public static String DATA_KERNELFILTERS = "kernelfilters";
+
     
     // todo: cannot be used because registry needs to know when superpeer changes (remap queries)
 //    /** Constant for the superpeer. */
@@ -250,7 +254,7 @@ public class Starter
 //				args.put("component", remotecid);
 //				CreationInfo ci = new CreationInfo(args);
 //				ci.setDaemon(true);
-//				IComponentManagementService	cms	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
+//				IComponentManagementService	cms	= ia.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 //				cms.createComponent(platformname, "jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
 //				return IFuture.DONE;
 //			}
@@ -347,28 +351,44 @@ public class Starter
 	 *  @param config The PlatformConfiguration object.
 	 *  @return The external access of the root component.
 	 */
-	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration pconfig, final String[] args)
+	public static IFuture<IExternalAccess> createPlatform(IPlatformConfiguration pconfig, String... args)
 	{
 		return createPlatform(pconfig, parseArgs(args));
 	}
 
 	/**
 	 *  Get a boolean value from args (otherwise return default value passed as arg).
+	 *  Any non-boolean, non-null value (e.g. a string) is also considered 'true'. 
 	 *  @param args The args map.
 	 *  @param argname The argument name.
-	 *  @param def The default value.
-	 *  @return The args value.
+	 *  @param conf The platform config.
+	 *  @return The arg value.
 	 */
-	public static boolean getBooleanValueWithArgs(Map<String, Object> args, String argname, boolean def)
+	public static boolean getBooleanValueWithArgs(Map<String, Object> args, String argname, IPlatformConfiguration conf)
 	{
-		boolean ret = def;
+		Object val	= null;
 		if(args!=null)
 		{
-			Object val = args.get(argname);
-			if(val!=null && val instanceof Boolean)
-				ret = ((Boolean)val).booleanValue();
+			val = args.get(argname);
 		}
-		return ret;
+		
+		if(val==null)
+		{
+			val	= conf.getValue(argname, null);
+			if(val instanceof String)
+			{
+				try
+				{
+					val = SJavaParser.evaluateExpression((String)val, null);
+				}
+				catch(Exception e)
+				{
+//					System.out.println("Argument parse exception using as string: " + argname + " \"" + val + "\"");
+				}
+			}
+		}
+		
+		return val instanceof Boolean ? (Boolean)val : val!=null;
 	}
 	
 	/**
@@ -392,7 +412,8 @@ public class Starter
 //		if(!Boolean.TRUE.equals(config.getValues().get("bisimulation")))
 //			System.out.println("no bisim");
 		
-		config.setReadOnly(true);
+		// Once a config is used to create a platform it must not be altered (performance optimization to avoid unnecessary copying of configs).
+		PlatformConfigurationHandler.makeImmutable(config);
 		
 		if(config.getExtendedPlatformConfiguration().isDropPrivileges())
 			VmHacks.get().tryChangeUser(null);
@@ -400,11 +421,11 @@ public class Starter
 //		IRootComponentConfiguration rootconf = config.getRootConfig();
 		
 		// pass configuration parameters to static fields:
-		MethodInvocationInterceptor.DEBUG = getBooleanValueWithArgs(args, "debugservices", config.getExtendedPlatformConfiguration().getDebugServices());
-		ExecutionComponentFeature.DEBUG = getBooleanValueWithArgs(args, "debugsteps", config.getExtendedPlatformConfiguration().getDebugSteps());
+		MethodInvocationInterceptor.DEBUG = getBooleanValueWithArgs(args, "debugservices", config);
+		ExecutionComponentFeature.DEBUG = getBooleanValueWithArgs(args, "debugsteps", config);
+		Future.NO_STACK_COMPACTION	= getBooleanValueWithArgs(args, "nostackcompaction", config);
 //		Future.NO_STACK_COMPACTION	= true;
-		Future.NO_STACK_COMPACTION	= getBooleanValueWithArgs(args, "nostackcompaction", config.getExtendedPlatformConfiguration().getNoStackCompaction());
-		Future.DEBUG = getBooleanValueWithArgs(args, "debugfutures", config.getExtendedPlatformConfiguration().getDebugFutures()); 
+		Future.DEBUG = getBooleanValueWithArgs(args, "debugfutures", config); 
 		
 //		new FastClasspathScanner(new String[]
 //		      {"com.xyz.widget", "com.xyz.gizmo" })  // Whitelisted package prefixes
@@ -494,15 +515,14 @@ public class Starter
 				String pfname = args!=null && args.containsKey(IPlatformConfiguration.PLATFORM_NAME)? (String)args.get(IPlatformConfiguration.PLATFORM_NAME): config.getPlatformName();
 //				Object pfname = config.getValue(RootComponentConfiguration.PLATFORM_NAME);
 //				rootConfig.setValue(RootComponentConfiguration.PLATFORM_NAME, pfname);
-				final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname: null);
+				final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname: null,
+					Boolean.TRUE.equals(config.getValue("uniquename", model)));
 				
 				if(IComponentIdentifier.LOCAL.get()==null)
 					IComponentIdentifier.LOCAL.set(cid);
 				
-				boolean readonlysettings = false;
-				readonlysettings |= config.isReadOnly();
-				if (args != null)
-					readonlysettings |= Boolean.TRUE.equals(args.get("settings.readonly"));
+				boolean readonlysettings = Boolean.TRUE.equals(config.getValue("settings.readonly", model))
+					|| args!=null && Boolean.TRUE.equals(args.get("settings.readonly"));
 				IPlatformSettings settings = (IPlatformSettings) SReflect.newInstance("jadex.platform.service.settings.PlatformSettings", cid, readonlysettings);
 				putPlatformValue(cid, DATA_PLATFORMSETTINGS, settings);
 				
@@ -732,11 +752,15 @@ public class Starter
 		return ret;
 	}
 	
+	/** Counters for generating unique names of platforms. */
+	protected static Map<String, Integer>	UNIQUENAMES	= new HashMap<>();
+	
 	/**
 	 *  Internal method to create a component identifier.
 	 *  @param pfname The platform name.
+	 *  @param unique	When true, keeps track of already created names and creates a name that is unique in this VM.
 	 */
-	public static IComponentIdentifier createPlatformIdentifier(String pfname)
+	public static IComponentIdentifier createPlatformIdentifier(String pfname, boolean unique)
 	{
 		// Build platform name.
 		String	platformname	= null; 
@@ -765,28 +789,50 @@ public class Starter
 		{
 			platformname = "platform_*";
 		}
-		Random	rnd	= new Random();
-		StringBuffer	buf	= new StringBuffer();
-		StringTokenizer	stok	= new StringTokenizer(platformname, "*+", true);
-		while(stok.hasMoreTokens())
+		
+		if(unique)
 		{
-			String	tok	= stok.nextToken();
-			if(tok.equals("+"))
+			Integer	num;
+			synchronized(UNIQUENAMES)
 			{
-				buf.append(Integer.toString(rnd.nextInt(36), 36));
+				num	= UNIQUENAMES.get(platformname);
+				if(num==null)
+				{
+					num	= 0;
+				}
+				else
+				{
+					num++;
+				}
+				UNIQUENAMES.put(platformname, num);
 			}
-			else if(tok.equals("*"))
-			{
-				buf.append(Integer.toString(rnd.nextInt(36), 36));
-				buf.append(Integer.toString(rnd.nextInt(36), 36));
-				buf.append(Integer.toString(rnd.nextInt(36), 36));
-			}
-			else
-			{
-				buf.append(tok);
-			}
+			platformname	+= "_$"+num;
 		}
-		platformname = SUtil.intern(buf.toString());
+		else
+		{
+			Random	rnd	= new Random();
+			StringBuffer	buf	= new StringBuffer();
+			StringTokenizer	stok	= new StringTokenizer(platformname, "*+", true);
+			while(stok.hasMoreTokens())
+			{
+				String	tok	= stok.nextToken();
+				if(tok.equals("+"))
+				{
+					buf.append(Integer.toString(rnd.nextInt(36), 36));
+				}
+				else if(tok.equals("*"))
+				{
+					buf.append(Integer.toString(rnd.nextInt(36), 36));
+					buf.append(Integer.toString(rnd.nextInt(36), 36));
+					buf.append(Integer.toString(rnd.nextInt(36), 36));
+				}
+				else
+				{
+					buf.append(tok);
+				}
+			}
+			platformname = SUtil.intern(buf.toString());
+		}
 		
 		// Create an instance of the component.
 		return new ComponentIdentifier(platformname).getRoot();
@@ -829,7 +875,7 @@ public class Starter
 				// must have : if both are presents otherwise all is configname
 				if(!comp.endsWith(")"))
 				{
-					throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>)[:<args>]]) : "+components.get(i));
+					throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>[:<args>])] : "+components.get(i));
 				}
 
 				int i3 = comp.indexOf(":");
@@ -1200,8 +1246,9 @@ public class Starter
 	 */
 	public static long getDefaultTimeout(IComponentIdentifier platform)
 	{
-		return platform!=null && hasPlatformValue(platform, DATA_DEFAULT_TIMEOUT)
-			? ((Long)getPlatformValue(platform, DATA_DEFAULT_TIMEOUT)).longValue()
+		Long	platform_timeout	= platform!=null ? (Long)getPlatformValue(platform, DATA_DEFAULT_TIMEOUT) : null;
+		return  platform_timeout!=null
+			? platform_timeout.longValue()
 			: SUtil.DEFTIMEOUT;
 	}
 
@@ -1503,7 +1550,7 @@ public class Starter
 		});
 		
 		component.create(cci, features);
-		component.init().thenAccept(x ->
+		component.init().then(x ->
 		{
 			//long end = System.currentTimeMillis();
 			//System.out.println("init took "+(end-start)+" ms, thread: "+Thread.currentThread());
@@ -1514,7 +1561,7 @@ public class Starter
 			
 			// Shutdown is called via killComponent()
 			//component.shutdown().get();
-		}).exceptionally(ret);
+		}).catchEx(ret);
 		
 		return ret;
 	}
@@ -1573,7 +1620,7 @@ public class Starter
 	{
 		try
 		{
-			IComponentIdentifier pcid = Starter.createPlatformIdentifier(null);
+			IComponentIdentifier pcid = Starter.createPlatformIdentifier(null, false);
 			IThreadPool threadpool = new JavaThreadPool(true);
 			Class<IExecutionService> esc = SReflect.findClass("jadex.noplatform.services.ExecutionService", null, Starter.class.getClassLoader());
 			Constructor<IExecutionService> ces = esc.getConstructor(new Class[]{IComponentIdentifier.class, IThreadPool.class});

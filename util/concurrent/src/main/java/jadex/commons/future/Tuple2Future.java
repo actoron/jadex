@@ -156,11 +156,11 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
      * 
      * @param firstListener Listener for the first available result.
      * @param secondListener Listener for the second available result.
-     */
+     * /
 	public void addTuple2ResultListener(IFunctionalResultListener<E> firstListener, IFunctionalResultListener<F> secondListener)
 	{
 		addTuple2ResultListener(firstListener, secondListener, null);
-	}
+	}*/
 
     /**
      * Uses two functional result listeners to create a Tuple2ResultListener and add it.
@@ -169,34 +169,40 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
      * 
      * Additionally, a given exception listener is called when exceptions occur.
      * 
-     * @param firstListener Listener for the first available result.
-     * @param secondListener Listener for the second available result.
+     * @param flistener Listener for the first available result.
+     * @param slistener Listener for the second available result.
 	 * @param exListener The listener that is called on exceptions. Passing
 	 *        <code>null</code> enables default exception logging.
-     */
-	public void addTuple2ResultListener(final IFunctionalResultListener<E> firstListener, final IFunctionalResultListener<F> secondListener, IFunctionalExceptionListener exceptionListener)
+     * /
+	public void addTuple2ResultListener(final IFunctionalResultListener<E> flistener, final IFunctionalResultListener<F> slistener, 
+		IFunctionalExceptionListener elistener)
 	{
-		final IFunctionalExceptionListener innerExceptionListener = (exceptionListener == null) ? SResultListener.printExceptions() : exceptionListener;
+		final IFunctionalExceptionListener ieistener = (elistener == null) ? SResultListener.printExceptions() : elistener;
 		addResultListener(new DefaultTuple2ResultListener<E, F>() 
 		{
 			public void firstResultAvailable(E result) 
 			{
-				if(firstListener!=null)
-					firstListener.resultAvailable(result);
+				if(flistener!=null)
+					flistener.resultAvailable(result);
 			}
 
 			public void secondResultAvailable(F result) 
 			{
-				if(secondListener!=null)
-					secondListener.resultAvailable(result);
+				if(slistener!=null)
+					slistener.resultAvailable(result);
 			}
 
 			public void exceptionOccurred(Exception exception) 
 			{
-				innerExceptionListener.exceptionOccurred(exception);
+				ieistener.exceptionOccurred(exception);
+			}
+			
+			public void maxResultCountAvailable(int max) 
+			{
+				// nop, we know there are only 2 results
 			}
 		});
-	}
+	}*/
 
 	/**
      *  Set the result. 

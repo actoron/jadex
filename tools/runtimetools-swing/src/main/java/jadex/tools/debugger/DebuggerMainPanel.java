@@ -27,9 +27,9 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.tools.debugger.common.ObjectInspectorDebuggerPanel;
@@ -297,7 +297,7 @@ public class DebuggerMainPanel extends JSplitPane
 		updatePanel((IComponentDescription)desc);
 
 		listener	= jcc.getCMSHandler().addCMSListener(desc.getName().getRoot());
-		listener.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+		listener.addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 		{
 			@Override
 			public void exceptionOccurred(Exception exception)
@@ -306,20 +306,10 @@ public class DebuggerMainPanel extends JSplitPane
 			}
 
 			@Override
-			public void resultAvailable(Collection<CMSStatusEvent> result)
-			{
-			}
-
-			@Override
 			public void intermediateResultAvailable(CMSStatusEvent event)
 			{
 				if(event.getComponentDescription().getName().equals(DebuggerMainPanel.this.desc.getName()))
 					updatePanel(event.getComponentDescription());
-			}
-
-			@Override
-			public void finished()
-			{
 			}
 		});
 	}

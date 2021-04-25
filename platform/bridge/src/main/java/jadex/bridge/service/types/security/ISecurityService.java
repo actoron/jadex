@@ -213,6 +213,13 @@ public interface ISecurityService
 	@Security(roles={Security.TRUSTED})
 	public JadexVersion getJadexVersion(IComponentIdentifier remoteid);
 	
+	/**
+	 *  Check the platform password.
+	 *  @param platformpass The platform password.
+	 *  @return True, if platform password is correct.
+	 */
+	public IFuture<Boolean> checkPlatformPassword(String platformpass);
+	
 //	/**
 //	 *  Gets the current network names. 
 //	 *  @return The current networks names.

@@ -15,8 +15,8 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
@@ -112,7 +112,7 @@ public class UserAgent
 			public void customResultAvailable(final IProcessEngineService engine)
 			{
 				ISubscriptionIntermediateFuture<ProcessEngineEvent> fut = engine.addBpmnModel(model, null);
-				fut.addResultListener(new IIntermediateResultListener<ProcessEngineEvent>()
+				fut.addResultListener(new IntermediateEmptyResultListener<ProcessEngineEvent>()
 				{
 					protected List<String> results = new ArrayList<String>();
 					protected boolean fini = false;
@@ -218,7 +218,7 @@ public class UserAgent
 			public void customResultAvailable(final IProcessEngineService mons)
 			{	
 				ISubscriptionIntermediateFuture<ProcessEngineEvent> fut = mons.addBpmnModel(model, null);
-				fut.addResultListener(new IIntermediateResultListener<ProcessEngineEvent>()
+				fut.addResultListener(new IntermediateEmptyResultListener<ProcessEngineEvent>()
 				{
 					protected boolean fini = false;
 					

@@ -2,6 +2,7 @@ package jadex.platform.service.awareness;
 
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
+import java.net.SocketException;
 
 import jadex.bridge.service.annotation.OnInit;
 import jadex.commons.Boolean3;
@@ -27,12 +28,19 @@ public class BroadcastAwarenessAgent extends LocalNetworkAwarenessBaseAgent
 	@OnInit
 	public void	init() throws Exception
 	{
-		sendsocket = new DatagramSocket(0);
-		sendsocket.setBroadcast(true);
-		sendsocket.setReuseAddress(true);
-		recvsocket = new DatagramSocket(null);
-		recvsocket.setReuseAddress(true);
-		recvsocket.bind(new InetSocketAddress(port));
+		try
+		{
+			sendsocket = new DatagramSocket(0);
+			sendsocket.setBroadcast(true);
+			sendsocket.setReuseAddress(true);
+			recvsocket = new DatagramSocket(null);
+			recvsocket.setReuseAddress(true);
+			recvsocket.bind(new InetSocketAddress(port));
+		}
+		catch(SocketException se)
+		{
+			throw new RuntimeException("port "+port+" problem?", se);
+		}
 		
 		super.init();
 	}

@@ -2,20 +2,16 @@ package jadex.micro.testcases.terminate;
 
 import java.util.Collection;
 
+import jadex.base.IPlatformConfiguration;
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.LocalResourceIdentifier;
-import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -28,7 +24,6 @@ import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.TestAgent;
@@ -41,7 +36,6 @@ import jadex.micro.testcases.TestAgent;
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Description("The invoker agent tests if futures can be terminated " +
 	"in local and remote cases.")
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class TerminateTestAgent extends TestAgent
 {
 	//-------- attributes --------
@@ -54,18 +48,14 @@ public class TerminateTestAgent extends TestAgent
 	@Override
 	protected IFuture<Void> performTests(Testcase tc)
 	{
-		if(SReflect.isAndroid()) 
-		{
-			tc.setTestCount(2);
-		} 
-		else 
-		{
-			tc.setTestCount(4);	
-		}
+		tc.setTestCount(4);	
+		
+		// Enough time for all tests +1
+		long	timeout	= Starter.getScaledDefaultTimeout(agent.getId().getRoot(), 1.0/(tc.getTestCount()+1));
 		
 		final Future<Void>	ret	= new Future<Void>();
 		
-		testLocal(1, 100).addResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
+		testLocal(1, timeout).addResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			@Override
 			public void intermediateResultAvailable(TestReport result)
@@ -75,25 +65,18 @@ public class TerminateTestAgent extends TestAgent
 			
 			public void finished()
 			{
-				if (SReflect.isAndroid()) 
+				testRemote(3, timeout).addResultListener(new ExceptionDelegationResultListener<Collection<TestReport>, Void>(ret)
 				{
-					ret.setResult(null);
-				} 
-				else 
-				{
-					testRemote(3, 1000).addResultListener(new ExceptionDelegationResultListener<Collection<TestReport>, Void>(ret)
+					public void customResultAvailable(Collection<TestReport> result)
 					{
-						public void customResultAvailable(Collection<TestReport> result)
+						for(TestReport rep: result)
 						{
-							for(TestReport rep: result)
-							{
-								tc.addReport(rep);
-							}
-							
-							ret.setResult(null);
+							tc.addReport(rep);
 						}
-					});
-				}
+						
+						ret.setResult(null);
+					}
+				});
 			}
 		});
 		
@@ -156,28 +139,28 @@ public class TerminateTestAgent extends TestAgent
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 
 		// Start service agent
-		IResourceIdentifier	rid	= new ResourceIdentifier(
-			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
+//		IResourceIdentifier	rid	= new ResourceIdentifier(
+//			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 		
-		agent.getExternalAccess(root).createComponent(new CreationInfo(rid).setFilename("jadex/micro/testcases/terminate/TerminableProviderAgent.class"))
-			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
+		createComponent("jadex/micro/testcases/terminate/TerminableProviderAgent.class", root, null)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
 		{	
-			public void customResultAvailable(final IExternalAccess exta)
+			public void customResultAvailable(final IComponentIdentifier id)
 			{
 				ret.addResultListener(new IResultListener<Collection<TestReport>>()
 				{
 					public void resultAvailable(Collection<TestReport> result)
 					{
-						agent.getExternalAccess(exta.getId()).killComponent();
+						agent.getExternalAccess(id).killComponent();
 					}
 					public void exceptionOccurred(Exception exception)
 					{
-						agent.getExternalAccess(exta.getId()).killComponent();
+						agent.getExternalAccess(id).killComponent();
 					}
 				});
 				
 //						System.out.println("cid is: "+cid);
-				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITerminableService.class).setProvider(exta.getId()))
+				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITerminableService.class).setProvider(id))
 					.addResultListener(new ExceptionDelegationResultListener<ITerminableService, Collection<TestReport>>(ret)
 				{
 					public void customResultAvailable(final ITerminableService service)
@@ -237,6 +220,7 @@ public class TerminateTestAgent extends TestAgent
 			}
 		});
 		fut.terminate();
+		System.out.println(agent.getId()+": testTerminate1b");
 
 		final Future<TestReport>	ret	= new Future<TestReport>();
 		final TestReport tr = new TestReport("#"+testno, "Tests if terminating future works");
@@ -269,7 +253,7 @@ public class TerminateTestAgent extends TestAgent
 		final Future<Void> tmp = new Future<Void>();
 		
 		final ITerminableFuture<String> fut = service.getResult(delay);
-		service.terminateCalled().addResultListener(new IntermediateExceptionDelegationResultListener<Void, Void>(tmp)
+		service.isTerminateCalled().addResultListener(new IntermediateExceptionDelegationResultListener<Void, Void>(tmp)
 		{
 			public void intermediateResultAvailable(Void result)
 			{
@@ -305,5 +289,14 @@ public class TerminateTestAgent extends TestAgent
 			}
 		});
 		return ret;
+	}
+	
+	@Override
+	public IPlatformConfiguration getConfig()
+	{
+		return super.getConfig()
+			.setValue("debugservices", "ITerminableService")
+			.setValue("security.debug", true)
+			.setValue("platformname", "TerminateTest");
 	}
 }

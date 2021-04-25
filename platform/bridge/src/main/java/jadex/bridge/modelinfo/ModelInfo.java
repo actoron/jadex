@@ -31,9 +31,6 @@ public class ModelInfo extends Startable implements IModelInfo
 	/** The name. */
 	protected String name;
 	
-	/** Default instance name. */
-	protected String instancename;
-	
 	/** The package. */
 	protected String packagename;
 	
@@ -165,15 +162,6 @@ public class ModelInfo extends Startable implements IModelInfo
 	public String getName()
 	{
 		return name;
-	}
-	
-	/**
-	 *  Get the default instance name.
-	 *  @return The instance name.
-	 */
-	public String getInstanceName()
-	{
-		return instancename;
 	}
 	
 	/**
@@ -487,15 +475,6 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void setName(String name)
 	{
 		this.name = name;
-	}
-	
-	/**
-	 *  Set the default instance name.
-	 *  @param instancename The instance name.
-	 */
-	public void setInstanceName(String instancename)
-	{
-		this.instancename = instancename;
 	}
 	
 	/**

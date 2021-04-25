@@ -419,7 +419,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 		
 		if(start)
 		{
-//			IDaemonThreadPoolService	tps	= handler.getAccess().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDaemonThreadPoolService.class, ServiceScope.PLATFORM));
+//			IDaemonThreadPoolService	tps	= handler.getAccess().getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IDaemonThreadPoolService.class, ServiceScope.PLATFORM));
 			tps.executeForever(new Runnable()
 			{
 				public void run()

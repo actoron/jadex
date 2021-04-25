@@ -609,10 +609,12 @@ public class MGoal extends MClassBasedElement
 	 */
 	public MethodInfo getSelectCandidateMethod(ClassLoader cl)
 	{
+		// todo: move specific annotation code to loader
+		// model should be agnostic of bdiv3 oder bdiv3x
 		if(selectcandidatemethod==null)
 		{
 			Class<?> tcl = getTargetClass(cl);
-			Method[] ms = SReflect.getAllMethods(tcl);
+			Method[] ms = tcl==null? new Method[0]: SReflect.getAllMethods(tcl);
 			boolean done = false;
 			for(int i=0; !done && i<ms.length; i++)
 			{

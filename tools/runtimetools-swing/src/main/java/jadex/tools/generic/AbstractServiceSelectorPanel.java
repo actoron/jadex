@@ -9,7 +9,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 /**
@@ -47,18 +47,21 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 		final Class<IService>	type	= (Class<IService>)servicetype;
 		final ServiceScope	scope	= isRemote() ? ServiceScope.GLOBAL: ServiceScope.PLATFORM;
 		platform.searchServices( new ServiceQuery<>(type, scope))
-			.addResultListener(new SwingIntermediateResultListener<IService>(new IIntermediateResultListener<IService>()
+			.addResultListener(new SwingIntermediateResultListener<IService>(new IntermediateEmptyResultListener<IService>()
 		{
 			boolean first = true;
+			
 			public void intermediateResultAvailable(IService result)
 			{
 				reset();
 				selcb.addItem(result);
 			}
+			
 			public void finished()
 			{
 				reset();
 			}
+			
 			public void resultAvailable(Collection<IService> result)
 			{
 				reset();
@@ -66,9 +69,6 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 				{
 					selcb.addItem(it.next());
 				}
-			}
-			public void exceptionOccurred(Exception exception)
-			{
 			}
 			
 			protected void reset()

@@ -175,7 +175,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 */
 	public IFuture<Void> startService()
 	{
-		libservice = provider.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class).setMultiplicity(0));
+		libservice = provider.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class).setMultiplicity(0));
 		if (libservice != null)
 			libservice.addLibraryServiceListener(libservicelistener);	// TODO: wait for future?
 		return BpmnFactory.super.startService();

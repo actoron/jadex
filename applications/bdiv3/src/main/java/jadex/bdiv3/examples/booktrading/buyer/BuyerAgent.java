@@ -103,12 +103,7 @@ public class BuyerAgent implements INegotiationAgent
 	public void shutdown()
 	{
 		if(gui!=null)
-		{
-			gui.addResultListener(thegui ->
-			{
-				SwingUtilities.invokeLater(()->thegui.dispose());
-			});
-		}
+			gui.then(thegui -> SwingUtilities.invokeLater(()->thegui.dispose()));
 	}
 	
 	@Goal(recur=true, recurdelay=10000, unique=true)

@@ -23,6 +23,7 @@ import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
@@ -221,6 +222,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 			{
 				public void customResultAvailable(Object result)
 				{
+					//System.out.println("Goal delegation handler: "+result);
 	//				Object res = RGoal.getGoalResult(fgoal, mgoal, agent.getClassLoader());
 	//				Object res = RGoal.getGoalResult(rgoal, agent.getClassLoader());
 					
@@ -232,7 +234,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 				}
 				public void exceptionOccurred(Exception exception)
 				{
-	//				System.out.println("gloaldelehandler endex"+SUtil.arrayToString(args));
+					//System.out.println("gloaldelehandler endex: "+exception);
 					fret.setExceptionIfUndone(exception);
 				}
 			};

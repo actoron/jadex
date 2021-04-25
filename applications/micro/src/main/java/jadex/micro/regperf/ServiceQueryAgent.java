@@ -14,9 +14,8 @@ import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 
 /**
  *  Agent that searches for services.
@@ -42,7 +41,7 @@ public class ServiceQueryAgent
 				final long start = System.currentTimeMillis();
 				
 				agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IExampleService.class, ServiceScope.NETWORK))
-					.addIntermediateResultListener(new IIntermediateResultListener<IExampleService>()
+					.addResultListener(new IntermediateEmptyResultListener<IExampleService>()
 				{
 					Set<IComponentIdentifier> plats = new HashSet<IComponentIdentifier>();
 					int cnt = 0;

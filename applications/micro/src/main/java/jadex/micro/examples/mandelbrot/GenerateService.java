@@ -26,8 +26,8 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.SGUI;
 
 /**
@@ -54,7 +54,7 @@ public class GenerateService implements IGenerateService
 	protected GeneratePanel panel;
 	
 	/** The service pool manager for calculation services. */
-	protected ServicePoolManager	manager;
+	protected ServicePoolManager manager;
 	
 	//-------- constructors --------
 	
@@ -274,7 +274,7 @@ public class GenerateService implements IGenerateService
 		final int number	= areas.size();
 		manager.setMax(data.getParallel());
 		manager.performTasks(areas, true, data).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
-			new IIntermediateResultListener<Object>()
+			new IntermediateEmptyResultListener<Object>()
 		{
 			int	cnt	= 0;
 			

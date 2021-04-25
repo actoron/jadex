@@ -35,7 +35,7 @@ public abstract class XMLReaderFactory
 	{
 		if(INSTANCE == null)
 		{
-			if(SReflect.isAndroid() && !SReflect.isAndroidTesting())
+			/*if(SReflect.isAndroid() && !SReflect.isAndroidTesting())
 			{
 				Class< ? > clz;
 				try
@@ -60,9 +60,9 @@ public abstract class XMLReaderFactory
 				}
 			}
 			else
-			{
+			{*/
 				INSTANCE = new XMLReaderFactoryDesktop();
-			}
+			//}
 		}
 		return INSTANCE;
 	}

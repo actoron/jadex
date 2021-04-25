@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 import jadex.commons.Boolean3;
 
 /**
- * 
+ *  Annotate fields and methods that will be called when the corresponding services are available.
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -22,7 +22,14 @@ public @interface OnService
 	//-------- search details --------
 	
 	/**
-	 *  Fail at startup if no service is found?
+	 *  Fail at startup if no service is found for a field?
+	 *  
+	 *  If required is false, a proxy will be injected. 
+	 *  The proxy will be resolved on first method invocation and
+	 *  performs a time limited query for the service (i.e. a time span search).
+	 *  If true on a field, init will only proceed when the service
+	 *  has been found and injected. If no service is found the startup
+	 *  of the component startup will fail.
 	 */
 	public Boolean3 required() default Boolean3.NULL;
 	
@@ -31,7 +38,7 @@ public @interface OnService
 	 * 
 	 *  If is lazy the service search will happen on first call.
 	 *  This can go wrong if first call is a synchronous message.
-	 *  If lazy is false, the agent might block when search takes time.
+	 *  If lazy is false, the agent might block when search takes time on agent init.
 	 */
 	public Boolean3 lazy() default Boolean3.NULL;
 	

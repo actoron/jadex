@@ -2,6 +2,9 @@ package jadex.bridge.service.component;
 
 import java.util.Collection;
 
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -54,23 +57,23 @@ public interface IRequiredServicesFeature extends IExternalRequiredServicesFeatu
 	 */
 	public <T> Collection<T> getLocalServices(Class<T> type);
 	
-	//-------- methods for searching --------
-	
 	/**
-	 *  Search for matching services and provide first result.
+	 *  Lookup matching services and provide first result.
 	 *  Synchronous method only for locally available services.
 	 *  @param query	The search query.
 	 *  @return The corresponding service or ServiceNotFoundException when not found.
 	 */
-	public <T> T searchLocalService(ServiceQuery<T> query);
+	public <T> T getLocalService(ServiceQuery<T> query);
 	
 	/**
-	 *  Search for all matching services.
+	 *  Lookup all matching services.
 	 *  Synchronous method only for locally available services.
 	 *  @param query	The search query.
 	 *  @return A collection of services.
 	 */
-	public <T> Collection<T> searchLocalServices(ServiceQuery<T> query);
+	public <T> Collection<T> getLocalServices(ServiceQuery<T> query);
+	
+	//-------- methods for searching --------
 	
 	/**
 	 *  Performs a sustained search for a service. Attempts to find a service
@@ -140,5 +143,19 @@ public interface IRequiredServicesFeature extends IExternalRequiredServicesFeatu
 	 *  @return Each service as an intermediate result or a collection of services as final result.
 	 */
 	public <T> ITerminableIntermediateFuture<T> getServices(Class<T> type);
+	
+	/**
+	 *  Create the user-facing object from the received search or query result.
+	 *  Result may be service object, service identifier (local or remote), or event.
+	 *  User object is either event or service (with or without required proxy).
+	 */
+	public IService getServiceProxy(IServiceIdentifier sid, RequiredServiceInfo info);
+	
+	/**
+	 *  Get a service query for a required service info (as defined in the agent under that name).
+	 *  @param name The name.
+	 *  @return The service query.
+	 */
+	public ServiceQuery<?> getServiceQuery(String name);
 	
 }

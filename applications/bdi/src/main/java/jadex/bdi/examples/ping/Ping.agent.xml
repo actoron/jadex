@@ -16,7 +16,7 @@
 	</capabilities>
 	
 	<properties>
-		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+		<property name="logging.level">java.util.logging.Level.FINE</property>
 	</properties>
 
 </agent>

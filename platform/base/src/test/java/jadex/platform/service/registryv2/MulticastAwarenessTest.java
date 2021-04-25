@@ -4,7 +4,12 @@ package jadex.platform.service.registryv2;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.net.MulticastSocket;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -15,6 +20,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.awareness.IAwarenessService;
+import jadex.commons.SUtil;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.security.SSecurity;
 
 /**
@@ -31,30 +38,44 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 	/** Plain provider configuration. */
 	public static final IPlatformConfiguration	PROCONF;
 	
-	/** Fixed custom port for multicast. */
-	public static final int customport	= SSecurity.getSecureRandom().nextInt(Short.MAX_VALUE*2-1024)+1025;
-
 	static
 	{
-		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(MulticastAwarenessTest.class);
+		// Fixed custom port for multicast, try 10 times (windows ipv6 problem?)
+		// https://stackoverflow.com/questions/3947555/java-net-socketexception-unrecognized-windows-sockets-error-0-jvm-bind-jboss
+		int	port	= -1;
+		for(int i=0; i<10; i++)
+		{
+			port	= SSecurity.getSecureRandom().nextInt(Short.MAX_VALUE*2-1023)+1024;  // random value from 1024 to 2^16-1
+			try
+			{
+				@SuppressWarnings({ "unused", "resource" })	// Hack!!! do not close socket to keep port available for test
+				MulticastSocket	recvsocket = new MulticastSocket(port);
+				break;
+			}
+			catch(IOException se)
+			{
+				System.out.println("port "+port+" problem?\n"+SUtil.getExceptionStacktrace(se));
+			}
+		}
+		System.out.println("MulticastAwarenessTest custom port: "+port);
+
+		IPlatformConfiguration	baseconf	= STest.createRealtimeTestConfig(MulticastAwarenessTest.class);
 		baseconf.setValue("superpeerclient.awaonly", true);
 		baseconf.setValue("intravmawareness", false);
 		baseconf.setValue("multicastawareness", true);
-		baseconf.setValue("multicastawareness.port", customport);
+		baseconf.setValue("multicastawareness.port", port);
+//		baseconf.setValue("debugservices", "IMarkerService");
 		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*3));
 		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
-
-		// Remote only -> no simulation please
-		baseconf.getExtendedPlatformConfiguration().setSimul(false);
-		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
 		
 		CLIENTCONF	= baseconf.clone();
-		CLIENTCONF.setPlatformName("client_*");
+		CLIENTCONF.setPlatformName("client");
 		
 		PROCONF	= baseconf.clone();
 		PROCONF.addComponent(GlobalProviderAgent.class);
+		PROCONF.addComponent(NetworkProviderAgent.class);
 		PROCONF.addComponent(LocalProviderAgent.class);
-		PROCONF.setPlatformName("provider_*");
+		PROCONF.setPlatformName("provider");
 	}
 	
 	//-------- constructors --------
@@ -75,14 +96,34 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 	@Test
 	public void	testBareAwareness()
 	{
+		// Start client and fetch awa service.
 		IExternalAccess	client	= createPlatform(CLIENTCONF);		
-		createPlatform(PROCONF);	
-		createPlatform(PROCONF);
-		
 		IAwarenessService	pawa	= client.searchService(new ServiceQuery<>(IAwarenessService.class)).get();
 		assertTrue("Found multicast awareness? "+pawa, pawa.toString().toLowerCase().contains("multicast"));
 		
-		Collection<IComponentIdentifier>	found	= pawa.searchPlatforms().get();
-		assertEquals(found.toString(), 2, found.size());
+		// Start providers and check that they can be found
+		IExternalAccess	pro1	= createPlatform(PROCONF);	
+		IExternalAccess	pro2	= createPlatform(PROCONF);
+		Set<IComponentIdentifier>	platforms	= new LinkedHashSet<IComponentIdentifier>(Arrays.asList(pro1.getId(), pro2.getId()));
+		IIntermediateFuture<IComponentIdentifier>	results	= pawa.searchPlatforms();
+		IComponentIdentifier	result	= results.getNextIntermediateResult();
+		assertTrue("Found provider platform? "+platforms+", "+result, platforms.remove(result));
+		result	= results.getNextIntermediateResult();
+		assertTrue("Found provider platform? "+platforms+", "+result, platforms.remove(result));
+	}
+
+	//-------- heisenbug test --------
+	
+	public static void main(String[] args)
+	{
+		MulticastAwarenessTest	test	= new MulticastAwarenessTest();
+		test.setup();
+		while(true)
+		{
+			System.out.print(".");
+			IExternalAccess	client	= test.createPlatform(test.clientconf);
+			test.waitForRegistryClient(client, true);
+			client.killComponent().get();
+		}
 	}
 }

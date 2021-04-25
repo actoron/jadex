@@ -491,11 +491,11 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					}
 				}
 				
-				if (addglobalnetwork && !networks.containsKey(GLOBAL_NETWORK_NAME))
+				if(addglobalnetwork && !networks.containsKey(GLOBAL_NETWORK_NAME))
 					networks.add(GLOBAL_NETWORK_NAME, AbstractAuthenticationSecret.fromString(DEFAULT_GLOBAL_ROOT_CERTIFICATE, true));
 				
-				if ((networks.isEmpty() || (networks.size() == 1 && networks.containsKey(GLOBAL_NETWORK_NAME))) &&
-					createdefaultnetwork)
+				if((networks.isEmpty() || (networks.size() == 1 
+					&& networks.containsKey(GLOBAL_NETWORK_NAME))) && createdefaultnetwork)
 				{
 					networks.add(SUtil.createPlainRandomId("default_network", 6), KeySecret.createRandom());
 					savesettings = true;
@@ -552,6 +552,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						}
 					}
 				}
+				// Update networknames in indexer
+				ServiceRegistry.getRegistry(agent.getId().getRoot()).updateService(null);
 				
 				// TODO: Make configurable
 				String[] cryptsuites = new String[] { NHCurve448ChaCha20Poly1305Suite.class.getCanonicalName() };
@@ -640,7 +642,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		String rplat = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot().toString();
 		final ICryptoSuite cs = currentcryptosuites.get(rplat);
 		if(cs != null && !isSecurityMessage(header) && !cs.isExpiring())
-			return new Future<byte[]>(cs.encryptAndSign(content));
+			return checkReceiverAndEncrypt(header, content, cs, null);
 		
 		return agent.scheduleStep(new IComponentStep<byte[]>()
 		{
@@ -684,7 +686,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					
 					if (cs != null)
 					{
-						ret.setResult(cs.encryptAndSign(content));
+						checkReceiverAndEncrypt(header, content, cs, ret);
 					}
 					else
 					{
@@ -701,13 +703,14 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						if(SSimulation.addBlocker(ret))
 						{
 							ia.waitForDelay(Starter.getScaledDefaultTimeout(ia.getId(), 0.5), true)
-								.addResultListener(v ->
+								.then(v ->
 							{
 								if(!ret.isDone())
 								{
 									//System.out.println("Security handshake timeout from "+agent+" to "+rplat);
 									checkCleanup();
-									ret.setExceptionIfUndone(new TimeoutException("Security handshake timeout from "+agent+" to "+rplat));
+									ret.setExceptionIfUndone(new TimeoutException("Communication with remote platform " + rplat + " failed when sending messages from " + agent + "."));
+									//ret.setExceptionIfUndone(new TimeoutException("Security handshake timeout from "+agent+" to "+rplat));
 								}
 							});
 						}
@@ -716,7 +719,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						{
 							public void customResultAvailable(ICryptoSuite result) throws Exception
 							{
-								ret.setResultIfUndone(result.encryptAndSign(content));
+								checkReceiverAndEncrypt(header, content, result, ret);
+								//ret.setResultIfUndone(result.encryptAndSign(content));
+								//ret.setResultIfUndone(result.encryptAndSign(content));
 							}
 						});
 					}
@@ -987,6 +992,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			return new Future<>(new IllegalArgumentException("Networkname is null."));
 		if(secret==null || secret.length()==0)
 			return new Future<>(new IllegalArgumentException("Secret is null."));
+		
+		//System.out.println("setNetwork: "+networkname);
 		
 		return agent.scheduleStep(new IComponentStep<Void>()
 		{
@@ -1604,6 +1611,30 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		return agent.getId();
 	}
 	
+	/**
+	 *  Checks receiver authorization and, if so, encrypts the message. Otherwise, an exception is issued.
+	 *  
+	 *  @param header Message header. 
+	 *  @param content Message content.
+	 *  @param cs The cryptosuite negotiated with receiver.
+	 *  @param resultfuture Optional result future if it already exist, if null a future is created.
+	 *  @return Result future containing encrypted message or exception.
+	 */
+	protected Future<byte[]> checkReceiverAndEncrypt(IMsgHeader header, byte[] content, ICryptoSuite cs, Future<byte[]> resultfuture)
+	{
+		//TODO: Implement receiver authorization here.
+		Future<byte[]> ret = resultfuture != null ? resultfuture : new Future<>();
+		//ISecurityInfo recinfo = cs.getSecurityInfos();
+		//if (isReceiverAuthorized(header, cs.getSecurityInfos()))
+			ret.setResultIfUndone(cs.encryptAndSign(content));
+		/*else
+		{
+			String rplat = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot().toString();
+			ret.setException(new SecurityException("Receiving platform " + rplat + " not authorized to receive message."));
+		}*/
+		return ret;
+	}
+	
 	// -------- Cleanup
 	
 	protected void checkCleanup()
@@ -1743,7 +1774,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							
 							return IFuture.DONE;
 						}
-					}, true).addResultListener(new DelegationResultListener<>(ret));;
+					}, true);//.addResultListener(new DelegationResultListener<>(ret));; // this seems wrong, causing duplicate results, result is set internally.
 				}
 				return cryptoreset;
 			}
@@ -1849,15 +1880,15 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public void sendSecurityHandshakeMessage(final IComponentIdentifier receiver, BasicSecurityMessage message)
 	{
 		message.setMessageId(SUtil.createUniqueId());
-		//System.out.println("sending handshake message to: "+agent+" "+receiver+" "+message.getMessageId());
+		if(debug)
+			System.out.println("sendSecurityHandshakeMessage0: sending handshake message to: "+agent+" "+receiver+" "+message.getMessageId());
 		sendSecurityMessage(receiver, message).addResultListener(new IResultListener<Void>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
 				if(debug)
 				{
-					System.out.println("Failure send message to and removing suite for: "+receiver.getRoot().toString()+" "+message.getMessageId());
-					exception.printStackTrace();
+					System.out.println("sendSecurityHandshakeMessage1: Failure send message to and removing suite for: "+receiver.getRoot().toString()+" "+message.getMessageId()+"\n"+SUtil.getExceptionStacktrace(exception));
 				}
 				
 				//System.out.println("Removing Handshake " + receiver.getRoot().toString()+" "+message.getMessageId());
@@ -1881,7 +1912,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			
 			public void resultAvailable(Void result)
 			{	
-				//System.out.println("sent handshake message to: "+agent+" "+receiver+" "+message.getMessageId());
+				if(debug)
+					System.out.println("sendSecurityHandshakeMessage2: sent handshake message to: "+agent+" "+receiver+" "+message.getMessageId());
 			}
 		});
 	}
@@ -1897,14 +1929,16 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		hstate.setExpirationTime(System.currentTimeMillis() + handshaketimeout);
 		hstate.setConversationId(convid);
 		hstate.setResultFuture(new Future<ICryptoSuite>());
-		//System.out.println("Init handhake " +agent+" "+cid+" "+convid+" "+handshaketimeout);
+		if(debug)
+			System.out.println("initializeHandshake0 " +agent+" "+cid+" "+convid+" "+handshaketimeout);
 		
 		initializingcryptosuites.put(cid.toString(), hstate);
 		
 		String[] csuites = allowedcryptosuites.keySet().toArray(new String[allowedcryptosuites.size()]);
 		InitialHandshakeMessage ihm = new InitialHandshakeMessage(agent.getId(), convid, csuites);
 		ComponentIdentifier rsec = new ComponentIdentifier("security@" + cid);
-		//System.out.println("Security Handshake " + convid + " " + agent.getId().getRoot() + " -> " + rsec.getRoot() + " Phase: 0 Step: 0 "+initializingcryptosuites+" "+System.identityHashCode(initializingcryptosuites));
+		if(debug)
+			System.out.println("initializeHandshake1 " + convid + " " + agent.getId().getRoot() + " -> " + rsec.getRoot() + " Phase: 0 Step: 0 "+initializingcryptosuites+" "+System.identityHashCode(initializingcryptosuites));
 		sendSecurityHandshakeMessage(rsec, ihm);
 	}
 	
@@ -2584,5 +2618,34 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		}
 		
 		return new Future<MethodInfo[]>(ret);
+	}
+	
+	/**
+	 *  Check the platform password.
+	 *  @param secret The platform secret.
+	 *  @return True, if platform password is correct.
+	 */
+	public IFuture<Boolean> checkPlatformPassword(String secret)
+	{
+		boolean ret = false;
+		
+		AbstractAuthenticationSecret sec = AbstractAuthenticationSecret.fromString(secret);
+		
+		if(platformsecret!=null)
+		{
+			if(platformsecret instanceof PasswordSecret && sec instanceof PasswordSecret 
+				|| platformsecret instanceof KeySecret && sec instanceof KeySecret)
+			{
+				ret = platformsecret.equals(sec);
+			}
+			else if(platformsecret instanceof KeySecret && sec instanceof PasswordSecret)
+			{
+				PasswordSecret ps = (PasswordSecret)sec;
+				byte[] kd = SSecurity.deriveKeyFromPassword(ps.getPassword(), null);
+				ret = SUtil.arrayEquals(((KeySecret)platformsecret).getKey(), kd);
+			}
+		}
+		
+		return new Future<Boolean>(ret);
 	}
 }

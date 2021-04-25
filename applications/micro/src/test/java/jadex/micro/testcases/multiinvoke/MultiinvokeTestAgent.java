@@ -185,6 +185,10 @@ public class MultiinvokeTestAgent extends JunitAgentTest
 			tr.setFailed(exception);
 			endlis.resultAvailable(null);
 		}
+		
+		public void maxResultCountAvailable(int max) 
+		{
+		}
 	}
 	
 	/**

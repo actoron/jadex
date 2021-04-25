@@ -261,7 +261,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 *  Return a string representation.
 	 *  @return The string representation.
 	 */
-	public String	toString()
+	public String toString()
 	{
 		return name;
 	}

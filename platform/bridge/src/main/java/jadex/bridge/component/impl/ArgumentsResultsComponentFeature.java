@@ -366,7 +366,7 @@ public class ArgumentsResultsComponentFeature extends AbstractComponentFeature	i
 	public Object get(Object key)
 	{
 		Object	ret	= null;
-		if(arguments.containsKey(key))
+		if(arguments!=null && arguments.containsKey(key))
 		{
 			ret	= arguments.get(key);
 		}

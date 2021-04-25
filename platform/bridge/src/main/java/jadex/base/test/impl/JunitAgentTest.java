@@ -20,19 +20,10 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
      */
     public JunitAgentTest() 
     {
+    	this("");	// Hack!!! cannot get class before this() or super()
 //      Logger.getLogger("ComponentTest").log(Level.INFO, "Trying to guess TestAgent name...");
         String className = this.getClass().getName();
         this.comp = extendWithClassIfNeeded(className);
-        setConfig(STest.getDefaultTestConfig(getClass()));
-    }
-
-    /**
-     * Constructor.
-     * @param clazz class (agent) to test
-     */
-    public JunitAgentTest(Class<?> clazz) 
-    {
-        this(clazz.getName() + ".class");
     }
 
     /**
@@ -42,18 +33,7 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
     public JunitAgentTest(String component) 
     {
         super(extendWithClassIfNeeded(component), null);
-        this.config = STest.getDefaultTestConfig(getClass());
-    }
-
-
-    /**
-     * Set platform config.
-     * Override to add/change config values.
-     * @param config
-     */
-    public void setConfig(IPlatformConfiguration config) 
-    {
-        this.config = config;
+        this.config = STest.createDefaultTestConfig(getClass());
     }
 
     /**
@@ -68,7 +48,7 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
     @Override
     public void runBare() 
     {
-        IExternalAccess platform = Starter.createPlatform(getConfig()).get();
+        IExternalAccess platform = Starter.createPlatform(getConfig().clone()).get();
         setPlatform(platform);
         super.runBare();
         platform.killComponent();

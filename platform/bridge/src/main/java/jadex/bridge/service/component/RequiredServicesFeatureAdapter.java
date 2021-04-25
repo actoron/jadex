@@ -2,6 +2,9 @@ package jadex.bridge.service.component;
 
 import java.util.Collection;
 
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -146,9 +149,9 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	 *  @param query	The search query.
 	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
-	public <T> T searchLocalService(ServiceQuery<T> query)
+	public <T> T getLocalService(ServiceQuery<T> query)
 	{
-		return delegate.searchLocalService(query);
+		return delegate.getLocalService(query);
 	}
 	
 	/**
@@ -167,9 +170,9 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	 *  @param query	The search query.
 	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
 	 */
-	public <T> Collection<T> searchLocalServices(ServiceQuery<T> query)
+	public <T> Collection<T> getLocalServices(ServiceQuery<T> query)
 	{
-		return delegate.searchLocalServices(query);
+		return delegate.getLocalServices(query);
 	}
 	
 	/**
@@ -229,6 +232,26 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query, long timeout)
 	{
 		return delegate.addQuery(query, timeout);
+	}
+	
+	/**
+	 *  Create the user-facing object from the received search or query result.
+	 *  Result may be service object, service identifier (local or remote), or event.
+	 *  User object is either event or service (with or without required proxy).
+	 */
+	public IService getServiceProxy(IServiceIdentifier sid, RequiredServiceInfo info)
+	{
+		return delegate.getServiceProxy(sid, info);
+	}
+	
+	/**
+	 *  Get a service query for a required service info (as defined in the agent under that name).
+	 *  @param name The name.
+	 *  @return The service query.
+	 */
+	public ServiceQuery<?> getServiceQuery(String name)
+	{
+		return delegate.getServiceQuery(name);
 	}
 	
 	//-------- template methods --------

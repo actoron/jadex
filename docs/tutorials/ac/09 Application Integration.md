@@ -73,7 +73,7 @@ String[] defargs = new String[]
   "-gui", "false",
   "-welcome", "false",
   "-cli", "false",
-  "-printpass", "false"
+  "-printsecret", "false"
 };
 String[] newargs = new String[defargs.length+args.length];
 System.arraycopy(defargs, 0, newargs, 0, defargs.length);
@@ -89,7 +89,7 @@ This code first defines a string array with default settings as follows:
 - **-gui false** disables the JCC
 - **-welcome false** disables printing of the welcome message with the platform startup time
 - **-cli false** disables the command line interface and thus also prevents printing of the command prompt (*Host\_123&gt;*)
-- **-printpass false** disables printing of platform password
+- **-printsecret false** disables printing of platform password
 
 Afterwards a new array is created and filled with first the default arguments and then with the args supplied to the main method. Therefore, in case of conflicts the arguments supplied from the outside override the default settings. Make sure that in the *createPlatform(...)* method the *newargs* array is passed instead of the *args*. Otherwise the default settings will be ignored.
 

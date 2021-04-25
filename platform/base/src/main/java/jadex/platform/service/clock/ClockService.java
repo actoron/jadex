@@ -23,6 +23,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.JavaThreadPool;
 import jadex.commons.future.DelegationResultListener;
@@ -217,7 +218,14 @@ public class ClockService extends BasicService implements IClockService
 		{
 			public void run()
 			{
-				to.timeEventOccurred(System.currentTimeMillis());
+				try
+				{
+					to.timeEventOccurred(System.currentTimeMillis());
+				}
+				catch(Exception e)
+				{
+					System.err.println("Exception on timer: "+component+"\n"+SUtil.getExceptionStacktrace(e));
+				}
 			}
 		};
 //		try
@@ -322,7 +330,7 @@ public class ClockService extends BasicService implements IClockService
 		final Future<Void> ret = new Future<Void>();
 
 		threadpool = ((IInternalRequiredServicesFeature)component.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
-//		ISettingsService settings = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISettingsService.class, ServiceScope.PLATFORM));
+//		ISettingsService settings = component.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( ISettingsService.class, ServiceScope.PLATFORM));
 
 //		System.out.println("clock: "+ServiceCall.get);
 		
@@ -339,7 +347,7 @@ public class ClockService extends BasicService implements IClockService
 				{
 					public void customResultAvailable(Void result)
 					{
-//						ISettingsService settings = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(0));
+//						ISettingsService settings = component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(0));
 //						if(settings!=null)
 //						{
 //							settings.registerPropertiesProvider("clockservice", ClockService.this)
@@ -377,7 +385,6 @@ public class ClockService extends BasicService implements IClockService
 	
 	/**
 	 *  Shutdown the service.
-	 *  @param listener The listener.
 	 */
 	public IFuture<Void> shutdownService()
 	{
@@ -395,7 +402,7 @@ public class ClockService extends BasicService implements IClockService
 		{
 			public void customResultAvailable(Void result)
 			{
-//				ISettingsService	settings	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
+//				ISettingsService	settings	= component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISettingsService.class));
 //				settings.deregisterPropertiesProvider("clockservice")
 //					.addResultListener(new DelegationResultListener<Void>(ret)
 //				{

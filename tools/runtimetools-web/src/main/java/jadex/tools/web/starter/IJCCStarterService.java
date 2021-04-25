@@ -3,7 +3,6 @@ package jadex.tools.web.starter;
 import java.util.Collection;
 import java.util.Map;
 
-import jadex.base.SRemoteGui;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
@@ -14,9 +13,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.gui.future.SwingResultListener;
 import jadex.tools.web.jcc.IJCCPluginService;
 
 /**
@@ -33,7 +30,10 @@ public interface IJCCStarterService extends IJCCPluginService
 	 *  @return The filenames and classnames of the component models.
 	 */
 	//public IFuture<Collection<String[]>> getComponentModels();
-	public IFuture<Collection<String[]>> getComponentModels(IComponentIdentifier cid);
+	//public IFuture<Collection<String[]>> getComponentModels(IComponentIdentifier cid);
+	
+	//public ISubscriptionIntermediateFuture<String[]> getComponentModelsAsStream(IComponentIdentifier cid);
+	public ISubscriptionIntermediateFuture<Collection<String[]>> getComponentModelsAsStream(IComponentIdentifier cid);
 	
 	/**
 	 *  Load a component model.
@@ -50,10 +50,30 @@ public interface IJCCStarterService extends IJCCPluginService
 	public IFuture<IComponentIdentifier> createComponent(CreationInfo ci, IComponentIdentifier cid);
 	
 	/**
+	 *  Kill a component.
+	 *  @param id The component id.
+	 *  @return The component id.
+	 */
+	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier id, IComponentIdentifier cid);
+		
+	/**
 	 *  Get the component descriptions.
 	 *  @return The component descriptions.
 	 */
 	public IFuture<IComponentDescription[]> getComponentDescriptions(IComponentIdentifier cid);
+	
+	/**
+	 *  Get the child component descriptions.
+	 *  @param parent The component id of the parent.
+	 *  @return The component descriptions.
+	 */
+	public IFuture<IComponentDescription[]> getChildComponentDescriptions(IComponentIdentifier cid, IComponentIdentifier parent);
+	
+	/**
+	 *  Get the component description.
+	 *  @return The component description.
+	 */
+	public IFuture<IComponentDescription> getComponentDescription(IComponentIdentifier cid);
 	
 	/**
 	 * Get a default icon for a file type.

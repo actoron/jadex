@@ -78,13 +78,13 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 //			IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 //				"-saveonexit", "false", "-welcome", "false", //"-awareness", "false",
 //			//	"-logging_level", "java.util.logging.Level.INFO",
-//				"-gui", "false", "-simulation", "false", "-printpass", "false", "-wstransport", "false",
+//				"-gui", "false", "-simulation", "false", "-printsecret", "false", "-wstransport", "false",
 //				"-superpeerclient", "false",
 //			}).get();
 			
 			disableLocalSimulationMode().get();
 			
-			IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get();
+			IExternalAccess plat = Starter.createPlatform(getConfig()).get();
 			
 			createProxies(plat).get();
 			// awareness is disabled in testsuite
@@ -117,7 +117,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 		boolean local = component.getId().getRoot().equals(providerid.getRoot());
 		if(local)
 		{
-			ret = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( servicetype).setProvider(providerid));
+			ret = component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( servicetype).setProvider(providerid));
 		}
 		else
 		{

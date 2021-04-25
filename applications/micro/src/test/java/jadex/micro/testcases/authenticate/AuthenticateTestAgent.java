@@ -8,7 +8,6 @@ import java.util.Map;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
@@ -45,10 +44,10 @@ public class AuthenticateTestAgent extends TestAgent
 	// Define expected test results for scenarios (un=unrestricted, cus=custom/role, def=default).
 	protected static boolean[][]	tests	= new boolean[][]
 	{
-		// Annot.:		un		def		cus		cus2	def		cus		un		def
-		new boolean[] {true,	false,	false,	false,	false,	false,	true,	false},
-		new boolean[] {true,	true,	false,	false,	true,	false,	true,	true},
-		new boolean[] {true,	true,	true,	true,	true,	true,	true,	true}
+		// method annos basic: un, def, cus, 	cus2 |	overriding: def, cus, un,	def
+		new boolean[] {true,	false,	false,	false,		false,	false,	true,	false},	// platform 1: shared network=false
+		new boolean[] {true,	true,	false,	false,		true,	false,	true,	true},	// platform 2: net=true, custom role=false
+		new boolean[] {true,	true,	true,	true,		true,	true,	true,	true}	// platform 3: net=true, cus=true
 	};
 
 	@Override
@@ -121,7 +120,7 @@ public class AuthenticateTestAgent extends TestAgent
 	{
 		disableLocalSimulationMode().get();
 		
-		IPlatformConfiguration	conf	= STest.getDefaultTestConfig(getClass());
+		IPlatformConfiguration	conf	= getConfig().clone();
 		
 		// Not default visibility means test unrestricted access -> don't use test network.
 		if(!def)
@@ -158,7 +157,7 @@ public class AuthenticateTestAgent extends TestAgent
 								{
 //									System.out.println("is compo:"+agent.isComponentThread());
 									
-									result.addRole(STest.testnetwork_name, "custom")
+									result.addRole(conf.getNetworkNames()[0], "custom")
 										.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 									{
 										@Override
@@ -324,7 +323,7 @@ public class AuthenticateTestAgent extends TestAgent
 //	{
 //		final Future<TestReport> ret = new Future<TestReport>();
 //		
-//		final ISecurityService	sec	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISecurityService.class));
+//		final ISecurityService	sec	= agent.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( ISecurityService.class));
 //		
 //		sec.addRole(agent.getComponentIdentifier().getPlatformPrefix(), "testuser")
 //			.addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
@@ -460,5 +459,5 @@ public class AuthenticateTestAgent extends TestAgent
 //			}
 //		});
 //		return ret;
-//	}
+//	}	
 }

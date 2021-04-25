@@ -3,6 +3,7 @@ package jadex.platform.service.awareness;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.SocketException;
 
 import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnInit;
@@ -30,9 +31,16 @@ public class MulticastAwarenessAgent	extends LocalNetworkAwarenessBaseAgent
 	@OnInit
 	public void	start() throws Exception
 	{
-		sendsocket	= new DatagramSocket(0);
-		recvsocket = new MulticastSocket(port);
-		((MulticastSocket)recvsocket).joinGroup(InetAddress.getByName(address));
+		try
+		{
+			sendsocket	= sendsocket!=null ? sendsocket : new DatagramSocket(0);
+			recvsocket = recvsocket!=null ? recvsocket : new MulticastSocket(port);
+			((MulticastSocket)recvsocket).joinGroup(InetAddress.getByName(address));
+		}
+		catch(SocketException se)
+		{
+			throw new RuntimeException("port "+port+" problem?", se);
+		}
 		
 		super.init();
 	}

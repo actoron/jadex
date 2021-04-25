@@ -30,7 +30,7 @@ import jadex.tools.web.jcc.IJCCWebService;
 import jadex.tools.web.jcc.JCCPluginAgent;
 
 @ProvidedServices({@ProvidedService(name="cloudviewweb", type=IJCCCloudviewService.class)})
-@Agent(autostart=Boolean3.TRUE)
+@Agent(autostart=Boolean3.FALSE)
 public class JCCCloudviewPluginAgent extends JCCPluginAgent implements IJCCCloudviewService
 {
 	@Agent
@@ -43,7 +43,7 @@ public class JCCCloudviewPluginAgent extends JCCPluginAgent implements IJCCCloud
 	public IFuture<Map<String, String[]>> getPlatformNetworks(String cid)
 	{
 		final Future<Map<String, String[]>> ret = new Future<>();
-		IJCCWebService ws = agent.searchLocalService(new ServiceQuery<>(IJCCWebService.class));
+		IJCCWebService ws = agent.getLocalService(new ServiceQuery<>(IJCCWebService.class));
 		ServiceCall.getOrCreateNextInvocation().setTimeout(1000);
 		ITerminableIntermediateFuture<IExternalAccess> pffut = agent.searchServices(new ServiceQuery<>(IExternalAccess.class, ServiceScope.GLOBAL).setServiceTags(IExternalAccess.PLATFORM));
 		pffut.addResultListener(new IResultListener<Collection<IExternalAccess>>()
@@ -103,7 +103,7 @@ public class JCCCloudviewPluginAgent extends JCCPluginAgent implements IJCCCloud
 						
 					}*/
 				}
-				bar.waitFor().thenAccept(d -> ret.setResult(res));
+				bar.waitFor().then(d -> ret.setResult(res));
 			}
 		});
 		return ret;
@@ -115,7 +115,7 @@ public class JCCCloudviewPluginAgent extends JCCPluginAgent implements IJCCCloud
 	 */
 	public IFuture<String> getPluginName()
 	{
-		return new Future<>("cloudview");
+		return new Future<>("Cloudview");
 	}
 	
 	/**
@@ -134,5 +134,14 @@ public class JCCCloudviewPluginAgent extends JCCPluginAgent implements IJCCCloud
 	public String getPluginUIPath()
 	{
 		return "jadex/tools/web/cloudview/cloudview.tag";
+	}
+	
+	/**
+	 *  Get the plugin icon.
+	 *  @return The plugin icon.
+	 */
+	public IFuture<byte[]> getPluginIcon()
+	{
+		return new Future<byte[]>((byte[])null);
 	}
 }

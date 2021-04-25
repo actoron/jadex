@@ -5,28 +5,28 @@ import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
 /**
- *  Service interface that returns terminable futures.
+ *  Service interface to test terminable futures.
  */
 public interface ITerminableService
 {
 	/**
-	 *  Get the result.
-	 *  @param delay The delay that is waited before the result is retured.
+	 *  Get a result.
+	 *  @param delay The delay that is waited before the result is returned.
 	 *  @return The result.
 	 */
 	public ITerminableFuture<String> getResult(long delay);
 	
 	/**
-	 *  Get the results.
-	 *  @param delay The delay that is waited between intermediate results.
+	 *  Get three results (one initial, one after half of the time has passed and one directly before finished).
+	 *  @param delay The delay that is waited before the future is set to finished.
 	 *  @return The results.
 	 */
-	public ITerminableIntermediateFuture<String> getResults(long delay, int max);
+	public ITerminableIntermediateFuture<String> getResults(long delay);
 	
 	/**
 	 *  Be informed when one of the other methods futures is terminated.
 	 *  Returns an initial result when this future is registered.
 	 *  Is finished, when the terminate action of the other future was called.
 	 */
-	public IIntermediateFuture<Void>	terminateCalled();
+	public IIntermediateFuture<Void>	isTerminateCalled();
 }

@@ -3,7 +3,6 @@ package jadex.bridge.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 
@@ -23,8 +22,8 @@ public class RequiredServiceBinding
 	/** The component type, i.e. the model name used for searching. */
 	protected String componenttype;
 
-	/** Information about the component to create. */
-	protected ComponentInstanceInfo creationinfo;
+	///** Information about the component to create. */
+	//protected ComponentInstanceInfo creationinfo;
 	
 	// Decided to drop caching support for v4
 //	/** Flag if binding is dynamic. */
@@ -32,6 +31,9 @@ public class RequiredServiceBinding
 
 	/** The search scope. */
 	protected ServiceScope scope;
+		
+	/** The scope expression (if any). */
+	protected UnparsedExpression scopeexpression;
 	
 //	/** The create flag. */
 //	protected boolean create;
@@ -99,20 +101,20 @@ public class RequiredServiceBinding
 	/**
 	 *  Get the creationinfo.
 	 *  @return The creationinfo.
-	 */
+	 * /
 	public ComponentInstanceInfo getCreationInfo()
 	{
 		return creationinfo;
-	}
+	}*/
 
 	/**
 	 *  Set the creationinfo.
 	 *  @param creationinfo The creationinfo to set.
-	 */
-	public void setCreationInfo(ComponentInstanceInfo creationinfo)
+	 * /
+	public CreationInfo setCreationInfo(ComponentInstanceInfo creationinfo)
 	{
 		this.creationinfo = creationinfo;
-	}
+	}*/
 
 	/**
 	 *  Get the name.
@@ -127,9 +129,10 @@ public class RequiredServiceBinding
 	 *  Set the name.
 	 *  @param name The name to set.
 	 */
-	public void setName(String name)
+	public RequiredServiceBinding setName(String name)
 	{
 		this.name = name;
+		return this;
 	}
 
 	/**
@@ -145,9 +148,10 @@ public class RequiredServiceBinding
 	 *  Set the componentname.
 	 *  @param componentname The componentname to set.
 	 */
-	public void setComponentName(String componentname)
+	public RequiredServiceBinding setComponentName(String componentname)
 	{
 		this.componentname = componentname;
+		return this;
 	}
 
 	/**
@@ -163,9 +167,10 @@ public class RequiredServiceBinding
 	 *  Set the componenttype.
 	 *  @param componenttype The componenttype to set.
 	 */
-	public void setComponentType(String componenttype)
+	public RequiredServiceBinding setComponentType(String componenttype)
 	{
 		this.componenttype = componenttype;
+		return this;
 	}
 
 	/**
@@ -181,29 +186,51 @@ public class RequiredServiceBinding
 	 *  Set the scope.
 	 *  @param scope The scope to set.
 	 */
-	public void setScope(ServiceScope scope)
+	public RequiredServiceBinding setScope(ServiceScope scope)
 	{
 		this.scope = scope;
+		return this;
+	}
+	
+	/**
+	 *  Get the scope expression.
+	 *  @return The scope expression.
+	 */
+	public UnparsedExpression getScopeExpression()
+	{
+		return scopeexpression;
+	}
+
+	/**
+	 *  Set the scope expression.
+	 *  @param expression The scope expression to set.
+	 */
+	public RequiredServiceBinding setScopeExpression(UnparsedExpression expression)
+	{
+		this.scopeexpression = expression;
+		return this;
 	}
 	
 	/**
 	 *  Add an interceptor.
 	 *  @param interceptor The interceptor.
 	 */
-	public void addInterceptor(UnparsedExpression interceptor)
+	public RequiredServiceBinding addInterceptor(UnparsedExpression interceptor)
 	{
 		if(interceptors==null)
 			interceptors = new ArrayList<UnparsedExpression>();
 		interceptors.add(interceptor);
+		return this;
 	}
 	
 	/**
 	 *  Remove an interceptor.
 	 *  @param interceptor The interceptor.
 	 */
-	public void removeInterceptor(UnparsedExpression interceptor)
+	public RequiredServiceBinding removeInterceptor(UnparsedExpression interceptor)
 	{
 		interceptors.remove(interceptor);
+		return this;
 	}
 	
 	/**
@@ -229,9 +256,10 @@ public class RequiredServiceBinding
 	 *  Set the proxytype.
 	 *  @param proxytype The proxytype to set.
 	 */
-	public void setProxytype(String proxytype)
+	public RequiredServiceBinding setProxytype(String proxytype)
 	{
 		this.proxytype = proxytype;
+		return this;
 	}
 	
 //	/**
@@ -276,7 +304,7 @@ public class RequiredServiceBinding
 	public String toString()
 	{
 		return " scope=" + scope + ", componentname=" + componentname
-			+ ", componenttype="+ componenttype	+" , creationcomp="+creationinfo;
+			+ ", componenttype="+ componenttype	;//+" , creationcomp="+creationinfo;
 	}
 
 	

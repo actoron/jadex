@@ -4,7 +4,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
-import jadex.bridge.IExternalAccess;
 import jadex.commons.Base64;
 import jadex.commons.SUtil;
 
@@ -13,35 +12,24 @@ import jadex.commons.SUtil;
  */
 public class STest 
 {
-    // one time network pass for this vm.
-    public static final String	testnetwork_name	= "test";
-    //public static final String	testnetwork_pass	= SUtil.createUniqueId();
-    public static final String	testnetwork_pass;
-    static
-    {
-    	byte[] key = new byte[32];
-    	SUtil.getSecureRandom().nextBytes(key);
-    	testnetwork_pass = "key:" + new String(Base64.encodeNoPadding(key), SUtil.UTF8);
-    }
-    
-    /** Counter for unique platform numbers. */
-	static AtomicInteger	platno	= new AtomicInteger(0);
-
     /**
-     *  Get local (no communication) test configuration using a unique platform name derived from the test name.
-     *  Attention: The name is unique and the config can not be reused for multiple platforms!
-     *  
+     *  Get local (no communication) test configuration using a generated unique platform name derived from the test name.
      *  Uses simulation for speed.
-     *  
-     *  @param test	The test name.
-     *  @return The default configuration with a unique platform name.
+     *  @param name	The test name used for deriving a platform name.
      */
-    public static IPlatformConfiguration getLocalTestConfig(String test)
+    public static IPlatformConfiguration getLocalTestConfig(String name)
     {
+        // Derive simple name from test name string
+    	if(name.indexOf('.')!=-1)
+    		name	= name.substring(name.lastIndexOf('.')+1);
+    	if(name.indexOf('/')!=-1)
+    		name	= name.substring(name.lastIndexOf('/')+1);    		
+    	if(name.indexOf('\\')!=-1)
+    		name	= name.substring(name.lastIndexOf('\\')+1);    		
+    	
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
-        // Don't use testcase name as platform name, it contains slashes and clashes with path management.
-		//config.setPlatformName(test+"-"+platno.getAndIncrement());
-		config.setPlatformName("test"+"-"+platno.getAndIncrement());
+		config.setPlatformName(name);
+		config.setValue("uniquename", true);
 
         // Do not use multi factory as it is much too slow now :(
 //		config.setValue("kernel_multi", true);
@@ -54,6 +42,8 @@ public class STest
 		
         config.getExtendedPlatformConfiguration().setSimul(true); // start simulation component
         config.getExtendedPlatformConfiguration().setSimulation(true);
+        
+		//config.setDefaultTimeout(-1);
 //        config.setValue("bisimulation", true);
         
         config.setValue("settings.readonly", true);
@@ -76,47 +66,59 @@ public class STest
     	return getLocalTestConfig(test.getName());
     }
 
+    protected static final AtomicInteger	NETNO	= new AtomicInteger(0);
     
     /**
-     *  Get the test configuration using a unique platform name derived from the test name.
-     *  Attention: The name is unique and the config can not be reused for multiple platforms!
-     *  @param test	The test name.
-     *  @return The default configuration with a unique platform name.
+     *  Create a test configuration to be used for platforms that should be able to communicate via intravm means.
+     *  Only platforms created from the same (base) configuration will see each other, i.e., this method should
+     *  only be used once for each test case and different configs for a single test should be derived via .clone() from a single base conf.
+     *  @param test	The test class for generating platform names.
      */
-    public static IPlatformConfiguration getDefaultTestConfig(String test)
+    public static IPlatformConfiguration createDefaultTestConfig(Class<?> test)
     {
     	IPlatformConfiguration config = getLocalTestConfig(test);
     	
 		// Enable intravm awareness, transport and security
-		config.setSuperpeerClient(true);
-		config.setValue("intravmawareness", true);
-        config.setValue("intravm", true);
-        config.setValue("security.handshaketimeoutscale", 0.2);
-        config.getExtendedPlatformConfiguration().setSecurity(true);
+    	try
+    	{
+    		Object awadata	= Class.forName("jadex.platform.service.awareness.IntraVMAwarenessAgent$AwarenessData").getConstructor().newInstance();
+    		config.setSuperpeerClient(true);
+    		config.setValue("intravmawareness", true);
+    		config.setValue("intravmawareness.data", awadata);
+            config.setValue("intravm", true);
+            config.setValue("security.handshaketimeoutscale", 0.2);
+            config.getExtendedPlatformConfiguration().setSecurity(true);
+    	}
+    	catch(Exception e)
+    	{
+    		throw SUtil.throwUnchecked(e);
+    	}
+        
+        // Create and set a one time network/pass for this config.
+        String	testnetwork_name	= "testnet"+NETNO.incrementAndGet();
+        String	testnetwork_pass;
+    	byte[] key = new byte[32];
+    	SUtil.getSecureRandom().nextBytes(key);
+    	testnetwork_pass = "key:" + new String(Base64.encodeNoPadding(key), SUtil.UTF8);
 		config.setNetworkNames(new String[] { testnetwork_name });
 		config.setNetworkSecrets(new String[] { testnetwork_pass });
 		
 		// Avoid problems due to old platform config files
 		config.setValue("rescan", true);
 
-		//config.setLogging(true);
+//		config.setLogging(true);
+//		config.setDefaultTimeout(300000);
 		
         return config;
     }
     
     /**
-     *  Get the test configuration using a unique platform name derived from the test class.
-     *  Attention: The name is unique and the config can not be reused for multiple platforms!
-     *  @param test	The test class.
-     *  @return The default configuration with a unique platform name.
+     *  Create a default (remote) test configuration with simulation disabled.
      */
-    public static IPlatformConfiguration getDefaultTestConfig(Class<?> test)
+    public static IPlatformConfiguration createRealtimeTestConfig(Class<?> test)
     {
-    	return getDefaultTestConfig(test.getName());
-    }
-    
-    public static void terminatePlatform(IExternalAccess platform) 
-    {
-        platform.killComponent().get();
+    	return createDefaultTestConfig(test)
+    		.getExtendedPlatformConfiguration().setSimul(false)
+			.getExtendedPlatformConfiguration().setSimulation(false);
     }
 }

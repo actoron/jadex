@@ -66,7 +66,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	/**
 	 *  Create a new service identifier.
 	 */
-	public ServiceIdentifier(IInternalAccess provider, Class<?> type, String servicename, IResourceIdentifier rid, ServiceScope scope)
+	public ServiceIdentifier(IInternalAccess provider, Class<?> type, String servicename, IResourceIdentifier rid, ServiceScope scope, Boolean unrestricted)
 	{
 //		if(!type.isInterface())
 //		{
@@ -89,7 +89,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 		@SuppressWarnings({"unchecked"})
 		Set<String>	networknames = (Set<String>)Starter.getPlatformValue(providerid, Starter.DATA_NETWORKNAMESCACHE);
 		this.networknames	= networknames;
-		this.unrestricted = isUnrestricted(provider, type);
+		this.unrestricted = unrestricted!=null ? unrestricted : isUnrestricted(provider, type);
 		
 		setScope(scope);
 	}
@@ -217,13 +217,14 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 */
 	public void setScope(ServiceScope scope)
 	{
+		if(ServiceScope.EXPRESSION.equals(scope))
+			throw new IllegalArgumentException("Cannot use scope 'expression' directly.");
+		
+//		if(ServiceScope.DEFAULT.equals(scope))
+//			System.out.println("setting def");
+		
 		// default publication scope is platform
-		
-		//if(ServiceScope.DEFAULT.equals(scope))
-		//	System.out.println("setting def");
-		
 		// Replace DEFAULT with PLATFORM scope (do we want this here or during resolution?) 
-		
 		this.scope = scope!=null && !ServiceScope.DEFAULT.equals(scope)? 
 			scope : ServiceScope.PLATFORM;
 	}

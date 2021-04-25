@@ -88,10 +88,11 @@ public class PingingAgent
 					msg.put(SFipa.PERFORMATIVE, SFipa.QUERY_IF);
 					msg.put(SFipa.CONVERSATION_ID, convid);
 					msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
-//					msg.put(SFipa.SENDER, getComponentIdentifier());
+					// sender is used for reply
+					msg.put(SFipa.SENDER, agent.getId());
 					dif++;
 					sent.add(convid);
-					agent.getFeature(IMessageFeature.class).sendMessage(msg, receiver);
+					agent.getFeature(IMessageFeature.class).sendMessage(msg, receiver).get();
 					agent.getFeature(IExecutionFeature.class).waitForDelay(timeout, this);
 				}
 				return IFuture.DONE;
@@ -128,6 +129,7 @@ public class PingingAgent
 	@OnMessage
 	public void messageArrived(Map<String, Object> msg)
 	{
+		System.out.println("msg: "+agent.getId()+" "+msg);
 		String convid = (String)msg.get(SFipa.CONVERSATION_ID);
 		if(sent.remove(convid))
 		{

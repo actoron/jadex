@@ -2,13 +2,14 @@ package jadex.commons.future;
 
 
 import java.util.Collection;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
  *  Exception delegation listener for intermediate futures.
  */
 public class IntermediateExceptionDelegationResultListener<E, T> implements IIntermediateResultListener<E>, 
-IFutureCommandResultListener<Collection<E>>, IUndoneIntermediateResultListener<E>
+	IFutureCommandResultListener<Collection<E>>, IUndoneIntermediateResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -19,10 +20,13 @@ IFutureCommandResultListener<Collection<E>>, IUndoneIntermediateResultListener<E
 	protected boolean undone;
 	
 	/** Custom functional result listener */
-	protected IFunctionalResultListener<E>	intermediateResultListener;
+	protected Consumer<E> irlistener;
 	
 	/** Custom functional finished listener */
-	protected IFunctionalResultListener<Void>	finishedListener;
+	protected Runnable flistener;
+	
+	/** Custom functional result count listener. */
+	protected Consumer<Integer> clistener;
 	
 //	protected DebugException	ex;
 	
@@ -32,16 +36,18 @@ IFutureCommandResultListener<Collection<E>>, IUndoneIntermediateResultListener<E
 	 * Create a new listener.
 	 * 
 	 * @param future The delegation target.
-	 * @param intermediateResultListener Functional intermediate result
+	 * @param irlistener Functional intermediate result
 	 *        Listener. Can be <code>null</code>.
-	 * @param finishedListener Functional finished listener. Can be
+	 * @param flistener Functional finished listener. Can be
 	 *        <code>null</code>.
 	 */
-	public IntermediateExceptionDelegationResultListener(Future<T> future, IFunctionalResultListener<E> intermediateResultListener, IFunctionalResultListener<Void> finishedListener)
+	public IntermediateExceptionDelegationResultListener(Future<T> future, Consumer<E> irlistener, 
+		Runnable flistener, Consumer<Integer> clistener)
 	{
 		this(future);
-		this.intermediateResultListener = intermediateResultListener;
-		this.finishedListener = finishedListener;
+		this.irlistener = irlistener;
+		this.flistener = flistener;
+		this.clistener = clistener;
 	}
 	
 	/**
@@ -115,10 +121,8 @@ IFutureCommandResultListener<Collection<E>>, IUndoneIntermediateResultListener<E
 	 */
 	public void intermediateResultAvailable(E result) 
 	{
-		if(intermediateResultListener != null)
-		{
-			intermediateResultListener.resultAvailable(result);
-		}
+		if(irlistener != null)
+			irlistener.accept(result);
 	}
 	
 	/**
@@ -130,10 +134,8 @@ IFutureCommandResultListener<Collection<E>>, IUndoneIntermediateResultListener<E
      */
     public void finished() 
     {
-		if(finishedListener != null)
-		{
-			finishedListener.resultAvailable(null);
-		}
+		if(flistener != null)
+			flistener.run();
     }
 	
 	/**
@@ -143,9 +145,7 @@ IFutureCommandResultListener<Collection<E>>, IUndoneIntermediateResultListener<E
 	public void customResultAvailable(Collection<E> result)
 	{
 		for(E e: result)
-		{
 			intermediateResultAvailable(e);
-		}
 		finished();
 	}
 
@@ -164,6 +164,12 @@ IFutureCommandResultListener<Collection<E>>, IUndoneIntermediateResultListener<E
 		{
 			future.setException(exception);
 		}
+	}
+	
+	public void maxResultCountAvailable(int max) 
+	{
+		if(clistener!=null)
+			clistener.accept(max);
 	}
 	
 	/**

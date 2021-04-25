@@ -23,8 +23,8 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
@@ -95,7 +95,7 @@ public class UploadFileCommand extends ACliCommand
 							final File source = new File(s);
 							final FileInputStream fis = new FileInputStream(source);
 							ServiceOutputConnection soc = new ServiceOutputConnection();
-							soc.writeFromInputStream(fis, comp).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<Long>()
+							soc.writeFromInputStream(fis, comp).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<Long>()
 							{
 								public void intermediateResultAvailable(Long result) 
 								{
@@ -115,7 +115,7 @@ public class UploadFileCommand extends ACliCommand
 								}
 							}));
 							ITerminableIntermediateFuture<Long> fut = ds.uploadFile(soc.getInputConnection(), d, source.getName());
-							fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<Long>()
+							fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<Long>()
 							{
 								long last = 0;
 								public void intermediateResultAvailable(final Long result)
@@ -174,7 +174,7 @@ public class UploadFileCommand extends ACliCommand
 		{
 			// global search not a good idea due to long timeout but what to do else?
 			ia.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IFileTransferService.class, ServiceScope.GLOBAL))
-				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<IFileTransferService>()
+				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<IFileTransferService>()
 			{
 				public void intermediateResultAvailable(IFileTransferService result)
 				{

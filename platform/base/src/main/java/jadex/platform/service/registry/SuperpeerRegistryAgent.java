@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -20,6 +22,7 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceEvent;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQueryInfo;
 import jadex.bridge.service.search.ServiceRegistry;
@@ -32,8 +35,8 @@ import jadex.commons.IFilter;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
@@ -65,6 +68,10 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	@AgentArgument
 	protected boolean unrestricted = false;
 	
+	/** Debug connection issues of polling mode for any of the named services (boolean or string with comma separated unqualified service interface names). */
+	@AgentArgument
+	protected Object debugservices;
+	
 	/** Queries received from client. */
 	protected MultiCollection<IComponentIdentifier, ServiceQueryInfo<?>> clientqueries = new MultiCollection<>();
 	
@@ -75,6 +82,25 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	
 	protected Set<IComponentIdentifier>	clients	= new LinkedHashSet<>();
 
+	/** Listen to disconnection events for debugging. */
+	protected Map<IComponentIdentifier, Future<Void>>	disconnections;
+	
+	/** Listen to disconnection events for debugging. */
+	public IFuture<Void>	whenDisconnected(IComponentIdentifier client)
+	{
+		if(clients.contains(client))
+		{
+			if(disconnections==null)
+				disconnections	= new LinkedHashMap<>();
+			Future<Void>	ret	= new Future<Void>();
+			disconnections.put(client, ret);
+			return ret;
+		}
+		else
+		{
+			return new Future<Void>(new IllegalStateException("No such client: "+client));
+		}
+	}
 	
 	/**
 	 *  Initiates the client registration procedure
@@ -102,6 +128,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 //				System.out.println(agent+": Initiated super peer connection with client "+client+" for network "+networkname);
 				for(SubscriptionIntermediateFuture<IComponentIdentifier> reglis: reglisteners)
 				{
+					agent.getLogger().info("new connection: "+client);
 					reglis.addIntermediateResult(client);
 				}
 				return IFuture.DONE;
@@ -113,7 +140,12 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			@Override
 			public void terminated(Exception reason)
 			{
-				agent.getLogger().info(agent+": Super peer connection with client "+client+" for network "+networkname+" terminated due to "+reason);
+				if(disconnections!=null && disconnections.containsKey(client))
+					disconnections.get(client).setResultIfUndone(null);
+				
+				if(debug(null))
+					System.out.println(agent+": Super peer connection with client "+client+" for network "+networkname+" terminated due to "+reason+(reason!=null?"/"+reason.getCause():""));
+				agent.getLogger().info(agent+": Super peer connection with client "+client+" for network "+networkname+" terminated due to "+reason+(reason!=null?"/"+reason.getCause():""));
 				// TODO: when connection is lost, remove all services and queries from client.
 				// FIXME: Terminate on error/timeout?
 				clients.remove(client);
@@ -147,6 +179,10 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			{
 				agent.getLogger().info("Superpeer registry received client event: "+obj);
 				ServiceEvent<IServiceIdentifier> event = (ServiceEvent<IServiceIdentifier>) obj;
+				
+				if(debug(event.getService()))
+					System.out.println(agent+" received client event: "+event);
+					
 				dispatchEventToRegistry(serviceregistry, event);
 			}
 		});
@@ -163,7 +199,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	public IFuture<IServiceIdentifier> searchService(ServiceQuery<?> query)
 	{
 		IServiceIdentifier ret = serviceregistry.searchService(query);
-		if (ret == null)
+		if(ret == null)
 		{
 			Iterator<IServiceRegistry> it = getApplicablePeers(query).iterator();			
 			while(ret==null && it.hasNext())
@@ -173,7 +209,9 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			}
 		}
 		
-		return new Future<>(ret);
+		return ret==null && query.getMultiplicity().getFrom()!=0
+			? new Future<>(new ServiceNotFoundException(query))
+		    : new Future<>(ret);
 	}
 	
 	/**
@@ -210,25 +248,12 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 		Set<IServiceRegistry> peercaches = getApplicablePeers(query);
 		for (IServiceRegistry peercache : peercaches)
 		{
-			peercache.addQuery(query).addResultListener(new IIntermediateResultListener<T>()
+			peercache.addQuery(query).addResultListener(new IntermediateEmptyResultListener<T>()
 			{
-				public void resultAvailable(Collection<T> result)
-				{
-				}
-
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-
 				public void intermediateResultAvailable(T result)
 				{
 					ret.addIntermediateResultIfUndone(result);
 				}
-
-				public void finished()
-				{
-				}
-				
 			});
 		}
 		
@@ -240,13 +265,8 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			}
 		});
 		
-		serviceregistry.addQuery(query).addResultListener(new IIntermediateResultListener<T>()
+		serviceregistry.addQuery(query).addResultListener(new IntermediateEmptyResultListener<T>()
 		{
-
-			public void resultAvailable(Collection<T> result)
-			{
-			}
-
 			public void exceptionOccurred(Exception exception)
 			{
 				finished();
@@ -347,36 +367,21 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			{
 				if (query.getNetworkNames() == null || !Collections.disjoint(nwnames, Arrays.asList(queryinfo.getQuery().getNetworkNames())))
 				{
-					regcache.addQuery(queryinfo.getQuery()).addResultListener(new IIntermediateResultListener()
+					regcache.addQuery(queryinfo.getQuery()).addResultListener(new IntermediateEmptyResultListener()
 					{
-						public void resultAvailable(Object result)
+						@Override
+						public void resultAvailable(Collection result)
 						{
 							TerminableIntermediateFuture fut = queryinfo.getFuture();
 							fut.addIntermediateResultIfUndone(result);
-						}
-
-						public void exceptionOccurred(Exception exception)
-						{
-						}
-
-						public void intermediateResultAvailable(Object result)
-						{
-						}
-
-						public void finished()
-						{
 						}
 					});
 				}
 			}
 		}
 		
-		sub.addResultListener(new IIntermediateResultListener<ServiceEvent<IServiceIdentifier>>()
+		sub.addResultListener(new IntermediateEmptyResultListener<ServiceEvent<IServiceIdentifier>>()
 		{
-			public void resultAvailable(Collection<ServiceEvent<IServiceIdentifier>> result)
-			{
-			}
-			
 			public void exceptionOccurred(Exception exception)
 			{
 				finished();
@@ -389,7 +394,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			
 			public void finished()
 			{
-				for (String nwname : nwnames)
+				for(String nwname : nwnames)
 					peercaches.removeObject(nwname, regcache);
 				regcache.removeServices(null);
 			}
@@ -454,6 +459,14 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 		}
 	}
 	
+	/**
+	 *  Check if a query should be debugged.
+	 */
+	protected boolean	debug(IServiceIdentifier service)
+	{
+		return SuperpeerClientAgent.debug(debugservices, service!=null ? service.toString() : null);
+	}
+	
 	//-------- superpeer status service --------
 		
 	/**
@@ -475,6 +488,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 		
 		for(IComponentIdentifier client: clients)
 		{
+			agent.getLogger().info("new connection: "+client+", "+reglis+", "+IComponentIdentifier.LOCAL.get());
 			reglis.addIntermediateResult(client);
 		}
 		

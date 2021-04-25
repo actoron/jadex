@@ -30,7 +30,7 @@ public class PuzzleStarterAgent
 		// does not need to create a puzzle agent as it uses session scope
 		
 		//System.out.println("publish started: "+pubser);
-		//IWebPublishService	wps	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IWebPublishService.class));
+		//IWebPublishService	wps	= agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IWebPublishService.class));
 		wps.publishResources("[http://localhost:8081/]wswebapi", "org/activecomponents/webservice").get();
 		wps.publishResources("[http://localhost:8081/]", "/").get();
 	}

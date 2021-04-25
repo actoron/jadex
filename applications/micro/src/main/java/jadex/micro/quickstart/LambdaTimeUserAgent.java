@@ -25,15 +25,19 @@ public class LambdaTimeUserAgent
 	@OnService(requiredservice = @RequiredService(scope = ServiceScope.GLOBAL))
 	public void	addTimeService(final ITimeService timeservice)
 	{
+		//timeservice.getLocation().then(location -> {System.out.println(location); return null;});
+		
 		// Wait for location result before continuing.
-		timeservice.getLocation().addResultListener(location ->
-		// For every time result do a println.
-		timeservice.subscribe(DateFormat.getDateTimeInstance()).addIntermediateResultListener(time ->
-			System.out.println("New time received from "
-				+ ((IService)timeservice).getServiceId().getProviderId().getPlatformName()
-				+ " at "+location+": "+time)
-			)
-		);
+		timeservice.getLocation().then(location ->
+		{
+			// For every time result do a println.
+			//timeservice.subscribe(DateFormat.getDateTimeInstance()).addIntermediateResultListener(time ->
+			timeservice.subscribe(DateFormat.getDateTimeInstance()).next(time ->
+				System.out.println("New time received from "
+					+ ((IService)timeservice).getServiceId().getProviderId().getPlatformName()
+					+ " at "+location+": "+time)
+				);
+		});
 	}	
 	
 	/**

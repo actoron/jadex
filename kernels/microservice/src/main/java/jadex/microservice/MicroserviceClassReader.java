@@ -140,7 +140,7 @@ public class MicroserviceClassReader
 			for(Class<?> sif: sifs)
 			{
 				ProvidedServiceImplementation impl = new ProvidedServiceImplementation(first? clazz: null, first? null: exp, Implementation.PROXYTYPE_DECOUPLED, null, null);
-				ProvidedServiceInfo psi = new ProvidedServiceInfo(sif.getName()+"ms", sif, impl, null, null, null);
+				ProvidedServiceInfo psi = new ProvidedServiceInfo(sif.getName()+"ms", sif, impl);
 				modelinfo.addProvidedService(psi);
 				first = false;
 			}

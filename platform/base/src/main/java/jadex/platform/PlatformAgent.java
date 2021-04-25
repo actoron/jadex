@@ -54,9 +54,9 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
@@ -91,7 +91,7 @@ import jadex.platform.service.security.SecurityAgent;
 	@ProvidedService(type=IExecutionService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="PlatformAgent.createExecutionServiceImpl($args.asyncexecution, $args.simulation, $args.bisimulation, $component)", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IClockService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(
 			expression="$args.simulation==null || !$args.simulation.booleanValue()? new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_SYSTEM, \"system_clock\", System.currentTimeMillis(), 100), $component): new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_EVENT_DRIVEN, \"simulation_clock\", System.currentTimeMillis(), 100), $component)", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=ILibraryService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="jadex.commons.SReflect.isAndroid() ? jadex.platform.service.library.AndroidLibraryService.class.newInstance() : $args.libpath==null? new jadex.platform.service.library.LibraryService(): new jadex.platform.service.library.LibraryService(new java.net.URLClassLoader(jadex.commons.SUtil.toURLs($args.libpath), $args.baseclassloader==null ? jadex.platform.service.library.LibraryService.class.getClassLoader() : $args.baseclassloader))")),
+	@ProvidedService(type=ILibraryService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$args.libpath==null? new jadex.platform.service.library.LibraryService(): new jadex.platform.service.library.LibraryService(new java.net.URLClassLoader(jadex.commons.SUtil.toURLs($args.libpath), $args.baseclassloader==null ? jadex.platform.service.library.LibraryService.class.getClassLoader() : $args.baseclassloader))")),
 	@ProvidedService(type=IDependencyService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$args.maven_dependencies? jadex.platform.service.dependency.maven.MavenDependencyResolverService.class.newInstance(): new jadex.platform.service.library.BasicDependencyService()"))
 //	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="new jadex.bridge.service.types.cms.ComponentManagementService($platformaccess, $bootstrapfactory, $args.uniqueids)"))
 })
@@ -302,7 +302,7 @@ public class PlatformAgent
 		Set<File> scanfiles = new HashSet<>(cpfiles);
 		
 		boolean writecache = false;
-		for (Iterator<Map.Entry<File, Set<ClassInfo>>> it = codesources.entrySet().iterator(); it.hasNext(); )
+		for(Iterator<Map.Entry<File, Set<ClassInfo>>> it = codesources.entrySet().iterator(); it.hasNext(); )
 		{
 			Map.Entry<File, Set<ClassInfo>> entry = it.next();
 			if (!cpfiles.contains(entry.getKey()) ||
@@ -318,9 +318,11 @@ public class PlatformAgent
 			}
 		}
 		
+		//System.out.println("scanning: "+scanfiles);
+		
 		//System.out.println("Scan size: " + scanfiles.size());
 		
-		for (File f : scanfiles)
+		for(File f : scanfiles)
 		{
 			writecache = true;
 			Set<ClassInfo> infos = SReflect.scanForClassInfos(new URL[] {SUtil.toURL(f.toURI())}, null, filter);
@@ -329,14 +331,16 @@ public class PlatformAgent
 		
 		Set<ClassInfo> cis = codesources.values().stream().filter(cscis -> cscis != null).flatMap(cscis -> cscis.stream()).collect(Collectors.toSet());
 		
-		if (writecache)
+		//System.out.println("cis: "+cis);
+		
+		if(writecache)
 		{
 			File cache = new File(STARTUP_CACHE_FILE);
-			try (OutputStream os = new BufferedOutputStream(new FileOutputStream(cache)))
+			try(OutputStream os = new BufferedOutputStream(new FileOutputStream(cache)))
 			{
-				for (Map.Entry<File, Set<ClassInfo>> entry : codesources.entrySet())
+				for(Map.Entry<File, Set<ClassInfo>> entry : codesources.entrySet())
 				{
-					if (entry.getValue() != null)
+					if(entry.getValue() != null)
 					{
 						String line = "## " + entry.getKey().getAbsolutePath() + " | " + entry.getKey().lastModified() + "\n";
 						os.write(line.getBytes(SUtil.UTF8));
@@ -366,40 +370,53 @@ public class PlatformAgent
 						vinfo.setBuildTime(ci.getLastModified());
 				}
 			}
+			//if(ci.getClassName().indexOf("BDI")!=-1)
+			//	System.out.println("hhhfhjsdf");
 			isSystemComponent(ci, PlatformAgent.class.getClassLoader());
 			AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
 			EnumInfo ei = (EnumInfo)ai.getValue("autostart");
 			if(ei==null)
 				System.out.println("No autostart agent: "+ci);
-			boolean ok = ei==null? true: "true".equals(ei.getValue().toLowerCase());
+
 			String name = ai.getValue("name")==null || ((String)ai.getValue("name")).length()==0? null: (String)ai.getValue("name");
+			
+			boolean ok = ei==null? true: "true".equals(ei.getValue().toLowerCase());
+			
+			Boolean agentstart = null;
 			if(name!=null)
 			{
-				Boolean agentstart = getAgentStart(name);
+				agentstart = getAgentStart(name);
 				if(agentstart!=null)
 					ok = agentstart.booleanValue();
 			}
-			else
+			
+			if(agentstart==null)
 			{
-				name = SReflect.getUnqualifiedTypeName(ci.getClassName());
+				String typename = SReflect.getUnqualifiedTypeName(ci.getClassName());
 				
-				if(getAgentStart(name.toLowerCase())!=null)
+				if(getAgentStart(typename.toLowerCase())!=null)
 				{	
-					ok = getAgentStart(name.toLowerCase());
+					ok = getAgentStart(typename.toLowerCase());
+					if(name==null)
+						name = typename;
 				}
 				else
 				{
 					// check classname - suffix (BDI/Agent etc) in lowercase
-					int suf = SUtil.inndexOfLastUpperCaseCharacter(name);
+					int suf = SUtil.inndexOfLastUpperCaseCharacter(typename);
 					if(suf>0)
 					{
-						name = name.substring(0, suf).toLowerCase();
-						if(getAgentStart(name)!=null)
+						typename = typename.substring(0, suf).toLowerCase();
+						if(getAgentStart(typename)!=null)
 						{	
-							ok = getAgentStart(name);
+							ok = getAgentStart(typename);
 						}
 					}
 				}
+				
+				// only set name, if was not explicitly set
+				if(name==null)
+					name = typename;
 			}
 			
 			if(ok)
@@ -413,7 +430,7 @@ public class PlatformAgent
 		}
 		
 		//for(CreationInfo ci: infos)
-		//	System.out.println("creating: "+ci.getFilename());
+		//	System.out.println("creating: "+ci);
 		
 		agent.getFeature(ISubcomponentsFeature.class).createComponents(infos.toArray(new CreationInfo[infos.size()])).addResultListener(new IResultListener<Collection<IExternalAccess>>()
 		{
@@ -440,7 +457,7 @@ public class PlatformAgent
 	protected void addQueryForPlatformProxies()
 	{
 		// No query when no search query manager service
-		if(agent.searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE))==null)
+		if(agent.getLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE))==null)
 		{
 			return;
 		}
@@ -451,13 +468,13 @@ public class PlatformAgent
 		ISubscriptionIntermediateFuture<IExternalAccess> query = agent.addQuery(new ServiceQuery<>(IExternalAccess.class)
 			.setScope(ServiceScope.NETWORK));
 //			.setScope(ServiceScope.GLOBAL));
-		query.addResultListener(new IIntermediateResultListener<IExternalAccess>()
+		query.addResultListener(new IntermediateEmptyResultListener<IExternalAccess>()
 		{
 			public void intermediateResultAvailable(IExternalAccess result)
 			{
 				try
 				{
-					if(!result.getId().getRoot().equals(agent.getId().getRoot()))
+					if(!agent.getId().getRoot().equals(result.getId().getRoot()))
 					{
 						//System.out.println("found platform: "+result.getId());//+" "+SComponentManagementService.containsComponent(result.getId()));
 						Map<String, Object> args = new HashMap<>();
@@ -472,17 +489,9 @@ public class PlatformAgent
 				}
 			}
 
-			public void finished()
-			{
-			}
-			
 			public void exceptionOccurred(Exception exception)
 			{
 				exception.printStackTrace();
-			}
-			
-			public void resultAvailable(Collection<IExternalAccess> result)
-			{
 			}
 		});
 	}
@@ -504,18 +513,20 @@ public class PlatformAgent
 				
 				String name = ai.getValue("name")==null || ((String)ai.getValue("name")).length()==0? null: (String)ai.getValue("name");
 //				String name = autostart.name().length()==0? null: autostart.name();
-				
+								
 				EnumInfo ei = (EnumInfo)ai.getValue("autostart");
 				
 				String val = ei.getValue();
 				boolean ok = "true".equals(val.toLowerCase()); 
+				Boolean start = null;
 				if(name!=null)
 				{
-					Boolean start = getAgentStart(name);
+					start = getAgentStart(name);
 					if(start!=null)
 						ok = start.booleanValue();
 				}
-				else
+				
+				if(start==null)
 				{
 					// check classname as parameter
 //					name = SReflect.getInnerClassName(cl);

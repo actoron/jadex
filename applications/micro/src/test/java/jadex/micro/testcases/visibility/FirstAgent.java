@@ -13,8 +13,6 @@ import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Implementation;
@@ -32,7 +30,7 @@ import jadex.micro.annotation.Results;
 @Agent
 @Arguments(@Argument(name="selfkill", clazz=boolean.class))
 @RequiredServices(@RequiredService(name = "MessageService", type = IMessageService.class, scope = ServiceScope.GLOBAL))
-@ProvidedServices(@ProvidedService(type = IMessageService.class, name = "MessageService", implementation = @Implementation(MessageService.class)))
+@ProvidedServices(@ProvidedService(type = IMessageService.class, scope=ServiceScope.GLOBAL, name = "MessageService", implementation = @Implementation(MessageService.class)))
 @Results(@Result(name="found", clazz=IServiceIdentifier[].class))
 public class FirstAgent
 {

@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import java.util.stream.Stream;
+
 import jadex.base.Starter;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Timeout;
@@ -38,6 +40,27 @@ import jadex.commons.future.Tuple2Future;
  */
 public class SFuture
 {
+	/**
+	 *  Create an intermediate future for a stream.
+	 *  The results are pulled from the stream using the agent thread i.e. the agent will be blocked when waiting for stream results.
+	 *  Safe to use (but somewhat useless) for finished streams.
+	 *  Also safe to use for streams, created with IntermediateFuture.asStream().
+	 *  Not safe to use for other kinds of infinite streams!
+	 */
+	public static <T> IntermediateFuture<T> streamToFuture(IInternalAccess agent, Stream<T> results)
+	{
+		// Asynchronously transform results, otherwise method would block before returning stream-connected future
+		// and results would only be sent in bunch at the end or never, if the source future doesn't finish.
+		IntermediateFuture<T>	ret	= new IntermediateFuture<>();
+		agent.scheduleStep(ia ->
+		{
+			results.forEach(item -> ret.addIntermediateResult(item));
+			ret.setFinished();
+			return IFuture.DONE;
+		});
+		return ret;
+	}
+	
 	/**
 	 *  Automatically update the timer of a long running service call future.
 	 *  Ensures that the caller does not timeout even if no result
@@ -348,7 +371,7 @@ public class SFuture
 	 */
 	public static <T> T getFirstResultAndTerminate(ITerminableIntermediateFuture<T> fut)
 	{
-		T	ret	= fut.getNextIntermediateResult(Timeout.UNSET, true);
+		T ret = fut.getNextIntermediateResult(Timeout.UNSET, true);
 		fut.terminate();
 		return ret;
 	}
@@ -450,10 +473,10 @@ public class SFuture
 		// Add remote results to future
 		if(f2!=null)
 		{
-			f2.addIntermediateResultListener(result-> 
+			f2.next(result-> 
 			{
 				((IntermediateFuture)ret).addIntermediateResult((T)result);
-			}, exception -> {}); // Ignore exception (printed when no listener supplied)
+			}).catchEx(exception -> {}); // Ignore exception (printed when no listener supplied)
 		}
 		
 		return ret;

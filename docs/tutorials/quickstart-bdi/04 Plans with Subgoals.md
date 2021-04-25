@@ -179,14 +179,14 @@ Once we remembered a station, the method will return `true` and the goal will be
 
 Note, that we have changed the signature of the `loadBattery()` method by adding the `IPlan plan` parameter.
 When present in a plan's method signature, the parameter gives access to the
-[plan API of Jadex](https://download.actoron.com/docs/nightlies/latest/javadoc/index.html?jadex/bdiv3/runtime/IPlan.html),
+[plan API of Jadex](https://www.activecomponents.org/forward.html?type=javadoc&path=index.html?jadex/bdiv3/runtime/IPlan.html),
 which provides methods related to the currently executing plan. Here we use the
 `dispatchSubgoal()` method to attach a newly created `QueryChargingStation` object
 as a subgoal to the plan.
 
 By default, Jadex would process the subgoals of a plan in parallel to the plan itself.
 The result of the `dispatchSubgoal()` call is therefore a
-[future](https://download.actoron.com/docs/nightlies/latest/javadoc//index.html?jadex/commons/future/IFuture.html) object that allows
+[future](https://www.activecomponents.org/forward.html?type=javadoc&path=/index.html?jadex/commons/future/IFuture.html) object that allows
 various ways of synchronously and asynchronously waiting for the subgoal being processed.
 Our load battery plan needs a charging station before it can continue, so we wait
 synchronously by blocking the plan until the subgoal completes by using the `get()` method

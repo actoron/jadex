@@ -6,14 +6,12 @@ import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
-import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExternalArgumentsResultsFeature;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 
@@ -50,7 +48,7 @@ public class ExternalFeatureAgent extends JunitAgentTest
 		
 		TestReport tr2 = new TestReport("#1", "Test if an external feature from remote platform can be used.");
 		
-		IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get();
+		IExternalAccess plat = Starter.createPlatform(getConfig()).get();
 		
 		feat = plat.getExternalFeature(IExternalArgumentsResultsFeature.class);
 		args = feat.getArgumentsAsync().get();

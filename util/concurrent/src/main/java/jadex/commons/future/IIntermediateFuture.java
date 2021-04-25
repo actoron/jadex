@@ -3,8 +3,8 @@ package jadex.commons.future;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
-
-import jadex.commons.functional.Function;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  *  Future that support intermediate results.
@@ -12,15 +12,16 @@ import jadex.commons.functional.Function;
 //@Reference
 public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 {
-	// -------- constants --------
+	//-------- constants --------
 
 	/**
 	 *  A future representing a completed action. Can be used as direct return
 	 *  value of methods that do not perform asynchronous operations and do not
 	 *  return a result value.
 	 */
-	public static final IntermediateFuture<Void>	DONE	= new IntermediateFuture<Void>((Collection<Void>)null);
+	public static final IntermediateFuture<Void> DONE = new IntermediateFuture<Void>((Collection<Void>)null);
 
+	//-------- methods --------
 	
     /**
      *  Get the intermediate results that are currently available.
@@ -98,72 +99,121 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
     /**
 	 * Add a result listener.
 	 * 
-	 * @param intermediateListener The intermediate listener.
+	 * @param ilistener The intermediate listener.
 	 * 
 	 * @deprecated Use addResultListener()
-	 */
-	public void addIntermediateResultListener(IIntermediateResultListener<E> intermediateListener);
+	 * /
+	public void addIntermediateResultListener(IIntermediateResultListener<E> ilistener);
+    */
     
 	/**
 	 * Add a functional result listener, which called on intermediate results.
 	 * Exceptions will be logged.
 	 * 
-	 * @param intermediateListener The intermediate listener.
-	 */
-	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener);
+	 * @param ilistener The intermediate listener.
+	 * /
+	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> ilistener);
     
 	/**
 	 * Add a functional result listener, which called on intermediate results.
 	 * Exceptions will be logged.
 	 * 
-	 * @param intermediateListener The intermediate listener.
-	 * @param finishedListener The finished listener, called when no more
+	 * @param ilistener The intermediate listener.
+	 * @param flistener The finished listener, called when no more
 	 *        intermediate results will arrive. If <code>null</code>, the finish
 	 *        event will be ignored.
-	 */
-	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener, IFunctionalIntermediateFinishedListener<Void> finishedListener);
+	 * /
+	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> ilistener, IFunctionalIntermediateFinishedListener<Void> flistener);
     
 	/**
 	 * Add a functional result listener, which called on intermediate results.
 	 * 
-	 * @param intermediateListener The intermediate listener.
-	 * @param exceptionListener The listener that is called on exceptions. Passing
+	 * @param ilistener The intermediate listener.
+	 * @param elistener The listener that is called on exceptions. Passing
 	 *        <code>null</code> enables default exception logging.
-	 */
-    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener, IFunctionalExceptionListener exceptionListener);
+	 * /
+    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> ilistener, IFunctionalExceptionListener elistener);
 
 	/**
 	 * Add a functional result listener, which called on intermediate results.
 	 * 
-	 * @param intermediateListener The intermediate listener.
-	 * @param finishedListener The finished listener, called when no more
+	 * @param ilistener The intermediate listener.
+	 * @param flistener The finished listener, called when no more
 	 *        intermediate results will arrive. If <code>null</code>, the finish
 	 *        event will be ignored.
-	 * @param exceptionListener The listener that is called on exceptions. Passing
+	 * @param elistener The listener that is called on exceptions. Passing
 	 *        <code>null</code> enables default exception logging.
-	 */
-    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener, IFunctionalIntermediateFinishedListener<Void> finishedListener, IFunctionalExceptionListener exceptionListener);
-
+	 * /
+    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> ilistener, IFunctionalIntermediateFinishedListener<Void> flistener, IFunctionalExceptionListener elistener);
+    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> ilistener, IFunctionalIntermediateFinishedListener<Void> flistener, IFunctionalExceptionListener elistener, IFunctionalIntermediateResultCountListener clistener);
+*/
     //-------- java 8 extensions --------
+	
+    /**
+     *  Called when the next intermediate value is available.
+     *  @param function Called when value arrives.
+     *  @return The future for chaining.
+     */
+	public IIntermediateFuture<? extends E> next(Consumer<? super E> function);
+	
+	/**
+     *  Called when the maximum number of results is available.
+     *  @param function Called when max value arrives.
+     *  @return The future for chaining.
+     */
+	public IIntermediateFuture<? extends E> max(Consumer<Integer> function);
+	
+	/**
+     *  Called when the future is finished.
+     *  @param function Called when max value arrives.
+     *  @return The future for chaining.
+     */
+	public IIntermediateFuture<? extends E> finished(Consumer<Void> function);
+	
+	/**
+     *  Called when the future is done (finished or exception occurred).
+     *  Exception parameter will be set if the cause was an exception, null otherwise.
+     *  
+     *  @param function Called future is done.
+     *  @return The future for chaining.
+     */
+	public IIntermediateFuture<? extends E> done(Consumer<? super Exception> function);
     
     /**
 	 *  Implements async loop and applies a an async function to each element.
 	 *  @param function The function.
 	 *  @return True result intermediate future.
 	 */
-	public <R> IIntermediateFuture<R> mapAsync(Function<E, IFuture<R>> function);
+	//public <R> IIntermediateFuture<R> mapAsync(Function<E, IFuture<R>> function);
 	
 	/**
 	 *  Implements async loop and applies a an async function to each element.
 	 *  @param function The function.
 	 *  @return True result intermediate future.
 	 */
-	public <R> IIntermediateFuture<R> mapAsync(Function<E, IFuture<R>> function, Class<?> futuretype);
+	//public <R> IIntermediateFuture<R> mapAsync(Function<E, IFuture<R>> function, Class<?> futuretype);
 	
 	/**
 	 *  Implements async loop and applies a an async multi-function to each element.
 	 *  @param function The function.
 	 *  @return True result intermediate future.
 	 */
-	public <R> IIntermediateFuture<R> flatMapAsync(Function<E, IIntermediateFuture<R>> function);
+	//public <R> IIntermediateFuture<R> flatMapAsync(Function<E, IIntermediateFuture<R>> function);
+
+	/**
+	 *  Return a stream of the results of this future.
+	 *  Although this method itself is non-blocking,
+	 *  all terminal stream methods (e.g. forEach) will block until the future is finished!
+	 */
+	public Stream<E>	asStream();
+
+	/**
+	 *  Return a stream of the results of this future.
+	 *  Use the given timeout settings when waiting for elements in the stream.
+	 *  Although this method itself is non-blocking,
+	 *  all terminal stream methods (e.g. forEach) will block until the future is finished!
+	 *  @param timeout The timeout in millis.
+	 *  @param realtime Flag, if wait should be realtime (in constrast to simulation time).
+	 */
+	public Stream<E>	asStream(long timeout, boolean realtime);
 }

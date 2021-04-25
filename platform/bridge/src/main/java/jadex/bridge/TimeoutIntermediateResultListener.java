@@ -105,6 +105,14 @@ public class TimeoutIntermediateResultListener<E> extends TimeoutResultListener<
 		}
 	}
     
+    /**
+     * 
+     */
+    public void maxResultCountAvailable(int max) 
+    {
+    	getIntermediateResultListener().maxResultCountAvailable(max);
+	}
+    
 	/**
 	 *  Called when an intermediate result is available.
 	 *  @param result The result.

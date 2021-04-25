@@ -9,25 +9,18 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.types.context.IContextService;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.OnStream;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 @Arguments(@Argument(name="filename", clazz=String.class, defaultvalue="\"copy.copy\""))
 @Results(@Result(name="filesize", clazz=long.class))
-@RequiredServices({
-	@RequiredService(name="contextService", type=IContextService.class)
-})
 @Agent
 public class ReceiverAgent
 {
@@ -37,8 +30,8 @@ public class ReceiverAgent
 	@AgentArgument
 	protected String filename;
 	
-	@AgentServiceSearch
-	protected IContextService contextService;
+	//@AgentServiceSearch
+	//protected IContextService contextService;
 
 //	@AgentCreated
 //	public void created()
@@ -55,7 +48,7 @@ public class ReceiverAgent
 	{
 		// todo: how to avoid garbage collection of connection?
 //		final IInputConnection con = (IInputConnection)msg.get(SFipa.CONTENT);
-//		System.out.println("received: "+con+" "+con.hashCode());
+		//System.out.println("received: "+con+" "+con.hashCode());
 		
 		receiveBehavior((IInputConnection)con);
 	}
@@ -68,11 +61,12 @@ public class ReceiverAgent
 		try
 		{
 			final long[] cnt = new long[1];
-			File f = contextService.getFile(filename).get();
+			//File f = contextService.getFile(filename).get();
+			File f = new File(filename);
 			final FileOutputStream fos = new FileOutputStream(f);
 			
 			ISubscriptionIntermediateFuture<byte[]> fut = ((IInputConnection)con).aread();
-			fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<byte[]>()
+			fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<byte[]>()
 			{
 				public void resultAvailable(Collection<byte[]> result)
 				{
@@ -91,8 +85,8 @@ public class ReceiverAgent
 				public void intermediateResultAvailable(byte[] result)
 				{
 					cnt[0] += result.length;
-//					if(cnt[0]%1000==0)
-//						System.out.println("bytes: "+cnt[0]);
+					//if(cnt[0]%1000==0)
+					//	System.out.println("bytes: "+cnt[0]);
 					try
 					{
 						fos.write(result);

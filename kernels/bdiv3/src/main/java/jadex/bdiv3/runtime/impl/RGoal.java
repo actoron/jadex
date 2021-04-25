@@ -222,8 +222,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		if(getProcessingState().equals(processingstate))
 			return;
 		
-//		if(this.toString().indexOf("lower")!=-1)
-//			System.out.println("setting proc: "+this+" "+processingstate);
+		//if(processingstate.equals(GoalProcessingState.FAILED))
+		//	System.out.println("setting proc: "+this+" "+processingstate);
 		
 //		if(getMGoal().getName().indexOf("achievecleanup")!=-1)
 //			System.out.println("proc state: "+processingstate+" "+this);
@@ -343,7 +343,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
 		
-//		System.out.println(ia.getComponentIdentifier()+" setLifecycleState: "+this+", "+lifecyclestate);
+		//System.out.println(ia.getId()+" setLifecycleState: "+this+", "+lifecyclestate);
 		
 //		if(this.toString().indexOf("docnt")!=-1 && GoalLifecycleState.DROPPING.equals(lifecyclestate))
 //			System.out.println("setting life: "+this+" "+lifecyclestate);
@@ -694,8 +694,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		boolean	queue	= ia.getFeature(IInternalBDIAgentFeature.class).getRuleSystem().isQueueEvents();
 		ia.getFeature(IInternalBDIAgentFeature.class).getRuleSystem().setQueueEvents(true);
 		
-//		if(this.toString().indexOf("da_initiate")!=-1)
-//			System.out.println("planfin: "+this+" "+getLifecycleState()+" "+getProcessingState());
+		//if(this.toString().indexOf("GetOne")!=-1 && this.getId().toString().indexOf("Rich")!=-1)
+		//	System.out.println("planfin: "+this+" "+getLifecycleState()+" "+getProcessingState());
 
 		super.planFinished(ia, rplan);
 
@@ -711,7 +711,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			// Find parameter mappings for xml agents
 			// todo: goal-goal mappings
 			// Todo: unify mapping code with RPlan.createPlan()
-			if(rplan instanceof RPlan)// && rplan.isPassed()) -> also copy results from failed plan, if any (e.g. used for negotiation rounds in booktrading)
+			//if(rplan instanceof RPlan)// && rplan.isPassed()) -> also copy results from failed plan, if any (e.g. used for negotiation rounds in booktrading)
+			if(rplan instanceof RPlan && (rplan.isPassed() || rplan.isFailed())) 
 			{
 				MPlan mplan = (MPlan)((RPlan)rplan).getModelElement();
 				if(mplan.getParameters()!=null && mplan.getParameters().size()>0)

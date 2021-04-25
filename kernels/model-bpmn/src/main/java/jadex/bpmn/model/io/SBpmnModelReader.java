@@ -125,18 +125,18 @@ public class SBpmnModelReader
 //		XMLInputFactory fac = XMLInputFactory.newInstance(); 
 //		XMLStreamReader reader = fac.createXMLStreamReader(fis);
 		IXMLReader reader = null;
-		if (!SReflect.isAndroid())
-		{
+		//if (!SReflect.isAndroid())
+		//{
 			Class<?> clazz = SReflect.classForName("jadex.xml.stax.StaxReaderWrapper", SBpmnModelReader.class.getClassLoader());
 			Constructor<?> con = clazz.getConstructor(new Class<?>[] { InputStream.class });
 			reader = (IXMLReader) con.newInstance(new Object[] { in });
-		}
+		/*}
 		else
 		{
 			Class<?> clazz = SReflect.classForName("jadex.xml.reader.PullParserWrapper", SBpmnModelReader.class.getClassLoader());
 			Constructor<?> con = clazz.getConstructor(new Class<?>[] { InputStream.class });
 			reader = (IXMLReader) con.newInstance(new Object[] { in });
-		}
+		}*/
 		
 //		LinkedList<XmlTag> tagstack = new LinkedList<XmlTag>();
 		LinkedList<Map<String, String>> attrstack = new LinkedList<Map<String,String>>();

@@ -36,8 +36,8 @@ import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.gui.SGUI;
@@ -270,24 +270,12 @@ public class ConversationPlugin extends AbstractJCCPlugin
 				});
 				return ret;
 			}
-		}).addResultListener(new IIntermediateResultListener<Object>()
+		}).addResultListener(new IntermediateEmptyResultListener<Object>()
 		{
 			@Override
 			public void intermediateResultAvailable(Object result)
 			{
 				convcenter.addMessage(result);
-			}
-			@Override
-			public void resultAvailable(Collection<Object> result)
-			{
-			}
-			@Override
-			public void finished()
-			{
-			}
-			@Override
-			public void exceptionOccurred(Exception exception)
-			{
 			}
 		});
 		

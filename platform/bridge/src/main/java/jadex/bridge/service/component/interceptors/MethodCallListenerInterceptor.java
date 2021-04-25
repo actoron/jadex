@@ -14,6 +14,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 
 /**
  *  Interceptor for observing method calls start and end e.g. for timing.
@@ -68,12 +69,8 @@ public class MethodCallListenerInterceptor extends ComponentThreadInterceptor
 				Object	res	= sic.getResult();
 				if(res instanceof IIntermediateFuture)
 				{
-					IIntermediateResultListener<Object> lis = new IIntermediateResultListener<Object>()
+					IIntermediateResultListener<Object> lis = new IntermediateEmptyResultListener<Object>()
 					{
-						public void intermediateResultAvailable(Object result)
-						{
-						}
-							
 						public void finished()
 						{
 							getComponent().getFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);

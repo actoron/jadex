@@ -18,7 +18,7 @@ public class HelloUserAgent
 	@OnStart
 	public void body()
 	{
-		IHelloService hs = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelloService.class, ServiceScope.PLATFORM));
+		IHelloService hs = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IHelloService.class, ServiceScope.PLATFORM));
 		System.out.println(hs.sayHello("Lars").get());
 	}
 }

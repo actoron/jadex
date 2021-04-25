@@ -18,14 +18,13 @@ The following chapters introduce concepts with hands-on code examples and help y
 # IDE Setup
 
 In this chapter, you will learn how to install eclipse for developing desktop applications with Jadex. Therefore, you will find instructions on setting up a proper eclipse working environment for programming and executing Jadex applications. If you use a different IDE the instructions and screenshots below should still be helpful for setting up your IDE accordingly.
-*(If you want to develop Android applications with Jadex, please refer to [Android](../android/android.md).)*
 
 Note that this tutorial is not a replacement for the existing eclipse documentation. If you have questions about using eclipse try also looking for an answer at the <http://www.eclipse.org/documentation/> site.
 
 ## Prerequisites
 
 - Make sure that you have a recent **Java** environment installed e.g. from <https://jdk.java.net/> (OpenJDK) or <https://www.oracle.com/java/technologies/javase-downloads.html> (Oracle JDK). The following has been tested with Java SE 11.
-- Make sure that you have a suitable **Eclipse** distribution from <http://www.eclipse.org/downloads/packages> installed. The following has been tested with the 2020‑03 Version of the 'Eclipse IDE for Enterprise Java Developers' package.
+- Make sure that you have a suitable **Eclipse** distribution from <http://www.eclipse.org/downloads/packages> installed. The following has been tested with the 2020-03 Version of the 'Eclipse IDE for Enterprise Java Developers' package.
 
 ## Eclipse Project Setup with Gradle/Maven
 
@@ -37,7 +36,7 @@ We provide an example project that uses Gradle as described in the next section.
 
 This section describes an easy way of setting up a Jadex project for development in eclipse using the [Gradle](https://gradle.org/) build tool.
 
-Download the **jadex-example-project.zip** from [Downloads](https://www.activecomponents.org/#/download) and unpack it to a place of your choice.
+Download the **jadex-example-project.zip** from [Downloads](https://www.activecomponents.org/forward.html?type=distribution&path=jadex-example-project.zip) and unpack it to a place of your choice.
 
 - Use "File -> Import -> Gradle / Existing Gradle Project" and choose "Next".
 
@@ -139,7 +138,7 @@ If you want to use our nightly builds, you need to add our repository:
 
 <!-- TODO: can someone confirm this IntelliJ setup? -->
 
-Using IntelliJ IDEA for development with Jadex Active Components is not officially supported except for [Android development](../android/android.md).
+Using IntelliJ IDEA for development with Jadex Active Components is not officially supported.
 If you still want to use IntelliJ IDEA, just try to import the Jadex Example Project - Gradle support is provided by IntelliJ.
 
 If you want to compile the Jadex source code, import the project included in sources.zip.
@@ -161,7 +160,7 @@ The setup also has some drawbacks:
 a) the source code of the Jadex libraries needs to attached manually, if needed, and
 b) you cannot easily switch/update Jadex versions.)
 
-- If not already done, download the desired Jadex distribution, e.g., from <https://download.actoron.com> and unpack it to a place of your choice.
+- If not already done, download the desired Jadex distribution, e.g. jadex-standard-x.y.z.zip, from [https://download.actoron.com](https://www.activecomponents.org/forward.html?type=distribution) and unpack it to a place of your choice.
 - Start eclipse.
 - Use "File -> New -> Project..." and choose 'Java Project':
 

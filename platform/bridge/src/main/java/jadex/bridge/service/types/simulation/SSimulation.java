@@ -36,7 +36,7 @@ public class SSimulation
 			try
 			{
 				debugBlocker();
-				ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
+				ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISimulationService.class))
 					.addAdvanceBlocker(adblock).get();
 			}
 			catch(ThreadDeath td)
@@ -87,7 +87,7 @@ public class SSimulation
 			try
 			{
 				debugBlocker();
-				ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
+				ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISimulationService.class))
 					.addAdvanceBlocker(adblock).get();
 			}
 			catch(ThreadDeath td)

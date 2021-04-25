@@ -1,6 +1,7 @@
 package jadex.bridge.service.component;
 
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.commons.future.IFuture;
@@ -10,6 +11,8 @@ import jadex.commons.future.IFuture;
  */
 public interface IExternalProvidedServicesFeature
 {
+	// todo: change signature of addService to return the service or sid!
+	
 	/**
 	 *  Add a service to the container.
 	 *  The service is started, if the container is already running.
@@ -17,7 +20,6 @@ public interface IExternalProvidedServicesFeature
 	 *  @param info The provided service info.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
-//	public void addService(IInternalService service, ProvidedServiceInfo info);
 	public IFuture<Void> addService(String name, Class<?> type, Object service);
 
 	/**
@@ -39,6 +41,15 @@ public interface IExternalProvidedServicesFeature
 	 *  @param scope	The service scope.
 	 */
 	public IFuture<Void> addService(String name, Class<?> type, Object service, PublishInfo pi, ServiceScope scope);
+	
+	/**
+	 *  Add a service to the platform. 
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
+	 *  @param type The public service interface.
+	 *  @param info The config settings.
+	 */
+	public IFuture<Void> addService(String name, Class<?> type, Object service, ProvidedServiceInfo info);
 	
 	/**
 	 *  Sets the tags of a service.

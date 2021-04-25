@@ -43,7 +43,7 @@ public class StepAgent	implements	IStepService
 	 */
 	public IIntermediateFuture<Integer>	performSteps(final int steps, final long millis)
 	{
-//		System.out.println("Perform steps called: "+agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
+//		System.out.println("Perform steps called: "+agent.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 		final IntermediateFuture<Integer>	ret	= new IntermediateFuture<Integer>();
 		
 		agent.getFeature(IExecutionFeature.class).waitForDelay(0, new IComponentStep<Void>()
@@ -52,7 +52,7 @@ public class StepAgent	implements	IStepService
 			{
 				for(int i=1; i<=steps; i++)
 				{
-//					System.out.println("Perform steps before wait for step "+i+": "+agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
+//					System.out.println("Perform steps before wait for step "+i+": "+agent.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 					ia.getFeature(IExecutionFeature.class).waitForDelay(millis).get();
 					ret.addIntermediateResult(Integer.valueOf(i));
 				}

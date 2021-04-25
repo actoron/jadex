@@ -135,7 +135,7 @@ public class AgentCreationAgent
 			// If nested, use initial component to kill others
 //			else
 			{
-//				IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
+//				IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 				String	initial	= createPeerName(1, agent.getId());
 				IComponentIdentifier	cid	= new ComponentIdentifier(initial, agent.getId().getRoot());
 				agent.getExternalAccessAsync(cid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess>()
@@ -184,7 +184,7 @@ public class AgentCreationAgent
 	{
 		final String name = createPeerName(cnt, agent.getId());
 //		System.out.println("Destroying peer: "+name);
-//		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
+//		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 		IComponentIdentifier aid = new ComponentIdentifier(name, agent.getId().getRoot());
 		agent.getExternalAccess(aid).killComponent().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Map<String, Object>>()
 		{

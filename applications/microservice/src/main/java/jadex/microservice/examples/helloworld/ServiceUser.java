@@ -25,7 +25,7 @@ public class ServiceUser
 	public void body()
 	{
 		// Search the service.
-		IHelloService ser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IHelloService.class, ServiceScope.PLATFORM));
+		IHelloService ser = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IHelloService.class, ServiceScope.PLATFORM));
 		
 		// Invoke and print the result.
 		System.out.println(ser.sayHello(agent.getId().getLocalName()));

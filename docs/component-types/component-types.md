@@ -14,7 +14,7 @@ Micro agents are pojo (plain old Java object) based Java classes that support th
 
 | Feature Name | Description |
 |--------------|-------------|
-|[IPojoComponentFeature](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/component/IPojoComponentFeature)| This feature allows to access the Component POJO object (e.g. from inside a service as in [Accessing the Component](../services/services.md#accessing-the-component)). |
+|[IPojoComponentFeature](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/bridge/component/IPojoComponentFeature)| This feature allows to access the Component POJO object (e.g. from inside a service as in [Accessing the Component](../services/services.md#accessing-the-component)). |
 |IMicroInjectionFeature| This feature implements the injections of agent object, arguments, results and features. *No user methods available.* |
 |IMicroServiceInjectionFeature| Injects required services into [annotated field values](../services/services.md#using-injection). *No user methods available.*|
 |ILifecycleComponentFeature| Implements the Component's [Lifecycle](../components/components.md#component-lifecycle). *No user methods available.*|
@@ -29,7 +29,7 @@ Despite, it may sound unfamiliar using mentalistic concepts like goals and plans
 | Feature Name | Description |
 |--------------|-------------|
 |All Micro Agent Features| As BDI Agents extend Micro Agents, all Micro Agent features are available.|
-|[IBDIAgentFeature](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bdiv3/features/IBDIAgentFeature.html)| Contains the API relevant for BDI Agent programming (handling of goals, plans and belief listeners).
+|[IBDIAgentFeature](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/bdiv3/features/IBDIAgentFeature.html)| Contains the API relevant for BDI Agent programming (handling of goals, plans and belief listeners).
 
 ## BPMN Workflows
 

@@ -15,11 +15,11 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.InitInfo;
 import jadex.bridge.service.types.cms.SComponentManagementService;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -40,7 +40,7 @@ import jadex.micro.testcases.TestAgent;
  */
 @Service
 @Agent
-@ProvidedServices(@ProvidedService(type=IAutoTerminateService.class))
+@ProvidedServices(@ProvidedService(type=IAutoTerminateService.class, scope=ServiceScope.GLOBAL))
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class AutoTerminateTestAgent extends	TestAgent implements IAutoTerminateService
 {
@@ -68,14 +68,7 @@ public class AutoTerminateTestAgent extends	TestAgent implements IAutoTerminateS
 	{
 		ret	= new Future<Void>();
 		this.tc	= tc;
-		if(SReflect.isAndroid()) 
-		{
-			tc.setTestCount(1);
-		} 
-		else 
-		{
-			tc.setTestCount(3);
-		}
+		tc.setTestCount(3);
 		
 		InitInfo ii = SComponentManagementService.getState(agent.getId().getRoot()).getComponent(agent.getId()).getInitInfo();
 		if(ii!=null)
@@ -87,20 +80,17 @@ public class AutoTerminateTestAgent extends	TestAgent implements IAutoTerminateS
 		{
 			public void customResultAvailable(IComponentIdentifier result)
 			{
-				if(!SReflect.isAndroid()) 
-				{
 //					agent.getLogger().severe("Testagent test remote1: "+agent.getComponentDescription());
-					setupRemoteTest(SubscriberAgent.class.getName()+".class", "self", null, false)
-						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				setupRemoteTest(SubscriberAgent.class.getName()+".class", "self", null, false)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier result)
 					{
-						public void customResultAvailable(IComponentIdentifier result)
-						{
 //							agent.getLogger().severe("Testagent test remote2: "+agent.getComponentDescription());
-							setupRemoteTest(SubscriberAgent.class.getName()+".class", "platform", null, true);
-							// keep future open -> is set in check finished.
-						}
-					});
-				}
+						setupRemoteTest(SubscriberAgent.class.getName()+".class", "platform", null, true);
+						// keep future open -> is set in check finished.
+					}
+				});
 			}
 		});
 		
@@ -214,7 +204,7 @@ public class AutoTerminateTestAgent extends	TestAgent implements IAutoTerminateS
 //                {
 //                    public void customResultAvailable(ITransportComponentIdentifier cid)
 //                    {
-						createComponent(filename, null, config, exta.getId(), reslis)
+						createComponent(filename, null, config, exta.getId(), exta, reslis)
 							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 //                    }
 //                });

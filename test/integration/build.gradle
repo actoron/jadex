@@ -29,8 +29,8 @@ dependencies
 										   ':platform:webservice-desktop-grizzly',
 
 										   ':transports:intravm',
-										   ':transports:websockettransport',
-										   ':transports:relaytransport',
+										   ':transports:websocket',
+										   ':transports:relay',
 										   ])
 	
 	launcharts.retainAll(gradle.ext.includeartifacts)

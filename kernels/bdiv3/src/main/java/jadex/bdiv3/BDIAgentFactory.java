@@ -51,9 +51,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgentFactory;
 import jadex.micro.annotation.Agent;
-import jadex.micro.features.impl.MicroExecutionComponentFeature;
 import jadex.micro.features.impl.MicroInjectionComponentFeature;
-import jadex.micro.features.impl.MicroLifecycleComponentFeature;
 import jadex.micro.features.impl.MicroPojoComponentFeature;
 import jadex.micro.features.impl.MicroServiceInjectionComponentFeature;
 
@@ -213,7 +211,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public IFuture<Void> startService()
 	{
-		libservice	= provider.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		libservice	= provider.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 		libservice.addLibraryServiceListener(libservicelistener);	// TODO: wait for future?
 		return BDIAgentFactory.super.startService();
 	}
@@ -472,7 +470,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	protected ILibraryService getLibraryService()
 	{
-		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 	}
 	
 	/**

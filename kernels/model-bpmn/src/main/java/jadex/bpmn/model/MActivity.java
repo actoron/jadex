@@ -908,6 +908,7 @@ public class MActivity extends MAssociationTarget
 	 */
 	public void setProperties(IndexMap<String, MProperty> properties)
 	{
+		//System.out.println("set props: "+properties);
 		this.properties = properties;
 	}
 	
@@ -945,6 +946,8 @@ public class MActivity extends MAssociationTarget
 	 */
 	public void addProperty(MProperty prop)
 	{
+		//if("message".equals(prop.getName()))
+		//	System.out.println("addprop: "+this+" "+prop);
 		if(properties==null)
 			properties = new IndexMap<String, MProperty>();
 		properties.put(prop.getName(), prop);
@@ -981,7 +984,7 @@ public class MActivity extends MAssociationTarget
 	 */
 	public void removeProperty(String propname)
 	{
-		if (properties != null)
+		if(properties != null)
 			properties.removeKey(propname);
 	}
 	
@@ -1003,7 +1006,7 @@ public class MActivity extends MAssociationTarget
 	 */
 	public void setProperty(String name, String value, boolean string)
 	{
-//		System.out.println("setProp: "+name+" "+value+" "+string);
+		//System.out.println("setProp: "+name+" "+value+" "+string);
 		
 		if(value==null)
 		{
@@ -1033,7 +1036,7 @@ public class MActivity extends MAssociationTarget
 	 */
 	public void setParameter(String name, String value, Class<?> type, boolean string, String direction)
 	{
-//		System.out.println("setProp: "+name+" "+value+" "+string);
+		//System.out.println("setProp: "+name+" "+value+" "+string);
 		
 		if(value==null)
 		{

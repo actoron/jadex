@@ -24,7 +24,7 @@ public class ProgressService implements IProgressService
 	 *  @param taskid	The id of the task.
 	 *  @return	A future object holding the progress as a percentage integer value.
 	 */
-	public IFuture getProgress(Object taskid)
+	public IFuture<Integer> getProgress(Object taskid)
 	{
 		int	ret;
 		
@@ -42,6 +42,6 @@ public class ProgressService implements IProgressService
 			ret	= 0;
 		}
 		
-		return new Future(Integer.valueOf(ret));
+		return new Future<Integer>(Integer.valueOf(ret));
 	}
 }

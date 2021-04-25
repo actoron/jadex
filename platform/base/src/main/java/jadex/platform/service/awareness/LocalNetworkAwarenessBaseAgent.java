@@ -18,6 +18,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
@@ -28,6 +29,7 @@ import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.awareness.IAwarenessService;
 import jadex.bridge.service.types.registry.SlidingCuckooFilter;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.bridge.service.types.transport.ITransportService;
 import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -35,6 +37,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -90,6 +93,9 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	/** The socket to receive. */
 	protected DatagramSocket recvsocket;
 	
+	/** ServiceQuery looking for new Transports */
+	protected ISubscriptionIntermediateFuture<ITransportService> tpquery;
+	
 	/** Last time platforms where searched. */
 //	protected long lastsearchplatform = 0;
 
@@ -123,10 +129,19 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 //		}
 
 		// Start listening thread.
-		IDaemonThreadPoolService dtps = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IDaemonThreadPoolService.class));
+		IDaemonThreadPoolService dtps = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IDaemonThreadPoolService.class));
 		dtps.executeForever(new Receiver(recvsocket, true));
 		// Also listen for single-cast response messages -> TODO: use NIO to spare one thread
 		dtps.executeForever(new Receiver(sendsocket, false));
+		
+		// Listen for transport to update addresses
+		ServiceQuery<ITransportService> query = new ServiceQuery<>(ITransportService.class);
+		query.setScope(ServiceScope.PLATFORM);
+		tpquery = agent.addQuery(query);
+		tpquery.then(res ->
+		{
+			sendInfo(address, port);
+		});
 
 		// Send own info initially.
 		sendInfo(address, port);
@@ -146,6 +161,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	public void shutdown() throws Exception
 	{
 //		recvsocket.leaveGroup(InetAddress.getByName(multicastaddress));
+		tpquery.terminate();
 		recvsocket.close();
 		sendsocket.close();
 	}
@@ -293,7 +309,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	protected IFuture<Void> sendInfo(final String address, final int port)
 	{
 		final Future<Void> ret = new Future<Void>();
-		//tas = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITransportAddressService.class));
+		//tas = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ITransportAddressService.class));
 		tas.getAddresses().addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Void>(ret)
 		{
 			@Override

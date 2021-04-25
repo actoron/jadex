@@ -7,7 +7,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.OnMessage;
 
 /**
@@ -29,6 +28,8 @@ public class PingAgent
 	@OnMessage
 	public void messageArrived(Map<String, Object> msg)
 	{
+		System.out.println("msg: "+agent.getId()+" "+msg);
+
 		String perf = (String)msg.get(SFipa.PERFORMATIVE);
 		if((SFipa.QUERY_IF.equals(perf) || SFipa.QUERY_REF.equals(perf)) 
 			&& "ping".equals(msg.get(SFipa.CONTENT)))
@@ -43,7 +44,7 @@ public class PingAgent
 			reply.put(SFipa.CONTENT, "alive");
 			reply.put(SFipa.PERFORMATIVE, SFipa.INFORM);
 			reply.put(SFipa.SENDER, agent.getId());
-			agent.getFeature(IMessageFeature.class).sendMessage(reply, (IComponentIdentifier)reply.get(SFipa.RECEIVERS));
+			agent.getFeature(IMessageFeature.class).sendMessage(reply, (IComponentIdentifier)reply.get(SFipa.RECEIVERS)).get();
 		}
 		else
 		{

@@ -1,6 +1,14 @@
+plugins {
+    id 'application'
+}
+
 import org.apache.tools.ant.filters.*
 
 description 'Jadex minimal distribution for running the middleware with core features only (e.g. without GUI).'
+
+application {
+    mainClassName = 'jadex.base.Starter'
+}
 
 dependencies
 {
@@ -9,8 +17,8 @@ dependencies
 	api project(':platform:base')
 	api project(':transports:base')
 	api project(':transports:tcp')
-	api project(':transports:relaytransport')
-	api project(':transports:websockettransport')
+	api project(':transports:relay')
+	api project(':transports:websocket')
 }
 
 // Add uptodate applications-quickstart sources to example project

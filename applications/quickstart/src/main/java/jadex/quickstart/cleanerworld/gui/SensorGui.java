@@ -79,7 +79,8 @@ public class SensorGui
 		
 		// Close window on agent kill.
 		SComponentManagementService.listenToComponent(cid, agent)
-			.addIntermediateResultListener(cse ->
+			//.addIntermediateResultListener(cse ->
+			.next(cse ->
 		{
 			if(cse instanceof CMSTerminatedEvent)
 			{

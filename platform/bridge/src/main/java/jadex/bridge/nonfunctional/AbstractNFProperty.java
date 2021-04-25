@@ -74,10 +74,10 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 	public IFuture<String> getPrettyPrintValue()
 	{
 		Future<String> ret = new Future<>();
-		getValue().thenAccept(v ->
+		getValue().then(v ->
 		{
 			ret.setResult(""+v);
-		}).exceptionally(ret);
+		}).catchEx(ret);
 		return ret;
 	}
 	

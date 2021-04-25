@@ -6,7 +6,7 @@ mainClassName = "jadex.relay.launch.Main"
 dependencies
 {
 	api project(':distributions:minimal')
-	api project(':transports:relaytransport')
-	api project(':transports:websockettransport')
+	api project(':transports:relay')
+	api project(':transports:websocket')
 }
 

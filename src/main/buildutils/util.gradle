@@ -208,9 +208,9 @@ def getDetachedConfiguration(Project p, Configuration c) {
  * @param p
  * @return
  */
-def addJavaDocJarTask(Project p) {
+def addJavadocJarTask(Project p) {
         def javadocJar = p.tasks.create('javadocJar', Jar) {
-        	baseName = getArtifactName(p)
+        	archiveBaseName = getArtifactName(p)
             classifier = 'javadoc'
             from p.javadoc
         }
@@ -225,9 +225,10 @@ def addJavaDocJarTask(Project p) {
  */
 def addSourcesJarTask(Project p) {
         def sourcesJar = p.tasks.create('sourcesJar', Jar) {
-        	baseName = getArtifactName(p)
+        	archiveBaseName = getArtifactName(p)
             classifier = 'sources'
             from p.sourceSets.main.allSource
+			outputs.cacheIf { true }
         }
         p.artifacts {archives sourcesJar}
 }
@@ -406,7 +407,7 @@ ext {
     setBootClassPath = this.&setBootClassPath
 //    addParentScopeMappings = this.&addParentScopeMappings
     getDetachedConfiguration = this.&getDetachedConfiguration
-    addJavaDocJarTask = this.&addJavaDocJarTask
+    addJavadocJarTask = this.&addJavadocJarTask
     addSourcesJarTask = this.&addSourcesJarTask
     addEclipseWorkarounds = this.&addEclipseWorkarounds
     getVar = this.&getVar
