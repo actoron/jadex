@@ -68,11 +68,11 @@ public class ComponentStartTest extends ComponentTest
 	protected void componentStarted(IFuture<IExternalAccess> fut)
 	{
 		// For start-test kill component after some delay. Let base test collect the result (start exception vs. finished vs. timeout)
-		System.out.println("component start test 0: "+filename);
+//		System.out.println("component start test 0: "+filename);
 		fut.then(exta ->
 		{
 			IComponentIdentifier	cid = exta.getId();
-			System.out.println("component start test 1: "+filename+", "+cid);
+//			System.out.println("component start test 1: "+filename+", "+cid);
 
 			// Wait some time (simulation and real time) and kill the component
 			// afterwards.
@@ -88,13 +88,13 @@ public class ComponentStartTest extends ComponentTest
 						// System.out.println("destroying1 "+cid);
 						try
 						{
-							System.out.println("component start test 2: "+exta.getId());
+//							System.out.println("component start test 2: "+exta.getId());
 							exta.killComponent().get();
-							System.out.println("component start test 3: "+exta.getId());
+//							System.out.println("component start test 3: "+exta.getId());
 						}
 						catch(ComponentTerminatedException e)
 						{
-							System.out.println("component start test 4: "+exta.getId());
+//							System.out.println("component start test 4: "+exta.getId());
 							// ignore, if agent killed itself already
 						}
 						// if(cid.getName().indexOf("ParentProcess")!=-1)
