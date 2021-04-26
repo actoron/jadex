@@ -76,7 +76,8 @@ public class JCCTest //extends TestCase
 		platform	= null;
 		jcc	= null;
 		
-		ComponentTestSuite.clearAWT();
+		if(!ComponentTestSuite.clearAWT())
+			System.out.println("TEST FAILED CLEANING AWT: "+getClass());
 		
 //		try
 //		{

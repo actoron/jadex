@@ -100,7 +100,7 @@ public class ComponentTestBase extends TestCase
 			{
 				t = new Timer(true);
 				
-				System.out.println("Using test timeout: "+timeout+" "+System.currentTimeMillis()+" "+filename);
+//				System.out.println("Using test timeout: "+timeout+" "+System.currentTimeMillis()+" "+filename);
 				
 				t.schedule(new TimerTask()
 				{
@@ -203,9 +203,9 @@ public class ComponentTestBase extends TestCase
 			{
 				try
 				{
-					System.out.println("KILLING PLATFORM: "+System.currentTimeMillis()+" "+filename);
+//					System.out.println("KILLING PLATFORM: "+System.currentTimeMillis()+" "+filename);
 					platform.killComponent().get(timeout, true);
-					System.out.println("KILLED PLATFORM: "+System.currentTimeMillis()+" "+filename);
+//					System.out.println("KILLED PLATFORM: "+System.currentTimeMillis()+" "+filename);
 				}
 				catch(Throwable t3)
 				{

@@ -592,9 +592,9 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	{
 		try
 		{
-			System.out.println("SUITE KILLING PLATFORM: "+getName());
+//			System.out.println("SUITE KILLING PLATFORM: "+getName());
 			platform.killComponent().get(Starter.getDefaultTimeout(platform.getId()), true);
-			System.out.println("SUITE KILLED PLATFORM: "+getName());
+//			System.out.println("SUITE KILLED PLATFORM: "+getName());
 		}
 		catch(Exception e)
 		{
@@ -604,9 +604,10 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		}
 		platform	= null;
 		
-		System.out.println("SUITE CLEARING AWT: "+getName());
-		clearAWT();
-		System.out.println("SUITE CLEARED AWT: "+getName());
+//		System.out.println("SUITE CLEARING AWT: "+getName());
+		if(!clearAWT())
+			System.out.println("SUITE FAILED CLEANING AWT: "+getName());
+//		System.out.println("SUITE CLEARED AWT: "+getName());
 		
 		stopTimer();
 	}
@@ -614,10 +615,9 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	/**
 	 *  Workaround for AWT/Swing memory leaks.
 	 */
-	public static void	clearAWT()
+	public static boolean	clearAWT()
 	{
-		if(SReflect.HAS_GUI)
-			internalClearAWT();
+		return !SReflect.HAS_GUI || internalClearAWT();
 	}
 
 	/**
@@ -681,7 +681,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	/**
 	 *  Workaround for AWT/Swing memory leaks.
 	 */
-	public static void	internalClearAWT()
+	public static boolean	internalClearAWT()
 	{
 		// Java Bug not releasing the last focused window, see:
 		// http://www.lucamasini.net/Home/java-in-general-/the-weakness-of-swing-s-memory-model
@@ -737,10 +737,11 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //		disposed.get(30000);
 		try
 		{
-			sem.tryAcquire(30000, TimeUnit.MILLISECONDS);
+			return sem.tryAcquire(30000, TimeUnit.MILLISECONDS);
 		}
 		catch (InterruptedException e)
 		{
+			return false;
 		}
 		
 //		// Another bug not releasing the last drawn window.
