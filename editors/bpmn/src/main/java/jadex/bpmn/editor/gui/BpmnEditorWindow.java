@@ -579,9 +579,11 @@ public class BpmnEditorWindow extends JFrame
 		}
 		else
 		{
-			ResourceInfo rinfo = new ResourceInfo(file.getAbsolutePath(), new FileInputStream(file), file.lastModified());
-			mmodel = BpmnXMLReader.read(rinfo, BpmnMenuBar.class.getClassLoader(), new ResourceIdentifier(), null);
-			(new BpmnVisualModelGenerator(mmodel)).generateModel(graph);
+			try(ResourceInfo rinfo = new ResourceInfo(file.getAbsolutePath(), new FileInputStream(file), file.lastModified()))
+			{
+				mmodel = BpmnXMLReader.read(rinfo, BpmnMenuBar.class.getClassLoader(), new ResourceIdentifier(), null);
+				(new BpmnVisualModelGenerator(mmodel)).generateModel(graph);
+			}
 		}
 		
 		modelcontainer.setGraph(graph);

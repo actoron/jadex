@@ -387,7 +387,7 @@ public class SComponentManagementService
 				{
 					getClassLoader(libservice, rid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<ClassLoader, Tuple2<String, ClassLoader>>(ret)
 					{
-						public void customResultAvailable(ClassLoader cl)
+						public void customResultAvailable(ClassLoader cl) throws Exception
 						{
 //							final IInternalAccess pad = getParentComponent(cinfo, agent);
 //							final IExternalAccess parent = pad.getExternalAccess();
@@ -423,22 +423,24 @@ public class SComponentManagementService
 									}
 									else
 									{
-										ResourceInfo info = SUtil.getResourceInfo0(filename, cl);
-										if(info!=null)
+										try(ResourceInfo info = SUtil.getResourceInfo0(filename, cl))
 										{
-											for(int i=0; cinfo.getLocalType()==null && i<subcomps.length; i++)
+											if(info!=null)
 											{
-												ResourceInfo info1 = SUtil.getResourceInfo0(subcomps[i].getFilename(), cl);
-												if(info1!=null)
+												for(int i=0; cinfo.getLocalType()==null && i<subcomps.length; i++)
 												{
-													if(info.getFilename().equals(info1.getFilename()))
+													try(ResourceInfo info1 = SUtil.getResourceInfo0(subcomps[i].getFilename(), cl))
 													{
-														cinfo.setLocalType(subcomps[i].getName());
+														if(info1!=null)
+														{
+															if(info.getFilename().equals(info1.getFilename()))
+															{
+																cinfo.setLocalType(subcomps[i].getName());
+															}
+														}
 													}
-													info1.cleanup();
 												}
 											}
-											info.cleanup();
 										}
 										getState(agent.getId()).getLocalTypes().put(key, cinfo.getLocalType());
 						//				System.out.println("Local type: "+cinfo.getLocalType()+", "+pad.getComponentIdentifier());

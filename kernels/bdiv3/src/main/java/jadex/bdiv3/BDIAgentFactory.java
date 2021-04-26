@@ -433,9 +433,8 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 				{
 					public void customResultAvailable(ClassLoader cl)
 					{
-						try
+						try(ResourceInfo ri = loader.getResourceInfo0(model, imports, cl))
 						{
-							ResourceInfo ri = loader.getResourceInfo0(model, imports, cl);
 							if(ri==null)
 							{
 								ret.setResult(null);

@@ -6,7 +6,7 @@ import java.io.InputStream;
 /**
  *  Info for a resource to load.
  */
-public class ResourceInfo
+public class ResourceInfo	implements AutoCloseable
 {
 	//-------- attributes --------
 
@@ -64,7 +64,8 @@ public class ResourceInfo
 	 *  Cleanup the resource info
 	 *  when it is no longer used.
 	 */
-	public void	cleanup()
+	@Override
+	public void close() throws Exception
 	{
 		if(input!=null)
 		{
@@ -76,13 +77,5 @@ public class ResourceInfo
 			{
 			}
 		}
-	}
-	
-	/**
-	 *  On finalize, close the input stream.
-	 */
-	protected void finalize() throws Throwable
-	{
-		cleanup();
 	}
 }

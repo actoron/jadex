@@ -400,9 +400,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 				{
 					public void customResultAvailable(ClassLoader cl)
 					{
-						try
+						try(ResourceInfo ri = loader.getResourceInfo0(model, imports, cl))
 						{
-							ResourceInfo ri = loader.getResourceInfo0(model, imports, cl);
 							if(ri==null)
 							{
 								ret.setResult(Boolean.FALSE);
@@ -602,6 +601,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 //		Collection<IComponentFeatureFactory> ret = features;
 //		if(model.getFeatures().length>0)
 //			ret = SUtil.arrayToSet(model.getFeatures());
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Collection<IComponentFeatureFactory> ret = model.getFeatures().length==0? features: (Collection)SUtil.arrayToList(model.getFeatures());
 //		System.out.println("getCompFeat: "+ret);
 		return new Future<Collection<IComponentFeatureFactory>>(ret);
