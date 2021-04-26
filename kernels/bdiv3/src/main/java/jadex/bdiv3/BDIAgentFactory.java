@@ -1,6 +1,7 @@
 package jadex.bdiv3;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +45,6 @@ import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -349,15 +349,17 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 			@Override
 			public void resultAvailable(ClassInfo ci)
 			{
-				if(ci!=null)
+				String	modeltype	= ci!=null ? getLoadableType(ci) : null;
+				if(modeltype!=null)
 				{
-					String	modeltype	= getLoadableType(ci);
-					System.out.println("isLoadable0: "+model+", "+modeltype);
-					ret.setResult(modeltype!=null);
+					ret.setResult(true);
+				}
+				else if(model.indexOf("BDI.class")!=-1)
+				{
+					ret.setException(new RuntimeException("kaputt: "+model+", "+ci+", "+modeltype));
 				}
 				else
 				{
-					System.out.println("isLoadable1: "+model);
 					ret.setResult(false);
 				}
 			}
@@ -365,8 +367,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("isLoadable2: "+model+"\n"+SUtil.getExceptionStacktrace(exception));
-				ret.setResult(false);
+				ret.setException(exception);
 			}
 		});
 		return ret;
@@ -442,23 +443,25 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 							ResourceInfo ri = loader.getResourceInfo0(model, imports, cl);
 							if(ri==null)
 							{
-								ret.setResult(null);
+								ret.setException(new RuntimeException("no resource info: "+model));
 							}
 							else
 							{
-								ret.setResult(SClassReader.getClassInfo(ri.getInputStream()));
+								InputStream is	= ri.getInputStream();
+								System.gc();
+								ret.setResult(SClassReader.getClassInfo(is));
 							}
 						}
 						catch(Exception e)
 						{
-							ret.setResult(null);
+							ret.setException(new RuntimeException("kaputt", e));
 						}						
 					}
 				});
 			}
 			else
 			{
-				ret.setResult(null);
+				ret.setException(new RuntimeException("no libservice: "+model));
 			}
 		}
 		else

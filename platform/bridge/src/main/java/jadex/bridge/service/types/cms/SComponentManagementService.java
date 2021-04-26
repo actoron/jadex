@@ -528,7 +528,8 @@ public class SComponentManagementService
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				if(getComponentFactory(agent.getId())!=null)
+				if(getComponentFactory(agent.getId())!=null
+					&& model.indexOf("BDI.class")==-1)
 				{
 					ff.filter(getComponentFactory(agent.getId())).addResultListener(new IResultListener<Boolean>()
 					{
@@ -536,7 +537,6 @@ public class SComponentManagementService
 						{
 							if(result.booleanValue())
 							{
-//								System.out.println("found fallback factory for: "+model);
 								ret.setResult(getComponentFactory(agent.getId()));
 							}
 							else

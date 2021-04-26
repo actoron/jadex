@@ -356,6 +356,7 @@ public class SUtil
 						try
 						{
 							ret = new ResourceInfo(filename, con.getInputStream(), modified);
+							ret.created	= "JarURLConnection: "+filename;
 						}
 						catch(NullPointerException e)
 						{
@@ -365,6 +366,7 @@ public class SUtil
 							ret = new ResourceInfo(filename, new JarFile(jarfilename)
 								.getInputStream(juc.getJarEntry()), modified);
 							// System.err.println("loaded with workaround: "+url);
+							ret.created	= "JarFile: "+jarfilename;
 						}
 	
 						// todo: what about jar directories?!
@@ -389,6 +391,7 @@ public class SUtil
 					{
 						Method	m	= con.getClass().getMethod("getLocalURL", new Class<?>[0]);
 						ret = new ResourceInfo(m.invoke(con, new Object[0]).toString(), con.getInputStream(), modified);
+						ret.created	= "BundleURLConnection: "+m.invoke(con, new Object[0]).toString();
 					}
 					catch(Exception e)
 					{
@@ -409,6 +412,7 @@ public class SUtil
 					long modified = con.getLastModified();
 					String	filename	= URLDecoder.decode(con.getURL().getFile(), "UTF-8");
 					ret	= new ResourceInfo(filename, con.getInputStream(), modified);
+					ret.created	= "URLConnection(mappers): "+filename;
 				}
 				catch(IOException e)
 				{
@@ -1331,6 +1335,7 @@ public class SUtil
 					{
 						ret = new ResourceInfo(file.getCanonicalPath(),
 							new FileInputStream(file), file.lastModified());
+						ret.created	= "FileInputStream: "+file;
 					}
 					catch(FileNotFoundException e)
 					{
@@ -1408,6 +1413,7 @@ public class SUtil
 								{
 									ret = new ResourceInfo(file.getCanonicalPath(),
 										new FileInputStream(file), file.lastModified());
+									ret.created	= "FileInputStream(url): "+file;
 								}
 								catch(FileNotFoundException fnfe)
 								{
@@ -1443,6 +1449,9 @@ public class SUtil
 							for(int i=0; ret==null && i<RESOURCEINFO_MAPPERS.length; i++)
 							{
 								ret	= RESOURCEINFO_MAPPERS[i].execute(con);
+								if(ret!=null && name.indexOf("BDI.class")!=-1)
+									System.out.println("RESOURCEINFO_MAPPERS["+i+"]: "+name);
+
 							}
 						}
 					}
@@ -1463,6 +1472,7 @@ public class SUtil
 				URL url = new URL(name);
 				URLConnection con = url.openConnection();
 				ret = new ResourceInfo(name, con.getInputStream(), con.getLastModified());
+				ret.created	= "URL: "+name;
 			}
 			catch(IOException le)
 			{

@@ -267,7 +267,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //		}
 //		
 		IPlatformConfiguration conf = STest.getLocalTestConfig(getName());	// Avoid dependencies to created platforms
-		conf.setLogging(true);
+//		conf.setLogging(true);
 		
 		// Initial timeout for starting platform.
 		// Use larger timeout so we can reduce default timeout on build slave
@@ -360,12 +360,12 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 						{
 							IResourceIdentifier rid = rids[projectIndex];
 
-							System.out.println("isLoadable: "+abspath+", "+System.currentTimeMillis());
+//							System.out.println("isLoadable: "+abspath+", "+System.currentTimeMillis());
 							if((SComponentFactory.isLoadable(platform, abspath, rid).get()).booleanValue())
 							{
-								System.out.println("isStartable: "+abspath+", "+System.currentTimeMillis());
+//								System.out.println("isStartable: "+abspath+", "+System.currentTimeMillis());
 								boolean startable = SComponentFactory.isStartable(platform, abspath, rid).get().booleanValue();
-								System.out.println("loadModel: "+abspath+", "+System.currentTimeMillis());
+//								System.out.println("loadModel: "+abspath+", "+System.currentTimeMillis());
 								IModelInfo model = SComponentFactory.loadModel(platform, abspath, rid).get();
 								boolean istest = false;
 								if(model != null && model.getReport() == null && startable)

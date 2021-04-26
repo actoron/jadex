@@ -18,6 +18,9 @@ public class ResourceInfo
 
 	/** The last modified date. */
 	protected long lastmodified;
+	
+	// Hack for debugging factory bug
+	public String created;
 
 	//-------- constructors --------
 
