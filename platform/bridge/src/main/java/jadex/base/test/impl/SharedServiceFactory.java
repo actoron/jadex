@@ -1,11 +1,15 @@
 package jadex.base.test.impl;
 
+import java.lang.reflect.Method;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
+import jadex.bridge.service.component.interceptors.ResolveInterceptor;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -24,7 +28,7 @@ public class SharedServiceFactory<T>	implements Function<Supplier<T>, T>
 	protected volatile T	instance	=  null;
 	
 	/** The init future of the shared service. */
-	protected volatile Future<Void>	inited	= null;
+	protected volatile IFuture<Void>	inited	= null;
 	
 	/** The usage count to know when the service can be shut down. */
 	protected volatile int	cnt	= 0;
@@ -63,21 +67,53 @@ public class SharedServiceFactory<T>	implements Function<Supplier<T>, T>
 	 */
 	public IFuture<Void> startService()
 	{
-		boolean	init	= false;
+		Future<Void>	init	= null;
 		synchronized(this)
 		{
 			cnt++;
 			if(inited==null)
 			{
-				init	= true;
-				inited	= new Future<Void>();
+				init	=  new Future<Void>();
+				inited	= init;
 			}
 		}
 		
-		if(init)
+		if(init!=null)
 		{
 //			System.out.println("Starting shared service instance: "+instance);
-			 ((BasicService)instance).startService().addResultListener(new DelegationResultListener<Void>(inited));
+			if(instance instanceof IInternalService)
+			{
+				((IInternalService)instance).startService().addResultListener(new DelegationResultListener<Void>(init));
+			}
+			else
+			{
+				Method	m	= ResolveInterceptor.searchMethod(instance.getClass(), OnStart.class);
+				if(m!=null)
+				{
+					try
+					{
+						Object	ret	= m.invoke(instance);
+						if(ret instanceof IFuture)
+						{
+							@SuppressWarnings("unchecked")
+							IFuture<Void>	fut	= (IFuture<Void>)ret;
+							fut.addResultListener(new DelegationResultListener<Void>(init));
+						}
+						else
+						{
+							init.setResult(null);
+						}
+					}
+					catch(Exception e)
+					{
+						init.setException(e);
+					}
+				}
+				else
+				{
+					init.setResult(null);					
+				}
+			}
 		}
 		
 		return inited;
@@ -88,13 +124,13 @@ public class SharedServiceFactory<T>	implements Function<Supplier<T>, T>
 	 */
 	public IFuture<Void> shutdownService()
 	{
-		BasicService	tmp	= null;
+		Object	tmp	= null;
 		synchronized(this)
 		{
 			cnt--;
 			if(cnt==0)
 			{
-				tmp	= (BasicService)instance;
+				tmp	= instance;
 				// Clear to allow another platform to be started with new service.
 				instance	= null;
 				inited	=  null;
@@ -104,7 +140,39 @@ public class SharedServiceFactory<T>	implements Function<Supplier<T>, T>
 		if(tmp!=null)
 		{
 //			System.out.println("Terminating shared service instance: "+tmp);
-			return tmp.shutdownService();
+			if(tmp instanceof IInternalService)
+			{
+				return ((IInternalService)tmp).shutdownService();
+			}
+			else
+			{
+				Method	m	= ResolveInterceptor.searchMethod(tmp.getClass(), OnEnd.class);
+				if(m!=null)
+				{
+					try
+					{
+						Object	ret	= m.invoke(tmp);
+						if(ret instanceof IFuture)
+						{
+							@SuppressWarnings("unchecked")
+							IFuture<Void>	fut	= (IFuture<Void>)ret;
+							return fut;
+						}
+						else
+						{
+							return IFuture.DONE;
+						}
+					}
+					catch(Exception e)
+					{
+						return new Future<>(e);
+					}
+				}
+				else
+				{
+					return IFuture.DONE;				
+				}
+			}
 		}
 		else
 		{

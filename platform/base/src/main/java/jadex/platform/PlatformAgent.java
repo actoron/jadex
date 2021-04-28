@@ -38,6 +38,7 @@ import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
+import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.execution.IExecutionService;
@@ -70,6 +71,8 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.platform.service.clock.ClockCreationInfo;
+import jadex.platform.service.clock.ClockService;
 import jadex.platform.service.execution.AsyncExecutionService;
 import jadex.platform.service.execution.BisimExecutionService;
 import jadex.platform.service.execution.SyncExecutionService;
@@ -89,12 +92,11 @@ import jadex.platform.service.threadpool.ThreadPoolService;
 })
 
 @ProvidedServices({
-	@ProvidedService(type=IThreadPoolService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="PlatformAgent.createThreadpoolServiceImpl($component)", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IThreadPoolService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="PlatformAgent.createThreadPoolServiceImpl($component)", proxytype=Implementation.PROXYTYPE_RAW)),
 	// hack!!! no daemon here (possibly fixed?)
 	@ProvidedService(type=IDaemonThreadPoolService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(true), $component.getId())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IExecutionService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="PlatformAgent.createExecutionServiceImpl($args.asyncexecution, $args.simulation, $args.bisimulation, $component)", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IClockService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(
-			expression="$args.simulation==null || !$args.simulation.booleanValue()? new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_SYSTEM, \"system_clock\", System.currentTimeMillis(), 100), $component): new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_EVENT_DRIVEN, \"simulation_clock\", System.currentTimeMillis(), 100), $component)", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IClockService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="PlatformAgent.createClockServiceImpl($component)", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=ILibraryService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$args.libpath==null? new jadex.platform.service.library.LibraryService(): new jadex.platform.service.library.LibraryService(new java.net.URLClassLoader(jadex.commons.SUtil.toURLs($args.libpath), $args.baseclassloader==null ? jadex.platform.service.library.LibraryService.class.getClassLoader() : $args.baseclassloader))")),
 	@ProvidedService(type=IDependencyService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$args.maven_dependencies? jadex.platform.service.dependency.maven.MavenDependencyResolverService.class.newInstance(): new jadex.platform.service.library.BasicDependencyService()"))
 //	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="new jadex.bridge.service.types.cms.ComponentManagementService($platformaccess, $bootstrapfactory, $args.uniqueids)"))
@@ -122,7 +124,7 @@ public class PlatformAgent
 	//-------- service creation helpers --------
 	
 	/** Create threadpool service. */
-	public static IThreadPoolService	createThreadpoolServiceImpl(IInternalAccess component)
+	public static IThreadPoolService	createThreadPoolServiceImpl(IInternalAccess component)
 	{
 		return createMaybeSharedServiceImpl("threadpool", component, () ->
 		{
@@ -153,10 +155,20 @@ public class PlatformAgent
 					: new AsyncExecutionService(component));
 	}
 	
+	/** Create clock service. */
+	public static IClockService createClockServiceImpl(IInternalAccess component)
+	{
+		return createMaybeSharedServiceImpl("clock", component, () ->
+		{
+			boolean	simulation	= component.getArgument("simulation")!=null && Boolean.TRUE.equals(component.getArgument("simulation"));
+			return new ClockService(new ClockCreationInfo(simulation?IClock.TYPE_EVENT_DRIVEN:IClock.TYPE_SYSTEM, simulation?"simulation_clock":"system_clock", System.currentTimeMillis(), 100), component);
+		});
+	}
+	
 	/**
 	 *  Create a service that may be shared between platforms using a shared service factory. 
 	 */
-	protected static <T>	T	createMaybeSharedServiceImpl(String name, IInternalAccess ia, Supplier<T> creator)
+	public static <T>	T	createMaybeSharedServiceImpl(String name, IInternalAccess ia, Supplier<T> creator)
 	{
 		@SuppressWarnings("unchecked")
 		Function<Supplier<T>, T>	fac	= (Function<Supplier<T>, T>) ia.getArgument(name+"factory");
@@ -249,7 +261,7 @@ public class PlatformAgent
 	{
 		Future<Void> ret = new Future<>();
 //		System.out.println("Start scanning...");
-		long start = System.currentTimeMillis();
+//		long start = System.currentTimeMillis();
 		
 		String file = (String)agent.getArgument("startconfig");
 		Boolean rescan = (Boolean)agent.getArgument("rescan");
@@ -645,6 +657,7 @@ public class PlatformAgent
 	 */
 	protected Boolean getAgentStart(String name)
 	{
+		@SuppressWarnings("unchecked")
 		Map<String, Object> argsmap = (Map<String, Object>)Starter.getPlatformValue(agent.getId(), IPlatformConfiguration.PLATFORMARGS);
 		if(argsmap.containsKey(name))
 			return (Boolean)argsmap.get(name);

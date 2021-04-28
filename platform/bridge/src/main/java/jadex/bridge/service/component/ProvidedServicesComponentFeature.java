@@ -47,6 +47,7 @@ import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -778,6 +779,14 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 							shutdownServices(services).addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					});
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					// On error -> print and continue shutdown process.
+					component.getLogger().severe("Exception in service shutdown: "+is+"\n"+SUtil.getExceptionStacktrace(exception));
+					customResultAvailable(null); 
 				}
 			});
 		}

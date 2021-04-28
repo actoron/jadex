@@ -244,7 +244,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	/**
 	 *  Search an annotation method.
 	 */
-	protected Method searchMethod(Class<?> impl, Class<? extends Annotation>  annotation)
+	public static Method searchMethod(Class<?> impl, Class<? extends Annotation>  annotation)
 	{
 		Method[] methods = SReflect.getAllMethods(impl);
 		Method found = null;

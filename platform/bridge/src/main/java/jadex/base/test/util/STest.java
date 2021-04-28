@@ -4,8 +4,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
+import jadex.base.test.impl.SharedClockService;
 import jadex.base.test.impl.SharedExecutionService;
 import jadex.base.test.impl.SharedServiceFactory;
+import jadex.base.test.impl.SharedSimulationService;
 import jadex.base.test.impl.SharedThreadPoolService;
 import jadex.commons.Base64;
 import jadex.commons.SUtil;
@@ -32,7 +34,7 @@ public class STest
     	
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
 		config.setPlatformName(name);
-		config.setValue("uniquename", true);
+		config.setValue("uniquename", true);	// Unique number will be appended to platform name
 
         // Do not use multi factory as it is much too slow now :(
 //		config.setValue("kernel_multi", true);
@@ -43,13 +45,15 @@ public class STest
 		config.setValue("kernel_bdix", true);
 		config.setValue("kernel_bdi", true);
 		
-        config.getExtendedPlatformConfiguration().setSimul(true); // start simulation component
-        config.getExtendedPlatformConfiguration().setSimulation(true);
+        config.getExtendedPlatformConfiguration().setSimul(true); // Start simulation component
+        config.getExtendedPlatformConfiguration().setSimulation(true);	// Set simulation clock and sync execution
         
 		//config.setDefaultTimeout(-1);
 //        config.setValue("bisimulation", true);
         
+		// Avoid problems due to old platform config files
         config.setValue("settings.readonly", true);
+		config.setValue("rescan", true);
         
 //        config.setLogging(true);
 //        config.getExtendedPlatformConfiguration().setDebugFutures(true);
@@ -106,15 +110,14 @@ public class STest
 		config.setNetworkNames(new String[] { testnetwork_name });
 		config.setNetworkSecrets(new String[] { testnetwork_pass });
 		
-		// Avoid problems due to old platform config files
-		config.setValue("rescan", true);
-
 //		config.setLogging(true);
 //		config.setDefaultTimeout(300000);
 		
 		// Shared services for all platforms to enable distributed simulation
 		config.setValue("threadpoolfactory", new SharedServiceFactory<>(SharedThreadPoolService::new));
 		config.setValue("exefactory", new SharedServiceFactory<>(SharedExecutionService::new));
+		config.setValue("clockfactory", new SharedServiceFactory<>(SharedClockService::new));
+		config.setValue("simulation.simfactory", new SharedServiceFactory<>(SharedSimulationService::new));
 		
         return config;
     }
