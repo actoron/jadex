@@ -20,7 +20,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -335,7 +334,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 				this.timeout = Starter.getScaledDefaultTimeout(platform.getId(), 1 + 0.05 * scanForTestCases.size()); // Timeout
 																																			// for
 				startTimer();
-				Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + project[rootIndex] + " (scan timeout: " + timeout + ")");
+//				Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + project[rootIndex] + " (scan timeout: " + timeout + ")");
 				for(String abspath : scanForTestCases)
 				{
 					boolean exclude = false;
@@ -376,7 +375,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 
 								if(istest)
 								{
-									System.out.print(".");
+//									System.out.print(".");
 									if(runtests)
 									{
 										ComponentTest test = SAME_PLATFORM ? new ComponentTest(platform, model, this) : new ComponentTest(STest.getLocalTestConfig(abspath), args, roots, platform, model, this);
@@ -394,7 +393,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 								}
 								else if(startable && model.getReport() == null)
 								{
-									System.out.print(".");
+//									System.out.print(".");
 									if(start)
 									{
 										ComponentStartTest test = new ComponentStartTest(platform, model, this);
@@ -415,7 +414,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 								}
 								else if(load)
 								{
-									System.out.print(".");
+//									System.out.print(".");
 									ComponentLoadTest test = new ComponentLoadTest(model, model.getReport());
 									test.setName(abspath);
 									addTest(test);
@@ -460,7 +459,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 
 				stopTimer();
 				Future.DEBUG = originalDebug;
-				Logger.getLogger("ComponentTestSuite").info("Finished Building Suite for " + project[rootIndex] + ", cumulated execution timeout is: " + ctimeout);
+//				Logger.getLogger("ComponentTestSuite").info("Finished Building Suite for " + project[rootIndex] + ", cumulated execution timeout is: " + ctimeout);
 			}
 		}
 		this.timeout = ctimeout;

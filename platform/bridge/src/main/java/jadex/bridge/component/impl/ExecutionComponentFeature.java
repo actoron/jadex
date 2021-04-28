@@ -120,6 +120,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/** Flag for testing double execution. */
 	protected volatile boolean executing;
 	
+	/** Exception for debugging double execution. */
+	protected volatile Throwable stacktrace;
+	
 	/** The thread currently executing the component (null for none). */
 	protected Thread componentthread;
 	
@@ -1044,6 +1047,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			beforeBlock();
 			
 			this.executing	= false;
+			this.stacktrace	= null;
 			setComponentThread(null);
 //			this.componentthread	= null;
 			
@@ -1118,9 +1122,14 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					if(executing)
 					{
 						System.err.println(getComponent().getId()+": double execution");
-						new RuntimeException("executing: "+getComponent().getId()).printStackTrace();
+						if(debug)
+							new RuntimeException("executing: "+getComponent().getId()).initCause(stacktrace).printStackTrace();
+						else
+							new RuntimeException("executing: "+getComponent().getId()).printStackTrace();
 					}
 					this.executing	= true;
+					if(debug)
+						this.stacktrace	= new Exception("First execution").fillInStackTrace();
 				}
 		
 				setComponentThread(Thread.currentThread());
@@ -1191,6 +1200,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public boolean execute()
 	{
+		try {
+		
 		if(endstepcnt!=-1 && debug)
 			getComponent().getLogger().severe("execute()0: "+getComponent().getId()+", "+IComponentIdentifier.LOCAL.get()+", endstepcnt="+endstepcnt+", stepcnt="+stepcnt);
 
@@ -1198,10 +1209,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			if(executing)
 			{
-				System.err.println(getComponent().getId()+": double execution"+" "+Thread.currentThread()+" "+getComponentThread());
-				new RuntimeException("executing: "+getComponent().getId()).printStackTrace();
+				System.err.println(getComponent().getId()+": double execution");
+				if(debug)
+					new RuntimeException("executing: "+getComponent().getId()).initCause(stacktrace).printStackTrace();
+				else
+					new RuntimeException("executing: "+getComponent().getId()).printStackTrace();
 			}
-			executing	= true;
+			this.executing	= true;
+			if(debug)
+				this.stacktrace	= new Exception("First execution").fillInStackTrace();
 		}
 
 		if(endstepcnt!=-1 && debug)
@@ -1778,6 +1794,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //			System.out.println("platform: "+steps.size());
 		
 		return ret;
+		
+		} catch(Throwable t) {
+			if(executing)
+				new RuntimeException("dreck").initCause(t).printStackTrace();
+			throw SUtil.throwUnchecked(t);
+		}
 	}
 
 	
@@ -1835,6 +1857,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		setComponentThread(null);
 //		this.componentthread = null;
 		executing	= false;
+		stacktrace	= null;
 		ISuspendable.SUSPENDABLE.set(null);
 	}
 

@@ -66,7 +66,7 @@ public class IntermediateFutureTest
 		for(Thread thread: threads)
 			thread.join();
 		
-		System.out.println("results: "+resultss.get(0));
+//		System.out.println("results: "+resultss.get(0));
 		
 		// Check that all listeners received all results in the same order for each future
 		for(int f=0; f<count; f++)

@@ -2,8 +2,6 @@ package jadex.base.test.impl;
 
 
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;

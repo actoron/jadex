@@ -11,7 +11,6 @@ import jadex.base.Starter;
 import jadex.base.test.IAbortableTestSuite;
 import jadex.base.test.util.STest;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -71,7 +70,7 @@ public class ComponentStartTest extends ComponentTest
 //		System.out.println("component start test 0: "+filename);
 		fut.then(exta ->
 		{
-			IComponentIdentifier	cid = exta.getId();
+//			IComponentIdentifier	cid = exta.getId();
 //			System.out.println("component start test 1: "+filename+", "+cid);
 
 			// Wait some time (simulation and real time) and kill the component
