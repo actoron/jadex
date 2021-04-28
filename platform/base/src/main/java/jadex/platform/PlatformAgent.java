@@ -20,6 +20,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -52,6 +54,7 @@ import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SClassReader.EnumInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -71,6 +74,7 @@ import jadex.platform.service.execution.AsyncExecutionService;
 import jadex.platform.service.execution.BisimExecutionService;
 import jadex.platform.service.execution.SyncExecutionService;
 import jadex.platform.service.security.SecurityAgent;
+import jadex.platform.service.threadpool.ThreadPoolService;
 
 /**
  *	Basic standalone platform services provided as a micro agent. 
@@ -85,7 +89,7 @@ import jadex.platform.service.security.SecurityAgent;
 })
 
 @ProvidedServices({
-	@ProvidedService(type=IThreadPoolService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(false), $component.getId())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IThreadPoolService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="PlatformAgent.createThreadpoolServiceImpl($component)", proxytype=Implementation.PROXYTYPE_RAW)),
 	// hack!!! no daemon here (possibly fixed?)
 	@ProvidedService(type=IDaemonThreadPoolService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(true), $component.getId())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IExecutionService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="PlatformAgent.createExecutionServiceImpl($args.asyncexecution, $args.simulation, $args.bisimulation, $component)", proxytype=Implementation.PROXYTYPE_RAW)),
@@ -117,17 +121,54 @@ public class PlatformAgent
 	
 	//-------- service creation helpers --------
 	
-	/** Create execution service. */
-	public static synchronized IExecutionService createExecutionServiceImpl(Object asyncexecution, Object simulation, Object bisimulation, IInternalAccess component)
+	/** Create threadpool service. */
+	public static IThreadPoolService	createThreadpoolServiceImpl(IInternalAccess component)
 	{
-		if(Boolean.TRUE.equals(bisimulation))
+		return createMaybeSharedServiceImpl("threadpool", component, () ->
 		{
-			return BisimExecutionService.getInstance(component);
+			String	threadpoolclass	= (String) component.getArgument("threadpoolclass");
+			IThreadPool pool;
+			try
+			{
+				pool = threadpoolclass!=null
+					? (IThreadPool)SReflect.classForName0(threadpoolclass, component.getClassLoader()).getConstructor().newInstance()
+					: new jadex.commons.concurrent.JavaThreadPool(false);
+				return new ThreadPoolService(pool, component.getId());
+			}
+			catch (Exception e)
+			{
+				throw SUtil.throwUnchecked(e);
+			}
+		});
+	}
+	
+	/** Create execution service. */
+	public static IExecutionService createExecutionServiceImpl(Object asyncexecution, Object simulation, Object bisimulation, IInternalAccess component)
+	{
+		return createMaybeSharedServiceImpl("exe", component, () ->
+			Boolean.TRUE.equals(bisimulation)
+				? BisimExecutionService.getInstance(component)
+				: Boolean.FALSE.equals(asyncexecution) || Boolean.TRUE.equals(simulation)
+					? new SyncExecutionService(component)
+					: new AsyncExecutionService(component));
+	}
+	
+	/**
+	 *  Create a service that may be shared between platforms using a shared service factory. 
+	 */
+	protected static <T>	T	createMaybeSharedServiceImpl(String name, IInternalAccess ia, Supplier<T> creator)
+	{
+		@SuppressWarnings("unchecked")
+		Function<Supplier<T>, T>	fac	= (Function<Supplier<T>, T>) ia.getArgument(name+"factory");
+		if(fac!=null)
+		{
+			// When factory exists -> use factory (only creates service on first access)
+			return fac.apply(creator);
 		}
 		else
 		{
-			boolean	sync = Boolean.FALSE.equals(asyncexecution) || Boolean.TRUE.equals(simulation);
-			return sync ? new SyncExecutionService(component) : new AsyncExecutionService(component);
+			// otherwise create new service for each platform.
+			return creator.get();
 		}
 	}
 	

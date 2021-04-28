@@ -4,6 +4,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
+import jadex.base.test.impl.SharedExecutionService;
+import jadex.base.test.impl.SharedServiceFactory;
+import jadex.base.test.impl.SharedThreadPoolService;
 import jadex.commons.Base64;
 import jadex.commons.SUtil;
 
@@ -108,6 +111,10 @@ public class STest
 
 //		config.setLogging(true);
 //		config.setDefaultTimeout(300000);
+		
+		// Shared services for all platforms to enable distributed simulation
+		config.setValue("threadpoolfactory", new SharedServiceFactory<>(SharedThreadPoolService::new));
+		config.setValue("exefactory", new SharedServiceFactory<>(SharedExecutionService::new));
 		
         return config;
     }
