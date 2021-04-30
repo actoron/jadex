@@ -18,7 +18,6 @@ import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -28,7 +27,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -191,8 +189,6 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 		// Start platform
 		try
 		{
-			disableLocalSimulationMode().get();
-			
 			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",

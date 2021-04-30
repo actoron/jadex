@@ -106,7 +106,6 @@ public class PullResultTestAgent extends TestAgent
 	 */
 	protected IFuture<TestReport[]> testLocal(final int testno, final long delay, final int max)
 	{
-		disableLocalSimulationMode().get();
 		final Future<TestReport[]> ret = new Future<TestReport[]>();
 		performTestA(agent.getId().getRoot(), null, testno, delay, max)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)

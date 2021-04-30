@@ -7,7 +7,6 @@ import java.util.Arrays;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.base.test.util.STest;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -28,13 +27,11 @@ import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.SComponentManagementService;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.RemoteTestBaseAgent;
@@ -82,15 +79,13 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 //				"-superpeerclient", "false",
 //			}).get();
 			
-			disableLocalSimulationMode().get();
-			
 			IExternalAccess plat = Starter.createPlatform(getConfig()).get();
 			
 			createProxies(plat).get();
 			// awareness is disabled in testsuite
 //			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000).get();
 			
-			ILibraryService ls = getServiceProxy(agent, plat.getId(), ILibraryService.class);
+//			ILibraryService ls = getServiceProxy(agent, plat.getId(), ILibraryService.class);
 //			IComponentDescription[] descs = cms.getComponentDescriptions().get();
 			IComponentDescription[] descs = SComponentManagementService.getComponentDescriptions(agent.getId()).get();
 			System.out.println(Arrays.toString(descs));

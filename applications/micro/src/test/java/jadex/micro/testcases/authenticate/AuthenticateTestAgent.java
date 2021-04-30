@@ -118,8 +118,6 @@ public class AuthenticateTestAgent extends TestAgent
 	 */
 	protected	IFuture<IExternalAccess> setupTestPlatform(boolean def, final boolean cus)
 	{
-		disableLocalSimulationMode().get();
-		
 		IPlatformConfiguration	conf	= getConfig().clone();
 		
 		// Not default visibility means test unrestricted access -> don't use test network.

@@ -340,8 +340,6 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	{
 		final Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
 		
-		disableLocalSimulationMode().get();
-//		
 ////		agent.getLogger().severe("Testagent setup remote platform: "+agent.getComponentDescription());
 //		IPlatformConfiguration conf = STest.getRealtimeTestConfig(getClass());
 //		//conf.getExtendedPlatformConfiguration().setDebugFutures(true);

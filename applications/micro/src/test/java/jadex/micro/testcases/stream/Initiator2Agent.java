@@ -44,7 +44,6 @@ public class Initiator2Agent extends TestAgent
 	 */
 	protected IFuture<Void> performTests(final Testcase tc)
 	{
-		disableLocalSimulationMode().get();
 		final Future<Void> ret = new Future<Void>();
 		
 //		agent.getLogger().severe("Testagent test local: "+agent.getDescription());

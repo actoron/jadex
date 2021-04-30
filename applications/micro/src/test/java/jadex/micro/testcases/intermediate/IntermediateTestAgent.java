@@ -209,13 +209,13 @@ public class IntermediateTestAgent extends TestAgent
 							{
 								if(start[0]==null)
 								{
-									start[0] = 	local ? clock.getTime() : (System.nanoTime()/1000000);
+									start[0] = 	clock.getTime();
 								}
 //													System.out.println("intermediateResultAvailable: "+result);
 							}
 							public void finished()
 							{
-								long needed = (local ? clock.getTime() : (System.nanoTime()/1000000))-start[0].longValue();
+								long needed = clock.getTime() - start[0].longValue();
 //															System.out.println("finished: "+needed);
 								long expected = delay*(max-1);
 								// deviation can happen because receival of results is measured
