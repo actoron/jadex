@@ -45,7 +45,6 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.IUntrustedMessageHandler;
-import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
@@ -60,7 +59,6 @@ import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.IPlatformSettings;
-import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.Boolean3;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
@@ -699,21 +697,21 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							hstate = initializingcryptosuites.get(rplat);
 						}
 						
-						// Add sim blocker and print error msg when handshake doesn't work
-						if(SSimulation.addBlocker(ret))
-						{
-							ia.waitForDelay(Starter.getScaledDefaultTimeout(ia.getId(), 0.5), true)
-								.then(v ->
-							{
-								if(!ret.isDone())
-								{
-									//System.out.println("Security handshake timeout from "+agent+" to "+rplat);
-									checkCleanup();
-									ret.setExceptionIfUndone(new TimeoutException("Communication with remote platform " + rplat + " failed when sending messages from " + agent + "."));
-									//ret.setExceptionIfUndone(new TimeoutException("Security handshake timeout from "+agent+" to "+rplat));
-								}
-							});
-						}
+//						// Add sim blocker and print error msg when handshake doesn't work
+//						if(SSimulation.addBlocker(ret))
+//						{
+//							ia.waitForDelay(Starter.getScaledDefaultTimeout(ia.getId(), 0.5), true)
+//								.then(v ->
+//							{
+//								if(!ret.isDone())
+//								{
+//									//System.out.println("Security handshake timeout from "+agent+" to "+rplat);
+//									checkCleanup();
+//									ret.setExceptionIfUndone(new TimeoutException("Communication with remote platform " + rplat + " failed when sending messages from " + agent + "."));
+//									//ret.setExceptionIfUndone(new TimeoutException("Security handshake timeout from "+agent+" to "+rplat));
+//								}
+//							});
+//						}
 							
 						hstate.getResultFuture().addResultListener(new ExceptionDelegationResultListener<ICryptoSuite, byte[]>(ret, true)
 						{
@@ -2097,7 +2095,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			}
 		}));
 		
-		((IInternalExecutionFeature) execfeat).addSimulationBlocker(ret);
 		return ret;
 	}
 	

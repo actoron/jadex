@@ -232,8 +232,6 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			ret.addResultListener(trl);
 		}
 		
-		((IInternalExecutionFeature)component.getFeature(IExecutionFeature.class)).addSimulationBlocker(ret);
-
 		if(outcommands==null)
 		{
 			outcommands	= new HashMap<String, OutCommand>();

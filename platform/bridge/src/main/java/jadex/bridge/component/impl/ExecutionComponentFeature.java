@@ -29,7 +29,6 @@ import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.ITypedComponentStep;
 import jadex.bridge.IntermediateComponentResultListener;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.StepAborted;
 import jadex.bridge.StepAbortedException;
 import jadex.bridge.StepInvalidException;
@@ -42,11 +41,9 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.Breakpoint;
 import jadex.bridge.service.component.ComponentSuspendable;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -59,8 +56,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
-import jadex.bridge.service.types.simulation.ISimulationService;
-import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.DebugException;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
@@ -77,7 +72,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ISuspendable;
-import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
@@ -2218,76 +2212,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		System.out.println("Child terminated: "+desc.getName());
 		// does nothing per default
 		// kernels need to override 
-	}
-	
-	/**
-	 *  Adds a simulation blocker for remote actions that have
-	 *  a definite end (i.e. regular futures), so remote calls
-	 *  work in simulation mode.
-	 *  
-	 *  Does not work for intermediates. Noop if simulation is
-	 *  disabled
-	 *  
-	 *  @param remotefuture The future of the remote action.
-	 */
-	public <T> void addSimulationBlocker(IFuture<T> remotefuture)
-	{
-		//Thread.dumpStack();
-		
-		if (SSimulation.isSimulating(component))
-		{
-			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
-			// there is no way of known how long to hold the clock.
-			// Update: Doing it anyway, relying on blocker realtime timeout to catch errors.
-//			if (!(remotefuture instanceof IIntermediateFuture))
-//			{
-				ServiceCall	sc	= SSimulation.debugBlocker();
-				component.scheduleStep(new IComponentStep<Void>()
-				{
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(0));
-						if (simserv != null)
-						{
-							Future<Void> blocker = new Future<>();
-							if(sc!=null) CallAccess.setNextInvocation(sc);
-							simserv.addAdvanceBlocker(blocker).addResultListener(new IResultListener<Void>()
-							{
-								@SuppressWarnings("unchecked")
-								public void resultAvailable(Void result)
-								{
-									@SuppressWarnings({ "rawtypes" })
-									IIntermediateResultListener rs = new IntermediateEmptyResultListener()
-									{
-										public void resultAvailable(Object result)
-										{
-											blocker.setResult(null);
-										}
-										public void exceptionOccurred(Exception exception)
-										{
-											resultAvailable(null);
-										}
-										public void finished()
-										{
-											resultAvailable(null);
-										}
-									};
-									
-									if (remotefuture instanceof ISubscriptionIntermediateFuture)
-										((ISubscriptionIntermediateFuture<T>) remotefuture).addQuietListener(rs);
-									else
-										remotefuture.addResultListener(rs);
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-								}
-							});
-						}
-						return IFuture.DONE;
-					}
-				});
-//			}
-		}
 	}
 	
 	/**

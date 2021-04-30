@@ -20,7 +20,6 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
-import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.component.impl.IInternalMessageFeature;
 import jadex.bridge.component.impl.MsgHeader;
 import jadex.bridge.service.BasicService;
@@ -471,7 +470,6 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			}
 		});
 		
-		((IInternalExecutionFeature) execfeat).addSimulationBlocker(ret);
 		return ret;
 	}
 	

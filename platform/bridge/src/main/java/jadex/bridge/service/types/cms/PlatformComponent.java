@@ -64,7 +64,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
-import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IParameterGuesser;
@@ -1914,11 +1913,6 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			// Called from other component?
 			if(caller!=null && !getInternalAccess().equals(caller))
 			{
-				// Add blocker to caller platform, when called from other platform
-				IComponentIdentifier callerplat = caller.getId().getRoot();
-				if (SSimulation.isSimulating(caller) && !callerplat.equals(getInternalAccess().getId().getRoot()))
-					((IInternalExecutionFeature) caller.getFeature(IExecutionFeature.class)).addSimulationBlocker(infut);
-				
 				// bidirectional decoupling (forward/backward).
 				func	= new ComponentFutureFunctionality(caller)
 				{

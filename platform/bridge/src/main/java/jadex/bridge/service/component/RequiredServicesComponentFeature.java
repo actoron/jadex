@@ -15,10 +15,8 @@ import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
-import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.NFRPropertyInfo;
@@ -792,7 +790,6 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 					//return processResult(result, info);
 				}
 			});
-			((IInternalExecutionFeature)component.getFeature(IExecutionFeature.class)).addSimulationBlocker(ret);
 			
 //			}
 		}
