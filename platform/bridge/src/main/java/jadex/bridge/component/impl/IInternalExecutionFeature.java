@@ -1,6 +1,5 @@
 package jadex.bridge.component.impl;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.future.IFuture;
@@ -94,4 +93,9 @@ public interface IInternalExecutionFeature
 	 */
 	public void childTerminated(IComponentDescription desc, Exception ex);
 	
+	/**
+	 *  Set manual execution mode, e.g. for bootstrapping at platform startup/shutdown.
+	 *  @param manual Ignore wake up calls, if true.
+	 */
+	public void	setManual(boolean manual);
 }

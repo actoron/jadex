@@ -26,11 +26,14 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
@@ -67,6 +70,7 @@ import jadex.commons.concurrent.JavaThreadPool;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.traverser.TransformSet;
@@ -398,6 +402,25 @@ public class Starter
 	 */
 	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration pconfig, Map<String, Object> pargs)
 	{
+		//  When already on other component's thread -> run new platform component init on extra executor to avoid conflicts (i.e. which local cid is correct!?) 
+		if(IInternalExecutionFeature.LOCAL.get()!=null)
+		{
+			// TODO: service call for platform creation used anywhere?
+			ServiceCall sc = CallAccess.getCurrentInvocation();
+			ServiceCall scn = CallAccess.getNextInvocation();
+			
+			Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
+			getExecutionService(IInternalExecutionFeature.LOCAL.get()).execute(() ->
+			{
+				CallAccess.setCurrentInvocation(sc);
+				CallAccess.setNextInvocation(scn);
+				
+				createPlatform(pconfig, pargs).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+				return false;
+			});
+			return ret;
+		}
+		
 		// Make all argument keys lower case.
 		final Map<String, Object> args = pargs != null ? new HashMap<>() : null;
 		if (args != null)
@@ -518,8 +541,8 @@ public class Starter
 				final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname: null,
 					Boolean.TRUE.equals(config.getValue("uniquename", model)));
 				
-				if(IComponentIdentifier.LOCAL.get()==null)
-					IComponentIdentifier.LOCAL.set(cid);
+				assert IComponentIdentifier.LOCAL.get()==null;
+				IComponentIdentifier.LOCAL.set(cid);
 				
 				boolean readonlysettings = Boolean.TRUE.equals(config.getValue("settings.readonly", model))
 					|| args!=null && Boolean.TRUE.equals(args.get("settings.readonly"));
@@ -657,7 +680,9 @@ public class Starter
 				Collection<IComponentFeatureFactory> features = cfac.getComponentFeatures(model).get();
 				component.create(cci, features);
 
-				initRescueThread(cid, config);	// Required for bootstrapping init.
+				// Required for bootstrapping init.
+				IInternalExecutionFeature	exe	= (IInternalExecutionFeature)component.getInternalAccess().getFeature(IExecutionFeature.class);
+				exe.setManual(true);
 
 				IBootstrapFactory fac = (IBootstrapFactory)SComponentManagementService.getComponentFactory(cid);
 				
@@ -713,13 +738,31 @@ public class Starter
 								});
 							}
 						});
-						
-						if(cid.equals(IComponentIdentifier.LOCAL.get()))
-						{
-							IComponentIdentifier.LOCAL.set(null);
-						}
 					}
 				});
+				
+				// Manually bootstrap platform execution until execution service is available
+				IProvidedServicesFeature	prov	= component.getInternalAccess().getFeature(IProvidedServicesFeature.class);
+				while(prov.getProvidedService(IExecutionService.class)==null
+					|| !((IService)prov.getProvidedService(IExecutionService.class)).isValid().get().booleanValue())
+				{
+					if(!exe.execute())
+					{
+						// execution stopped before init complete!?
+						throw new IllegalStateException("Boostrapping failed: "+component.getInternalAccess());
+					}
+				}
+				
+				// Rare case when createPlatform called from non-component future listener notification
+				// Run scheduled init steps before starting platform executor to avoid parallel execution
+				FutureHelper.notifyStackedListeners();
+				
+				// End bootstrapping and kick of platform executor
+				exe.setManual(false);
+				// Rescue thread is shared by all components of platform and used e.g.
+				// for component termination listener notification after component executor is already stopped
+				initRescueThread(cid, config); 
+				exe.wakeup();
 			}
 	//		System.out.println("Model: "+model);
 		}
@@ -1021,6 +1064,8 @@ public class Starter
 	 */
 	public synchronized static void scheduleRescueStep(IComponentIdentifier cid, Runnable run)
 	{
+		StackTraceElement[]	ste	= Thread.currentThread().getStackTrace();
+		System.out.println("rescue step for "+cid+" called from "+ste[2]);
 		Tuple2<BlockingQueue, Thread> tup = rescuethreads!=null ? rescuethreads.get(cid.getRoot()) : null;
 		if(tup!=null)
 		{

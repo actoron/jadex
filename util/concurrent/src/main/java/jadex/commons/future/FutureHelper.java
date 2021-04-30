@@ -10,34 +10,11 @@ public abstract class FutureHelper
 	 */
 	public static void	notifyStackedListeners()
 	{
+		// TODO: resetting notification state breaks some BDI agents (e.g. MaintainGoalContext.agent.xml)
+//		boolean	noti	= Future.NOTIFYING.get()!=null;
 		Future.NOTIFYING.remove();	// force new loop even when in outer notification loop
 		Future.startScheduledNotifications();
+//		if(noti)
+//			Future.NOTIFYING.set(true);
 	}
-	
-//	/**
-//	 *  Remove all collected listener notifications for the current thread.
-//	 */
-//	public static Set<Future<?>>	removeStackedListeners()
-//	{
-//		synchronized(Future.NOTIFICATIONS)
-//		{
-//			List<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>> ret	= Future.NOTIFICATIONS.remove(Thread.currentThread());
-//		}
-//	}
-//	
-//	/**
-//	 *  Add listener notifications to the current thread.
-//	 */
-//	public static void	addStackedListeners(Set<Future<?>> notifications)
-//	{
-//		Set<Future<?>>	stack	= Future.NOTIFY.get();
-//		if(stack==null)
-//		{
-//    		Future.NOTIFY.set(notifications);
-//		}
-//		else
-//		{
-//			stack.addAll(notifications);
-//		}
-//	}
 }

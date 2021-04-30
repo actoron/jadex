@@ -750,16 +750,25 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //	public IFuture waitForImmediate(long delay, IComponentStep step);
 	
 	/** Flag to indicate bootstrapping execution of main thread (only for platform, hack???). */
-	protected volatile boolean bootstrap;
+	protected volatile boolean manual;
 	
-	/** Flag to indicate that the execution service has become available during bootstrapping (only for platform, hack???). */
-	protected volatile boolean available;
+	/**
+	 *  Set manual execution mode, e.g. for bootstrapping at platform startup.
+	 *  @param manual Ignore wake up calls, if true.
+	 */
+	public void	setManual(boolean manual)
+	{
+		this.manual	= manual;
+	}
 	
 	/**
 	 *  Trigger component execution.
 	 */
 	public void	wakeup()
 	{
+		if(manual)
+			return;
+		
 		if(getComponent().getDescription().isSynchronous())
 		{
 			// Add to parent and wake up parent.
@@ -820,102 +829,16 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			// Hack!!! service is found before it is started, grrr.
 			if(exe!=null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
-				if(bootstrap)
-				{
-					if(endstepcnt!=-1 && debug)
-						getComponent().getLogger().severe("wakeup3: "+this);
-					// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
-					available	= true;
-				}
-				else
-				{
-					if(endstepcnt!=-1 && debug)
-						getComponent().getLogger().severe("wakeup4: "+this);
-					exe.execute(ExecutionComponentFeature.this);
-				}
+				if(endstepcnt!=-1 && debug)
+					getComponent().getLogger().severe("wakeup4: "+this);
+				exe.execute(ExecutionComponentFeature.this);
 			}
+			
+			// Exe service gone -> component is platform during last steps of shutdown
 			else
 			{
-				if(endstepcnt!=-1 && debug)
-					getComponent().getLogger().severe("wakeup5: "+this);
-//				System.err.println(getInternalAccess()+" rescue "+SSimulation.isBisimulating(getInternalAccess())+", "+Starter.getPlatformValue(getInternalAccess().getId().getRoot(), IClockService.BISIMULATION_CLOCK_FLAG));
-				available = false;
-				// Happens during platform bootstrapping -> execute on platform rescue thread.
-				if(!bootstrap)
-				{
-					bootstrap	= true;
-					Starter.scheduleRescueStep(getComponent().getId().getRoot(), new Runnable()
-					{
-						public void run()
-						{
-							boolean	again	= true;
-							while(!available && again)
-							{
-								again	= execute();
-							}
-							bootstrap	= false;
-							
-							if(again)
-							{		
-								// Bootstrapping finished -> do real kickoff
-								wakeup();
-							}
-						}
-					});
-				}
+				Starter.scheduleRescueStep(getComponent().getId(), () -> { while(execute()); } );
 			}
-//			component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IExecutionService.class, ServiceScope.PLATFORM, false))
-//				.addResultListener(new IResultListener<IExecutionService>()
-//			{
-//				public void resultAvailable(IExecutionService exe)
-//				{
-//					// Hack!!! service is foudn before it is started, grrr.
-//					if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
-//					{
-//						if(bootstrap)
-//						{
-//							// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
-//							available	= true;
-//						}
-//						else
-//						{
-//							exe.execute(ExecutionComponentFeature.this);
-//						}
-//					}
-//					else
-//					{
-//						exceptionOccurred(null);
-//					}
-//				}
-//				
-//				public void exceptionOccurred(Exception exception)
-//				{
-//					available	= false;
-//					// Happens during platform bootstrapping -> execute on platform rescue thread.
-//					if(!bootstrap)
-//					{
-//						bootstrap	= true;
-//						Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
-//						{
-//							public void run()
-//							{
-//								boolean	again	= true;
-//								while(!available && again)
-//								{
-//									again	= execute();
-//								}
-//								bootstrap	= false;
-//								
-//								if(again)
-//								{		
-//									// Bootstrapping finished -> do real kickoff
-//									wakeup();
-//								}
-//							}
-//						});
-//					}
-//				}
-//			});
 		}
 	}
 	
