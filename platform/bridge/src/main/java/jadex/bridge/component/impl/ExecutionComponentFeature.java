@@ -803,30 +803,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			IExecutionService exe = getExecutionService();
 			//IExecutionService exe = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
 			
-			// Do not use rescue thread for bisimulation of platform init/shutdown/zombie agents to avoid clock running out.
-			if(exe==null && SSimulation.isBisimulating(getInternalAccess()))
-			{
-				if(endstepcnt!=-1 && debug)
-					getComponent().getLogger().severe("wakeup1: "+this);
-				
-				try
-				{
-					Field f = Class.forName("jadex.platform.service.execution.BisimExecutionService")
-						.getDeclaredField("instance");
-					f.setAccessible(true);
-					exe	= (IExecutionService)f.get(null);
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-//				System.err.println(getInternalAccess()+" bisim exe is"+exe);
-			}
-
 			if(endstepcnt!=-1 && debug)
 				getComponent().getLogger().severe("wakeup2: "+this+", "+exe);
 
-			// Hack!!! service is found before it is started, grrr.
 			if(exe!=null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
 				if(endstepcnt!=-1 && debug)

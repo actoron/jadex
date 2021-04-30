@@ -1,7 +1,5 @@
 package jadex.bridge.service.types.simulation;
 
-import java.lang.reflect.Field;
-
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
@@ -45,28 +43,6 @@ public class SSimulation
 			}
 			blocked	= true;
 		}
-		else if(isBisimulating(ia))
-		{
-			try
-			{
-				Field	f	= Class.forName("jadex.platform.service.simulation.SimulationAgent").getDeclaredField("bisimservice");
-				f.setAccessible(true);
-				ISimulationService	simserv	= (ISimulationService)f.get(null);
-				try
-				{
-					simserv.addAdvanceBlocker(adblock).get();
-				}
-				catch(ThreadDeath td)
-				{
-					// happens after successful get() wakeup in notifications caused by component died (endagenda.setResult()), grrr -> ignore so blocker gets removed.
-				}
-				blocked	= true;
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
 		
 		return blocked;
 	}
@@ -95,40 +71,10 @@ public class SSimulation
 				// happens after successful get() wakeup in notifications caused by component died (endagenda.setResult()), grrr -> ignore so blocker gets removed.
 			}
 		}
-		else if(isBisimulating(ia))
-		{
-			try
-			{
-				Field	f	= Class.forName("jadex.platform.service.simulation.SimulationAgent").getDeclaredField("bisimservice");
-				f.setAccessible(true);
-				ISimulationService	simserv	= (ISimulationService)f.get(null);  
-				adblock	= new Future<>();
-				try
-				{
-					simserv.addAdvanceBlocker(adblock).get();
-				}
-				catch(ThreadDeath td)
-				{
-					// happens after successful get() wakeup in notifications caused by component died (endagenda.setResult()), grrr -> ignore so blocker gets removed.
-				}
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
 		
 		return adblock;
 	}
 
-	/**
-	 *  Check if running in bisimulation.
-	 */
-	public static boolean	isBisimulating(IInternalAccess ia)
-	{
-		return ia!=null && Boolean.TRUE.equals(Starter.getPlatformValue(ia.getId().getRoot(), IClockService.BISIMULATION_CLOCK_FLAG));
-	}
-	
 	/**
 	 *  Check if running in (single platform) simulation.
 	 */

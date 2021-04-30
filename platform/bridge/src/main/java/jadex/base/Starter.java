@@ -432,9 +432,6 @@ public class Starter
 //		System.out.println("Java Version: " + System.getProperty("java.version"));
 		final IPlatformConfiguration config = pconfig!=null? pconfig: PlatformConfigurationHandler.getDefault();
 		
-//		if(!Boolean.TRUE.equals(config.getValues().get("bisimulation")))
-//			System.out.println("no bisim");
-		
 		// Once a config is used to create a platform it must not be altered (performance optimization to avoid unnecessary copying of configs).
 		PlatformConfigurationHandler.makeImmutable(config);
 		
@@ -663,7 +660,6 @@ public class Starter
 				putPlatformValue(cid, DATA_TRANSPORTCACHE, Collections.synchronizedMap(new LRU<IComponentIdentifier, Tuple2<ITransportService, Integer>>(2000)));
 				
 				putPlatformValue(cid, DATA_DEFAULT_TIMEOUT, config.getDefaultTimeout());
-				putPlatformValue(cid, IClockService.BISIMULATION_CLOCK_FLAG, config.getValue("bisimulation", model));
 
 				Map<String, Object> argsmap = config==null? new HashMap<String, Object>(): config.getValues();
 				if(args!=null)

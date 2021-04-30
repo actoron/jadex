@@ -74,7 +74,6 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.platform.service.clock.ClockCreationInfo;
 import jadex.platform.service.clock.ClockService;
 import jadex.platform.service.execution.AsyncExecutionService;
-import jadex.platform.service.execution.BisimExecutionService;
 import jadex.platform.service.execution.SyncExecutionService;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.threadpool.ThreadPoolService;
@@ -87,15 +86,14 @@ import jadex.platform.service.threadpool.ThreadPoolService;
 	@Argument(name=LOGGING_LEVEL, clazz=Level.class, defaultvalue="java.util.logging.Level.SEVERE"),
 	@Argument(name=UNIQUEIDS, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=PLATFORMPROXIES, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="simulation", clazz=boolean.class, defaultvalue="false"),
-	@Argument(name="bisimulation", clazz=boolean.class, defaultvalue="false")
+	@Argument(name="simulation", clazz=boolean.class, defaultvalue="false")
 })
 
 @ProvidedServices({
 	@ProvidedService(type=IThreadPoolService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="PlatformAgent.createThreadPoolServiceImpl($component)", proxytype=Implementation.PROXYTYPE_RAW)),
 	// hack!!! no daemon here (possibly fixed?)
 	@ProvidedService(type=IDaemonThreadPoolService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(true), $component.getId())", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IExecutionService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="PlatformAgent.createExecutionServiceImpl($args.asyncexecution, $args.simulation, $args.bisimulation, $component)", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IExecutionService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="PlatformAgent.createExecutionServiceImpl($args.asyncexecution, $args.simulation, $component)", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IClockService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="PlatformAgent.createClockServiceImpl($component)", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=ILibraryService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$args.libpath==null? new jadex.platform.service.library.LibraryService(): new jadex.platform.service.library.LibraryService(new java.net.URLClassLoader(jadex.commons.SUtil.toURLs($args.libpath), $args.baseclassloader==null ? jadex.platform.service.library.LibraryService.class.getClassLoader() : $args.baseclassloader))")),
 	@ProvidedService(type=IDependencyService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$args.maven_dependencies? jadex.platform.service.dependency.maven.MavenDependencyResolverService.class.newInstance(): new jadex.platform.service.library.BasicDependencyService()"))
@@ -145,14 +143,12 @@ public class PlatformAgent
 	}
 	
 	/** Create execution service. */
-	public static IExecutionService createExecutionServiceImpl(Object asyncexecution, Object simulation, Object bisimulation, IInternalAccess component)
+	public static IExecutionService createExecutionServiceImpl(Object asyncexecution, Object simulation, IInternalAccess component)
 	{
 		return createMaybeSharedServiceImpl("exe", component, () ->
-			Boolean.TRUE.equals(bisimulation)
-				? BisimExecutionService.getInstance(component)
-				: Boolean.FALSE.equals(asyncexecution) || Boolean.TRUE.equals(simulation)
-					? new SyncExecutionService(component)
-					: new AsyncExecutionService(component));
+			Boolean.FALSE.equals(asyncexecution) || Boolean.TRUE.equals(simulation)
+				? new SyncExecutionService(component)
+				: new AsyncExecutionService(component));
 	}
 	
 	/** Create clock service. */

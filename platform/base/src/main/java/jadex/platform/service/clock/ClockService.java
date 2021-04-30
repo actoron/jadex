@@ -37,11 +37,6 @@ import jadex.platform.service.threadpool.ThreadPoolService;
  */
 public class ClockService extends BasicService implements IClockService
 {
-	//-------- static part --------
-	
-	/** Shared clock for bisimulation, if any. */
-	protected static volatile IClock bisimclock;	
-	
 	//-------- attributes --------
 	
 	/** The clock. */
@@ -448,32 +443,12 @@ public class ClockService extends BasicService implements IClockService
 		IClock old	= clock;
 		boolean	start	= old!=null && IClock.STATE_RUNNING.equals(old.getState());
 		
-		Object bisimulation = component.getFeature(IArgumentsResultsFeature.class).getArguments().get("bisimulation");
-		if(Boolean.TRUE.equals(bisimulation))
-		{
-			synchronized(ClockService.class)
-			{
-				if(bisimclock==null)
-				{
-					// HACK!!! first setting wins
-					bisimclock	= createClock(cinfo, new ThreadPoolService(new JavaThreadPool(false), getProviderId()));
-				}
-			}
-			clock	= bisimclock;
-			// Sim flag false to disable auto-adblockers for bisim.
-			Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.FALSE);
-			// Separate bisim flag for platform bootstrap w/o rescue thread
-			Starter.putPlatformValue(component.getId().getRoot(), BISIMULATION_CLOCK_FLAG, Boolean.TRUE);
-		}
+		clock	= createClock(cinfo, tp);
+		
+		if (clock instanceof ISimulationClock)
+			Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.TRUE);
 		else
-		{
-			clock	= createClock(cinfo, tp);
-			
-			if (clock instanceof ISimulationClock)
-				Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.TRUE);
-			else
-				Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.FALSE);
-		}
+			Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.FALSE);
 		
 		if(old!=null)
 		{

@@ -15,7 +15,7 @@ import jadex.platform.service.transport.ITransportHandler;
 
 
 /**
- *  Message transport for bisimulation (no external threads)
+ *  Message transport for distributed tests with simulation (no external threads)
  *  based on intra VM passing of message data.
  */
 public class IntravmTransport implements ITransport<IntravmTransport.HandlerHolder>

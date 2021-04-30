@@ -49,7 +49,6 @@ public class STest
         config.getExtendedPlatformConfiguration().setSimulation(true);	// Set simulation clock and sync execution
         
 		//config.setDefaultTimeout(-1);
-//        config.setValue("bisimulation", true);
         
 		// Avoid problems due to old platform config files
         config.setValue("settings.readonly", true);
