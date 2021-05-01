@@ -1,6 +1,8 @@
 package jadex.platform.service.registryv2;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
@@ -11,21 +13,16 @@ import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.registry.IRemoteRegistryService;
 import jadex.commons.SUtil;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.ISuspendable;
-import jadex.commons.future.ThreadSuspendable;
 
 /**
  *  Test that a search does not timeout even when there is an unresponsive platform.
@@ -45,8 +42,8 @@ public class BlockedPlatformSearchTest extends AbstractInfrastructureTest
 		IPlatformConfiguration	baseconf	= STest.createRealtimeTestConfig(BlockedPlatformSearchTest.class);
 		baseconf.setValue("superpeerclient.awaonly", true);
 		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR));
-		baseconf.setValue("superpeerclient.debugservices", "ITestService");
-		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
+//		baseconf.setValue("superpeerclient.debugservices", "ITestService");
+//		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
 
 		CLIENTCONF	= baseconf.clone();
 		CLIENTCONF.setPlatformName("client");
@@ -68,58 +65,36 @@ public class BlockedPlatformSearchTest extends AbstractInfrastructureTest
 		// Start platforms
 		IExternalAccess	client	= createPlatform(CLIENTCONF);
 		IExternalAccess	provider	= createPlatform(PROCONF);
+		
+		// Check that provider service can be found.
+		assertEquals(1, client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get().size());
+		assertNotNull(client.searchService(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get());
 
 		// Block registry of provider
-		Future<Void>	block	= new Future<>();
-		Future<Void>	blocking	= new Future<>();
 		IComponentIdentifier	registry	= ((IService)provider.searchService(
 			new ServiceQuery<>(IRemoteRegistryService.class)).get()).getServiceId().getProviderId();
-		provider.getExternalAccess(registry).scheduleStep(new IComponentStep<Void>()
-		{
-			@Override
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				System.out.println("Blocking registry "+System.currentTimeMillis());
-				ISuspendable	sus	= ISuspendable.SUSPENDABLE.get();
-				ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
-				blocking.setResult(null);	// notify that blocking is about to take place
-				block.get(Timeout.NONE);
-				ISuspendable.SUSPENDABLE.set(sus);
-				System.out.println("Registry unblocked "+System.currentTimeMillis());
-				return IFuture.DONE;
-			}
-		});
+		provider.getExternalAccess(registry).suspendComponent().get();
 		
+		System.out.println("Starting searches: "+client.searchService(new ServiceQuery<>(IClockService.class)).get().getTime());
+		IIntermediateFuture<ITestService>	multi	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL));
+		IFuture<ITestService>	single	= client.searchService(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL));
+		
+		// Search multi (i.e. multiplicity 0..)
+		Collection<ITestService>	results	= multi.get();
+		assertTrue(""+results, results.isEmpty());
+		
+		
+		// Search single (i.e. multiplicity 1)
 		try
 		{
-			blocking.get();
-			System.out.println("Starting searches: "+System.currentTimeMillis());			
-			IIntermediateFuture<ITestService>	multi	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL));
-			IFuture<ITestService>	single	= client.searchService(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL));
-			
-			// Search multi (i.e. multiplicity 0..)
-			Collection<ITestService>	results	= multi.get();
-			assertTrue(results.isEmpty());
-			System.out.println("Search multi: "+results);
-			
-			
-			// Search single (i.e. multiplicity 1)
-			try
-			{
-				ITestService	result	= single.get();
-				System.out.println("Search single: "+result);
-				assertFalse("Search should throw ServiceNotFoundException", true);
-			}
-			catch(Exception e)
-			{
-				System.out.println("Search single: "+e);
-				assertTrue(SUtil.getExceptionStacktrace(e), e instanceof ServiceNotFoundException);
-			}
+			ITestService	result	= single.get();
+			assertFalse("Expected ServiceNotFoundException but was: "+result, true);
 		}
-		finally
+		catch(Exception e)
 		{
-			// Release provider platform before test shutdown
-			block.setResult(null);
+			assertTrue(SUtil.getExceptionStacktrace(e), e instanceof ServiceNotFoundException);
 		}
+		
+		System.out.println("Finished searches: "+client.searchService(new ServiceQuery<>(IClockService.class)).get().getTime());
 	}
 }
