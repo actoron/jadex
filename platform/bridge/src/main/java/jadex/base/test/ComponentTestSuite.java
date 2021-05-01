@@ -60,8 +60,8 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	//-------- constants --------
 	
 	/** Run all tests on the same platform. */
-	// Set to true for old behavior 
-	public static final boolean	SAME_PLATFORM	= false;
+	// Set to true for old behavior (speeds up old BDI tests)
+	public static final boolean	SAME_PLATFORM	= true;
 	
 //	/**
 //	 *  The default test platform arguments.
