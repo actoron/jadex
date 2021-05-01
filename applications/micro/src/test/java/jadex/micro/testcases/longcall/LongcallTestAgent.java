@@ -17,7 +17,7 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.commons.SReflect;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -256,7 +256,7 @@ public class LongcallTestAgent extends TestAgent
 			// set timeout to low value to avoid long waiting in test
 			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledDefaultTimeout(agent.getId(), 0.05));
 			
-			final long start	= System.currentTimeMillis();
+			final long start	= agent.getLocalService(IClockService.class).getTime();
 			Object	fut	= m.invoke(ts, new Object[0]);
 			
 			if(fut instanceof ISubscriptionIntermediateFuture)
@@ -269,7 +269,8 @@ public class LongcallTestAgent extends TestAgent
 					
 					public void finished()
 					{
-						System.out.println("rec result "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						long time	= agent.getLocalService(IClockService.class).getTime() - start;
+						System.out.println("rec result "+cnt+": "+time);
 						tr.setSucceeded(true);
 						ret.addIntermediateResult(tr);
 						proceed();
@@ -282,7 +283,8 @@ public class LongcallTestAgent extends TestAgent
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						System.out.println("rec exception "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						long time	= agent.getLocalService(IClockService.class).getTime() - start;
+						System.out.println("rec exception "+cnt+": "+time);
 						exception.printStackTrace();
 						tr.setFailed("Exception: "+exception);
 						ret.addIntermediateResult(tr);

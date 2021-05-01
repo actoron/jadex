@@ -110,7 +110,7 @@ public class AutoTerminateTestAgent extends	TestAgent implements IAutoTerminateS
 		
 //		agent.getLogger().severe("test: "+report.getDescription()+", "+Starter.getDefaultTimeout(agent.getComponentIdentifier()));
 		
-		waitForRealtimeDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.25),
+		agent.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.25),
 			new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -143,13 +143,13 @@ public class AutoTerminateTestAgent extends	TestAgent implements IAutoTerminateS
 		});
 		
 		// sending ping every second (by default)
-		waitForRealtimeDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.0/30), new IComponentStep<Void>()
+		agent.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.0/30), new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(ret.addIntermediateResultIfUndone("ping"))
 				{
-					waitForRealtimeDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.0/30), this);
+					agent.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.0/30), this);
 				}
 				
 				return IFuture.DONE;

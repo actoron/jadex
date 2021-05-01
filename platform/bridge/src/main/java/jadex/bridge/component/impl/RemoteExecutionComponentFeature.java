@@ -206,7 +206,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		if(ftimeout>=0)
 		{
 			@SuppressWarnings({"rawtypes", "unchecked"})
-			IResultListener<T>	trl	= new TimeoutIntermediateResultListener(ftimeout, getComponent().getExternalAccess(), true, command, null)
+			IResultListener<T>	trl	= new TimeoutIntermediateResultListener(ftimeout, getComponent().getExternalAccess(), Starter.isRealtimeTimeout(getComponent().getId(), true), command, null)
 			{
 				@Override
 				public void timeoutOccurred(TimeoutException te)

@@ -8,16 +8,13 @@ import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnStart;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.commons.SUtil;
@@ -368,26 +365,6 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 			}
 		});
 		
-		return ret;
-	}
-	
-	public <T> IFuture<T>	waitForRealtimeDelay(final long delay, final IComponentStep<T> step)
-	{
-		final Future<T>	ret	= new Future<T>();
-		IFuture<IClockService>	clockfut	= agent.getFeature(IRequiredServicesFeature.class).getService("clock");
-		clockfut.addResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
-		{
-			public void customResultAvailable(IClockService clock)
-			{
-				clock.createRealtimeTimer(delay, new ITimedObject()
-				{
-					public void timeEventOccurred(long currenttime)
-					{
-						agent.getFeature(IExecutionFeature.class).scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
-					}
-				});
-			}
-		});
 		return ret;
 	}
 	

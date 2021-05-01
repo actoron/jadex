@@ -7,6 +7,7 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.ICommand;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -21,7 +22,6 @@ import jadex.commons.future.PullSubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -114,24 +114,22 @@ public class ProviderAgent implements ITestService
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		long to = sc.getTimeout();
-		boolean realtime = sc.isRemoteCall(agent.getId());
 		
-		SFuture.avoidCallTimeouts(ret, agent.getExternalAccess(), to, 0.5, realtime);
+		SFuture.avoidCallTimeouts(ret, agent, to, 0.5, false);
 		
 		System.out.println("Timeout is: " + to);		
-		System.out.println(agent + " isRemote / Realtime: " + realtime);
 	
 		final long wait = to>0? (long)(to*1.2): 0;
-		final long startwait = System.currentTimeMillis();
+		final long startwait = agent.getLocalService(IClockService.class).getTime();
 //		System.out.println("waiting: "+wait+", "+System.currentTimeMillis());
 		agent.getFeature(IExecutionFeature.class).waitForDelay(wait, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				System.out.println("waited: "+ (System.currentTimeMillis() - startwait));
+				System.out.println("waited: "+ (agent.getLocalService(IClockService.class).getTime() - startwait));
 				ret.setResultIfUndone(null);
 				return IFuture.DONE;
 			}
-		}, realtime);
+		});
 	}
 }

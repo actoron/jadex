@@ -117,6 +117,7 @@ public class STest
 		config.setValue("exefactory", new SharedServiceFactory<>(SharedExecutionService::new));
 		config.setValue("clockfactory", new SharedServiceFactory<>(SharedClockService::new));
 		config.setValue("simulation.simfactory", new SharedServiceFactory<>(SharedSimulationService::new));
+		config.setValue(IPlatformConfiguration.REALTIMETIMEOUT, false);	// Force simulation time also for network timeouts
 		
         return config;
     }
@@ -128,6 +129,38 @@ public class STest
     {
     	return createDefaultTestConfig(test)
     		.getExtendedPlatformConfiguration().setSimul(false)
-			.getExtendedPlatformConfiguration().setSimulation(false);
+			.getExtendedPlatformConfiguration().setSimulation(false)
+			.setValue(IPlatformConfiguration.REALTIMETIMEOUT, null);	// Un-force simulation time also for network timeouts
     }
+    
+//    /**
+//     *  Start a platform and run the code on a component thread.
+//     *  Preferred way for running test methods to avoid simulation clock busy cycling
+//     *  while (external) test thread is active. 
+//     */
+//    public static void	runSimLocked(IPlatformConfiguration conf, Consumer<IInternalAccess> code)
+//    {
+//    	Future<Void>	run	= new Future<>();
+//    	IPlatformConfiguration	runconf	= conf.clone();
+//    	Starter.createPlatform(runconf).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(run)
+//		{			
+//			@Override
+//			public void customResultAvailable(IExternalAccess result)
+//			{
+//				result.scheduleStep(ia ->
+//				{
+//					code.accept(ia);
+//					return IFuture.DONE;
+//				}).addResultListener(new DelegationResultListener<Void>(run)
+//				{
+//					public void customResultAvailable(Void v)
+//					{
+//						result.killComponent().get();
+//						run.setResult(null);
+//					}
+//				});
+//			}
+//		});
+//    	run.get();
+//    }
 }

@@ -40,7 +40,7 @@ public class InitialMessagingHandshakeTest
 	@Test
 	public void	testRecoveryFromMissingReceiverTransport()
 	{
-    	IPlatformConfiguration baseconf = STest.createRealtimeTestConfig(getClass());
+    	IPlatformConfiguration baseconf = STest.createDefaultTestConfig(getClass());
     	
 		// Sender platform without awareness
     	IPlatformConfiguration senderconf = baseconf.clone()
@@ -85,7 +85,7 @@ public class InitialMessagingHandshakeTest
 	@Test
 	public void	testRecoveryFromMissingSenderTransport()
 	{
-    	IPlatformConfiguration baseconf = STest.createRealtimeTestConfig(getClass());
+    	IPlatformConfiguration baseconf = STest.createDefaultTestConfig(getClass());
     	
 		// Receiver platform ready to receive
     	IPlatformConfiguration receiverconf = baseconf.clone();

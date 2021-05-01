@@ -247,7 +247,7 @@ public class ServiceInvocationContext
 		}
 		if(!nextcall.getProperties().containsKey(ServiceCall.REALTIME))
 		{
-			nextcall.setProperty(ServiceCall.REALTIME, Starter.isRealtimeTimeout(sid.getProviderId())? Boolean.TRUE : Boolean.FALSE);
+			nextcall.setProperty(ServiceCall.REALTIME, Starter.isRealtimeTimeout(sid.getProviderId(), true));
 		}
 		
 //		// Init the cause of the next call based on the last one

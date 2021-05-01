@@ -187,7 +187,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 					rsi.getName(), rsi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()),
 					BasicServiceInvocationHandler.class, component.getModel().getResourceIdentifier(), info);
 				final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
-					component, sid, rsi, impl.getBinding(), component.getClassLoader(), Starter.isRealtimeTimeout(component.getId()));
+					component, sid, rsi, impl.getBinding(), component.getClassLoader(), Starter.isRealtimeTimeout(component.getId(), true));
 				
 				addService(service, info);
 				fut.setResult(null);

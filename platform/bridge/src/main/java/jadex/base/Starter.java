@@ -1311,12 +1311,16 @@ public class Starter
 	}
 
 	/**
-	 * Check if the real time timeout flag is set for a platform.
+	 *  Check if the real time / non-real time timeout flag is set for a platform.
+	 *  By default some timeouts are real time (e.g. network communication) and others are clock dependent (e.g. agent.waitFor...).
+	 *  The "realtimetimeout" platform setting (default=null) allows forcing all timeouts to real time (true) or clock dependent (false).
+	 *  @param cid	Use platform setting of the given component.
+	 *  @param def	The default value to be returned when flag is null in platform config.  
 	 */
-	public static boolean isRealtimeTimeout(IComponentIdentifier platform)
+	public static boolean isRealtimeTimeout(IComponentIdentifier cid, boolean def)
 	{
-		// Hack!!! Should default to false?
-		return !Boolean.FALSE.equals(getPlatformValue(platform, DATA_REALTIMETIMEOUT));
+		Object	val	= getPlatformValue(cid, DATA_REALTIMETIMEOUT);
+		return val==null ? def : Boolean.TRUE.equals(val);
 	}
 
 	/**
