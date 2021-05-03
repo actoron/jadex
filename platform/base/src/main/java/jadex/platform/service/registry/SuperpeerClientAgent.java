@@ -1220,7 +1220,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		{
 			this.query	= query;
 			this.retfut	= new SubscriptionIntermediateFuture<>();
-			SFuture.avoidCallTimeouts(retfut, agent, true);	// Should be not need for timeouts on local platform???
+			SFuture.avoidCallTimeouts(retfut, agent, Starter.isRealtimeTimeout(agent.getId(), true));	// Should be not need for timeouts on local platform???
 			this.networkspersuperpeer	= new MultiCollection<>();
 			this.futures	= new LinkedHashSet<>();
 			
@@ -1467,7 +1467,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 					}
 					return IFuture.DONE;
 				}
-			}, true);
+			}, Starter.isRealtimeTimeout(agent.getId(), true));
 		}
 	}	
 }
