@@ -43,11 +43,25 @@ public class StatusWebGuiTest
 		
 		IExternalAccess	platform	= Starter.createPlatform(webguiconf).get();
 		
-		// TODO: Wait for publish service...?
-		
 		// Check that index.html is correctly served.
 		String	file	= getUrlContent(getClass().getResource("/META-INF/legacystatuswebgui/index.html"));
-		String	http	= getUrlContent(new URL("http://localhost:"+port+"/"));
+		String	http	= null;
+		for(int i=0; i<10 && http==null; i++)
+		{
+			try
+			{
+				http	= getUrlContent(new URL("http://localhost:"+port+"/"));
+			}
+			catch(IOException e)
+			{
+				if(i==9)
+				{
+					throw e;
+				}
+				// Wait for publish service (hack?)
+				platform.waitForDelay(Starter.getScaledDefaultTimeout(platform.getId(), 0.1));				
+			}
+		}
 		assertEquals(file, http);
 		
 		// Start second platform and send message so that one connection exists

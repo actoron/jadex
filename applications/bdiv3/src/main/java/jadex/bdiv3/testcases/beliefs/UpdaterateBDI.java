@@ -1,5 +1,6 @@
 package jadex.bdiv3.testcases.beliefs;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bdiv3.BDIAgentFactory;
@@ -48,7 +49,7 @@ public class UpdaterateBDI
 	@OnStart
 	public void	body(IInternalAccess agent)
 	{
-		agent.getFeature(IExecutionFeature.class).waitForDelay(1000).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 0.1)).get();
 		tr.setFailed("Plan was not triggered.");
 		agent.killComponent();
 	}

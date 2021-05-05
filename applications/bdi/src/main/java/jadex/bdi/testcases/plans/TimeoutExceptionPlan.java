@@ -1,5 +1,6 @@
 package jadex.bdi.testcases.plans;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.TimeoutException;
@@ -23,7 +24,7 @@ public class TimeoutExceptionPlan extends Plan
 	{
 		TestReport tr = new TestReport("#1", "Test normal timed wait.");
 		long start = getTime();
-		long test = 300;
+		long test = Starter.getScaledDefaultTimeout(getComponentIdentifier(), 0.05);
 		waitFor(test);
 		long dur = getTime()-start;
 		double diff = ((double)Math.abs(dur-test))/((double)test)*100;

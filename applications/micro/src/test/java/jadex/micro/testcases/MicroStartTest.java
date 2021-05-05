@@ -3,7 +3,6 @@ package jadex.micro.testcases;
 import java.io.File;
 
 import jadex.base.test.ComponentTestSuite;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import junit.framework.Test;
 
@@ -72,7 +71,7 @@ public class MicroStartTest extends ComponentTestSuite
 		"MicroPrey",
 		"Firefly",
 		"Heatbug",
-		"ChatE3Agent",
+		"ChatE3",
 		"TimeUserAgent",
 		"SubscriberAgent",
 		"lottery/PlayerAgent",

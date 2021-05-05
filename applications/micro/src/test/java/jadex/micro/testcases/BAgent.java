@@ -8,9 +8,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.ServiceScope;
-import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.Future;
@@ -38,8 +38,8 @@ public class BAgent implements IBService
 	/**
 	 *  Init service method.
 	 */
-	//@ServiceStart
-	@OnStart
+	@ServiceStart
+//	@OnStart
 	public IFuture<Void> start()
 	{
 		final List<TestReport> tests = new ArrayList<TestReport>();

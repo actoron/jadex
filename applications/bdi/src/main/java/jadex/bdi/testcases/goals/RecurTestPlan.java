@@ -1,5 +1,6 @@
 package jadex.bdi.testcases.goals;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.IGoal;
@@ -64,7 +65,7 @@ public class RecurTestPlan extends Plan
 		
 		// Check state when plans are applicable.
 		getBeliefbase().getBelief("context").setFact(Boolean.TRUE);
-		waitFor(250);
+		waitFor(Starter.getScaledDefaultTimeout(getComponentIdentifier(), 0.02));
 
 		report	= new TestReport("perform_succeeded", "Test if perform goal succeeds after plan is found.");
 		if(perf.isSucceeded())

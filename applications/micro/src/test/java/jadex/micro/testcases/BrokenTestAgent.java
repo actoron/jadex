@@ -17,7 +17,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
@@ -143,12 +142,13 @@ public class BrokenTestAgent extends JunitAgentTest
 			}
 		};
 		
-		agent.createComponent(new CreationInfo().setFilename(model))
+		agent.createComponent(new CreationInfo().setFilename(model).setSuspend(true))
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
 				result.waitForTermination().addResultListener(lis);
+				result.resumeComponent();
 			}
 		});
 		return ret;

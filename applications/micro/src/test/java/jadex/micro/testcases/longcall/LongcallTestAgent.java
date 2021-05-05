@@ -251,12 +251,11 @@ public class LongcallTestAgent extends TestAgent
 			final TestReport tr = new TestReport("#"+cnt, "Test if long call works with normal timeout.");
 
 			Method m = ITestService.class.getMethod("method"+cnt, new Class[0]);
-			System.out.println("calling method "+cnt+": "+System.currentTimeMillis());
+			final long start	= agent.getLocalService(IClockService.class).getTime();
+			System.out.println("calling method "+cnt+": "+start);
 			
 			// set timeout to low value to avoid long waiting in test
-			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledDefaultTimeout(agent.getId(), 0.05));
-			
-			final long start	= agent.getLocalService(IClockService.class).getTime();
+			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledDefaultTimeout(agent.getId(), 0.1));
 			Object	fut	= m.invoke(ts, new Object[0]);
 			
 			if(fut instanceof ISubscriptionIntermediateFuture)
@@ -319,7 +318,8 @@ public class LongcallTestAgent extends TestAgent
 				{
 					public void resultAvailable(Object result)
 					{
-						System.out.println("rec result "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						long end	= agent.getLocalService(IClockService.class).getTime();
+						System.out.println("rec result "+cnt+": "+(end-start)+", "+end);
 						tr.setSucceeded(true);
 						ret.addIntermediateResult(tr);
 						proceed();
@@ -327,7 +327,8 @@ public class LongcallTestAgent extends TestAgent
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						System.out.println("rec exception "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						long end	= agent.getLocalService(IClockService.class).getTime();
+						System.out.println("rec exception "+cnt+": "+(end-start)+", "+end);
 						exception.printStackTrace();
 						tr.setFailed("Exception: "+exception);
 						ret.addIntermediateResult(tr);

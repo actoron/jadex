@@ -138,8 +138,6 @@ public class ComponentTestBase extends TestCase
 			{
 				public void resultAvailable(IExternalAccess result)
 				{
-					result.resumeComponent();
-					
 					//System.out.println("Created component: "+System.currentTimeMillis()+" "+filename);
 					cid[0] = result.getId();
 					
@@ -156,6 +154,8 @@ public class ComponentTestBase extends TestCase
 							finished.setExceptionIfUndone(exception);
 						}
 					});
+					
+					result.resumeComponent();
 				}
 				public void exceptionOccurred(Exception exception)
 				{

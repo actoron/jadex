@@ -1,6 +1,8 @@
 package jadex.bdi.testcases.goals;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
+import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
@@ -18,13 +20,16 @@ public class MaintainTestPlan extends Plan
 	 */
 	public void body()
 	{
+		long	retrydelay	= Starter.getScaledDefaultTimeout(getComponentIdentifier(), 0.01);
+		
 		// Create and dispatch goal.
 		TestReport	report	= new TestReport("dispatch_maintain", "Dispatch a maintain goal that should start processing.");
 		getLogger().info("Creating goal");
 		IGoal	maintain	= createGoal("maintain");
+		((MGoal)maintain.getModelElement()).setRetrydelay(retrydelay);
 		dispatchSubgoal(maintain);
 		// Wait for goal to be in process.
-		waitFor(100);
+		waitFor(retrydelay);
 		if(((Number)getBeliefbase().getBelief("count").getFact()).intValue()>=5
 			|| ((Number)getBeliefbase().getBelief("count").getFact()).intValue()<=0)
 			report.setReason("Belief should be 0<count<5, but was: "+getBeliefbase().getBelief("count").getFact());
@@ -38,7 +43,7 @@ public class MaintainTestPlan extends Plan
 		getLogger().info("Suspending goal: "+maintain);
 		getBeliefbase().getBelief("context").setFact(Boolean.FALSE);
 		// Wait for goal to be suspended.
-		waitFor(100);
+		waitFor(retrydelay);
 		if(maintain.getLifecycleState()==GoalLifecycleState.SUSPENDED)
 			report.setSucceeded(true);
 		else
@@ -51,7 +56,7 @@ public class MaintainTestPlan extends Plan
 		getLogger().info("Reactivating goal: "+maintain);
 		getBeliefbase().getBelief("context").setFact(Boolean.TRUE);
 		// Wait for goal to be reactivated.
-		waitFor(100);
+		waitFor(retrydelay);
 		if(maintain.getLifecycleState()==GoalLifecycleState.ACTIVE)
 			report.setSucceeded(true);
 		else
@@ -61,15 +66,15 @@ public class MaintainTestPlan extends Plan
 		
 		// Wait for goal to finish
 		report	= new TestReport("waitfor_maintain", "Wait for the maintain goal to finish.");
-		getLogger().info("Waiting for goal to finish (500 millis).");
+		getLogger().info("Waiting for goal to finish.");
 		try
 		{
-			waitForGoalFinished(maintain, 3000);
+			waitForGoalFinished(maintain, retrydelay*5);
 			report.setSucceeded(true);
 		}
 		catch(TimeoutException e)
 		{
-			report.setReason("Goal did not finish.");
+			report.setReason("Goal did not finish: lifecycle="+maintain.getLifecycleState()+", processing="+maintain.getProcessingState());
 		}
 		catch(GoalFailureException e)
 		{

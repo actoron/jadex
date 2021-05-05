@@ -77,7 +77,7 @@ public class IntermediateTestAgent extends TestAgent
 //			}
 //		}));
 		
-		long	delay	= Starter.getScaledDefaultTimeout(agent.getId().getRoot(), 0.01);
+		long	delay	= Starter.getScaledDefaultTimeout(agent.getId().getRoot(), 0.02);
 		
 		testLocal(1, delay, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
