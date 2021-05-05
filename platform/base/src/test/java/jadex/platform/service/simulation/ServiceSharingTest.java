@@ -27,6 +27,10 @@ public class ServiceSharingTest
 	@Test
 	public void	testServiceSharing()
 	{
+		// Test only makes sense when running in sim mode.
+		if(STest.REALTIME)
+			return;
+
 		// Shared config contains the shared service factories.
 		IPlatformConfiguration	conf	= STest.createDefaultTestConfig(getClass());
 //		conf.setLogging(true);

@@ -1,22 +1,44 @@
 package jadex.base.test.util;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
+import jadex.base.Starter;
 import jadex.base.test.impl.SharedClockService;
 import jadex.base.test.impl.SharedExecutionService;
 import jadex.base.test.impl.SharedServiceFactory;
 import jadex.base.test.impl.SharedSimulationService;
 import jadex.base.test.impl.SharedThreadPoolService;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Base64;
 import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 /**
  *  Static config class for tests.
  */
 public class STest 
 {
+	/** Global flag to switch between sim and realtime tests. */
+	public static final boolean REALTIME;
+	static
+	{
+		// Set REALTIME from environment, if set.
+	    String	prop	= System.getProperty("jadex_realtimetests", System.getenv("jadex_realtimetests"));
+	    if(prop!=null)
+	    {
+	        System.out.println("Setting jadex_realtimetests: "+prop);
+	    }
+		
+		REALTIME	= "true".equalsIgnoreCase(prop);	// default to false, if not set
+	}
+	
     /**
      *  Get local (no communication) test configuration using a generated unique platform name derived from the test name.
      *  Uses simulation for speed.
@@ -45,8 +67,11 @@ public class STest
 		config.setValue("kernel_bdix", true);
 		config.setValue("kernel_bdi", true);
 		
-        config.getExtendedPlatformConfiguration().setSimul(true); // Start simulation component
-        config.getExtendedPlatformConfiguration().setSimulation(true);	// Set simulation clock and sync execution
+		if(!REALTIME)
+		{
+	        config.getExtendedPlatformConfiguration().setSimul(true); // Start simulation component
+	        config.getExtendedPlatformConfiguration().setSimulation(true);	// Set simulation clock and sync execution
+		}
         
 		//config.setDefaultTimeout(-1);
         
@@ -113,11 +138,14 @@ public class STest
 //		config.setDefaultTimeout(300000);
 		
 		// Shared services for all platforms to enable distributed simulation
-		config.setValue("threadpoolfactory", new SharedServiceFactory<>(SharedThreadPoolService::new));
-		config.setValue("exefactory", new SharedServiceFactory<>(SharedExecutionService::new));
-		config.setValue("clockfactory", new SharedServiceFactory<>(SharedClockService::new));
-		config.setValue("simulation.simfactory", new SharedServiceFactory<>(SharedSimulationService::new));
-		config.setValue(IPlatformConfiguration.REALTIMETIMEOUT, false);	// Force simulation time also for network timeouts
+		if(!REALTIME)
+		{
+			config.setValue("threadpoolfactory", new SharedServiceFactory<>(SharedThreadPoolService::new));
+			config.setValue("exefactory", new SharedServiceFactory<>(SharedExecutionService::new));
+			config.setValue("clockfactory", new SharedServiceFactory<>(SharedClockService::new));
+			config.setValue("simulation.simfactory", new SharedServiceFactory<>(SharedSimulationService::new));
+			config.setValue(IPlatformConfiguration.REALTIMETIMEOUT, false);	// Force simulation time also for network timeouts
+    	}
 		
         return config;
     }
@@ -133,34 +161,50 @@ public class STest
 			.setValue(IPlatformConfiguration.REALTIMETIMEOUT, null);	// Un-force simulation time also for network timeouts
     }
     
-//    /**
-//     *  Start a platform and run the code on a component thread.
-//     *  Preferred way for running test methods to avoid simulation clock busy cycling
-//     *  while (external) test thread is active. 
-//     */
-//    public static void	runSimLocked(IPlatformConfiguration conf, Consumer<IInternalAccess> code)
-//    {
-//    	Future<Void>	run	= new Future<>();
-//    	IPlatformConfiguration	runconf	= conf.clone();
-//    	Starter.createPlatform(runconf).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(run)
-//		{			
-//			@Override
-//			public void customResultAvailable(IExternalAccess result)
-//			{
-//				result.scheduleStep(ia ->
-//				{
-//					code.accept(ia);
-//					return IFuture.DONE;
-//				}).addResultListener(new DelegationResultListener<Void>(run)
-//				{
-//					public void customResultAvailable(Void v)
-//					{
-//						result.killComponent().get();
-//						run.setResult(null);
-//					}
-//				});
-//			}
-//		});
-//    	run.get();
-//    }
+    /**
+     *  Start a platform and run the code on a component thread.
+     *  Preferred way for running test methods to avoid simulation clock advancement
+     *  while (external) test thread is active. 
+     */
+    public static void	runSimLocked(IPlatformConfiguration conf, Consumer<IInternalAccess> code)
+    {
+    	Future<Void>	run	= new Future<>();
+    	boolean	spc	= conf.getSuperpeerClient();
+    	IPlatformConfiguration	runconf	= conf.clone()
+    		.setSuperpeerClient(false);	// Start w/o spc to avoid sim clock advancement due to polling superpeer query 
+    	Starter.createPlatform(runconf).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(run)
+		{			
+			@Override
+			public void customResultAvailable(IExternalAccess result)
+			{
+				result.scheduleStep(ia ->
+				{
+					if(spc)
+					{
+						// Delayed super peer client start, now on platform thread, so clock is locked
+						ia.addComponent("jadex.base.service.registryv2.SuperpeerClientAgent.class").get();
+					}
+					
+					code.accept(ia);
+					
+					return IFuture.DONE;
+				}).addResultListener(new DelegationResultListener<Void>(run)
+				{
+					public void customResultAvailable(Void v)
+					{
+						result.killComponent().get();
+						run.setResult(null);
+					}
+					
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						result.killComponent().get();
+						run.setException(exception);
+					}
+				});
+			}
+		});
+    	run.get();
+    }
 }

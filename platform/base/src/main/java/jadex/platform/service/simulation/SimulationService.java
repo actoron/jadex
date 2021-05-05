@@ -463,7 +463,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	 */
 	public IFuture<Void> addAdvanceBlocker(IFuture<?> blocker)
 	{
-		System.out.println("ADDBLOCKER: "+blocker);
+//		System.out.println("ADDBLOCKER: "+blocker);
 		
 		long rttimeout = Starter.getDefaultTimeout(access.getId().getRoot());
 		if (rttimeout <= 0)

@@ -27,6 +27,10 @@ public class SimulationSharingTest
 	@Test
 	public void test()
 	{
+		// Test only makes sense when running in sim mode.
+		if(STest.REALTIME)
+			return;
+		
 		IPlatformConfiguration	config	= STest.createDefaultTestConfig(getClass());
 		
 		// Run test on first platform such that clock cannot advance
