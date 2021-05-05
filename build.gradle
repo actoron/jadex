@@ -245,6 +245,20 @@ subprojects
 		//eclipse.project.name = 'kernel-' + project.name
 	//}
 	
+	// ignore gradle 'build' dir in eclipse workspace (e.g. also in searches)
+	// cf. https://docs.gradle.org/current/javadoc/org/gradle/plugins/ide/eclipse/model/ResourceFilter.html
+	eclipse.project.resourceFilter {
+       appliesTo = 'FOLDERS'
+       type = 'EXCLUDE_ALL'
+       matcher {
+         id = 'org.eclipse.ui.ide.multiFilter'
+         // to find out which arguments to use, configure the desired
+         // filter with Eclipse's UI and copy the arguments string over
+         arguments = '1.0-name-matches-false-false-build'
+       }
+     }
+	
+	
     ext.libraries = [
             protobuf: "com.google.protobuf:protobuf-java:2.4.1",
             junit: junit,
