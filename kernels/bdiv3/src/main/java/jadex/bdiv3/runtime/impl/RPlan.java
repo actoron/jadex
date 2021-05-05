@@ -522,6 +522,16 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //		if(lifecyclestate.equals(PlanLifecycleState.ABORTED))
 //			System.out.println("state: "+this+", "+lifecyclestate);
 		
+		// Cleanup previous lifecycle phase
+		if(subgoals!=null)
+		{
+			for(IGoal subgoal: subgoals)
+			{
+				// Todo: wait for goals dropped?
+				subgoal.drop();
+			}
+		}
+		
 		this.lifecyclestate = lifecyclestate;
 		
 		if(PlanLifecycleState.BODY.equals(lifecyclestate))
@@ -907,15 +917,6 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	//			setLifecycleState(PLANLIFECYCLESTATE_ABORTED);
 				Exception ex = new PlanAbortedException();
 				setException(ex); // remove? // todo: BodyAborted
-				
-				if(subgoals!=null)
-				{
-					for(IGoal subgoal: subgoals)
-					{
-						// Todo: wait for goals dropped?
-						subgoal.drop();
-					}
-				}
 				
 				// Stop plan execution if any.
 //				System.out.println("aborting2: "+this);
