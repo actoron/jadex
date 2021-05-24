@@ -1,5 +1,7 @@
 package jadex.base.test.util;
 
+import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -13,12 +15,15 @@ import jadex.base.test.impl.SharedSimulationService;
 import jadex.base.test.impl.SharedThreadPoolService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.Base64;
+import jadex.commons.MultiException;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 /**
  *  Static config class for tests.
@@ -173,7 +178,9 @@ public class STest
     	IPlatformConfiguration	runconf	= conf.clone()
     		.setSuperpeerClient(false);	// Start w/o spc to avoid sim clock advancement due to polling superpeer query 
     	Starter.createPlatform(runconf).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(run)
-		{			
+		{
+    		IExternalAccess	spca;
+    		
 			@Override
 			public void customResultAvailable(IExternalAccess result)
 			{
@@ -182,8 +189,11 @@ public class STest
 					if(spc)
 					{
 						// Delayed super peer client start, now on platform thread, so clock is locked
-						ia.addComponent("jadex.base.service.registryv2.SuperpeerClientAgent.class").get();
+						spca	= ia.createComponent(new CreationInfo().setFilename("jadex.platform.service.registry.SuperpeerClientAgent.class")).get();
 					}
+					
+					// Make sure that execution service is idle (i.e. all agents started) before executing user code.
+					ia.waitForDelay(1).get();
 					
 					code.accept(ia);
 					
@@ -192,16 +202,55 @@ public class STest
 				{
 					public void customResultAvailable(Void v)
 					{
-						result.killComponent().get();
-						run.setResult(null);
+						shutdown(null);
 					}
 					
 					@Override
 					public void exceptionOccurred(Exception exception)
 					{
-						result.killComponent().get();
-						run.setException(exception);
+						shutdown(exception);
 					}
+					
+					protected void shutdown(Exception e1)
+					{
+						// Kill super peer client in sync, to stop polling before async platform shutdown.
+						if(e1==null && spca!=null)
+						{
+							spca.killComponent().get();
+						}
+						
+						result.killComponent().addResultListener(new IResultListener<Map<String,Object>>()
+						{
+
+							@Override
+							public void resultAvailable(Map<String, Object> result)
+							{
+								exceptionOccurred(null);
+							}
+
+							@Override
+							public void exceptionOccurred(Exception e2)
+							{
+								if(e1!=null && e2!=null)
+								{
+									run.setException(new MultiException(Arrays.asList(e1, e2)));
+								}
+								else if(e1!=null)
+								{
+									run.setException(e1);
+								}
+								else if(e2!=null)
+								{
+									run.setException(e2);
+								}
+								else
+								{
+									run.setResult(null);
+								}
+							}
+						});
+					}
+					
 				});
 			}
 		});
