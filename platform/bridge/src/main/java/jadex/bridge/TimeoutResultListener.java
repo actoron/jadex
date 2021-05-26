@@ -79,6 +79,10 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 		if(exta==null)
 			throw new IllegalArgumentException("External access must not null.");
 			
+//		// For checking that tests use sim only
+//		if(realtime)
+//			throw new UnsupportedOperationException();
+			
 		this.exta	= exta;
 		this.listener	= listener;
 		this.timeout	= timeout;

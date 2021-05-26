@@ -57,7 +57,7 @@ public class BroadcastAwarenessTest	extends AbstractSearchQueryTest
 		}
 		System.out.println("BroadcastAwarenessTest custom port: "+port);
 		
-		IPlatformConfiguration	baseconf	= STest.createRealtimeTestConfig(BroadcastAwarenessTest.class);
+		IPlatformConfiguration	baseconf	= STest.createDefaultTestConfig(BroadcastAwarenessTest.class);
 		baseconf.setValue("superpeerclient.awaonly", true);
 		baseconf.setValue("intravmawareness", false);
 		baseconf.setValue("broadcastawareness", true);
@@ -95,19 +95,24 @@ public class BroadcastAwarenessTest	extends AbstractSearchQueryTest
 	@Test
 	public void	testBareAwareness()
 	{
-		// Start client and fetch awa service.
-		IExternalAccess	client	= createPlatform(CLIENTCONF);		
-		IAwarenessService	pawa	= client.searchService(new ServiceQuery<>(IAwarenessService.class)).get();
-		assertTrue("Found broadcast awareness? "+pawa, pawa.toString().toLowerCase().contains("broadcast"));
-		
-		// Start providers and check that they can be found
-		IExternalAccess	pro1	= createPlatform(PROCONF);	
-		IExternalAccess	pro2	= createPlatform(PROCONF);
-		Set<IComponentIdentifier>	platforms	= new LinkedHashSet<IComponentIdentifier>(Arrays.asList(pro1.getId(), pro2.getId()));
-		IIntermediateFuture<IComponentIdentifier>	results	= pawa.searchPlatforms();
-		IComponentIdentifier	result	= results.getNextIntermediateResult();
-		assertTrue("Found provider platform? "+platforms+", "+result, platforms.remove(result));
-		result	= results.getNextIntermediateResult();
-		assertTrue("Found provider platform? "+platforms+", "+result, platforms.remove(result));
+		STest.runSimLocked(CLIENTCONF, ia->
+		{
+			// Start client and fetch awa service.
+			IExternalAccess	client	= ia.getExternalAccess();	
+			IAwarenessService	pawa	= client.searchService(new ServiceQuery<>(IAwarenessService.class)).get();
+			assertTrue("Found broadcast awareness? "+pawa, pawa.toString().toLowerCase().contains("broadcast"));
+			
+			// Start providers and check that they can be found
+			IExternalAccess	pro1	= createPlatform(PROCONF);
+			IExternalAccess	pro2	= createPlatform(PROCONF);
+			waitForRegistryWithProvider(client, pro1, false);
+			waitForRegistryWithProvider(client, pro2, false);
+			Set<IComponentIdentifier>	platforms	= new LinkedHashSet<IComponentIdentifier>(Arrays.asList(pro1.getId(), pro2.getId()));
+			IIntermediateFuture<IComponentIdentifier>	results	= pawa.searchPlatforms();
+			IComponentIdentifier	result	= results.getNextIntermediateResult();
+			assertTrue("Found provider platform? "+platforms+", "+result, platforms.remove(result));
+			result	= results.getNextIntermediateResult();
+			assertTrue("Found provider platform? "+platforms+", "+result, platforms.remove(result));			
+		});
 	}
 }

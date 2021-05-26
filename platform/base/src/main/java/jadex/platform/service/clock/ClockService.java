@@ -8,28 +8,20 @@ import java.util.TimerTask;
 
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
-import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.IChangeListener;
-import jadex.commons.IPropertiesProvider;
-import jadex.commons.Properties;
-import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.concurrent.JavaThreadPool;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.platform.service.threadpool.ThreadPoolService;
 
 /**
  *  A clock service abstracts away from clock implementations.
@@ -204,6 +196,10 @@ public class ClockService extends BasicService implements IClockService
 	 */
 	public TimerTask createRealtimeTimer(final long time, final ITimedObject to)
 	{
+//		// For testing: when realtime is forcefully disabled (e.g. for tests) do not allow realtime timers.
+//		if(!Starter.isRealtimeTimeout(getProviderId(), true))
+//			throw new UnsupportedOperationException();
+		
 		if(timer==null)
 		{
 //			System.out.println("create realtime timer: "+this);

@@ -492,8 +492,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		
 		directconns.put(client, ret);
 		
-		SFuture.avoidCallTimeouts(ret, agent, true);
-//		SFuture.avoidCallTimeouts(ret, agent);
+		SFuture.avoidCallTimeouts(ret, agent);
 		
 		return ret;
 	}
@@ -552,7 +551,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					{
 						try
 						{
-							relayupdatefuture.get(keepaliveinterval, true);
+							relayupdatefuture.get(keepaliveinterval, Starter.isRealtimeTimeout(agent.getId(), true));
 						}
 						catch (Exception e)
 						{
@@ -561,7 +560,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					}
 					else
 					{
-						agent.getFeature(IExecutionFeature.class).waitForDelay(keepaliveinterval >>> 1, this, true);
+						agent.getFeature(IExecutionFeature.class).waitForDelay(keepaliveinterval >>> 1, this, Starter.isRealtimeTimeout(agent.getId(), true));
 					}
 					return IFuture.DONE;
 				}

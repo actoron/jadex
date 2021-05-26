@@ -140,7 +140,7 @@ public abstract class AbstractInfrastructureTest
 			if (timeout <= 0)
 				timeout = 30000;
 //			System.err.println("waitForSuperpeerConnections0: Waiting for next cid, remaining: " +this+", "+connected+", "+ Arrays.toString(platformids.toArray())+", "+Thread.currentThread());
-			IComponentIdentifier	cid	= connected.getNextIntermediateResult(timeout, true);
+			IComponentIdentifier	cid	= connected.getNextIntermediateResult(timeout, Starter.isRealtimeTimeout(sp.getId(), true));
 			platformids.remove(cid.getRoot());
 //			System.err.println("waitForSuperpeerConnections1:"+this+", "+sp.getId()+" got connection from "+cid.getRoot());
 		}

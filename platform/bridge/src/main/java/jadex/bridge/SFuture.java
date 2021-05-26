@@ -7,12 +7,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.ComponentFutureFunctionality;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
-import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceEvent;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.search.ServiceQuery.Multiplicity;
-import jadex.bridge.service.types.registry.ISearchQueryManagerService;
 import jadex.bridge.service.types.registry.SlidingCuckooFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
@@ -30,7 +25,6 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.PullIntermediateDelegationFuture;
 import jadex.commons.future.PullSubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
-import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.Tuple2Future;
@@ -74,7 +68,7 @@ public class SFuture
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 //		boolean	realtime	= sc!=null ? sc.getRealtime()!=null ? sc.getRealtime().booleanValue() : false : false;
 		boolean	realtime = sc != null ? sc.isRemoteCall(ia.getId()) : false;
-		avoidCallTimeouts(ret, ia, realtime);
+		avoidCallTimeouts(ret, ia, Starter.isRealtimeTimeout(ia.getId(), realtime));
 	}
 	
 	/**
@@ -113,7 +107,7 @@ public class SFuture
 	//	boolean local = sc.getCaller().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName());
 	//	long to = sc.getTimeout()>0? sc.getTimeout(): (local? BasicService.DEFAULT_LOCAL: BasicService.DEFAULT_REMOTE);
 	//	to = 5000;
-		avoidCallTimeouts(ret, ea, to, realtime);
+		avoidCallTimeouts(ret, ea, to, Starter.isRealtimeTimeout(ea.getId(), realtime));
 	}
 		
 	/**
@@ -365,13 +359,14 @@ public class SFuture
 	/**
 	 *  Blocking wait for first result.
 	 *  Future is terminated after first result is received.
-	 *  Uses realtime timeout (hack?)
+	 *  Defaults to realtime timeout (hack?)
 	 *  @param fut	The future.
 	 *  @return The first result.
 	 */
 	public static <T> T getFirstResultAndTerminate(ITerminableIntermediateFuture<T> fut)
 	{
-		T ret = fut.getNextIntermediateResult(Timeout.UNSET, true);
+		IComponentIdentifier	local	= IComponentIdentifier.LOCAL.get();
+		T ret = fut.getNextIntermediateResult(Timeout.UNSET, local!=null ? Starter.isRealtimeTimeout(local, true) : true);
 		fut.terminate();
 		return ret;
 	}

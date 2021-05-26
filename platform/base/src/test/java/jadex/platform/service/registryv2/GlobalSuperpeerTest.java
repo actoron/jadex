@@ -45,7 +45,7 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		AbstractAuthenticationSecret clientsecret = AbstractAuthenticationSecret.fromKeyPair(ca, true);
 		AbstractAuthenticationSecret serversecret = AbstractAuthenticationSecret.fromKeyPair(cert, false, ca);
 		
-		IPlatformConfiguration	baseconf	= STest.createRealtimeTestConfig(GlobalSuperpeerTest.class)
+		IPlatformConfiguration	baseconf	= STest.createDefaultTestConfig(GlobalSuperpeerTest.class)
 			.setValue("superpeerclient.awaonly", false)
 			.setValue("superpeerclient.contimeout", WAITFACTOR*2)
 			.setValue("intravmawareness", false)
@@ -63,6 +63,7 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 //			.getExtendedPlatformConfiguration()
 //				.setDebugFutures(true)
 //			.setValue("superpeer.debugservices", "ITestService")
+//			.setValue("superpeerclient.debugservices", "IRoutingService")
 //			.setValue("superpeer.debugservices", true)
 //			.setValue("security.debug", true)
 			;
@@ -120,9 +121,12 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 	// TODO: fix abstract transport create connection retry?
 	public void testClientFirstConnection()
 	{
-		IExternalAccess	client	= createPlatform(CLIENTCONF);
-		IExternalAccess	relay	= createPlatform(RELAYCONF);
-		waitForSuperpeerConnections(relay, client);
+		STest.runSimLocked(CLIENTCONF, ia ->
+		{
+			IExternalAccess	client	= ia.getExternalAccess();
+			IExternalAccess	relay	= createPlatform(RELAYCONF);
+			waitForSuperpeerConnections(relay, client);			
+		});
 	}
 
 	/**
@@ -131,9 +135,12 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 	@Test
 	public void testRelayFirstConnection()
 	{
-		IExternalAccess	relay	= createPlatform(RELAYCONF);
-		IExternalAccess	client	= createPlatform(CLIENTCONF);
-		waitForSuperpeerConnections(relay, client);
+		STest.runSimLocked(RELAYCONF, ia ->
+		{
+			IExternalAccess	relay	= ia.getExternalAccess();
+			IExternalAccess	client	= createPlatform(CLIENTCONF);
+			waitForSuperpeerConnections(relay, client);			
+		});
 	}
 	
 	/**
@@ -144,14 +151,17 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 	{		
 		if(spconf!=null)
 		{
-			// Start SSP, SP and provider and wait for connections.
-			IExternalAccess	ssp	= sspconf!=null ? createPlatform(sspconf) : null;
-			IExternalAccess	sp	= createPlatform(spconf);
-	
-			// Shutdown transport of provider first to trigger dirty disconnection (i.e. SP is not informed of superpeerclient shutdown)
-			// -> disconnection should happen when no-timeout forward commands fail eventually
-			IExternalAccess	provider	= createPlatform(proconf);
-			waitForProviderDisconnection(provider, false, ssp, sp);
+			STest.runSimLocked(sspconf!=null ? sspconf : spconf, ia ->
+			{
+				// Start SSP, SP and provider and wait for connections.
+				IExternalAccess	ssp	= sspconf!=null ? ia.getExternalAccess() : null;
+				IExternalAccess	sp	= sspconf!=null ? createPlatform(spconf) : ia.getExternalAccess();
+		
+				// Shutdown transport of provider first to trigger dirty disconnection (i.e. SP is not informed of superpeerclient shutdown)
+				// -> disconnection should happen when no-timeout forward commands fail eventually
+				IExternalAccess	provider	= createPlatform(proconf);
+				waitForProviderDisconnection(provider, false, ssp, sp);				
+			});
 		}
 	}
 
@@ -163,14 +173,17 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 	{		
 		if(spconf!=null)
 		{
-			// Start SSP, SP and provider and wait for connections.
-			IExternalAccess	ssp	= sspconf!=null ? createPlatform(sspconf) : null;
-			IExternalAccess	sp	= createPlatform(spconf);
+			STest.runSimLocked(sspconf!=null ? sspconf : spconf, ia ->
+			{
+				// Start SSP, SP and provider and wait for connections.
+				IExternalAccess	ssp	= sspconf!=null ? ia.getExternalAccess() : null;
+				IExternalAccess	sp	= sspconf!=null ? createPlatform(spconf) : ia.getExternalAccess();
 	
-			// Shutdown transport of provider first to trigger dirty disconnection (i.e. SP is not informed of superpeerclient shutdown)
-			// -> disconnection should happen when no-timeout forward commands fail eventually
-			IExternalAccess	provider	= createPlatform(proconf);
-			waitForProviderDisconnection(provider, true, ssp, sp);
+				// Shutdown transport of provider first to trigger dirty disconnection (i.e. SP is not informed of superpeerclient shutdown)
+				// -> disconnection should happen when no-timeout forward commands fail eventually
+				IExternalAccess	provider	= createPlatform(proconf);
+				waitForProviderDisconnection(provider, true, ssp, sp);
+			});
 		}
 	}
 }

@@ -206,7 +206,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 						delay = (long)(SUtil.DEFTIMEOUT_DEFAULT*waitfactor);
 					//System.out.println("delay is: "+delay);
 					agent.getFeature(IExecutionFeature.class)
-						.waitForDelay(delay, true)
+						.waitForDelay(delay, Starter.isRealtimeTimeout(agent.getId(), true))
 						.addResultListener(new IResultListener<Void>()
 					{
 						@Override

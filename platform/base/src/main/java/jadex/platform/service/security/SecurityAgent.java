@@ -1656,7 +1656,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 									cleanuptask = null;
 									return IFuture.DONE;
 								}
-							}, true);
+							}, Starter.isRealtimeTimeout(getComponentIdentifier(), true));
 						}
 					});
 				}

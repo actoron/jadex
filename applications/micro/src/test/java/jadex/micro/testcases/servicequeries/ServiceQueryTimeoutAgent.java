@@ -1,9 +1,9 @@
 package jadex.micro.testcases.servicequeries;
 
 import java.util.Collection;
-import java.util.concurrent.TimeoutException;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
-import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
@@ -15,8 +15,10 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.Boolean3;
+import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -52,7 +54,8 @@ public class ServiceQueryTimeoutAgent extends TestAgent
 		
 		// Create user as subcomponent -> should be able to find the service with publication scope application
 		final int cnt = 3;
-		IComponentIdentifier[] cids = new IComponentIdentifier[cnt];
+		Set<IComponentIdentifier> cids = new LinkedHashSet<>();
+		Set<IComponentIdentifier> cids2 = new LinkedHashSet<>();
 		
 		final TestReport tr = new TestReport("#1", "Test if timeout be used with query");
 		
@@ -70,7 +73,14 @@ public class ServiceQueryTimeoutAgent extends TestAgent
 				{
 					if(exception instanceof TimeoutException)
 					{
-						tr.setSucceeded(true);
+						if(cids.equals(cids2))
+						{
+							tr.setSucceeded(true);
+						}
+						else
+						{
+							tr.setFailed("Wrong query results: expected="+cids+", actual="+cids2);
+						}
 					}
 					else
 					{
@@ -93,6 +103,8 @@ public class ServiceQueryTimeoutAgent extends TestAgent
 //					System.out.println("thread: " + IComponentIdentifier.LOCAL.get() +" on comp thread: " + agent.getFeature0(IExecutionFeature.class).isComponentThread());
 					if(!platform.getId().getRoot().equals(((IService)result).getServiceId().getProviderId().getRoot()))
 						System.out.println("Found service that does not come from target platform: "+result);
+					
+					cids2.add(((IService)result).getServiceId().getProviderId());
 				}
 				
 				public void finished()
@@ -110,13 +122,13 @@ public class ServiceQueryTimeoutAgent extends TestAgent
 			{
 				
 				IFuture<IExternalAccess> fut = creator.createComponent(ci.setFilename(ProviderAgent.class.getName()+".class"));
-				cids[i] = fut.get(Starter.getDefaultTimeout(agent.getId()), true).getId();
+				cids.add(fut.get().getId());
 			}
 			
 			// Wait for completion of query fut (or some timeout)
 
-			long start = System.currentTimeMillis();
-			agent.getFeature(IExecutionFeature.class).waitForDelay(5000, true).then(v -> 
+			long start = agent.getLocalService(IClockService.class).getTime();
+			agent.getFeature(IExecutionFeature.class).waitForDelay(5000).then(v -> 
 			{
 				if(!tr.isFinished())
 					tr.setFailed("query was not terminated in time"); 
@@ -125,7 +137,7 @@ public class ServiceQueryTimeoutAgent extends TestAgent
 			
 			waitfut.get();
 			queryfut.terminate();
-			System.out.println("wait dur: "+(System.currentTimeMillis()-start));
+			System.out.println("wait dur: "+(agent.getLocalService(IClockService.class).getTime()-start));
 					
 //			System.out.println("Correct: could find service: "+ser.getInfo().get());
 		}
@@ -139,9 +151,9 @@ public class ServiceQueryTimeoutAgent extends TestAgent
 		{
 			try
 			{
-				for(int i=0; i<cids.length; i++)
+				for(IComponentIdentifier cid: cids)
 				{
-					platform.getExternalAccess(cids[i]).killComponent().get();
+					platform.getExternalAccess(cid).killComponent().get();
 				}
 			}
 			catch(Exception e)

@@ -119,6 +119,7 @@ public class STest
     	{
     		Object awadata	= Class.forName("jadex.platform.service.awareness.IntraVMAwarenessAgent$AwarenessData").getConstructor().newInstance();
     		config.setSuperpeerClient(true);
+    		config.setValue("superpeerclient.awaonly", true);
     		config.setValue("intravmawareness", true);
     		config.setValue("intravmawareness.data", awadata);
             config.setValue("intravm", true);
@@ -189,7 +190,9 @@ public class STest
 					if(spc)
 					{
 						// Delayed super peer client start, now on platform thread, so clock is locked
-						spca	= ia.createComponent(new CreationInfo().setFilename("jadex.platform.service.registry.SuperpeerClientAgent.class")).get();
+						spca	= ia.createComponent(new CreationInfo()
+							.setFilename("jadex.platform.service.registry.SuperpeerClientAgent.class")
+							.setName("superpeerclient")).get();
 					}
 					
 					// Make sure that execution service is idle (i.e. all agents started) before executing user code.

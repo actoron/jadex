@@ -353,6 +353,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				{
 					if(getFeature0(IExecutionFeature.class)!=null)
 					{
+						// TODO: should not use agent waitFor at all and instead system (realtime) timer? What about sim repeatability?
+//						getFeature(IExecutionFeature.class).waitForDelay(timeout, Starter.isRealtimeTimeout(getId(), true))
 						getFeature(IExecutionFeature.class).waitForDelay(timeout, true)
 							.addResultListener(new IResultListener<Void>()
 						{

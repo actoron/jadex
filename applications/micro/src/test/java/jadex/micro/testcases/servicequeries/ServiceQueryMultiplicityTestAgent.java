@@ -134,16 +134,15 @@ public class ServiceQueryMultiplicityTestAgent extends TestAgent
 			IExternalAccess creator = platform.getId().getPlatformName().equals(agent.getId().getPlatformName()) ? agent : platform;
 			for(int i=0; i<cnt; i++)
 			{
-				
 				IFuture<IExternalAccess> fut = creator.createComponent(ci.setFilename(ProviderAgent.class.getName()+".class"));
-				cids[i] = fut.get(Starter.getDefaultTimeout(agent.getId()), true).getId();
+				cids[i] = fut.get(Starter.getDefaultTimeout(agent.getId()), Starter.isRealtimeTimeout(agent.getId(), true)).getId();
 			}
 			
 			// Wait for completion of query fut (or some timeout)
 			
 			long start = System.currentTimeMillis();
 			if(!queryfut.isDone())
-				agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledDefaultTimeout(agent.getId().getRoot(), 0.9), true).then(v -> waitfut.setResultIfUndone(null));
+				agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledDefaultTimeout(agent.getId().getRoot(), 0.9), Starter.isRealtimeTimeout(agent.getId(), true)).then(v -> waitfut.setResultIfUndone(null));
 			
 			waitfut.get();
 			queryfut.terminate();

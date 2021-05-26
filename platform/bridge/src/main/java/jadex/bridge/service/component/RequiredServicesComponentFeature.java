@@ -9,7 +9,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeoutException;
 
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
@@ -42,6 +41,7 @@ import jadex.bridge.service.types.registry.SlidingCuckooFilter;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.TimeoutException;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -481,11 +481,11 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		});
 		
 		long to = timeout;
-		//isRemote(query)
+		//isRemote(query)	// TODO: only realtime for remote queries?
 		
 		if(to>0)
 		{
-			component.waitForDelay(timeout, true).then(done -> 
+			component.waitForDelay(timeout, Starter.isRealtimeTimeout(getComponent().getId(), true)).then(done -> 
 			{
 				Multiplicity m = query.getMultiplicity();
 				if(m.getFrom()>0)
@@ -555,7 +555,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		
 		if(to>0)
 		{
-			component.waitForDelay(timeout, true).then(done -> 
+			component.waitForDelay(timeout, Starter.isRealtimeTimeout(component.getId(), true)).then(done -> 
 			{
 				Exception e;
 				Multiplicity m = query.getMultiplicity();
@@ -566,7 +566,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 				}
 				else
 				{
-					e = new TimeoutException();
+					e = new TimeoutException(""+to);
 					//new ServiceNotFoundException("Service " + query + " not found in search period " + to)
 				}
 				queryfut.terminate(e);

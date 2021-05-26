@@ -31,9 +31,11 @@ public class StatusWebGuiTest
 		s.close();
 		
 		// Start platform with published status agent gui
-		IPlatformConfiguration	baseconf	= STest.createDefaultTestConfig(getClass());
+		// Use realtime config as http service interface is not sync'ed with execution service
+		IPlatformConfiguration	baseconf	= STest.createRealtimeTestConfig(getClass());
 		IPlatformConfiguration	webguiconf	= baseconf
 			.setSuperpeer(true)
+    		.setValue("superpeerclient.awaonly", false)
 			.getExtendedPlatformConfiguration().setRsPublish(true)
 			.setValue("jettyrspublish", true)
 			.setValue("status", true)
@@ -103,11 +105,23 @@ public class StatusWebGuiTest
 	 */
 	protected String getUrlContent(URL url) throws IOException
 	{
+//		URLConnection	con	= url.openConnection();
+//		
+//		// On subscription with empty initial result -> request another result (long polling)
+//		if(con instanceof HttpURLConnection && ((HttpURLConnection)con).getResponseCode()==202
+//			&& con.getContentLength()==0)
+//		{
+//			String	callid	= con.getHeaderField("x-jadex-callid");
+//			con	= url.openConnection();
+//			con.setRequestProperty("x-jadex-callid", callid);
+//		}
+		
+//		try(InputStream	is	= con.getInputStream())
 		try(InputStream	is	= url.openStream())
 		{
 			try(Scanner	s	= new Scanner(is, "UTF-8"))
 			{
-				return s.useDelimiter("\\A").next();
+				return s.hasNext() ? s.useDelimiter("\\A").next() : "";
 			}
 		}
 	}

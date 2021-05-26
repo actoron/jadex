@@ -3,7 +3,6 @@ package jadex.micro.testcases.distributedservicepool;
 import java.util.Collection;
 import java.util.Map;
 
-import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
@@ -76,17 +75,17 @@ public class PoolTestAgent extends TestAgent
 		return tstcnt*2;
 	}
 	
-	/**
-     * Returns the platform config.
-     * Can be overridden to apply special settings. 
-     */
-    public IPlatformConfiguration getConfig() 
-    {
-    	// It is important to turn off simulation also for local test!
-    	// The distri pool will search globally using intermediate future which
-    	// is not supported by the simulation blockers
-        return super.getConfig().getExtendedPlatformConfiguration().setSimulation(false);
-    }
+//	/**
+//     * Returns the platform config.
+//     * Can be overridden to apply special settings. 
+//     */
+//    public IPlatformConfiguration getConfig() 
+//    {
+//    	// It is important to turn off simulation also for local test!
+//    	// The distri pool will search globally using intermediate future which
+//    	// is not supported by the simulation blockers
+//        return super.getConfig().getExtendedPlatformConfiguration().setSimulation(false);
+//    }
 	
 	/**
 	 *  Perform the tests.

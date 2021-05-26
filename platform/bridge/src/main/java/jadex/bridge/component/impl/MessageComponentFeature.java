@@ -243,7 +243,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				}
 				return IFuture.DONE;
 			}
-		}, true);
+		}, Starter.isRealtimeTimeout(getComponent().getId(), true));
 		return ret;
 	}
 	
@@ -343,7 +343,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				}
 				return IFuture.DONE;
 			}
-		}, true);
+		}, Starter.isRealtimeTimeout(getComponent().getId(), true));
 		
 		return ret;
 	}
@@ -1340,7 +1340,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						}
 					}
 					
-					getComponent().getFeature(IExecutionFeature.class).waitForDelay(lt, this, true);
+					getComponent().getFeature(IExecutionFeature.class).waitForDelay(lt, this, Starter.isRealtimeTimeout(getComponent().getId(), true));
 					
 					return IFuture.DONE;
 				}
@@ -1936,7 +1936,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		}
 		@SuppressWarnings("unchecked")
 		final SubscriptionIntermediateFuture<MessageEvent>	ret	= (SubscriptionIntermediateFuture<MessageEvent>)
-			SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getInternalAccess(), true);
+			SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getInternalAccess(), Starter.isRealtimeTimeout(getInternalAccess().getId(), true));
 		ret.setTerminationCommand(new TerminationCommand()
 		{
 			@Override

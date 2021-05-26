@@ -21,6 +21,7 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
@@ -329,5 +330,13 @@ public class PathVarAgent extends JunitAgentTest implements IMyService
 		Response result = client.target(baseurl).path("abc/def/method1").request(MediaType.APPLICATION_JSON).get();
 		
 		System.out.println(result.readEntity(String.class));
+	}
+	
+	// Cannot run in simulation as publish service is not sync'ed to execution service.
+	@Override
+	public IPlatformConfiguration getConfig()
+	{
+		return super.getConfig()
+			.getExtendedPlatformConfiguration().setSimulation(false);
 	}
 }

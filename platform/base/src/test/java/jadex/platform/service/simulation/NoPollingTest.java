@@ -37,4 +37,16 @@ public class NoPollingTest
 			assertArrayEquals("run simlocked", new ITimer[0], ia.getProvidedService(IClockService.class).getTimers());
 		});
 	}
+
+	/**
+	 *  Check no polling for default (remote) config with super peer client (assumes "awaonly" setting to avoid polling queries for SPs).
+	 */
+	@Test
+	public void	testNoPolling()
+	{
+		STest.runSimLocked(STest.createDefaultTestConfig(getClass()), ia ->
+		{
+			assertArrayEquals("run simlocked", new ITimer[0], ia.getProvidedService(IClockService.class).getTimers());
+		});
+	}
 }

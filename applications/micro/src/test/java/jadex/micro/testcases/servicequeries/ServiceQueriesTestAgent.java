@@ -119,7 +119,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 			{
 				
 				IFuture<IExternalAccess> fut = creator.createComponent(ci.setFilename(ProviderAgent.class.getName()+".class"));
-				cids[i] = fut.get(Starter.getDefaultTimeout(agent.getId()), true).getId();
+				cids[i] = fut.get(Starter.getDefaultTimeout(agent.getId()), Starter.isRealtimeTimeout(agent.getId(), true)).getId();
 			}
 			
 			// Wait some time and then terminate query
@@ -128,7 +128,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 			int	loop	= 100;
 			for(int i=0; i<loop && num[0]<cnt; i++)
 			{
-				agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledDefaultTimeout(agent.getId().getRoot(), 1.0/loop), true).get();
+				agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledDefaultTimeout(agent.getId().getRoot(), 1.0/loop), Starter.isRealtimeTimeout(agent.getId(), true)).get();
 			}
 			System.out.println("wait dur: "+(System.currentTimeMillis()-start));
 			

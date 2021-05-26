@@ -22,6 +22,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.servicepool.ServicePoolHelper;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -460,7 +461,7 @@ public class ServiceHandler implements InvocationHandler
 			
 			Tuple2<Integer, Long> info = services.get(service);
 			
-			long now = System.currentTimeMillis();
+			long now = component.getLocalService(IClockService.class).getTime();
 			if(now>=delay+info.getSecondEntity())
 			{
 				//System.out.println("checking: "+service);
@@ -510,7 +511,7 @@ public class ServiceHandler implements InvocationHandler
 		 */
 		public void addFailedService(IService service)
 		{
-			services.put(service, new Tuple2<Integer, Long>(1, System.currentTimeMillis()));
+			services.put(service, new Tuple2<Integer, Long>(1, component.getLocalService(IClockService.class).getTime()));
 		}
 		
 		/**

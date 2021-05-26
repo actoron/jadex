@@ -1054,7 +1054,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 											}
 											return IFuture.DONE;
 										}
-									}, true);
+									}, Starter.isRealtimeTimeout(agent.getId(), true));
 								}
 								
 								// Connection immediately failed but no other connection -> retry this super peer after some timeout
@@ -1072,7 +1072,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 											}
 											return IFuture.DONE;
 										}
-									}, true);
+									}, Starter.isRealtimeTimeout(agent.getId(), true));
 								}
 							}
 						});
@@ -1211,6 +1211,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		/** State counter to check if new search should be started after wait. */
 		protected int	state;
 		
+		/** Filter to avoid resetting polltime backoff on known results.*/ 
+		protected SlidingCuckooFilter	filter	= new SlidingCuckooFilter();
+		
 		//-------- constructors --------
 		
 		/**
@@ -1220,7 +1223,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		{
 			this.query	= query;
 			this.retfut	= new SubscriptionIntermediateFuture<>();
-			SFuture.avoidCallTimeouts(retfut, agent, Starter.isRealtimeTimeout(agent.getId(), true));	// Should be not need for timeouts on local platform???
+			SFuture.avoidCallTimeouts(retfut, agent);
 			this.networkspersuperpeer	= new MultiCollection<>();
 			this.futures	= new LinkedHashSet<>();
 			
@@ -1375,6 +1378,14 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						@Override
 						public void intermediateResultAvailable(IServiceIdentifier result)
 						{
+							if(filter.contains(result.toString()))
+							{
+								// no increment -> no doFinished()
+								return;
+							}
+							
+							filter.insert(result.toString());
+							
 							// Forward result to user query
 							Object res = result;
 							if(query.isEventMode())
@@ -1386,6 +1397,10 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							// Reset search backoff and when something was found after at least one polling interval has passed
 							if(polltime>getNextPollingInterval(0))
 							{
+								if(debug(query))
+								{
+									System.out.println(QueryManager.this.hashCode()+": Reset polltime due to result "+result+" for "+SUtil.arrayToString(networknames)+": "+query);
+								}
 								polltime	= 0;
 								scheduleSearch(networknames);
 							}
@@ -1466,6 +1481,12 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						updateQuery(networknames);
 					}
 					return IFuture.DONE;
+				}
+				
+				@Override
+				public String toString()
+				{
+					return agent+".scheduleSearch "+query.hashCode()+"@"+query;
 				}
 			}, Starter.isRealtimeTimeout(agent.getId(), true));
 		}

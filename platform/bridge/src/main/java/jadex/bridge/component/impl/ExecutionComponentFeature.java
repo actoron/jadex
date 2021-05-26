@@ -200,7 +200,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		if(termfuture!=null)
 		{
 			IArgumentsResultsFeature arf = getComponent().getFeature0(IArgumentsResultsFeature.class);
-			termfuture.setResult(arf!=null? arf.getResults(): Collections.EMPTY_MAP);
+			termfuture.setResult(arf!=null? arf.getResults(): Collections.emptyMap());
 		}
 		
 		return ret;
@@ -966,7 +966,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					{
 						if(!unblocked[0])
 						{
-							unblock(monitor, new TimeoutException(Future.DEBUG ? "" : "Use PlatformConfiguration.getExtendedPlatformConfiguration().setDebugFutures(true) for timeout cause.", ex));
+							unblock(monitor, new TimeoutException(Future.DEBUG ? ""+timeout : timeout+": Use PlatformConfiguration.getExtendedPlatformConfiguration().setDebugFutures(true) for timeout cause.", ex));
 						}
 					}
 					

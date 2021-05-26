@@ -15,6 +15,7 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
@@ -67,7 +68,7 @@ public class ServiceSearchMultiplicityAgent extends TestAgent
 			for(int i=0; i<cnt; i++)
 			{
 				IFuture<IExternalAccess> fut = creator.createComponent(ci.setFilename(ProviderAgent.class.getName()+".class"));
-				cids[i] = fut.get(Starter.getDefaultTimeout(agent.getId()), true).getId();
+				cids[i] = fut.get(Starter.getDefaultTimeout(agent.getId()), Starter.isRealtimeTimeout(agent.getId(), true)).getId();
 			}
 			
 			ITerminableIntermediateFuture<IExampleService> queryfut = rsf.searchServices(
@@ -142,13 +143,13 @@ public class ServiceSearchMultiplicityAgent extends TestAgent
 			
 			// Wait for completion of query fut (or some timeout)
 
-			long start = System.currentTimeMillis();
+			long start = agent.getLocalService(IClockService.class).getTime();
 			if(!queryfut.isDone())
-				agent.getFeature(IExecutionFeature.class).waitForDelay(local? 1000: 11000, true).then(v -> waitfut.setResultIfUndone(null));
+				agent.getFeature(IExecutionFeature.class).waitForDelay(local? 1000: 11000, Starter.isRealtimeTimeout(agent.getId(), true)).then(v -> waitfut.setResultIfUndone(null));
 			
 			waitfut.get();
 			queryfut.terminate();
-			System.out.println("wait dur: "+(System.currentTimeMillis()-start));
+			System.out.println("wait dur: "+(agent.getLocalService(IClockService.class).getTime()-start));
 					
 //			System.out.println("Correct: could find service: "+ser.getInfo().get());
 		}

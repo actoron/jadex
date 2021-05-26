@@ -341,11 +341,11 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 //		IPlatformConfiguration conf = STest.getRealtimeTestConfig(getClass());
 //		//conf.getExtendedPlatformConfiguration().setDebugFutures(true);
 		
-		IPlatformConfiguration conf = getConfig().clone()
-    		.getExtendedPlatformConfiguration().setSimul(false)
-			.getExtendedPlatformConfiguration().setSimulation(false);
+//		IPlatformConfiguration conf = getConfig().clone()
+//    		.getExtendedPlatformConfiguration().setSimul(false)
+//			.getExtendedPlatformConfiguration().setSimulation(false);
 
-		createPlatform(conf, null).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
+		createPlatform(getConfig(), null).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{

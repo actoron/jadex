@@ -62,39 +62,42 @@ public class BlockedPlatformSearchTest extends AbstractInfrastructureTest
 	@Test
 	public void testBlockedSearch()
 	{
-		// Start platforms
-		IExternalAccess	client	= createPlatform(CLIENTCONF);
-		IExternalAccess	provider	= createPlatform(PROCONF);
-		
-		// Check that provider service can be found.
-		assertEquals(1, client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get().size());
-		assertNotNull(client.searchService(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get());
+		STest.runSimLocked(CLIENTCONF, ia->
+		{
+			// Start platforms
+			IExternalAccess	client	= ia.getExternalAccess();
+			IExternalAccess	provider	= createPlatform(PROCONF);
+			
+			// Check that provider service can be found.
+			assertEquals(1, client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get().size());
+			assertNotNull(client.searchService(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get());
 
-		// Block registry of provider
-		IComponentIdentifier	registry	= ((IService)provider.searchService(
-			new ServiceQuery<>(IRemoteRegistryService.class)).get()).getServiceId().getProviderId();
-		provider.getExternalAccess(registry).suspendComponent().get();
-		
-		System.out.println("Starting searches: "+client.searchService(new ServiceQuery<>(IClockService.class)).get().getTime());
-		IIntermediateFuture<ITestService>	multi	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL));
-		IFuture<ITestService>	single	= client.searchService(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL));
-		
-		// Search multi (i.e. multiplicity 0..)
-		Collection<ITestService>	results	= multi.get();
-		assertTrue(""+results, results.isEmpty());
-		
-		
-		// Search single (i.e. multiplicity 1)
-		try
-		{
-			ITestService	result	= single.get();
-			assertFalse("Expected ServiceNotFoundException but was: "+result, true);
-		}
-		catch(Exception e)
-		{
-			assertTrue(SUtil.getExceptionStacktrace(e), e instanceof ServiceNotFoundException);
-		}
-		
-		System.out.println("Finished searches: "+client.searchService(new ServiceQuery<>(IClockService.class)).get().getTime());
+			// Block registry of provider
+			IComponentIdentifier	registry	= ((IService)provider.searchService(
+				new ServiceQuery<>(IRemoteRegistryService.class)).get()).getServiceId().getProviderId();
+			provider.getExternalAccess(registry).suspendComponent().get();
+			
+			System.out.println("Starting searches: "+client.searchService(new ServiceQuery<>(IClockService.class)).get().getTime());
+			IIntermediateFuture<ITestService>	multi	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL));
+			IFuture<ITestService>	single	= client.searchService(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL));
+			
+			// Search multi (i.e. multiplicity 0..)
+			Collection<ITestService>	results	= multi.get();
+			assertTrue(""+results, results.isEmpty());
+			
+			
+			// Search single (i.e. multiplicity 1)
+			try
+			{
+				ITestService	result	= single.get();
+				assertFalse("Expected ServiceNotFoundException but was: "+result, true);
+			}
+			catch(Exception e)
+			{
+				assertTrue(SUtil.getExceptionStacktrace(e), e instanceof ServiceNotFoundException);
+			}
+			
+			System.out.println("Finished searches: "+client.searchService(new ServiceQuery<>(IClockService.class)).get().getTime());			
+		});
 	}
 }
