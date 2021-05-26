@@ -19,24 +19,25 @@ public class ExecutionServiceTest
 	@Test
 	public void	testSimpleExecution()
 	{
-		IExternalAccess	platform	= Starter.createPlatform(STest.createDefaultTestConfig(getClass())).get();
-		IExecutionService	exe	= platform.searchService( new ServiceQuery<>( IExecutionService.class, ServiceScope.PLATFORM)).get();
-		
-		final List<String>	list	= new ArrayList<String>();		
-		exe.execute(new IExecutable()
+		STest.runSimLocked(STest.createDefaultTestConfig(getClass()), ia->
 		{
-			@Override
-			public boolean execute()
+			IExternalAccess	platform	= ia.getExternalAccess();
+			IExecutionService	exe	= platform.searchService( new ServiceQuery<>( IExecutionService.class, ServiceScope.PLATFORM)).get();
+			
+			final List<String>	list	= new ArrayList<String>();		
+			exe.execute(new IExecutable()
 			{
-				list.add("executed");
-				return false;
-			}
+				@Override
+				public boolean execute()
+				{
+					list.add("executed");
+					return false;
+				}
+			});
+
+			exe.getNextIdleFuture().get(Starter.getDefaultTimeout(platform.getId()));
+
+			Assert.assertEquals(list.toString(), 1, list.size());			
 		});
-
-		exe.getNextIdleFuture().get(Starter.getDefaultTimeout(platform.getId()));
-
-		Assert.assertEquals(list.toString(), 1, list.size());
-		
-		platform.killComponent().get();
 	}
 }
