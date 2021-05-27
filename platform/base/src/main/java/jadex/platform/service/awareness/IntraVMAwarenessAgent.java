@@ -150,7 +150,7 @@ public class IntraVMAwarenessAgent implements IAwarenessService
 		
 		/**
 		 *  Lookup the target agent for a platform id.
-		 *  @return The previously registered agent if found or nulöl otherwise.
+		 *  @return The previously registered agent if found or null otherwise.
 		 */
 		protected IntraVMAwarenessAgent getAgentForId(IComponentIdentifier platformid)
 		{
