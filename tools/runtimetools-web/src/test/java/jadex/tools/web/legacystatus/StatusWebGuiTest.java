@@ -18,6 +18,8 @@ import jadex.base.Starter;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IMessageFeature;
+import jadex.bridge.service.types.simulation.SSimulation;
+import jadex.commons.future.Future;
 
 /**
  *  Test the web registry page.
@@ -33,8 +35,7 @@ public class StatusWebGuiTest
 		s.close();
 		
 		// Start platform with published status agent gui
-		// Use realtime config as http service interface is not sync'ed with execution service
-		IPlatformConfiguration	baseconf	= STest.createRealtimeTestConfig(getClass());
+		IPlatformConfiguration	baseconf	= STest.createDefaultTestConfig(getClass());
 		IPlatformConfiguration	webguiconf	= baseconf.clone()
 			.setSuperpeer(true)
     		.setValue("superpeerclient.awaonly", false)
@@ -46,60 +47,62 @@ public class StatusWebGuiTest
 			;
 //			config.setValue("nanorspublish", false);
 		
-		IExternalAccess	platform	= Starter.createPlatform(webguiconf).get();
-		
-		// Check that index.html is correctly served.
-		String	file	= getUrlContent(getClass().getResource("/META-INF/legacystatuswebgui/index.html"));
-		String	http	= null;
-		for(int i=0; i<10 && http==null; i++)
+		STest.runSimLocked(webguiconf, ia0 ->
 		{
-			try
+			IExternalAccess	platform	= ia0.getExternalAccess();
+			
+			// Check that index.html is correctly served.
+			String	fileurl	= getClass().getResource("/META-INF/legacystatuswebgui/index.html").toExternalForm();
+			String	file	= getUrlContent(fileurl);
+			String	http	= null;
+			for(int i=0; i<10 && http==null; i++)
 			{
-				http	= getUrlContent(new URL("http://localhost:"+port+"/"));
-			}
-			catch(IOException e)
-			{
-				if(i==9)
+				try
 				{
-					throw e;
+					http	= getUrlContent("http://localhost:"+port+"/");
 				}
-				// Wait for publish service (hack?)
-				platform.waitForDelay(Starter.getScaledDefaultTimeout(platform.getId(), 0.1)).get();
+				catch(Exception e)
+				{
+					if(i==9)
+					{
+						throw e;
+					}
+					// Wait for publish service (hack?)
+					platform.waitForDelay(Starter.getScaledDefaultTimeout(platform.getId(), 0.1)).get();
+				}
 			}
-		}
-		assertEquals(file, http);
-		
-		// Start second platform and send message so that one connection exists
-		IExternalAccess	dummy	= Starter.createPlatform(baseconf).get();
-		dummy.scheduleStep(ia -> ia.getFeature(IMessageFeature.class).sendMessage("huhu", platform.getId())).get();
-		// Check that platforms can be retrieved.
-		// TODO: why empty initial response
-		String	con	= getUrlContent(new URL("http://localhost:"+port+"/status/subscribeToConnections"));
-//		String	con	= getUrlContent(new URL("http://localhost:"+port+"/status/getConnectedPlatforms"));
-		System.out.println("platform: "+con);
-		assertContainsField(con, "platform");
-		assertContainsField(con, "connected");
-		assertContainsField(con, "protocol");
-		dummy.killComponent().get();
+			assertEquals(file, http);
+			
+			// Start second platform and send message so that one connection exists
+			IExternalAccess	dummy	= Starter.createPlatform(baseconf).get();
+			dummy.scheduleStep(ia -> ia.getFeature(IMessageFeature.class).sendMessage("huhu", platform.getId())).get();
+			// Check that platforms can be retrieved.
+			// TODO: why empty initial response
+			String	con	= getUrlContent("http://localhost:"+port+"/status/subscribeToConnections");
+//			String	con	= getUrlContent("http://localhost:"+port+"/status/getConnectedPlatforms");
+			System.out.println("platform: "+con);
+			assertContainsField(con, "platform");
+			assertContainsField(con, "connected");
+			assertContainsField(con, "protocol");
+			dummy.killComponent().get();
 
-		// Check that provided services can be retrieved.
-		String	service	= getUrlContent(new URL("http://localhost:"+port+"/status/subscribeToServices"));
-		System.out.println("service: "+service);
-		assertContainsField(service, "type");
-		assertContainsField(service, "providerId");
-		assertContainsField(service, "tags");
-		assertContainsField(service, "scope");
-		assertContainsField(service, "networkNames");
-		assertContainsField(service, "unrestricted");
+			// Check that provided services can be retrieved.
+			String	service	= getUrlContent("http://localhost:"+port+"/status/subscribeToServices");
+			System.out.println("service: "+service);
+			assertContainsField(service, "type");
+			assertContainsField(service, "providerId");
+			assertContainsField(service, "tags");
+			assertContainsField(service, "scope");
+			assertContainsField(service, "networkNames");
+			assertContainsField(service, "unrestricted");
 
-		// Check that queries can be retrieved.
-		String	query	= getUrlContent(new URL("http://localhost:"+port+"/status/subscribeToQueries"));
-		System.out.println("query: "+query);
-		assertContainsField(query, "serviceType");
-		assertContainsField(query, "owner");
-		assertContainsField(query, "scope");
-
-		platform.killComponent().get();
+			// Check that queries can be retrieved.
+			String	query	= getUrlContent("http://localhost:"+port+"/status/subscribeToQueries");
+			System.out.println("query: "+query);
+			assertContainsField(query, "serviceType");
+			assertContainsField(query, "owner");
+			assertContainsField(query, "scope");
+		});
 	}
 
 	//-------- helper methods --------
@@ -107,27 +110,44 @@ public class StatusWebGuiTest
 	/**
 	 *  Retrieve URL content and return as string (UTF-8).
 	 */
-	protected String getUrlContent(URL url) throws IOException
+	protected String getUrlContent(String urlstring)
 	{
-		URLConnection	con	= url.openConnection();
-		
-		// On subscription with empty initial result -> request another result (long polling)
-		if(con instanceof HttpURLConnection && ((HttpURLConnection)con).getResponseCode()==202
-			&& con.getContentLength()==0)
+		// Blocking IO on external thread
+		Future<String>	ret	= new Future<>();
+		SSimulation.addBlocker(ret);
+		new Thread(()->
 		{
-			String	callid	= con.getHeaderField("x-jadex-callid");
-			con	= url.openConnection();
-			con.setRequestProperty("x-jadex-callid", callid);
-		}
-		
-		try(InputStream	is	= con.getInputStream())
-//		try(InputStream	is	= url.openStream())
-		{
-			try(Scanner	s	= new Scanner(is, "UTF-8"))
+			try
 			{
-				return s.hasNext() ? s.useDelimiter("\\A").next() : "";
+				URL	url	= new URL(urlstring);
+				URLConnection	con	= url.openConnection();
+				
+				// On subscription with empty initial result -> request another result (long polling)
+				if(con instanceof HttpURLConnection && ((HttpURLConnection)con).getResponseCode()==202
+					&& con.getContentLength()==0)
+				{
+					String	callid	= con.getHeaderField("x-jadex-callid");
+					con	= url.openConnection();
+					con.setRequestProperty("x-jadex-callid", callid);
+				}
+				
+				try(InputStream	is	= con.getInputStream())
+	//			try(InputStream	is	= url.openStream())
+				{
+					try(Scanner	s	= new Scanner(is, "UTF-8"))
+					{
+						ret.setResult(s.hasNext() ? s.useDelimiter("\\A").next() : "");
+					}
+				}
 			}
-		}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}).start();
+		
+		//  Blocking get() with component suspendable on component thread
+		return ret.get();
 	}
 	
 	/**

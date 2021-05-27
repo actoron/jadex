@@ -156,16 +156,16 @@ public class STest
         return config;
     }
     
-    /**
-     *  Create a default (remote) test configuration with simulation disabled.
-     */
-    public static IPlatformConfiguration createRealtimeTestConfig(Class<?> test)
-    {
-    	return createDefaultTestConfig(test)
-    		.getExtendedPlatformConfiguration().setSimul(false)
-			.getExtendedPlatformConfiguration().setSimulation(false)
-			.setValue(IPlatformConfiguration.REALTIMETIMEOUT, null);	// Un-force simulation time also for network timeouts
-    }
+//    /**
+//     *  Create a default (remote) test configuration with simulation disabled.
+//     */
+//    public static IPlatformConfiguration createRealtimeTestConfig(Class<?> test)
+//    {
+//    	return createDefaultTestConfig(test)
+//    		.getExtendedPlatformConfiguration().setSimul(false)
+//			.getExtendedPlatformConfiguration().setSimulation(false)
+//			.setValue(IPlatformConfiguration.REALTIMETIMEOUT, null);	// Un-force simulation time also for network timeouts
+//    }
     
     /**
      *  Start a platform and run the code on a component thread.
