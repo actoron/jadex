@@ -5,8 +5,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Scanner;
 
 import org.junit.Test;
@@ -33,14 +35,15 @@ public class StatusWebGuiTest
 		// Start platform with published status agent gui
 		// Use realtime config as http service interface is not sync'ed with execution service
 		IPlatformConfiguration	baseconf	= STest.createRealtimeTestConfig(getClass());
-		IPlatformConfiguration	webguiconf	= baseconf
+		IPlatformConfiguration	webguiconf	= baseconf.clone()
 			.setSuperpeer(true)
     		.setValue("superpeerclient.awaonly", false)
 			.getExtendedPlatformConfiguration().setRsPublish(true)
 			.setValue("jettyrspublish", true)
 			.setValue("status", true)
-			.setValue("status.port", port);
-//			config.setLogging(true);
+			.setValue("status.port", port)
+//			.setLogging(true)
+			;
 //			config.setValue("nanorspublish", false);
 		
 		IExternalAccess	platform	= Starter.createPlatform(webguiconf).get();
@@ -61,7 +64,7 @@ public class StatusWebGuiTest
 					throw e;
 				}
 				// Wait for publish service (hack?)
-				platform.waitForDelay(Starter.getScaledDefaultTimeout(platform.getId(), 0.1));				
+				platform.waitForDelay(Starter.getScaledDefaultTimeout(platform.getId(), 0.1)).get();
 			}
 		}
 		assertEquals(file, http);
@@ -70,8 +73,9 @@ public class StatusWebGuiTest
 		IExternalAccess	dummy	= Starter.createPlatform(baseconf).get();
 		dummy.scheduleStep(ia -> ia.getFeature(IMessageFeature.class).sendMessage("huhu", platform.getId())).get();
 		// Check that platforms can be retrieved.
-//		String	con	= getUrlContent(new URL("http://localhost:"+port+"/status/subscribeToConnections"));	// TODO: why empty initial response and how to handle (x-jadex-callid...)
-		String	con	= getUrlContent(new URL("http://localhost:"+port+"/status/getConnectedPlatforms"));
+		// TODO: why empty initial response
+		String	con	= getUrlContent(new URL("http://localhost:"+port+"/status/subscribeToConnections"));
+//		String	con	= getUrlContent(new URL("http://localhost:"+port+"/status/getConnectedPlatforms"));
 		System.out.println("platform: "+con);
 		assertContainsField(con, "platform");
 		assertContainsField(con, "connected");
@@ -105,19 +109,19 @@ public class StatusWebGuiTest
 	 */
 	protected String getUrlContent(URL url) throws IOException
 	{
-//		URLConnection	con	= url.openConnection();
-//		
-//		// On subscription with empty initial result -> request another result (long polling)
-//		if(con instanceof HttpURLConnection && ((HttpURLConnection)con).getResponseCode()==202
-//			&& con.getContentLength()==0)
-//		{
-//			String	callid	= con.getHeaderField("x-jadex-callid");
-//			con	= url.openConnection();
-//			con.setRequestProperty("x-jadex-callid", callid);
-//		}
+		URLConnection	con	= url.openConnection();
 		
-//		try(InputStream	is	= con.getInputStream())
-		try(InputStream	is	= url.openStream())
+		// On subscription with empty initial result -> request another result (long polling)
+		if(con instanceof HttpURLConnection && ((HttpURLConnection)con).getResponseCode()==202
+			&& con.getContentLength()==0)
+		{
+			String	callid	= con.getHeaderField("x-jadex-callid");
+			con	= url.openConnection();
+			con.setRequestProperty("x-jadex-callid", callid);
+		}
+		
+		try(InputStream	is	= con.getInputStream())
+//		try(InputStream	is	= url.openStream())
 		{
 			try(Scanner	s	= new Scanner(is, "UTF-8"))
 			{
