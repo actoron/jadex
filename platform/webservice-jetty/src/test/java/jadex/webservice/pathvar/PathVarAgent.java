@@ -1,5 +1,6 @@
 package jadex.webservice.pathvar;
 
+import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,6 +31,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.types.publish.IPublishService;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -48,7 +50,7 @@ import jadex.transformation.jsonserializer.JsonTraverser;
 @Agent
 @ProvidedServices(@ProvidedService(name="myser", type=IMyService.class, scope=ServiceScope.PLATFORM,
 	publish=@Publish(publishtype=IPublishService.PUBLISH_RS, 
-	publishid="[http://localhost:7000/]myservice"
+	publishid="\"[http://localhost:\"+$pojoagent.port+\"/]myservice\""
 )))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class PathVarAgent extends JunitAgentTest implements IMyService
@@ -62,11 +64,25 @@ public class PathVarAgent extends JunitAgentTest implements IMyService
 	@AgentArgument
 	protected int cnt;
 	
+	public int port;
+	
 	@AgentResult
 	protected String someresult;
 
 	public PathVarAgent()
 	{
+		// Find free port for http publishing
+		try
+		{
+			ServerSocket	s	= new ServerSocket(0);
+			this.port	= s.getLocalPort();
+			s.close();
+		}
+		catch(Exception e)
+		{
+			SUtil.throwUnchecked(e);
+		}
+
 		getConfig().setValue("jettyrspublish", true);
 		//getConfig().getExtendedPlatformConfiguration().setDebugFutures(true);
 	}
@@ -78,7 +94,7 @@ public class PathVarAgent extends JunitAgentTest implements IMyService
 	@OnStart
 	public void body()
 	{
-		String baseurl = "http://localhost:7000/myservice";
+		String baseurl = "http://localhost:"+port+"/myservice";
 		
 		final List<TestReport> reports = new ArrayList<>();
 		
