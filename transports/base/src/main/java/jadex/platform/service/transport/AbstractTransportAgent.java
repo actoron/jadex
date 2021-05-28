@@ -41,9 +41,11 @@ import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.memstat.IMemstatService;
 import jadex.bridge.service.types.security.ISecurityInfo;
@@ -55,6 +57,7 @@ import jadex.bridge.service.types.transport.PlatformData;
 import jadex.commons.Boolean3;
 import jadex.commons.ICommand;
 import jadex.commons.MethodInfo;
+import jadex.commons.MultiException;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
@@ -166,7 +169,7 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 		platformid = agent.getId().getRoot();
 		cleanupinterval = Starter.getDefaultTimeout(platformid);
 		cleanupinterval = cleanupinterval > 0 ? cleanupinterval : 30000;
-		nextcleanup = new AtomicLong(System.currentTimeMillis() + cleanupinterval);
+		nextcleanup = new AtomicLong(currentTimeMillis() + cleanupinterval);
 		
 		handshakingconnections = new LeaseTimeMap<>(Starter.getDefaultTimeout(platformid), new ICommand<Tuple2<Entry<Con, IComponentIdentifier>, Long>>()
 		{
@@ -241,6 +244,14 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 		// Init is only complete when platform is ready to receive messages
 		return openportret;
 	}
+
+	/**
+	 *  Get the current time, using simulation time, if necessary.
+	 */
+	protected long currentTimeMillis()
+	{
+		return Starter.isRealtimeTimeout(agent.getId(), true) ? System.currentTimeMillis() : ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class).getTime();
+	}
 	
 	//@AgentKilled
 	@OnEnd
@@ -310,7 +321,7 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 						boolean createcon = !commandswaitingforcons.containsKey(receiverpf);
 						
 						boolean[] canceled = new boolean[1];
-						final long timeout = System.currentTimeMillis() + cleanupinterval;
+						final long timeout = currentTimeMillis() + cleanupinterval;
 						Tuple3<ICommand<Con>, Long, TerminableFuture<Integer>> cmd = new Tuple3<ICommand<Con>, Long, TerminableFuture<Integer>>(new ICommand<Con>()
 						{
 							public void execute(Con con)
@@ -645,10 +656,14 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 			ITransportAddressService tas = agent.getFeature(IRequiredServicesFeature.class).getLocalService(ITransportAddressService.class);
 			tas.resolveAddresses(remotepf, impl.getProtocolName()).addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Void>(ret)
 			{
+				int	todo;
+				MultiException	ex;
+				
 				public void customResultAvailable(List<TransportAddress> result)
 				{
 					if (result != null && result.size() > 0)
 					{
+						todo	= result.size();
 						for (TransportAddress address : result)
 						{
 							impl.createConnection(address.getAddress(), remotepf).addResultListener(
@@ -685,6 +700,7 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 													{
 														establishedconnections.remove(remotepf);
 														impl.closeConnection(con);
+														conFailed(exception);
 													}
 												}));
 										}
@@ -703,14 +719,31 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 											{
 												impl.closeConnection(con);
 		//										exception.printStackTrace();
+												conFailed(exception);
 											}
 										}));
 									}
 								}
+								
 								public void exceptionOccurred(Exception exception)
 								{
-									// TODO: if finally failed, propagate exception for command cleanup?
-	//								exception.printStackTrace();
+									conFailed(exception);
+								}
+								
+								protected void	conFailed(Exception exception)
+								{
+									if(--todo==0)
+									{
+										ret.setException(ex!=null ? ex.addCause(exception) : exception);
+									}
+									else
+									{
+										if(ex==null)
+										{
+											ex	= new MultiException();
+										}
+										ex.addCause(exception);
+									}
 								}
 							});
 						}
@@ -762,7 +795,7 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 	protected void cleanup()
 	{
 		long val = nextcleanup.get();
-		long cur = System.currentTimeMillis();
+		long cur = currentTimeMillis();
 		if (val < cur)
 		{
 			if (nextcleanup.compareAndSet(val, cur + cleanupinterval))

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
@@ -111,14 +110,12 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		super(false, CLIENTCONF, PROCONF, SPCONF, RELAYCONF);
 	}
 	
-	// debug test
+	//-------- extra tests (in addition to inherited tests) --------
 	
 	/**
 	 *  Test if client can find local SP by using SSP.
 	 */
 	@Test
-	@Ignore
-	// TODO: fix abstract transport create connection retry?
 	public void testClientFirstConnection()
 	{
 		STest.runSimLocked(CLIENTCONF, ia ->
