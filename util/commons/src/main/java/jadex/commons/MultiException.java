@@ -50,11 +50,12 @@ public class MultiException extends RuntimeException
 	 *  Add an exception.
 	 *  @param cause The cause.
 	 */
-	public synchronized void addCause(Throwable cause)
+	public synchronized MultiException addCause(Throwable cause)
 	{
 		if(causes==null)
 			causes = new ArrayList<Throwable>();
 		causes.add(cause);
+		return this;
 	}
 	
 	/**
