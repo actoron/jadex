@@ -13,6 +13,7 @@ import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.VersionInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
@@ -292,7 +293,14 @@ public class StatusAgent implements IStatusService
 		
 		return fubar.waitForResultsIgnoreFailures(null);
 	}
-
+	
+	/**
+	 *  Get the current jadex version
+	 */
+	public String	getJadexVersion()
+	{
+		return VersionInfo.getInstance().getVersion()+" ("+VersionInfo.getInstance().getTimestamp()+")";
+	}
 
 	/**
 	 *  Main for testing.

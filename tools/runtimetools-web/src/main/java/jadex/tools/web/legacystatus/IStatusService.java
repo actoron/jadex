@@ -56,4 +56,9 @@ public interface IStatusService
 	 */
 	// No intermediate for easier REST?
 	public IFuture<Collection<Map<String, Object>>>	getMemInfo();
+	
+	/**
+	 *  Get the current jadex version
+	 */
+	public String	getJadexVersion();
 }
