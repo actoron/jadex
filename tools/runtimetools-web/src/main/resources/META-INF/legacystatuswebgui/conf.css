@@ -14,7 +14,7 @@ body {
 	padding: 3px 3px;
 	*/
 	background-color:#2a6699;
-	border-radius:10px 4px 10px 4px;
+	border-radius:10px;
 	font-size:16px;
 	font-weight:bold;
 	font-weight:600;
@@ -30,7 +30,7 @@ body {
 
 .actext{
 	background-color:#f0f6f8;
-	border-radius:10px 4px 10px 4px;
+	border-radius:10px;
 	font-size:1em;
 	font-weight:bold;
 	font-weight:300;
@@ -44,7 +44,7 @@ body {
 }
 
 .acframe{
-	border-radius:10px 4px 10px 4px;
+	border-radius:10px;
 	padding:10px;
 	border: 1px solid #2a6699;
 	display: block;
@@ -56,7 +56,7 @@ body {
 	font-size:16px;
 	font-weight:bold;
 	font-weight:600;
-	border-radius:10px 4px 10px 4px;
+	border-radius:10px;
 }
 
 .nav-pills.actabs  > .active > a{
@@ -113,10 +113,10 @@ a:visited,a:hover,a:active {
     font-size: 1em;
 }
 .actwtable tr:first-child td:first-child, .actwtable tr:first-child th:first-child {
-	border-top-left-radius: 10px;
+	border-top-left-radius: 4px;
 }
 .actwtable tr:last-child td:last-child, .actwtable tr:last-child th:last-child {
-	border-bottom-right-radius: 10px;
+	border-bottom-right-radius: 4px;
 }
 .actwtable tr:first-child td:last-child, .actwtable tr:first-child th:last-child {
 	border-top-right-radius: 4px;
