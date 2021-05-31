@@ -340,11 +340,11 @@ public class SComponentManagementService
 		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>> slis = new ArrayList<>(SUtil.notNull(getState(desc.getName()).getCmsListeners(desc.getName())));
 		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>> alis = new ArrayList<>(SUtil.notNull(getState(desc.getName()).getCmsListeners(null)));
 		
-		if(desc.getName().toString().indexOf("Sokrates")!=-1)
-		{
-			System.out.println("Listener for kill slis: "+slis);
-			System.out.println("Listener for kill alis: "+alis);
-		}
+//		if(desc.getName().toString().indexOf("Sokrates")!=-1)
+//		{
+//			System.out.println("Listener for kill slis: "+slis);
+//			System.out.println("Listener for kill alis: "+alis);
+//		}
 		
 		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: alis)
 		{

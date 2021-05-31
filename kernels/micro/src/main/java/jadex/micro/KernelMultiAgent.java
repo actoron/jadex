@@ -690,7 +690,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 				}
 				catch(Exception e)
 				{
-					System.out.println("Error reading: "+kk);
+					agent.getLogger().info("Predefined Jadex kernel not available: "+kk+", "+e);
 				}
 			}
 		}
