@@ -1061,7 +1061,7 @@ public class Starter
 	public synchronized static void scheduleRescueStep(IComponentIdentifier cid, Runnable run)
 	{
 		StackTraceElement[]	ste	= Thread.currentThread().getStackTrace();
-		System.out.println("rescue step for "+cid+" called from "+ste[2]);
+//		System.out.println("rescue step for "+cid+" called from "+ste[2]);
 		Tuple2<BlockingQueue, Thread> tup = rescuethreads!=null ? rescuethreads.get(cid.getRoot()) : null;
 		if(tup!=null)
 		{
