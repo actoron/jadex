@@ -19,7 +19,7 @@ public class Main
 	public static void main(String[] args) 
 	{
 		IExternalAccess platform = Starter.createPlatform(PlatformConfigurationHandler.getDefaultNoGui()).get();
-		CreationInfo ci = new CreationInfo().setFilename("jadex/bdi/examples/garbagecollector/GarbageCollector_classic.application.xml");
+		CreationInfo ci = new CreationInfo().setFilename("jadex/bdi/examples/garbagecollector_classic/GarbageCollector.application.xml");
 		platform.createComponent(ci).get();
 	}
 }
