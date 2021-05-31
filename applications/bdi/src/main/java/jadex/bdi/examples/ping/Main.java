@@ -19,7 +19,7 @@ public class Main
 	public static void main(String[] args) 
 	{
 		IExternalAccess platform = Starter.createPlatform(PlatformConfigurationHandler.getDefault()).get();
-		CreationInfo ci = new CreationInfo().setFilename("jadex/bdi/examples/ping/PingScenario.component.xml");
+		CreationInfo ci = new CreationInfo().setFilename("jadex/bdi/examples/ping/PingScenario.application.xml");
 		platform.createComponent(ci).get();
 	}
 }
