@@ -35,6 +35,7 @@ import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -56,6 +57,7 @@ import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.IPlatformSettings;
@@ -250,6 +252,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	
 	/** The list of network names (used by all service identifiers). */
 	protected Set<String> networknames;
+	
+	/** Flag if terminating. */
+	protected boolean terminating;
 	
 	/**
 	 *  Initialization.
@@ -646,9 +651,14 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			public IFuture<byte[]> execute(IInternalAccess ia)
 			{
-				doCleanup();
-				
 				final Future<byte[]> ret = new Future<byte[]>();
+				if (terminating)
+				{
+					ret.setException(new ComponentTerminatedException());
+					return ret;
+				}
+					
+				doCleanup();
 				
 				if (isSecurityMessage(header))
 				{
@@ -759,9 +769,15 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			public IFuture<Tuple2<ISecurityInfo, byte[]>> execute(IInternalAccess ia)
 			{
-				doCleanup();
-				
 				final Future<Tuple2<ISecurityInfo, byte[]>> ret = new Future<Tuple2<ISecurityInfo,byte[]>>();
+				
+				if (terminating)
+				{
+					ret.setException(new ComponentTerminatedException());
+					return ret;
+				}
+				
+				doCleanup();
 				
 				if (content.length > 0 && content[0] == -1)
 				{
@@ -2466,7 +2482,11 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  Shutdown the service.
 	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
-	public IFuture<Void>	shutdownService() {return IFuture.DONE;}
+	public IFuture<Void>	shutdownService()
+	{
+		terminating = true;
+		return IFuture.DONE;
+	}
 	
 	/**
 	 *  Sets the access for the component.
