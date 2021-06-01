@@ -293,14 +293,6 @@ public class StatusAgent implements IStatusService
 		
 		return fubar.waitForResultsIgnoreFailures(null);
 	}
-	
-	/**
-	 *  Get the current jadex version
-	 */
-	public String	getJadexVersion()
-	{
-		return VersionInfo.getInstance().getVersion()+" ("+VersionInfo.getInstance().getTimestamp()+")";
-	}
 
 	/**
 	 *  Main for testing.

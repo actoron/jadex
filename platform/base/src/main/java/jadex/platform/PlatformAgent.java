@@ -86,7 +86,8 @@ import jadex.platform.service.threadpool.ThreadPoolService;
 	@Argument(name=LOGGING_LEVEL, clazz=Level.class, defaultvalue="java.util.logging.Level.SEVERE"),
 	@Argument(name=UNIQUEIDS, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=PLATFORMPROXIES, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="simulation", clazz=boolean.class, defaultvalue="false")
+	@Argument(name="simulation", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name="printversion", clazz=boolean.class, defaultvalue="true", description="Print the Jadex version on startup and expose the version, where appropriate (e.g. REST headers).")
 })
 
 @ProvidedServices({

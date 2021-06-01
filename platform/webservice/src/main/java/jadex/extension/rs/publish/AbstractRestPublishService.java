@@ -61,6 +61,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.VersionInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
@@ -75,7 +76,6 @@ import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.ICommand;
-import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
@@ -119,6 +119,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 {
 	/** Async context info. */
 	public static final String ASYNC_CONTEXT_INFO = "__cinfo";
+
+	/** Http header for the Jadex version. */
+	public static final String HEADER_JADEX_VERSION = "x-jadex-version";
 
 	/** Http header for the call id (req and resp). */
 	public static final String HEADER_JADEX_CALLID = "x-jadex-callid";
@@ -1557,6 +1560,12 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			// add header for non-caching
 			response.addHeader("Cache-Control", "no-cache, no-store");
 			response.addHeader("Expires", "-1");
+			
+			// Add Jadex version header, if enabled
+			if(Boolean.TRUE.equals(Starter.getPlatformArgument(component.getId(), "printversion")))
+			{
+				response.addHeader(HEADER_JADEX_VERSION, VersionInfo.getInstance().toString());				
+			}
 		}
 
 		return sr;
@@ -2368,8 +2377,17 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 			ret.append("<div id=\"result\"></div>");
 
-			ret.append(
-				"<div class=\"powered\"> <span class=\"powered\">powered by</span> <span class=\"jadex\">Jadex Active Components</span> <a class=\"jadexurl\" href=\"http://www.activecomponents.org\">http://www.activecomponents.org</a> </div>\n");
+			ret.append("<div class=\"powered\"> <span class=\"powered\">powered by</span> <span class=\"jadex\">");
+			// Add Jadex version header, if enabled
+			if(Boolean.TRUE.equals(Starter.getPlatformArgument(component.getId(), "printversion")))
+			{
+				ret.append(VersionInfo.getInstance());
+			}
+			else
+			{
+				ret.append("Jadex Active Components");				
+			}
+			ret.append("</span> <a class=\"jadexurl\" href=\"http://www.activecomponents.org\">http://www.activecomponents.org</a> </div>\n");
 		}
 		catch(Exception e)
 		{

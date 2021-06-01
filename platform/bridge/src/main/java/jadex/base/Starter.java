@@ -23,6 +23,7 @@ import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.VersionInfo;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -715,6 +716,10 @@ public class Starter
 								{
 									public void customResultAvailable(Void result)
 									{
+										if(Boolean.TRUE.equals(component.getInternalAccess().getArgument("printversion")))
+										{
+											System.out.println(VersionInfo.getInstance());											
+										}
 										if(Boolean.TRUE.equals(config.getValue(IPlatformConfiguration.WELCOME, model)))
 										{
 											long startup = System.currentTimeMillis() - starttime;
@@ -1227,6 +1232,20 @@ public class Starter
 		return ret;
 	}
 
+
+	/**
+	 * Get a platform argument, i.e. global Jadex setting value as defined by arguments of jadex.platform.PlatformAgent.
+	 *
+	 * @param platform An id of any component on the platform. 
+	 * @param arg The argument name.
+	 * @return The value.
+	 */
+	public static Object getPlatformArgument(IComponentIdentifier cid, String arg)
+	{
+		IPlatformComponentAccess	platform	= (IPlatformComponentAccess)getPlatformValue(cid, DATA_PLATFORMACCESS);
+		return platform.getInternalAccess().getArgument(arg);
+	}
+	
 	/**
 	 * Get a global platform value.
 	 *

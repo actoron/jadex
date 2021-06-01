@@ -13,7 +13,7 @@ import java.util.Properties;
 
 
 /**
- *	Some version infos for Jadex.
+ *	Some version infos for Jadex, loaded from version.properties in classpath.
  */
 public class VersionInfo
 {
@@ -67,7 +67,7 @@ public class VersionInfo
 			if(timestamp.startsWith("$"))
 			{
 				// non build -> use file date
-				URL	url	= VersionInfo.class.getResource("version.properties");
+				URL	url	= VersionInfo.class.getResource("VersionInfo.class");
 				URLConnection	con	= url.openConnection();
 				date	= new Date(con.getLastModified());
 				con.getInputStream().close();	// Required to release file handle!
@@ -201,5 +201,13 @@ public class VersionInfo
 	public String getTimestamp()
 	{
 		return getDate()==null ? "unknown" : DATE_FORMAT_TIMESTAMP.format(getDate());
+	}
+
+	/**
+	 *  Get a human readable version string.
+	 */
+	public String	toString()
+	{
+		return "Jadex Version " + version + " ("+getTimestamp()+")";
 	}
 }
