@@ -127,6 +127,6 @@ public class EchoChatAgent
 //		{
 //		}
 		
-		System.out.println("fini");
+		//System.out.println("fini");
 	}
 }
