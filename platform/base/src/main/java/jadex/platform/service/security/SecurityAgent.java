@@ -2333,7 +2333,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							if (!state.getCryptoSuite().handleHandshake(SecurityAgent.this, secmsg))
 							{
 								if(debug)
-									System.out.println(agent.getId()+" finished handshake: " + secmsg.getSender() + " trusted:" + state.getCryptoSuite().getSecurityInfos().getRoles().contains(Security.TRUSTED));
+									System.out.println(agent.getId()+
+											" finished handshake: " + secmsg.getSender() +
+											" trusted:" + state.getCryptoSuite().getSecurityInfos().getRoles().contains(Security.TRUSTED)+
+											" authenticated networks: " + Arrays.toString(state.getCryptoSuite().getSecurityInfos().getNetworks().toArray()));
 								currentcryptosuites.put(secmsg.getSender().getRoot().toString(), state.getCryptoSuite());
 								//System.out.println("Removing Handshake " + secmsg.getSender().getRoot().toString());
 								initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
