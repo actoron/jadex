@@ -69,7 +69,7 @@ public class ArgumentsResultsComponentFeature extends AbstractComponentFeature	i
 	{
 //		System.out.println("cl: "+getComponent().getClassLoader());
 		
-//		if(getComponent().getComponentIdentifier().getName().indexOf("secu")!=-1)
+//		if(getComponent().getId().getName().toLowerCase().indexOf("intravma")!=-1)
 //			System.out.println("here");
 		
 		// Init the arguments with parameters.
@@ -94,7 +94,8 @@ public class ArgumentsResultsComponentFeature extends AbstractComponentFeature	i
 			dotname = getReverseName(dotname);
 		}
 		
-		Map<String, Object>	platformargs = (Map<String, Object>)Starter.getPlatformValue(getComponent().getId().getRoot(),  IPlatformConfiguration.PLATFORMARGS);
+		@SuppressWarnings("unchecked")
+		Map<String, Object>	platformargs = (Map<String, Object>)Starter.getPlatformValue(getComponent().getId().getRoot(), IPlatformConfiguration.PLATFORMARGS);
 		if(platformargs!=null)
 		{
 			IArgument[] margs = component.getModel().getArguments();
@@ -110,37 +111,39 @@ public class ArgumentsResultsComponentFeature extends AbstractComponentFeature	i
 //					if(dotname.toLowerCase().indexOf("cli")!=-1)
 //						System.out.println("sdfhjsdf");
 					
-					// Test different versions of argument names
-					// a) name directly contained
-					if(platformargs.containsKey(argname))
+					// Test different versions of argument names (highest prio first), e.g. "arg" for agent a@b.platform_123
+					
+					// 1) full application agent name (i.e. excluding platform), e.g. "b.a.arg"
+					if(platformargs.containsKey(dotname+"."+argname))
 					{
-						arguments.put(argname, platformargs.get(argname));
+						arguments.put(argname, platformargs.get(dotname+"."+argname));
 					}
-					// b1) agent name hierarchy aarg
-					else if(platformargs.containsKey(cid.getLocalName()+argname))
-					{
-						arguments.put(argname, platformargs.get(cid.getLocalName()+argname));
-					}
-					// b2) agent name hierarchy a.arg
+					// 2a) local agent name dot arg, e.g. "a.arg"
 					else if(platformargs.containsKey(cid.getLocalName()+"."+argname))
 					{
 						arguments.put(argname, platformargs.get(cid.getLocalName()+"."+argname));
 					}
-					// c) agent name hierarchy b.a.arg
-					else if(platformargs.containsKey(dotname+"."+argname))
+					// 2b) local agent name + arg, e.g. "aarg"
+					else if(platformargs.containsKey(cid.getLocalName()+argname))
 					{
-						arguments.put(argname, platformargs.get(dotname+"."+argname));
+						arguments.put(argname, platformargs.get(cid.getLocalName()+argname));
 					}
-					// d) agent type name
+					
+					// 3) agent type name
 					else if(platformargs.containsKey(getComponent().getModel().getName()+"."+argname))
 					{
 						arguments.put(argname, platformargs.get(getComponent().getModel().getName()+"."+argname));
 					}
-//					// todo: e) agent type hierarchy name
+//					// todo: 4) agent type hierarchy name
 //					else if(platformargs.containsKey(getComponent().getModel().getName()))
 //					{
 //						
 //					}
+					// 999...) name directly contained
+					else if(platformargs.containsKey(argname))
+					{
+						arguments.put(argname, platformargs.get(argname));
+					}
 				}
 			}
 		}
@@ -190,7 +193,7 @@ public class ArgumentsResultsComponentFeature extends AbstractComponentFeature	i
 		{
 			b.append(res.get(0));
 			if(i+1<res.size())
-				b.append(".");
+				b.append(":");
 		}
 		return b.toString();
 	}
@@ -366,7 +369,7 @@ public class ArgumentsResultsComponentFeature extends AbstractComponentFeature	i
 	public Object get(Object key)
 	{
 		Object	ret	= null;
-		if(arguments.containsKey(key))
+		if(arguments!=null && arguments.containsKey(key))
 		{
 			ret	= arguments.get(key);
 		}
@@ -394,7 +397,7 @@ public class ArgumentsResultsComponentFeature extends AbstractComponentFeature	i
 	 */
 	public Map<String, Object> getArguments()
 	{
-		return arguments==null? Collections.EMPTY_MAP: arguments;
+		return arguments==null? Collections.emptyMap(): arguments;
 	}
 	
 	/**
@@ -422,6 +425,15 @@ public class ArgumentsResultsComponentFeature extends AbstractComponentFeature	i
 	public IFuture<Map<String, Object>> getResultsAsync()
 	{
 		return new Future<Map<String, Object>>(getResults());
+	}
+	
+	/**
+	 *  Get the exception, if any.
+	 *  @return The failure reason for use during cleanup, if any.
+	 */
+	public IFuture<Exception> getExceptionAsync()
+	{
+		return new Future<>(component.getException());
 	}
 	
 	/**

@@ -9,13 +9,13 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 
 /**
  *  Agent that searches for services.
@@ -30,7 +30,8 @@ public class ServiceQueryAgent
 	/**
 	 *  Perform the agents actions.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 		IComponentStep<Void> step = new IComponentStep<Void>()
@@ -39,8 +40,8 @@ public class ServiceQueryAgent
 			{
 				final long start = System.currentTimeMillis();
 				
-				agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IExampleService.class, RequiredServiceInfo.SCOPE_NETWORK))
-					.addIntermediateResultListener(new IIntermediateResultListener<IExampleService>()
+				agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IExampleService.class, ServiceScope.NETWORK))
+					.addResultListener(new IntermediateEmptyResultListener<IExampleService>()
 				{
 					Set<IComponentIdentifier> plats = new HashSet<IComponentIdentifier>();
 					int cnt = 0;

@@ -6,8 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  Marker for agent killed method.
+ *  A method marked with this annotation will be called just before the component is removed from the platform.
+ *
+ *  use: @OnEnd
  */
+@Deprecated
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AgentKilled

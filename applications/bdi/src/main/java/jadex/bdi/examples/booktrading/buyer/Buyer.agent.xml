@@ -85,7 +85,7 @@
 	</expressions>
 
 	<services>
-		<requiredservice name="buyservice" class="IBuyBookService" multiple="true">
+		<requiredservice name="buyservice" class="IBuyBookService" >
 			<binding scope="global"/>
 		</requiredservice>
 	</services>

@@ -38,7 +38,7 @@
 	</beliefs>
 
 	<goals>
-		<maintaingoal name="maintain" exclude="never" retrydelay="100">
+		<maintaingoal name="maintain" exclude="never" retrydelay="100"><!-- dummy retry delay overridden by test plan -->
 			<contextcondition>
  				$beliefbase.context
 			</contextcondition>

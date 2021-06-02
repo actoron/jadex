@@ -1,5 +1,6 @@
 package jadex.bdiv3.testcases.componentplans;
 
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -27,7 +28,8 @@ public class ComponentPlanAgent
 	/**
 	 *  Plan body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void>	body()
 	{
 		System.out.println("Setting success: "+parent);

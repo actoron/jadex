@@ -33,6 +33,21 @@ import java.lang.annotation.Target;
 public @interface GoalCreationCondition
 {
 	/**
+	 *  The fact added belief names, i.e. the goal will be created whenever a fact is added to the given belief set(s).
+	 */
+	public String[] factadded() default {};
+	
+	/**
+	 *  The fact removed belief names, i.e. the goal will be created whenever a fact is removed from the given belief set(s).
+	 */
+	public String[] factremoved() default {};
+	
+	/**
+	 *  The fact changed belief names, i.e. the goal will be created whenever a fact of a given belief (set) changes.
+	 */
+	public String[] factchanged() default {};
+	
+	/**
 	 *  The events this condition should react to.
 	 */
 	public String[] beliefs() default {};

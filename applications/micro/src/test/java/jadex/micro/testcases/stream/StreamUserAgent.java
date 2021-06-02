@@ -2,17 +2,15 @@ package jadex.micro.testcases.stream;
 
 import java.util.Map;
 
-import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
@@ -32,17 +30,20 @@ import jadex.micro.testcases.TestAgent;
  *  Agent that provides a service with a stream.
  */
 @Agent
-@RequiredServices(@RequiredService(name="ss", type=IStreamService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL))
+@RequiredServices(@RequiredService(name="ss", type=IStreamService.class, scope=ServiceScope.GLOBAL))
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class StreamUserAgent extends TestAgent
 {
-	public IPlatformConfiguration getConfig()
-	{
-		IPlatformConfiguration ret = STest.getDefaultTestConfig();
-		ret.getExtendedPlatformConfiguration().setSimul(false);
-		ret.getExtendedPlatformConfiguration().setSimulation(false);
-		return ret;
-	}
+//	public IPlatformConfiguration getConfig()
+//	{
+//		IPlatformConfiguration ret = STest.getRealtimeTestConfig(getClass());
+//		
+////		// For debugging heisenbug
+////		ret.setLogging(true);
+////		ret.setValue("security.debug", true);
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  The test count.
@@ -67,8 +68,7 @@ public class StreamUserAgent extends TestAgent
 		{
 			public void customResultAvailable(Integer testcnt)
 			{
-//				testRemote(testcnt.intValue(), tc, false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
-				testRemote(1, tc, false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+				testRemote(testcnt, tc, false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 				{
 					public void customResultAvailable(Integer testcnt)
 					{
@@ -154,13 +154,14 @@ public class StreamUserAgent extends TestAgent
 //			}
 //		}));
 		
-		IExternalAccess platform = STest.createPlatform(getConfig());
+//		IExternalAccess platform = createPlatform(getConfig(), null).get();
+		IExternalAccess platform = setupRemotePlatform(false).get();
 		performTests(testno, platform.getId(), tc)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
 		{
 			public void customResultAvailable(final Integer result)
 			{
-				platform.killComponent();
+//				platform.killComponent();
 		//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
 		//						{
 		//							public void customResultAvailable(Map<String, Object> v)
@@ -198,25 +199,25 @@ public class StreamUserAgent extends TestAgent
 						{
 							public void customResultAvailable(TestReport result)
 							{
-								System.out.println(result);
+								System.out.println("Test result: "+agent+", "+root+", "+result);
 								tc.addReport(result);
 								testGetOutputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 								{
 									public void customResultAvailable(TestReport result)
 									{
-										System.out.println(result);
+										System.out.println("Test result: "+agent+", "+root+", "+result);
 										tc.addReport(result);
 										testPassInputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 										{
 											public void customResultAvailable(TestReport result)
 											{
-												System.out.println(result);
+												System.out.println("Test result: "+agent+", "+root+", "+result);
 												tc.addReport(result);
 												testPassOutputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 												{
 													public void customResultAvailable(TestReport result)
 													{
-														System.out.println(result);
+														System.out.println("Test result: "+agent+", "+root+", "+result);
 														tc.addReport(result);
 														destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Integer>(ret)
 														{
@@ -380,7 +381,7 @@ public class StreamUserAgent extends TestAgent
 	protected IFuture<TestReport> testPassOutputStream(int testno, IStreamService ss)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
-		final TestReport tr = new TestReport("#"+testno, "Test passInputStream()");
+		final TestReport tr = new TestReport("#"+testno, "Test passOutputStream()");
 		
 		ServiceInputConnection con = new ServiceInputConnection();
 		

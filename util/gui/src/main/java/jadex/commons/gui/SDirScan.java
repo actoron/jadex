@@ -17,6 +17,7 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
 public class SDirScan
@@ -44,7 +45,7 @@ public class SDirScan
 		
 		final ISubscriptionIntermediateFuture<String> fut = asyncScanForFiles(urls, filefilter);
 		
-		fut.addResultListener(new IIntermediateResultListener<String>()
+		fut.addResultListener(new IntermediateEmptyResultListener<String>()
 		{
 			int resultcnt = 0;
 			
@@ -97,6 +98,7 @@ public class SDirScan
 //				System.out.println("finiiii");
 				ret.setFinishedIfUndone();
 			}
+			
 		});
 		
 		return ret;
@@ -173,7 +175,7 @@ public class SDirScan
 				else if(f.isDirectory())
 				{
 					final ISubscriptionIntermediateFuture<String> fut = asyncScanDir(urls, f, filter, new ArrayList<String>());
-					fut.addResultListener(new IIntermediateResultListener<String>()
+					fut.addResultListener(new IntermediateEmptyResultListener<String>()
 					{
 						public void intermediateResultAvailable(String result)
 						{
@@ -277,7 +279,7 @@ public class SDirScan
 					if(!donedirs.contains(dir.getAbsolutePath()))
 					{
 						final ISubscriptionIntermediateFuture<String> fut = asyncScanDir(urls, dir, filter, donedirs);
-						fut.addResultListener(new IIntermediateResultListener<String>()
+						fut.addResultListener(new IntermediateEmptyResultListener<String>()
 						{
 							public void intermediateResultAvailable(String result)
 							{

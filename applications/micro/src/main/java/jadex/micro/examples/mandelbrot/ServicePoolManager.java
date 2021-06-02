@@ -11,7 +11,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
@@ -19,8 +19,8 @@ import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 
 /**
@@ -89,7 +89,7 @@ public class ServicePoolManager
 	 */
 	public IIntermediateFuture	performTasks(Set tasks, boolean retry, Object user)
 	{
-//		System.out.println("Peforming "+tasks.size()+" tasks");
+		System.out.println("Peforming "+tasks.size()+" tasks");
 //		System.out.println("Performing tasks: busy="+busy.size()+", free="+free.size());
 		
 		// Allocation data binds tasks together to a single result future.
@@ -153,7 +153,7 @@ public class ServicePoolManager
 		// Start timer to be triggered when search is not finished after 1 second.
 		if(timer==null)
 		{
-			component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, ServiceScope.PLATFORM))
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -200,7 +200,7 @@ public class ServicePoolManager
 			
 //			System.out.println("wurksn0");
 			component.getFeature(IRequiredServicesFeature.class).getServices(name).addResultListener(
-				new IIntermediateResultListener<Object>()
+				new IntermediateEmptyResultListener<Object>()
 			{
 				/**
 				 *  A service has been found.

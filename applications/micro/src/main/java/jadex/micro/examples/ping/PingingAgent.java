@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -13,6 +13,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -22,6 +23,7 @@ import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnMessage;
 
 /**
  *  Agent that pings another and waits for its replies.
@@ -56,7 +58,8 @@ public class PingingAgent
 	/**
 	 *  Execute the body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -85,10 +88,11 @@ public class PingingAgent
 					msg.put(SFipa.PERFORMATIVE, SFipa.QUERY_IF);
 					msg.put(SFipa.CONVERSATION_ID, convid);
 					msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
-//					msg.put(SFipa.SENDER, getComponentIdentifier());
+					// sender is used for reply
+					msg.put(SFipa.SENDER, agent.getId());
 					dif++;
 					sent.add(convid);
-					agent.getFeature(IMessageFeature.class).sendMessage(msg, receiver);
+					agent.getFeature(IMessageFeature.class).sendMessage(msg, receiver).get();
 					agent.getFeature(IExecutionFeature.class).waitForDelay(timeout, this);
 				}
 				return IFuture.DONE;
@@ -97,7 +101,7 @@ public class PingingAgent
 		
 		if(receiver==null)
 		{
-			receiver = new BasicComponentIdentifier("Ping", agent.getId().getParent());
+			receiver = new ComponentIdentifier("Ping", agent.getId().getParent());
 		}
 //			createComponentIdentifier("Ping").addResultListener(new DefaultResultListener()
 //			{
@@ -121,9 +125,11 @@ public class PingingAgent
 	/**
 	 *  Called when a message arrives.
 	 */
-	@AgentMessageArrived
+	//@AgentMessageArrived
+	@OnMessage
 	public void messageArrived(Map<String, Object> msg)
 	{
+		System.out.println("msg: "+agent.getId()+" "+msg);
 		String convid = (String)msg.get(SFipa.CONVERSATION_ID);
 		if(sent.remove(convid))
 		{

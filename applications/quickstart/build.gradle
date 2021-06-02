@@ -6,4 +6,7 @@ dependencies
 	implementation project(':platform:bridge')
 	implementation project(':kernels:micro')
 	implementation project(':kernels:bdiv3')
+
+ 	// Allow starting examples from Main.java without extra dependencies
+ 	runtimeOnly project(':distributions:minimal')
 }

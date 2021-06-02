@@ -17,7 +17,9 @@ import javax.swing.SwingUtilities;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -34,11 +36,8 @@ import jadex.commons.gui.SGUI;
 import jadex.micro.IntervalBehavior;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -51,7 +50,7 @@ import jadex.micro.annotation.RequiredServices;
  *  
  *  It offers the executeCommand() method via the ICliService.
  */
-@Agent(autostart=@Autostart(Boolean3.TRUE))
+@Agent(autostart=Boolean3.TRUE)
 @Service
 @Arguments(
 {
@@ -61,8 +60,8 @@ import jadex.micro.annotation.RequiredServices;
 })
 @ProvidedServices(
 {
-	@ProvidedService(name="cliser", scope=RequiredService.SCOPE_PLATFORM, type=ICliService.class, implementation=@Implementation(expression="$pojoagent")),
-	@ProvidedService(type=IInternalCliService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"cliser\")"))
+	@ProvidedService(name="cliser", scope=ServiceScope.PLATFORM, type=ICliService.class),
+	@ProvidedService(type=IInternalCliService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"cliser\")"))
 })
 @RequiredServices(
 	@RequiredService(name="dtp", type=IDaemonThreadPoolService.class)
@@ -99,7 +98,8 @@ public class CliAgent implements ICliService, IInternalCliService
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		shells = new HashMap<Tuple2<String, Integer>, Tuple2<ACliShell, Long>>();
@@ -134,7 +134,8 @@ public class CliAgent implements ICliService, IInternalCliService
 	/**
 	 *  Called when the agent is killed.
 	 */
-	@AgentKilled
+	@OnEnd
+	//@AgentKilled
 	public void	killed()
 	{
 		aborted	= true;

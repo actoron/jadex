@@ -15,7 +15,7 @@ public class ShutdownTesterPlan extends Plan
 	{
 		try
 		{
-			getAgent().killComponent(getComponentIdentifier().getRoot()).get();
+			getAgent().getExternalAccess(getComponentIdentifier().getRoot()).killComponent().get();
 			System.out.println("Remote platform successfully shutdowned.");
 		}
 		catch(GoalFailureException e)

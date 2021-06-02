@@ -120,4 +120,27 @@ public interface IEncodingContext extends IRootObjectContext
 	 *  @return The number of bytes written.
 	 */
 	public long getWrittenBytes();
+	
+	/**
+	 *  Starts an object frame
+	 *  when using a context with framing support.
+	 */
+	public void startObjectFrame();
+	
+	/**
+	 *  Starts an object frame
+	 *  when using a context with framing support.
+	 *  
+	 *  @param fixedsize If true, use fixed-size (integer) framing.
+	 *  				 Set true if the object being framed is expected
+	 *  				 to be larger than 127 bytes (same type of object MUST use
+	 *  				 either fixed OR variable framing).
+	 */
+	public void startObjectFrame(boolean fixedsize);
+	
+	/**
+	 *  Stops an object frame
+	 *  when using a context with framing support.
+	 */
+	public void stopObjectFrame();
 }

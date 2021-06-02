@@ -12,7 +12,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
@@ -36,7 +36,7 @@ import jadex.micro.testcases.TestAgent;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="ts", type=ITestService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL)
+	@RequiredService(name="ts", type=ITestService.class, scope=ServiceScope.GLOBAL)
 })
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 3)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class TimeoutTestAgent extends TestAgent
@@ -48,18 +48,18 @@ public class TimeoutTestAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+//		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
 		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
-				agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
+//				agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
 				tc.addReport(result);
 				testRemote(2).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
-						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
+//						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -142,7 +142,7 @@ public class TimeoutTestAgent extends TestAgent
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
 				System.out.println("Comp created: "+cid);
-				callService(cid, testno, 5000).addResultListener(new DelegationResultListener<TestReport>(ret));
+				callService(cid, testno, Starter.getScaledDefaultTimeout(agent.getId(), 1/6.0)).addResultListener(new DelegationResultListener<TestReport>(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -190,10 +190,8 @@ public class TimeoutTestAgent extends TestAgent
 		{
 			public void customResultAvailable(final ITestService ts)
 			{
-				// Use clock (i.e. sim time) for local and real time for remote
-				final long start = agent.getId().getRoot().equals(cid.getRoot())
-					? agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class)).getTime()
-					: System.currentTimeMillis();
+				// Use clock (i.e. sim time) for local and remote
+				final long start = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class)).getTime();
 					
 				// create a service call meta object and set the timeout
 				if(to!=-1)
@@ -224,10 +222,8 @@ public class TimeoutTestAgent extends TestAgent
 						}
 						else if(exception instanceof TimeoutException)
 						{
-							// Use clock (i.e. sim time) for local and real time for remote
-							long end = agent.getId().getRoot().equals(cid.getRoot())
-								? agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class)).getTime()
-								: System.currentTimeMillis();
+							// Use clock (i.e. sim time) for local and remote
+							long end = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class)).getTime();
 							long diff = end - (start+to);
 							if(to==Timeout.NONE || diff>=0 && diff<Starter.getScaledDefaultTimeout(agent.getId(), 1.0/15)) // 2 secs max overdue delay? ignore diff when deftimeout==-1
 							{

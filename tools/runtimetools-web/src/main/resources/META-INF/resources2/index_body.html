@@ -1,0 +1,337 @@
+<!-- 
+	Defines shared web components functionality as global variables :-(
+	
+	language: handling i18n
+	jadex: handling jadex calls
+	loader: dynamically loading resources 
+	cache: cache for resources by url
+ -->
+ 
+<script type="text/javascript">
+	//console.log("body");
+	
+	// Add a format method for Date 
+	Date.prototype.yyyymmdd = function(sep) 
+	{
+		var mm = (this.getMonth() + 1).toString();
+		var dd = this.getDate().toString();
+		return [this.getFullYear(), (mm.length===2 ? '' : '0')+mm, (dd.length===2 ? '' : '0')+dd].join(sep? sep: '');
+	};
+	//var now = new Date();
+	//alert(now.yyyymmdd()+" "+now.yyyymmdd('-'));
+	
+	Array.prototype.equals = function(a, b) 
+	{
+		if (a === b) return true;
+		if (a == null || b == null) return false;
+		if (a.length != b.length) return false;
+	
+		for (var i = 0; i < a.length; ++i) {
+	    	if (a[i] !== b[i]) return false;
+	  	}
+	  	return true;
+	};
+	
+	// not using var to set a global variable
+	var PROMISE_DOME = Promise.resolve("Dummy response to keep the console quiet");
+	
+	var jadex = 
+	{
+		transform: 
+		{
+			// Currently this impl is the same as internal axios 
+			transformResponse: [function(data) 
+			{
+				/*daterev = function reviver(key, value) 
+				{
+					if(typeof value === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(value)) 
+					{
+				    	return new Date(value);
+				    }
+				    return value;
+				}*/
+				try
+				{
+					var ret = JSON.parse(data);//, daterev);
+					//console.log("json: "+ret);
+					return ret;
+				}
+				catch(ex)
+				{
+					//console.log("ex: "+ex);
+				}
+				//console.log("data: "+data);
+				return data;
+			}]
+		},	
+			
+		getIntermediate: function(path, handler, error, maxhandler) 
+		{
+			// problem with hanging requests to same URL because of cache
+			// https://stackoverflow.com/questions/27513994/chrome-stalls-when-making-multiple-requests-to-same-resource
+			if(path.indexOf("?")==-1)
+				path = path+'?__random='+Math.random();
+			else 
+				path = path+'&__random='+Math.random();
+			
+			var terminated = false;
+			var call;
+	
+			var erfunc = function(err)
+			{
+				//if(axios.isCancel(err))
+	             //   console.log('request canceled', err.message);
+				
+				if(terminated)
+				{
+					//console.log("call terminated: "+path);
+					return;
+				}
+				
+				error(err);
+			}
+			
+			var	func = function(resp)
+			{
+				if(terminated)
+				{
+					//console.log("call terminated: "+path);
+					return;
+				}
+				
+				var fini = resp.headers["x-jadex-callidfin"];
+				var callid = resp.headers["x-jadex-callid"];
+				var max = resp.headers["x-jadex-max"];
+				
+				if(resp.status!=202)	// ignore updatetimer commands
+				{
+					if(max!=null)
+						maxhandler(max);
+					else
+						handler(resp);
+				}
+				
+				call = axios.CancelToken.source();
+
+				//console.log("received: "+resp)
+				
+				//console.log("call headers: "+resp.headers["x-jadex-callid"]+" "+resp.headers["x-jadex-callidfin"]);
+				
+				if(fini)
+				{
+					//console.log("call finished: "+fini);
+				}
+				else
+				{
+					if(callid!=null)
+					{
+						//console.log("long-poll request sent: "+path);
+						axios.get(path, {cancelToken: call.token, headers: {'x-jadex-callid': callid, 'cache-control': 'no-store'}}, this.transform).then(func).catch(erfunc); 
+					}
+				}
+				
+				return callid;
+			};
+			
+			var prom = new Promise(function(resolve, reject)
+			{
+				//console.log("initial request sent: "+path);
+				call = axios.CancelToken.source();
+				axios.get(path, {cancelToken: call.token, headers: {'cache-control': 'no-cache'}}, this.transform)
+					.then(function(resp) 
+					{
+						var callid = func(resp); 
+						if(callid!=null) 
+						{
+							//console.log("received callid: "+callid);
+							resolve(callid);
+						}
+					})
+					.catch(function(err) 
+					{
+						reject(err); 
+						erfunc(err);
+					});
+			});
+			
+			var termcom = function(reason)
+			{
+				return new Promise(function(resolve, reject)
+				{
+					prom.then(function(callid)
+					{
+						if(call)
+				            call.cancel();
+						
+						terminated = true;
+						var r = reason==null? 'true': reason;
+						
+						//console.log("terminating request sent: "+path);
+						axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': r, headers: {'x-jadex-callid': callid, 'cache-control': 'no-cache'}}}, this.transform)
+							.then(resolve).catch(reject); 
+					})
+					.catch(function(err)
+					{
+						console.log("error: "+err);
+						reject(err);
+					});
+				});
+			}
+			
+			// return termination command
+			return termcom;
+		},
+		
+		createProxy: function(cid, servicetype)
+		{
+			let ret = new Proxy({cid: cid, type:servicetype, transform:self.transform},
+			{
+				get: function(service, prop)
+				{
+					let callstrprefix = 'webjcc/invokeServiceMethod?cid='+service.cid+'&servicetype='+service.type+'&methodname='+prop;
+					return function(...args)
+					{
+						let callstr = callstrprefix;
+						for (let i = 0; i < args.length; i++)
+							callstr += '&args_'+i+'='+args[i];
+						
+						return axios.get(callstr, service.transform);
+			        }
+				}
+		    });
+			return ret;
+		}
+		
+		/*generateUUID: function() 
+		{ 
+		    var d = new Date().getTime();
+		    if(typeof performance !== 'undefined' && typeof performance.now === 'function')
+		        d += performance.now();
+		    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) 
+		    {
+		        var r = (d + Math.random() * 16) % 16 | 0;
+		        d = Math.floor(d / 16);
+		        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+		    });
+		}*/
+	};
+		
+	var loader = 
+	{
+		loaded: {},
+	    getHead: function()
+	    {
+	    	return document.getElementsByTagName("head")[0];
+	    },
+	    loadStyle: function(i, files, callback)
+        {
+       		var self = this;
+
+       		if(i>=files.length)
+        	{
+        		callback();
+        	}
+        	else if(this.loaded[files[i]]!=null)
+        	{
+        		//console.log("already loaded css: "+files[i]);
+        		self.loadStyle(i+1, files, callback);
+        	}
+        	else
+        	{
+        		this.loaded[files[i]] = files[i];
+        		
+        		var link = document.createElement("link");
+	            link.rel = "stylesheet";
+	            link.type = "text/css";
+	            link.href = files[i];
+	            
+	            link.onload = function ()
+	            {
+	            	console.log('Loaded style: ' + files[i]);
+	            	self.loadStyle(i+1, files, callback);
+	            };
+	            link.onerror = function ()
+	            {
+	                console.log('Error loading style: ' + files[i]);
+	                self.loadStyle(i+1, files, callback);
+	            };
+	            
+	            //console.log('Loading style ' + files[i]);
+	           	self.getHead().appendChild(link);
+        	}
+        },
+        loadScript: function(i, files, callback)
+        {
+       		var self = this;
+
+       		if(i>=files.length)
+        	{
+        		callback();
+        	}
+        	else if(this.loaded[files[i]]!=null)
+        	{
+        		//console.log("already loaded script: "+files[i]);
+        		self.loadScript(i+1, files, callback);
+        	}
+        	else
+        	{
+        		this.loaded[files[i]] = files[i];
+        		
+				console.log("loading script content start: "+files[i]);
+        		axios.get(files[i]).then(function(resp)
+    			{
+    				console.log("loaded script content end: "+files[i]);//+" "+resp.data);
+    				
+    				// directly loading via a script src attributes has the
+    				// disadvantage that the type is checked from the response
+    				// throwing check errors :-(
+    						
+    				var js = resp.data;    				
+    	            var script = document.createElement('script');
+    	            script.type = "module";
+    	            script.textContent = js;
+    				
+    				/*script.onload = function ()
+		            {
+		                console.log('Loaded script fini: ' + files[i]);
+		                self.loadScript(i+1, files, callback);
+		            };
+		            script.onerror = function ()
+		            {
+		                console.log('Error loading script: ' + files[i]);
+		                self.loadScript(i+1, files, callback);
+		            };*/
+    				
+		            self.getHead().append(script);
+			    	self.loadScript(i+1, files, callback);
+    			})
+    			.catch(function(err)
+    			{
+    				console.log("Error loading script: "+files[i]);
+    				self.loadScript(i+1, files, callback);
+    			})
+    				
+	            //var script = document.createElement('script');
+	            //script.type = 'text/javascript';
+	            //script.type = 'module';
+	            //script.src = files[i];
+	            
+	            //console.log('Loading script ' + files[i]);
+	            //self.getHead().appendChild(script);
+        	}
+        },
+        loadFiles: function(cssfiles, jsfiles, callback)
+        {
+        	var self = this;
+        	
+        	// loads recursively
+            self.loadStyle(0, cssfiles, function()
+            {
+            	self.loadScript(0, jsfiles, callback);
+            });
+        },
+	};
+</script>
+
+<jadex-app></jadex-app>
+<!-- <jadex-test></jadex-test> -->

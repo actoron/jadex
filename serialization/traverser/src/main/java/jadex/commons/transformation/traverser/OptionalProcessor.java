@@ -4,7 +4,6 @@ package jadex.commons.transformation.traverser;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 
 import jadex.commons.SReflect;
 
@@ -77,9 +76,9 @@ public class OptionalProcessor implements ITraverseProcessor
 		Object result = null;
 		if (SCloner.isCloneContext(context)) {
 			try {
-				Boolean isPresent = (Boolean) isPresentMethod.invoke(object, null);
+				Boolean isPresent = (Boolean) isPresentMethod.invoke(object);
 				if (isPresent) {
-					Object subobject = getMethod.invoke(object, null);
+					Object subobject = getMethod.invoke(object);
 					Object newval = traverser.doTraverse(subobject, null, conversionprocessors, processors, mode, targetcl, context);
 					if(newval != Traverser.IGNORE_RESULT) {
 						result = ofMethod.invoke(optionalClass, newval);
@@ -88,7 +87,7 @@ public class OptionalProcessor implements ITraverseProcessor
 						result = ofMethod.invoke(optionalClass, subobject);
 					}
 				} else {
-					result = emptyMethod.invoke(optionalClass, null);
+					result = emptyMethod.invoke(optionalClass);
 				}
 			} catch (Exception e) {
 				throw new RuntimeException(e);

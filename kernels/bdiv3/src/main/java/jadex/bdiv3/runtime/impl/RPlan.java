@@ -30,7 +30,6 @@ import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -406,8 +405,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	{
 		Future<Object> ret = new Future<Object>();
 		
-		if(rplan.toString().indexOf("cnp_make_proposal")!=-1)
-			System.out.println("execute plan: "+rplan);
+//		if(rplan.toString().indexOf("cnp_make_proposal")!=-1)
+//			System.out.println("execute plan: "+rplan);
 		
 //		executePlan(rplan, ia, null);
 		IConditionalComponentStep<Void> action = new ExecutePlanStepAction(rplan);
@@ -415,8 +414,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		
 		rplan.addListener(new DelegationResultListener<Object>(ret));
 		
-		if(rplan.toString().indexOf("cnp_make_proposal")!=-1)
-			System.out.println("scheduled plan: "+rplan);
+//		if(rplan.toString().indexOf("cnp_make_proposal")!=-1)
+//			System.out.println("scheduled plan: "+rplan);
 		
 		return ret;
 	}
@@ -521,6 +520,16 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	{
 //		if(lifecyclestate.equals(PlanLifecycleState.ABORTED))
 //			System.out.println("state: "+this+", "+lifecyclestate);
+		
+		// Cleanup previous lifecycle phase
+		if(subgoals!=null)
+		{
+			for(IGoal subgoal: subgoals)
+			{
+				// Todo: wait for goals dropped?
+				subgoal.drop();
+			}
+		}
 		
 		this.lifecyclestate = lifecyclestate;
 		
@@ -893,9 +902,10 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	/**
 	 * 
 	 */
-	public IFuture<Void>	abort()
+	public IFuture<Void> abort()
 	{
-//		System.out.println("aborting: "+this+" "+IComponentIdentifier.LOCAL.get());
+		//if(agent.getId().toString().indexOf("Sokrates")!=-1)
+		//System.out.println("aborting: "+this+" "+IComponentIdentifier.LOCAL.get()+" "+agent.getId());
 		
 		if(!isFinishing())
 		{
@@ -906,15 +916,6 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	//			setLifecycleState(PLANLIFECYCLESTATE_ABORTED);
 				Exception ex = new PlanAbortedException();
 				setException(ex); // remove? // todo: BodyAborted
-				
-				if(subgoals!=null)
-				{
-					for(IGoal subgoal: subgoals)
-					{
-						// Todo: wait for goals dropped?
-						subgoal.drop();
-					}
-				}
 				
 				// Stop plan execution if any.
 //				System.out.println("aborting2: "+this);
@@ -936,14 +937,14 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 							ICommand<ResumeCommandArgs> resc = getResumeCommand();
 							if(resc!=null)
 							{
-//								System.out.println("aborting5: "+this+", "+resc);
+								//System.out.println("aborting5: "+this+", "+resc);
 								resc.execute(new ResumeCommandArgs(null, null, ex));
 							}
 							List<ICommand<ResumeCommandArgs>> rescoms = getResumeCommands();
 							if(rescoms!=null)
 							{
 								ICommand<ResumeCommandArgs>[] tmp = (ICommand<ResumeCommandArgs>[])rescoms.toArray(new ICommand[rescoms.size()]);
-//								System.out.println("aborting6: "+this+", "+SUtil.arrayToString(tmp));
+								//System.out.println("aborting6: "+this+", "+SUtil.arrayToString(tmp));
 								for(ICommand<ResumeCommandArgs> rescom: tmp)
 								{
 									rescom.execute(new ResumeCommandArgs(null, null, ex));
@@ -951,6 +952,11 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 							}
 	//					}
 	//				});
+				}
+				else
+				{
+					// happens with state=RUNNING ?!
+					//System.out.println("plan abort: not performing abort due to plan state: "+getProcessingState());
 				}
 	//			// Can be currently executing and being abort due to e.g. goal condition triggering
 	//			else if(PlanProcessingState.RUNNING.equals(getProcessingState()))
@@ -1092,6 +1098,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public IFuture<Void> waitFor(long delay)
 	{
+		//System.out.println("before wait: "+delay+" "+agent.getId());
+		
 		final Future<Void> ret = new BDIFuture<Void>();
 		
 		final ResumeCommand<Void> rescom = new ResumeCommand<Void>(ret, true);
@@ -1102,6 +1110,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				//System.out.println("after wait: "+delay+" "+agent.getId());
 //				if(rescom.equals(getResumeCommand()))
 				{
 					rescom.execute(null);
@@ -1518,7 +1527,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		final Future<ITimer> ret = new Future<ITimer>();
 		if(timeout>-1)
 		{
-			IClockService	cs	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+			IClockService	cs	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class));
 			ITimedObject to	= new ITimedObject()
 			{
 				public void timeEventOccurred(long currenttime)
@@ -1582,7 +1591,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //	{
 //		final Future<ITimer> ret = new Future<ITimer>();
 //		
-//		IClockService cs = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//		IClockService cs = getComponent().getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
 //		ITimedObject	to	=  	new ITimedObject()
 //		{
 //			public void timeEventOccurred(long currenttime)
@@ -2039,6 +2048,18 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public boolean	isSucceeded()
 	{
 		return isPassed();
+	}
+	
+	/**
+	 *  Check if the element is currently part of the agent's reasoning.
+	 *  E.g. the bases are always adopted and all of their contents such as goals, plans and beliefs.
+	 */
+	public boolean	isAdopted()
+	{
+		return true;
+//	 	// Hack!!! Subgoals removed to late, TODO: fix hierarchic goal plan lifecycle management
+//		System.out.println(this + " isAdopted(): "+(!(getReason() instanceof RParameterElement) || ((RParameterElement) getReason()).isAdopted()));
+//		return !(getReason() instanceof RParameterElement) || ((RParameterElement) getReason()).isAdopted();
 	}
 	
 //	/**

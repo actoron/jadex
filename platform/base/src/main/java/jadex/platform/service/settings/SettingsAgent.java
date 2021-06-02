@@ -14,6 +14,8 @@ import java.util.logging.Level;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -32,14 +34,14 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.Autostart;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  *  Agent that provides the settings service.
  */
 @Service
-@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.TRUE, predecessors="jadex.platform.service.context.ContextAgent"))
+@Agent(autoprovide=Boolean3.TRUE,
+	autostart=Boolean3.TRUE)
 public class SettingsAgent	implements ISettingsService
 {
 	// -------- constants --------
@@ -73,9 +75,6 @@ public class SettingsAgent	implements ISettingsService
 	@AgentArgument
 	protected boolean	readonly;
 	
-	/** The context service. */
-	//protected IContextService contextService;
-	
 	//-------- Service methods --------
 	
 	/**
@@ -83,6 +82,7 @@ public class SettingsAgent	implements ISettingsService
 	 *  @return A future that is done when the service has completed starting.  
 	 */
 	@ServiceStart
+	//@OnStart
 	public IFuture<Void>	startService()
 	{
 		this.providers	= new LinkedHashMap<String, IPropertiesProvider>();
@@ -98,7 +98,6 @@ public class SettingsAgent	implements ISettingsService
 		//this.filename	= access.getComponentIdentifier().getPlatformPrefix() + SETTINGS_EXTENSION;
 		
 		final Future<Void>	ret	= new Future<Void>();
-		//contextService = access.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		loadProperties().addResultListener(new DelegationResultListener<Void>(ret));
 		
 		return ret;
@@ -109,6 +108,7 @@ public class SettingsAgent	implements ISettingsService
 	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
 	@ServiceShutdown
+	//@OnEnd
 	public IFuture<Void>	shutdownService()
 	{
 		final Future<Void>	ret	= new Future<Void>();
@@ -164,7 +164,7 @@ public class SettingsAgent	implements ISettingsService
 	 *  @param id 	A unique id to identify the properties (e.g. component or service name).
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public IFuture<Void>	deregisterPropertiesProvider(final String id)
+	public IFuture<Void> deregisterPropertiesProvider(final String id)
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		if(!providers.containsKey(id))
@@ -455,170 +455,5 @@ public class SettingsAgent	implements ISettingsService
 //		return contextService.getFile(path);
 //	}
 	
-	// -------------------------------- New API -------------------------------
 	
-	/**
-	 *  Saves arbitrary state to a persistent directory as JSON.
-	 *  Object must be serializable and the ID must be unique.
-	 *  
-	 *  @param id Unique ID for the saved state.
-	 *  @param state The state being saved.
-	 *  @return Null, when done.
-	 */
-	public IFuture<Void> saveState(String id, Object state)
-	{
-		if (!readonly)
-		{
-			OutputStream os = null;
-			
-			File file = (new File(settingsdir, id + ".json")).getAbsoluteFile();
-			File tmpfile = null;
-			
-			try
-			{
-				tmpfile = File.createTempFile(file.getName(), ".tmp");
-				
-				String json = toJson(state);
-				
-				os = new FileOutputStream(tmpfile);
-				os.write(json.getBytes(SUtil.UTF8));
-				SUtil.close(os);
-				SUtil.moveFile(tmpfile, file);
-			}
-			catch(Exception e)
-			{
-				System.out.println("Warning: Could not save state " + id + ": " + e);
-				e.printStackTrace();
-			}
-			finally
-			{
-				if (os != null)
-					SUtil.close(os);
-			}
-		}
-		
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Loads arbitrary state form a persistent directory.
-	 *  
-	 *  @param id Unique ID for the saved state.
-	 *  @return The state or null if none was found or corrupt.
-	 */
-	public IFuture<Object> loadState(String id)
-	{
-		Future<Object> ret = new Future<Object>();
-		
-		File file = new File(settingsdir, id + ".json");
-		
-		try
-		{
-			String json = new String(SUtil.readFile(file), SUtil.UTF8);
-			Object state = fromJson(json);
-			ret.setResult(state);
-		}
-		catch (Exception e)
-		{
-			ret.setResultIfUndone(null);
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Directly saves a file in the settings directory.
-	 *  
-	 *  @param filename Name of the file.
-	 *  @param content The file content.
-	 *  @return Null, when done.
-	 */
-	public IFuture<Void> saveFile(String filename, byte[] content)
-	{
-		Future<Void> ret = new Future<>();
-		File file = (new File(settingsdir, filename)).getAbsoluteFile();
-		OutputStream os = null;
-		try
-		{
-			File tmpfile = File.createTempFile(filename, ".tmp");
-			os =  new FileOutputStream(tmpfile);
-			os.write(content);
-			SUtil.close(os);
-			SUtil.moveFile(tmpfile, file);
-			ret.setResult(null);
-		}
-		catch (Exception e)
-		{
-			ret.setException(e);
-		}
-		finally
-		{
-			SUtil.close(os);
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Directly loads a file from the settings directory.
-	 *  
-	 *  @param filename Name of the file.
-	 *  @return Content of the file or null if not found.
-	 */
-	public IFuture<byte[]> loadFile(String filename)
-	{
-		Future<byte[]> ret = new Future<>();
-		File file = (new File(settingsdir, filename)).getAbsoluteFile();
-		if (file.exists())
-		{
-			try
-			{
-				byte[] content = SUtil.readFile(file);
-				ret.setResult(content);
-			}
-			catch (Exception e)
-			{
-				ret.setException(e);
-			}
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Converts object to JSON.
-	 * 
-	 *  @param object Object.
-	 *  @return JSON string.
-	 */
-	public static final String toJson(Object object)
-	{
-		ArrayList<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>(JsonTraverser.writeprocs.size() + 1);
-		procs.addAll(JsonTraverser.writeprocs);
-		procs.add(procs.size() - 1, new JsonAuthenticationSecretProcessor());
-		String json = JsonTraverser.objectToString(object,
-									 SettingsAgent.class.getClassLoader(),
-									 true, false,
-									 null, null,
-									 procs);
-		json = JsonTraverser.prettifyJson(json);
-		return json;
-	}
-	
-	/**
-	 *  Converts JSON to object.
-	 * 
-	 *  @param json JSON.
-	 *  @return Object.
-	 */
-	public static final Object fromJson(String json)
-	{
-		ArrayList<ITraverseProcessor> rprocs = new ArrayList<ITraverseProcessor>(JsonTraverser.readprocs.size() + 1);
-		rprocs.addAll(JsonTraverser.readprocs);
-		rprocs.add(rprocs.size() - 2, new JsonAuthenticationSecretProcessor());
-		Object ret = JsonTraverser.objectFromString(json, SettingsAgent.class.getClassLoader(), null, null, rprocs);
-		return ret;
-	}
 }

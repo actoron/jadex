@@ -3,6 +3,7 @@ package jadex.micro.testcases.nflatency;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -15,7 +16,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=ITestService.class))
+@ProvidedServices(@ProvidedService(type=ITestService.class, scope=ServiceScope.GLOBAL))
 public class ProviderAgent implements ITestService
 {
 	@Agent

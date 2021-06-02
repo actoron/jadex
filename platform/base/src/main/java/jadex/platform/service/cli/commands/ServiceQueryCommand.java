@@ -12,6 +12,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.SUtil;
@@ -84,13 +85,15 @@ public class ServiceQueryCommand extends ACliCommand
 				if(owner==null)
 					owner = ia.getId().getRoot();
 				
-				ServiceQuery<IService> q = new ServiceQuery<IService>(type==null? null: new ClassInfo(type), scope, owner).setProvider(provider);
+				ServiceQuery<IService> q = new ServiceQuery<IService>(type==null? null: new ClassInfo(type),
+					scope!=null?ServiceScope.valueOf(scope):ServiceScope.DEFAULT, owner).setProvider(provider);
 				if(tags!=null)
 					q.setServiceTags(tags);
 				
 				//SServiceProvider.getServices(ia, q, false);
-				ia.getFeature(IRequiredServicesFeature.class).searchServices(q)
-					.addIntermediateResultListener(new IntermediateDelegationResultListener<IService>(ret));
+				ia.getFeature(IRequiredServicesFeature.class).searchServices(q).delegate(ret);
+				//ia.getFeature(IRequiredServicesFeature.class).searchServices(q)
+				//	.addIntermediateResultListener(new IntermediateDelegationResultListener<IService>(ret));
 				
 				return ret;
 			}

@@ -20,7 +20,8 @@ import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.VersionInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
@@ -62,10 +63,10 @@ import jadex.xml.writer.XMLWriterFactory;
 @Agent
 @RequiredServices(
 {	
-	@RequiredService(name="chatser", type=IChatGuiService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
-	@RequiredService(name="emailser", type=IEmailService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
-	@RequiredService(name="depser", type=IDependencyService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
-	@RequiredService(name="daeser", type=IDaemonService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)
+	@RequiredService(name="chatser", type=IChatGuiService.class, scope=ServiceScope.PLATFORM),
+	@RequiredService(name="emailser", type=IEmailService.class, scope=ServiceScope.PLATFORM),
+	@RequiredService(name="depser", type=IDependencyService.class, scope=ServiceScope.PLATFORM),
+	@RequiredService(name="daeser", type=IDaemonService.class, scope=ServiceScope.PLATFORM)
 })
 @Arguments(
 {
@@ -138,7 +139,8 @@ public class UpdateAgent implements IUpdateService
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
@@ -174,7 +176,7 @@ public class UpdateAgent implements IUpdateService
 												public void resultAvailable(Void result) 
 												{
 													// Kill platform.
-													agent.killComponent(agent.getId().getRoot());	
+													agent.getExternalAccess(agent.getId().getRoot()).killComponent();	
 												}
 												
 												public void exceptionOccurred(Exception exception) 
@@ -294,7 +296,7 @@ public class UpdateAgent implements IUpdateService
 	{
 		// Todo: version service!?
 		final Future<String>	ret	= new Future<String>();
-		agent.getExternalAccess(newcid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String>(ret)
+		agent.getExternalAccessAsync(newcid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String>(ret)
 		{
 			public void customResultAvailable(IExternalAccess exta)
 			{
@@ -529,7 +531,7 @@ public class UpdateAgent implements IUpdateService
 		
 //		String cmd = System.getProperty("sun.java.command");
 		
-		agent.getExternalAccess(agent.getId().getRoot())
+		agent.getExternalAccessAsync(agent.getId().getRoot())
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, StartOptions>(ret)
 		{
 			public void customResultAvailable(IExternalAccess plat)

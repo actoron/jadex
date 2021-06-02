@@ -7,12 +7,12 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Implementation;
@@ -29,8 +29,8 @@ import jadex.micro.annotation.Results;
  */
 @Agent
 @Arguments(@Argument(name="selfkill", clazz=boolean.class))
-@RequiredServices(@RequiredService(name = "MessageService", type = IMessageService.class, scope = RequiredServiceInfo.SCOPE_GLOBAL))
-@ProvidedServices(@ProvidedService(type = IMessageService.class, name = "MessageService", implementation = @Implementation(MessageService.class)))
+@RequiredServices(@RequiredService(name = "MessageService", type = IMessageService.class, scope = ServiceScope.GLOBAL))
+@ProvidedServices(@ProvidedService(type = IMessageService.class, scope=ServiceScope.GLOBAL, name = "MessageService", implementation = @Implementation(MessageService.class)))
 @Results(@Result(name="found", clazz=IServiceIdentifier[].class))
 public class FirstAgent
 {
@@ -40,13 +40,15 @@ public class FirstAgent
 	@AgentArgument
 	private boolean selfkill;
 
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void init()
 	{
 		System.out.println("Inited :" + ia.getId());
 	}
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		System.out.println("MY PLATFORM :" + ia.getId().getPlatformName());

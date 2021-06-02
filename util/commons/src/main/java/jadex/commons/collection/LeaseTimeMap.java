@@ -39,6 +39,14 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 		this(leasetime, null, true, true, false);
 	}
 	
+	/**
+	 *  Create a new lease time map.
+	 */
+	public LeaseTimeMap(long leasetime, boolean passive, final ICommand<Tuple2<Entry<K, V>, Long>> removecmd)
+	{
+		this(leasetime, removecmd, true, true, passive);
+	}
+	
 
 	/**
 	 *  Create a new lease time map.

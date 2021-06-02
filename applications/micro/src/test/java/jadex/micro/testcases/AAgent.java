@@ -7,11 +7,10 @@ import jadex.base.test.TestReport;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
@@ -20,7 +19,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Simple test agent with one service.
  */
-@ProvidedServices(@ProvidedService(type=IAService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IAService.class))
 @Results(@Result(name="testcases", clazz=List.class))
 @Service(IAService.class)
 @Agent
@@ -32,7 +31,8 @@ public class AAgent implements IAService
 	/**
 	 *  Init service method.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> test()
 	{
 		boolean ext = !agent.getFeature(IExecutionFeature.class).isComponentThread();

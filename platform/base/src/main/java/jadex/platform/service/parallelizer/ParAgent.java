@@ -1,6 +1,7 @@
 package jadex.platform.service.parallelizer;
 
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.servicepool.IServicePoolService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
@@ -12,7 +13,6 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.platform.service.servicepool.IServicePoolService;
 
 /**
  *  Agent that wants to offer a service that delegates

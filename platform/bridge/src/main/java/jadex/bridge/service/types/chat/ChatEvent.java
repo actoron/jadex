@@ -11,28 +11,31 @@ public class ChatEvent
 	//-------- constants --------
 	
 	/** Event type for a chat user status change (value is user state). */
-	public static final String	TYPE_STATECHANGE	= "statechange";
+	public static final String TYPE_STATECHANGE = "statechange";
 
 	/** Event type for a received message (value is message text). */
-	public static final String	TYPE_MESSAGE	= "message";
+	public static final String TYPE_MESSAGE = "message";
 	
 	/** Event type for a received file (value is file info, nick only available for initial file events). */
-	public static final String	TYPE_FILE	= "file";
+	public static final String TYPE_FILE = "file";
 	
+	/** Event type for added or removed user. */
+	public static final String TYPE_USER = "user";
+
 	
 	//-------- attributes --------
 	
 	/** The event type. */
-	protected String	type;
+	protected String type;
 	
 	/** The nick name. */
-	protected String	nick;
+	protected String nick;
 	
 	/** The user cid. */
-	protected IComponentIdentifier	cid;
+	protected IComponentIdentifier cid;
 	
 	/** The event value (depends on type). */
-	protected Object	value;
+	protected Object value;
 	
 	/** Flag for privat message. */
 	protected boolean privatemessage;

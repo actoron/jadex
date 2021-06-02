@@ -12,6 +12,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -75,7 +76,8 @@ public class TranslationBDI
 	/**
 	 * 
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		String eword = "cat";

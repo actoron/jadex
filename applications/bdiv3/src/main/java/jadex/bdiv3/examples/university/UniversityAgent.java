@@ -12,6 +12,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -70,7 +71,8 @@ public class UniversityAgent
 	 *  The agent body is executed on startup.
 	 *  It creates and dispatches a come to university goal.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		System.out.println("rainy: "+raining);

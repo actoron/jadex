@@ -3,6 +3,8 @@ package jadex.micro.testcases.killcomponent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -20,14 +22,16 @@ public class ProviderAgent
 	@AgentFeature
 	private IArgumentsResultsFeature argResults;
 
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void created(IInternalAccess agent)
 	{
-		agent.getLogger().severe("Agent created: " + agent.getDescription());
+//		agent.getLogger().severe("Agent created: " + agent.getDescription());
 		argResults.getResults().put("exampleresult", "value");
 	}
 
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	private void body()
 	{
 		// cannot work because this agent is terminated from outside

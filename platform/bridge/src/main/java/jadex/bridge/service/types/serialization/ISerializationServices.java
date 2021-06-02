@@ -1,9 +1,12 @@
 package jadex.bridge.service.types.serialization;
 
 import java.util.List;
+import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.service.types.message.ISerializer;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 /**
@@ -52,6 +55,27 @@ public interface ISerializationServices
 	 */
 	public List<ITraverseProcessor> getCloneProcessors();
 	
+	/**
+	 *  Get the string converters (can convert to and from string, possibly only for some types).
+	 *  @return The converters by name (constants in IStringConverter).
+	 */
+	public Map<String, IStringConverter> getStringConverters();
+	
+	/**
+	 *  Convert object to string.
+	 *  @param val The value.
+	 *  @return The string value.
+	 */
+	public String convertObjectToString(Object val, Class<?> type, ClassLoader cl, String mediatype, Object context);
+	
+	/**
+	 *  Convert string to object.
+	 *  @param val The value.
+	 *  @return The object.
+	 */
+	public Object convertStringToObject(String val, Class<?> type, ClassLoader cl, String mediatype, Object context);
+
+	
 //	/**
 //	 *  Gets the remote reference management.
 //	 *
@@ -82,13 +106,18 @@ public interface ISerializationServices
 //	 */
 //	public ISerializer getSendSerializer(IComponentIdentifier receiver);
 	
-//	/**
-//	 *  Returns all serializers.
-//	 *  
-//	 *  @param platform Sending platform.
-//	 *  @return Serializers.
-//	 */
-//	public Map<Integer, ISerializer> getSerializers();
+	/**
+	 *  Returns all serializers.
+	 *  @return Serializers.
+	 */
+	public ISerializer[] getSerializers();
+	
+	/**
+	 *  Returns a serializer per id.
+	 *  @param id The id.
+	 *  @return The serializer.
+	 */
+	public ISerializer getSerializer(int id);
 	
 //	/**
 //	 *  Returns the codecs for sending.

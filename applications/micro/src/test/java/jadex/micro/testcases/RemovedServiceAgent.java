@@ -12,6 +12,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.ServiceInvalidException;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
@@ -23,9 +25,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.servicecall.DecoupledServiceAgent;
@@ -55,7 +55,8 @@ public class RemovedServiceAgent extends JunitAgentTest
 	/**
 	 *  Perform the tests and indicate completion in the future.
 	 */
-	@AgentBody
+	@OnStart
+	//@AgentBody
 	public IFuture<Void>	body()
 	{
 		final Future<Collection<TestReport>>	reports	= new Future<Collection<TestReport>>();
@@ -112,13 +113,13 @@ public class RemovedServiceAgent extends JunitAgentTest
 		final IntermediateFuture<TestReport>	testfut	= new IntermediateFuture<TestReport>();
 		
 		// Create agent to call service on.
-		agent.createComponent(new CreationInfo(agent.getId()).setFilename(agentname), null)
+		agent.createComponent(new CreationInfo().setFilename(agentname))
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(testfut)
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
 				// Get service reference of created agent.
-				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServiceCallService.class, RequiredService.SCOPE_PLATFORM))
+				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServiceCallService.class, ServiceScope.PLATFORM))
 					.addResultListener(new ExceptionDelegationResultListener<IServiceCallService, Collection<TestReport>>(testfut)
 				{
 					public void customResultAvailable(final IServiceCallService scs)
@@ -132,13 +133,13 @@ public class RemovedServiceAgent extends JunitAgentTest
 								tr1.setSucceeded(true);
 								
 								// Now kill the agent.
-								agent.killComponent(exta.getId()).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Collection<TestReport>>(testfut)
+								agent.getExternalAccess(exta.getId()).killComponent().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Collection<TestReport>>(testfut)
 								{
 									public void customResultAvailable(Map<String, Object> result)
 									{
 										final TestReport	tr2	= new TestReport("#"+(++cnt), "Test if service of destroyed "+agentname+" can be found.");
 										testfut.addIntermediateResult(tr2);
-										agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServiceCallService.class, RequiredService.SCOPE_PLATFORM))
+										agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServiceCallService.class, ServiceScope.PLATFORM))
 											.addResultListener(new IResultListener<IServiceCallService>()
 										{
 											public void resultAvailable(IServiceCallService result)

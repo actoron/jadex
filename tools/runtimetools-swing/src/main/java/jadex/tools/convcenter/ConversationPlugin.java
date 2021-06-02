@@ -23,7 +23,7 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -36,8 +36,8 @@ import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.gui.SGUI;
@@ -116,7 +116,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 					final IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					final IComponentIdentifier rec = node.getDescription().getName();
 					// Use clone, as added component id might be modified by user.
-					IComponentIdentifier receiver = new BasicComponentIdentifier(rec.getName());
+					IComponentIdentifier receiver = new ComponentIdentifier(rec.getName());
 					FipaMessage	message	= convcenter.getMessagePanel().getMessage();
 					Set<IComponentIdentifier>	recs	= message.getReceivers();
 					if(recs!=null && recs.contains(receiver))
@@ -270,24 +270,12 @@ public class ConversationPlugin extends AbstractJCCPlugin
 				});
 				return ret;
 			}
-		}).addResultListener(new IIntermediateResultListener<Object>()
+		}).addResultListener(new IntermediateEmptyResultListener<Object>()
 		{
 			@Override
 			public void intermediateResultAvailable(Object result)
 			{
 				convcenter.addMessage(result);
-			}
-			@Override
-			public void resultAvailable(Collection<Object> result)
-			{
-			}
-			@Override
-			public void finished()
-			{
-			}
-			@Override
-			public void exceptionOccurred(Exception exception)
-			{
 			}
 		});
 		

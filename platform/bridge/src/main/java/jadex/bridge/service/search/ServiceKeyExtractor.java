@@ -91,7 +91,6 @@ public class ServiceKeyExtractor implements IKeyExtractor<IServiceIdentifier>
 	 *  @param service The service.
 	 *  @return The keys matching the type.
 	 */
-	@SuppressWarnings("unchecked")
 	public static final Set<String> getKeysStatic(String keytype, IServiceIdentifier serv)
 	{
 //		if(serv instanceof IService)
@@ -108,7 +107,7 @@ public class ServiceKeyExtractor implements IKeyExtractor<IServiceIdentifier>
 			ClassInfo[] supertypes = serv.getServiceSuperTypes();
 			if (supertypes != null)
 			{
-				for (ClassInfo supertype : supertypes)
+				for(ClassInfo supertype : supertypes)
 					ret.add(supertype.toString());
 			}
 		}
@@ -133,7 +132,20 @@ public class ServiceKeyExtractor implements IKeyExtractor<IServiceIdentifier>
 		}
 		else if(KEY_TYPE_NETWORKS.equals(keytype))
 		{
-			ret = new HashSet<String>(serv.getNetworkNames());
+			if(!serv.isUnrestricted())
+			{
+				if(serv.getNetworkNames()!=null)
+				{
+					// Hack!!! service identifier should be immutable but isn't
+					synchronized(serv.getNetworkNames())
+					{
+						ret	= new HashSet<String>(serv.getNetworkNames());
+					}
+				}
+				// else ret	= null;
+			}
+			else
+				ret = new SetWrapper<String>(IKeyExtractor.MATCH_ALWAYS);
 		}
 		else if(KEY_TYPE_UNRESTRICTED.equals(keytype))
 		{

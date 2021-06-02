@@ -8,7 +8,9 @@ import java.net.URI;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Currency;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +29,7 @@ import jadex.commons.Tuple3;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.IObjectStringConverter;
+import jadex.commons.transformation.traverser.SStackTraceElementHelper;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -93,6 +96,7 @@ public class JavaWriter
 	 *  - java.util.Color
 	 *  - java.util.Date
 	 *  - java.util.Calendar
+	 *  - java.util.Currency
 	 *  - java.lang.Class
 	 *  - java.net.URL
 	 *  - java.logging.Level
@@ -260,9 +264,28 @@ public class JavaWriter
 //				new AttributeInfo(new AccessInfo("date", null, AccessInfo.IGNORE_READWRITE))},
 				null
 			));
-			
 			typeinfos.add(ti_calendar);
-			
+
+			// java.util.Currency
+			// Ignores several redundant bean attributes for performance reasons.
+			TypeInfo ti_currency = new TypeInfo(new XMLInfo(new QName("typeinfo:java.util", "Currency")), new ObjectInfo(Currency.class), 
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("currencyCode", null))},
+				null
+			));
+			typeinfos.add(ti_currency);
+
+			// java.text.SimpleDateFormat
+			// Pattern managed with applyPattern(String) and String toPattern() grrrr.
+			TypeInfo ti_simpledateformat = new TypeInfo(new XMLInfo(new QName("typeinfo:java.text", "SimpleDateFormat")), new ObjectInfo(SimpleDateFormat.class), 
+				new MappingInfo(null, null, null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("pattern", null, null, null,
+					new BeanAccessInfo(SimpleDateFormat.class.getMethod("applyPattern", String.class),
+						SimpleDateFormat.class.getMethod("toPattern"))))},
+				null, false, null, null
+			));
+			typeinfos.add(ti_simpledateformat);
+
 			// java.sql.Timestamp
 			// Ignores several redundant bean attributes for performance reasons.
 			TypeInfo ti_timestamp = new TypeInfo(null, new ObjectInfo(Timestamp.class), 
@@ -801,16 +824,35 @@ public class JavaWriter
 				}
 			));
 			typeinfos.add(ti_th);
-			TypeInfo ti_ste = new TypeInfo(null, new ObjectInfo(StackTraceElement.class),
-				new MappingInfo(null, new AttributeInfo[]
-				{
-					new AttributeInfo(new AccessInfo("className", null)),
-					new AttributeInfo(new AccessInfo("methodName", null)),
-					new AttributeInfo(new AccessInfo("fileName", null)),
-					new AttributeInfo(new AccessInfo("lineNumber", null)),
-				}, null
-			));
-			typeinfos.add(ti_ste);
+			if (SStackTraceElementHelper.hasJava9())
+			{
+				TypeInfo ti_ste = new TypeInfo(null, new ObjectInfo(StackTraceElement.class),
+					new MappingInfo(null, new AttributeInfo[]
+					{
+						new AttributeInfo(new AccessInfo("classLoaderName", null)),
+						new AttributeInfo(new AccessInfo("moduleName", null)),
+						new AttributeInfo(new AccessInfo("moduleVersion", null)),
+						new AttributeInfo(new AccessInfo("className", null)),
+						new AttributeInfo(new AccessInfo("methodName", null)),
+						new AttributeInfo(new AccessInfo("fileName", null)),
+						new AttributeInfo(new AccessInfo("lineNumber", null)),
+					}, null
+				));
+				typeinfos.add(ti_ste);
+			}
+			else
+			{
+				TypeInfo ti_ste = new TypeInfo(null, new ObjectInfo(StackTraceElement.class),
+						new MappingInfo(null, new AttributeInfo[]
+						{
+							new AttributeInfo(new AccessInfo("className", null)),
+							new AttributeInfo(new AccessInfo("methodName", null)),
+							new AttributeInfo(new AccessInfo("fileName", null)),
+							new AttributeInfo(new AccessInfo("lineNumber", null)),
+						}, null
+					));
+				typeinfos.add(ti_ste);
+			}
 			
 			// java.math.BigInteger
 			TypeInfo ti_bi = new TypeInfo(new XMLInfo(new QName("typeinfo:java.math", "BigInteger")), 
@@ -827,10 +869,7 @@ public class JavaWriter
 			));
 			typeinfos.add(ti_bi);
 			
-			if(!SReflect.isAndroid()) 
-			{
-				typeinfos.addAll(STypeInfosAWT.getWriterTypeInfos());
-			}
+			typeinfos.addAll(STypeInfosAWT.getWriterTypeInfos());
 		}
 		catch(Exception e)
 		{

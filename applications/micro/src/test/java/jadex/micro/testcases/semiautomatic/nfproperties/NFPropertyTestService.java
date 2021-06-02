@@ -2,6 +2,7 @@ package jadex.micro.testcases.semiautomatic.nfproperties;
 
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.future.IFuture;
@@ -15,7 +16,8 @@ public class NFPropertyTestService implements ICoreDependentService
 	/**
 	 *  Init method.
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public IFuture<Void> x()
 	{
 //		System.out.println("SSTASD");

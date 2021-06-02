@@ -2,10 +2,15 @@ package jadex.bridge.component.impl;
 
 import java.util.Collections;
 
+import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.PlatformComponent;
+import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
@@ -157,4 +162,40 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 		}
 		return guesser;
 	}	
+	
+	/**
+	 *  Get the clock service.
+	 *  @return The clock service.
+	 */
+	public IClockService getClockService()
+	{
+		IInternalRequiredServicesFeature rs = ((IInternalRequiredServicesFeature)getComponent().getFeature0(IRequiredServicesFeature.class));
+		if(rs!=null)
+		{
+			return rs.getRawService(IClockService.class);
+		}
+		else
+		{
+			// no platform variant
+			return (IClockService)Starter.getPlatformValue(getComponent().getId().getRoot(), IClockService.class.getName());
+		}
+	}
+	
+	/**
+	 *  Get the execution service.
+	 *  @return The execution service.
+	 */
+	public IExecutionService getExecutionService()
+	{
+		IInternalRequiredServicesFeature rs = ((IInternalRequiredServicesFeature)getComponent().getFeature0(IRequiredServicesFeature.class));
+		if(rs!=null)
+		{
+			return rs.getRawService(IExecutionService.class);
+		}
+		else
+		{
+			// no platform variant
+			return (IExecutionService)Starter.getPlatformValue(getComponent().getId().getRoot(), IExecutionService.class.getName());
+		}
+	}
 }

@@ -3,7 +3,7 @@
  */
 package org.activecomponents.udp;
 
-import org.spongycastle.crypto.AsymmetricCipherKeyPair;
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 
 /**
  * Interface for providing randomly generated public/private key pairs.

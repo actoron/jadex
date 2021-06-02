@@ -5,6 +5,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -27,7 +28,8 @@ public class HelloWorldPlan
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		agent.getFeature(IBDIAgentFeature.class).adoptPlan("printHello").get();

@@ -101,5 +101,58 @@ public class NFPropertyRef<T, U> extends AbstractNFProperty<T, U>
 		});
 		return ret;
 	}
+	
+	@Override
+	public IFuture<String> getPrettyPrintValue() 
+	{
+		final Future<String> ret = new Future<String>();
+		
+		IFuture<String> fut;
+		if(sid==null && method==null)
+		{
+			fut = comp.getNFPropertyPrettyPrintValue(getName());
+		}
+		else if(sid!=null && method==null)
+		{
+			fut = comp.getNFPropertyPrettyPrintValue(sid, getName());
+		}
+		else
+		{
+			fut = comp.getMethodNFPropertyPrettyPrintValue(sid, method, getName());
+		}
+		
+		fut.addResultListener(new IResultListener<String>()
+		{
+			public void resultAvailable(String result)
+			{
+				ret.setResult(result);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+//				((INFPropertyProvider)comp.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeNFProperty(getName());
+//				SNFPropertyProvider.removeNFProperty(comp, name)
+				
+				// todo: remote case?
+//				source.removeNFProperty(getName());
+				
+				if(sid==null && method==null)
+				{
+					comp.removeNFProperty(getName());
+				}
+				else if(sid!=null && method==null)
+				{
+					comp.removeNFProperty(sid, getName());
+				}
+				else
+				{
+					comp.removeMethodNFProperty(sid, method, getName());
+				}
+				
+				ret.setException(exception);
+			}
+		});
+		return ret;
+	}
 }
 

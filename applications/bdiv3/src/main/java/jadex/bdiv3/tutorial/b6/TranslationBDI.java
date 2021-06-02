@@ -6,6 +6,7 @@ import java.util.Map;
 import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -55,7 +56,8 @@ public class TranslationBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		IFuture<String[]>	fut	= bdi.adoptPlan("translateEnglishGerman");

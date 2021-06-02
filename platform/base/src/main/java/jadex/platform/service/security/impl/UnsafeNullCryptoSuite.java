@@ -1,14 +1,18 @@
 package jadex.platform.service.security.impl;
 
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bouncycastle.util.Pack;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.JadexVersion;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.platform.service.security.ICryptoSuite;
-import jadex.platform.service.security.SecurityInfo;
 import jadex.platform.service.security.SecurityAgent;
+import jadex.platform.service.security.SecurityInfo;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
 
 /**
@@ -28,8 +32,15 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	/** The handshake ID. */
 	protected String handshakeid;
 	
+	/** The remote Jadex version. */
+	protected JadexVersion remoteversion;
+	
+	/** Creation time of the suite. */
+	protected long creationtime = System.currentTimeMillis();
+	
 	public UnsafeNullCryptoSuite()
 	{
+		remoteversion = new JadexVersion();
 		Logger.getLogger("security").warning("Unsafe crypto suite enabled: " + getClass().getName());
 	}
 	
@@ -114,11 +125,9 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	{
 		secinf = new SecurityInfo();
 //		secinf.setPlatformAuthenticated(true);
-		secinf.setTrustedPlatform(true);
-		secinf.setAdminPlatform(true);
 		secinf.setNetworks(agent.getInternalNetworks().keySet());
 		secinf.setSharedNetworks(secinf.getNetworks());
-		secinf.setAllowDefaultAuthorization(true);
+		secinf.setFixedRoles(Stream.of(Security.ADMIN, Security.TRUSTED).collect(Collectors.toSet()));
 		
 		if (!(incomingmessage instanceof NullMessage))
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), new NullMessage(agent.getComponentIdentifier(), incomingmessage.getConversationId()));
@@ -147,6 +156,16 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	}
 	
 	/**
+	 *  Returns the creation time of the crypto suite.
+	 *  
+	 *  @return The creation time.
+	 */
+	public long getCreationTime()
+	{
+		return creationtime;
+	}
+	
+	/**
 	 *  Null message handshake class.
 	 *  @author jander
 	 *
@@ -167,5 +186,31 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 		{
 			super(sender, conversationid);
 		}
+	}
+	
+	/**
+	 *  Gets the version of the remote Jadex platform.
+	 *  @return The Jadex version.
+	 */
+	public JadexVersion getRemoteVersion()
+	{
+		return remoteversion;
+	}
+	
+	/**
+	 *  Sets the version of the remote Jadex platform.
+	 *  @param jadexversion The Jadex version.
+	 */
+	public void setRemoteVersion(JadexVersion jadexversion)
+	{
+		remoteversion = jadexversion;
+	}
+	
+	/**
+	 *  Sets if the suite represents the protocol initializer.
+	 * @param initializer True, if initializer.
+	 */
+	public void setInitializer(boolean initializer)
+	{
 	}
 }

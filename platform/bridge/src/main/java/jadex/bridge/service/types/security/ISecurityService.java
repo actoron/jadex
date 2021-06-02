@@ -4,9 +4,11 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.JadexVersion;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
@@ -27,6 +29,7 @@ import jadex.commons.future.IFuture;
 	@GuiClassName("jadex.android.controlcenter.settings.SecuritySettings")
 })
 @Service(system=true)
+@Security(roles={Security.ADMIN})
 public interface ISecurityService
 {
 	//-------- message-level encryption/authentication -------
@@ -99,14 +102,12 @@ public interface ISecurityService
 	
 	/**
 	 *  Gets the current known networks and secrets. 
-	 *  
 	 *  @return The current networks and secrets.
 	 */
 	public IFuture<MultiCollection<String, String>> getAllKnownNetworks();
 	
 	/** 
 	 *  Adds an authority for authenticating platform names.
-	 *  
 	 *  @param secret The secret, only X.509 secrets allowed.
 	 *  @return Null, when done.
 	 */
@@ -114,7 +115,6 @@ public interface ISecurityService
 	
 	/** 
 	 *  Remvoes an authority for authenticating platform names.
-	 *  
 	 *  @param secret The secret, only X.509 secrets allowed.
 	 *  @return Null, when done.
 	 */
@@ -122,7 +122,6 @@ public interface ISecurityService
 	
 	/** 
 	 *  Adds a name of an authenticated platform to allow access.
-	 *  
 	 *  @param name The platform name, name must be authenticated with certificate.
 	 *  @return Null, when done.
 	 */
@@ -130,7 +129,6 @@ public interface ISecurityService
 	
 	/** 
 	 *  Adds a name of an authenticated platform to allow access.
-	 *  
 	 *  @param name The platform name.
 	 *  @return Null, when done.
 	 */
@@ -144,21 +142,25 @@ public interface ISecurityService
 	
 	/** 
 	 *  Gets all authorities for authenticating platform names.
-	 *  
 	 *  @return List of all name authorities.
 	 */
 	public IFuture<Set<String>> getNameAuthorities();
 	
+	/**
+	 *  Get infos about name authorities.
+	 *  Format is [{subjectid,dn,custom},...]
+	 *  @return Infos about the name authorities.
+	 */
+	public IFuture<String[][]> getNameAuthoritiesInfo();
+	
 	/** 
 	 *  Gets all authorities not defined in the Java trust store for authenticating platform names.
-	 *  
 	 *  @return List of name authorities.
 	 */
 	public IFuture<Set<String>> getCustomNameAuthorities();
 	
 	/**
 	 *  Gets the secret of a platform if available.
-	 * 
 	 *  @param cid ID of the platform.
 	 *  @return Encoded secret or null.
 	 */
@@ -174,7 +176,6 @@ public interface ISecurityService
 	
 	/**
 	 *  Adds a role for an entity (platform or network name).
-	 *  
 	 *  @param entity The entity name.
 	 *  @param role The role name.
 	 *  @return Null, when done.
@@ -183,7 +184,6 @@ public interface ISecurityService
 	
 	/**
 	 *  Adds a role of an entity (platform or network name).
-	 *  
 	 *  @param entity The entity name.
 	 *  @param role The role name.
 	 *  @return Null, when done.
@@ -192,7 +192,6 @@ public interface ISecurityService
 	
 	/**
 	 *  Gets a copy of the current role map.
-	 *  
 	 *  @return Copy of the role map.
 	 */
 	public IFuture<Map<String, Set<String>>> getRoleMap();
@@ -201,7 +200,25 @@ public interface ISecurityService
 	 *  Gets the current network names. 
 	 *  @return The current networks names.
 	 */
+	@Security(roles={Security.TRUSTED})
 	public IFuture<Set<String>> getNetworkNames();
+	
+	/**
+	 *  Opportunistically returns the remote Jadex version if known.
+	 *  @param remoteid ID of the remote platform.
+	 *  @return Null, if the version is cannot be determined, a JadexVersion otherwise.
+	 *  		Note that the JadexVersion can still be an unknown version (as determined by isUnknown),
+	 *  		which means that the platform itself reported an unknown version.
+	 */
+	@Security(roles={Security.TRUSTED})
+	public JadexVersion getJadexVersion(IComponentIdentifier remoteid);
+	
+	/**
+	 *  Check the platform password.
+	 *  @param platformpass The platform password.
+	 *  @return True, if platform password is correct.
+	 */
+	public IFuture<Boolean> checkPlatformPassword(String platformpass);
 	
 //	/**
 //	 *  Gets the current network names. 

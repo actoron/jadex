@@ -1,6 +1,7 @@
 package jadex.micro.testcases.semiautomatic.features;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Feature;
@@ -17,7 +18,8 @@ public class CustomFeatureAgent
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void hello()
 	{
 		System.out.println(agent+" "+agent.getFeature(ICustomFeature.class).someMethod());

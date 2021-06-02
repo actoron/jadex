@@ -44,14 +44,22 @@ import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.nonfunctional.annotation.SNameValue;
+import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.Tag;
+import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.annotation.Value;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -63,6 +71,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
+import jadex.micro.MicroModel.ServiceInjectionInfo;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -91,6 +100,9 @@ import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Imports;
+import jadex.micro.annotation.OnMessage;
+import jadex.micro.annotation.OnService;
+import jadex.micro.annotation.OnStream;
 import jadex.micro.annotation.Parent;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
@@ -157,6 +169,9 @@ public class MicroClassReader
 //		System.out.println("mircor: "+src+File.separatorChar+model);
 		modelinfo.setType(MicroAgentFactory.FILETYPE_MICROAGENT);
 		modelinfo.setStartable(true);
+		
+		// todo: Hack! Sets features to have them available during read :-(
+		// Are deleted again when no custom features are set 
 		if(features!=null)
 			modelinfo.setFeatures((IComponentFeatureFactory[])features.toArray(new IComponentFeatureFactory[features.size()]));
 		
@@ -279,6 +294,7 @@ public class MicroClassReader
 		boolean breaksdone = false;
 		boolean nfpropsdone = false;
 		boolean featdone = false;
+		boolean tagsdone = false;
 		
 		boolean addfeat = false;
 		Set<String> configdone = new HashSet<String>();
@@ -298,6 +314,10 @@ public class MicroClassReader
 				Boolean	sync	= val.synchronous().toBoolean();
 //				Boolean	persist	= val.persistable().toBoolean();
 				Boolean	keep	= val.keepalive().toBoolean();
+				
+				modelinfo.setNameHint(!"".equals(val.name()) ? val.name() : null);
+				modelinfo.addPredecessors(val.predecessors());
+				modelinfo.addSuccessors(val.successors());
 				
 				// Use most specific autoprovide setting.
 				autoprovide	= autoprovide != Boolean3.NULL ? autoprovide : val.autoprovide();
@@ -429,6 +449,39 @@ public class MicroClassReader
 //				nfpropsdone = val.replace();
 			}
 			
+			// Take all, upper replace lower
+			if(!tagsdone && isAnnotationPresent(cma, Tags.class, cl))
+			{
+				Tags tags = (Tags)getAnnotation(cma, Tags.class, cl);
+				
+				List<Object> nfps = (List<Object>)getOrCreateList("nfproperties", toset);
+				
+				List<UnparsedExpression> params = new ArrayList<>();
+				
+//				if(val.argumentname().length()>0)
+//					params.add(new UnparsedExpression(TagProperty.ARGUMENT, "\"val.argumentname()\""));
+				
+				for(int i=0; i<tags.value().length; i++)
+				{
+					Tag tag = tags.value()[i];
+					
+					if(tag.include().length()>0)
+					{
+						//Object val = SJavaParser.evaluateExpression(tag.include(), agent.getModel().getAllImports(), getInternalAccess().getFetcher(), getInternalAccess().getClassLoader());
+						//if(val instanceof Boolean && ((Boolean)val).booleanValue())
+						params.add(new UnparsedExpression(TagProperty.NAME+"_condition_"+i, tag.value()));
+						params.add(new UnparsedExpression(TagProperty.NAME+"_"+i, tag.value()));
+					}
+				}
+				
+				NFPropertyInfo pi = new NFPropertyInfo(TagProperty.NAME, new ClassInfo(TagProperty.class), params);
+					
+				nfps.add(pi);
+				
+				// todo!
+//				tagsdone = val.replace();
+			}
+			
 			// Take newest version
 			// todo: move to be able to use the constant
 			// jadex.base.gui.componentviewer.IAbstractViewerPanel.PROPERTY_VIEWERCLASS
@@ -484,16 +537,18 @@ public class MicroClassReader
 					{
 						RequiredServiceInfo rsis = createRequiredServiceInfo(vals[i], cl);
 					
-						if(rsers.containsKey(vals[i].name()))
-						{
-							RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(vals[i].name());
-							if(old.isMultiple()!=rsis.isMultiple() || !old.getType().getType(cl).equals(rsis.getType().getType(cl)))
-								throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+vals[i].name());
-						}
-						else
-						{
-							rsers.put(vals[i].name(), rsis);
-						}
+						checkAndAddRequiredServiceInfo(rsis, rsers, cl);
+
+//						if(rsers.containsKey(vals[i].name()))
+//						{
+//							RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(vals[i].name());
+//							if(old.getMin()!=rsis.getMin() || old.getM()!=rsis.getMax() || !old.getType().getType(cl).equals(rsis.getType().getType(cl)))
+//								throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+vals[i].name());
+//						}
+//						else
+//						{
+//							rsers.put(vals[i].name(), rsis);
+//						}
 					}
 				}
 			}
@@ -509,33 +564,10 @@ public class MicroClassReader
 				
 				for(int i=0; i<vals.length; i++)
 				{
-					Implementation im = vals[i].implementation();
-					Value[] inters = im.interceptors();
-					UnparsedExpression[] interceptors = null;
-					if(inters.length>0)
-					{
-						interceptors = new UnparsedExpression[inters.length];
-						for(int j=0; j<inters.length; j++)
-						{
-							interceptors[j] = new UnparsedExpression(null, inters[j].clazz(), inters[j].value(), null);
-						}
-					}
-					ProvidedServiceImplementation impl = createImplementation(im, clazz);
-					Publish p = vals[i].publish();
-					NameValue[] props = p.properties();
-					UnparsedExpression[] exps = SNameValue.createUnparsedExpressions(props);
-					
-					PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(), p.multi(), Object.class.equals(p.mapping())? null: p.mapping(), exps);
-					
-					props = vals[i].properties();
-					List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(SNameValue.createUnparsedExpressions(props))) : null;
-					
-					ProvidedServiceInfo psis = new ProvidedServiceInfo(vals[i].name().length()>0? 
-						vals[i].name(): null, vals[i].type(), impl, vals[i].scope(), pi, serprops);
-				
 					if(vals[i].name().length()==0 || !psers.containsKey(vals[i].name()))
 					{
-						psers.put(vals[i].name().length()==0? ("#"+cnt++): vals[i].name(), psis);
+						ProvidedServiceInfo psi = createProvidedServiceInfo(vals[i]);
+						psers.put(vals[i].name().length()==0? ("#"+cnt++): vals[i].name(), psi);
 					}
 				}
 			}
@@ -696,8 +728,6 @@ public class MicroClassReader
 //							configinfo.setPersistable(config.persistable().toBoolean());
 						if(configinfo.getSuspend()==null)
 							configinfo.setSuspend(config.suspend().toBoolean());
-						if(configinfo.getScope()==null && !RequiredServiceInfo.SCOPE_GLOBAL.equals(config.scope()))
-							configinfo.setScope(config.scope());
 							
 						NameValue[] argvals = config.arguments();
 						for(int j=0; j<argvals.length; j++)
@@ -718,29 +748,7 @@ public class MicroClassReader
 						{
 							if(!configinfo.hasProvidedService(provs[j].name()))
 							{
-								Implementation im = provs[j].implementation();
-								Value[] inters = im.interceptors();
-								UnparsedExpression[] interceptors = null;
-								if(inters.length>0)
-								{
-									interceptors = new UnparsedExpression[inters.length];
-									for(int k=0; k<inters.length; k++)
-									{
-										interceptors[k] = new UnparsedExpression(null, inters[k].clazz(), inters[k].value(), null);
-									}
-								}
-								RequiredServiceBinding bind = null;//createBinding(im.binding());
-								ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
-									im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
-								Publish p = provs[j].publish();
-								PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(), p.multi(),
-									p.mapping(), SNameValue.createUnparsedExpressions(p.properties()));
-								
-								NameValue[] props = provs[j].properties();
-								List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(SNameValue.createUnparsedExpressions(props))) : null;
-								
-								ProvidedServiceInfo psi = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl,  provs[j].scope(), pi, serprops);
-		//						configinfo.setProvidedServices(psis);
+								ProvidedServiceInfo psi = createProvidedServiceInfo(provs[j]);
 								configinfo.addProvidedService(psi);
 							}
 						}
@@ -753,7 +761,7 @@ public class MicroClassReader
 							{
 								RequiredServiceBinding binding = createBinding(reqs[j]);
 								List<NFRPropertyInfo> nfprops = createNFRProperties(reqs[j].nfprops());
-								RequiredServiceInfo rsi = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), reqs[j].multiple(), 
+								RequiredServiceInfo rsi = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), reqs[j].min(), reqs[j].max(),// reqs[j].multiple(), 
 									binding, nfprops, Arrays.asList(reqs[j].tags()));
 		//						configinfo.setRequiredServices(rsis);
 								configinfo.addRequiredService(rsi);
@@ -773,7 +781,11 @@ public class MicroClassReader
 			}
 			
 			// Find injection targets by reflection (agent, arguments, services)
-			Field[] fields = cma.getDeclaredFields();
+			Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
+			//micromodel.getInjectionInfoHolder().setRequiredServiceInfos((Map)rsers); // Hack! todo
+			findInjections(cma, cl, micromodel.getInjectionInfoHolder(), rsers);
+			
+			/*Field[] fields = cma.getDeclaredFields();
 			for(int i=0; i<fields.length; i++)
 			{
 				if(isAnnotationPresent(fields[i], Agent.class, cl))
@@ -789,13 +801,15 @@ public class MicroClassReader
 					AgentServiceSearch ser = getAnnotation(fields[i], AgentServiceSearch.class, cl);
 					RequiredService rs = ser.requiredservice();
 					
+					Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
+					
+					// This is still broken in the lazy case!
 					if(!rs.type().equals(Object.class))
 					{
 						if(ser.name().length()>0)
 							throw new IllegalArgumentException("Use 'name' to reference a required service OR use inline declaration of required service, not both.");
 						
-						Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
-						
+						// This needs to be outsider the check
 						RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
 						if(rsis.getName().length()==0)
 							rsis.setName(fields[i].getName());
@@ -824,29 +838,32 @@ public class MicroClassReader
 					AgentServiceQuery ser = getAnnotation(fields[i], AgentServiceQuery.class, cl);
 					RequiredService rs = ser.requiredservice();
 					
+					Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
+					
+					RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
+					if(rsis.getName().length()==0)
+						rsis.setName(fields[i].getName());
+				
+					if(rsers.containsKey(rsis.getName()))
+					{
+						RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(rsis.getName());
+						if(old.isMultiple()!=rsis.isMultiple() || !old.getType().getType(cl).equals(rsis.getType().getType(cl)))
+							throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+rsis.getName());
+					}
+					else
+					{
+						rsers.put(rsis.getName(), rsis);
+					}
+					
 					if(!rs.type().equals(Object.class))
 					{
-						Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
 						
-						RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
-						if(rsis.getName().length()==0)
-							rsis.setName(fields[i].getName());
-					
-						if(rsers.containsKey(rsis.getName()))
-						{
-							RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(rsis.getName());
-							if(old.isMultiple()!=rsis.isMultiple() || !old.getType().getType(cl).equals(rsis.getType().getType(cl)))
-								throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+rsis.getName());
-						}
-						else
-						{
-							rsers.put(rsis.getName(), rsis);
-						}
 						
 						micromodel.addServiceInjection(rsis.getName(), new FieldInfo(fields[i]), true, true);
 					}
 					else
 					{
+						rsis.setType(new ClassInfo(fields[i].getType()));
 						String name = fields[i].getName();
 						micromodel.addServiceInjection(name, new FieldInfo(fields[i]), true, true);
 					}
@@ -881,13 +898,13 @@ public class MicroClassReader
 					String reqname = ser.name();
 					micromodel.addServiceCall(new ServiceCallInfo(reqname, null, new FieldInfo(fields[i])));
 				}
-			}
+			}*/
 
 			// Find method injection targets by reflection (services)
 			Method[] methods = cma.getDeclaredMethods();
 			for(int i=0; i<methods.length; i++)
 			{
-				if(isAnnotationPresent(methods[i], AgentServiceSearch.class, cl))
+				/*if(isAnnotationPresent(methods[i], AgentServiceSearch.class, cl))
 				{
 					AgentServiceSearch ser = getAnnotation(methods[i], AgentServiceSearch.class, cl);
 					String name;
@@ -951,12 +968,17 @@ public class MicroClassReader
 					AgentServiceValue ser = getAnnotation(methods[i], AgentServiceValue.class, cl);
 					String reqname = ser.name();
 					micromodel.addServiceCall(new ServiceCallInfo(reqname, null, new MethodInfo(methods[i])));
-				}
+				}*/
 				
 				if(isAnnotationPresent(methods[i], AgentCreated.class, cl))
 				{
 					checkMethodReturnType(AgentCreated.class, methods[i], cl);
 					micromodel.setAgentMethod(AgentCreated.class, new MethodInfo(methods[i]));
+				}
+				if(isAnnotationPresent(methods[i], OnInit.class, cl))
+				{
+					checkMethodReturnType(OnInit.class, methods[i], cl);
+					micromodel.setAgentMethod(OnInit.class, new MethodInfo(methods[i]));
 				}
 				if(isAnnotationPresent(methods[i], AgentBody.class, cl))
 				{
@@ -981,10 +1003,38 @@ public class MicroClassReader
 					
 					micromodel.setAgentMethod(AgentBody.class, new MethodInfo(methods[i]));
 				}
+				if(isAnnotationPresent(methods[i], OnStart.class, cl))
+				{
+					checkMethodReturnType(OnStart.class, methods[i], cl);
+					
+					// Set default keepalive to false, when not plain void body (i.e., future return value).
+					boolean	isvoid	= methods[i].getReturnType().equals(void.class);
+					if(!isvoid)
+					{
+						if(modelinfo.getKeepalive()==null)
+						{
+							modelinfo.setKeepalive(Boolean.FALSE);
+						}
+						for(ConfigurationInfo ci: modelinfo.getConfigurations())
+						{
+							if(ci.getKeepalive()==null)
+							{
+								ci.setKeepalive(Boolean.FALSE);								
+							}
+						}
+					}
+					
+					micromodel.setAgentMethod(OnStart.class, new MethodInfo(methods[i]));
+				}
 				if(isAnnotationPresent(methods[i], AgentKilled.class, cl))
 				{
 					checkMethodReturnType(AgentKilled.class, methods[i], cl);
 					micromodel.setAgentMethod(AgentKilled.class, new MethodInfo(methods[i]));
+				}
+				if(isAnnotationPresent(methods[i], OnEnd.class, cl))
+				{
+					checkMethodReturnType(OnEnd.class, methods[i], cl);
+					micromodel.setAgentMethod(OnEnd.class, new MethodInfo(methods[i]));
 				}
 				if(isAnnotationPresent(methods[i], AgentBreakpoint.class, cl))
 				{
@@ -996,10 +1046,20 @@ public class MicroClassReader
 					checkMethodReturnType(AgentStreamArrived.class, methods[i], cl);
 					micromodel.setAgentMethod(AgentStreamArrived.class, new MethodInfo(methods[i]));
 				}
+				if(isAnnotationPresent(methods[i], OnStream.class, cl))
+				{
+					checkMethodReturnType(OnStream.class, methods[i], cl);
+					micromodel.setAgentMethod(OnStream.class, new MethodInfo(methods[i]));
+				}
 				if(isAnnotationPresent(methods[i], AgentMessageArrived.class, cl))
 				{
 					checkMethodReturnType(AgentMessageArrived.class, methods[i], cl);
 					micromodel.setAgentMethod(AgentMessageArrived.class, new MethodInfo(methods[i]));
+				}
+				if(isAnnotationPresent(methods[i], OnMessage.class, cl))
+				{
+					checkMethodReturnType(OnMessage.class, methods[i], cl);
+					micromodel.setAgentMethod(OnMessage.class, new MethodInfo(methods[i]));
 				}
 				if(isAnnotationPresent(methods[i], AgentChildKilled.class, cl))
 				{
@@ -1098,6 +1158,11 @@ public class MicroClassReader
 			Collection<IComponentFeatureFactory> facts = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(fs.values()));
 			modelinfo.setFeatures(facts.toArray(new IComponentFeatureFactory[facts.size()]));
 		}
+		else
+		{
+			// Clear features in case no ones have been used by model itself
+			modelinfo.setFeatures(null);
+		}
 		
 		// Check if there are implemented service interfaces for which the agent
 		// does not have a provided service declaration (implementation=agent)
@@ -1119,10 +1184,46 @@ public class MicroClassReader
 			for(Class<?> iface: serifaces)
 			{
 				ProvidedServiceImplementation impl = new ProvidedServiceImplementation(null, "$pojoagent!=null? $pojoagent: $component", Implementation.PROXYTYPE_DECOUPLED, null, null);
-				ProvidedServiceInfo psi = new ProvidedServiceInfo(null, iface, impl, null, null, null);
+				ProvidedServiceInfo psi = new ProvidedServiceInfo(null, iface, impl);
 				modelinfo.addProvidedService(psi);
 			}
 		}
+	}
+
+	/**
+	 *  Create info from annotation.
+	 */
+	protected static ProvidedServiceInfo createProvidedServiceInfo(ProvidedService prov)
+	{
+		Implementation im = prov.implementation();
+		Value[] inters = im.interceptors();
+		UnparsedExpression[] interceptors = null;
+		if(inters.length>0)
+		{
+			interceptors = new UnparsedExpression[inters.length];
+			for(int k=0; k<inters.length; k++)
+			{
+				interceptors[k] = new UnparsedExpression(null, inters[k].clazz(), inters[k].value(), null);
+			}
+		}
+		RequiredServiceBinding bind = null;//createBinding(im.binding());
+		ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
+			im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
+		Publish p = prov.publish();
+		PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.publishscope(), p.multi(),
+			Object.class.equals(p.mapping())? null: p.mapping(), SNameValue.createUnparsedExpressions(p.properties()));
+		
+		UnparsedExpression	scopeexpression	= prov.scopeexpression()!=null && prov.scopeexpression().length()>0
+				? new UnparsedExpression("scopeexpression", ServiceScope.class, prov.scopeexpression(), null) : null;
+
+		// Only keep security settings explicitly set in @ProvidedService annotation (default: empty roles)
+		Security	security	= prov.security().roles().length>0 ? prov.security() : null;
+		
+		NameValue[] props = prov.properties();
+		List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(SNameValue.createUnparsedExpressions(props))) : null;
+		
+		ProvidedServiceInfo psi = new ProvidedServiceInfo(prov.name().length()>0? prov.name(): null, prov.type(), impl,  prov.scope(), scopeexpression, security, pi, serprops);
+		return psi;
 	}
 	
 	/**
@@ -1150,9 +1251,9 @@ public class MicroClassReader
 	}
 	
 	/**
-	 *  Create a required service info and add it to the map.
+	 *  Create a required service info from annotation.
 	 */
-	protected RequiredServiceInfo createRequiredServiceInfo(RequiredService rs, ClassLoader cl)
+	protected static RequiredServiceInfo createRequiredServiceInfo(RequiredService rs, ClassLoader cl)
 	{
 		RequiredServiceBinding binding = createBinding(rs);
 		List<NFRPropertyInfo> nfprops = createNFRProperties(rs.nfprops());
@@ -1164,7 +1265,7 @@ public class MicroClassReader
 		}
 		
 		RequiredServiceInfo rsis = new RequiredServiceInfo(rs.name(), rs.type(), 
-			rs.multiple(), binding, nfprops, Arrays.asList(rs.tags()));
+			rs.min(), rs.max(), binding, nfprops, Arrays.asList(rs.tags())); // rs.multiple()
 		
 		return rsis;
 	}
@@ -1732,15 +1833,18 @@ public class MicroClassReader
 	 */
 	public static RequiredServiceBinding createBinding(RequiredService rq)
 	{
+		UnparsedExpression	scopeexpression	= rq.scopeexpression()!=null && rq.scopeexpression().length()>0
+				? new UnparsedExpression("scopeexpression", ServiceScope.class, rq.scopeexpression(), null) : null;
+
 		return new RequiredServiceBinding(null, null, null,
-			rq.scope().length()==0? null: rq.scope(), createUnparsedExpressions(rq.interceptors()),
-			rq.proxytype());
+			rq.scope(), createUnparsedExpressions(rq.interceptors()),
+			rq.proxytype()).setScopeExpression(scopeexpression);
 	}
 	
 	/**
 	 *  Create req service props.
 	 */
-	protected List<NFRPropertyInfo> createNFRProperties(NFRProperty[] nfrp)
+	protected static List<NFRPropertyInfo> createNFRProperties(NFRProperty[] nfrp)
 	{
 		List<NFRPropertyInfo> nfprops = new ArrayList<NFRPropertyInfo>();
 		for(NFRProperty prop: nfrp)
@@ -2241,5 +2345,298 @@ public class MicroClassReader
 			}
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Find injections:
+	 *  @Agent, @Parent, @AgentServiceSearch, @AgentServiceQuery, 
+	 *  @AgentFeature, @AgentArgument, @AgentResult, @AgentServiceValue
+	 *  
+	 *  @param cma
+	 *  @param cl
+	 *  @param ii
+	 *  @param rsers
+	 */
+	public static void findInjections(Class<?> cma, ClassLoader cl, InjectionInfoHolder ii, Map<String, Object> rsers)
+	{
+		//Map<String, RequiredServiceInfo> rsers = ii.getRequiredServiceInfos();
+		
+		// Find injection targets by reflection (agent, arguments, services)
+		Field[] fields = cma.getDeclaredFields();
+		
+		for(int i=0; i<fields.length; i++)
+		{
+			if(isAnnotationPresent(fields[i], Agent.class, cl))
+			{
+				ii.addAgentInjection(new FieldInfo(fields[i]));
+			}
+			else if(isAnnotationPresent(fields[i], Parent.class, cl))
+			{
+				ii.addParentInjection(new FieldInfo(fields[i]));
+			}
+			else if(isAnnotationPresent(fields[i], AgentServiceSearch.class, cl))
+			{
+				AgentServiceSearch ser = getAnnotation(fields[i], AgentServiceSearch.class, cl);
+				RequiredService rs = ser.requiredservice();
+				
+				//if(rsis.getName().length()==0)
+				//	rsis.setName(fields[i].getName());
+				
+				RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
+				String name = ser.name().length()>0? ser.name(): fields[i].getName();
+				
+				if(Object.class.equals(rsis.getType().getType(cl)))
+					rsis.setType(new ClassInfo(fields[i].getType()));
+				
+				// references existing required service def or add it under this name
+				if(ser.name().length()>0)
+					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
+				
+				ii.addServiceInjection(name, new ServiceInjectionInfo().setFieldInfo(new FieldInfo(fields[i])).setLazy(ser.lazy()).setQuery(false).setRequiredServiceInfo(rsis));
+			}
+			else if(isAnnotationPresent(fields[i], AgentServiceQuery.class, cl))
+			{
+				AgentServiceQuery ser = getAnnotation(fields[i], AgentServiceQuery.class, cl);
+				RequiredService rs = ser.requiredservice();
+				
+				//Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
+				//if(rsis.getName().length()==0)
+				//	rsis.setName(fields[i].getName());
+				
+				RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
+				String name = rs.name().length()>0? rs.name(): fields[i].getName();
+				
+				if(Object.class.equals(rsis.getType().getType(cl)))
+					rsis.setType(new ClassInfo(fields[i].getType()));
+				
+				if(rs.name().length()>0)
+					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
+				
+				ii.addServiceInjection(name, new ServiceInjectionInfo().setFieldInfo(new FieldInfo(fields[i])).setLazy(true).setQuery(true).setRequiredServiceInfo(rsis));
+
+			}
+			else if(isAnnotationPresent(fields[i], OnService.class, cl))
+			{
+				//if("secser".equals(fields[i].getName()))
+				//	System.out.println("secser");
+				
+				OnService ser = getAnnotation(fields[i], OnService.class, cl);
+				RequiredService rs = ser.requiredservice();
+
+				RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
+				String name = rs.name().length()>0? rs.name(): fields[i].getName();
+				
+				if(Object.class.equals(rsis.getType().getType(cl)))
+					rsis.setType(new ClassInfo(fields[i].getType()));
+						
+				if(ser.name().length()>0)
+					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
+				
+				ServiceInjectionInfo sii = new ServiceInjectionInfo().setFieldInfo(new FieldInfo(fields[i])).setRequiredServiceInfo(rsis);
+				
+				if(ser.query().toBoolean()!=null)
+					sii.setQuery(ser.query().toBoolean());
+				else
+					sii.setQuery(false); // default on fields is false
+				sii.setRequired(ser.required().toBoolean());
+				sii.setLazy(ser.required().toBoolean());
+				sii.setActive(ser.active());
+				
+				ii.addServiceInjection(name, sii);
+			}
+			else if(isAnnotationPresent(fields[i], AgentFeature.class, cl))
+			{
+				ii.addFeatureInjection(fields[i].getName(), new FieldInfo(fields[i]));
+			}
+			else
+			{
+				if(isAnnotationPresent(fields[i], AgentArgument.class, cl))
+				{
+					AgentArgument arg = getAnnotation(fields[i], AgentArgument.class, cl);
+					String name = arg.value().length()>0? arg.value(): fields[i].getName();
+					ii.addArgumentInjection(name, new FieldInfo(fields[i]), arg.convert());
+				}
+				if(isAnnotationPresent(fields[i], AgentResult.class, cl))
+				{
+					AgentResult res = getAnnotation(fields[i], AgentResult.class, cl);
+					String name = res.value().length()>0? res.value(): fields[i].getName();
+					if(ii.getResultInjection(name)==null)
+					{
+						ii.addResultInjection(name, new FieldInfo(fields[i]), res.convert(), res.convertback());
+					}
+				}
+			}
+			
+			// todo: method name, parameters, intervals...
+			if(isAnnotationPresent(fields[i], AgentServiceValue.class, cl))
+			{
+				AgentServiceValue ser = getAnnotation(fields[i], AgentServiceValue.class, cl);
+				String reqname = ser.name();
+				ii.addServiceCall(new ServiceCallInfo(reqname, null, new FieldInfo(fields[i])));
+			}
+		}
+
+		// Find method injection targets by reflection (services)
+		Method[] methods = cma.getDeclaredMethods();
+		for(int i=0; i<methods.length; i++)
+		{
+			if(isAnnotationPresent(methods[i], AgentServiceSearch.class, cl))
+			{
+				AgentServiceSearch ser = getAnnotation(methods[i], AgentServiceSearch.class, cl);
+				String name = ser.name().length()>0? ser.name(): guessName(methods[i].getName());
+				
+				RequiredServiceInfo rsis = createRequiredServiceInfo(ser.requiredservice(), cl);
+				
+				if(ser.name().length()>0)
+					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
+				
+				ii.addServiceInjection(name, new ServiceInjectionInfo().setMethodInfo(new MethodInfo(methods[i])).setRequiredServiceInfo(rsis).setQuery(false));
+			}
+			
+			if(isAnnotationPresent(methods[i], AgentServiceQuery.class, cl))
+			{
+				AgentServiceQuery asq = getAnnotation(methods[i], AgentServiceQuery.class, cl);
+				
+				//String name = SUtil.createUniqueId(methods[i].getName());
+				String name = asq.requiredservice().name().length()>0? asq.requiredservice().name(): guessName(methods[i].getName());
+				
+				// Find parameter that can be used for injection 
+				// todo: use parameter annotation to allow for more than one parameter
+				Class<?> iftype = Object.class.equals(asq.type())? guessParameterType(methods[i].getParameterTypes(), cl): asq.type();
+				
+				//RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
+				RequiredServiceInfo rsis = new RequiredServiceInfo(name, iftype, asq.scope());
+				//rsis.setMultiple(asq.multiple());
+				//rsis.setMax(RequiredServiceInfo.MANY);
+			
+				//if(asq.requiredservice().name().length()>0)
+					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
+				
+				//ModelInfo mi = (ModelInfo)micromodel.getModelInfo();
+				//mi.addRequiredService(rsi);
+				
+				ii.addServiceInjection(name, new ServiceInjectionInfo().setMethodInfo(new MethodInfo(methods[i])).setQuery(true).setRequiredServiceInfo(rsis));
+			}
+			
+			if(isAnnotationPresent(methods[i], OnService.class, cl))
+			{
+				OnService ser = getAnnotation(methods[i], OnService.class, cl);
+				RequiredService rs = ser.requiredservice();
+					
+				//String name = ser.requiredservice().name().length()>0? ser.requiredservice().name(): guessName(methods[i].getName());
+				String name = ser.name();
+				
+				if(name.length()==0)
+					name = rs.name();
+				if(name.length()==0)
+					guessName(methods[i].getName());
+				
+				RequiredServiceInfo rsis = (RequiredServiceInfo)rsers.get(name);
+				if(rsis==null)
+				{
+					rsis = createRequiredServiceInfo(rs, cl);
+					
+					if(new ClassInfo(Object.class).equals(rsis.getType()))
+					{
+						Class<?> iftype = Object.class.equals(ser.requiredservice().type())? guessParameterType(methods[i].getParameterTypes(), cl): ser.requiredservice().type();
+						rsis.setType(new ClassInfo(iftype));
+					}
+					
+					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
+				}
+								
+				ServiceInjectionInfo sii = new ServiceInjectionInfo().setMethodInfo(new MethodInfo(methods[i])).setRequiredServiceInfo(rsis);
+						
+				//if(ser.requiredservice().name().length()>0)
+				//	checkAndAddRequiredServiceInfo(rsis, rsers, cl);
+				
+				if(ser.query().toBoolean()!=null)
+					sii.setQuery(ser.query().toBoolean());
+				else
+					sii.setQuery(true); // default on methods is true
+				sii.setRequired(ser.required().toBoolean());
+				sii.setLazy(ser.required().toBoolean());
+				sii.setActive(ser.active());
+				
+				ii.addServiceInjection(name, sii);
+			}
+
+			// todo: method name, parameters, intervals...
+			if(isAnnotationPresent(methods[i], AgentServiceValue.class, cl))
+			{
+				AgentServiceValue ser = getAnnotation(methods[i], AgentServiceValue.class, cl);
+				String reqname = ser.name();
+				ii.addServiceCall(new ServiceCallInfo(reqname, null, new MethodInfo(methods[i])));
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected static String guessName(String methodname)
+	{
+		String ret = methodname;
+	
+		ret	= ret.toLowerCase();
+			
+		// Guess the injection name
+		if(ret.startsWith("add"))
+		{
+			ret = ret.substring(3);
+			ret	= SUtil.getPlural(ret);
+		}
+		else if(ret.startsWith("set"))
+		{
+			ret	= ret.substring(3);							
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected static Class<?> guessParameterType(Class<?>[] ptypes, ClassLoader cl)
+	{
+		Class<?> iftype = null;
+		
+		for(Class<?> ptype: ptypes)
+		{
+			if(isAnnotationPresent(ptype, Service.class, cl))
+			{
+				iftype = ptype;
+				break;
+			}
+		}
+		
+		if(iftype==null || Object.class.equals(iftype))
+			throw new RuntimeException("No service interface found for service query");
+		
+		return iftype;
+	}
+	
+	/**
+	 * 
+	 * @param rsis
+	 * @param rsers
+	 * @param cl
+	 */
+	public static void checkAndAddRequiredServiceInfo(RequiredServiceInfo rsis, Map<String, Object> rsers, ClassLoader cl)
+	{
+		// Do not add definitions without name!
+		if(rsis.getName()==null || rsis.getName().length()==0)
+			return;
+		
+		if(rsers.containsKey(rsis.getName()))
+		{
+			RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(rsis.getName());
+			//if(old.isMultiple()!=rsis.isMultiple()
+			if(old.getMin()!=rsis.getMin() || old.getMax()!=rsis.getMax() || !old.getType().getType(cl).equals(rsis.getType().getType(cl)))
+				throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+rsis.getName());
+		}
+		else
+		{
+			rsers.put(rsis.getName(), rsis);
+		}
 	}
 }

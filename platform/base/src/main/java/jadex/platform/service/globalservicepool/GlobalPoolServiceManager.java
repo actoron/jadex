@@ -16,7 +16,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
@@ -38,7 +38,6 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
-import jadex.micro.annotation.RequiredService;
 import jadex.platform.service.servicepool.PoolServiceInfo;
 import jadex.platform.service.servicepool.ServicePoolAgent;
 
@@ -130,7 +129,7 @@ public class GlobalPoolServiceManager
 		
 		// Check if service is available in global pool itself
 		@SuppressWarnings("unchecked")
-		Collection<IService> ownsers = (Collection<IService>) component.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(servicetype));
+		Collection<IService> ownsers = (Collection<IService>) component.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>(servicetype));
 //		Collection<IService> ownsers = (Collection<IService>)SServiceProvider.getLocalServices(component, servicetype);
 		if(ownsers!=null)
 		{
@@ -240,6 +239,11 @@ public class GlobalPoolServiceManager
 				{
 					ret.setException(exception);
 				}
+				
+				public void maxResultCountAvailable(int max) 
+				{
+					ret.setMaxResultCount(max);
+				}
 			});
 		}
 		
@@ -305,8 +309,8 @@ public class GlobalPoolServiceManager
 //		else
 //		{
 			
-			//SServiceProvider.getServices(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-			component.getFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(ILibraryService.class).setScope(RequiredService.SCOPE_GLOBAL)))
+			//SServiceProvider.getServices(component, IComponentManagementService.class, ServiceScope.GLOBAL)
+			component.getFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(ILibraryService.class).setScope(ServiceScope.GLOBAL)))
 				.addResultListener(new IntermediateDelegationResultListener<ILibraryService>(ret)
 			{
 				public void customIntermediateResultAvailable(ILibraryService cms) 
@@ -382,6 +386,11 @@ public class GlobalPoolServiceManager
 				{
 					ret.setException(exception);
 				}
+				
+				public void maxResultCountAvailable(int max) 
+				{
+					ret.setMaxResultCount(max);
+				}
 			});
 		}
 		
@@ -422,14 +431,15 @@ public class GlobalPoolServiceManager
 					ci.setArguments(args);
 					ci.setFilename(ServicePoolAgent.class.getName()+".class");
 					
-					IExternalAccess ea = SServiceProvider.getExternalAccessProxy(component, ((IService)cms).getServiceId().getProviderId());
-					ea.createComponent(ci, null)
+//					IExternalAccess ea = SServiceProvider.getExternalAccessProxy(component, ((IService)cms).getServiceId().getProviderId());
+					IExternalAccess ea = component.getExternalAccess(((IService)cms).getServiceId().getProviderId());
+					ea.createComponent(ci)
 //					cms.createComponent(null, componentname, ci, null)
 						.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExternalAccess>()
 					{
 						public void resultAvailable(IExternalAccess ea)
 						{
-							Future<IService> fut = (Future<IService>)ea.searchService( new ServiceQuery<>( servicetype, RequiredServiceInfo.SCOPE_COMPONENT_ONLY));
+							Future<IService> fut = (Future<IService>)ea.searchService( new ServiceQuery<>( servicetype, ServiceScope.COMPONENT_ONLY));
 							fut.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IService>()
 							{
 								public void resultAvailable(final IService ser)
@@ -505,6 +515,11 @@ public class GlobalPoolServiceManager
 			{
 		//		ret.setException(exception);
 				ret.setFinished();
+			}
+			
+			public void maxResultCountAvailable(int max) 
+			{
+				ret.setMaxResultCount(max);
 			}
 		});
 		
@@ -597,7 +612,7 @@ public class GlobalPoolServiceManager
 
 //		System.out.println("removing worker: "+workercid+" "+servicepool);
 		
-		component.killComponent(workercid).addResultListener(
+		component.getExternalAccess(workercid).killComponent().addResultListener(
 			inta.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 		{
 			public void customResultAvailable(Map<String, Object> result) 
@@ -654,7 +669,7 @@ public class GlobalPoolServiceManager
 		
 		final Future<ITimer> ret = new Future<ITimer>();
 		
-		IClockService cs = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		IClockService cs = component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
 		ret.setResult(cs.createTimer(delay, to));
 		
 		return ret;

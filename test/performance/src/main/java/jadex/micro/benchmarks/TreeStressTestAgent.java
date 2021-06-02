@@ -5,11 +5,11 @@ import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
@@ -29,7 +29,8 @@ public class TreeStressTestAgent
 	/**
 	 *  Execute the agent.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 		int	depth	= ((Number)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("depth")).intValue();
@@ -37,10 +38,10 @@ public class TreeStressTestAgent
 		{
 			Map	args	= new HashMap();
 			args.put("depth", Integer.valueOf(depth-1));
-			CreationInfo	ci	= new CreationInfo(args, agent.getId()).setFilename(TreeStressTestAgent.this.getClass().getName()+".class");
+			CreationInfo	ci	= new CreationInfo(args).setFilename(TreeStressTestAgent.this.getClass().getName()+".class");
 			for(int i=0; i<depth; i++)
 			{
-				agent.createComponent(ci, null);
+				agent.createComponent(ci);
 			}
 		}
 		

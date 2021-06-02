@@ -6,6 +6,7 @@ import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
@@ -26,7 +27,8 @@ public class ClockBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		setTime(System.currentTimeMillis());
@@ -35,7 +37,7 @@ public class ClockBDI
 	/**
 	 *  Plan that prints the time.
 	 */
-	@Plan(trigger=@Trigger(factchangeds="time"))
+	@Plan(trigger=@Trigger(factchanged="time"))
 	protected void printTime()
 	{
 		System.out.println(formatter.format(getTime()));

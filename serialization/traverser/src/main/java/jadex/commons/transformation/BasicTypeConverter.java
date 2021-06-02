@@ -14,7 +14,7 @@ import jadex.commons.SUtil;
 /**
  *  Converter for basic types.
  */
-public class BasicTypeConverter //implements ITypeConverter
+public class BasicTypeConverter //implements IStringObjectConverter
 {
 	//-------- static part --------
 	
@@ -94,6 +94,115 @@ public class BasicTypeConverter //implements ITypeConverter
 //		extconverters.put(byte[].class, BA_CONVERTER);
 	}
 	
+	public final static BasicTypeConverter CONVERTERS = new BasicTypeConverter();
+	
+	/** The map of instance converters. */
+	protected Map<Class<?>, IStringObjectConverter> converters;
+	
+	/**
+	 *  Create a new type converter.
+	 *  @param converters The contained converters.
+	 */
+	public BasicTypeConverter()
+	{
+		this(null);
+	}
+	
+	/**
+	 *  Create a new type converter.
+	 *  @param converters The contained converters.
+	 */
+	public BasicTypeConverter(Map<Class<?>, IStringObjectConverter> converters)
+	{
+		this.converters = converters!=null? converters: new HashMap<>(extconverters);
+	}
+	
+	/**
+	 *  Convert a string value.
+	 *  @param val The string value.
+	 *  @param type The target class.
+	 *  @param context The conversion context.
+	 *  @return The converted value.
+	 */
+	public Object convertString(String val, Class<?> type, Object context) throws Exception
+	{
+		IStringObjectConverter conv = getStringConverter(type);
+		return conv==null? null: conv.convertString(val, context);
+	}
+	
+	/**
+	 *  Convert a string value.
+	 *  @param val The string value.
+	 *  @param type The target class.
+	 *  @param context The conversion context.
+	 *  @return The converted value.
+	 */
+	public String convertObject(Object val, Class<?> type, Object context) throws Exception
+	{
+		IObjectStringConverter conv = getObjectConverter(type==null && val!=null? val.getClass(): type);
+		return conv==null? null: conv.convertObject(val, context);
+	}
+	
+	/**
+	 *  Add a new converter.
+	 *  @param type The type.
+	 *  @param converter The converter.
+	 */
+	public void addConverter(Class<?> type, IStringObjectConverter converter)
+	{
+		converters.put(type, converter);
+	}
+	
+	/**
+	 *  Remove a converter.
+	 *  @param type The type.
+	 */
+	public void removeConverter(Class<?> type)
+	{
+		converters.remove(type);
+	}
+	
+	/**
+	 *  Test if a clazz is a built-in type.
+	 *  @param clazz The clazz.
+	 *  @return True, if built-in type.
+	 */
+	public boolean isSupportedType(Class<?> clazz)
+	{
+		return converters.get(clazz)!=null;
+	}
+	
+	/**
+	 *  Get a String -> X converter for a target clazz.
+	 *  @param clazz The clazz.
+	 *  @return converter The converter.
+	 */
+	public IStringObjectConverter getStringConverter(Class<?> clazz)
+	{
+		return (IStringObjectConverter)converters.get(clazz);
+	}
+	
+	/**
+	 *  Get a X -> String converter for a source clazz.
+	 *  @param clazz The clazz.
+	 *  @return converter The converter.
+	 */
+	public IObjectStringConverter getObjectConverter(Class<?> clazz)
+	{
+		IObjectStringConverter ret = null;
+		if(converters.get(clazz)!=null)
+		{
+			ret = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, Object context)
+				{
+					return val==null? "null": val.toString();
+				}
+			};
+		}
+		return ret;
+	}
+	
 	/**
 	 *  Test if a clazz is a built-in type.
 	 *  @param clazz The clazz.
@@ -104,15 +213,15 @@ public class BasicTypeConverter //implements ITypeConverter
 		return basicconverters.get(clazz)!=null;
 	}
 	
-	/**
-	 *  Test if a clazz is a built-in type.
-	 *  @param clazz The clazz.
-	 *  @return True, if built-in type.
-	 */
-	public static boolean isExtendedBuiltInType(Class<?> clazz)
-	{
-		return extconverters.get(clazz)!=null;
-	}
+//	/**
+//	 *  Test if a clazz is a built-in type.
+//	 *  @param clazz The clazz.
+//	 *  @return True, if built-in type.
+//	 */
+//	public static boolean isExtendedBuiltInType(Class<?> clazz)
+//	{
+//		return extconverters.get(clazz)!=null;
+//	}
 	
 	/**
 	 *  Get a String -> X converter for a target clazz.
@@ -145,35 +254,53 @@ public class BasicTypeConverter //implements ITypeConverter
 		return ret;
 	}
 	
+//	/**
+//	 *  Get a String -> X converter for a target clazz.
+//	 *  @param clazz The clazz.
+//	 *  @return converter The converter.
+//	 */
+//	public static IStringObjectConverter getExtendedStringConverter(Class<?> clazz)
+//	{
+//		return (IStringObjectConverter)extconverters.get(clazz);
+//	}
+	
+//	/**
+//	 *  Get a X -> String converter for a source clazz.
+//	 *  @param clazz The clazz.
+//	 *  @return converter The converter.
+//	 */
+//	public static IObjectStringConverter getExtendedObjectConverter(Class<?> clazz)
+//	{
+//		IObjectStringConverter ret = null;
+//		if(extconverters.get(clazz)!=null)
+//		{
+//			ret = new IObjectStringConverter()
+//			{
+//				public String convertObject(Object val, Object context)
+//				{
+//					return val==null? "null": val.toString();
+//				}
+//			};
+//		}
+//		return ret;
+//	}
+	
 	/**
-	 *  Get a String -> X converter for a target clazz.
-	 *  @param clazz The clazz.
-	 *  @return converter The converter.
+	 *  Get converters copy.
+	 *  @return Get a copy of the converters.
 	 */
-	public static IStringObjectConverter getExtendedStringConverter(Class<?> clazz)
+	public Map<Class<?>, IStringObjectConverter> getConverters()
 	{
-		return (IStringObjectConverter)extconverters.get(clazz);
+		return new HashMap<>(basicconverters);
 	}
 	
 	/**
-	 *  Get a X -> String converter for a source clazz.
-	 *  @param clazz The clazz.
-	 *  @return converter The converter.
+	 *  Get extended converters copy.
+	 *  @return Get a copy of the extended converters.
 	 */
-	public static IObjectStringConverter getExtendedObjectConverter(Class<?> clazz)
+	public Map<Class<?>, IStringObjectConverter> getExtendedConverters()
 	{
-		IObjectStringConverter ret = null;
-		if(extconverters.get(clazz)!=null)
-		{
-			ret = new IObjectStringConverter()
-			{
-				public String convertObject(Object val, Object context)
-				{
-					return val==null? "null": val.toString();
-				}
-			};
-		}
-		return ret;
+		return new HashMap<>(extconverters);
 	}
 }
 

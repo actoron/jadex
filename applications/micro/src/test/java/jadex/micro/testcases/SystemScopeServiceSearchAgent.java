@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -12,6 +13,7 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceSearch;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -30,16 +32,18 @@ public class SystemScopeServiceSearchAgent extends JunitAgentTest
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentServiceSearch
+	//@AgentServiceSearch
+	@OnService
 	protected ILibraryService cms;
 	
-	@AgentBody
+	@OnStart
+	//@AgentBody
 	public void body()
 	{	
 		TestReport tr1 = new TestReport("#1", "Test if system service can be found without scope with SServiceProvider");
 		try
 		{
-			ILibraryService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+			ILibraryService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 			System.out.println("Found: "+cms);
 			tr1.setSucceeded(true);
 		}

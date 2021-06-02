@@ -20,8 +20,9 @@ import javax.net.ssl.SSLServerSocketFactory;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.email.Email;
 import jadex.bridge.service.types.email.EmailAccount;
@@ -36,7 +37,6 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.IntervalBehavior;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Component;
@@ -123,7 +123,8 @@ public class EmailAgent implements IEmailService
 	/**
 	 *  Called on agent start.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> start()
 	{
 //		System.out.println("email agent started");
@@ -144,7 +145,8 @@ public class EmailAgent implements IEmailService
 	/**
 	 *  Called when service is shudowned.
 	 */
-	@ServiceShutdown
+	//@ServiceShutdown
+	@OnEnd
 	public IFuture<Void> shutdown()
 	{
 		if(subscriptions!=null)

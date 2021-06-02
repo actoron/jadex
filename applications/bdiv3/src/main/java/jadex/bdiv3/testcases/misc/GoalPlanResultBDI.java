@@ -10,6 +10,7 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -64,7 +65,8 @@ public class GoalPlanResultBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		String res1 = (String)agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new AGoal()).get();

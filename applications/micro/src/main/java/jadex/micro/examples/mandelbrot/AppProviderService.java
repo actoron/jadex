@@ -13,7 +13,7 @@ import jadex.commons.future.IFuture;
  * 
  */
 @Service
-public class AppProviderService implements IAppProviderService<IMandelbrotService>
+public class AppProviderService //implements IAppProviderService<IMandelbrotService>
 {
 	/** The app meta info. */
 	protected AppMetaInfo ami;
@@ -41,10 +41,10 @@ public class AppProviderService implements IAppProviderService<IMandelbrotServic
 
 	/**
 	 * 
-	 */
+	 * /
 	public IFuture<IMandelbrotService> getApplication()
 	{
 		IMandelbrotService ms = (IMandelbrotService)agent.getFeature(IProvidedServicesFeature.class).getProvidedServices(IMandelbrotService.class)[0];
 		return new Future<IMandelbrotService>(ms);
-	}
+	}*/
 }

@@ -10,8 +10,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -20,10 +19,9 @@ import jadex.micro.annotation.RequiredServices;
 /**
  *  An agent that provides the stepped service.
  */
-@Agent
+@Agent(predecessors="jadex.micro.testcases.blocking.BlockAgent")
 @Service
-@ProvidedServices(@ProvidedService(type=IStepService.class,
-	implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IStepService.class))
 @RequiredServices(@RequiredService(name="block", type=IBlockService.class))
 public class StepAgent	implements	IStepService
 {
@@ -34,7 +32,8 @@ public class StepAgent	implements	IStepService
 	protected IInternalAccess	agent;
 	
 	/** The blocking service. */
-	@AgentServiceSearch
+	//@AgentServiceSearch
+	@OnService
 	protected IBlockService	block;
 	
 	//-------- IIntermediateBlockingService interface --------
@@ -44,7 +43,7 @@ public class StepAgent	implements	IStepService
 	 */
 	public IIntermediateFuture<Integer>	performSteps(final int steps, final long millis)
 	{
-//		System.out.println("Perform steps called: "+agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
+//		System.out.println("Perform steps called: "+agent.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 		final IntermediateFuture<Integer>	ret	= new IntermediateFuture<Integer>();
 		
 		agent.getFeature(IExecutionFeature.class).waitForDelay(0, new IComponentStep<Void>()
@@ -53,7 +52,7 @@ public class StepAgent	implements	IStepService
 			{
 				for(int i=1; i<=steps; i++)
 				{
-//					System.out.println("Perform steps before wait for step "+i+": "+agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
+//					System.out.println("Perform steps before wait for step "+i+": "+agent.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 					ia.getFeature(IExecutionFeature.class).waitForDelay(millis).get();
 					ret.addIntermediateResult(Integer.valueOf(i));
 				}

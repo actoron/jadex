@@ -789,7 +789,7 @@ public abstract class Plan
 	 */
 	public IClockService getClock()
 	{
-		return agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+		return agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class));
 	}
 
 	/**

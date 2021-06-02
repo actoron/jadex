@@ -9,6 +9,7 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cron.CronJob;
@@ -23,16 +24,16 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -58,7 +59,7 @@ public class TestAgent
 	protected IInternalAccess agent;
 	
 	/** The library service. */
-	@AgentServiceSearch
+	@OnService
 	protected IClockService clock;
 	
 	//-------- methods --------
@@ -66,7 +67,8 @@ public class TestAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+//	@AgentBody
+	@OnStart
 	public IFuture<Void> body()
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -97,7 +99,7 @@ public class TestAgent
 			"0 0 1 1 *"
 		};
 		
-		testPatterns(patterns).addResultListener(new IIntermediateResultListener<TestReport>()
+		testPatterns(patterns).addResultListener(new IntermediateEmptyResultListener<TestReport>()
 		{
 			protected List<TestReport> trs = new ArrayList<TestReport>();
 			
@@ -346,6 +348,13 @@ public class TestAgent
 		public void exceptionOccurred(Exception exception)
 		{
 			exception.printStackTrace();
+		}
+		
+		/**
+		 * 
+		 */
+		public void maxResultCountAvailable(int max) 
+		{
 		}
 	};
 }

@@ -12,6 +12,8 @@ dependencies
 	api project(':platform:bridge')
 	api project(':kernels:base')
 	api project(':kernels:micro')
+	
+	// TODO: move process engine to separate package (for exclude from minimal)
 	api project(':kernels:bpmn')
 	api project(':rules:eca')
 	
@@ -22,15 +24,14 @@ dependencies
 	// Add transpors for testing
 	testImplementation project(':transports:intravm')
 	testImplementation project(':transports:tcp')
-	testImplementation project(':transports:relaytransport')
+	testImplementation project(':transports:relay')
 	
-	//testImplementation project(':transports:jadex-platform-extension-websockettransport')
-	// required for test suite (why?)
-	//testImplementation project(':kernels:jadex-kernel-component')
+	//testImplementation project(':transports:websocket')
 	
-	apiNoAndroidRuntime 'javax.mail:mail:1.4.5'
-	api group: 'org.tukaani', name: 'xz', version: '1.5'
-	api group: 'net.jpountz.lz4', name: 'lz4', version: '1.3.0'
-	api group: 'org.xerial.snappy', name: 'snappy-java', version: '1.1.2.6'
-	api group: 'net.i2p.crypto', name: 'eddsa', version: '0.2.0'
+	api 'javax.mail:mail:1.4.5'
+	api 'org.tukaani:xz:1.5'
+	api 'net.jpountz.lz4:lz4:1.3.0'
+	api 'org.xerial.snappy:snappy-java:1.1.2.6'
+	api 'net.i2p.crypto:eddsa:0.2.0'
+	
 }

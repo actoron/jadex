@@ -39,6 +39,7 @@ import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.CheckNotNull;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -640,7 +641,7 @@ public class CleanerAgent
 	{
 	}
 	
-	@Plan(trigger=@Trigger(factchangeds={"environment", "my_location"}))
+	@Plan(trigger=@Trigger(factchanged={"environment", "my_location"}))
 	protected IFuture<Void> updateVision(IPlan rplan)
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -809,7 +810,8 @@ public class CleanerAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		SwingUtilities.invokeLater(new Runnable()

@@ -1,13 +1,9 @@
 package jadex.commons.gui.future;
 
 
-import javax.swing.SwingUtilities;
+import java.util.function.Consumer;
 
-import jadex.bridge.service.types.simulation.SSimulation;
-import jadex.commons.SReflect;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFunctionalExceptionListener;
-import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IUndoneResultListener;
 import jadex.commons.gui.SGUI;
@@ -27,10 +23,10 @@ public class SwingDelegationResultListener<E> implements IUndoneResultListener<E
 	protected boolean undone;
 	
 	/** Custom result listener */
-	protected IFunctionalResultListener<E>	customResultListener;
+	protected Consumer<E>	customResultListener;
 	
 	/** Custom result listener */
-	protected IFunctionalExceptionListener	customExceptionListener;
+	protected Consumer<Exception>	customExceptionListener;
 	
 	//-------- constructors --------
 	
@@ -39,7 +35,7 @@ public class SwingDelegationResultListener<E> implements IUndoneResultListener<E
 	 * @param fut The Delegate.
 	 * @param customResultListener The listener.
 	 */
-	public SwingDelegationResultListener(Future<E> fut, final IFunctionalResultListener<E> customResultListener)
+	public SwingDelegationResultListener(Future<E> fut, final Consumer<E> customResultListener)
 	{
 		this(fut, customResultListener, null);
 	}
@@ -51,7 +47,7 @@ public class SwingDelegationResultListener<E> implements IUndoneResultListener<E
 	 * @param customResultListener The custom result listener.
 	 * @param customExceptionListener The listener that is called on exceptions.
 	 */
-	public SwingDelegationResultListener(Future<E> fut, final IFunctionalResultListener<E> customResultListener, IFunctionalExceptionListener customExceptionListener)
+	public SwingDelegationResultListener(Future<E> fut, final Consumer<E> customResultListener, Consumer<Exception> customExceptionListener)
 	{
 		this(fut);
 		this.customResultListener = customResultListener;
@@ -122,7 +118,7 @@ public class SwingDelegationResultListener<E> implements IUndoneResultListener<E
 	public void customResultAvailable(E result)
 	{
 		if (customResultListener != null) {
-			customResultListener.resultAvailable(result);
+			customResultListener.accept(result);
 		} else {
 			if(undone)
 			{
@@ -143,7 +139,7 @@ public class SwingDelegationResultListener<E> implements IUndoneResultListener<E
 	{
 //		System.err.println("Problem: "+exception);
 		if (customExceptionListener != null) {
-			customExceptionListener.exceptionOccurred(exception);
+			customExceptionListener.accept(exception);
 		} else {
 			if(undone)
 			{

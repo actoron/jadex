@@ -8,10 +8,9 @@ import java.util.List;
 import java.util.Set;
 
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceKeyExtractor.SetWrapper;
 import jadex.commons.Tuple2;
-import jadex.commons.Tuple3;
 
 /**
  *  Extractor for query infos.
@@ -33,8 +32,8 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 	/** Key type for the service platform. */
 	public static final String KEY_TYPE_PLATFORM = "platform";
 	
-	/** Key type for the service scope. */
-	public static final String KEY_TYPE_SCOPE = "scope";
+//	/** Key type for the service scope. */
+//	public static final String KEY_TYPE_SCOPE = "scope";
 
 	/** Key type for the id. */
 	public static final String KEY_TYPE_NETWORKS = "networks";
@@ -50,13 +49,16 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 	
 	/** Key type for the query id. */
 	public static final String KEY_TYPE_ID = "id";
+	
+	/** Key type for the unrestricted services. */
+	public static final String KEY_TYPE_UNRESTRICTED = "unrestricted";
 
 	
 	/** The key types. */
 	public static final String[] QUERY_KEY_TYPES;
 	
 	/** The indexable types. */
-	public static final String[] QUERY_KEY_TYPES_INDEXABLE = {KEY_TYPE_INTERFACE, KEY_TYPE_TAGS, KEY_TYPE_OWNER, KEY_TYPE_PROVIDER, KEY_TYPE_PLATFORM, KEY_TYPE_OWNER_PLATORM, KEY_TYPE_ID, KEY_TYPE_SID, KEY_TYPE_NETWORKS};//, KEY_TYPE_ISREMOTE};
+	public static final String[] QUERY_KEY_TYPES_INDEXABLE = {KEY_TYPE_INTERFACE, KEY_TYPE_TAGS, KEY_TYPE_OWNER, KEY_TYPE_PROVIDER, KEY_TYPE_PLATFORM, KEY_TYPE_OWNER_PLATORM, KEY_TYPE_ID, KEY_TYPE_SID, KEY_TYPE_NETWORKS, KEY_TYPE_UNRESTRICTED};//, KEY_TYPE_ISREMOTE};
 	
 	static
 	{
@@ -123,7 +125,7 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 		}
 		else if(KEY_TYPE_PROVIDER.equals(keytype))
 		{
-			if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(query.getScope()))
+			if(ServiceScope.COMPONENT_ONLY.equals(query.getScope()))
 				ret = new SetWrapper<String>(query.getSearchStart() != null ? query.getSearchStart().toString() : query.getOwner().toString());
 		}
 		else if(KEY_TYPE_PLATFORM.equals(keytype))
@@ -133,11 +135,12 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 			if(query.getPlatform()!=null)
 				ret = new SetWrapper<String>(query.getPlatform().toString());
 		}
-		else if(KEY_TYPE_SCOPE.equals(keytype))
-		{
-			//if(query.getProvider()!=null)
-				ret = new SetWrapper<String>(query.getScope());
-		}
+		// TODO: support indexing (nested!) scopes
+//		else if(KEY_TYPE_SCOPE.equals(keytype))
+//		{
+//			//if(query.getProvider()!=null)
+//				ret = new SetWrapper<String>(query.getScope());
+//		}
 		else if(KEY_TYPE_OWNER_PLATORM.equals(keytype))
 		{
 			if(query.getOwner()!=null)
@@ -154,7 +157,7 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 //		}
 		else if(KEY_TYPE_SID.equals(keytype))
 		{
-			if (RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(query.getScope()))
+			if (ServiceScope.COMPONENT_ONLY.equals(query.getScope()))
 			{
 				String id = query.getSearchStart() != null ? query.getSearchStart().toString() : query.getOwner().toString();
 				ret = new SetWrapper<String>(id);
@@ -219,6 +222,8 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 		
 		if (sid.getNetworkNames() != null)
 			ret.add(new Tuple2<>(KEY_TYPE_NETWORKS, sid.getNetworkNames().toArray(new String[sid.getNetworkNames().size()])));
+		
+		ret.add(new Tuple2<>(KEY_TYPE_UNRESTRICTED, new String[]{""+sid.isUnrestricted()}));
 		
 		return ret;
 	}

@@ -2,10 +2,7 @@ package jadex.micro.testcases;
 
 import java.io.File;
 
-import org.junit.Ignore;
-
 import jadex.base.test.ComponentTestSuite;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import junit.framework.Test;
 
@@ -74,10 +71,13 @@ public class MicroStartTest extends ComponentTestSuite
 		"MicroPrey",
 		"Firefly",
 		"Heatbug",
-		"ChatE3Agent",
+		"ChatE3",
 		"TimeUserAgent",
 		"SubscriberAgent",
 		"lottery/PlayerAgent",
+		"lottery/HumanPlayerAgent",
+		"lottery\\PlayerAgent",
+		"lottery\\HumanPlayerAgent",
 		
 		// Todo: fix race condition between shutdown and autocreate
 		"mandelbrot",
@@ -95,11 +95,11 @@ public class MicroStartTest extends ComponentTestSuite
 		"MegaParallelStarter",
 		
 		// android excludes
-		SReflect.isAndroid() ? "authenticate/InitiatorAgent" : NOEXCLUDE,
-		SReflect.isAndroid() ? "nfpropvis/ProviderAndUserAgent" : NOEXCLUDE,
-		SReflect.isAndroid() ? "nfpropvis/ProviderAgent" : NOEXCLUDE,
-		SReflect.isAndroid() ? "nfpropvis/UserAgent" : NOEXCLUDE,
-		SReflect.isAndroid() ? "nfpropvis/Application" : NOEXCLUDE,
+		//SReflect.isAndroid() ? "authenticate/InitiatorAgent" : NOEXCLUDE,
+		//SReflect.isAndroid() ? "nfpropvis/ProviderAndUserAgent" : NOEXCLUDE,
+		//SReflect.isAndroid() ? "nfpropvis/ProviderAgent" : NOEXCLUDE,
+		//SReflect.isAndroid() ? "nfpropvis/UserAgent" : NOEXCLUDE,
+		//SReflect.isAndroid() ? "nfpropvis/Application" : NOEXCLUDE,
 	};
 
 	/**

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jadex.bridge.SFuture;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.ecarules.IRuleService;
 import jadex.commons.future.IFuture;
@@ -45,7 +46,8 @@ public class RuleAgent extends RulebaseAgent implements IRuleService
 	/**
 	 *  Init method.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> init()
 	{
 		this.rulesystem = new RuleSystem(agent);

@@ -10,6 +10,7 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.ServiceInvalidException;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -40,12 +41,21 @@ public class SyncServicesTestAgent extends JunitAgentTest
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		final List<TestReport> results = new ArrayList<TestReport>();
 		
-		ISynchronousExampleService ser = (ISynchronousExampleService)agent.getFeature(IRequiredServicesFeature.class).getService("syncser").get();
+		ISynchronousExampleService ser = null;//(ISynchronousExampleService)agent.getFeature(IRequiredServicesFeature.class).getService("syncser").get();
+		while (ser == null)
+		{
+			try
+			{
+				ser = (ISynchronousExampleService)agent.getFeature(IRequiredServicesFeature.class).getService("syncser").get();
+			}
+			catch (Exception e){}
+		}
 		
 		TestReport tr1 = new TestReport("#1", "Test if can use synchronous get with int value.");
 		try

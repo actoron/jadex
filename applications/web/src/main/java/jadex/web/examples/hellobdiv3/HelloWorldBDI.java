@@ -4,6 +4,7 @@ import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.IBDIAgent;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -16,7 +17,8 @@ public abstract class HelloWorldBDI implements IBDIAgent, IHelloService
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		adoptPlan("printHello").get();

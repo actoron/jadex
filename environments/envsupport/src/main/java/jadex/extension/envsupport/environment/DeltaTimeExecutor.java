@@ -6,8 +6,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -82,12 +81,12 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 		final boolean tick = getProperty("tick")!=null && ((Boolean)getProperty("tick")).booleanValue();
 		this.container	= space.getExternalAccess();
 
-		container.searchService( new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		container.searchService( new ServiceQuery<>( IExecutionService.class, ServiceScope.PLATFORM))
 			.addResultListener(new DefaultResultListener<IExecutionService>()
 		{
 			public void resultAvailable(final IExecutionService exeservice)
 			{
-				container.searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				container.searchService( new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM))
 					.addResultListener(new DefaultResultListener<IClockService>()
 				{
 					public void resultAvailable(final IClockService clockservice)
@@ -229,7 +228,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 	public void terminate()
 	{
 		terminated = true;
-		container.searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new DefaultResultListener()
+		container.searchService( new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM)).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

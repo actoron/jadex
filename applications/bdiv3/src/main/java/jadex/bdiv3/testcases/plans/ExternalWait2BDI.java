@@ -16,12 +16,12 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -94,7 +94,8 @@ public class ExternalWait2BDI
 	/**
 	 *  Called when agent is killed.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void	destroy(IInternalAccess agent)
 	{
 		System.out.println("destroy: "+agent);

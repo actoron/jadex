@@ -15,16 +15,7 @@ public abstract class OpcodeHelper
 	public static OpcodeHelper getInstance()
 	{
 		if(INSTANCE == null) 
-		{
-			if(SReflect.isAndroid()) 
-			{
-				throw new Error("OpcodeHelper.getInstance() is not implemented for Android.");
-			} 
-			else 
-			{
-				INSTANCE = new AsmOpcodeHelper();
-			}
-		}
+			INSTANCE = new AsmOpcodeHelper();
 		return INSTANCE;
 	}
 

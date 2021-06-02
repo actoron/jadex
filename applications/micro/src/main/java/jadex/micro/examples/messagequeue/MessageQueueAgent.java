@@ -8,6 +8,7 @@ import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -24,7 +25,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=IMessageQueueService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IMessageQueueService.class))
 public class MessageQueueAgent implements IMessageQueueService
 {
 	//-------- attributes --------
@@ -41,7 +42,8 @@ public class MessageQueueAgent implements IMessageQueueService
 	/**
 	 *  Called on agent creation.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void agentCreated()
 	{
 		this.subscribers = new HashMap<String, List<SubscriptionIntermediateFuture<Event>>>();

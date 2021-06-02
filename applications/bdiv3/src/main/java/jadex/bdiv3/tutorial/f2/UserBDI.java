@@ -12,17 +12,17 @@ import javax.swing.SwingUtilities;
 
 import jadex.bdiv3.BDIAgentFactory;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Description;
 
 /**
@@ -46,7 +46,8 @@ public class UserBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		SwingUtilities.invokeLater(new Runnable()
@@ -65,8 +66,8 @@ public class UserBDI
 					public void actionPerformed(ActionEvent e)
 					{
 						// Search a translation service
-						agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITranslationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-							.addResultListener(new IIntermediateResultListener<ITranslationService>()
+						agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITranslationService.class, ServiceScope.PLATFORM))
+							.addResultListener(new IntermediateEmptyResultListener<ITranslationService>()
 						{
 							public void intermediateResultAvailable(ITranslationService ts)
 							{
@@ -114,7 +115,8 @@ public class UserBDI
 	/**
 	 *  Cleanup when agent is killed.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void	cleanup()
 	{
 		SwingUtilities.invokeLater(new Runnable()

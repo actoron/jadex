@@ -1,11 +1,11 @@
 package org.activecomponents.udp.asymciphers;
 
 import org.activecomponents.udp.SUdpUtil;
-import org.spongycastle.crypto.AsymmetricCipherKeyPair;
-import org.spongycastle.crypto.agreement.DHBasicAgreement;
-import org.spongycastle.crypto.generators.DHKeyPairGenerator;
-import org.spongycastle.crypto.generators.DHParametersGenerator;
-import org.spongycastle.crypto.params.DHKeyGenerationParameters;
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+import org.bouncycastle.crypto.agreement.DHBasicAgreement;
+import org.bouncycastle.crypto.generators.DHKeyPairGenerator;
+import org.bouncycastle.crypto.generators.DHParametersGenerator;
+import org.bouncycastle.crypto.params.DHKeyGenerationParameters;
 
 public class DHExchange extends AbstractKeyExchange
 {

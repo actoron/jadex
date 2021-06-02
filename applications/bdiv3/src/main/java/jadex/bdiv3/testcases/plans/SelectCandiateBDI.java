@@ -15,6 +15,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -83,7 +84,8 @@ public class SelectCandiateBDI
 	/**
 	 *  Agent body with behavior code.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body()
 	{
 		final Future<Void> ret = new Future<Void>();

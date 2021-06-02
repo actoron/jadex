@@ -757,7 +757,7 @@ public class GuiPanel extends JPanel
 
 			// Add some default entries for easy testing of the gui.
 			// These orders are not added to the agent (see manager.agent.xml).
-			agent.searchService( new ServiceQuery<>(IClockService.class)).addResultListener(clock ->
+			agent.searchService( new ServiceQuery<>(IClockService.class)).then(clock ->
 			{
 				if(buy)
 				{

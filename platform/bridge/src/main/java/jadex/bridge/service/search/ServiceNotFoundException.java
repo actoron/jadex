@@ -5,24 +5,41 @@ package jadex.bridge.service.search;
  */
 public class ServiceNotFoundException extends RuntimeException
 {
+	/** The failed query. */
+	protected ServiceQuery<?>	query;
+	
 	/**
-	 * 
+	 *  Create a new service not found exception.
 	 */
-	private static final long serialVersionUID = -1578469236285544067L;
-
+	public ServiceNotFoundException(ServiceQuery<?> query)
+	{
+		this(""+query);
+		this.query	= query;
+		//if(message!=null && message.indexOf("chat")!=-1)
+		//	System.out.println("gotcha");
+	}
+	
 	/**
 	 *  Create a new service not found exception.
 	 */
 	public ServiceNotFoundException(String message)
 	{
 		super(message);
-//		if(message!=null && message.indexOf("ISuperpeerRegistrySynchronizationService")!=-1)
-//			System.out.println("gotcha");
+		//if(message!=null && message.indexOf("chat")!=-1)
+		//	System.out.println("gotcha");
 	}
 	
-//	public void printStackTrace()
-//	{
-//		Thread.dumpStack();
-//		super.printStackTrace();
-//	}
+	/**
+	 *  Get the failed query, if any.
+	 */
+	public ServiceQuery<?>	getQuery()
+	{
+		return query;
+	}
+	
+	public void printStackTrace()
+	{
+		Thread.dumpStack();
+		super.printStackTrace();
+	}
 }

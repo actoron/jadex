@@ -20,14 +20,14 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.tutorial.f3.TranslationGoal;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -35,7 +35,7 @@ import jadex.micro.annotation.RequiredServices;
  * 
  */
 @Agent(type=BDIAgentFactory.TYPE)
-@RequiredServices(@RequiredService(name="transser", type=ITranslationService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
+@RequiredServices(@RequiredService(name="transser", type=ITranslationService.class, scope=ServiceScope.PLATFORM))
 @Goals(@Goal(clazz=TranslationGoal.class))
 @Plans(@Plan(trigger=@Trigger(goals=TranslationGoal.class), 
 	body=@Body(service=@ServicePlan(name="transser", mapper=TranslationGoalMapper.class))))
@@ -59,7 +59,8 @@ public class UserBDI
 	/**
 	 * 
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		SwingUtilities.invokeLater(new Runnable()
@@ -107,7 +108,8 @@ public class UserBDI
 	/**
 	 *  Cleanup when agent is killed.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void	cleanup()
 	{
 		SwingUtilities.invokeLater(new Runnable()

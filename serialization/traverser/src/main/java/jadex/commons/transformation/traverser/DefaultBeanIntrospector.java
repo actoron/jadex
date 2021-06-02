@@ -3,10 +3,7 @@ package jadex.commons.transformation.traverser;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -129,22 +126,27 @@ public class DefaultBeanIntrospector implements IBeanIntrospector
 					List<Method> setters = new ArrayList<Method>();
 					for(int i=0; i<ms.length; i++)
 					{
-						String method_name = ms[i].getName();
-						if(ms[i].getParameterTypes().length==0)
+						// Only consider non-static methods and exported methods
+						if((ms[i].getModifiers()&Modifier.STATIC)==0 && SReflect.isExported(ms[i].getDeclaringClass()))
 						{
-							if(method_name.startsWith("is"))
+							String method_name = ms[i].getName();
+							if(ms[i].getParameterTypes().length==0)
 							{
-								getters.put(method_name.substring(2), ms[i]);
+								if(method_name.startsWith("is"))
+								{
+									getters.put(method_name.substring(2), ms[i]);
+								}
+								else if(method_name.startsWith("get"))
+								{
+									getters.put(method_name.substring(3), ms[i]);
+								}
 							}
-							else if(method_name.startsWith("get"))
+							else if(method_name.startsWith("set")
+								&& ms[i].getParameterTypes().length == 1
+								&& SReflect.isExported(ms[i].getDeclaringClass()))
 							{
-								getters.put(method_name.substring(3), ms[i]);
+								setters.add(ms[i]);
 							}
-						}
-						else if(method_name.startsWith("set")
-							&& ms[i].getParameterTypes().length == 1)
-						{
-							setters.add(ms[i]);
 						}
 					}
 					
@@ -155,32 +157,35 @@ public class DefaultBeanIntrospector implements IBeanIntrospector
 						if(getter!=null && getter.getReturnType().equals(setter.getParameterTypes()[0]))
 						{
 							propname = Character.toLowerCase(propname.charAt(0)) + propname.substring(1);
+							if(!Character.isJavaIdentifierStart(propname.charAt(0)))
+							{
+								propname = "_" + propname;	// e.g. DateFormat.get2DigitYearStart() -> _2DigitYearStart
+							}
 							beanprops.put(propname, createBeanProperty(propname, getter.getReturnType(), getter, setter, setter.getParameterTypes()[0], getter.getGenericReturnType()));
 						}
 					}
 				}
 				
-				// Get all public fields.
-				Field[] fields = clazz.getFields();
-				for(int i = 0; i < fields.length; i++)
+				// Get all fields (and include if requested)
+				Field[]	fields = SReflect.getAllFields(clazz);
+				for(int i=0; i<fields.length; i++)
 				{
+					int modifiers = fields[i].getModifiers();
 					String property_java_name = fields[i].getName();
-					if((includefields || fields[i].isAnnotationPresent(Include.class)) 
-						&& fields[i].getAnnotation(Exclude.class) == null && !beanprops.containsKey(property_java_name))
+					
+					// Only allow exported fields.
+					if (SReflect.isExported(fields[i].getDeclaringClass()))
 					{
-						beanprops.put(property_java_name, createBeanProperty(property_java_name, fields[i], false));
-					}
-				}
-
-				// Get all private fields (and include if requested)
-				fields = SReflect.getAllFields(clazz);
-				for(int i = 0; i < fields.length; i++)
-				{
-					String property_java_name = fields[i].getName();
-					if(((includefields && includePrivateFields)|| fields[i].isAnnotationPresent(Include.class))
-							&& fields[i].getAnnotation(Exclude.class) == null && !beanprops.containsKey(property_java_name))
-					{
-						beanprops.put(property_java_name, createBeanProperty(property_java_name, fields[i], false));
+						// Include public, private or annotated field?
+						if(includefields && (includePrivateFields || Modifier.isPublic(modifiers)) || fields[i].isAnnotationPresent(Include.class))
+						{
+							// Field not excluded, native or static and property not already found (from getter/setter or subclass field)
+							if(fields[i].getAnnotation(Exclude.class) == null && !beanprops.containsKey(property_java_name)
+								&& !(Modifier.isNative(modifiers) || Modifier.isStatic(modifiers)))
+							{
+								beanprops.put(property_java_name, createBeanProperty(property_java_name, fields[i], false));
+							}
+						}
 					}
 				}
 				

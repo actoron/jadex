@@ -6,14 +6,16 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import jadex.base.Starter;
-import jadex.bridge.Cause;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.ServiceCall;
@@ -29,11 +31,11 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.CheckIndex;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.CheckState;
+import jadex.bridge.service.annotation.FutureReturnType;
 import jadex.bridge.service.annotation.Raw;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
-import jadex.bridge.service.component.interceptors.AuthenticationInterceptor;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
 import jadex.bridge.service.component.interceptors.DecouplingReturnInterceptor;
@@ -41,7 +43,6 @@ import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.interceptors.IntelligentProxyInterceptor;
 import jadex.bridge.service.component.interceptors.MethodCallListenerInterceptor;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
-import jadex.bridge.service.component.interceptors.NFRequiredServicePropertyProviderInterceptor;
 import jadex.bridge.service.component.interceptors.PrePostConditionInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
 import jadex.commons.SReflect;
@@ -260,7 +261,36 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			
 			if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
 			{
-				final Future<Object> fret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), 
+				Class<?> rettype = null;
+				Annotation[][] anss = method.getParameterAnnotations();
+				for(int i=0; i<anss.length; i++)
+				{
+					Annotation[] ans = anss[i];
+					for(Annotation an: ans)
+					{
+						if(an instanceof FutureReturnType)
+						{
+							Object t = myargs.get(i);
+							if(t instanceof Class)
+								rettype = (Class<?>)t;
+							else if(t instanceof ClassInfo)
+								rettype = ((ClassInfo)t).getType(comp.getClassLoader());
+							if(rettype!=null)
+								break;
+						}
+					}
+				}
+				/*if("invokeMethod".equals(method.getName()))
+				{
+					ClassInfo rtype = (ClassInfo)myargs.get(3);
+					if(rtype!=null)
+						rettype = rtype.getType(comp.getClassLoader());
+				}*/
+				
+				if(rettype==null)
+					rettype = method.getReturnType();
+				
+				final Future<Object> fret = (Future<Object>)FutureFunctionality.getDelegationFuture(rettype, 
 					new FutureFunctionality(logger));
 //					new ServiceCallFutureFunctionality(logger, sic.getLastServiceCall(), method.getName()));
 				ret	= fret;
@@ -302,6 +332,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 							}
 							else
 							{
+//								if(method.getName().equals("getRegisteredClients"))
+//								{
+//									System.err.println("connect getRegisteredClients future: "+fret+", "+sic.getResult());
+//								}
+
 								FutureFunctionality.connectDelegationFuture((Future<?>)fret, (IFuture<?>)sic.getResult());
 							}
 						}
@@ -520,8 +555,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 *  Static method for creating a standard service proxy for a provided service.
 	 */
 	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, Object service, 
-		String name, Class<?> type, String proxytype, IServiceInvocationInterceptor[] ics, 
-		boolean monitoring, ProvidedServiceInfo info, String scope)
+		String name, Class<?> type, IServiceInvocationInterceptor[] ics, 
+		boolean monitoring, ProvidedServiceInfo info)
 	{
 		IServiceIdentifier sid = null;
 		
@@ -538,17 +573,19 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		
 		if(service instanceof IInternalService)
 		{
-			sid = BasicService.createServiceIdentifier(ia, name, type, service.getClass(), ia.getModel().getResourceIdentifier(), scope);
+			sid = BasicService.createServiceIdentifier(ia, name, type, service.getClass(), ia.getModel().getResourceIdentifier(), info);
 			((IInternalService)service).setServiceIdentifier(sid);
 		}
 			
 		
 //		if(type.getName().indexOf("IServiceCallService")!=-1)
 //			System.out.println("hijijij");
+		String proxytype	= info!=null && info.getImplementation()!=null && info.getImplementation().getProxytype()!=null
+			? info.getImplementation().getProxytype() : BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED;
 		
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
-			BasicServiceInvocationHandler handler = createProvidedHandler(name, ia, type, service, info, scope);
+			BasicServiceInvocationHandler handler = createProvidedHandler(name, ia, type, service, info);
 			if(sid==null)
 			{
 				Object ser = handler.getService();
@@ -597,9 +634,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	}
 	
 	/**
-	 *  Create a basic invocation handler.
+	 *  Create a basic invocation handler for a provided service.
 	 */
-	protected static BasicServiceInvocationHandler createProvidedHandler(String name, IInternalAccess ia, Class<?> type, Object service, ProvidedServiceInfo info, String scope)
+	protected static BasicServiceInvocationHandler createProvidedHandler(String name, IInternalAccess ia, Class<?> type, Object service, ProvidedServiceInfo info)
 	{
 //		if(type.getName().indexOf("ITestService")!=-1 && ia.getComponentIdentifier().getName().startsWith("Global"))
 //			System.out.println("gaga");
@@ -658,16 +695,18 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 					type = types[0];
 				}
 			}
+			
 			Class<?> serclass = service.getClass();
 
 			BasicService mgmntservice = new BasicService(ia.getId(), type, serclass, null);
-			mgmntservice.setServiceIdentifier(BasicService.createServiceIdentifier(ia, name, type, service.getClass(), ia.getModel().getResourceIdentifier(), scope));
+			mgmntservice.setServiceIdentifier(BasicService.createServiceIdentifier(ia, name, type, service.getClass(), ia.getModel().getResourceIdentifier(), info));
 			serprops.putAll(mgmntservice.getPropertyMap());
 			mgmntservice.setPropertyMap(serprops);
 			
 			// Do not try to call isAnnotationPresent for Proxy on Android
 			// see http://code.google.com/p/android/issues/detail?id=24846
-			if(!(SReflect.isAndroid() && ProxyFactory.isProxyClass(serclass)))
+			if(!(ProxyFactory.isProxyClass(serclass)))
+			//if(!(SReflect.isAndroid() && ProxyFactory.isProxyClass(serclass)))
 			{
 				while(!Object.class.equals(serclass))
 				{
@@ -739,10 +778,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		if(!PROXYTYPE_RAW.equals(proxytype))
 		{
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
+			//handler.addFirstServiceInterceptor(new TracingInterceptor(ia));
+
 //			if(monitoring)
 //				handler.addFirstServiceInterceptor(new MonitoringInterceptor(ia));
 //			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, false));
-			
 			
 			try
 			{
@@ -853,19 +893,25 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			// are automatically pushed to the req component thread
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype())) // done on provided side
 				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, false, true));
-//			ret = (IService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IService.class, 
-			// service.getServiceIdentifier().getServiceType()
-//			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, INFRPropertyProvider.class, info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports())}, handler); 
-			Class<?> ty = info.getType()!=null? info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports()): null;
-			if(ty==null)
+			
+			// Collect service interfaces (if interfaces are not present they are omitted. 
+			ClassLoader cl = ia.getClassLoader();
+			IServiceIdentifier sid = service.getServiceId();
+			Set<Class<?>> ifaces = new HashSet<>();
+			Class<?> iface = sid.getServiceType().getType(cl);
+			if(iface!=null)
+				ifaces.add(iface);
+			for(ClassInfo ci: sid.getServiceSuperTypes())
 			{
-//				throw new IllegalArgumentException("Type must not null: "+ty);
-				ret = (IService)ProxyFactory.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class}, handler); 
+				iface = ci.getType(cl);
+				if(iface!=null)
+					ifaces.add(iface);
 			}
-			else
-			{
-				ret = (IService)ProxyFactory.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, ty}, handler); 	
-			}
+			
+			ifaces.add(IService.class);
+			
+			ret = (IService)ProxyFactory.newProxyInstance(ia.getClassLoader(), ifaces.toArray(new Class<?>[ifaces.size()]), handler); 	
+			
 			// todo: think about orders of decouping interceptors
 			// if we want the decoupling return interceptor to schedule back on an external caller actual order must be reversed
 			// now it can only schedule back on the hosting component of the required proxy

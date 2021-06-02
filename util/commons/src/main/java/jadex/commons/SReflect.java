@@ -1,11 +1,16 @@
 package jadex.commons;
 
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -19,11 +24,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +39,7 @@ import java.util.WeakHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import jadex.commons.SClassReader.ClassFileInfo;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.collection.SCollection;
 import jadex.commons.collection.WeakValueMap;
@@ -73,7 +79,10 @@ public class SReflect
 	protected static final Set convertabletypes;
 	
 	/** This is set to true if the VM has a working GUI environment available. */
-	public static final boolean HAS_GUI	= !isAndroid() && SNonAndroid.hasGui();
+	public static final boolean HAS_GUI	= hasGui();
+	
+	/** Null object. */
+	public static final Object NULL = new Object();
 	
 	static
 	{
@@ -410,8 +419,8 @@ public class SReflect
 		else if(t instanceof ParameterizedType)
 		{
 			// Bug in Android 2.2. see http://code.google.com/p/android/issues/detail?id=6636
-			if(!SReflect.isAndroid() ||  SUtil.androidUtils().getAndroidVersion() > 8)
-			{
+			//if(!SReflect.isAndroid() ||  SUtil.androidUtils().getAndroidVersion() > 8)
+			//{
 				// Hack!!! Bug in JDK returning the owner type twice!?
 //				ret = t.toString();
 				
@@ -437,11 +446,11 @@ public class SReflect
 						ret	+= ", ";
 					}
 				}
-			}
-			else
-			{
-				ret	= "n/a";
-			}
+//			}
+//			else
+//			{
+//				ret	= "n/a";
+//			}
 		}
 		else if(t instanceof GenericArrayType)
 		{
@@ -508,6 +517,39 @@ public class SReflect
 		
 		return name;
 	}
+	
+	
+	/**
+	 *	Get unqualified type name.
+	 *  @return The unqualified (without package) name of a class.
+	 */
+	public static String getTypeName(String name)
+	{
+		if(name==null)
+			throw new IllegalArgumentException("Null not allowed.");
+		
+		int lpos = name.indexOf("<");
+		if(lpos>0)
+		{
+			String left = name.substring(0, lpos);
+			
+			left = makeNiceArrayNotation(left);
+			
+			String right = name.substring(lpos+1);
+			right = getTypeName(right);
+			name = left+"<"+right;
+		}
+		else
+		{
+			name = makeNiceArrayNotation(name);
+		}
+		
+		int pos = name.lastIndexOf(".");
+		if(pos!=-1)
+			name = name.substring(pos+1);
+		
+		return name;
+	}
 
 	/**
 	 *  Process a type name and replace array notation with nice one.
@@ -548,6 +590,7 @@ public class SReflect
 		return name;
 	}
 	
+	
 	public static void main(String[] args)
 	{
 //		System.out.println(getUnqualifiedTypeName("a.b.c.D<aa.F<ab.V><a.B>>>"));
@@ -555,21 +598,24 @@ public class SReflect
 //		System.out.println(String[][].class.getName()+" "+getUnqualifiedTypeName(String[][].class.getName()));
 	
 	
-		String a1 = Object[].class.getName();
-		String a2 = String[].class.getName();
-		String a3 = Integer[].class.getName();
-		String a4 = int[].class.getName();
-		String a5 = double[].class.getName();
-		String a6 = byte[].class.getName();
-		String a7 = Byte[].class.getName();
+//		String a1 = Object[].class.getName();
+//		String a2 = String[].class.getName();
+//		String a3 = Integer[].class.getName();
+//		String a4 = int[].class.getName();
+//		String a5 = double[].class.getName();
+//		String a6 = byte[].class.getName();
+//		String a7 = Byte[].class.getName();
+//		
+//		System.out.println(makeNiceArrayNotation(a1));
+//		System.out.println(makeNiceArrayNotation(a2));
+//		System.out.println(makeNiceArrayNotation(a3));
+//		System.out.println(makeNiceArrayNotation(a4));
+//		System.out.println(makeNiceArrayNotation(a5));
+//		System.out.println(makeNiceArrayNotation(a6));
+//		System.out.println(makeNiceArrayNotation(a7));
 		
-		System.out.println(makeNiceArrayNotation(a1));
-		System.out.println(makeNiceArrayNotation(a2));
-		System.out.println(makeNiceArrayNotation(a3));
-		System.out.println(makeNiceArrayNotation(a4));
-		System.out.println(makeNiceArrayNotation(a5));
-		System.out.println(makeNiceArrayNotation(a6));
-		System.out.println(makeNiceArrayNotation(a7));
+		System.out.println(getMethodSignature(SReflect.getMethod(Object.class, "main", new Class[] {String[].class})));
+		
 	}
 	
 	/**
@@ -668,11 +714,14 @@ public class SReflect
 	 */
 	public static String getMethodSignature(Method method)
 	{
+		if(method==null)
+			throw new IllegalArgumentException("Method must not null");
+		
 		StringBuffer buf = new StringBuffer();
 		try
 		{
 			Type rtype = method.getGenericReturnType();
-			buf.append(getUnqualifiedTypeName(rtype.toString())).append(" ");
+			buf.append(getTypeName(rtype.toString())).append(" ");
 		}
 		catch(Exception e)
 		{
@@ -684,8 +733,7 @@ public class SReflect
 			Type[] ptypes = method.getGenericParameterTypes();
 			for(int i=0; i<ptypes.length; i++)
 			{
-				// why unqualified?
-				buf.append(getUnqualifiedTypeName(ptypes[i].toString()));
+				buf.append(getTypeName(ptypes[i].toString()));
 				if(i+1<ptypes.length)
 					buf.append(", ");
 			}
@@ -808,7 +856,7 @@ public class SReflect
 	}
 
 	/**
-	 *  Get a method of the class.
+	 *  Get a public method of the class.
 	 *  Unlike {@link Class#getMethod(String, Class[])},
 	 *  this uses the methodcache.
 	 *  @param clazz	The class to search.
@@ -816,10 +864,10 @@ public class SReflect
 	 *  @param types	The parameter types.
 	 *  @return	The method (or null if not found).
 	 */
-	public static Method	getMethod(Class<?> clazz, String name, Class<?>[] types)
+	public static Method getMethod(Class<?> clazz, String name, Class<?>[] types)
 	{
-		Method	meth	= null;
-		Method[]	ms	= getMethods(clazz, name);
+		Method	meth = null;
+		Method[] ms = getMethods(clazz, name);
 		for(int i=0; i<ms.length; i++)
 		{
 			Class<?>[]	ptypes	= ms[i].getParameterTypes();
@@ -832,6 +880,37 @@ public class SReflect
 			if(match)
 			{
 				meth	= ms[i];
+				break;
+			}
+		}
+		return meth;
+	}
+	
+	/**
+	 *  Get a method of the class.
+	 *  Unlike {@link Class#getMethod(String, Class[])},
+	 *  this uses the methodcache.
+	 *  @param clazz The class to search.
+	 *  @param name	The name of the method to search for.
+	 *  @param types The parameter types.
+	 *  @return	The method (or null if not found).
+	 */
+	public static Method getAnyMethod(Class<?> clazz, String name, Class<?>[] types)
+	{
+		Method	meth = null;
+		Method[] ms = getAllMethods(clazz, name);
+		for(int i=0; i<ms.length; i++)
+		{
+			Class<?>[] ptypes = ms[i].getParameterTypes();
+			boolean	match = ptypes.length==types.length;
+			for(int j=0; match && j<ptypes.length; j++)
+			{
+				match = ptypes[j].equals(types[j]);
+			}
+
+			if(match)
+			{
+				meth = ms[i];
 				break;
 			}
 		}
@@ -888,7 +967,7 @@ public class SReflect
 	 *  Get all method(s) of the class by name,
 	 *  including public, protected and private methods.
 	 *  
-	 *  @param clazz	The class to search.
+	 *  @param clazz The class to search.
 	 *  @param name	The name of the method to search for.
 	 *  @return	The method(s).
 	 */
@@ -938,13 +1017,21 @@ public class SReflect
 	 *  @return Array of all methods starting from the current
 	 *  	class upwards towards Object.class.
 	 */
-	public static Method[]	getAllMethods(Class clazz)
+	public static Method[]	getAllMethods(Class<?> clazz)
 	{
-		List<Method>	ret	= new ArrayList<Method>();
-		Class	cls	= clazz;
+		if(clazz==null)
+			throw new IllegalArgumentException("clazz must not null");
+		
+		// todo: should add methods of interfaces when clazz is a class?
+		// currently adds interface methods only when clazz is interface
 
-		while(cls!=null)
+		List<Method> ret = new ArrayList<Method>();
+		
+		List<Class<?>> todo = new ArrayList<Class<?>>();
+		todo.add(clazz);
+		while(todo.size()>0)
 		{
+			Class<?> cls = todo.remove(0);
 			try
 			{
 				ret.addAll(Arrays.asList(cls.getDeclaredMethods()));
@@ -953,10 +1040,88 @@ public class SReflect
 			{
 				//e.printStackTrace();
 			}
-			cls	= cls.getSuperclass();
+			if(cls.isInterface())
+			{
+				Class<?>[] ifs = cls.getInterfaces();
+				for(int i=0; i<ifs.length; i++)
+					todo.add(ifs[i]);
+			}
+			else
+			{
+				Class<?> spcl = cls.getSuperclass();
+				if(spcl!=null)
+					todo.add(spcl);
+			}
 		}
 
 		return ret.toArray(new Method[ret.size()]);
+	}
+	
+	/**
+	 *  Gets a declared methods similar to Class.getDeclaredMethod() but returns null instead of throwing exception.
+	 * 
+	 *  @param clazz The class being operated on.
+	 *  @param methodname Name of the method.
+	 *  @param parametertypes The parameter types.
+	 *  @return Method, if declared method is found in the class, null otherwise.
+	 */
+	public static final Method getDeclaredMethod0(Class<?> clazz, String methodname, Class<?>... parametertypes)
+	{
+		Method[] methods = clazz.getDeclaredMethods();
+		for (int i = 0; i < methods.length; ++i)
+		{
+			if (methods[i].getName().equals(methodname) && Arrays.equals(parametertypes, methods[i].getParameterTypes()))
+				return methods[i];
+		}
+		return null;
+	}
+	
+	/**
+	 *  Finds the declaring interface of a method in a multiple-inheritance interface using a breadth-first approach.
+	 * 
+	 *  @param iface The starting interface.
+	 *  @param methodname The method name.
+	 *  @param parametertypes The method parameter types.
+	 *  @return The declaring interface or null if none is found.
+	 */
+	public static final Class<?> getDeclaringInterface(Class<?> iface, String methodname, Class<?>... parametertypes)
+	{
+		assert iface != null && iface.isInterface();
+		Method declmeth = getDeclaredMethod0(iface, methodname, parametertypes);
+		
+		if (declmeth != null)
+			return iface;
+		else
+			return findDeclaringInterface(iface, methodname, parametertypes);
+	}
+	
+	/**
+	 *  Recursive breadth-first search of superinterfaces for a declaring interface of a specific method.
+	 * 
+	 *  @param iface The starting interface.
+	 *  @param methodname The method name.
+	 *  @param parametertypes The method parameter types.
+	 *  @return The declaring interface or null if none is found.
+	 */
+	private static final Class<?> findDeclaringInterface(Class<?> iface, String methodname, Class<?>... parametertypes)
+	{
+		Method declmeth = null;
+		Class<?>[] superinterfaces = iface.getInterfaces();
+		
+		for (int i = 0; i < superinterfaces.length; ++i)
+		{
+			declmeth = getDeclaredMethod0(superinterfaces[i], methodname, parametertypes);
+			if (declmeth != null)
+				return superinterfaces[i];
+		}
+		
+		for (int i = 0; i < superinterfaces.length; ++i)
+		{
+			Class<?> ret = findDeclaringInterface(superinterfaces[i], methodname, parametertypes);
+			if (ret != null)
+				return ret;
+		}
+		return null;
 	}
 
 	/**
@@ -1099,6 +1264,64 @@ public class SReflect
 //		System.out.println("found: "+res);
 		
 		return clazz;
+	}
+	
+	/**
+	 *  Reflectively instantiates an object by heuristically matching the constructor parameters.
+	 *  
+	 *  @param classname Name of the object class.
+	 *  @param conparams Constructor parameters.
+	 *  @return Instantiated object.
+	 */
+	public static final Object newInstance(String classname, Object... conparams)
+	{
+		return newInstance(classname, SReflect.class.getClassLoader(), conparams);
+	}
+	
+	/**
+	 *  Reflectively instantiates an object by heuristically matching the constructor parameters.
+	 *  
+	 *  @param classname Name of the object class.
+	 *  @param cl The classloader to find the class.
+	 *  @param conparams Constructor parameters.
+	 *  @return Instantiated object.
+	 */
+	public static final Object newInstance(String classname, ClassLoader cl, Object... conparams)
+	{
+		try
+		{
+			Class<?> clazz = cl.loadClass(classname);
+			if (conparams.length == 0)
+				return clazz.getConstructor().newInstance();
+			
+			Constructor<?>[] cons = clazz.getConstructors();
+			for (Constructor<?> con : cons)
+			{
+				Class<?>[] params = con.getParameterTypes();
+				if (params.length == conparams.length)
+				{
+					boolean match = true;
+					for (int i = 0; i < params.length; ++i)
+					{
+						Class<?> conparamtype = conparams[i] != null ? conparams[i].getClass() : null;
+						if (conparamtype != null && !isSupertype(getWrappedType(params[i]), conparamtype))
+						{
+							match = false;
+							break;
+						}
+					}
+					if (match)
+					{
+						return con.newInstance(conparams);
+					}
+				}
+			}
+			throw new IllegalArgumentException("No constructor found: " + classname + " " + Arrays.toString(conparams));
+		}
+		catch (Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
 	}
 
 	/**
@@ -1372,7 +1595,7 @@ public class SReflect
 	 *  @throws IllegalArgumentException when argument is not
 	 * 		one of (Iterator, Enumeration, Collection, Map, Array).
 	 */
-	public static <T> Iterator<T>	getIterator(Object collection)
+	public static <T> Iterator<T> getIterator(Object collection)
 	{
 		if(collection==null)
 		{
@@ -1661,6 +1884,80 @@ public class SReflect
 		return ret;
 	}
 	
+	/** Reflective access to Class.getModule(). */
+	protected static final MethodHandle GET_MODULE;
+	
+	/** Reflective access to Module.isExported(). */
+	protected static final MethodHandle IS_EXPORTED;
+	static
+	{
+		MethodHandle getmodulemh = null;
+		MethodHandle isexportedmh = null;
+		try
+		{
+			Method getmodule = Class.class.getMethod("getModule");
+			getmodulemh = MethodHandles.lookup().unreflect(getmodule);
+			Class<?> moduleclazz = Class.forName("java.lang.Module");
+			Method isexported = moduleclazz.getMethod("isExported", String.class);
+			isexportedmh = MethodHandles.lookup().unreflect(isexported);
+		}
+		catch (Exception e)
+		{
+		}
+		GET_MODULE = getmodulemh;
+		IS_EXPORTED = isexportedmh;
+	}
+	
+	/**
+	 *  Gets a method that is exported by the module.
+	 *  
+	 *  @param clazz Class with the method.
+	 *  @param name Name of the method.
+	 *  @param params Method parameters.
+	 *  @return The method or null if not found.
+	 */
+	public static final Method getExportedMethod(Class<?> clazz, String name, Class<?>... params)
+	{
+		params = params == null ? new Class<?>[0] : params;
+		Method[] methods = SReflect.getAllMethods(clazz);
+		for (Method m : methods)
+		{
+			if (m.getName().equals(name) && Arrays.equals(params, m.getParameterTypes()))
+			{
+				if (isExported(m.getDeclaringClass()))
+					return m;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 *  Tests if the class is part of a package that the  containing module has exported.
+	 *  @param clazz The class.
+	 *  @return True, if exported.
+	 */
+	public static final boolean isExported(Class<?> clazz)
+	{
+		if (GET_MODULE != null)
+		{
+			try
+			{
+				Object module = GET_MODULE.invoke(clazz);
+				return (boolean) IS_EXPORTED.invoke(module, clazz.getPackage().getName());
+			}
+			catch (Throwable t)
+			{
+				t.printStackTrace();
+				throw SUtil.throwUnchecked(t);
+			}
+		}
+		else
+		{
+			// Java 8 has no modules so everything is exported.
+			return true;
+		}
+	}
+	
 	/**
 	 *  Get the current method name from the caller.
 	 *  @return The method name. 
@@ -1771,17 +2068,18 @@ public class SReflect
 		return ret.toArray(new String[ret.size()]);
 	}
 	
-	protected static Map<Tuple3<Set<URL>, IFilter<Object>, IFilter<ClassInfo>>, Set<ClassInfo>> CICACHE	= Collections.synchronizedMap(new LinkedHashMap<>());
+	// This cache cannot really work due to a key with plain objects like filters (other filter object = new entry)
+//	protected static Map<Tuple3<Set<URL>, IFilter<Object>, IFilter<ClassInfo>>, Set<ClassInfo>> CICACHE	= Collections.synchronizedMap(new LinkedHashMap<>());
 	
 	/**
 	 *  Scan for component classes in the classpath.
 	 */
 	public static Set<ClassInfo> scanForClassInfos(URL[] urls, IFilter<Object> filefilter, IFilter<ClassInfo> classfilter)
 	{
-		Tuple3<Set<URL>, IFilter<Object>, IFilter<ClassInfo>>	key
-			= new Tuple3<>(new HashSet<>(Arrays.asList(urls)), filefilter, classfilter);
+//		Tuple3<Set<URL>, IFilter<Object>, IFilter<ClassInfo>>	key
+//			= new Tuple3<>(new HashSet<>(Arrays.asList(urls)), filefilter, classfilter);
 		
-		Set<ClassInfo> ret = CICACHE.get(key);
+		Set<ClassInfo> ret = null;//CICACHE.get(key);
 		if(ret==null)
 		{
 			ret	= new LinkedHashSet<>();
@@ -1802,7 +2100,7 @@ public class SReflect
 						{
 							JarEntry je = jar.getJarEntry(jename);
 							InputStream is = jar.getInputStream(je);
-							ClassInfo ci = SClassReader.getClassInfo(jarname+jename, is);
+							ClassInfo ci = SClassReader.getClassInfo(jarname+jename, is, new Date(je.getLastModifiedTime().toMillis()));
 							if(classfilter.filter(ci))
 							{
 								ret.add(ci);
@@ -1818,9 +2116,10 @@ public class SReflect
 				{
 					for(String filename: entry.getValue())
 					{
-						try(FileInputStream is = new FileInputStream(filename))
+						File inputfile = new File(filename);
+						try(FileInputStream is = new FileInputStream(inputfile))
 						{
-							ClassInfo ci = SClassReader.getClassInfo(filename, is);
+							ClassInfo ci = SClassReader.getClassInfo(filename, is, new Date(inputfile.lastModified()));
 							if(classfilter.filter(ci))
 							{
 								ret.add(ci);
@@ -1834,7 +2133,81 @@ public class SReflect
 					}
 				}
 			}
-			CICACHE.put(key, ret);
+//			CICACHE.put(key, ret);
+//			System.out.println("scanned class infos cache size: "+CICACHE.size());
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Scan for component classes in the classpath.
+	 */
+	public static Set<ClassFileInfo> scanForClassFileInfos(URL[] urls, IFilter<Object> filefilter, IFilter<ClassFileInfo> classfilter)
+	{
+//		Tuple3<Set<URL>, IFilter<Object>, IFilter<ClassInfo>>	key
+//			= new Tuple3<>(new HashSet<>(Arrays.asList(urls)), filefilter, classfilter);
+		
+//		Set<ClassInfo> ret = CICACHE.get(key);
+		
+		Set<ClassFileInfo> ret = null;
+		
+		if(ret==null)
+		{
+			ret	= new LinkedHashSet<>();
+			
+			if(filefilter==null)
+				filefilter = new jadex.commons.FileFilter("$", false, ".class");
+			Map<String, Set<String>> files = SReflect.scanForFiles2(urls, filefilter);
+			
+			//int cnt = 0;
+			for(Map.Entry<String, Set<String>> entry: files.entrySet())
+			{
+				String jarname = entry.getKey();
+				if(jarname!=null)
+				{
+					try(JarFile jar	= new JarFile(jarname))
+					{
+						for(String jename: entry.getValue())
+						{
+							JarEntry je = jar.getJarEntry(jename);
+							InputStream is = jar.getInputStream(je);
+							ClassInfo ci = SClassReader.getClassInfo(jarname+jename, is, new Date(je.getLastModifiedTime().toMillis()));
+							ClassFileInfo cfi = new ClassFileInfo(ci, jarname+jename);
+							if(classfilter.filter(cfi))
+							{
+								ret.add(cfi);
+							}
+						}
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				else
+				{
+					for(String filename: entry.getValue())
+					{
+						File inputfile = new File(filename);
+						try(FileInputStream is = new FileInputStream(inputfile))
+						{
+							ClassInfo ci = SClassReader.getClassInfo(filename, is, new Date(inputfile.lastModified()));
+							ClassFileInfo cfi = new ClassFileInfo(ci, filename);
+							if(classfilter.filter(cfi))
+							{
+								ret.add(new ClassFileInfo(ci, filename));
+							}
+	//						System.out.println(cnt++);
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+//			CICACHE.put(key, ret);
 //			System.out.println("scanned class infos cache size: "+CICACHE.size());
 		}
 		
@@ -1843,6 +2216,9 @@ public class SReflect
 	
 	/**
 	 *  Scan for files in a given list of urls.
+	 *  @return Map of files matching the filter in the following format:
+	 *  <jarpath>[entrypath1,entrypath2,...]
+	 *  jarpath is null for directories
 	 */
 	public static Map<String, Set<String>> scanForFiles2(URL[] urls, IFilter<Object> filter)
 	{
@@ -1907,6 +2283,8 @@ public class SReflect
 		
 		return ret;
 	}
+	
+
 	
 	/**
 	 *  Scan directories.
@@ -2053,51 +2431,49 @@ public class SReflect
 //		});
 //	}
 	
-	/** Cached flag for android check. */
-	protected static volatile Boolean isAndroid;
-
-	/** Flag set by testcases that indicates we're testing android projects in a desktop environment. **/
-	protected static Boolean isAndroidTesting;
-
-	/** private setter that can be made accessible for robolectric testcases. **/
-	protected static void setAndroid(boolean isAndroidFlag, boolean isAndroidTestingFlag) {
-		synchronized (SReflect.class) {
-			isAndroid = isAndroidFlag;
-			isAndroidTesting = isAndroidTestingFlag;
-		}
-	}
-
-	public static Boolean isAndroidTesting() {
-		return isAndroidTesting;
-	}
-
-	/**
-	 *  Test if running on android.
-	 */
-	public static boolean	isAndroid()
-	{
-		if(isAndroid==null)
-		{
-			synchronized (SReflect.class)
-			{
-				if (isAndroid==null)
-				{
-					String vmName = System.getProperty("java.vm.name");
-					String vmVendor = System.getProperty("java.vm.vendor");
-					String vendorUrl = System.getProperty("java.vendor.url");
-
-					isAndroid =
-							("Dalvik".equalsIgnoreCase(vmName) ||
-							"The Android Project".equalsIgnoreCase(vmVendor) ||
-							"http://www.android.com".equalsIgnoreCase(vendorUrl));
-				}
-			}
-		}
-		return isAndroid.booleanValue();
-	}
-	
 	private class NotFound
 	{
+	}
+	
+	/**
+	 *  Get the default value of an annotation method.
+	 *  @param clazz The annotation class.
+	 *  @param name The method name.
+	 *  @return The value.
+	 */
+	public static<T> T getAnnotationDefaultValue(Class<? extends Annotation> clazz, String name)
+	{
+		T ret = null;
+		
+		try
+		{
+			Method method = clazz.getMethod(name,(Class[])null);
+			ret = (T)method.getDefaultValue();
+		}
+		catch(Exception e)
+		{
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Test if there is a gui available.
+	 */
+	public static boolean hasGui()
+	{
+		boolean hasgui;
+		try
+		{
+			hasgui = !(GraphicsEnvironment.isHeadless() ||
+				GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length < 1);
+		}
+		catch(Error e)
+		{
+			// On system misconfigurations, Java throws an Error (grr).
+			hasgui = false;
+		}
+		return hasgui;
 	}
 }
 

@@ -8,6 +8,7 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -31,7 +32,8 @@ public class ServiceImplTestAgent extends JunitAgentTest
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody()
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body()
 	{
 		TestReport tr1 = test(1, PojoProviderAgent.class.getName()+".class");
@@ -51,7 +53,7 @@ public class ServiceImplTestAgent extends JunitAgentTest
 		TestReport tr = new TestReport(""+no, "Test if creating service without explicit implementation works.");
 		try
 		{
-			IExternalAccess exta = agent.createComponent(new CreationInfo(agent.getId()).setFilename(model), null).get();
+			IExternalAccess exta = agent.createComponent(new CreationInfo().setFilename(model)).get();
 			IInfoService ser = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IInfoService.class).setProvider(exta.getId())).get();
 			String res = ser.getInfo().get();
 			tr.setSucceeded(true);

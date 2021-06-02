@@ -7,15 +7,15 @@ import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.quickstart.cleanerworld.environment.IChargingstation;
 import jadex.quickstart.cleanerworld.environment.ICleaner;
 import jadex.quickstart.cleanerworld.environment.SensorActuator;
 import jadex.quickstart.cleanerworld.gui.SensorGui;
 
 /**
- *  Using Deliberation Settings for Managing Conflicting Goals.
+ *  Using deliberation settings for managing conflicting goals.
  */
 @Agent(type="bdi")	// This annotation makes the java class and agent and enabled BDI features
 public class CleanerBDIAgentB2
@@ -35,7 +35,7 @@ public class CleanerBDIAgentB2
 	 *  The body is executed when the agent is started.
 	 *  @param bdifeature	Provides access to bdi specific methods
 	 */
-	@AgentBody	// This annotation informs the Jadex platform to call this method once the agent is started
+	@OnStart	// This annotation informs the Jadex platform to call this method once the agent is started
 	private void	exampleBehavior(IBDIAgentFeature bdi)
 	{
 		// Open a window showing the agent's perceptions

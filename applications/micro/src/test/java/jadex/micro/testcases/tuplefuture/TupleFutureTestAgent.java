@@ -6,6 +6,7 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.ITuple2Future;
@@ -34,7 +35,7 @@ import jadex.micro.annotation.Results;
 {
 	@RequiredService(name="ts", type=ITestService.class)
 		// Hangs with global search during micro tests?
-//		binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, create=true, creationinfo=@CreationInfo(type="ta"))),
+//		binding=@Binding(scope=ServiceScope.GLOBAL, create=true, creationinfo=@CreationInfo(type="ta"))),
 })
 @Configurations(@Configuration(name="default", components=@Component(type="ta")))
 @Results(@Result(name="testresults", clazz=Testcase.class))
@@ -50,7 +51,8 @@ public class TupleFutureTestAgent extends JunitAgentTest
 	/**
 	 * 
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		ITestService ts = (ITestService)agent.getFeature(IRequiredServicesFeature.class).getService("ts").get();

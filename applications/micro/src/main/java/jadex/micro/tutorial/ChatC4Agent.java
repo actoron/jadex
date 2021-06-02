@@ -4,6 +4,7 @@ import javax.management.ServiceNotFoundException;
 
 import jadex.bridge.FactoryFilter;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.IComponentFactory;
@@ -16,7 +17,6 @@ import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.micro.MicroAgentFactory;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Description;
 
 /**
@@ -34,7 +34,8 @@ public class ChatC4Agent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 		IAsyncFilter<IComponentFactory>	filter	= new FactoryFilter(MicroAgentFactory.FILETYPE_MICROAGENT);

@@ -1,7 +1,8 @@
 package jadex.micro.testcases.autoterminate;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IResultListener;
@@ -15,13 +16,16 @@ import jadex.micro.annotation.RequiredServices;
 
 /**
  *  Agent that subscribes to the service and kills itself or its platform.
+ *  
+ *  self: kills itselfs
+ *  platform: kills platform
  */
 @Agent
 @Configurations({
 	@Configuration(name="self"),
 	@Configuration(name="platform")})
 @RequiredServices({
-	@RequiredService(name="sub", type=IAutoTerminateService.class, scope=RequiredService.SCOPE_GLOBAL),
+	@RequiredService(name="sub", type=IAutoTerminateService.class, scope=ServiceScope.GLOBAL),
 })
 public class SubscriberAgent
 {
@@ -40,12 +44,13 @@ public class SubscriberAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void	body(final IInternalAccess agent)
 	{
 //		agent.getLogger().severe("subscribe "+agent.getComponentIdentifier()+", "+agent.getConfiguration());
 		
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IAutoTerminateService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IAutoTerminateService.class, ServiceScope.GLOBAL))
 			.addResultListener(new IResultListener<IAutoTerminateService>()
 		{
 			public void exceptionOccurred(Exception exception)
@@ -64,7 +69,7 @@ public class SubscriberAgent
 						if("platform".equals(agent.getConfiguration()))
 						{
 //							agent.getLogger().severe("destroy platform: "+agent.getComponentIdentifier().getRoot());
-							agent.killComponent(agent.getId().getRoot());
+							agent.getExternalAccess(agent.getId().getRoot()).killComponent();
 						}
 						else
 						{
@@ -75,7 +80,5 @@ public class SubscriberAgent
 				});
 			}
 		});
-		
-		
 	}
 }

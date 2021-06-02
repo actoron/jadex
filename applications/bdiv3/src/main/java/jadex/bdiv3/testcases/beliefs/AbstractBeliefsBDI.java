@@ -8,8 +8,8 @@ import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Mapping;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -61,7 +61,8 @@ public class AbstractBeliefsBDI
 	
 	//-------- constructors --------
 	
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void	destroy(IInternalAccess agent)
 	{
 		TestReport[]	trs	= capa.results.values().toArray(new TestReport[capa.results.size()]);

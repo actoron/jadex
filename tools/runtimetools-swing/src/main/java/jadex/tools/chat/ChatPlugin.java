@@ -33,7 +33,7 @@ public class ChatPlugin extends AbstractServicePlugin
 	/**
 	 *  Get the icon for the chat.
 	 */
-	public static Icon	getStatusIcon(boolean star)
+	public static Icon getStatusIcon(boolean star)
 	{
 		return star ? icons.getIcon("chat_small_star") : icons.getIcon("chat_small");
 	}

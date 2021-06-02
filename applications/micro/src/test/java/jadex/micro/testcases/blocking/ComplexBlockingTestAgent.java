@@ -3,12 +3,14 @@ package jadex.micro.testcases.blocking;
 import java.util.ArrayList;
 import java.util.List;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.Boolean3;
@@ -16,7 +18,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -45,16 +46,19 @@ public class ComplexBlockingTestAgent extends JunitAgentTest
 	/**
 	 *  Execute the agent
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void	execute(final IInternalAccess agent)
 	{
+		long	delay	= Starter.getScaledDefaultTimeout(agent.getId(), 0.1);
+		
 		IStepService	step	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IStepService.class)).get();
 		
-//		System.out.println("Calling perform steps: "+agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
-		IIntermediateFuture<Integer>	first	= step.performSteps(3, 1000);
-		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
-//		System.out.println("Calling perform steps: "+agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
-		IIntermediateFuture<Integer>	second	= step.performSteps(3, 1000);
+//		System.out.println("Calling perform steps: "+agent.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class)).getTime());
+		IIntermediateFuture<Integer>	first	= step.performSteps(3, delay);
+		agent.getFeature(IExecutionFeature.class).waitForDelay(delay/2).get();	// wait for half the delay to interleave steps
+//		System.out.println("Calling perform steps: "+agent.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class)).getTime());
+		IIntermediateFuture<Integer>	second	= step.performSteps(3, delay);
 
 		final List<Integer>	steps	= new ArrayList<Integer>();
 		IIntermediateResultListener<Integer>	lis	= new IntermediateDefaultResultListener<Integer>()

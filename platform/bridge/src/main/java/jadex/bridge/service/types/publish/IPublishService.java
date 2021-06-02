@@ -20,6 +20,7 @@ public interface IPublishService
 	/** The default publish implementations for rest. */
 	public static final String[] DEFAULT_RSPUBLISH_COMPONENTS = new String[]
 	{
+		"/jadex/extension/rs/publish/NanoRSPublishAgent.class",
 		"/jadex/extension/rs/publish/JettyRSPublishAgent.class",
 		"/jadex/extension/rs/publish/GrizzlyRSPublishAgent.class",
 		"/jadex/extension/rs/publish/LegacyGrizzlyRSPublishAgent.class",

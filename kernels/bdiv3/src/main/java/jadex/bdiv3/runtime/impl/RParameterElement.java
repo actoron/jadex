@@ -253,6 +253,13 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		return ret;
 	}
 	
+
+	/**
+	 *  Check if the element is currently part of the agent's reasoning.
+	 *  E.g. the bases are always adopted and all of their contents such as goals, plans and beliefs.
+	 */
+	public abstract boolean	isAdopted();
+	
 	/**
 	 * 
 	 */

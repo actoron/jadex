@@ -3,7 +3,7 @@ package jadex.micro.testcases;
 
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
@@ -28,7 +28,7 @@ import jadex.micro.annotation.Results;
 @Description("Base description")
 @Imports({"b1", "b2"})
 @Properties({@NameValue(name="a", value="\"ba\""), @NameValue(name="b", value="\"bb\"")})
-@RequiredServices(@RequiredService(name="clock", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
+@RequiredServices(@RequiredService(name="clock", type=IClockService.class, scope=ServiceScope.PLATFORM))
 @ProvidedServices(@ProvidedService(name="myservice", type=IAService.class, implementation=@Implementation(Object.class)))
 @Arguments(@Argument(name="arg1", defaultvalue="\"bval\"", clazz=String.class))
 @Results(@Result(name="res1", defaultvalue="\"bres\"", clazz=String.class))

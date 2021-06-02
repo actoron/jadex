@@ -7,6 +7,7 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.CollectingIntermediateResultListener;
 import jadex.commons.future.Future;
@@ -40,7 +41,8 @@ import jadex.micro.annotation.Results;
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class ListenerAgent
 {
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body(final IInternalAccess agent)
 	{
 		final Future<Void>	ret	= new Future<Void>();
@@ -93,6 +95,10 @@ public class ListenerAgent
 				reports.add(tr2);
 				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(reports.size(), reports.toArray(new TestReport[reports.size()])));
 				ret.setResult(null);				
+			}
+			
+			public void maxResultCountAvailable(int max) 
+			{
 			}
 		});
 		

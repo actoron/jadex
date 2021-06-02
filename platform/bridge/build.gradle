@@ -1,4 +1,4 @@
-description 'Jadex bridge is a base package for kernels and platforms, i.e. it is used by both and provides commonly used interfaces and classes for active components and their management.'
+description 'Jadex bridge is a base package for kernels and platforms, i.e., it is used by both and provides commonly used interfaces and classes for active components and their management.'
 
 dependencies
 {
@@ -11,4 +11,7 @@ dependencies
 	api 'junit:junit:4.11'	// required for component test suite classes
 	
 	api group: 'net.cinnom', name: 'nano-cuckoo', version: '1.0.0'	// required for sliding cuckoo filter
+	api 'io.opentracing:opentracing-api:0.33.0'
+	api 'io.opentracing:opentracing-util:0.33.0'
+	api 'io.opentracing:opentracing-mock:0.33.0'
 }

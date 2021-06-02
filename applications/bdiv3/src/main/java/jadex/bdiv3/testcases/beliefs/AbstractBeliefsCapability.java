@@ -146,7 +146,7 @@ public class AbstractBeliefsCapability
 	
 	//-------- plans --------
 	
-	@Plan(trigger=@Trigger(factchangeds={"byte", "short", "int", "long", "float", "double", "char", "boolean", "string", "array"}))
+	@Plan(trigger=@Trigger(factchanged={"byte", "short", "int", "long", "float", "double", "char", "boolean", "string", "array"}))
 	public void	beliefChanged(ChangeEvent event)
 	{
 		TestReport	tr	= results.get(event.getSource());

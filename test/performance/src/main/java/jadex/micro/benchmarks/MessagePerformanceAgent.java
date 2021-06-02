@@ -26,9 +26,10 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SUtil;
@@ -36,19 +37,17 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnMessage;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.examples.ping.IEchoService;
@@ -101,7 +100,8 @@ public class MessagePerformanceAgent
 	/**
 	 *  Called once after agent creation.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -134,19 +134,22 @@ public class MessagePerformanceAgent
 					f.setLocation(SGUI.calculateMiddlePosition(f));
 					f.setVisible(true);
 					
-					agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IEchoService.class, RequiredServiceInfo.SCOPE_GLOBAL))
-						.addResultListener(new SwingIntermediateResultListener<IEchoService>(new IIntermediateResultListener<IEchoService>()
+					agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IEchoService.class, ServiceScope.GLOBAL))
+						.addResultListener(new SwingIntermediateResultListener<IEchoService>(new IntermediateEmptyResultListener<IEchoService>()
 					{
 						boolean first = true;
+						
 						public void intermediateResultAvailable(IEchoService result)
 						{
 							reset();
 							selcb.addItem(((IService)result).getServiceId().getProviderId());
 						}
+						
 						public void finished()
 						{
 							reset();
 						}
+						
 						public void resultAvailable(Collection<IEchoService> result)
 						{
 							reset();
@@ -154,9 +157,6 @@ public class MessagePerformanceAgent
 							{
 								selcb.addItem(((IService)it.next()).getServiceId().getProviderId());
 							}
-						}
-						public void exceptionOccurred(Exception exception)
-						{
 						}
 						
 						protected void reset()
@@ -181,7 +181,8 @@ public class MessagePerformanceAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 		future = new Future<Void>();
@@ -342,7 +343,7 @@ public class MessagePerformanceAgent
 		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
 		if(auto)
 		{
-			agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IEchoService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+			agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IEchoService.class, ServiceScope.GLOBAL))
 				.addResultListener(new IResultListener<IEchoService>()
 			{
 				public void resultAvailable(IEchoService result)
@@ -367,7 +368,8 @@ public class MessagePerformanceAgent
 	/**
 	 *  Called on message arrival.
 	 */
-	@AgentMessageArrived
+	//@AgentMessageArrived
+	@OnMessage
 	public void messageArrived(Map<String, Object> msg)
 	{
 		if(received == 0)
@@ -409,6 +411,6 @@ public class MessagePerformanceAgent
 	 */
 	public IFuture<Long> getTime()
 	{
-		return new Future<Long>(new Long(agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()));
+		return new Future<Long>(new Long(agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM)).getTime()));
 	}
 }

@@ -5,6 +5,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.Future;
@@ -14,13 +15,12 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
 
 /**
  * 
  */
 @Agent
-@ProvidedServices(@ProvidedService(type=ITestService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=ITestService.class, scope=ServiceScope.GLOBAL))
 @Service
 public class ProviderAgent implements ITestService
 {
@@ -54,7 +54,7 @@ public class ProviderAgent implements ITestService
 			return new Future<Void>(new RuntimeException("Current service call after schedule internal has changed: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 
-		IExternalAccess	rootacc	= agent.getExternalAccess(agent.getId().getRoot()).get();
+		IExternalAccess	rootacc	= agent.getExternalAccessAsync(agent.getId().getRoot()).get();
 		rootacc.scheduleStep(new IComponentStep<Void>() {
 			@Override
 			@Classname("myuniquestepname")
@@ -73,7 +73,7 @@ public class ProviderAgent implements ITestService
 			return new Future<Void>(new RuntimeException("Current service call has changed after remote CMS call: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 		
-		ITestService	ts	= exta.searchService( new ServiceQuery<>( ITestService.class, RequiredService.SCOPE_COMPONENT_ONLY)).get();
+		ITestService	ts	= exta.searchService( new ServiceQuery<>( ITestService.class, ServiceScope.COMPONENT_ONLY)).get();
 		ts.method(agent.getExternalAccess()).get();
 		if (ServiceCall.getCurrentInvocation() != sc) {
 			return new Future<Void>(new RuntimeException("Current service call has changed after remote callback: "+ServiceCall.getCurrentInvocation()+", "+sc));

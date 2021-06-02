@@ -6,6 +6,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
@@ -14,8 +17,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
@@ -34,7 +35,7 @@ import jadex.micro.annotation.RequiredServices;
 	implementation=@Implementation(value=ChatServiceD5.class)))
 @RequiredServices({
 	@RequiredService(name="clockservice", type=IClockService.class),
-	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=RequiredService.SCOPE_GLOBAL),
+	@RequiredService(name="chatservices", type=IChatService.class, scope=ServiceScope.GLOBAL), // multiple=true,
 	@RequiredService(name="regservice", type=IRegistryServiceE3.class)
 })
 @Arguments(@Argument(name="nickname", clazz=String.class, defaultvalue="\"Willi\""))
@@ -52,7 +53,8 @@ public class ChatE3Agent
 //	@AgentService
 	protected IRegistryServiceE3 regservice;
 	
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> init()
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -69,7 +71,7 @@ public class ChatE3Agent
 			public void exceptionOccurred(Exception exception)
 			{
 				System.out.println("exception, could not find appreg service: "+exception);
-//				IRegistryServiceE3 reg = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IRegistryServiceE3.class));
+//				IRegistryServiceE3 reg = agent.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IRegistryServiceE3.class));
 				IFuture<IRegistryServiceE3>	fut	= agent.getFeature(IRequiredServicesFeature.class).getService("regservice");
 				super.exceptionOccurred(exception);
 			}
@@ -81,7 +83,8 @@ public class ChatE3Agent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 //		IFuture<IRegistryServiceE3>	regservice	= agent.getComponentFeature(IRequiredServicesFeature.class).getService("regservice");

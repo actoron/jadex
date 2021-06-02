@@ -7,7 +7,8 @@ import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.nonfunctional.search.ComposedEvaluator;
 import jadex.bridge.sensor.service.ExecutionTimeEvaluator;
 import jadex.bridge.sensor.service.ExecutionTimeProperty;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
@@ -21,7 +22,7 @@ import jadex.micro.annotation.RequiredServices;
 
 @Agent
 @Service
-@RequiredServices(@RequiredService(name="aser", type=IAService.class, multiple=true, scope=RequiredServiceInfo.SCOPE_PLATFORM,
+@RequiredServices(@RequiredService(name="aser", type=IAService.class, scope=ServiceScope.PLATFORM, //  multiple=true,
 	nfprops=@NFRProperty(value=ExecutionTimeProperty.class, methodname="test")))
 public class UserAgent
 {
@@ -31,7 +32,8 @@ public class UserAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		// todo: make ITerminable in DefaultServiceFetcher

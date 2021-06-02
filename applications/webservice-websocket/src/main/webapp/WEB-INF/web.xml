@@ -14,7 +14,7 @@
 	
 	<!-- Jadex websocket server setup. Listener starts websocket at path from ws_url context parameter. -->
 	<listener>
-    	<listener-class>com.actoron.webservice.WebSocketInitListener</listener-class>
+    	<listener-class>org.activecomponents.webservice.WebSocketInitListener</listener-class>
 	</listener>
 	<context-param>
 		<param-name>ws_url</param-name>
@@ -22,7 +22,7 @@
 	</context-param>
 	<context-param>
 		<param-name>ws_component_0</param-name>
-		<param-value>com.actoron.webservice.WebsocketsTestAgent.class</param-value>
+		<param-value>org.activecomponents.webservice.WebsocketsTestAgent.class</param-value>
 	</context-param>
 	<context-param>
 		<param-name>ws_serviceimpl_jadex.bridge.service.types.chat.IChatGuiService</param-name>

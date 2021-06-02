@@ -36,11 +36,11 @@ public class JavaThreadPool implements IThreadPool
 	public JavaThreadPool(boolean daemon)
 	{
 //		System.out.println("Using Java 5.0 ThreadPool");
-		executor	= Executors.newCachedThreadPool(new ThreadFactory()
+		executor = Executors.newCachedThreadPool(new ThreadFactory()
 		{
 			public Thread newThread(final Runnable r)
 			{
-				return new Thread(r)
+				Thread ret = new Thread(r)
 				{
 					/**
 					 *  Get the string representation.
@@ -50,10 +50,11 @@ public class JavaThreadPool implements IThreadPool
 						return super.toString()+":"+hashCode()+", task="+r;
 					}
 				};
+				ret.setDaemon(true);
+				return ret;
 			}
 		});
 //		executor	= Executors.newFixedThreadPool(20);
-		
 		
 		shutdown = new Future<Void>();
 		

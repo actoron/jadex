@@ -2,6 +2,9 @@ package jadex.bridge.service.component;
 
 import java.util.Collection;
 
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -38,6 +41,17 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	public <T> IFuture<T> getService(String name)
 	{
 		return delegate.getService(rename(name));
+	}
+	
+	/**
+	 *  Resolve a required service of a given type.
+	 *  Synchronous method only for locally available services.
+	 *  @param type The service type.
+	 *  @return The service.
+	 */
+	public <T> T getLocalService0(Class<T> type)
+	{
+		return delegate.getLocalService0(type);
 	}
 	
 	/**
@@ -116,7 +130,7 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	{
 		return delegate.getLocalServices(type);
 	}
-
+	
 	//-------- methods for searching --------
 	
 	/**
@@ -135,9 +149,9 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	 *  @param query	The search query.
 	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
-	public <T> T searchLocalService(ServiceQuery<T> query)
+	public <T> T getLocalService(ServiceQuery<T> query)
 	{
-		return delegate.searchLocalService(query);
+		return delegate.getLocalService(query);
 	}
 	
 	/**
@@ -156,9 +170,22 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	 *  @param query	The search query.
 	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
 	 */
-	public <T> Collection<T> searchLocalServices(ServiceQuery<T> query)
+	public <T> Collection<T> getLocalServices(ServiceQuery<T> query)
 	{
-		return delegate.searchLocalServices(query);
+		return delegate.getLocalServices(query);
+	}
+	
+	/**
+	 *  Performs a sustained search for a service. Attempts to find a service
+	 *  for a maximum duration until timeout occurs.
+	 *  
+	 *  @param query The search query.
+	 *  @param timeout Maximum time period to search.
+	 *  @return Service matching the query, exception if service is not found.
+	 */
+	public <T> IFuture<T> searchService(ServiceQuery<T> query, long timeout)
+	{
+		return delegate.searchService(query, timeout);
 	}
 	
 	//-------- query methods --------
@@ -194,6 +221,37 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
 	{
 		return delegate.addQuery(query);
+	}
+	
+	/**
+	 *  Add a service query.
+	 *  Continuously searches for matching services.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query, long timeout)
+	{
+		return delegate.addQuery(query, timeout);
+	}
+	
+	/**
+	 *  Create the user-facing object from the received search or query result.
+	 *  Result may be service object, service identifier (local or remote), or event.
+	 *  User object is either event or service (with or without required proxy).
+	 */
+	public IService getServiceProxy(IServiceIdentifier sid, RequiredServiceInfo info)
+	{
+		return delegate.getServiceProxy(sid, info);
+	}
+	
+	/**
+	 *  Get a service query for a required service info (as defined in the agent under that name).
+	 *  @param name The name.
+	 *  @return The service query.
+	 */
+	public ServiceQuery<?> getServiceQuery(String name)
+	{
+		return delegate.getServiceQuery(name);
 	}
 	
 	//-------- template methods --------

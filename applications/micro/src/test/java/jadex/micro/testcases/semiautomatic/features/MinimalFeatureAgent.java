@@ -7,6 +7,7 @@ import jadex.bridge.component.ILifecycleComponentFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.impl.ArgumentsResultsComponentFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.micro.annotation.Agent;
@@ -38,7 +39,8 @@ public class MinimalFeatureAgent
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void hello()
 	{
 		System.out.println("hello: "+agent);

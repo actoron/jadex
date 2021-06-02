@@ -3,21 +3,17 @@ package jadex.micro.benchmarks;
 import java.util.HashMap;
 import java.util.Map;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
@@ -62,12 +58,12 @@ public class BlockingAgentCreationAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 		if(num==0)
 		{
-			IClockService	clock	= getClock(agent);
 			System.gc();
 			try
 			{
@@ -76,7 +72,7 @@ public class BlockingAgentCreationAgent
 			catch(InterruptedException e){}
 			
 			startmem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-			starttime = clock.getTime();
+			starttime = System.currentTimeMillis();
 		}
 		
 		num++;
@@ -89,14 +85,13 @@ public class BlockingAgentCreationAgent
 			args.put("num", Integer.valueOf(num));
 			args.put("starttime", Long.valueOf(starttime));
 			args.put("startmem", Long.valueOf(startmem));
-			agent.createComponent(
+			agent.getExternalAccess(agent.getId().getParent()).createComponent(
 				new CreationInfo(null, args, agent.getDescription().getResourceIdentifier())
-				.setName(createPeerName(num+1, agent.getId())).setFilename(BlockingAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class"), null);
+				.setName(createPeerName(num+1, agent.getId())).setFilename(BlockingAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class"));
 		}
 		else
 		{
-			IClockService	clock	= getClock(agent);
-			long	end	= clock.getTime();
+			long	end	= System.currentTimeMillis();
 			
 			System.gc();
 			try
@@ -117,25 +112,24 @@ public class BlockingAgentCreationAgent
 			// Use initial component to kill others
 //			IComponentManagementService cms	= getCMS(agent);
 			String	initial	= createPeerName(1, agent.getId());
-			IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
-			IExternalAccess exta	= agent.getExternalAccess(cid).get();
+			IComponentIdentifier	cid	= new ComponentIdentifier(initial, agent.getId().getRoot());
+			IExternalAccess exta	= agent.getExternalAccessAsync(cid).get();
 			exta.scheduleStep(new IComponentStep<Void>()
 			{
 				@Classname("deletePeers")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					IClockService	clock	= getClock(ia);
-					long	killstarttime	= clock.getTime();
+					long	killstarttime	= System.currentTimeMillis();
 //					IComponentManagementService	cms	= getCMS(ia);
 					for(int i=max; i>1; i--)
 					{
 						String name = createPeerName(i, ia.getId());
-						IComponentIdentifier cid = new BasicComponentIdentifier(name, ia.getId().getRoot());
-						agent.killComponent(cid).get();
+						IComponentIdentifier cid = new ComponentIdentifier(name, ia.getId().getRoot());
+						agent.getExternalAccess(cid).killComponent().get();
 						System.out.println("Successfully destroyed peer: "+name);
 					}
 					
-					long killend = clock.getTime();
+					long killend = System.currentTimeMillis();
 					System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
 					double killdur = ((double)killend-killstarttime)/1000.0;
 					final double killpera = killdur/(max-1);
@@ -183,10 +177,5 @@ public class BlockingAgentCreationAgent
 			name	+= "Peer_#"+num;
 		}
 		return name;
-	}
-	
-	protected static IClockService getClock(IInternalAccess ia)
-	{
-		return ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 	}
 }

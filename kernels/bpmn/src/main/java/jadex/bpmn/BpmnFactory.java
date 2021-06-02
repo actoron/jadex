@@ -1,6 +1,7 @@
 package jadex.bpmn;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,12 +13,14 @@ import jadex.bpmn.features.impl.BpmnMessageComponentFeature;
 import jadex.bpmn.features.impl.BpmnMonitoringComponentFeature;
 import jadex.bpmn.features.impl.BpmnProvidedServicesFeature;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.component.impl.ArgumentsResultsComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
@@ -42,6 +45,34 @@ import jadex.commons.future.IFuture;
  */
 public class BpmnFactory extends BasicService implements IComponentFactory, IBootstrapFactory
 {
+	//-------- constants for noplatform variant --------
+	
+	/** The default component features. */
+	public static final Collection<IComponentFeatureFactory> NOPLATFORM_DEFAULT_FEATURES;
+	
+	static
+	{
+		Collection<IComponentFeatureFactory> def_features = new ArrayList<IComponentFeatureFactory>();
+		
+		// exchanged
+		def_features.add(new ComponentFeatureFactory(IExecutionFeature.class, BpmnExecutionFeature.class));
+		
+		//def_features.add(new ComponentFeatureFactory(IMonitoringComponentFeature.class, MonitoringComponentFeature.class));
+		def_features.add(new ComponentFeatureFactory(IArgumentsResultsFeature.class, ArgumentsResultsComponentFeature.class));
+		//def_features.add(PropertiesComponentFeature.FACTORY);	// After args for logging
+		//def_features.add(new ComponentFeatureFactory(IRequiredServicesFeature.class, RequiredServicesComponentFeature.class));
+		//def_features.add(new ComponentFeatureFactory(IProvidedServicesFeature.class, ProvidedServicesComponentFeature.class));
+		//def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class, SubcomponentsComponentFeature.class, new Class[]{IProvidedServicesFeature.class}, null));
+		//def_features.add(new ComponentFeatureFactory(IMessageFeature.class, MessageComponentFeature.class));
+		//def_features.add(RemoteExecutionComponentFeature.FACTORY);	// After message for adding handler
+		//def_features.add(NFPropertyComponentFeature.FACTORY);
+		
+		// added
+		def_features.add(BpmnComponentFeature.FACTORY);
+
+		NOPLATFORM_DEFAULT_FEATURES = Collections.unmodifiableCollection(def_features);
+	}
+	
 	//-------- constants --------
 	
 	/** The supported component types (file extensions).
@@ -95,7 +126,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	// This constructor is used by the Starter class and the ADFChecker plugin. 
 	public BpmnFactory(String providerid)
 	{
-		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
+		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new BpmnModelLoader();
 		this.features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BPMN_FEATURES));
 	}
@@ -144,8 +175,9 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 */
 	public IFuture<Void> startService()
 	{
-		libservice = provider.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
-		libservice.addLibraryServiceListener(libservicelistener);	// TODO: wait for future?
+		libservice = provider.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class).setMultiplicity(0));
+		if (libservice != null)
+			libservice.addLibraryServiceListener(libservicelistener);	// TODO: wait for future?
 		return BpmnFactory.super.startService();
 	}
 	
@@ -175,6 +207,15 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 			}
 		});
 		return ret;
+	}
+	
+	/**
+	 *  Set the features.
+	 *  @param features The features to set.
+	 */
+	public void setFeatures(Collection<IComponentFeatureFactory> features)
+	{
+		this.features = new ArrayList<IComponentFeatureFactory>(features);
 	}
 	
 	/**

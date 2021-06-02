@@ -3,6 +3,7 @@ package jadex.bdi.testcases.misc;
 import java.util.ArrayList;
 import java.util.List;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
@@ -31,7 +32,7 @@ public class EndStateWorkerPlan extends Plan
 		final List<TestReport> reports = new ArrayList<TestReport>();
 		
 		// Test abortion of agenda actions (goal and plan creation actions should have been aborted).
-		waitFor(20);
+		waitFor(Starter.getScaledDefaultTimeout(getComponentIdentifier(), 0.002));
 		TestReport	report	= new TestReport("agenda_action", "Test if goal creation action has not been executed due to invalid precondition.");
 		if(getGoalbase().getGoals("testgoal").length==0)
 		{
@@ -57,8 +58,8 @@ public class EndStateWorkerPlan extends Plan
 		// Test deactivation of creation/trigger conditions.
 		getBeliefbase().getBelief("trigger").setFact(Boolean.FALSE);
 		getBeliefbase().getBelief("trigger").setFact(Boolean.TRUE);
-		waitFor(20);
-
+		waitFor(Starter.getScaledDefaultTimeout(getComponentIdentifier(), 0.002));
+		
 		report	= new TestReport("goal_condition", "Test if goal creation conditions are disabled in end state.");
 		if(getGoalbase().getGoals("testgoal").length==0)
 		{
@@ -85,7 +86,7 @@ public class EndStateWorkerPlan extends Plan
 		report	= new TestReport("manual_goal", "Test if manual creation of goal and activation of plan still works.");
 		try
 		{
-			dispatchSubgoalAndWait(createGoal("testgoal"), 200);
+			dispatchSubgoalAndWait(createGoal("testgoal"), Starter.getScaledDefaultTimeout(getComponentIdentifier(), 0.02));
 			report.setSucceeded(true);
 		}
 		catch(GoalFailureException e)

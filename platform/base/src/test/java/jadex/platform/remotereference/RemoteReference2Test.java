@@ -7,13 +7,13 @@ import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 
 /**
  *  Test if a remote references are correctly transferred and mapped back.
  */
-public class RemoteReference2Test //extends TestCase
+public class RemoteReference2Test
 {
 	/**
 	 *  Run the test.
@@ -21,24 +21,26 @@ public class RemoteReference2Test //extends TestCase
 	@Test
 	public void	testRemoteReference()
 	{
-		long timeout	= Starter.getDefaultTimeout(null);
+		IPlatformConfiguration	baseconf	= STest.createDefaultTestConfig(getClass());
+		// Use larger timeout so we can reduce default timeout on build slave
+		long timeout = Starter.getScaledDefaultTimeout(null, 5);
 		
 		// Start platform1 used for remote access.
-		final IExternalAccess	platform1	= Starter.createPlatform(STest.getDefaultTestConfig()).get(timeout);
+		final IExternalAccess	platform1	= Starter.createPlatform(baseconf).get(timeout);
 		timeout	= Starter.getDefaultTimeout(platform1.getId());
 		
 		// Start platform2 with services.
-		IPlatformConfiguration	config2	= STest.getDefaultTestConfig();
-		config2.addComponent(SearchServiceProviderAgent.class);		
-		config2.addComponent(LocalServiceProviderAgent.class);		
+		IPlatformConfiguration	config2	= baseconf.clone()
+			.addComponent(SearchServiceProviderAgent.class)
+			.addComponent(LocalServiceProviderAgent.class);
 		IExternalAccess	platform2	= Starter.createPlatform(config2).get(timeout);
 		
 		// Find local service with direct remote search.
 		System.out.println("searching local");
-		ILocalService	service1	= platform1.searchService( new ServiceQuery<>(ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get(timeout);
+		ILocalService	service1	= platform1.searchService( new ServiceQuery<>(ILocalService.class, ServiceScope.GLOBAL)).get(timeout);
 		// Search for remote search service from local platform
 		System.out.println("searching global");
-		ISearchService	search	= platform1.searchService( new ServiceQuery<>(ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get(timeout);
+		ISearchService	search	= platform1.searchService( new ServiceQuery<>(ISearchService.class, ServiceScope.GLOBAL)).get(timeout);
 		
 		// Invoke service to obtain reference to local service.
 		System.out.println("searching through service");

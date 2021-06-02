@@ -126,7 +126,7 @@ public class MessageList implements Iterable, Serializable
 
 	/**
 	 * Register for message events.
-	 * @param listener A class implementing the IMessageListListener interface.
+	 * @param ml A class implementing the IMessageListListener interface.
 	 */
 	protected void addListener(IMessageListListener ml)
 	{

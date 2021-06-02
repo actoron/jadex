@@ -13,7 +13,7 @@ public interface ISecurityInfo
 	 *
 	 *  @return True if authenticated.
 	 */
-	public boolean hasDefaultAuthorization();
+//	public boolean hasDefaultAuthorization();
 	
 	/**
 	 *  Returns the authenticated platform name.
@@ -27,14 +27,14 @@ public interface ISecurityInfo
 	 *
 	 *  @return True, if trusted.
 	 */
-	public boolean isTrustedPlatform();
+//	public boolean isTrustedPlatform();
 	
 	/**
 	 *  Gets the ID of the sender platform if it is trusted, null otherwise.
 	 *
 	 *  @return The ID of the sender platform if it is trusted, null otherwise.
 	 */
-	public boolean isAdminPlatform();
+//	public boolean isAdminPlatform();
 	
 	/**
 	 *  Gets the authenticated networks of the sender.

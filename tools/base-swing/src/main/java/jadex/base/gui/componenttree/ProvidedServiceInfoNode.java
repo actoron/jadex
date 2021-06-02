@@ -18,12 +18,10 @@ import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.MethodInfo;
@@ -147,7 +145,8 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 			public void resultAvailable(final IService ser)
 			{
 //				((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyMetaInfos()
-				ea.getNFPropertyMetaInfos(ser.getServiceId())
+				IServiceIdentifier sid = ser.getServiceId();
+				ea.getNFPropertyMetaInfos(sid)
 					.addResultListener(new SwingResultListener<Map<String,INFPropertyMetaInfo>>(new IResultListener<Map<String,INFPropertyMetaInfo>>()
 //					.addResultListener(new SwingResultListener<Map<String,INFPropertyMetaInfo>>(new IResultListener<Map<String,INFPropertyMetaInfo>>()
 				{
@@ -249,7 +248,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 		
 		if(service.getType().getType0()==null)
 		{
-			platformea.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			platformea.searchService( new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 				.addResultListener(new SwingDefaultResultListener<ILibraryService>()
 			{
 				public void customResultAvailable(ILibraryService ls)

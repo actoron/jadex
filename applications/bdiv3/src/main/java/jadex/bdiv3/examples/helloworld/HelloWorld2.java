@@ -18,6 +18,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -97,7 +98,8 @@ public class HelloWorld2
 	 *  right hand side creates goal and executes it
 	 *  Plan is selected and executed (hello is printed out)
 	 */
-	@AgentBody
+	@OnStart
+	//@AgentBody
 	public void body()
 	{
 		sayhello = "Hello BDI agent V3.";

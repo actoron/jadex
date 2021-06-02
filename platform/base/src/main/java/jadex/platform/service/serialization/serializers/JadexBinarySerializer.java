@@ -4,14 +4,27 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
+import jadex.binary.IDecoderHandler;
 import jadex.binary.SBinarySerializer;
 import jadex.binary.SerializationConfig;
+import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.component.impl.RemoteExecutionComponentFeature;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.platform.service.serialization.serializers.JadexJsonSerializer.JsonByteArrayReadProcessor;
+import jadex.platform.service.serialization.serializers.JadexJsonSerializer.JsonByteArrayWriteProcessor;
+import jadex.platform.service.serialization.serializers.jsonread.JsonComponentIdentifierProcessor;
+import jadex.platform.service.serialization.serializers.jsonwrite.JsonResourceIdentifierProcessor;
+import jadex.platform.service.serialization.serializers.jsonwrite.JsonServiceIdentifierProcessor;
+import jadex.platform.service.serialization.serializers.jsonwrite.JsonServiceProcessor;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  *  The Jadex Binary serializer. Codec supports parallel
@@ -30,200 +43,90 @@ public class JadexBinarySerializer implements ISerializer
 	/** The debug flag. */
 	protected boolean DEBUG = false;
 	
+	/**
+	 *  Config with pre-defined Strings for faster encoding/decoding.
+	 */
 	protected static SerializationConfig CONFIG = new SerializationConfig(new String[] {
-		"doSendMessage",
-		"MapCodec.java",
-		"logging.level",
-		"decoupled",
-		"getServiceProvider",
-		"arguments",
-		"notifyListener",
-		"getServiceContainer",
-		"linkToLinkMap",
-		"endToEndMap",
-		"realReceiver",
-		"ThreadPool.java",
-		"providerId",
-		"java.util.logging.Level.SEVERE",
-		"runPreProcessors",
-		"callId",
-		"excludedMethods",
-		"getProxyReference",
-		"addResultListener",
-		"nonFunctionalProperties",
-		"encode",
-		"invoke",
-		"targetInterfaces",
-		"sender",
-		"writeObjectToStream",
-		"writeBeanProperties",
-		"content",
-		"addCachedMethodValue",
-		"methodReplacements",
-		"execute",
-		"Future.java",
-		"SBinarySerializer.java",
-		"x_nonfunctional",
-		"remoteReference",
-		"java.lang.reflect.Method",
-		"providedServices",
-		"targetIdentifier",
-		"global",
-		"requiredServices",
-		"timestamp",
-		"scope",
-		"AsyncExecutionService.java",
-		"Executor.java",
-		"JadexBinarySerializer.java",
-		"jadex.bridge.service.types.execution.IExecutionService",
-		"componentviewer.viewerclass",
-		"BeanCodec.java",
-		"jadex.bridge.service.types.threadpool.IThreadPoolService",
-		"process",
-		"jadex.platform.service.df.DirectoryFacilitatorAgent.class",
-		"jadex.bridge.service.types.persistence.IPersistenceService",
-		"jadex.platform.service.address.TransportAddressAgent.class",
-		"jadex.platform.service.filetransfer.FileTransferAgent.class",
-		"doTraverse",
-		"contentData",
-		"x_timestamp",
-		"className",
-		"jadex.bridge.service.types.threadpool.IDaemonThreadPoolService",
-		"proxytype",
-		"MapSendTask.java",
-		"jadex.platform.service.remote.RemoteServiceManagementAgent.class",
-		"jadex.platform.service.dht.DistributedServiceRegistryAgent.class",
+		"jadex",
+		"bridge",
+		"platform",
+		"service",
+		"commons",
+		"component",
+		"impl",
+		"remotecommands",
+		"Tuple2",
+		"IService",
+		"ClassInfo",
+		"ClassInfo[]",
+		"MethodInfo",
+		"MsgHeader",
+		"ComponentIdentifier",
+		"ServiceScope",
+		"RemoteFinishedCommand",
+		"RemoteForwardCmdCommand",
+		"RemoteIntermediateResultCommand",
+		"RemotePullCommand",
+		"RemoteBackwardCommand",
+		"RemoteResultCommand",
+		"RemoteTerminationCommand",
+		"RemoteMethodInvocationCommand",
+		"java",
+		"lang",
+		"util",
+		"String",
+		"Boolean",
+		"Integer",
+		"ArrayList",
+		"HashSet",
+		"HashMap",
+		"Collections$UnmodifiableSet",
+		"Long",
 		"FALSE",
-		"__securitymessage__",
-		"x_message_id",
-		"java.lang.Boolean",
-		"RemoteServiceManagementService.java",
-		"digestContent",
-		"jadex.platform.service.awareness.management.AwarenessManagementAgent.class",
-		"receiver",
-		"conversation_id",
-		"implementation",
-		"validityDuration",
-		"type",
-		"jadex.commons.concurrent.ThreadPool$ServiceThread",
-		"remoteManagementServiceIdentifier",
-		"authenticationData",
 		"TRUE",
-		"RemoteReferenceModule.java",
-		"jadex.commons.transformation.binaryserializer.MapCodec",
-		"jadex.commons.future.Future",
-		"jadex.platform.service.execution.AsyncExecutionService$1",
-		"Traverser.java",
-		"MessageService.java",
-		"jadex.platform.service.message.MessageService$SendManager",
-		"NativeMethodAccessorImpl.java",
-		"resultAvailable",
-		"parameterTypeInfos",
-		"jadex.commons.transformation.binaryserializer.SBinarySerializer",
-		"AbstractSendTask.java",
-		"jadex.platform.service.remote.RemoteServiceManagementService$15",
-		"addresses",
-		"successors",
-		"jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport",
-		"jadex.commons.concurrent.Executor",
-		"lookupTypes",
-		"AbstractCodec.java",
-		"sun.reflect.NativeMethodAccessorImpl",
-		"jadex.bridge.service.types.cms.IComponentManagementService",
-		"jadex.platform.service.message.transport.serializers.JadexBinarySerializer",
-		"predecessors",
-		"jadex.platform.service.message.MapSendTask",
-		"NIOTCPTransport.java",
-		"jadex.platform.service.remote.RemoteReferenceModule",
-		"jadex.commons.transformation.binaryserializer.BeanCodec",
-		"java.lang.String",
-		"jadex.platform.service.message.MessageService$SendManager$1",
-		"java.lang.Object",
-		"implementationClass",
-		"filename",
-		"jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport$2",
-		"jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport$2$1",
-		"boolean",
-		"jadex.platform.service.message.AbstractSendTask",
-		"value",
-		"clazz",
-		"jadex.commons.transformation.traverser.Traverser",
-		"jadex.commons.transformation.binaryserializer.AbstractCodec",
-		"name",
-		"typeName",
-		"description"
-	},
-	new String[] {
 		"0",
-		"jadex.bridge.service.IService",
-		"jadex.bridge.component.IMessageFeature",
-		"java.util.HashSet",
-		"jadex.commons.Tuple2",
-		"jadex.bridge.component.impl.MsgHeader",
-		"jadex.bridge.component.IExecutionFeature",
-		"jadex.bridge.component.IPropertiesFeature",
-		"jadex.bridge.modelinfo.UnparsedExpression",
-		"jadex.bridge.modelinfo.ConfigurationInfo[]",
-		"jadex.bridge.service.ProvidedServiceInfo[]",
-		"jadex.bridge.service.RequiredServiceInfo[]",
-		"jadex.micro.features.IMicroInjectionFeature",
-		"jadex.bridge.modelinfo.UnparsedExpression[]",
-		"jadex.bridge.service.RequiredServiceBinding",
-		"jadex.bridge.component.ISubcomponentsFeature",
-		"jadex.bridge.component.IPojoComponentFeature",
-		"jadex.bridge.modelinfo.SubcomponentTypeInfo[]",
-		"jadex.bridge.component.IArgumentsResultsFeature",
-		"jadex.base.service.remote.commands.RemoteMethodInvocationCommand",
-		"jadex.bridge.component.IComponentFeatureFactory[]",
-		"jadex.bridge.component.ILifecycleComponentFeature",
-		"jadex.bridge.service.ProvidedServiceImplementation",
-		"jadex.bridge.component.IMonitoringComponentFeature",
-		"jadex.micro.features.IMicroServiceInjectionFeature",
-		"jadex.bridge.component.INFPropertyComponentFeature",
-		"java.lang.Class[]",
-		"jadex.micro.features.impl.MicroPojoComponentFeature",
-		"jadex.bridge.component.impl.ComponentFeatureFactory",
 		"1",
-		"jadex.bridge.component.impl.ExecutionComponentFeature",
-		"jadex.base.service.remote.commands.RemoteSearchCommand",
-		"jadex.bridge.component.impl.PropertiesComponentFeature",
-		"jadex.bridge.component.impl.NFPropertyComponentFeature",
-		"jadex.bridge.component.impl.MonitoringComponentFeature",
-		"jadex.bridge.ClassInfo[]",
-		"jadex.micro.features.impl.MicroMessageComponentFeature",
-		"jadex.commons.MethodInfo",
-		"jadex.bridge.service.component.IRequiredServicesFeature",
-		"jadex.bridge.service.component.IProvidedServicesFeature",
-		"jadex.micro.features.impl.MicroInjectionComponentFeature",
-		"jadex.micro.features.impl.MicroLifecycleComponentFeature",
-		"jadex.bridge.component.impl.SubcomponentsComponentFeature",
-		"jadex.bridge.component.impl.ArgumentsResultsComponentFeature",
-		"jadex.micro.features.impl.MicroServiceInjectionComponentFeature",
-		"jadex.bridge.service.component.ProvidedServicesComponentFeature",
-		"jadex.bridge.service.component.RequiredServicesComponentFeature",
-		"byte[]",
-		"jadex.base.service.remote.commands.RemoteResultCommand",
-		"jadex.bridge.service.ServiceIdentifier",
-		"java.lang.Long",
-//		"jadex.base.service.remote.ProxyInfo",
-		"jadex.bridge.component.impl.remotecommands.ProxyInfo",
-		"java.lang.Boolean",
-		"jadex.bridge.ClassInfo",
-		"jadex.base.service.remote.ProxyReference",
-		"java.util.HashMap",
-		"java.lang.String[]",
-		"java.util.ArrayList",
-		"jadex.base.service.remote.RemoteReference",
-		"jadex.base.service.remote.commands.RemoteIntermediateResultCommand",
-		"jadex.base.service.remote.replacements.DefaultEqualsMethodReplacement",
-		"jadex.base.service.remote.replacements.DefaultHashcodeMethodReplacement",
-		"jadex.bridge.ComponentIdentifier",
-		"java.lang.String",
-		"jadex.bridge.IComponentIdentifier[]",
-		"jadex.platform.service.message.transport.MessageEnvelope",
-		"jadex.bridge.BasicComponentIdentifier"
+		"name",
+		"properties",
+		"typeName",
+		"serviceName",
+		"serviceType",
+		"networkNames",
+		"scope",
+		"security",
+		"DEFAULT",
+		"NONE",
+		"COMPONENT_ONLY",
+		"NETWORK",
+		"APPLICATION_NETWORK",
+		"APPLICATION_GLOBAL",
+		"GLOBAL",
+		RemoteExecutionComponentFeature.RX_ID,
+		"__fw_sender__", //RelayTransportAgent.FORWARD_SENDER,
+		"__fw_dest__", //RelayTransportAgent.FORWARD_DEST,
+		IMsgHeader.SENDER,
+		IMsgHeader.RECEIVER,
+		IMsgHeader.CONVERSATION_ID,
+		IMsgHeader.XID
 	});
 	
+	/** The write processors. */
+	public List<ITraverseProcessor> writeprocs;
+	
+	/** The read processors. */
+	public List<IDecoderHandler> readprocs;
+	
+	/**
+	 *  Create a new serializer.
+	 */
+	public JadexBinarySerializer()
+	{
+		writeprocs = Collections.synchronizedList(new ArrayList<ITraverseProcessor>());
+		writeprocs.addAll(SBinarySerializer.ENCODER_HANDLERS);
+		
+		readprocs = Collections.synchronizedList(new ArrayList<IDecoderHandler>());
+		readprocs.addAll(SBinarySerializer.DECODER_HANDLERS);
+	}
 	
 	//-------- methods --------
 	
@@ -246,14 +149,12 @@ public class JadexBinarySerializer implements ISerializer
 	public byte[] encode(Object val, ClassLoader classloader, ITraverseProcessor[] preprocs, Object usercontext)
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		SBinarySerializer.writeObjectToStream(baos, val, preprocs!=null?Arrays.asList(preprocs):null, null, usercontext, classloader, CONFIG);
+		SBinarySerializer.writeObjectToStream(baos, val, preprocs!=null?Arrays.asList(preprocs):null, writeprocs, usercontext, classloader, CONFIG);
 		
 		byte[] ret = baos.toByteArray();
 		
 		if(DEBUG)
-		{
 			System.out.println("encode message: "+(new String(ret, SUtil.UTF8)));
-		}
 		return ret;
 	}
 
@@ -265,9 +166,7 @@ public class JadexBinarySerializer implements ISerializer
 	public Object decode(byte[] bytes, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep, Object usercontext)
 	{
 		if(DEBUG)
-		{
 			System.out.println("decode message: "+(new String((byte[])bytes, SUtil.UTF8)));
-		}
 		
 		InputStream is = new ByteArrayInputStream((byte[]) bytes);
 		
@@ -291,8 +190,7 @@ public class JadexBinarySerializer implements ISerializer
 	 */
 	public Object decode(InputStream is, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep, Object usercontext)
 	{
-		
-		Object ret = SBinarySerializer.readObjectFromStream(is, postprocs!=null?Arrays.asList(postprocs):null, usercontext, classloader, null, CONFIG);
+		Object ret = SBinarySerializer.readObjectFromStream(is, postprocs!=null?Arrays.asList(postprocs):null, usercontext, classloader, null, CONFIG, readprocs);
 		
 		try
 		{
@@ -302,7 +200,15 @@ public class JadexBinarySerializer implements ISerializer
 		{
 		}
 		
-		
 		return ret;
+	}
+	
+	/**
+	 *  Add a processor pair.
+	 */
+	public void addProcessor(IDecoderHandler readproc, ITraverseProcessor writeproc)
+	{
+		readprocs.add(0, readproc);
+		writeprocs.add(0, writeproc);
 	}
 }

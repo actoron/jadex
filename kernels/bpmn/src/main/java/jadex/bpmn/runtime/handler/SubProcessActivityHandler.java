@@ -18,6 +18,7 @@ import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
@@ -26,7 +27,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 
@@ -43,15 +44,13 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 	 */
 	public void execute(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
-//		System.out.println(instance.getComponentIdentifier().getLocalName()+": sub "+activity);
+		System.out.println(instance.getId().getLocalName()+": sub "+activity);
 
-		MSubProcess	proc	= (MSubProcess)activity;
+		MSubProcess	proc = (MSubProcess)activity;
 		final List<MActivity> start = proc.getStartActivities();
 		String tmpfile = (String)thread.getPropertyValue("file");
 		if(tmpfile == null)
-		{
 			tmpfile = (String)thread.getPropertyValue("filename");
-		}
 		final String	file	= tmpfile;
 	
 		// Internal subprocess (when no file is given and has start activities).
@@ -192,7 +191,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 
 			thread.setWaiting(true);
 			
-//			IComponentManagementService cms = instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//			IComponentManagementService cms = instance.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			// Todo: If remote remember subprocess and kill on cancel.
 
 			final CreationInfo	info = thread.hasPropertyValue("creation info")? 
@@ -207,8 +206,9 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			IComponentIdentifier	parent	= thread.hasPropertyValue("parent")
 				? (IComponentIdentifier)thread.getPropertyValue("parent")
 				: instance.getId();
-			if(info.getParent()==null && parent!=null)
-				info.setParent(parent);
+//			if(info.getParent()==null && parent!=null)
+//				info.setParent(parent);
+			IExternalAccess creator = parent == null ? instance.getExternalAccess() : instance.getExternalAccess(parent);
 			
 			String[] imps = instance.getModel().getAllImports();
 			if(info.getImports()==null && imps!=null)
@@ -216,13 +216,14 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			info.setFilename(file);	
 //					System.out.println("parent is: "+parent.getAddresses());	
 
-			instance.createComponentWithResults(info)
-				.addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+			creator.createComponentWithEvents(info)
+				.addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 			{
 				protected SubprocessResultHandler handler = new SubprocessResultHandler(thread, activity);	
 					
 				public void intermediateResultAvailable(CMSStatusEvent cse)
 				{
+					//System.out.println("cmsevent: "+cse);
 					if(cse instanceof CMSIntermediateResultEvent)
 					{
 						String	param	= ((CMSIntermediateResultEvent)cse).getName();
@@ -244,7 +245,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				
 				public void finished()
 				{
-//							System.out.println("end0: "+instance.getComponentIdentifier()+" "+file+" "+thread.getParameterValue("$results"));
+					//System.out.println("end0: "+instance.getId()+" "+file+" "+thread.getParameterValue("$results"));
 					handler.updateParameters(thread, activity);
 					
 					thread.setNonWaiting();
@@ -262,12 +263,13 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				
 				public void exceptionOccurred(final Exception exception)
 				{
+					//System.out.println("ex: "+exception);
 					// Hack!!! Ignore exception, when component already terminated.
 					if(!(exception instanceof ComponentTerminatedException)
 						|| !instance.getId().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
 					{
-//								System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
-//								exception.printStackTrace();
+//						System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
+//						exception.printStackTrace();
 						thread.setNonWaiting();
 						thread.setException(exception);
 						getBpmnFeature(instance).step(activity, instance, thread, null);

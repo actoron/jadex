@@ -60,7 +60,7 @@ public class Traverser
 		processors.add(new CollectionProcessor());
 		processors.add(new IteratorProcessor());
 		processors.add(new EnumerationProcessor());
-		if(!SReflect.isAndroid())
+		//if(!SReflect.isAndroid())
 		{
 			processors.add(new ColorProcessor());
 			processors.add(new ExcludeSwingProcessor());

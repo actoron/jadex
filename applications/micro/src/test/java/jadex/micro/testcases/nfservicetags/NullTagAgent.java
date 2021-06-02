@@ -9,10 +9,10 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.sensor.service.TagProperty;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
@@ -35,7 +35,8 @@ public class NullTagAgent extends JunitAgentTest
 	/**
 	 *  The agent body. 
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		final List<TestReport> results = new ArrayList<TestReport>();

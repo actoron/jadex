@@ -1,6 +1,8 @@
 package jadex.bridge.fipa;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
@@ -50,7 +52,9 @@ public class FipaMessage	implements IFilter<Object>
 	/**
 	 *  Bean constructor.
 	 */
-	public FipaMessage(){}
+	public FipaMessage()
+	{
+	}
 	
 	/**
 	 *  Constructor for most common fields (for sending).

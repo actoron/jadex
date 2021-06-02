@@ -19,16 +19,7 @@ public abstract class NodeHelper
 	public static NodeHelper getInstance()
 	{
 		if(INSTANCE == null) 
-		{
-			if(SReflect.isAndroid()) 
-			{
-				throw new Error("OpcodeHelper.getInstance() is not implemented for Android.");
-			} 
-			else 
-			{
-				INSTANCE = new AsmNodeHelper();
-			}
-		}
+			INSTANCE = new AsmNodeHelper();
 		return INSTANCE;
 	}
 	

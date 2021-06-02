@@ -8,6 +8,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -26,7 +27,8 @@ public class ClockBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body(IInternalAccess agent)
 	{
 		// Stop the agent after 5 seconds.
@@ -37,7 +39,7 @@ public class ClockBDI
 	/**
 	 *  Plan that prints the time.
 	 */
-	@Plan(trigger=@Trigger(factchangeds="time"))
+	@Plan(trigger=@Trigger(factchanged="time"))
 	protected void printTime()
 	{
 		System.out.println(formatter.format(getTime()));

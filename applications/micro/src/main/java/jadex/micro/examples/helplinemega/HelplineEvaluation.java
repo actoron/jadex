@@ -16,10 +16,9 @@ import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.registry.RegistryEvent;
 import jadex.commons.future.FutureBarrier;
 
 /**
@@ -166,7 +165,7 @@ public class HelplineEvaluation
 					try
 					{
 						// search for person 1 (single: only present on second platform, multi: present once on each platform)
-						found	= firstplatform.searchServices( new ServiceQuery<>(IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK).setServiceTags("person1")).get();
+						found	= firstplatform.searchServices( new ServiceQuery<>(IHelpline.class, ServiceScope.NETWORK).setServiceTags("person1")).get();
 					}
 					catch(Exception e)
 					{
@@ -193,7 +192,8 @@ public class HelplineEvaluation
 	 */
 	protected static IPlatformConfiguration getConfig(String[] args)
 	{
-		RegistryEvent.LEASE_TIME	= 1000*60*60*24*365;
+		//RegistryEvent deleted: public static long LEASE_TIME = 10000;
+		//RegistryEvent.LEASE_TIME	= 1000*60*60*24*365;
 		
 		IPlatformConfiguration config	= PlatformConfigurationHandler.getDefaultNoGui();
 //		config.setLogging(true);
@@ -333,7 +333,7 @@ public class HelplineEvaluation
 						? m*cnt/measurecnt + j	// multi: same person numbers used on for all platforms.
 						: numpersons + m*platforms.length + i*cnt/measurecnt + j;	// single: different person numbers for each platform
 					fubar.addFuture(platforms[i].createComponent(
-						new CreationInfo(Collections.singletonMap("person", (Object)("person"+num))).setFilename(HelplineAgent.class.getName()+".class"), null));
+						new CreationInfo(Collections.singletonMap("person", (Object)("person"+num))).setFilename(HelplineAgent.class.getName()+".class")));
 				}
 			}
 			fubar.waitFor().get();

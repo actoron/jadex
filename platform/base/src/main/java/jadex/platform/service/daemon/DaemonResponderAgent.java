@@ -7,6 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -44,7 +45,8 @@ public class DaemonResponderAgent
 	/**
 	 *  Agent behavior.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> start()
 	{
 		agent.getLogger().info("Sending message "+content+" to "+cid);//+", "+SUtil.arrayToString(cid.getAddresses()));

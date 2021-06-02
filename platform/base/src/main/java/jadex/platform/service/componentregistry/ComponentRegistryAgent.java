@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
@@ -21,6 +20,7 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -33,7 +33,6 @@ import jadex.commons.Boolean3;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -44,7 +43,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -53,7 +51,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  The component registry is a component for creating proxy services.
  *  Real services/components are created on demand on service call.
  */
-@Agent(autostart=@Autostart(value=Boolean3.FALSE, name="serviceproxy"))
+@Agent(name="serviceproxy", autostart=Boolean3.FALSE)
 @Service
 @Imports("jadex.bridge.service.types.cms.*")
 @Arguments(
@@ -103,7 +101,8 @@ public class ComponentRegistryAgent implements IComponentRegistryService
     /**
      *  Called once after agent creation.
      */
-    @AgentCreated
+    //@AgentCreated
+    @OnInit
     public IFuture<Void> agentCreated()
     {
 //  	System.out.println(((Map)agent.getFetcher().fetchValue("$args")).size());
@@ -143,7 +142,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
     {
         final Future<Void> ret = new Future<Void>();
 
-        ILibraryService ls = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+        ILibraryService ls = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
         ls.getClassLoader(info.getResourceIdentifier()).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 		{
         	public void customResultAvailable(ClassLoader cl) throws Exception
@@ -212,7 +211,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        	                            else
 	        	                            {
 	        	                            	 IExternalAccess exta = getComponent(info).get();
-	        	                            	 IService service = (IService)agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype).setProvider(exta.getId()));
+	        	                            	 IService service = (IService)agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(servicetype).setProvider(exta.getId()));
 	        	                            	 return method.invoke(service, args);
 	        	                            }
 	        	                        }
@@ -268,31 +267,21 @@ public class ComponentRegistryAgent implements IComponentRegistryService
         else
         {
         	components.put(info.getFilename(), ret);
-//          final IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-            if(info.getParent()==null)
-            	info.setParent(agent.getId());
-            agent.createComponent(info).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
-            {
-                public void firstResultAvailable(IComponentIdentifier cid)
-                {
-                	agent.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
-                	{
-                		public void customResultAvailable(IExternalAccess exta)
-                		{
-                			components.put(info.getFilename(), exta);
-                			super.customResultAvailable(exta);
-                		}
-                	});
-                }
-
-                public void secondResultAvailable(Map<String, Object> result)
-                {
-                }
-                
-                public void exceptionOccurred(Exception exception)
-                {
-                }
-            });
+//          final IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//            if(info.getParent()==null)
+//            	info.setParent(agent.getId());
+            agent.createComponent(info).addResultListener(new IResultListener<IExternalAccess>()
+			{
+            	public void resultAvailable(IExternalAccess exta)
+            	{
+        			components.put(info.getFilename(), exta);
+        			ret.setResult(exta);
+            	}
+            	
+            	public void exceptionOccurred(Exception exception)
+            	{
+            	}
+			});
         }
 
         return ret;

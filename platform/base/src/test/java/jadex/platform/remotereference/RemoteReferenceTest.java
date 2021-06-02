@@ -7,7 +7,7 @@ import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 
 /**
@@ -18,26 +18,29 @@ import jadex.bridge.service.search.ServiceQuery;
  *  
  *  Tests if the result of the remote search yields the same local service proxy.
  */
-public class RemoteReferenceTest //extends TestCase
+public class RemoteReferenceTest
 {
 	@Test
 	public void	testRemoteReference()
 	{
-		long timeout = Starter.getDefaultTimeout(null);
+		IPlatformConfiguration	baseconf	= STest.createDefaultTestConfig(getClass());
+		// Use larger timeout so we can reduce default timeout on build slave
+		long timeout = Starter.getScaledDefaultTimeout(null, 5);
 		
 		// Start platform1 with local service.
-		IPlatformConfiguration	config1	= STest.getDefaultTestConfig();
-//		config1.setLogging(true);
-		config1.addComponent(LocalServiceProviderAgent.class);
+		IPlatformConfiguration	config1	= baseconf.clone()
+//			.setLogging(true)
+			.addComponent(LocalServiceProviderAgent.class);
 		final IExternalAccess	platform1	= Starter.createPlatform(config1).get(timeout);
 		timeout	= Starter.getDefaultTimeout(platform1.getId());
 		
 		// Find local service (as local provided service proxy).
-		ILocalService	service1	= platform1.searchService( new ServiceQuery<>(ILocalService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
+		ILocalService	service1	= platform1.searchService( new ServiceQuery<>(ILocalService.class, ServiceScope.PLATFORM)).get(timeout);
 		
 		// Start platform2 with (remote) search service.
-		IPlatformConfiguration	config2	= STest.getDefaultTestConfig();
-		config2.addComponent(SearchServiceProviderAgent.class);
+		IPlatformConfiguration	config2	= baseconf.clone()
+//			.setLogging(true)
+			.addComponent(SearchServiceProviderAgent.class);
 		IExternalAccess	platform2	= Starter.createPlatform(config2).get(timeout);
 		
 //		// Connect platforms by creating proxy agents.
@@ -45,7 +48,7 @@ public class RemoteReferenceTest //extends TestCase
 //		Starter.createProxy(platform2, platform1).get(timeout);
 		
 		// Search for remote search service from local platform
-		ISearchService	search = platform1.searchService( new ServiceQuery<>( ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get(timeout);
+		ISearchService	search = platform1.searchService( new ServiceQuery<>( ISearchService.class, ServiceScope.GLOBAL)).get(timeout);
 
 		// Invoke service to obtain reference to local service.
 		ILocalService	service2	= search.searchService("dummy").get(timeout);

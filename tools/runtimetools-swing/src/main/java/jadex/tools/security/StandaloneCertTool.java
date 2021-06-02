@@ -119,8 +119,11 @@ public class StandaloneCertTool extends JFrame
 					{
 						String catchain = "";
 						System.out.println(chain.length);
-						for (String cert : SUtil.notNull(chain))
-							catchain += cert;
+						if (chain != null)
+						{
+							for (String cert : chain)
+								catchain += cert;
+						}
 						X509PemStringsSecret secret = new X509PemStringsSecret(catchain, kp.getKey());
 						StringSelection contents = new StringSelection(secret.toString());
 						Toolkit.getDefaultToolkit().getSystemClipboard().setContents(contents, null);

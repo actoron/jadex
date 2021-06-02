@@ -7,6 +7,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.annotation.Raw;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
@@ -61,6 +62,7 @@ public interface IComponentFactory
 	/**
 	 *  Get the names of component types supported by this factory.
 	 */
+	@Raw
 	public String[] getComponentTypes();
 
 	//-------- excluded --------
@@ -73,6 +75,7 @@ public interface IComponentFactory
 	 *  @return The properties or null, if the component type is not supported by this factory.
 	 */
 	@Excluded
+	@Raw
 	public Map<String, Object>	getProperties(String type);
 	
 	/**

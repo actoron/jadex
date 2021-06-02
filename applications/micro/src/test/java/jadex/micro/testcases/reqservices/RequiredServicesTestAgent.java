@@ -5,11 +5,13 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceSearch;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -26,17 +28,20 @@ public class RequiredServicesTestAgent extends JunitAgentTest
 	@Agent
 	protected IInternalAccess agent;
 
-	@AgentServiceSearch(name="clock", lazy=false)
+	//@AgentServiceSearch(name="clock", lazy=false)
+	@OnService
 	protected IClockService clockser;
 	
 	// todo: allow for omitting name=""
-	@AgentServiceSearch(lazy=false, requiredservice=@RequiredService(name="", type=ILibraryService.class))
+	//@AgentServiceSearch(lazy=false, requiredservice=@RequiredService(name="", type=ILibraryService.class))
+	@OnService
 	protected ILibraryService ls;
 
 	/**
 	 * The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		final TestReport tr1 = new TestReport("#1", "Test if inline required service definition works");

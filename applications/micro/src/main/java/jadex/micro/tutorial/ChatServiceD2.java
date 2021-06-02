@@ -8,17 +8,13 @@ import javax.swing.SwingUtilities;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceShutdown;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.future.Future;
-import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 
@@ -52,7 +48,8 @@ public class ChatServiceD2 implements IChatService
 	/**
 	 *  Init the service.
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public IFuture<Void> startService()
 	{
 		final Future<Void> fut = new Future<Void>();
@@ -70,7 +67,7 @@ public class ChatServiceD2 implements IChatService
 			}
 		});
 		
-//		ISimulationService	simserv	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+//		ISimulationService	simserv	= agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 //		if(simserv!=null)
 //		{
 //			FutureBarrier<Void>	fubar	= new FutureBarrier<>();
@@ -85,7 +82,8 @@ public class ChatServiceD2 implements IChatService
 	/**
 	 *  Init the service.
 	 */
-	@ServiceShutdown
+	//@ServiceShutdown
+	@OnEnd
 	public void shutdownService()
 	{
 		SwingUtilities.invokeLater(new Runnable()

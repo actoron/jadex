@@ -24,18 +24,37 @@ public @interface Trigger
 	
 	/**
 	 *  The fact added belief names, i.e. the plan will be executed whenever a fact is added to the given belief set(s).
+	 *  @deprecated Use factadded (without trailing 's').
 	 */
+	@Deprecated
 	public String[] factaddeds() default {};
 	
 	/**
 	 *  The fact removed belief names, i.e. the plan will be executed whenever a fact is removed from the given belief set(s).
+	 *  @deprecated Use factremoved (without trailing 's').
 	 */
 	public String[] factremoveds() default {};
 	
 	/**
 	 *  The fact changed belief names, i.e. the plan will be executed whenever a fact of a given belief (set) changes.
+	 *  @deprecated Use factchanged (without trailing 's').
 	 */
 	public String[] factchangeds() default {};
+	
+	/**
+	 *  The fact added belief names, i.e. the plan will be executed whenever a fact is added to the given belief set(s).
+	 */
+	public String[] factadded() default {};
+	
+	/**
+	 *  The fact removed belief names, i.e. the plan will be executed whenever a fact is removed from the given belief set(s).
+	 */
+	public String[] factremoved() default {};
+	
+	/**
+	 *  The fact changed belief names, i.e. the plan will be executed whenever a fact of a given belief (set) changes.
+	 */
+	public String[] factchanged() default {};
 	
 	/**
 	 *  Activate from service invocation, i.e. choose this plan to handle service invocation requests of the given type.

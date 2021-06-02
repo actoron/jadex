@@ -1,6 +1,5 @@
 package jadex.platform;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -11,7 +10,6 @@ import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -19,12 +17,10 @@ import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -32,8 +28,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -43,7 +37,7 @@ import jadex.micro.annotation.Results;
 @RequiredServices(
 {
 //	@RequiredService(name="msgservice", type=IMessageService.class, 
-//		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+//		binding=@Binding(scope=ServiceScope.PLATFORM)),
 //	@RequiredService(name="cms", type=IComponentManagementService.class),
 	@RequiredService(name="clock", type=IClockService.class)
 })
@@ -62,7 +56,8 @@ public abstract class TestAgent
 	/**
 	 *  Cleanup created platforms.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public IFuture<Void>	cleanup()
 	{
 		final Future<Void>	ret	= new Future<Void>();
@@ -82,7 +77,8 @@ public abstract class TestAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body()
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -183,7 +179,7 @@ public abstract class TestAgent
 //			"-binarymessages", "false",
 			"-gui", "false",
 			"-cli", "false",
-			"-simulation", "false", "-printpass", "false"};
+			"-simulation", "false", "-printsecret", "false"};
 		
 		if(args!=null && args.length>0)
 		{
@@ -225,7 +221,7 @@ public abstract class TestAgent
 	 * 
 	 */
 	protected IFuture<IComponentIdentifier> createComponent(final String filename,
-		final IComponentIdentifier root, final IResultListener<Collection<Tuple2<String,Object>>> reslis)
+		final IComponentIdentifier root, final IResultListener<Map<String,Object>> reslis)
 	{
 		return createComponent(filename, null, null, root, reslis);
 	}
@@ -234,7 +230,7 @@ public abstract class TestAgent
 	 * 
 	 */
 	protected IFuture<IComponentIdentifier> createComponent(final String filename, final Map<String, Object> args, 
-		final String config, final IComponentIdentifier root, final IResultListener<Collection<Tuple2<String,Object>>> reslis)
+		final String config, final IComponentIdentifier root, final IResultListener<Map<String,Object>> reslis)
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
@@ -242,15 +238,16 @@ public abstract class TestAgent
 		new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //		boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
 //		CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
-		CreationInfo ci	= new CreationInfo(root==null? agent.getId(): root, rid);
+		CreationInfo ci	= new CreationInfo(rid);
 		ci.setArguments(args);
 		ci.setConfiguration(config);
 		ci.setFilename(filename);
-		agent.createComponent(ci, reslis)
+		agent.getExternalAccess(root==null? agent.getId(): root).createComponent(ci)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
+				result.waitForTermination().addResultListener(reslis);
 				ret.setResult(result.getId());
 			}
 			
@@ -271,7 +268,7 @@ public abstract class TestAgent
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		agent.killComponent(cid).addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
+		agent.getExternalAccess(cid).killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 		
 		return ret;
 	}
@@ -279,7 +276,7 @@ public abstract class TestAgent
 	/**
 	 *  Setup a local test.
 	 */
-	protected IFuture<IComponentIdentifier>	setupLocalTest(String filename, IResultListener<Collection<Tuple2<String,Object>>> reslis)
+	protected IFuture<IComponentIdentifier>	setupLocalTest(String filename, IResultListener<Map<String,Object>> reslis)
 	{
 		return createComponent(filename, agent.getId().getRoot(), reslis);
 	}
@@ -288,7 +285,7 @@ public abstract class TestAgent
 	 *  Setup a remote test.
 	 */
 	protected IFuture<IComponentIdentifier>	setupRemoteTest(final String filename, final String config,
-		final IResultListener<Collection<Tuple2<String,Object>>> reslis)
+		final IResultListener<Map<String,Object>> reslis)
 	{
 		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
 		
@@ -297,7 +294,7 @@ public abstract class TestAgent
 			public void customResultAvailable(final IExternalAccess exta)
 			{
 				
-//				exta.getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//				exta.getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)
@@ -426,25 +423,25 @@ public abstract class TestAgent
 		return ret;
 	}
 	
-	public <T> IFuture<T>	waitForRealtimeDelay(final long delay, final IComponentStep<T> step)
-	{
-		final Future<T>	ret	= new Future<T>();
-		IFuture<IClockService>	clockfut	= agent.getFeature(IRequiredServicesFeature.class).getService("clock");
-		clockfut.addResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
-		{
-			public void customResultAvailable(IClockService clock)
-			{
-				clock.createRealtimeTimer(delay, new ITimedObject()
-				{
-					public void timeEventOccurred(long currenttime)
-					{
-						agent.getFeature(IExecutionFeature.class).scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
-					}
-				});
-			}
-		});
-		return ret;
-	}
+//	public <T> IFuture<T>	waitForRealtimeDelay(final long delay, final IComponentStep<T> step)
+//	{
+//		final Future<T>	ret	= new Future<T>();
+//		IFuture<IClockService>	clockfut	= agent.getFeature(IRequiredServicesFeature.class).getService("clock");
+//		clockfut.addResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
+//		{
+//			public void customResultAvailable(IClockService clock)
+//			{
+//				clock.createRealtimeTimer(delay, new ITimedObject()
+//				{
+//					public void timeEventOccurred(long currenttime)
+//					{
+//						agent.getFeature(IExecutionFeature.class).scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
+//					}
+//				});
+//			}
+//		});
+//		return ret;
+//	}
 	
 	/**
 	 *  Perform  the test.

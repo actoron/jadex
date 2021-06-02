@@ -2,6 +2,7 @@ package jadex.platform.service.cron;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cron.ICronService;
@@ -40,7 +41,8 @@ public class UserAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body()
 	{
 		final Future<Void> ret = new Future<Void>();

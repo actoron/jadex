@@ -2,19 +2,17 @@ package jadex.micro.testcases.authenticate;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeSet;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -36,20 +34,20 @@ import jadex.micro.testcases.TestAgent;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="ts", type=ITestService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL)
+	@RequiredService(name="ts", type=ITestService.class, scope=ServiceScope.GLOBAL)
 })
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class AuthenticateTestAgent extends TestAgent
 {
 	//-------- test settings --------
 	
-	// Define expected test results for scenarios (un=unrestricted, cus=custom, def=default).
+	// Define expected test results for scenarios (un=unrestricted, cus=custom/role, def=default).
 	protected static boolean[][]	tests	= new boolean[][]
 	{
-		// Annot.:		un		def		cus		cus2	def		cus		un		def
-		new boolean[] {true,	false,	false,	false,	false,	false,	true,	false},
-		new boolean[] {true,	true,	false,	false,	true,	false,	true,	true},
-		new boolean[] {true,	true,	true,	true,	true,	true,	true,	true}
+		// method annos basic: un, def, cus, 	cus2 |	overriding: def, cus, un,	def
+		new boolean[] {true,	false,	false,	false,		false,	false,	true,	false},	// platform 1: shared network=false
+		new boolean[] {true,	true,	false,	false,		true,	false,	true,	true},	// platform 2: net=true, custom role=false
+		new boolean[] {true,	true,	true,	true,		true,	true,	true,	true}	// platform 3: net=true, cus=true
 	};
 
 	@Override
@@ -120,12 +118,7 @@ public class AuthenticateTestAgent extends TestAgent
 	 */
 	protected	IFuture<IExternalAccess> setupTestPlatform(boolean def, final boolean cus)
 	{
-		disableLocalSimulationMode().get();
-		
-		IPlatformConfiguration	conf	= STest.getDefaultTestConfig();
-		// use different platform name / key etc.
-		conf.setPlatformName("other_*");
-		conf.setValue("settings.readonly", Boolean.TRUE);	// Do not save settings (hack!!! security isn't read from config, when settings file exists)
+		IPlatformConfiguration	conf	= getConfig().clone();
 		
 		// Not default visibility means test unrestricted access -> don't use test network.
 		if(!def)
@@ -162,7 +155,7 @@ public class AuthenticateTestAgent extends TestAgent
 								{
 //									System.out.println("is compo:"+agent.isComponentThread());
 									
-									result.addRole(STest.testnetwork_name, "custom")
+									result.addRole(conf.getNetworkNames()[0], "custom")
 										.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 									{
 										@Override
@@ -193,7 +186,7 @@ public class AuthenticateTestAgent extends TestAgent
 		final Future<boolean[]>	ret	= new Future<boolean[]>();
 //		System.out.println("invokeServices "+IComponentIdentifier.LOCAL.get());
 		
-		agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITestService.class, RequiredService.SCOPE_GLOBAL))
+		agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL))
 			.addResultListener(new ExceptionDelegationResultListener<Collection<ITestService>, boolean[]>(ret)
 		{
 			@Override
@@ -205,19 +198,10 @@ public class AuthenticateTestAgent extends TestAgent
 				}
 				else
 				{
-					// Sort results by toString -->  Basic... goes first, then Overriding...
-					Collection<ITestService>	sorted	= new TreeSet<ITestService>(new Comparator<ITestService>()
-					{
-						@Override
-						public int compare(ITestService o1, ITestService o2)
-						{
-							return o1.toString().compareTo(o2.toString());
-						}
-					});
-					sorted.addAll(result);
-					System.out.println("Sorted services: "+sorted);
-					
-					final Iterator<ITestService>	it	= sorted.iterator();
+					// Sort results by provider.name -->  Basic... goes first, then Overriding...
+					final Iterator<ITestService>	it	= result.stream().sorted(
+							(s1, s2) -> ((IService)s1).getServiceId().getProviderId().getName()
+								.compareTo(((IService)s2).getServiceId().getProviderId().getName())).iterator();
 					invokeService(it.next())
 						.addResultListener(new DelegationResultListener<boolean[]>(ret)
 					{
@@ -337,7 +321,7 @@ public class AuthenticateTestAgent extends TestAgent
 //	{
 //		final Future<TestReport> ret = new Future<TestReport>();
 //		
-//		final ISecurityService	sec	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISecurityService.class));
+//		final ISecurityService	sec	= agent.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( ISecurityService.class));
 //		
 //		sec.addRole(agent.getComponentIdentifier().getPlatformPrefix(), "testuser")
 //			.addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
@@ -473,5 +457,5 @@ public class AuthenticateTestAgent extends TestAgent
 //			}
 //		});
 //		return ret;
-//	}
+//	}	
 }

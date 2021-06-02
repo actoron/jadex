@@ -81,6 +81,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
@@ -583,21 +584,13 @@ public class VisualProcessViewPanel extends JPanel
 			});
 			
 			cmshandler.addCMSListener(access.getId())
-				.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+				.addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 			{
 
 				@Override
 				public void exceptionOccurred(Exception exception)
 				{
-					// TODO Auto-generated method stub
-					
-				}
-
-				@Override
-				public void resultAvailable(Collection<CMSStatusEvent> result)
-				{
-					// TODO Auto-generated method stub
-					
+					System.out.println("Exception occurred: "+exception);
 				}
 
 				@Override
@@ -693,14 +686,6 @@ public class VisualProcessViewPanel extends JPanel
 						// nop, component can be terminated
 					}
 				}
-
-				@Override
-				public void finished()
-				{
-					// TODO Auto-generated method stub
-					
-				}
-				
 			});
 		}
 		catch(Exception e)
@@ -1066,7 +1051,7 @@ public class VisualProcessViewPanel extends JPanel
 	 */
 	protected void doStep()
 	{
-		IFuture<Void> ret = access.stepComponent(access.getId(), getStepInfo());
+		IFuture<Void> ret = access.stepComponent(getStepInfo());
 		ret.addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
@@ -1107,7 +1092,7 @@ public class VisualProcessViewPanel extends JPanel
 						abps.add(bp);
 					}
 					
-					access.setComponentBreakpoints(access.getId(), (String[])abps.toArray(new String[abps.size()]))
+					access.setComponentBreakpoints((String[])abps.toArray(new String[abps.size()]))
 						.addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});

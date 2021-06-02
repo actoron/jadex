@@ -8,7 +8,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -73,7 +73,7 @@ public class CreateComponentCommand extends ACliCommand
 //			{
 //				final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 //				
-//				ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//				ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 //				{
 //					public void customResultAvailable(final IComponentManagementService cms)
@@ -87,7 +87,7 @@ public class CreateComponentCommand extends ACliCommand
 //						
 //						IExternalAccess comp = (IExternalAccess)((CliContext)context).getUserContext();
 //				
-//						comp.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//						comp.searchService( new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 //							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IComponentIdentifier>(ret)
 //						{
 //							public void customResultAvailable(ILibraryService  libs)
@@ -165,8 +165,9 @@ public class CreateComponentCommand extends ACliCommand
 				final Integer count = (Integer)args.get("-cnt");
 				
 				IExternalAccess comp = (IExternalAccess)((CliContext)context).getUserContext();
+				IExternalAccess parentcomp = parent != null ? comp.getExternalAccess(parent) : comp.getExternalAccess(comp.getId().getRoot());
 		
-				comp.searchService( new ServiceQuery<>(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				comp.searchService( new ServiceQuery<>(ILibraryService.class, ServiceScope.PLATFORM))
 					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IComponentIdentifier>(ret)
 				{
 					public void customResultAvailable(ILibraryService  libs)
@@ -196,8 +197,8 @@ public class CreateComponentCommand extends ACliCommand
 								}
 								
 								CreationInfo info = new CreationInfo();
-								if(parent!=null)
-									info.setParent(parent);
+//								if(parent!=null)
+//									info.setParent(parent);
 								if(config!=null)
 									info.setConfiguration(config);
 								if(found!=null)
@@ -209,7 +210,7 @@ public class CreateComponentCommand extends ACliCommand
 								
 								for(int i=0; i<(count==null? 1: count.intValue()); i++)
 								{
-									comp.createComponent(info, null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
+									parentcomp.createComponent(info).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 									{
 										public void customResultAvailable(IExternalAccess result) throws Exception
 										{

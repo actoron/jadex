@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Web JCC</title>
+		
+		<!--  <link rel="icon" href="favicon.ico" type="image/x-icon"> -->
+		<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+		
+		<script type="text/javascript" src="libs/axios_0.19.0/axios.js"></script>
+		
+		<link rel="stylesheet" href="libs/bootstrap_4.5.0/bootstrap.min.css">
+		
+		<script src="libs/jquery_3.4.1/jquery.js"></script>
+		<script src="libs/bootstrap_4.5.0/bootstrap.bundle.min.js"></script>
+		
+		<script src="libs/constructablestylesheets/adoptedStyleSheets.js"></script>
+		
+		<script src="libs/page/page.js"></script>
+		<!-- https://github.com/krasimir/navigo -->
+		<!-- https://www.npmjs.com/package/lit-element-router -->
+		
+		<!-- Due to jstree buggy behavior of adding the context menu to the document.body instead of shadown dom -->
+		<link rel="stylesheet" href="libs/jstree_3.3.7.css">
+		
+		<link rel="stylesheet" href="css/style.css">
+		
+		<!--  <script defer src="https://unpkg.com/es-module-shims@latest/dist/es-module-shims.js"></script> -->
+		
+	    <!--  <script type="importmap-shim">
+      	{
+        	"imports": {
+        		"lit-element": "/libs/lit/lit-element.js",
+				"base-element": "/webcomponents/baseelement.js"
+      		}
+     	}
+    	</script> <script type="module" src="webcomponents/baseelement.js"></script> -->
+    	
+    	<!-- <script type="module" data-name='lit-element' src="/libs/lit/lit-element.js"></script>
+    	<script type="module" data-name='base-element' src="webcomponents/baseelement.js"></script> -->
+	    <script type="module" src="libs/moduleloader.js"></script>
+	    
+    	<script type="module" src="webcomponents/about.js"></script>
+    	<script type="module" src="webcomponents/login.js"></script>
+	    <script type="module" src="webcomponents/appelement.js"></script>
+	    <script type="module" src="webcomponents/imprint.js"></script>
+	    <script type="module" src="webcomponents/platform.js"></script>
+	    <script type="module" src="webcomponents/platforms.js"></script>
+		<script type="module" src="webcomponents/privacy.js"></script>
+		<!--  <script type="module-shim" src="webcomponents/test.js"></script> -->
+		
+		<script type="module" src="webcomponents/restricted.js"></script>
+		
+		<!-- <link rel="stylesheet" href="libs/fontawesome_5.8.2.css"> -->
+		
+		<script type="text/javascript">
+			$(function(){$("#includedContent").load("index_body.html");});
+    	</script>
+    	
+    	<!-- <script src="libs/module-shims/module-shims.js"></script>  -->
+	</head>
+	
+	<body id="includedContent">
+		<!--  <script>
+		    var link = document.querySelector('link[rel="import"]');
+		    var content = link.import;
+		    var el = content.querySelector('app');
+		    document.body.appendChild(el.cloneNode(true));
+		</script>-->
+	</body>
+</html>

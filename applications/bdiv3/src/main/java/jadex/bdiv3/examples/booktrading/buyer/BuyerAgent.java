@@ -30,6 +30,8 @@ import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.Tuple2;
@@ -39,7 +41,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.RequiredService;
@@ -51,7 +52,7 @@ import jadex.micro.annotation.RequiredServices;
 @Agent(type=BDIAgentFactory.TYPE)
 @RequiredServices(
 {
-	@RequiredService(name="buyservice", type=IBuyBookService.class, multiple=true),
+	@RequiredService(name="buyservice", type=IBuyBookService.class), // multiple=true
 	@RequiredService(name="clockser", type=IClockService.class)
 })
 @Arguments(@Argument(name="initial_orders", clazz=Order[].class))
@@ -68,7 +69,8 @@ public class BuyerAgent implements INegotiationAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		Order[] ios = (Order[])agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("initial_orders");
@@ -96,16 +98,12 @@ public class BuyerAgent implements INegotiationAgent
 	/**
 	 *  Called when agent terminates.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void shutdown()
 	{
 		if(gui!=null)
-		{
-			gui.addResultListener(thegui ->
-			{
-				SwingUtilities.invokeLater(()->thegui.dispose());
-			});
-		}
+			gui.then(thegui -> SwingUtilities.invokeLater(()->thegui.dispose()));
 	}
 	
 	@Goal(recur=true, recurdelay=10000, unique=true)

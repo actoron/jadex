@@ -1,11 +1,17 @@
 package jadex.bridge.service;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,6 +19,7 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.component.impl.NFPropertyComponentFeature;
@@ -20,18 +27,19 @@ import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
-import jadex.bridge.service.annotation.Tags;
+import jadex.bridge.service.annotation.Security;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.commons.IValueFetcher;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.javaparser.SJavaParser;
 
 /**
  *  Basic service provide a simple default isValid() implementation
@@ -278,6 +286,107 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	}
 	
 	/**
+	 *  Invoke a method reflectively.
+	 *  @param methodname The method name.
+	 *  @param argtypes The argument types (can be null if method exists only once).
+	 *  @param args The arguments.
+	 *  @return The result.
+	 */
+	public IFuture<Object> invokeMethod(String methodname, ClassInfo[] argtypes, Object[] args, ClassInfo rettype)
+	{
+		Future<Object> ret = (Future<Object>)SFuture.getNoTimeoutFuture(rettype.getType(internalaccess.getClassLoader()), internalaccess);
+		
+		Method m = getInvokeMethod(this.getClass(), internalaccess.getClassLoader(), methodname, argtypes);
+		
+		if(m!=null)
+		{
+			try
+			{
+				ret = (Future)m.invoke(this, args);
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setException(new RuntimeException("Method not found: "+methodname));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get reflective info about the service methods, args, return types.
+	 *  @return The method infos.
+	 */
+	public IFuture<MethodInfo[]> getMethodInfos()
+	{
+		Class<?> iface = sid.getServiceType().getType(internalaccess.getClassLoader());
+		
+		Set<Method> ms = new HashSet<>();
+		
+		Set<Class<?>> todo = new HashSet<>();
+		todo.add(iface);
+		todo.add(IService.class);
+		while(todo.size()>0)
+		{
+			Class<?> cur = todo.iterator().next();
+			todo.remove(cur);
+			ms.addAll(SUtil.arrayToList(cur.getMethods()));
+			
+			cur = cur.getSuperclass();
+			while(cur!=null && cur.getAnnotation(Service.class)==null)
+				cur = cur.getSuperclass();
+			
+			if(cur!=null)
+				todo.add(cur);
+		}
+		
+		MethodInfo[] ret = new MethodInfo[ms.size()];
+		Iterator<Method> it = ms.iterator();
+		for(int i=0; i<ms.size(); i++)
+		{
+			MethodInfo mi = new MethodInfo(it.next());
+			ret[i] = mi;
+		}
+		
+		return new Future<MethodInfo[]>(ret);
+	}
+	
+	/**
+	 *  Get method that should be invoked on target object.
+	 */
+	public static Method getInvokeMethod(Class<?> target, ClassLoader cl, String methodname, ClassInfo[] argtypes)
+	{
+		Method m = null;
+		if(argtypes==null)
+		{
+			Method[] methods = SReflect.getMethods(target, methodname);
+			if(methods.length!=1)
+			{
+				throw new IllegalArgumentException("Multiple methods with name: "+methodname);
+			}
+			else
+			{
+				m = methods[0];
+			}
+		}
+		else
+		{
+			Class<?>[] ats = new Class[argtypes.length];
+			
+			for(int i=0; i<argtypes.length; i++)
+				ats[i] = argtypes[i].getType(cl, null);
+			
+			m = SReflect.getMethod(target, methodname, ats);
+		}
+		
+		return m;
+	}
+	
+	/**
 	 *  Get a service property.
 	 *  @return The service property (if any).
 	 * /
@@ -339,27 +448,29 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 //							System.out.println("Starting serviceINIT: "+getId()+" "+getInternalAccess().getComponentFeature(IExecutionFeature.class).isComponentThread());
 							Collection<String> coll = result == null ? new ArrayList<String>() : new LinkedHashSet<String>((Collection<String>)result);
 							
-							IValueFetcher vf = (IValueFetcher) internalaccess.getFetcher();
-							Class<?>[] sertypes = new Class<?>[] { type, BasicService.this.impltype };
-							for (int si = 0; si < sertypes.length; ++si)
-							{
-								if(sertypes[si] != null && sertypes[si].isAnnotationPresent(Tags.class))
-								{
-									Tags anntags = (Tags)sertypes[si].getAnnotation(Tags.class);
-									String[] tags = anntags != null ? anntags.value() : null;
-									if (tags != null && tags.length > 0)
-									{
-										for (int i = 0; i < tags.length; ++i)
-										{
-											Object tagval = SJavaParser.evaluateExpression(tags[i], null, vf, internalaccess.getClassLoader());
-											if (tagval instanceof String)
-												coll.add((String) tagval);
-											else
-												internalaccess.getLogger().warning("Invalid tag value, ignored: " + tagval + " " + tags[i]);
-										}
-									}
-								}
-							}
+							// Is now done using addTagsProerties()
+							
+//							IValueFetcher vf = (IValueFetcher) internalaccess.getFetcher();
+//							Class<?>[] sertypes = new Class<?>[] { type, BasicService.this.impltype };
+//							for(int si = 0; si < sertypes.length; ++si)
+//							{
+//								if(sertypes[si] != null && sertypes[si].isAnnotationPresent(Tags.class))
+//								{
+//									Tags anntags = (Tags)sertypes[si].getAnnotation(Tags.class);
+//									String[] tags = anntags != null ? anntags.value() : null;
+//									if(tags != null && tags.length > 0)
+//									{
+//										for(int i = 0; i < tags.length; ++i)
+//										{
+//											Object tagval = SJavaParser.evaluateExpression(tags[i], null, vf, internalaccess.getClassLoader());
+//											if(tagval instanceof String)
+//												coll.add((String) tagval);
+//											else
+//												internalaccess.getLogger().warning("Invalid tag value, ignored: " + tagval + " " + tags[i]);
+//										}
+//									}
+//								}
+//							}
 							
 							if(coll!=null && coll.size()>0)
 							{
@@ -474,7 +585,8 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 //			System.out.println("shutdown service: "+getServiceId());
 
 		// Deregister pojo->sid mapping in shutdown.
-		BasicServiceInvocationHandler.removePojoServiceProxy(sid);
+		if(sid!=null)	// sid is null for shared/wrapped service impls.
+			BasicServiceInvocationHandler.removePojoServiceProxy(sid);
 		
 		final Future<Void> ret = new Future<Void>();
 		isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
@@ -515,15 +627,21 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 *  Create a new service identifier for the own component.
 	 */
 	public static IServiceIdentifier createServiceIdentifier(IInternalAccess provider, String servicename, 
-		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, String scope)
+		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, ProvidedServiceInfo info)
 	{
-		return new ServiceIdentifier(provider, servicetype, servicename!=null? servicename: generateServiceName(servicetype), rid, scope);
+//		if(servicetype.getName().indexOf("IServicePool")!=-1)
+//			System.out.println("sdjhvkl");
+		Security	security	= getSecurityLevel(provider, info, serviceimpl, servicetype, null, null);
+		Set<String>	roles	= ServiceIdentifier.getRoles(security, provider);
+		ServiceScope	scope	= info!=null ? info.getScope() : null;
+		return new ServiceIdentifier(provider, servicetype, servicename!=null? servicename: generateServiceName(servicetype), rid, scope,
+			roles!=null && roles.contains(Security.UNRESTRICTED));
 	}
 	
 	/**
 	 *  Create a new service identifier for a potentially remote component.
 	 */
-	public static ServiceIdentifier	createServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, ClassInfo[] supertypes, String servicename, IResourceIdentifier rid, String scope, Set<String> networknames, boolean unrestricted)
+	public static ServiceIdentifier	createServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, ClassInfo[] supertypes, String servicename, IResourceIdentifier rid, ServiceScope scope, Set<String> networknames, boolean unrestricted)
 	{
 		return new ServiceIdentifier(providerid, type, supertypes, servicename, rid, scope, networknames, unrestricted);
 	}
@@ -637,7 +755,195 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	{
 		return type;
 	}
+
+	/**
+	 *  todo: move to some security class
+	 *  Check if a service method is unrestricted.
+	 *  Schedules on component to check this.
+	 * @param sid The service id.
+	 * @param component The internal access.
+	 * @param mi The method info.
+	 * @return True, if is unrestricted.
+	 */
+	public static IFuture<Boolean> isUnrestricted(IServiceIdentifier sid, IInternalAccess component, Method method)
+	{
+		IComponentIdentifier cid = sid.getProviderId();
+		return component.getExternalAccess(cid).scheduleStep((IInternalAccess access) -> 
+		{
+			Security sec = getSecurityLevel(access, null, null, null, method, sid);
+			Set<String>	roles	= ServiceIdentifier.getRoles(sec, access);
+			return new Future<Boolean>(roles!=null && roles.contains(Security.UNRESTRICTED));
+		});
+	}
+
+	/**
+	 *  Find the most specific security setting.
+	 */
+	public static Security getSecurityLevel(IInternalAccess access, ProvidedServiceInfo info, Class<?> implclass, Class<?> type, Method method, IServiceIdentifier sid)
+	{
+		Security level = null;
+		
+		// at runtime: have to refetch info from model
+		if(info==null && sid!=null)
+		{
+			ProvidedServiceInfo	found	= null;
+			for(ProvidedServiceInfo psi: access.getModel().getProvidedServices())
+			{
+				if(psi.getType().equals(sid.getServiceType()))
+				{
+					// Match when type and name are equal
+					if(sid.getServiceName().equals(psi.getName()))
+					{
+						found	= psi;
+						break;
+					}
+					
+					// Potential match when type is equal and no other service with same type
+					else if(found==null)
+					{
+						found	= psi;
+					}
+					
+					// Two services with same type -> fail if settings differ because we don't know which to use
+					else if(Arrays.equals(psi.getSecurity().roles(), found.getSecurity().roles()))
+					{
+						throw new RuntimeException("Use specific names for security settings on provided services with same type: "+psi.getType());
+					}
+				}
+			}
+			info	= found;
+		}
+		
+		// Instance level -> check for instance settings in provided service description			
+		if(info!=null && info.getSecurity()!=null && info.getSecurity().roles().length>0)
+		{
+			level	= info.getSecurity();
+		}
+		
+		// at runtime: fetch implclass from service
+		if(level==null && implclass==null && sid!=null)
+		{
+			Object impl = access.getFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(sid);
+			implclass = impl!=null ? impl.getClass() : null;
+		}
+		
+		// For service call -> look for annotation in impl class hierarchy
+		// Precedence: hierarchy before specificity (e.g. class annotation in subclass wins over method annotation in superclass)
+		while(level==null && implclass!=null)
+		{
+			// Specificity: method before class
+			if(method!=null)
+			{
+				Method declmeth = SReflect.getDeclaredMethod0(implclass, method.getName(), method.getParameterTypes());
+				if(declmeth != null)
+				{
+					level = declmeth.getAnnotation(Security.class);
+				}
+			}
+			
+			if(level==null)
+			{
+				level	= implclass.getAnnotation(Security.class);
+			}
+			
+			implclass	= implclass.getSuperclass();
+		}
+			
+		// at runtime: fetch interface from sid
+		if(level==null && type==null && sid!=null)
+		{
+			type = sid.getServiceType().getType(access.getClassLoader());
+		}
+		
+		// For service call -> look for annotation in interface hierarchy
+		// Precedence: hierarchy before specificity (e.g. class annotation in subclass wins over method annotation in superclass)
+		if(level==null && type!=null)
+		{
+			List<Class<?>>	types = new LinkedList<Class<?>>();
+			types.add(type);
+			while(level==null && !types.isEmpty())
+			{
+				type	= types.remove(0);
+				
+				// Only consider interfaces that contain or inherit the method (if any)
+				if(method==null || SReflect.getMethod(type, method.getName(), method.getParameterTypes())!=null)
+				{
+					// Specificity: method before class
+					if(method!=null)
+					{
+						Method declmeth = SReflect.getDeclaredMethod0(type, method.getName(), method.getParameterTypes());
+						if(declmeth != null)
+						{
+							level = declmeth.getAnnotation(Security.class);
+						}
+					}
+					
+					if(level==null)
+					{
+						level	= type.getAnnotation(Security.class);
+					}
+					
+					// prepend -> depth first search
+					types.addAll(0, Arrays.asList(type.getInterfaces()));
+				}
+			}
+		}
+
+		// Default: e.g. remote invocation on non-service methods?
+		if(level==null && method!=null)
+		{
+			level = method.getAnnotation(Security.class);
+		}
+		
+//			// Default to interface if not specified in impl.
+//			if(level==null)
+//			{
+//				level = method.getAnnotation(Security.class);
+//				Class<?> type = sid.getServiceType().getType(access.getClassLoader());
+//				
+//				if(level==null && type != null)
+//				{
+//					type = SReflect.getDeclaringInterface(type, method.getName(), method.getParameterTypes());
+//					
+//					if(type != null)
+//					{
+//						Method declmeth = null;
+//						try
+//						{
+//							declmeth = type.getDeclaredMethod(method.getName(), method.getParameterTypes());
+//						}
+//						catch (Exception e)
+//						{
+//							// Should not happen, we know the method is there...
+//						}
+//						level = declmeth.getAnnotation(Security.class);
+//						if (level == null)
+//							level = type.getAnnotation(Security.class);
+//					}
+//				}
+				
+		if(level==null && access.getDescription().isSystemComponent())
+		{
+			level = DEFAULT_SYSTEM_SECURITY;
+		}
+		
+		// level==null -> disallow direct access to components (overridden by TRUSTED platform)
+		
+		return level;
+	}
 	
+	public static final Security DEFAULT_SYSTEM_SECURITY = new Security()
+	{
+		public Class<? extends Annotation> annotationType()
+		{
+			return Security.class;
+		}
+		
+		public String[] roles()
+		{
+			return new String[] { Security.ADMIN };
+		}
+	};
 //	/**
 //	 * 
 //	 */

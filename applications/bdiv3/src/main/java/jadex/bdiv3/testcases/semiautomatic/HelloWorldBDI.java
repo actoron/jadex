@@ -9,6 +9,7 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -76,7 +77,8 @@ public class HelloWorldBDI
 	 *  right hand side creates goal and executes it
 	 *  Plan is selected and executed (hello is printed out)
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		sayhello = "Hello BDI agent V3.";

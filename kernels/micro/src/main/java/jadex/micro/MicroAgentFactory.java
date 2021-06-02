@@ -3,21 +3,30 @@ package jadex.micro;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.base.Starter;
+import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.ArgumentsResultsComponentFeature;
+import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IBootstrapFactory;
+import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -40,6 +49,7 @@ import jadex.micro.features.impl.MicroInjectionComponentFeature;
 import jadex.micro.features.impl.MicroLifecycleComponentFeature;
 import jadex.micro.features.impl.MicroMessageComponentFeature;
 import jadex.micro.features.impl.MicroPojoComponentFeature;
+import jadex.micro.features.impl.MicroProvidedServicesComponentFeature;
 import jadex.micro.features.impl.MicroServiceInjectionComponentFeature;
 
 
@@ -48,6 +58,70 @@ import jadex.micro.features.impl.MicroServiceInjectionComponentFeature;
  */
 public class MicroAgentFactory extends BasicService implements IComponentFactory, IBootstrapFactory
 {
+	//-------- constants for noplatform variant --------
+	
+	/** The default component features. */
+	public static final Collection<IComponentFeatureFactory> NOPLATFORM_DEFAULT_FEATURES;
+	
+	static
+	{
+		Collection<IComponentFeatureFactory> def_features = new ArrayList<IComponentFeatureFactory>();
+		
+		// exchanged
+		def_features.add(new ComponentFeatureFactory(IExecutionFeature.class, MicroExecutionComponentFeature.class));
+		
+		//def_features.add(new ComponentFeatureFactory(IMonitoringComponentFeature.class, MonitoringComponentFeature.class));
+		def_features.add(new ComponentFeatureFactory(IArgumentsResultsFeature.class, ArgumentsResultsComponentFeature.class));
+		//def_features.add(PropertiesComponentFeature.FACTORY);	// After args for logging
+		//def_features.add(new ComponentFeatureFactory(IRequiredServicesFeature.class, RequiredServicesComponentFeature.class));
+		//def_features.add(new ComponentFeatureFactory(IProvidedServicesFeature.class, ProvidedServicesComponentFeature.class));
+		//def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class, SubcomponentsComponentFeature.class, new Class[]{IProvidedServicesFeature.class}, null));
+		//def_features.add(new ComponentFeatureFactory(IMessageFeature.class, MessageComponentFeature.class));
+		//def_features.add(RemoteExecutionComponentFeature.FACTORY);	// After message for adding handler
+		//def_features.add(NFPropertyComponentFeature.FACTORY);
+		
+		// exchanged
+		def_features.add(MicroLifecycleComponentFeature.FACTORY);
+		
+		// added
+		def_features.add(MicroPojoComponentFeature.FACTORY);
+		def_features.add(MicroInjectionComponentFeature.FACTORY);
+		def_features.add(MicroServiceInjectionComponentFeature.FACTORY);
+		
+		NOPLATFORM_DEFAULT_FEATURES = Collections.unmodifiableCollection(def_features);
+	}
+	
+	/**
+	 *  Create a micro agent using services.
+	 *  
+	 *  Note: this method automatically creates needed platform services.
+	 *  Using this method frequently is inefficient as they are recreated on each call.
+	 *  
+	 *  @param filename The agent filename.
+	 *  @return The external access of the agent.
+	 * /
+	public static IFuture<IExternalAccess> createAgent(String filename)
+	{
+		Tuple2<IExecutionService, IClockService> tup = BaseService.createServices();
+		MicroAgentFactory cfac = new MicroAgentFactory("rootid");
+		cfac.setFeatures(MicroAgentFactory.NOPLATFORM_DEFAULT_FEATURES);
+		return Starter.createAgent(filename, cfac, tup.getFirstEntity(), tup.getSecondEntity());
+	}*/
+	
+	/**
+	 *  Create a micro agent using services.
+	 *  @param filename The agent filename.
+	 *  @param es The execution service.
+	 *  @param cs The clock service.
+	 *  @return The external access of the agent.
+	 */
+	public static IFuture<IExternalAccess> createAgent(String filename, IExecutionService es, IClockService cs)
+	{
+		MicroAgentFactory cfac = new MicroAgentFactory("rootid");
+		cfac.setFeatures(MicroAgentFactory.NOPLATFORM_DEFAULT_FEATURES);
+		return Starter.createAgent(filename, cfac, es, cs);
+	}
+	
 	//-------- constants --------
 	
 	/** The supported component types (file extensions).
@@ -69,7 +143,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			MicroInjectionComponentFeature.FACTORY,
 			MicroServiceInjectionComponentFeature.FACTORY,
 			MicroLifecycleComponentFeature.FACTORY,
-			MicroMessageComponentFeature.FACTORY
+			MicroMessageComponentFeature.FACTORY,
+			MicroProvidedServicesComponentFeature.FACTORY
 		));
 
 	//-------- attributes --------
@@ -130,7 +205,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 //			System.out.println("no library listener on: "+this);
 //		}
 		
-		features	= SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
+		//features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
 	}
 	
 	/**
@@ -140,11 +215,35 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	// This constructor is used by the Starter class and the ADFChecker plugin. 
 	public MicroAgentFactory(String providerid)
 	{
-		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
+		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new MicroModelLoader();
-		features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
+		//features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
 	}
 	
+	/**
+	 *  Get the standard micro features.
+	 *  
+	 *  NOTE: This is used to give the reader the standard features. It needs them when 
+	 *  a user defines @Features and only wants to add some new.
+	 *  
+	 *  @return The standard features for a micro component.
+	 */
+	protected Collection<IComponentFeatureFactory> getStandardFeatures()
+	{
+		if(features==null)
+			features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
+		return features;
+	}
+	
+	/**
+	 *  Set the features.
+	 *  @param features The features to set.
+	 */
+	public void setFeatures(Collection<IComponentFeatureFactory> features)
+	{
+		this.features = new ArrayList<IComponentFeatureFactory>(features);
+	}
+
 	/**
 	 *  Start the service.
 	 */
@@ -162,7 +261,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 //	public IFuture<Void> startService()
 //	{
 //		final Future<Void> ret = new Future<Void>();
-//		provider.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//		provider.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 //			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 //		{
 //			public void customResultAvailable(ILibraryService result)
@@ -234,7 +333,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 						{
 							try
 							{
-								IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
+								IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), getStandardFeatures()}).getModelInfo();
 								ret.setResult(mi);
 							}
 							catch(Exception e)
@@ -249,7 +348,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 					try
 					{
 						ClassLoader cl = getClass().getClassLoader();
-						IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
+						IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), getStandardFeatures()}).getModelInfo();
 						ret.setResult(mi);
 					}
 					catch(Exception e)
@@ -301,9 +400,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 				{
 					public void customResultAvailable(ClassLoader cl)
 					{
-						try
+						try(ResourceInfo ri = loader.getResourceInfo0(model, imports, cl))
 						{
-							ResourceInfo ri = loader.getResourceInfo0(model, imports, cl);
 							if(ri==null)
 							{
 								ret.setResult(Boolean.FALSE);
@@ -503,6 +601,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 //		Collection<IComponentFeatureFactory> ret = features;
 //		if(model.getFeatures().length>0)
 //			ret = SUtil.arrayToSet(model.getFeatures());
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Collection<IComponentFeatureFactory> ret = model.getFeatures().length==0? features: (Collection)SUtil.arrayToList(model.getFeatures());
 //		System.out.println("getCompFeat: "+ret);
 		return new Future<Collection<IComponentFeatureFactory>>(ret);
@@ -624,7 +723,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 */
 	protected ILibraryService getLibraryService()
 	{
-		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class).setMultiplicity(0));
 	}
 	
 	/**

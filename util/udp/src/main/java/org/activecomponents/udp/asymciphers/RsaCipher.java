@@ -10,21 +10,21 @@ import java.util.Arrays;
 import org.activecomponents.udp.DaemonThreadExecutor;
 import org.activecomponents.udp.IThreadExecutor;
 import org.activecomponents.udp.SUdpUtil;
-import org.spongycastle.crypto.AsymmetricBlockCipher;
-import org.spongycastle.crypto.AsymmetricCipherKeyPair;
-import org.spongycastle.crypto.InvalidCipherTextException;
-import org.spongycastle.crypto.Signer;
-import org.spongycastle.crypto.digests.SHA512Digest;
-import org.spongycastle.crypto.encodings.OAEPEncoding;
-import org.spongycastle.crypto.engines.AESLightEngine;
-import org.spongycastle.crypto.engines.RSAEngine;
-import org.spongycastle.crypto.modes.CBCBlockCipher;
-import org.spongycastle.crypto.paddings.PaddedBufferedBlockCipher;
-import org.spongycastle.crypto.params.AsymmetricKeyParameter;
-import org.spongycastle.crypto.params.KeyParameter;
-import org.spongycastle.crypto.params.ParametersWithIV;
-import org.spongycastle.crypto.params.RSAKeyParameters;
-import org.spongycastle.crypto.signers.PSSSigner;
+import org.bouncycastle.crypto.AsymmetricBlockCipher;
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.bouncycastle.crypto.Signer;
+import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.bouncycastle.crypto.encodings.OAEPEncoding;
+import org.bouncycastle.crypto.engines.AESLightEngine;
+import org.bouncycastle.crypto.engines.RSAEngine;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bouncycastle.crypto.params.RSAKeyParameters;
+import org.bouncycastle.crypto.signers.PSSSigner;
 
 /**
  * @author jander

@@ -14,8 +14,6 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
-import jadex.commons.future.IFunctionalExceptionListener;
-import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
@@ -27,7 +25,7 @@ public class SWebSocket
 	//-------- constants --------
 	
 	/** Attribute name for platform in context. */
-	public static final String	ATTR_PLATFORM	= "com.actoron.webservice.platform";
+	public static final String	ATTR_PLATFORM	= "org.activecomponents.webservice.platform";
 	
 	//-------- methods --------
 	
@@ -38,6 +36,8 @@ public class SWebSocket
 	 */
 	public static IFuture<Void>	initContext(ServletContext context)
 	{
+		System.out.println("Init context for: "+context.getContextPath());
+		
 		FutureBarrier<IComponentIdentifier>	agents	= new FutureBarrier<IComponentIdentifier>();
 
 		// Create components specified in web.xml
@@ -154,18 +154,14 @@ public class SWebSocket
 		{
 			@Override
 			public void customResultAvailable(IExternalAccess platform) throws Exception
-			{				
-				platform.createComponent(new CreationInfo().setFilename(model)).addTuple2ResultListener(new IFunctionalResultListener<IComponentIdentifier>()
+			{
+				platform.createComponent(new CreationInfo().setFilename(model)).addResultListener(new IResultListener<IExternalAccess>()
 				{
-					@Override
-					public void resultAvailable(IComponentIdentifier cid)
+					public void resultAvailable(IExternalAccess result)
 					{
-						ret.setResult(cid);
-						System.out.println("Created component: "+cid);
+						ret.setResult(result.getId());
+						System.out.println("Created component: "+result.getId());
 					}
-				}, null, new IFunctionalExceptionListener()
-				{
-					@Override
 					public void exceptionOccurred(Exception exception)
 					{
 						ret.setExceptionIfUndone(exception);

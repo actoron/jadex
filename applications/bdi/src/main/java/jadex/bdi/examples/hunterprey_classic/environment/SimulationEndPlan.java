@@ -26,10 +26,10 @@ public class SimulationEndPlan extends Plan
 		{
 			// System.out.println(creatures[i].getAID());
 			en.removeCreature(creatures[i]);
-			getAgent().killComponent(creatures[i].getAID()).addResultListener(lis);
+			getAgent().getExternalAccess(creatures[i].getAID()).killComponent().addResultListener(lis);
 		}
 		
 		destroyed.get();
-		getAgent().killComponent(getScope().getComponentIdentifier().getParent());
+		getAgent().getExternalAccess(getScope().getComponentIdentifier().getParent()).killComponent();
 	}
 }

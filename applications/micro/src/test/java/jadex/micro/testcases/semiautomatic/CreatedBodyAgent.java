@@ -1,6 +1,8 @@
 package jadex.micro.testcases.semiautomatic;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
@@ -18,7 +20,8 @@ public class CreatedBodyAgent
 	/**
 	 *  Init the service.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void agentCreated()
 	{
 		System.out.println("created");
@@ -28,7 +31,8 @@ public class CreatedBodyAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 		System.out.println("body");

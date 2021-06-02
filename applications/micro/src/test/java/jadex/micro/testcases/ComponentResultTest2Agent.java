@@ -9,6 +9,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -36,7 +37,8 @@ public class ComponentResultTest2Agent extends JunitAgentTest
 	/**
 	 *  Perform the tests
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -93,12 +95,12 @@ public class ComponentResultTest2Agent extends JunitAgentTest
 	protected IFuture<Void> testComponentResult(final String config, final String expected)
 	{
 		final Future<Void>	fut	= new Future<Void>();
-		agent.createComponent(new CreationInfo(config, null, agent.getId()).setFilename("jadex/micro/testcases/Result.component.xml"), null)
+		agent.createComponent(new CreationInfo(config, null).setFilename("jadex/micro/testcases/Result.component.xml"))
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(fut)
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				agent.killComponent(result.getId())
+				agent.getExternalAccess(result.getId()).killComponent()
 					.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(fut)
 				{
 					public void customResultAvailable(Map<String, Object> results)

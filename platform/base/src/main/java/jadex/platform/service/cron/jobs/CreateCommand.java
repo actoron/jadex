@@ -51,7 +51,7 @@ public class CreateCommand implements IResultCommand<IIntermediateFuture<CMSStat
 		
 		info.setName(name);
 		info.setFilename(model);
-		ISubscriptionIntermediateFuture<CMSStatusEvent> fut = ia.createComponentWithResults(info);
+		ISubscriptionIntermediateFuture<CMSStatusEvent> fut = ia.createComponentWithEvents(info);
 		TerminableIntermediateDelegationResultListener<CMSStatusEvent> lis = new TerminableIntermediateDelegationResultListener<CMSStatusEvent>(ret, fut);
 		fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(lis));
 				

@@ -61,6 +61,14 @@ public interface INFPropertyProvider
 	public <T, U> IFuture<T> getNFPropertyValue(String name, U unit);
 	
 	/**
+	 *  Returns the current value of a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public IFuture<String> getNFPropertyPrettyPrintValue(String name);
+	
+	/**
 	 *  Add a non-functional property.
 	 *  @param nfprop The property.
 	 */

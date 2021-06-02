@@ -27,9 +27,7 @@ public class FakeFreeMemoryProperty extends AbstractNFProperty<Long, MemoryUnit>
 	{
 		long ret = (long) Math.round(Math.random() * 17179869184.0);
 		if(unit!=null)
-		{
 			ret = unit.convert(ret);
-		}
 		
 		return new Future<Long>(ret);
 	}

@@ -6,7 +6,6 @@ import java.util.List;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.FutureBarrier;
@@ -200,8 +199,8 @@ public class SecurityEvaluation
 		{
 			for(int j=0; j<cnt; j++)
 			{
-				fubar.addFuture(platforms[i].createComponent(new CreationInfo().setFilename(ServiceProviderAgent.class.getName()+".class"), null));
-				fubar.addFuture(platforms[i].createComponent(new CreationInfo().setFilename(ServiceQueryAgent.class.getName()+".class"), null));
+				fubar.addFuture(platforms[i].createComponent(new CreationInfo().setFilename(ServiceProviderAgent.class.getName()+".class")));
+				fubar.addFuture(platforms[i].createComponent(new CreationInfo().setFilename(ServiceQueryAgent.class.getName()+".class")));
 			}
 		}
 		fubar.waitFor().get();

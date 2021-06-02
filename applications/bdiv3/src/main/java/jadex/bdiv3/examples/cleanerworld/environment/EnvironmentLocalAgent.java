@@ -5,6 +5,8 @@ import javax.swing.SwingUtilities;
 import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.examples.cleanerworld.world.Environment;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
@@ -28,7 +30,8 @@ public class EnvironmentLocalAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	@OnStart
+	//@AgentBody
 	public void body()
 	{
 //		System.out.println(EnvironmentLocalBDI.class.getClassLoader());
@@ -42,7 +45,8 @@ public class EnvironmentLocalAgent
 		});
 	}
 	
-	@AgentKilled
+	@OnEnd
+	//@AgentKilled
 	public void	killed()
 	{
 		Environment.clearInstance();

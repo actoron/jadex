@@ -25,10 +25,11 @@ import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.IChangeListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -138,7 +139,7 @@ public class ObserverCenter implements IObserverCenter
 			selecteddataviewname = (String)spaceviews.keySet().iterator().next();
 		activeplugin = null;
 		
-		space.getExternalAccess().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		space.getExternalAccess().searchService( new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM))
 			.addResultListener(new DefaultResultListener<IClockService>()
 		{
 			public void resultAvailable(IClockService result)
@@ -380,73 +381,56 @@ public class ObserverCenter implements IObserverCenter
 	public IFuture<Void>	addPerspective(final String name, final IPerspective perspective)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		
 		if(SwingUtilities.isEventDispatchThread())
 		{
-			Exception e	= null;
-			synchronized(perspectives)
-			{
-				try
-				{
-					perspective.setObserverCenter(this);
-					perspective.setName(name);
-					perspectives.put(name, perspective);
-					if(perspectives.size() == 1)
-					{
-						setSelectedPerspective(name);
-					}
-				}
-				catch(Exception ex)
-				{
-					e	= ex;
-				}
-			}
-			if(e!=null)
-			{
-				ret.setException(e);
-			}
-			else
-			{
-				ret.setResult(null);
-			}
+			addPerspective(name, perspective, ret);
 		}
 		else
-		{
-			SwingUtilities.invokeLater(new Runnable()
+		{			
+			SSimulation.addBlocker(ret);
+			SwingUtilities.invokeLater(() ->
 			{
-				public void run() 
-				{
-					Exception e	= null;
-					synchronized(perspectives)
-					{
-						try
-						{
-							perspective.setObserverCenter(ObserverCenter.this);
-							perspective.setName(name);
-							perspectives.put(name, perspective);
-							if(perspectives.size() == 1)
-							{
-								setSelectedPerspective(name);
-							}
-						}
-						catch(Exception ex)
-						{
-							e	= ex;
-						}
-					}
-					if(e!=null)
-					{
-						ret.setException(e);
-					}
-					else
-					{
-						ret.setResult(null);
-					}
-				}
+				addPerspective(name, perspective, ret);
 			});
 		}
-		
 		return ret;
+	}
+	
+	/**
+	 * Adds a perspective.
+	 * Internal method only to be called on swing thread.
+	 * @param name name of the perspective
+	 * @param perspective the perspective
+	 */
+	protected void	addPerspective(final String name, final IPerspective perspective, final Future<Void> ret)
+	{
+		assert SwingUtilities.isEventDispatchThread();
+		synchronized(perspectives)
+		{
+			try
+			{
+				perspective.setObserverCenter(this);
+				perspective.setName(name);
+				perspectives.put(name, perspective);
+				if(perspectives.size() == 1)
+				{
+					setSelectedPerspective(name);
+				}
+				space.getExternalAccess().scheduleStep(ia ->
+				{
+					ret.setResult(null);
+					return IFuture.DONE;
+				});
+			}
+			catch(Exception ex)
+			{
+				space.getExternalAccess().scheduleStep(ia ->
+				{
+					ret.setException(ex);
+					return IFuture.DONE;
+				});
+			}
+		}
 	}
 	
 	/**
@@ -834,7 +818,7 @@ public class ObserverCenter implements IObserverCenter
 		{
 			if(delay==-1)
 			{
-				space.getExternalAccess().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				space.getExternalAccess().searchService( new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM))
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)
@@ -854,7 +838,7 @@ public class ObserverCenter implements IObserverCenter
 			}
 			else if(delay==0)
 			{
-				space.getExternalAccess().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				space.getExternalAccess().searchService( new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM))
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)
@@ -874,7 +858,7 @@ public class ObserverCenter implements IObserverCenter
 			}
 			else
 			{
-				space.getExternalAccess().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				space.getExternalAccess().searchService( new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM))
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)
@@ -912,7 +896,7 @@ public class ObserverCenter implements IObserverCenter
 			dispose();
 			if(killonexit)
 			{
-				space.getExternalAccess().killComponent(space.getExternalAccess().getId());
+				space.getExternalAccess().getExternalAccess(space.getExternalAccess().getId()).killComponent();
 			}
 		}
 		
@@ -961,7 +945,7 @@ public class ObserverCenter implements IObserverCenter
 		if(clocklistener!=null)
 		{
 			clock.removeChangeListener(clocklistener);
-//			space.getExternalAccess().getServiceProvider().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//			space.getExternalAccess().getServiceProvider().searchService( new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM))
 //				.addResultListener(new SwingDefaultResultListener(mainwindow)
 //			{
 //				public void customResultAvailable(Object result)

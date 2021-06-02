@@ -5,6 +5,7 @@ import java.util.List;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceValue;
@@ -46,7 +47,8 @@ public class NewsConsumerAgent
 //		System.out.println("received: "+news);
 //	}
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		while(true)

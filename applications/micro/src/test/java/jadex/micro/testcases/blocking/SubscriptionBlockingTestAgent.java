@@ -9,6 +9,7 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.Boolean3;
@@ -42,7 +43,8 @@ public class SubscriptionBlockingTestAgent  extends JunitAgentTest
 	/**
 	 *  Execute the agent
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void	execute(final IInternalAccess agent)
 	{
 		IStepService	step	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IStepService.class)).get();

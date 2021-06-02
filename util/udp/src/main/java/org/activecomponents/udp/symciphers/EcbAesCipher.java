@@ -1,9 +1,9 @@
 package org.activecomponents.udp.symciphers;
 
-import org.spongycastle.crypto.BlockCipher;
-import org.spongycastle.crypto.engines.AESFastEngine;
-import org.spongycastle.crypto.paddings.PaddedBufferedBlockCipher;
-import org.spongycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.BlockCipher;
+import org.bouncycastle.crypto.engines.AESFastEngine;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
 
 /**
  *  Implementation of AES in ECB mode. Insecure in most cases, for testing purposes only.

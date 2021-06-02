@@ -10,7 +10,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
@@ -22,20 +23,18 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -69,8 +68,8 @@ import jadex.micro.annotation.RequiredServices;
 	@Argument(name="useworkeragent", clazz=boolean.class, defaultvalue="true", description="Flag if a worker agent should be used to execute a cron job.")
 })
 @Service
-@ProvidedServices(@ProvidedService(type=ICronService.class, implementation=@Implementation(expression="$pojoagent")))
-@RequiredServices(@RequiredService(name="clockser", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
+@ProvidedServices(@ProvidedService(type=ICronService.class))
+@RequiredServices(@RequiredService(name="clockser", type=IClockService.class, scope=ServiceScope.PLATFORM))
 @Configurations(
 {
 	@Configuration(name="realtime clock"),
@@ -104,7 +103,8 @@ public class CronAgent implements ICronService
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		if(realtime)
@@ -309,9 +309,9 @@ public class CronAgent implements ICronService
 		
 		if(useworkeragent)
 		{
-			CreationInfo ci = new CreationInfo(agent.getId());
+			CreationInfo ci = new CreationInfo();
 			ci.setFilename("jadex/platform/service/cron/WorkerAgent.class");
-			agent.createComponent(ci, null)
+			agent.createComponent(ci)
 //					cms.createComponent(null, "jadex/platform/service/cron/WorkerAgent.class", ci, null)
 				.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
@@ -359,7 +359,7 @@ public class CronAgent implements ICronService
 		final Future<Void> ret = new Future<Void>();
 		
 		ISubscriptionIntermediateFuture<Object> res = (ISubscriptionIntermediateFuture<Object>)jobtup.getFirstEntity().getCommand().execute(new Tuple2<IInternalAccess, Long>(agent, Long.valueOf(time)));
-		res.addResultListener(new IIntermediateResultListener<Object>()
+		res.addResultListener(new IntermediateEmptyResultListener<Object>()
 		{
 			public void intermediateResultAvailable(Object result)
 			{

@@ -24,6 +24,12 @@ public interface IExternalArgumentsResultsFeature extends IExternalComponentFeat
 	public IFuture<Map<String, Object>> getArgumentsAsync();
 	
 	/**
+	 *  Get the exception, if any.
+	 *  @return The failure reason for use during cleanup, if any.
+	 */
+	public IFuture<Exception> getExceptionAsync();
+	
+	/**
 	 * Subscribe to receive results.
 	 */
 	public ISubscriptionIntermediateFuture<Tuple2<String, Object>> subscribeToResults();

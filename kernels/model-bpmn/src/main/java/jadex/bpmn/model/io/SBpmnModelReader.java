@@ -39,6 +39,7 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -124,18 +125,18 @@ public class SBpmnModelReader
 //		XMLInputFactory fac = XMLInputFactory.newInstance(); 
 //		XMLStreamReader reader = fac.createXMLStreamReader(fis);
 		IXMLReader reader = null;
-		if (!SReflect.isAndroid())
-		{
+		//if (!SReflect.isAndroid())
+		//{
 			Class<?> clazz = SReflect.classForName("jadex.xml.stax.StaxReaderWrapper", SBpmnModelReader.class.getClassLoader());
 			Constructor<?> con = clazz.getConstructor(new Class<?>[] { InputStream.class });
 			reader = (IXMLReader) con.newInstance(new Object[] { in });
-		}
+		/*}
 		else
 		{
 			Class<?> clazz = SReflect.classForName("jadex.xml.reader.PullParserWrapper", SBpmnModelReader.class.getClassLoader());
 			Constructor<?> con = clazz.getConstructor(new Class<?>[] { InputStream.class });
 			reader = (IXMLReader) con.newInstance(new Object[] { in });
-		}
+		}*/
 		
 //		LinkedList<XmlTag> tagstack = new LinkedList<XmlTag>();
 		LinkedList<Map<String, String>> attrstack = new LinkedList<Map<String,String>>();
@@ -1062,11 +1063,10 @@ public class SBpmnModelReader
 				rs.setName(name);
 				rs.setType(itrface);
 				if(multi != null)
-				{
-					rs.setMultiple(multi.booleanValue());
-				}
+					rs.setMax(RequiredServiceInfo.MANY);
+					//rs.setMultiple(multi.booleanValue());
 				rs.setDefaultBinding(new RequiredServiceBinding());
-				rs.getDefaultBinding().setScope(scope);
+				rs.getDefaultBinding().setScope(ServiceScope.valueOf(scope.toUpperCase()));
 				// Dropped in v4??
 //				if(dyn!=null)
 //					rs.getDefaultBinding().setDynamic(Boolean.parseBoolean(dyn));
@@ -1088,7 +1088,7 @@ public class SBpmnModelReader
 				RequiredServiceInfo rs = new RequiredServiceInfo();
 				rs.setName(name);
 				rs.setDefaultBinding(new RequiredServiceBinding());
-				rs.getDefaultBinding().setScope(scope);
+				rs.getDefaultBinding().setScope(ServiceScope.valueOf(scope));
 				vals.add(rs);
 			}
 			else if ("configuration".equals(tag.getLocalPart()))

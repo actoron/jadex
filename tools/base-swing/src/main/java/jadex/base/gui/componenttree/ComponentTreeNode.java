@@ -2,7 +2,6 @@ package jadex.base.gui.componenttree;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -22,7 +21,6 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -33,12 +31,14 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 
 /**
@@ -109,9 +109,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 		
 		// Add CMS listener for platform node.
 		if(desc.getName().getParent()==null)
-		{
 			addCMSListener(desc.getName());
-		}
 	}
 	
 	//-------- AbstractComponentTreeNode methods --------
@@ -231,10 +229,11 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 	 */
 	public ISwingTreeNode	createComponentNode(final IComponentDescription desc)
 	{
-		ISwingTreeNode	node	= getModel().getNode(desc.getName());
+		ISwingTreeNode node = getModel().getNode(desc.getName());
 		if(node==null)
 		{
-			boolean proxy = "jadex.platform.service.remote.Proxy".equals(desc.getModelName());
+			// hack
+			boolean proxy = "jadex.platform.service.remote.ProxyAgent".equals(desc.getModelName());
 			if(proxy)
 			{
 				// Only create proxy nodes for local proxy components to avoid infinite nesting.
@@ -326,17 +325,18 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 	 */
 	protected IFuture<List<ITreeNode>> searchChildren(final IExternalAccess access, final IComponentIdentifier cid)
 	{
-		final Future<List<ITreeNode>>	ret	= new Future<List<ITreeNode>>();
-		final List<ITreeNode>	children	= new ArrayList<ITreeNode>();
-		final boolean	ready[]	= new boolean[2];	// 0: children, 1: services;
+		final Future<List<ITreeNode>> ret = new Future<List<ITreeNode>>();
+		final List<ITreeNode> children = new ArrayList<ITreeNode>();
+		final boolean ready[] = new boolean[2];	// 0: children, 1: services;
 
-//		if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
+//		if(ComponentTreeNode.this instanceof ProxyComponentTreeNode)
 //			System.out.println("searchChildren 1: "+this);
 		
 		access.getChildren(null, cid).addResultListener(new SwingResultListener<>(new IResultListener<IComponentIdentifier[]>()
 		{
 			public void resultAvailable(IComponentIdentifier[] result)
 			{
+//				System.out.println("searchChildren 1 end: "+result.length);
 				Arrays.sort(result, new java.util.Comparator<IComponentIdentifier>()
 				{
 					public int compare(IComponentIdentifier o1, IComponentIdentifier o2)
@@ -345,22 +345,54 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 					}
 				});
 				
-				for(int i=0; i<result.length; i++)
+				FutureBarrier<Void>	fubar	= new FutureBarrier<>();
+				for(IComponentIdentifier rescid: result)
 				{
-					// todo: avoid get()
-					ISwingTreeNode node = createComponentNode(access.getDescription(result[i]).get());
-					children.add(node);
+//					if(!rescid.getLocalName().equals("rt"))
+					{
+						Future<Void>	wait	= new Future<>();
+						fubar.addFuture(wait);
+//						System.out.println("------getDescription "+rescid);
+						IFuture<IComponentDescription>	fut	= access.getDescription(rescid);
+						fut.addResultListener(new SwingDefaultResultListener<IComponentDescription>()
+						{
+							@Override
+							public void customResultAvailable(IComponentDescription desc)
+							{
+//									System.out.println("++++++getDescription "+rescid);
+								ISwingTreeNode node = createComponentNode(desc);	
+								children.add(node);
+								wait.setResult(null);
+							}
+							
+							@Override
+							public void customExceptionOccurred(Exception ex)
+							{
+								ex.printStackTrace();
+								// TODO: OK to ignore failures?
+								wait.setResult(null);
+							}
+						});
+					}
 				}
-				ready[0]	= true;
-				if(ready[0] &&  ready[1])
+				fubar.waitFor().then(v->
 				{
-					ret.setResult(children);
-				}
+					ready[0]	= true;
+					if(ready[0] &&  ready[1])
+					{
+						ret.setResult(children);
+					}	
+				});
 			}
 			
-			@Override
 			public void exceptionOccurred(Exception exception)
 			{
+//				System.out.println("searchChildren 1 end ex: ");
+				// If a platform is added manually and we lack access,
+				// a security exception may be thrown. This is normal
+				// behavior and can be ignored.
+				if (!(exception instanceof SecurityException))
+					exception.printStackTrace();
 			}
 		}));
 		
@@ -408,80 +440,91 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 //		System.out.println("name: "+desc.getName());
 		
 		IComponentIdentifier root = access.getId().getRoot();//.addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
-		access.getExternalAccess(root)
+		access.getExternalAccessAsync(root)
 			.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
 		{
 			public void resultAvailable(final IExternalAccess rootea)
 			{
-				access.getExternalAccess(cid)
+				access.getExternalAccessAsync(cid)
 					.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(final IExternalAccess ea)
 					{
-//							System.out.println("search childs: "+ea);
+//						System.out.println("search childs 2: "+ea);
 						
 						ea.getNFPropertyNames()
-//								((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyNames()
+//							((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyNames()
 							.addResultListener(new SwingResultListener<String[]>(new IResultListener<String[]>()
+							{
+								public void resultAvailable(String[] names)
+								{
+		//								System.out.println("nfprops ready");
+									if(names!=null && names.length>0)
+									{
+										NFPropertyContainerNode cn = (NFPropertyContainerNode)getModel().getNode(getId()+NFPropertyContainerNode.NAME);
+										if(cn==null)
+											cn = new NFPropertyContainerNode(null, null, ComponentTreeNode.this, getModel(), getTree(), ea, null, null, null);
+										children.add(0, cn);
+										cont(ea);
+		//											final NFPropertyContainerNode node = cn;
+		//											
+		//											final List<ISwingTreeNode>	results	= new ArrayList<ISwingTreeNode>();
+		//											Iterator<String> it = SReflect.getIterator(names);
+										
+		//											createNFPropertyNodes(it, results, ea, rootea, cn).addResultListener(new IResultListener<Void>()
+		//											{
+		//												public void resultAvailable(Void result)
+		//												{
+		//													Collections.sort(results, new java.util.Comparator<ISwingTreeNode>()
+		//													{
+		//														public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
+		//														{
+		//															String si1 = ((NFPropertyNode)t1).getMetaInfo().getName();
+		//															String si2 = ((NFPropertyNode)t2).getMetaInfo().getName();
+		//															return si1.compareTo(si2);
+		//														}
+		//													});
+		//													
+		//													node.setChildren(results);
+		//													cont(ea, node, results);
+		//												}
+		//												
+		//												public void exceptionOccurred(Exception exception)
+		//												{
+		//													cont(ea, null, null);
+		//												}
+		//											});
+									}
+									else
+									{
+										cont(ea);
+									}
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									cont(ea);
+								}
+							})
 						{
-							public void resultAvailable(String[] names)
-							{
-								if(names!=null && names.length>0)
-								{
-									NFPropertyContainerNode cn = (NFPropertyContainerNode)getModel().getNode(getId()+NFPropertyContainerNode.NAME);
-									if(cn==null)
-										cn = new NFPropertyContainerNode(null, null, ComponentTreeNode.this, getModel(), getTree(), ea, null, null, null);
-									children.add(0, cn);
-									cont(ea);
-//											final NFPropertyContainerNode node = cn;
-//											
-//											final List<ISwingTreeNode>	results	= new ArrayList<ISwingTreeNode>();
-//											Iterator<String> it = SReflect.getIterator(names);
-									
-//											createNFPropertyNodes(it, results, ea, rootea, cn).addResultListener(new IResultListener<Void>()
-//											{
-//												public void resultAvailable(Void result)
-//												{
-//													Collections.sort(results, new java.util.Comparator<ISwingTreeNode>()
-//													{
-//														public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
-//														{
-//															String si1 = ((NFPropertyNode)t1).getMetaInfo().getName();
-//															String si2 = ((NFPropertyNode)t2).getMetaInfo().getName();
-//															return si1.compareTo(si2);
-//														}
-//													});
-//													
-//													node.setChildren(results);
-//													cont(ea, node, results);
-//												}
-//												
-//												public void exceptionOccurred(Exception exception)
-//												{
-//													cont(ea, null, null);
-//												}
-//											});
-								}
-								else
-								{
-									cont(ea);
-								}
+							public void customExceptionOccurred(Exception exception) {
+								// Access may fail due to security restrictions
+								if (!(exception instanceof SecurityException))
+									super.customExceptionOccurred(exception);
 							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								cont(ea);
-							}
-						}));
+						});
 					}
 					
 					public void cont(final IExternalAccess ea)
 					{
+//						System.out.println("getServiceInfos start");
 						SRemoteGui.getServiceInfos(ea)
 							.addResultListener(new SwingResultListener<Object[]>(new IResultListener<Object[]>()
 						{
 							public void resultAvailable(final Object[] res)
 							{
+//								System.out.println("getServiceInfos end");
+								
 								final ProvidedServiceInfo[] pros = (ProvidedServiceInfo[])res[0];
 								final RequiredServiceInfo[] reqs = (RequiredServiceInfo[])res[1];
 								final IServiceIdentifier[] sis = (IServiceIdentifier[])res[2];
@@ -558,6 +601,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 										}
 										public void exceptionOccurred(Exception exception)
 										{
+											exception.printStackTrace();
 											// Children not found -> don't add services.
 										}
 									}));
@@ -572,6 +616,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 							
 							public void exceptionOccurred(Exception exception)
 							{
+								exception.printStackTrace();
 								ready[1]	= true;
 								if(ready[0] &&  ready[1])
 								{
@@ -583,6 +628,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						exception.printStackTrace();
 						ready[1]	= true;
 						if(ready[0] &&  ready[1])
 						{
@@ -593,6 +639,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 			}
 			public void exceptionOccurred(Exception exception)
 			{
+				exception.printStackTrace();
 				ready[1]	= true;
 				if(ready[0] &&  ready[1])
 				{
@@ -658,16 +705,12 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 		assert cmslistener==null;
 		CMSUpdateHandler	cmshandler	= (CMSUpdateHandler)getTree().getClientProperty(CMSUpdateHandler.class);
 		this.cmslistener	= cmshandler.addCMSListener(cid);
-		cmslistener.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+		cmslistener.addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 		{
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-			}
-
-			@Override
-			public void resultAvailable(Collection<CMSStatusEvent> result)
-			{
+				System.out.println("Exception occurred: "+exception);
 			}
 
 			@Override
@@ -775,11 +818,6 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 						}
 					});
 				}				
-			}
-
-			@Override
-			public void finished()
-			{
 			}
 		});
 	}

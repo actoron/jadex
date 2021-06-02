@@ -1,8 +1,10 @@
 package jadex.platform.service.parallelizer;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.servicepool.IServicePoolService;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -20,20 +22,18 @@ import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.platform.service.servicepool.IServicePoolService;
 
 /**
  * 
  */
 @Agent
 @Service
-@ProvidedServices(
-	@ProvidedService(type=IParallelService.class, 
-		implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IParallelService.class))
 @RequiredServices(
 {
 	@RequiredService(name="poolser", type=IServicePoolService.class),
@@ -46,13 +46,15 @@ public class Par2Agent implements IParallelService
 	//-------- attributes --------
 	
 	/** The pool service (injected by jadex runtime). */
-	@AgentServiceSearch
+//	@AgentServiceSearch
+	@OnService
 	protected IServicePoolService	poolser;
 	
 	/** The sequential service (set in init). */
 	protected ISequentialService	seqser;
 	
-	@AgentCreated 
+	//@AgentCreated 
+	@OnInit
 	public IFuture<Void> init(final IInternalAccess agent)
 	{
 		final Future<Void> ret = new Future<Void>();

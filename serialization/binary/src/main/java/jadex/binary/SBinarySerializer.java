@@ -19,7 +19,6 @@ import jadex.commons.transformation.traverser.Traverser;
 
 /**
  *  Object serializer for encoding to and decoding from a compact binary format.
- *
  */
 public class SBinarySerializer
 {
@@ -27,7 +26,7 @@ public class SBinarySerializer
 	protected static final byte MAGIC_BYTE = -13;
 	
 	/** Serializer version */
-	protected static final int VERSION = 3;
+	protected static final int VERSION = 4;
 	
 	/** Marker for null values */
 	protected static final String NULL_MARKER = "0";
@@ -51,7 +50,7 @@ public class SBinarySerializer
 		ENCODER_HANDLERS.add(new MultiCollectionCodec());
 		ENCODER_HANDLERS.add(new LRUCodec());
 		ENCODER_HANDLERS.add(new MapCodec());
-		if(!SReflect.isAndroid())
+		//if(!SReflect.isAndroid())
 		{
 			ENCODER_HANDLERS.add(new ColorCodec());
 			ENCODER_HANDLERS.add(new ImageCodec());
@@ -62,6 +61,8 @@ public class SBinarySerializer
 		ENCODER_HANDLERS.add(new TupleCodec());
 		ENCODER_HANDLERS.add(new DateCodec());
 		ENCODER_HANDLERS.add(new CalendarCodec());
+		ENCODER_HANDLERS.add(new CurrencyCodec());
+		ENCODER_HANDLERS.add(new SimpleDateFormatCodec());
 		ENCODER_HANDLERS.add(new InetAddressCodec());
 		ENCODER_HANDLERS.add(new LoggingLevelCodec());
 		ENCODER_HANDLERS.add(new LogRecordCodec());
@@ -80,7 +81,8 @@ public class SBinarySerializer
 	/** 
 	 *  Handlers for decoding.
 	 */
-	protected static final List<IDecoderHandler> DECODER_HANDLERS;
+	public static final List<IDecoderHandler> DECODER_HANDLERS;
+	
 	static
 	{
 		DECODER_HANDLERS = new ArrayList<IDecoderHandler>();
@@ -165,6 +167,44 @@ public class SBinarySerializer
 	}
 	
 	/**
+	 *  Convert an object to an encoded byte array with framing support.
+	 *  
+	 *  @param val The object being encoded.
+	 *  @param preprocessors List of processors called before the object is encoded, may be null.
+	 *  @param usercontext A user context, may be null.
+	 *  @param classloader The class loader used.
+	 *  @return Bytes written.
+	 */
+	public static byte[] writeObjectToFramedArray(Object val, ClassLoader classloader)
+	{
+		return writeObjectToFramedArray(val, null, null, null, classloader, null);
+	}
+	
+	/**
+	 *  Convert an object to an encoded byte array with framing support.
+	 *  
+	 *  @param val The object being encoded.
+	 *  @param preprocessors List of processors called before the object is encoded, may be null.
+	 *  @param usercontext A user context, may be null.
+	 *  @param classloader The class loader used.
+	 *  @return Bytes written.
+	 */
+	public static byte[] writeObjectToFramedArray(Object val, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> encoderhandlers, Object usercontext, ClassLoader classloader, SerializationConfig config)
+	{
+		encoderhandlers = encoderhandlers == null? ENCODER_HANDLERS : encoderhandlers;
+		IEncodingContext context = new FramingEncodingContext(val, usercontext, preprocessors, classloader, config);
+		context.writeByte(MAGIC_BYTE);
+		context.writeVarInt(VERSION);
+		
+		Traverser traverser = new BinaryWriteTraverser();
+		//Traverser.traverseObject(val, ENCODER_HANDLERS, false, context);
+		traverser.traverse(val, null, preprocessors, encoderhandlers, Traverser.MODE.PREPROCESS, classloader, context);
+//		traverser.traverse(val, null, new IdentityHashMap<Object, Object>(), preprocessors, encoderhandlers, null, false, null, context);
+		
+		return ((FramingEncodingContext) context).toByteArray();
+	}
+	
+	/**
 	 *  Convert an object to an encoded byte array.
 	 *  
 	 *  @param val The object being encoded.
@@ -175,7 +215,7 @@ public class SBinarySerializer
 	 */
 	public static long writeObjectToDataOutput(DataOutput dato, Object val, ClassLoader classloader)
 	{
-		return writeObjectToDataOutput(dato, val, null, null, classloader);
+		return writeObjectToDataOutput(dato, val, null, null, classloader, null, null);
 	}
 	
 	/**
@@ -187,9 +227,9 @@ public class SBinarySerializer
 	 *  @param classloader The class loader used.
 	 *  @return Bytes written.
 	 */
-	public static long writeObjectToDataOutput(DataOutput dato, Object val, List<ITraverseProcessor> preprocessors, Object usercontext, ClassLoader classloader)
+	public static long writeObjectToDataOutput(DataOutput dato, Object val, List<ITraverseProcessor> preprocessors, Object usercontext, ClassLoader classloader, SerializationConfig config)
 	{
-		return writeObjectToDataOutput(dato, val, preprocessors, null, usercontext, classloader);
+		return writeObjectToDataOutput(dato, val, preprocessors, null, usercontext, classloader, config);
 	}
 	
 	/**
@@ -201,7 +241,7 @@ public class SBinarySerializer
 	 *  @param classloader The class loader used.
 	 *  @return Bytes written.
 	 */
-	public static long writeObjectToDataOutput(DataOutput dato, Object val, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> encoderhandlers, Object usercontext, ClassLoader classloader)
+	public static long writeObjectToDataOutput(DataOutput dato, Object val, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> encoderhandlers, Object usercontext, ClassLoader classloader, SerializationConfig config)
 	{
 		try
 		{
@@ -213,7 +253,7 @@ public class SBinarySerializer
 		}
 		
 		encoderhandlers = encoderhandlers == null? ENCODER_HANDLERS : encoderhandlers;
-		IEncodingContext context = new DataOutputEncodingContext(dato, val, usercontext, preprocessors, classloader);
+		IEncodingContext context = new DataOutputEncodingContext(dato, val, usercontext, preprocessors, classloader, config);
 		context.writeVarInt(VERSION);
 		
 		Traverser traverser = new BinaryWriteTraverser();
@@ -255,7 +295,7 @@ public class SBinarySerializer
 	 */
 	public static Object readObjectFromByteArray(byte[] val, List<ITraverseProcessor> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter)
 	{
-		return readObjectFromStream(new ByteArrayInputStream(val), postprocessors, usercontext, classloader, errorreporter, null);
+		return readObjectFromStream(new ByteArrayInputStream(val), postprocessors, usercontext, classloader, errorreporter, null, null);
 	}
 	
 	/**
@@ -281,6 +321,56 @@ public class SBinarySerializer
 	 */
 	public static Object readObjectFromStream(InputStream is, List<ITraverseProcessor> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter, SerializationConfig config)
 	{
+		return readObjectFromStream(is, postprocessors, usercontext, classloader, errorreporter, config, null);
+	}
+	
+	/**
+	 *  Convert a byte array to an object.
+	 *  @param val The byte array.
+	 *  @param usercontext A user context, may be null.
+	 *  @param classloader The class loader.
+	 *  @param errorreporter The error reporter, may be null in which case the default reporter is used.
+	 *  @return The decoded object.
+	 */
+	public static Object readObjectFromStream(InputStream is, List<ITraverseProcessor> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter, SerializationConfig config, List<IDecoderHandler> decoders)
+	{
+		try
+		{
+			byte mbyte = (byte) is.read();
+			if (mbyte != MAGIC_BYTE)
+			{
+				throw new RuntimeException("Decoding failed, magic byte not found., found: " + mbyte);
+			}
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		
+		if(errorreporter == null)
+			errorreporter = new DefaultErrorReporter();
+		IDecodingContext context = new StreamDecodingContext(is, decoders==null? DECODER_HANDLERS: decoders, postprocessors, usercontext, classloader, errorreporter, config);
+		int streamver = (int) context.readVarInt();
+		if (streamver > VERSION)
+		{
+			throw new RuntimeException("Version mismatch, stream reported version " + streamver + " should be " + VERSION  + " or lower.");
+		}
+		context.setVersion(streamver);
+		
+		return decodeObject(context);
+	}
+	
+	/**
+	 *  Convert a byte array to an object with framing support.
+	 *  @param val The byte array.
+	 *  @param usercontext A user context, may be null.
+	 *  @param classloader The class loader.
+	 *  @param errorreporter The error reporter, may be null in which case the default reporter is used.
+	 *  @return The decoded object.
+	 */
+	public static Object readObjectFromFramedStream(InputStream is, List<ITraverseProcessor> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter, SerializationConfig config)
+	{
 		try
 		{
 			byte mbyte = (byte) is.read();
@@ -299,7 +389,7 @@ public class SBinarySerializer
 		{
 			errorreporter = new DefaultErrorReporter();
 		}
-		IDecodingContext context = new StreamDecodingContext(is, DECODER_HANDLERS, postprocessors, usercontext, classloader, errorreporter, config);
+		IDecodingContext context = new FramingStreamDecodingContext(is, DECODER_HANDLERS, postprocessors, usercontext, classloader, errorreporter, config);
 		int streamver = (int) context.readVarInt();
 		if (streamver > VERSION)
 		{
@@ -354,7 +444,7 @@ public class SBinarySerializer
 	 *  @param context The decoding context.
 	 *  @return Decoded object.
 	 */
-	protected static Object decodeObject(IDecodingContext context)
+	public static Object decodeObject(IDecodingContext context)
 	{
 		String classname = context.readClassname();
 		

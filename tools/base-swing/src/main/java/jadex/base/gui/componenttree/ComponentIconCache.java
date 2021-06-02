@@ -131,7 +131,7 @@ public class ComponentIconCache
 	 */
 	protected void	doSearch(final Future<Icon> ret, final String type, final List<IComponentIdentifier> todo, final int i)
 	{
-		jccaccess.getExternalAccess(todo.get(i)).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Icon>(ret)
+		jccaccess.getExternalAccessAsync(todo.get(i)).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Icon>(ret)
 		{
 			public void customResultAvailable(IExternalAccess exta)
 			{

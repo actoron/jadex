@@ -7,12 +7,10 @@ import java.util.Map;
 import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.interceptors.CallAccess;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.interceptors.ServiceGetter;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
@@ -162,7 +160,7 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	public ServiceGetter<IMonitoringService> getMonitoringServiceGetter()
 	{
 		if(getter == null)
-			getter = new ServiceGetter<IMonitoringService>(getInternalAccess(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			getter = new ServiceGetter<IMonitoringService>(getInternalAccess(), IMonitoringService.class, ServiceScope.PLATFORM);
 		return getter;
 	}
 

@@ -6,8 +6,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCallInfo;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -19,12 +23,17 @@ import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.commons.FieldInfo;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.Tuple3;
 import jadex.commons.future.Future;
@@ -61,12 +70,52 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	}
 
 	/**
+	 *  Check if a method using an annotation was already invoked.
+	 *  @param ann The annotation.
+	 *  @return True, if it was already called.
+	 */
+	public boolean wasAnnotationCalled(Class<? extends Annotation> ann)
+	{
+		Object pojo = component.getFeature(IPojoComponentFeature.class).getPojoAgent();
+		Map<Object, Set<String>> invocs = (Map<Object, Set<String>>)Starter.getPlatformValue(component.getId(), Starter.DATA_INVOKEDMETHODS);
+		Set<String> invans = invocs.get(pojo);
+		if(invans!=null && invans.contains(SReflect.getUnqualifiedClassName(ann)))
+		{
+			return true;
+		}
+		else
+		{
+			if(invans==null)
+			{
+				invans = new HashSet<>();
+				invocs.put(pojo, invans);
+			}
+			invans.add(SReflect.getUnqualifiedClassName(ann));
+			return false;
+		}
+	}
+	
+	/**
 	 *  Initialize the feature.
 	 *  Empty implementation that can be overridden.
 	 */
 	public IFuture<Void> init()
 	{
-		return invokeMethod(getInternalAccess(), AgentCreated.class, null);
+		MicroModel model = (MicroModel)component.getModel().getRawModel();
+		
+		Class<? extends Annotation> ann = OnInit.class;
+		if(model.getAgentMethod(ann)!=null)
+		{
+			//return invokeMethod(getInternalAccess(), OnInit.class, null);
+			if(wasAnnotationCalled(ann))
+				return IFuture.DONE;
+			else
+				return invokeMethod(getInternalAccess(), ann, null);
+		}
+		else
+		{
+			return invokeMethod(getInternalAccess(), AgentCreated.class, null);
+		}
 	}
 	
 	/**
@@ -75,11 +124,25 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	 */
 	public IFuture<Void> body()
 	{
-		//System.out.println("body on: "+getComponent().getComponentIdentifier());
+		//System.out.println("body on: "+getComponent().getId());
 		// Invoke initial service calls.
 		invokeServices();
 		
-		return invokeMethod(getInternalAccess(), AgentBody.class, null);
+		MicroModel model = (MicroModel)component.getModel().getRawModel();
+		
+		Class<? extends Annotation> ann = OnStart.class;
+		if(model.getAgentMethod(ann)!=null)
+		{
+			//return invokeMethod(getInternalAccess(), OnInit.class, null);
+			if(wasAnnotationCalled(ann))
+				return IFuture.DONE;
+			else
+				return invokeMethod(getInternalAccess(), ann, null);
+		}
+		else
+		{
+			return invokeMethod(getInternalAccess(), AgentBody.class, null);
+		}
 	}
 
 	/**
@@ -88,27 +151,69 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	 */
 	public IFuture<Void> shutdown()
 	{
-//		if(getComponent().getComponentIdentifier().getName().indexOf("Initiator")!=-1)
-//			System.out.println("lifecycle feature shutdown start: "+getComponent().getComponentIdentifier());
+		boolean debug	= component instanceof IPlatformComponentAccess && ((IPlatformComponentAccess)component).getPlatformComponent().debug;
+		if(debug)
+		{
+			component.getLogger().severe("lifecycle feature shutdown start: "+getComponent());
+		}
 			
 		final Future<Void> ret = new Future<Void>();
-		invokeMethod(getInternalAccess(), AgentKilled.class, null).addResultListener(new IResultListener<Void>()
+		
+		MicroModel model = (MicroModel)component.getModel().getRawModel();
+		
+		IFuture<Void> fut;
+		Class<? extends Annotation> ann = OnEnd.class;
+		if(model.getAgentMethod(ann)!=null)
+		{
+			//return invokeMethod(getInternalAccess(), OnInit.class, null);
+			if(wasAnnotationCalled(ann))
+			{
+				fut = IFuture.DONE;
+				if(debug)
+				{
+					component.getLogger().severe("lifecycle feature shutdown method already invoked: "+getComponent());
+				}
+			}
+			else
+			{
+				fut = invokeMethod(getInternalAccess(), ann, null);
+				if(debug)
+				{
+					component.getLogger().severe("lifecycle feature shutdown method invoked: "+getComponent()+" done="+fut.isDone());
+				}
+			}
+		}
+		else
+		{
+			fut = invokeMethod(getInternalAccess(), AgentKilled.class, null);
+			if(debug)
+			{
+				component.getLogger().severe("lifecycle feature shutdown agent killed invoked: "+getComponent()+" done="+fut.isDone());
+			}
+		}
+		
+		fut.addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
+				if(debug)
+				{
+					component.getLogger().severe("lifecycle feature shutdown end result: "+getComponent());
+				}
 				proceed(null);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				if(debug)
+				{
+					component.getLogger().severe("lifecycle feature shutdown end exception: "+getComponent()+"\n"+SUtil.getExceptionStacktrace(exception));
+				}
 				proceed(exception);
 			}
 			
 			protected void proceed(Exception e)
 			{
-//				if(getComponent().getComponentIdentifier().getName().indexOf("Initiator")!=-1)
-//					System.out.println("lifecycle feature shutdown end: "+getComponent().getComponentIdentifier());
-				
 				try
 				{
 					MicroModel micromodel = (MicroModel)getComponent().getModel().getRawModel();
@@ -321,7 +426,8 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 			Method	method	= null;
 			try
 			{
-				method	= mi.getMethod(component.getClassLoader());
+				Object pojo = component.getFeature(IPojoComponentFeature.class).getPojoAgent();
+				method = mi.getMethod(pojo.getClass().getClassLoader());
 				
 				// Try to guess parameters from given args or component internals.
 				IParameterGuesser	guesser	= args!=null ? new SimpleParameterGuesser(component.getParameterGuesser(), Arrays.asList(args)) : component.getParameterGuesser();
@@ -335,7 +441,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 				{
 					// It is now allowed to use protected/private agent created, body, terminate methods
 					method.setAccessible(true);
-					Object res = method.invoke(component.getFeature(IPojoComponentFeature.class).getPojoAgent(), iargs);
+					Object res = method.invoke(pojo, iargs);
 					if(res instanceof IFuture)
 					{
 						ret	= (IFuture<Void>)res;

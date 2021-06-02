@@ -20,7 +20,8 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -46,10 +47,10 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -59,8 +60,6 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -76,7 +75,7 @@ import jadex.platform.service.processengine.EventMapper.ModelDetails;
 /**
  *  Agent that implements the bpmn monitoring starter interface.
  */
-@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.FALSE))
+@Agent(autoprovide=Boolean3.TRUE, autostart=Boolean3.FALSE)
 @Service
 @RequiredServices(
 {
@@ -118,7 +117,8 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	/**
 	 *  Init method.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> init()
 	{
 		this.remcoms = new HashMap<Tuple2<String,IResourceIdentifier>, List<Runnable>>();
@@ -143,7 +143,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		final Tuple2<String, IResourceIdentifier> key = new Tuple2<String, IResourceIdentifier>(model, urid);
 
 		// find classloader for rid
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 			.addResultListener(new DefaultResultListener<ILibraryService>()
 		{
 			public void resultAvailable(ILibraryService libs)
@@ -513,16 +513,16 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		
 		Tuple2<String, IResourceIdentifier> model = new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid());
 		
-		CreationInfo info = new CreationInfo(agent.getId(), det.getRid());
+		CreationInfo info = new CreationInfo(det.getRid());
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, det.getEventId(), event));
 		info.setArguments(args);
 		info.setFilename(det.getModel());
 		
-		ISubscriptionIntermediateFuture<CMSStatusEvent> fut = agent.createComponentWithResults(info);
+		ISubscriptionIntermediateFuture<CMSStatusEvent> fut = agent.createComponentWithEvents(info);
 		fut.addResultListener(new ConversionListener(new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid()), det.getFuture())); // Add converion listener for addmodel() future 
 		
-		fut.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+		fut.addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 		{
 			public void intermediateResultAvailable(CMSStatusEvent result)
 			{
@@ -533,18 +533,10 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 				}
 			}
 			
-			public void resultAvailable(Collection<CMSStatusEvent> result)
-			{
-			}
-			
 			public void exceptionOccurred(Exception exception)
 			{
 				exception.printStackTrace();
 				cont();
-			}
-			
-			public void finished()
-			{
 			}
 			
 			protected void cont()

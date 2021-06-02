@@ -129,7 +129,7 @@ public abstract class AbstractClock implements IClock
 	/**
 	 *  Transfer state from another clock to this clock.
 	 */
-	protected void copyFromClock(IClock oldclock)
+	public void copyFromClock(IClock oldclock)
 	{
 		if(IClock.STATE_RUNNING.equals(state))
 			throw new RuntimeException("Cannot copy entries, while clock is running.");
@@ -354,7 +354,10 @@ public abstract class AbstractClock implements IClock
 	 */
 	public ITimer[] getTickTimers()
 	{
-		return (ITimer[])ticktimers.toArray(new ITimer[0]);
+		synchronized(this)
+		{
+			return (ITimer[])ticktimers.toArray(new ITimer[0]);
+		}
 	}
 	
 	/**
@@ -366,7 +369,7 @@ public abstract class AbstractClock implements IClock
 		synchronized(this)
 		{
 			timers.add(timer);
-//			System.out.println(this+" Added timer: "+timer.getTimedObject());
+			//System.out.println(this+" Added timer: "+timer.getNotificationTime());
 		}
 		
 		notifyListeners(new ChangeEvent(this, EVENT_TYPE_TIMER_ADDED));

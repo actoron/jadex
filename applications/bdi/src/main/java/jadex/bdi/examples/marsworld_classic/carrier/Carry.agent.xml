@@ -11,7 +11,8 @@
 	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
 	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
 	name="Carry"
-	package="jadex.bdi.examples.marsworld_classic.carrier">
+	package="jadex.bdi.examples.marsworld_classic.carrier"
+	predecessors="jadex.bdi.examples.marsworld_classic.environment.Environment">
 
 	<imports>
 		<import>jadex.bdi.examples.marsworld_classic.*</import>
@@ -168,8 +169,8 @@
 				<!-- <initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							((IDF)$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))).createDFComponentDescription($component.getId(),
-								((IDF)$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)))
+							((IDF)$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class).getLocalService(new ServiceQuery( IDF.class, ServiceScope.PLATFORM))).createDFComponentDescription($component.getId(),
+								((IDF)$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class).getLocalService(new ServiceQuery( IDF.class, ServiceScope.PLATFORM)))
 								.createDFServiceDescription("service_carry", "service_carry", "University of Hamburg"),
 								20000)
  						</value>

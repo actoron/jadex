@@ -1,5 +1,6 @@
 package jadex.micro.testcases.authenticate;
 
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
@@ -13,7 +14,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  Agent implementing the test service without extra settings.
  */
 @Agent
-@ProvidedServices(@ProvidedService(type=ITestService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=ITestService.class, scope=ServiceScope.GLOBAL))
 @Service
 public class BasicProviderAgent implements ITestService
 {

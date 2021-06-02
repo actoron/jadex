@@ -20,9 +20,9 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
@@ -43,6 +43,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 
 /**
  *  The service handler is used as service implementation for proxy services.
@@ -101,7 +102,8 @@ public class ServiceHandler implements InvocationHandler
 	/**
 	 *  Init.
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public IFuture<Void> init()
 	{
 //		System.out.println("called init: "+this);
@@ -172,18 +174,18 @@ public class ServiceHandler implements InvocationHandler
 		final Future<IService> ret = new Future<IService>();
 		
 		CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
-		ci.setParent(component.getId());
+//		ci.setParent(component.getId());
 		ci.setImports(component.getModel().getAllImports());
 		// Worker services are exposed with scope parent only to hinder others finding directly the worker services
-		ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
+		ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, ServiceScope.PARENT, null, null, null, null)});
 		ci.setFilename(componentname);
 		
-		component.createComponent(ci, null)
+		component.createComponent(ci)
 			.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IService>(ret)
 		{
 			public void customResultAvailable(IExternalAccess ea)
 			{
-				Future<IService> fut = (Future<IService>)ea.searchService(new ServiceQuery<>(servicetype, RequiredServiceInfo.SCOPE_COMPONENT_ONLY));
+				Future<IService> fut = (Future<IService>)ea.searchService(new ServiceQuery<>(servicetype, ServiceScope.COMPONENT_ONLY));
 				fut.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IService>(ret)
 				{
 					public void customResultAvailable(IService ser)
@@ -367,12 +369,8 @@ public class ServiceHandler implements InvocationHandler
 			// Must reschedule on component thread as it has no required service proxy
 			if(res instanceof IIntermediateFuture)
 			{
-				IIntermediateResultListener lis = component.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<Object>()
+				IIntermediateResultListener lis = component.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<Object>()
 				{
-					public void intermediateResultAvailable(Object result)
-					{
-					}
-					
 					public void finished()
 					{
 						boolean	remove	= strategy.taskFinished(); 
@@ -485,7 +483,7 @@ public class ServiceHandler implements InvocationHandler
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		component.killComponent(workercid).addResultListener(
+		component.getExternalAccess(workercid).killComponent().addResultListener(
 			inta.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 		{
 			public void customResultAvailable(Map<String, Object> result) 
@@ -514,7 +512,7 @@ public class ServiceHandler implements InvocationHandler
 		else
 		{
 			component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( 
-				IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				IClockService.class, ServiceScope.PLATFORM))
 				.addResultListener(new DelegationResultListener<IClockService>(ret)
 			{
 				public void customResultAvailable(IClockService cs)
@@ -550,6 +548,15 @@ public class ServiceHandler implements InvocationHandler
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the strategy.
+	 *  @return The strategy.
+	 */
+	public IPoolStrategy getStrategy() 
+	{
+		return strategy;
 	}
 
 	/**

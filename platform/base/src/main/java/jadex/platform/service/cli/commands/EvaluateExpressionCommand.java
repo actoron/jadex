@@ -65,7 +65,8 @@ public class EvaluateExpressionCommand extends ACliCommand
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IExternalAccess ea = SServiceProvider.getExternalAccessProxy(ia, comp.getId().getRoot());
+//				IExternalAccess ea = SServiceProvider.getExternalAccessProxy(ia, comp.getId().getRoot());
+				IExternalAccess ea = ia.getExternalAccess(comp.getId().getRoot());
 				return ea.scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)

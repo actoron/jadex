@@ -25,12 +25,11 @@ import javax.ws.rs.core.Response;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
-import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -88,7 +87,7 @@ public class RestInvocationHelper
 										 			  final Class<?> resttype,
 										 			  final boolean inurlparams)
 	{
-		IDaemonThreadPoolService tp = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		IDaemonThreadPoolService tp = component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IDaemonThreadPoolService.class, ServiceScope.PLATFORM));
 		final Future<String> ret = new Future<String>();
 		final IExternalAccess exta = component.getExternalAccess();
 		Runnable runnable = new Runnable()
@@ -99,8 +98,10 @@ public class RestInvocationHelper
 				performRequest(exta, uri, path, headers, params, postplainjson, resttype, inurlparams, ret);
 			}
 		};
-		if (USE_THREADS)
+		if(USE_THREADS)
+		{
 			tp.execute(runnable);
+		}
 		else
 		{
 			Map<String, Object> restargs = new HashMap<String, Object>();
@@ -114,30 +115,33 @@ public class RestInvocationHelper
 			CreationInfo info = new CreationInfo();
 			info.addArgument("restargs", restargs);
 			info.setFilename("jadex.extension.rs.invoke.RestInvocationAgent.class");
-			component.createComponent(info, new IResultListener<Collection<Tuple2<String,Object>>>()
+			component.createComponent(info).then(result ->
 			{
-				public void resultAvailable(Collection<Tuple2<String, Object>> result)
+				result.waitForTermination().addResultListener(new IResultListener<Map<String,Object>>()
 				{
-					String json = null;
-					Exception exception = null;
-					for (Iterator<Tuple2<String, Object>> it = result.iterator(); it.hasNext(); )
+					public void resultAvailable(Map<String, Object> result)
 					{
-						Tuple2<String, Object> res = it.next();
-						if (res.getSecondEntity() instanceof String)
-							json = (String) res.getSecondEntity();
-						else if (res.getSecondEntity() instanceof Exception)
-							exception = (Exception) res.getSecondEntity();
+						String json = null;
+						Exception exception = null;
+						for (Iterator<Map.Entry<String, Object>> it = result.entrySet().iterator(); it.hasNext(); )
+						{
+							Map.Entry<String, Object> res = it.next();
+							if (res.getValue() instanceof String)
+								json = (String) res.getValue();
+							else if (res.getValue() instanceof Exception)
+								exception = (Exception) res.getValue();
+						}
+						if (exception != null)
+							ret.setException(exception);
+						else
+							ret.setResult(json);
 					}
-					if (exception != null)
+					
+					public void exceptionOccurred(Exception exception)
+					{
 						ret.setException(exception);
-					else
-						ret.setResult(json);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setException(exception);
-				}
+					}
+				});
 			});
 		}
 		return ret;

@@ -35,7 +35,9 @@ import jadex.bridge.nonfunctional.search.ComposedEvaluator;
 import jadex.bridge.sensor.service.AverageEvaluator;
 import jadex.bridge.sensor.service.WaitqueueEvaluator;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
@@ -45,8 +47,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
@@ -55,7 +55,7 @@ import jadex.micro.annotation.RequiredServices;
 /**
  *  Ranking of a requires services via an waitqueue ranker.
  */
-@RequiredServices(@RequiredService(name="aser", type=ICryptoService.class, multiple=true, scope=RequiredServiceInfo.SCOPE_PLATFORM))
+@RequiredServices(@RequiredService(name="aser", type=ICryptoService.class, scope=ServiceScope.PLATFORM)) // multiple=true,
 //ranker="new AverageEvaluator(new WaitqueueEvaluator(new MethodInfo(ICryttoService.class.getMethod(\"encrypt\", new Class[]{String.class}))))"
 
 @Agent
@@ -63,7 +63,7 @@ import jadex.micro.annotation.RequiredServices;
 @Configurations({@Configuration(name="default"), @Configuration(name="with gui")})
 
 //@RequiredServices(@RequiredService(name="cryptoser", type=ICryptoService.class, multiple=true, 
-//	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, dynamic=true),
+//	binding=@Binding(scope=ServiceScope.PLATFORM, dynamic=true),
 //	nfreqs=@NFRequirement(description="select service with smallest call waitqueue", 
 //	value=WaitqueueProperty.class, methodname="encrypt", ranker=WaitqueueEvaluator.class)))
 public class UserAgent
@@ -106,7 +106,8 @@ public class UserAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body() throws Exception
 	{
 		// todo: make ITerminable in DefaultServiceFetcher
@@ -124,7 +125,8 @@ public class UserAgent
 		invoke();
 	}
 	
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void cleanup()
 	{
 		if(frame!=null)

@@ -545,7 +545,7 @@ public class BDIXMLReader extends ComponentXMLReader
 							BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
 						
 						// todo: allow specifying scope
-						model.addProvidedService(new ProvidedServiceInfo(null, key, psi, null, null, null, false));
+						model.addProvidedService(new ProvidedServiceInfo(null, key, psi));
 					}
 				}
 				
@@ -803,6 +803,15 @@ public class BDIXMLReader extends ComponentXMLReader
 					}
 				}
 				
+				Map<String, UnparsedExpression>	matches	= mtr.getGoalNameMatchExpressions();
+				if(matches!=null)
+				{
+					for(Map.Entry<String, UnparsedExpression> match: matches.entrySet())
+					{
+						mtr.addGoalMatchExpression(mcapa.getResolvedGoal(null, match.getKey()).getName(), match.getValue());
+					}
+				}
+				
 				return null;
 			}
 			
@@ -837,13 +846,17 @@ public class BDIXMLReader extends ComponentXMLReader
 			{
 				if(context.getStackElement(context.getStackSize()-1).getTag().equals(new QName(uri, "match")))
 				{
-					MTrigger mtrig = (MTrigger)context.getStackElement(context.getStackSize()-3).getObject();
-					String	ref	= (String)context.getStackElement(context.getStackSize()-2).getRawAttributes().get("ref");
-					if(ref==null)
+					// Todo: support match expression on other elements as allowed in schema
+					if("goal".equalsIgnoreCase(pathname[0].getLocalPart()))
 					{
-						ref	= (String)context.getStackElement(context.getStackSize()-2).getRawAttributes().get("cref");
+						MTrigger mtrig = (MTrigger)context.getStackElement(context.getStackSize()-3).getObject();
+						String	ref	= (String)context.getStackElement(context.getStackSize()-2).getRawAttributes().get("ref");
+						if(ref==null)
+						{
+							ref	= (String)context.getStackElement(context.getStackSize()-2).getRawAttributes().get("cref");
+						}
+						mtrig.addGoalNameMatchExpression(MElement.internalName(ref), (UnparsedExpression)object);
 					}
-					mtrig.addGoalMatchExpression(MElement.internalName(ref), (UnparsedExpression)object);	// Todo: support match expression on other elements as allowed in schema 
 				}
 				else if(context.getTopStackElement().getTag().equals(new QName(uri, "factadded")))
 				{

@@ -1,7 +1,7 @@
 package jadex.quickstart.cleanerworld;
 
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.quickstart.cleanerworld.environment.SensorActuator;
 import jadex.quickstart.cleanerworld.gui.SensorGui;
 
@@ -16,7 +16,7 @@ public class SimpleCleanerAgent
 	/**
 	 *  The body is executed when the agent is started.
 	 */
-	@AgentBody
+	@OnStart
 	private void	exampleBehavior()
 	{
 		// Create the sensor/actuator interface object.

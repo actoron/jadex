@@ -27,9 +27,9 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.tools.debugger.common.ObjectInspectorDebuggerPanel;
@@ -95,7 +95,7 @@ public class DebuggerMainPanel extends JSplitPane
 		
 		final JTabbedPane tabs = new JTabbedPane();	
 		
-		jcc.getPlatformAccess().getExternalAccess(desc.getName())
+		jcc.getPlatformAccess().getExternalAccessAsync(desc.getName())
 			.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
 		{			
 			public void resultAvailable(final IExternalAccess exta)
@@ -186,7 +186,7 @@ public class DebuggerMainPanel extends JSplitPane
 			public void actionPerformed(ActionEvent e)
 			{
 				pause.setEnabled(false);
-				DebuggerMainPanel.this.jcc.getPlatformAccess().suspendComponent(DebuggerMainPanel.this.desc.getName());
+				DebuggerMainPanel.this.jcc.getPlatformAccess().getExternalAccess(DebuggerMainPanel.this.desc.getName()).suspendComponent();
 			}
 		});
 		
@@ -221,7 +221,7 @@ public class DebuggerMainPanel extends JSplitPane
 				step.setEnabled(false);
 				run.setEnabled(false);
 				pause.setEnabled(true);
-				IFuture<Void> ret = DebuggerMainPanel.this.jcc.getPlatformAccess().resumeComponent(DebuggerMainPanel.this.desc.getName()); 
+				IFuture<Void> ret = DebuggerMainPanel.this.jcc.getPlatformAccess().getExternalAccess(DebuggerMainPanel.this.desc.getName()).resumeComponent(); 
 				ret.addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
@@ -297,16 +297,12 @@ public class DebuggerMainPanel extends JSplitPane
 		updatePanel((IComponentDescription)desc);
 
 		listener	= jcc.getCMSHandler().addCMSListener(desc.getName().getRoot());
-		listener.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+		listener.addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 		{
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-			}
-
-			@Override
-			public void resultAvailable(Collection<CMSStatusEvent> result)
-			{
+				System.out.println("Exception occurred: "+exception);
 			}
 
 			@Override
@@ -314,11 +310,6 @@ public class DebuggerMainPanel extends JSplitPane
 			{
 				if(event.getComponentDescription().getName().equals(DebuggerMainPanel.this.desc.getName()))
 					updatePanel(event.getComponentDescription());
-			}
-
-			@Override
-			public void finished()
-			{
 			}
 		});
 	}

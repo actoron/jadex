@@ -3,13 +3,13 @@ package org.activecomponents.udp.asymciphers;
 import java.util.Arrays;
 
 import org.activecomponents.udp.SUdpUtil;
-import org.spongycastle.crypto.agreement.ECDHBasicAgreement;
-import org.spongycastle.crypto.generators.ECKeyPairGenerator;
-import org.spongycastle.crypto.params.ECDomainParameters;
-import org.spongycastle.crypto.params.ECKeyGenerationParameters;
-import org.spongycastle.math.ec.ECPoint;
-import org.spongycastle.math.ec.custom.djb.Curve25519;
-import org.spongycastle.util.encoders.Hex;
+import org.bouncycastle.crypto.agreement.ECDHBasicAgreement;
+import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
+import org.bouncycastle.crypto.params.ECDomainParameters;
+import org.bouncycastle.crypto.params.ECKeyGenerationParameters;
+import org.bouncycastle.math.ec.ECPoint;
+import org.bouncycastle.math.ec.custom.djb.Curve25519;
+import org.bouncycastle.util.encoders.Hex;
 
 public class ECDHExchange extends AbstractKeyExchange
 {

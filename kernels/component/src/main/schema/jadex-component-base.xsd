@@ -379,6 +379,10 @@ In the configurations section, predefined
 		<xs:annotation>
 			<xs:documentation>Base type for any startable element.</xs:documentation>
 		</xs:annotation>
+		<xs:attribute name="autostart" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="predecessors" type="xs:string" use="optional"/>
+		<xs:attribute name="successors" type="xs:string" use="optional"/>
+		<xs:attribute name="keepalive" type="xs:boolean" use="optional" default="false"/>
 		<xs:attribute name="suspend" type="xs:boolean" use="optional" default="false"/>
 		<xs:attribute name="monitoring" type="xs:boolean" use="optional" default="false"/>
 		<xs:attribute name="synchronous" type="xs:boolean" use="optional" default="false"/>

@@ -32,7 +32,7 @@ public class CreationInfo
 	protected Map<String, Object> args;
 	
 	/** The parent component. */
-	protected IComponentIdentifier parent;
+//	protected IComponentIdentifier parent;
 	
 	/** The resource identifier. */
 	protected IResourceIdentifier rid;
@@ -98,7 +98,7 @@ public class CreationInfo
 			this.filename = info.getFilename();
 			this.config	= info.getConfiguration();
 			this.args	= info.getArguments();
-			this.parent	= info.getParent();
+//			this.parent	= info.getParent();
 			this.suspend	= info.getSuspend(); 
 //			this.master = info.getMaster();
 //			this.daemon = info.getDaemon();
@@ -116,12 +116,11 @@ public class CreationInfo
 
 	/**
 	 *  Create a new creation info.
-	 *  @param parent	The parent of the component to be created.
 	 */
-	public CreationInfo(IComponentIdentifier parent)
-	{
-		this(null, parent);
-	}
+//	public CreationInfo(IComponentIdentifier parent)
+//	{
+//		this(null, parent);
+//	}
 	
 	/**
 	 *  Create a new creation info.
@@ -138,17 +137,17 @@ public class CreationInfo
 	 */
 	public CreationInfo(IResourceIdentifier rid)
 	{
-		this(null, null, null, null, null, null, null, null, rid);
+		this(null, null, rid);
 	}
 	
 	/**
 	 *  Create a new creation info.
 	 *  @param parent	The parent of the component to be created.
 	 */
-	public CreationInfo(IComponentIdentifier parent, IResourceIdentifier rid)
-	{
-		this(null, null, parent, null, null, null, null, null, rid);
-	}
+//	public CreationInfo(IComponentIdentifier parent, IResourceIdentifier rid)
+//	{
+//		this(null, null, parent, null, null, null, null, null, rid);
+//	}
 	
 	/**
 	 *  Create a new creation info.
@@ -157,7 +156,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args)
 	{
-		this(config, args, (IComponentIdentifier)null);
+		this(config, args, null);
 	}
 	
 	/**
@@ -165,118 +164,9 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IResourceIdentifier rid)
 	{
-		this(config, args, null, null, null, null, null, null, rid);
-	}
-	
-
-	/**
-	 *  Create a new creation info.
-	 *  @param args	The arguments.
-	 *  @param parent	The parent of the component to be created.
-	 */
-	public CreationInfo(Map<String, Object> args, IComponentIdentifier parent)
-	{
-		this(null, args, parent);
-	}
-	
-	/**
-	 *  Create a new creation info.
-	 *  @param config	The configuration.
-	 *  @param args	The arguments.
-	 *  @param parent	The parent of the component to be created.
-	 */
-	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent)
-	{
-		this(config, args, parent, null, (String[])null);
-	}
-	
-	/**
-	 *  Create a new creation info.
-	 *  @param config	The configuration.
-	 *  @param args	The arguments.
-	 *  @param parent	The parent of the component to be created.
-	 *  @param suspend	The suspend flag.
-	 */
-	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend)
-	{
-		this(config, args, parent, suspend, (String[])null);
-	}
-	
-	/**
-	 *  Create a new creation info.
-	 *  @param config	The configuration.
-	 *  @param args	The arguments.
-	 *  @param parent	The parent of the component to be created.
-	 *  @param suspend	The suspend flag.
-	 *  @param imports	The imports.
-	 */
-	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, String[] imports)
-	{
-		this(config, args, parent, suspend, null, null, imports, null, null);
-	}
-	
-	/**
-	 *  Create a new creation info.
-	 *  @param config	The configuration.
-	 *  @param args	The arguments.
-	 *  @param parent	The parent of the component to be created.
-	 *  @param suspend	The suspend flag.
-	 *  @param master	The master flag.
-	 */
-	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, 
-		//Boolean master, Boolean daemon, Boolean autoshutdown, 
-		Boolean synchronous, //Boolean persistable, 
-		PublishEventLevel monitoring)
-	{
-		this(config, args, parent, suspend, synchronous, monitoring, null, null, null);
-	}
-	
-	/**
-	 *  Create a new creation info.
-	 *  @param config	The configuration.
-	 *  @param args	The arguments.
-	 *  @param parent	The parent of the component to be created.
-	 *  @param suspend	The suspend flag.
-	 *  @param master	The master flag.
-	 *  @param imports	The imports.
-	 */
-	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, 
-		Boolean suspend, //Boolean master, Boolean daemon, Boolean autoshutdown, 
-		Boolean synchronous, //Boolean persistable, 
-		PublishEventLevel monitoring,
-		String[] imports, RequiredServiceBinding[] bindings, IResourceIdentifier rid)
-	{
-		this.config	= config;
-		this.args	= args;
-		this.parent	= parent;
-		this.suspend	= suspend;
-//		this.master = master;
-//		this.daemon = daemon;
-//		this.autoshutdown = autoshutdown;
-		this.monitoring = monitoring;
-		this.imports	= imports;
-		this.bindings = bindings;
-		this.rid = rid;
-	}
-	
-	/**
-	 *  Create a new creation info.
-	 *  @param filename The filename.
-	 */
-	public CreationInfo(String filename)
-	{
-		this.filename = filename;
-	}
-	
-	/**
-	 *  Create a new creation info.
-	 *  @param filename The filename.
-	 */
-	public CreationInfo(String filename, String config, Map<String, Object> args)
-	{
-		this.filename = filename;
 		this.config = config;
 		this.args = args;
+		this.rid = rid;
 	}
 	
 	//-------- methods --------
@@ -339,20 +229,24 @@ public class CreationInfo
 	 *  Get the parent.
 	 *  @return the parent
 	 */
-	public IComponentIdentifier getParent()
-	{
-		return parent;
-	}
+//	public IComponentIdentifier getParent()
+//	{
+//		return parent;
+//	}
+//	public IComponentIdentifier getParent()
+//	{
+//		return null;
+//	}
 
 	/**
 	 *  Set the parent.
 	 *  @param parent the parent to set
 	 */
-	public CreationInfo setParent(IComponentIdentifier parent)
-	{
-		this.parent = parent;
-		return this;
-	}
+//	public CreationInfo setParent(IComponentIdentifier parent)
+//	{
+//		this.parent = parent;
+//		return this;
+//	}
 
 	/**
 	 *  Get the resource identifier for loading the component model.
@@ -637,6 +531,16 @@ public class CreationInfo
 	{
 		return name;
 	}
+	
+	/**
+	 *  Set the filename.
+	 *  @param filename The filename to set
+	 */
+	public CreationInfo setFilenameClass(Class<?> clazz)
+	{
+		this.filename = clazz.getName()+".class";
+		return this;
+	}
 
 	/**
 	 *  Set the name.
@@ -665,6 +569,16 @@ public class CreationInfo
 	{
 		this.pojo = pojo;
 		return this;
+	}
+
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	@Override
+	public String toString()
+	{
+		return "CreationInfo(name=" + name + ", filename=" + filename + ")";
 	}
 	
 }

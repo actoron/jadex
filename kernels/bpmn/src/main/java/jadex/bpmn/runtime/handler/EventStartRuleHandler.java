@@ -49,9 +49,7 @@ public class EventStartRuleHandler extends EventIntermediateRuleHandler
 		// Internal subprocess -> treat like intermediate event.
 //		if(thread.getThreadContext().getParent()!=null)
 		if(thread.getParent()!=null)
-		{
 			super.execute(activity, instance, thread);
-		}
 	}
 	
 }

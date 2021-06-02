@@ -15,6 +15,7 @@ import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.nonfunctional.annotation.SNameValue;
 import jadex.bridge.service.IService;
 import jadex.commons.MethodInfo;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
 
@@ -64,6 +65,20 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 	public NFPropertyMetaInfo getMetaInfo()
 	{
 		return metainfo;
+	}
+	
+	/**
+	 *  Returns the current value of the property in a human readable form.
+	 *  @return The current value of the property.
+	 */
+	public IFuture<String> getPrettyPrintValue()
+	{
+		Future<String> ret = new Future<>();
+		getValue().then(v ->
+		{
+			ret.setResult(""+v);
+		}).catchEx(ret);
+		return ret;
 	}
 	
 	/**
@@ -131,8 +146,15 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 							ps = new HashMap<String, Object>();
 							for(UnparsedExpression entry: params)
 							{
-								Object val = SJavaParser.evaluateExpression(entry.getValue(), comp.getModel().getAllImports(), comp.getFetcher(), comp.getClassLoader());
-								ps.put(entry.getName(), val);
+								try
+								{
+									Object val = SJavaParser.evaluateExpression(entry.getValue(), comp.getModel().getAllImports(), comp.getFetcher(), comp.getClassLoader());
+									ps.put(entry.getName(), val);
+								}
+								catch(Exception ex3)
+								{
+									ps.put(entry.getName(), entry.getValue());
+								}
 							}
 						}
 						

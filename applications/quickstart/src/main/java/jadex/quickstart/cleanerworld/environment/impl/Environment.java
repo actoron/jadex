@@ -13,7 +13,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CMSStatusEvent.CMSTerminatedEvent;
 import jadex.bridge.service.types.cms.SComponentManagementService;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.quickstart.cleanerworld.environment.ILocationObject;
 
 /**
@@ -101,7 +101,7 @@ public class Environment
 			create	= ret==null;
 			if(create)
 			{
-				ret	= new Cleaner(cid, new Location(Math.random(), Math.random()), null, 0.1, 0.8);
+				ret	= new Cleaner(cid, new Location(Math.random()*0.4+0.3, Math.random()*0.4+0.3), null, 0.1, 0.8);
 				cleaners.put(cid, ret);
 			}
 		}
@@ -110,7 +110,7 @@ public class Environment
 		{
 			// Remove on agent kill.
 			SComponentManagementService.listenToComponent(cid, agent)
-				.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+				.addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 			{
 				@Override
 				public void intermediateResultAvailable(CMSStatusEvent cse)
@@ -123,26 +123,11 @@ public class Environment
 						}
 					}
 				}
-				
-				@Override
-				public void finished()
-				{
-				}
-				
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-				
-				@Override
-				public void resultAvailable(Collection<CMSStatusEvent> result)
-				{
-				}
 			});
 		}
 		else
 		{
-			throw new IllegalStateException("Cleaner for agent "+cid+" alreqady exists (duplicate actsense?).");
+			throw new IllegalStateException("Cleaner for agent "+cid+" already exists (duplicate actsense?).");
 		}
 		
 		return ret.clone();

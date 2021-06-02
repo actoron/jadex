@@ -46,7 +46,7 @@ public class WaitingTimeProperty extends TimedProperty
 		this.method = method;
 		this.sid = service.getServiceId();
 		
-		WaitingTimeProperty.this.clock = comp.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+		WaitingTimeProperty.this.clock = comp.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class));
 		
 		if(ProxyFactory.isProxyClass(service.getClass()))
 		{

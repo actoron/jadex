@@ -2,8 +2,12 @@ package jadex.bpmn.testcases;
 
 import java.io.File;
 
+import jadex.base.Starter;
 import jadex.base.test.ComponentTestSuite;
-import jadex.commons.SUtil;
+import jadex.base.test.util.STest;
+import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.cms.CreationInfo;
 import junit.framework.Test;
 
 /**
@@ -21,6 +25,7 @@ public class BPMNTest	extends ComponentTestSuite
 		
 			"AgentCreation",	// Sometimes doesn't stop.
 			"WaitForTick",	// Doesn't work in simulation?
+			"MessageSending",	// Broken as start test since receiver not found
 			"Result",
 			"_diagram",
 			"load",
@@ -58,5 +63,21 @@ public class BPMNTest	extends ComponentTestSuite
 	public static Test suite() throws Exception
 	{
 		return new BPMNTest();
+	}
+	
+	public static void main(String[] args)
+	{
+		String	bpmn	= "jadex.bpmn.tutorial.C1_GlobalParameters.bpmn";
+		IExternalAccess	platform	= Starter.createPlatform(STest.getLocalTestConfig(bpmn)).get();
+		for(int i=0; i<10000; i++)
+		{
+			try
+			{
+				IExternalAccess	comp	= platform.createComponent(new CreationInfo().setFilename(bpmn)).get();
+				comp.killComponent().get();
+			}
+			catch(ComponentTerminatedException cte) {}	// ignore when already finished
+		}
+		platform.killComponent().get();
 	}
 }

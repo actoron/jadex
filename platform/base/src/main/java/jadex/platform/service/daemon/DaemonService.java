@@ -15,9 +15,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.daemon.IDaemonService;
 import jadex.bridge.service.types.daemon.StartOptions;
@@ -61,7 +61,8 @@ public class DaemonService implements IDaemonService
 	/**
 	 *  Start the service.
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public void start()
 	{
 		platforms = new HashMap<IComponentIdentifier, Process>();

@@ -1,6 +1,7 @@
 package jadex.micro.testcases.timeoutcascade;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.Boolean3;
@@ -16,7 +17,7 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Agent(autoprovide=Boolean3.TRUE)
 @Service
-@RequiredServices({@RequiredService(name = "ser2", type=IService2.class, scope = RequiredService.SCOPE_PLATFORM)})
+@RequiredServices({@RequiredService(name = "ser2", type=IService2.class, scope = ServiceScope.PLATFORM)})
 public class Service1Agent implements IService1
 {
 	@Agent

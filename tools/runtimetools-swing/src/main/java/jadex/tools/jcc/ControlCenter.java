@@ -32,7 +32,7 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-import jadex.platform.service.settings.SettingsAgent;
+import jadex.platform.service.settings.PlatformSettings;
 
 /**
  *  The global control center.
@@ -149,7 +149,7 @@ public class ControlCenter
 		try
 		{
 			String	read	= new String(Files.readAllBytes(Paths.get(file.toURI())), StandardCharsets.UTF_8);
-			props	= (Properties)SettingsAgent.fromJson(read);
+			props	= (Properties)PlatformSettings.fromJson(read);
 			
 			Properties windowprops = props.getSubproperty("window");
 			if(windowprops != null)
@@ -268,7 +268,7 @@ public class ControlCenter
 					props.removeSubproperties("window");
 					props.addSubproperties("window", windowprops);
 					
-					String	write	= SettingsAgent.toJson(props);
+					String	write	= PlatformSettings.toJson(props);
 					Files.write(Paths.get(file.toURI()), write.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
 					window.getStatusBar().setText("Settings saved successfully: "+ file.getAbsolutePath());
 					ret.setResult(null);

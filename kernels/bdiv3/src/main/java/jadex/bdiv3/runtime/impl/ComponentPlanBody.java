@@ -3,10 +3,12 @@ package jadex.bdiv3.runtime.impl;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.IResultListener;
 
 /**
  *  Plan body implementation as a component.
@@ -51,7 +53,7 @@ public class ComponentPlanBody extends AbstractPlanBody
 //		rplan.setLifecycleState(RPlan.PlanLifecycleState.BODY);
 //		// Todo: should also set processing state and RPLANS thread local?
 //		
-////		IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+////		IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
 //		CreationInfo ci = new CreationInfo(ia.getId());
 //		ci.setFilename(component);
 //		
@@ -75,25 +77,28 @@ public class ComponentPlanBody extends AbstractPlanBody
 	public Object invokeBody(Object[] params) throws BodyAborted
 	{
 		Future<Void>	ret	= new Future<>();
-		ia.createComponent(new CreationInfo(ia.getId()).setFilename(component))
-			.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+		ia.createComponent(new CreationInfo().setFilename(component)).addResultListener(new IResultListener<IExternalAccess>()
 		{
-			@Override
-			public void firstResultAvailable(IComponentIdentifier result)
-			{
-				cid	= result;
-			}
-			
-			@Override
-			public void secondResultAvailable(Map<String, Object> result)
-			{
-				ret.setResult(null);
-			}
-			
-			@Override
 			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
+			}
+			
+			public void resultAvailable(IExternalAccess result)
+			{
+				cid = result.getId();
+				result.waitForTermination().addResultListener(new IResultListener<Map<String,Object>>()
+				{
+					public void resultAvailable(Map<String, Object> result)
+					{
+						ret.setResult(null);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
 			}
 		});
 		return ret;
@@ -133,7 +138,7 @@ public class ComponentPlanBody extends AbstractPlanBody
 		if(cid!=null)
 		{
 			// todo: fix synchronous subcomponents!? may be called from inner or outer component.
-			ia.killComponent(cid);
+			ia.getExternalAccess(cid).killComponent();
 		}
 		
 		super.abort();

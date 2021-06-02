@@ -7,9 +7,9 @@ import java.util.List;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -31,7 +31,8 @@ public class BankingService implements IBankingService
 	/**
 	 *  Init with some data.
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public void start()
 	{
 		data = new ArrayList<String>();

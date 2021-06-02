@@ -1,3 +1,0 @@
-mvn deploy:deploy-file -DgroupId=net.sourceforge.jadex.<suffix> -DartifactId=<the_artifact_id> -Dversion=<version> -Dpackaging=jar -Dfile=<the_jar.jar> -DrepositoryId=sonatype-nexus-snapshots -Durl=https://oss.sonatype.org/content/repositories/snapshots/ -s <jadexpath>/src/main/config/settings.xml
-
-http://maven.apache.org/guides/mini/guide-3rd-party-jars-remote.html

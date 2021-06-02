@@ -8,9 +8,13 @@ import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.servicepool.IServicePoolService;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.IPoolStrategy;
 import jadex.commons.future.CounterResultListener;
@@ -18,9 +22,9 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -34,11 +38,13 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@Arguments(
-{
-	@Argument(name="serviceinfos", clazz=PoolServiceInfo[].class, description="The array of service pool infos.")
+@Arguments({
+	@Argument(name="serviceinfos", clazz=PoolServiceInfo[].class, description="The array of service pool infos."),
+	@Argument(name="scope", clazz=ServiceScope.class, description="The provided scope for the meta pool service.")
 })
-@ProvidedServices(@ProvidedService(type=IServicePoolService.class))
+@Imports("jadex.bridge.service.annotation.Security")
+@ProvidedServices(@ProvidedService(type=IServicePoolService.class, scope=ServiceScope.EXPRESSION, scopeexpression="$args.scope",
+	security=@Security(roles= "%{$args.scope.isGlobal() ? Security.UNRESTRICTED : Security.TRUSTED}")))
 public class ServicePoolAgent implements IServicePoolService
 {
 	//-------- attributes --------
@@ -46,7 +52,7 @@ public class ServicePoolAgent implements IServicePoolService
 	/** The agent. */
 	@Agent
 	protected IInternalAccess agent;
-	
+		
 	/** The registered service types. */
 	protected Map<Class<?>, ServiceHandler> servicetypes;
 	
@@ -55,29 +61,30 @@ public class ServicePoolAgent implements IServicePoolService
 	/**
 	 *  Called once after agent creation.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void> ret = new Future<Void>();
-
-		PoolServiceInfo[] psis = (PoolServiceInfo[])agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("serviceinfos");
 		
-		if(psis!=null)
+		Object psis = (PoolServiceInfo[])agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("serviceinfos");
+		
+		if(psis instanceof PoolServiceInfo[])
 		{
-			CounterResultListener<Void> lis = new CounterResultListener<Void>(psis.length, true, new DelegationResultListener<Void>(ret));
-			for(PoolServiceInfo psi: psis)
+			CounterResultListener<Void> lis = new CounterResultListener<Void>(((PoolServiceInfo[])psis).length, true, new DelegationResultListener<Void>(ret));			
+			for(PoolServiceInfo psi: (PoolServiceInfo[])psis)
 			{
 				IPoolStrategy str = psi.getPoolStrategy()==null? getDefaultStrategy(): (IPoolStrategy)psi.getPoolStrategy();
 				CreationInfo ci = psi.getArguments()!=null? new CreationInfo(psi.getArguments()): null;
-				Class<?> sertype = psi.getServicetype().getType(agent.getClassLoader(), agent.getModel().getAllImports());
+				Class<?> sertype = psi.getServiceType().getType(agent.getClassLoader(), agent.getModel().getAllImports());
 				if(sertype==null)
-					throw new RuntimeException("Could not resolve service class: "+psi.getServicetype());
-				addServiceType(sertype, str, psi.getWorkermodel(), ci, psi.getPublishInfo()).addResultListener(lis);
+					throw new RuntimeException("Could not resolve service class: "+psi.getServiceType());
+				addServiceType(sertype, str, psi.getWorkermodel(), ci, psi.getPublishInfo(), psi.getPublicationScope()).addResultListener(lis);
 			}
 		}
 		else
 		{
-			ret.setResult(null);
+			ret.setException(new IllegalArgumentException("A PoolServiceInfo[] array must be provided in 'serviceinfos' argument."));
 		}
 		
 		return ret;
@@ -154,12 +161,14 @@ public class ServicePoolAgent implements IServicePoolService
 	 *  @param servicetype The service type.
 	 *  @param strategy The service pool strategy.
 	 */
-	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi, String scope)
+	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi, ServiceScope scope)
 	{
 		if(servicetypes==null)
 			servicetypes = new HashMap<Class<?>, ServiceHandler>();
 		if(strategy==null)
 			strategy = getDefaultStrategy();
+		if(scope==null)
+			scope = ServiceScope.DEFAULT;
 		ServiceHandler handler = new ServiceHandler(agent, servicetype, strategy, componentmodel, info);
 		servicetypes.put(servicetype, handler);
 
@@ -212,6 +221,28 @@ public class ServicePoolAgent implements IServicePoolService
 		return new DefaultPoolStrategy(5, 35000, 10);
 //		return new DefaultPoolStrategy(Runtime.getRuntime().availableProcessors()+1, 
 //			Runtime.getRuntime().availableProcessors()+1);
+	}
+	
+	/**
+	 *  Get the maximum capacity.
+	 *  @param servicetype The service type.
+	 *  @return The maximum capacity.
+	 */
+	public IFuture<Integer> getMaxCapacity(Class<?> servicetype)
+	{
+		ServiceHandler handler = servicetypes.get(servicetype);
+		return new Future<Integer>(handler==null? 0: handler.getStrategy().getWorkerCount());
+	}
+	
+	/**
+	 *  Get the free capacity.
+	 *  @param servicetype The service type.
+	 *  @return The free capacity.
+	 */
+	public IFuture<Integer> getFreeCapacity(Class<?> servicetype)
+	{
+		ServiceHandler handler = servicetypes.get(servicetype);
+		return new Future<Integer>(handler==null? 0: handler.getStrategy().getCapacity());
 	}
 	
 	// Not necessary because service publication scope of workers is set to parent

@@ -3,7 +3,7 @@ package jadex.platform.service.cli.commands;
 import java.util.Iterator;
 import java.util.Map;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.SUtil;
@@ -31,7 +31,7 @@ public class DestroyComponentCommand extends ACliCommand
 			{
 				val += "@"+pfn;
 			}
-			return new BasicComponentIdentifier(val);
+			return new ComponentIdentifier(val);
 		}
 	};
 	
@@ -79,7 +79,7 @@ public class DestroyComponentCommand extends ACliCommand
 		else
 		{
 			final IExternalAccess comp = (IExternalAccess)context.getUserContext();
-			comp.killComponent(cid).addResultListener(new DelegationResultListener<Map<String,Object>>(ret));
+			comp.getExternalAccess(cid).killComponent().addResultListener(new DelegationResultListener<Map<String,Object>>(ret));
 		}
 		
 		return ret;

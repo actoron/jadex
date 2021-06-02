@@ -51,7 +51,7 @@ public class DecentralizedAcquisitionMechanism extends AAcquisitionMechanism
 //		final IComponentIdentifier cid = new BasicComponentIdentifier(name);
 //		
 //		// Try to fetch certificate from other platforms
-//		SServiceProvider.getServices(secser.getComponent(), ISecurityService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+//		SServiceProvider.getServices(secser.getComponent(), ISecurityService.class, ServiceScope.GLOBAL)
 //			.addResultListener(new IIntermediateResultListener<ISecurityService>()
 //		{
 //			protected int ongoing;

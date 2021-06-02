@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.swing.Icon;
@@ -28,8 +26,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 /**
  *  The monitoring settings panel.

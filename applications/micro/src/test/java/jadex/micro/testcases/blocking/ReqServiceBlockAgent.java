@@ -5,7 +5,8 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.Boolean3;
@@ -28,15 +29,16 @@ import jadex.micro.annotation.Results;
 @ProvidedServices(@ProvidedService(type=IBlockService.class))
 @RequiredServices(
 {
-	@RequiredService(name="myser", type=IBlockService.class, scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY),
-	@RequiredService(name="stepser", type=IStepService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL)
+	@RequiredService(name="myser", type=IBlockService.class, scope=ServiceScope.COMPONENT_ONLY),
+	@RequiredService(name="stepser", type=IStepService.class, scope=ServiceScope.GLOBAL)
 })
 public class ReqServiceBlockAgent  extends JunitAgentTest implements IBlockService
 {
 	/**
 	 *  Execute the agent
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void	execute(final IInternalAccess agent)
 	{
 		TestReport[] trs = new TestReport[2];

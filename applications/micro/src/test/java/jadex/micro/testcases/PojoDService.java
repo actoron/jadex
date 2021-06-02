@@ -7,9 +7,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -32,7 +32,8 @@ public class PojoDService implements IDService
 	/**
 	 *  Init the agent.
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public IFuture<Void> serviceStarted()
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -41,7 +42,7 @@ public class PojoDService implements IDService
 		if("first".equals(agent.getConfiguration()))
 		{
 			agent.createComponent(
-				new CreationInfo("second", null, agent.getId()).setFilename( "jadex.micro.testcases.ServiceParameterAgent.class"), null)
+				new CreationInfo("second", null).setFilename( "jadex.micro.testcases.ServiceParameterAgent.class"))
 				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
 				public void customResultAvailable(IExternalAccess exta)

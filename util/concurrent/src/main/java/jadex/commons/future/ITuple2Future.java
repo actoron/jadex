@@ -74,8 +74,9 @@ public interface ITuple2Future<E, F> extends IIntermediateFuture<TupleResult>
      * 
      * @param firstListener Listener for the first available result.
      * @param secondListener Listener for the second available result.
-     */
+     * /
     public void addTuple2ResultListener(IFunctionalResultListener<E> firstListener, IFunctionalResultListener<F> secondListener);
+    */
     
     /**
      * Uses two functional result listeners to create a Tuple2ResultListener and add it.
@@ -88,6 +89,7 @@ public interface ITuple2Future<E, F> extends IIntermediateFuture<TupleResult>
      * @param secondListener Listener for the second available result.
 	 * @param exListener The listener that is called on exceptions. Passing
 	 *        <code>null</code> enables default exception logging.
-     */
+     * /
     public void addTuple2ResultListener(IFunctionalResultListener<E> firstListener, IFunctionalResultListener<F> secondListener, IFunctionalExceptionListener exceptionListener);
+	*/
 }

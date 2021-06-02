@@ -8,6 +8,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
@@ -18,13 +19,13 @@ import jadex.rules.eca.ChangeInfo;
  *   
  *   Hello,
  *   I wrote an agent that was triggering self regulating plans based on a belief
- *   (ie. @Trigger(factchangeds="belief")). then I tried using this same belief
+ *   (ie. @Trigger(factchanged="belief")). then I tried using this same belief
  *   in a goal condition (@GoalCreationCondition).
  *   When I ran the agent with the Goal implemented, the plans associated with triggers
  *   senstive to this belief would not execute. I created a test case Agent to observe this behaviour.
  *   
  *   I have implemented a belief called number which triggers the numberChangedPlan plan with the
- *   factchangeds propertyListener in the trigger.
+ *   factchanged propertyListener in the trigger.
  *   
  *   I have also created a dummy goal GenericGoal which uses the belief number
  *   in the @GoalCreationCondition. If you run the agent with the goal present
@@ -47,14 +48,15 @@ public class SelectiveBeliefChangeBDI
 		number = 9.2;
 	}
 
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body(IInternalAccess agent)
 	{
 		number = 9.4;
 		number = 29.5;
 	}
 
-	@Plan(trigger = @Trigger(factchangeds = "number"))
+	@Plan(trigger = @Trigger(factchanged = "number"))
 	public void numberChangedPlan(ChangeEvent event)
 	{
 		ChangeInfo<Double> change = (ChangeInfo<Double>)event.getValue();

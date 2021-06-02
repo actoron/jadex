@@ -7,7 +7,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
@@ -107,7 +106,8 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	 *  Set the participant.
 	 *  @param participant The participant to set.
 	 */
-	public void setParticipant(ITransportComponentIdentifier participant)
+	public void setParticipant(IComponentIdentifier participant)
+//	public void setParticipant(ITransportComponentIdentifier participant)
 	{
 		this.participant = participant;
 	}

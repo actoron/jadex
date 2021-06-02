@@ -31,7 +31,7 @@ public class TimePatternFilter extends ComposedFilter<Long>
 	 */
 	public TimePatternFilter()
 	{
-		super(null);
+		super((IFilter<Long>[])null);
 	}
 	
 	/**

@@ -1,8 +1,15 @@
 package jadex.bridge;
 
+import java.util.stream.Stream;
+
 import jadex.base.Starter;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.component.ComponentFutureFunctionality;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.bridge.service.search.ServiceEvent;
+import jadex.bridge.service.types.registry.SlidingCuckooFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IForwardCommandFuture;
@@ -28,6 +35,27 @@ import jadex.commons.future.Tuple2Future;
 public class SFuture
 {
 	/**
+	 *  Create an intermediate future for a stream.
+	 *  The results are pulled from the stream using the agent thread i.e. the agent will be blocked when waiting for stream results.
+	 *  Safe to use (but somewhat useless) for finished streams.
+	 *  Also safe to use for streams, created with IntermediateFuture.asStream().
+	 *  Not safe to use for other kinds of infinite streams!
+	 */
+	public static <T> IntermediateFuture<T> streamToFuture(IInternalAccess agent, Stream<T> results)
+	{
+		// Asynchronously transform results, otherwise method would block before returning stream-connected future
+		// and results would only be sent in bunch at the end or never, if the source future doesn't finish.
+		IntermediateFuture<T>	ret	= new IntermediateFuture<>();
+		agent.scheduleStep(ia ->
+		{
+			results.forEach(item -> ret.addIntermediateResult(item));
+			ret.setFinished();
+			return IFuture.DONE;
+		});
+		return ret;
+	}
+	
+	/**
 	 *  Automatically update the timer of a long running service call future.
 	 *  Ensures that the caller does not timeout even if no result
 	 *  value is set in that time span.
@@ -40,7 +68,7 @@ public class SFuture
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 //		boolean	realtime	= sc!=null ? sc.getRealtime()!=null ? sc.getRealtime().booleanValue() : false : false;
 		boolean	realtime = sc != null ? sc.isRemoteCall(ia.getId()) : false;
-		avoidCallTimeouts(ret, ia, realtime);
+		avoidCallTimeouts(ret, ia, Starter.isRealtimeTimeout(ia.getId(), realtime));
 	}
 	
 	/**
@@ -79,7 +107,7 @@ public class SFuture
 	//	boolean local = sc.getCaller().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName());
 	//	long to = sc.getTimeout()>0? sc.getTimeout(): (local? BasicService.DEFAULT_LOCAL: BasicService.DEFAULT_REMOTE);
 	//	to = 5000;
-		avoidCallTimeouts(ret, ea, to, realtime);
+		avoidCallTimeouts(ret, ea, to, Starter.isRealtimeTimeout(ea.getId(), realtime));
 	}
 		
 	/**
@@ -125,7 +153,8 @@ public class SFuture
 		if(to>0)
 		{
 			final long w = (long)(to*factor);
-			IComponentStep<Void> step = new ImmediateComponentStep<Void>()
+			IComponentStep<Void> step = new IComponentStep<Void>()
+//			IComponentStep<Void> step = new ImmediateComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -262,6 +291,9 @@ public class SFuture
 	 */
 	public static Future<?> getFuture(Class<?> clazz)
 	{
+		if(clazz==null)
+			return new Future();
+		
 		Future<?> ret = null;
 		Exception ex	= null;
 		
@@ -327,16 +359,121 @@ public class SFuture
 	/**
 	 *  Blocking wait for first result.
 	 *  Future is terminated after first result is received.
-	 *  Uses realtime timeout (hack?)
+	 *  Defaults to realtime timeout (hack?)
 	 *  @param fut	The future.
 	 *  @return The first result.
 	 */
 	public static <T> T getFirstResultAndTerminate(ITerminableIntermediateFuture<T> fut)
 	{
-		T	ret	= fut.getNextIntermediateResult(Timeout.UNSET, true);
+		IComponentIdentifier	local	= IComponentIdentifier.LOCAL.get();
+		T ret = fut.getNextIntermediateResult(Timeout.UNSET, local!=null ? Starter.isRealtimeTimeout(local, true) : true);
 		fut.terminate();
 		return ret;
 	}
 	
-
+	/**
+	 *  Combine results of two subscription futures and exclude duplicates 
+	 *  (uses sliding cuckoo filter with toString() on results).
+	 *  @param f1 Future 1.
+	 *  @param f2 Future 2.
+	 *  @return A future combining results of f1 and f2.
+	 */
+	public static <T> ISubscriptionIntermediateFuture<T> combineSubscriptionFutures(IInternalAccess ia, ISubscriptionIntermediateFuture<T> f1, ISubscriptionIntermediateFuture<T> f2)
+	{
+		return combineSubscriptionFutures(ia, f1, f2, null);
+	}
+	
+	/**
+	 *  Combine results of two subscription futures and exclude duplicates 
+	 *  (uses sliding cuckoo filter with toString() on results).
+	 *  @param f1 Future 1.
+	 *  @param f2 Future 2.
+	 *  @return A future combining results of f1 and f2.
+	 */
+	public static <T, E> ISubscriptionIntermediateFuture<T> combineSubscriptionFutures(IInternalAccess ia, ISubscriptionIntermediateFuture<E> f1, ISubscriptionIntermediateFuture<E> f2, IResultCommand<T, E> cmd)
+	{
+		final SlidingCuckooFilter scf = new SlidingCuckooFilter();
+	
+		ISubscriptionIntermediateFuture<T> ret = (ISubscriptionIntermediateFuture)FutureFunctionality
+			.getDelegationFuture(f1, new ComponentFutureFunctionality(ia)
+		{
+			@Override
+			public Object handleIntermediateResult(Object result) throws Exception
+			{
+				// Drop result when already in cuckoo filter
+				
+				if(result instanceof ServiceEvent)
+				{
+					ServiceEvent se = (ServiceEvent)result;
+					
+					if(ServiceEvent.SERVICE_REMOVED == se.getType())
+					{
+						return removeValue(result);
+					}
+					else if(ServiceEvent.SERVICE_ADDED == se.getType())
+					{
+						return addValue(result);
+					}
+					return DROP_INTERMEDIATE_RESULT;
+				}
+				// In case of no service events always new elements are reported
+				else
+				{
+					return addValue(result);
+				}
+			}
+			
+			protected Object addValue(Object val)
+			{
+				if(scf.contains(val.toString()))
+				{
+					return DROP_INTERMEDIATE_RESULT;
+				}
+				else
+				{
+					// todo: allow transforming the results?!
+					scf.insert(val.toString());
+					T res = cmd!=null? cmd.execute((E)val): (T)val;
+					return res;
+				}
+			}
+			
+			protected Object removeValue(Object val)
+			{
+				if(scf.contains(val.toString()))
+				{
+					scf.delete(val.toString());
+					T res = cmd!=null? cmd.execute((E)val): (T)val;
+					return res;
+				}
+				else
+				{
+					return DROP_INTERMEDIATE_RESULT;
+				}
+			}
+			
+			@Override
+			public void handleTerminated(Exception reason)
+			{
+				// TODO: multi delegation future with multiple sources but one target?
+				if(f2!=null)
+					f2.terminate(reason);
+				
+				super.handleTerminated(reason);
+			}
+		});
+		
+		SFuture.avoidCallTimeouts((IntermediateFuture)ret, ia);
+		
+		// Add remote results to future
+		if(f2!=null)
+		{
+			f2.next(result-> 
+			{
+				((IntermediateFuture)ret).addIntermediateResult((T)result);
+			}).catchEx(exception -> {}); // Ignore exception (printed when no listener supplied)
+		}
+		
+		return ret;
+	}
 }

@@ -125,11 +125,11 @@
 	</plans>
 	
 	<services>
-		<requiredservice name="treatvictimservices" class="ITreatVictimsService" multiple="true"/>
-		<requiredservice name="extinguishfireservices" class="IExtinguishFireService" multiple="true"/>
+		<requiredservice name="treatvictimservices" class="ITreatVictimsService" />
+		<requiredservice name="extinguishfireservices" class="IExtinguishFireService" />
 <!-- 			<binding selector="BrigadeSelector"/>
 		</requiredservice> -->
-		<requiredservice name="clearchemicalsservices" class="IClearChemicalsService" multiple="true"/>
+		<requiredservice name="clearchemicalsservices" class="IClearChemicalsService" />
 <!-- 			<binding selector="BrigadeSelector"/>
 		</requiredservice> -->
 	</services>

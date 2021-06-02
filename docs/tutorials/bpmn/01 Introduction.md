@@ -1,0 +1,15 @@
+# 1 Chapter 1 - Introduction
+
+**Outdated Documentation**: This page is yet to be updated to the latest Jadex version. The documentation is still valid and the explanations still apply. Yet, due to some API changes, not all code examples in this document may be used as such. When in doubt, check the example sources in the *applications* modules available on GitHub, e.g. for [Micro](https://github.com/actoron/jadex/tree/master/applications/micro/src/main/java/jadex/micro) and [BDI](https://github.com/actoron/jadex/tree/master/applications/bdiv3/src/main/java/jadex/bdiv3) agents.
+
+The Jadex Processes project aims at providing modelling and execution facilities for workflows. Main focus is on graphical forms of process representation (e.g. the Business Process Modelling Notation - BPMN) and direct execution of modelled processes (i.e. without prior code generation).
+
+Currently, with BPMN and GPMN two workflow types are supported. Both workflow types are designed as active components and can thus be executed on the Jadex Active Components middleware. The BPMN engine is realized as an interpreter for (extended) BPMN diagrams that are produced by the Jadex BPMN editor. In order to be executable the diagrams need to be annotated with Java expressions describing the semantics of the main elements like activities or branching conditions. GPMN workflows are goal-oriented and allow the definition of processes at a higher abstraction level.
+
+This tutorial provides step-by-step instructions for learning how to use the Jadex process infrastructure and BPMN modelling features. You will learn how to install and use the process infrastructure (i.e. the Jadex platform) for executing modelled processes and how to install and use the extended eclipse BPMN modeller tool. In particular, the following topics are covered in the upcoming chapters:
+
+- [Installation](02%20Installation.md) describes the steps necessary to install and run the Jadex process engine and modelling tools.
+- [Basic Processes](03%20Basic%20Processes.md) illustrates how to use the editor and platform to create and execute simple processes.
+- [Data and Parameters](04%20Data%20and%20Parameters.md) covers how data can be accessed from and passed between process activities.
+- [Events and Messages](05%20Events%20and%20Messages.md) shows how to react to and issue events as well as send and receive messages.
+- [Custom Functionality](06%20Custom%20Functionality.md) describes the various ways to extend Jadex BPMN with custom functionality.

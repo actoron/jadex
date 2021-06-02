@@ -35,7 +35,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.commons.gui.SGUI;
 import jadex.quickstart.cleanerworld.environment.ILocation;
 import jadex.quickstart.cleanerworld.environment.IPheromone;
@@ -218,7 +218,7 @@ public class EnvironmentGui	extends JFrame
 				//System.out.println("cls: "+env.hashCode()+" "+cleaners.length);
 				for(int i=0; i<cleaners.length; i++)
 				{
-					int colorcode	= Math.abs(BasicComponentIdentifier.getPlatformPrefix(cleaners[i].getAgentIdentifier().getParent().getLocalName()).hashCode()%8);
+					int colorcode	= Math.abs(ComponentIdentifier.getPlatformPrefix(cleaners[i].getAgentIdentifier().getParent().getLocalName()).hashCode()%8);
 					Point	p	= onScreenLocation(cleaners[i].getLocation(), bounds);
 					w	= (int)(cleaners[i].getVisionRange()*bounds.width);
 					h	= (int)(cleaners[i].getVisionRange()*bounds.height);

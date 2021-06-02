@@ -1,6 +1,7 @@
 package jadex.micro.testcases.semiautomatic.remoteservice;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.commons.future.IFuture;
@@ -19,7 +20,8 @@ public class MathAgent
 	/**
 	 *  Called once after agent creation.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> agentCreated()
 	{
 		//agent.getComponentFeature(IProvidedServicesFeature.class)

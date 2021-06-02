@@ -1,6 +1,8 @@
 package jadex.micro.testcases.semiautomatic.compositeservice;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -14,8 +16,8 @@ import jadex.micro.annotation.RequiredServices;
 
 @Description("This agent is an empty minimal calculator.")
 @RequiredServices({
-	@RequiredService(name="addservice", type=IAddService.class, scope=RequiredService.SCOPE_PLATFORM),
-	@RequiredService(name="subservice", type=ISubService.class, scope=RequiredService.SCOPE_PLATFORM)
+	@RequiredService(name="addservice", type=IAddService.class, scope=ServiceScope.PLATFORM),
+	@RequiredService(name="subservice", type=ISubService.class, scope=ServiceScope.PLATFORM)
 })
 //@Configurations({
 //	@Configuration(name="Without services", bindings={@Binding(name="addservice"), @Binding(name="subservice")}),
@@ -34,7 +36,8 @@ public class CompositeCalculatorAgent
 	/**
 	 *  The body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 		add(1,1).addResultListener(new IResultListener()

@@ -109,7 +109,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 		Object[] t = new Object[]{context.getCaller().getPlatformPrefix(), classname, methodname, args};
 		final byte[] content = SBinarySerializer.writeObjectToByteArray(t, null);
 		
-		getComponent().searchService( new ServiceQuery<>( ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		getComponent().searchService( new ServiceQuery<>( ISecurityService.class, ServiceScope.PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 		{
 			public void customResultAvailable(ISecurityService sser)
@@ -185,7 +185,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 				{
 					// if not contained in direct names check virtual name mappings
 					final String[] virtuals = au.virtuals();
-					ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+					ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ISecurityService.class, ServiceScope.PLATFORM))
 						.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 					{
 						public void customResultAvailable(ISecurityService sser)
@@ -231,7 +231,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 		Object[] t = new Object[]{callername, classname, methodname, args};
 		final byte[] content = SBinarySerializer.writeObjectToByteArray(t, null);
 		
-		ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ISecurityService.class, ServiceScope.PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 		{
 			public void customResultAvailable(ISecurityService sser)

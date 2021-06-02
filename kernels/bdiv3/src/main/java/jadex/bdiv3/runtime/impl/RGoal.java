@@ -12,6 +12,7 @@ import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.DropGoalAction;
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
@@ -24,6 +25,7 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MPlanParameter;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.IParameter;
 import jadex.bdiv3x.runtime.IParameterSet;
@@ -138,7 +140,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	/**
 	 *  Get parent (goal or plan).
 	 */
-	public RElement getParent()
+	public RParameterElement getParent()
 	{
 		return parentplan!=null? parentplan: parentgoal;
 	}
@@ -220,8 +222,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		if(getProcessingState().equals(processingstate))
 			return;
 		
-//		if(this.toString().indexOf("lower")!=-1)
-//			System.out.println("setting proc: "+this+" "+processingstate);
+		//if(processingstate.equals(GoalProcessingState.FAILED))
+		//	System.out.println("setting proc: "+this+" "+processingstate);
 		
 //		if(getMGoal().getName().indexOf("achievecleanup")!=-1)
 //			System.out.println("proc state: "+processingstate+" "+this);
@@ -341,7 +343,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
 		
-//		System.out.println(ia.getComponentIdentifier()+" setLifecycleState: "+this+", "+lifecyclestate);
+		//System.out.println(ia.getId()+" setLifecycleState: "+this+", "+lifecyclestate);
 		
 //		if(this.toString().indexOf("docnt")!=-1 && GoalLifecycleState.DROPPING.equals(lifecyclestate))
 //			System.out.println("setting life: "+this+" "+lifecyclestate);
@@ -692,8 +694,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		boolean	queue	= ia.getFeature(IInternalBDIAgentFeature.class).getRuleSystem().isQueueEvents();
 		ia.getFeature(IInternalBDIAgentFeature.class).getRuleSystem().setQueueEvents(true);
 		
-//		if(this.toString().indexOf("da_initiate")!=-1)
-//			System.out.println("planfin: "+this+" "+getLifecycleState()+" "+getProcessingState());
+		//if(this.toString().indexOf("GetOne")!=-1 && this.getId().toString().indexOf("Rich")!=-1)
+		//	System.out.println("planfin: "+this+" "+getLifecycleState()+" "+getProcessingState());
 
 		super.planFinished(ia, rplan);
 
@@ -709,7 +711,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			// Find parameter mappings for xml agents
 			// todo: goal-goal mappings
 			// Todo: unify mapping code with RPlan.createPlan()
-			if(rplan instanceof RPlan)// && rplan.isPassed()) -> also copy results from failed plan, if any (e.g. used for negotiation rounds in booktrading)
+			//if(rplan instanceof RPlan)// && rplan.isPassed()) -> also copy results from failed plan, if any (e.g. used for negotiation rounds in booktrading)
+			if(rplan instanceof RPlan && (rplan.isPassed() || rplan.isFailed())) 
 			{
 				MPlan mplan = (MPlan)((RPlan)rplan).getModelElement();
 				if(mplan.getParameters()!=null && mplan.getParameters().size()>0)
@@ -1472,6 +1475,28 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			aborted = plan.isAborted();
 		}
 		return aborted;
+	}
+	
+	/**
+	 *  Check if the element is currently part of the agent's reasoning.
+	 *  E.g. the bases are always adopted and all of their contents such as goals, plans and beliefs.
+	 */
+	public boolean	isAdopted()
+	{
+		boolean	ret	= super.isAdopted() 
+			&& (getParent()==null || getParent().isAdopted()); 	// Hack!!! Subgoals removed to late, TODO: fix hierarchic goal plan lifecycle management
+		if(ret)
+		{
+			if(agent.getFeature0(IBDIAgentFeature.class)!=null)
+			{
+				ret	= agent.getFeature(IBDIAgentFeature.class).getGoals().contains(this);
+			}
+			else //if(agent.getFeature0(IBDIXAgentFeature.class)!=null)
+			{
+				ret	= agent.getFeature(IBDIXAgentFeature.class).getGoalbase().containsGoal(this);
+			}
+		}
+		return ret;
 	}
 
 	

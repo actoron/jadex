@@ -36,7 +36,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Properties;
@@ -347,7 +347,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						{
 							public void customResultAvailable(final IService service)
 							{
-								getJCC().getJCCAccess().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+								getJCC().getJCCAccess().searchService( new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 //								AbstractJCCPlugin.getClassLoader(((IActiveComponentTreeNode)node.getParent().getParent()).getComponentIdentifier(), getJCC())
 									.addResultListener(new SwingDefaultResultListener<ILibraryService>(comptree)
 								{
@@ -417,11 +417,11 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
 						final IComponentIdentifier cid = node.getComponentIdentifier();
 						
-						getJCC().getJCCAccess().getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>(comptree)
+						getJCC().getJCCAccess().getExternalAccessAsync(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>(comptree)
 						{
 							public void customResultAvailable(final IExternalAccess exta)
 							{
-								getJCC().getJCCAccess().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+								getJCC().getJCCAccess().searchService( new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 //										AbstractJCCPlugin.getClassLoader(cid, getJCC())
 									.addResultListener(new SwingDefaultResultListener<ILibraryService>(comptree)
 								{
@@ -609,7 +609,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					final Future<Boolean>	fut	= new Future<Boolean>();
 					viewables.put(cid, fut);
 					// Unknown -> start search to find out asynchronously
-					getJCC().getJCCAccess().getExternalAccess(cid).addResultListener(new SwingExceptionDelegationResultListener<IExternalAccess, Boolean>(fut)
+					getJCC().getJCCAccess().getExternalAccessAsync(cid).addResultListener(new SwingExceptionDelegationResultListener<IExternalAccess, Boolean>(fut)
 					{
 						public void customResultAvailable(final IExternalAccess exta)
 						{

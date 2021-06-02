@@ -9,6 +9,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Configuration;
@@ -24,7 +25,8 @@ public class ObjectConditionJavaBeansBDI
 	@Belief 
 	protected Bean mybean = bean;
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 //		this.mybean = bean;

@@ -1,6 +1,6 @@
 package jadex.bdiv3;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 
 public class BDIClassReaderTest
 {
@@ -16,7 +16,7 @@ public class BDIClassReaderTest
 				System.out.println("done: "+i);				
 			}
 			bcr.read("jadex.bdiv3.TestBDI.class", (String[])null,
-				BDIClassReaderTest.class.getClassLoader(), null, new BasicComponentIdentifier("dummy"), null);
+				BDIClassReaderTest.class.getClassLoader(), null, new ComponentIdentifier("dummy"), null);
 		}
 		
 		long needed = System.currentTimeMillis()-start;

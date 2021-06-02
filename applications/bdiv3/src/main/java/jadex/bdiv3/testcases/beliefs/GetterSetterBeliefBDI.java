@@ -10,10 +10,10 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -56,7 +56,8 @@ public class GetterSetterBeliefBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		setNumber(22);
@@ -74,7 +75,8 @@ public class GetterSetterBeliefBDI
 	/**
 	 *  Called when agent is killed.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void	destroy(IInternalAccess agent)
 	{
 		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
@@ -83,7 +85,7 @@ public class GetterSetterBeliefBDI
 	/**
 	 * 
 	 */
-	@Plan(trigger=@Trigger(factchangeds="number"))
+	@Plan(trigger=@Trigger(factchanged="number"))
 	protected void plan()
 	{
 		System.out.println("plan: "+getNumber());

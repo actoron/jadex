@@ -6,6 +6,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
@@ -32,7 +34,7 @@ import jadex.micro.annotation.RequiredServices;
 	implementation=@Implementation(value=ChatServiceD5.class)))
 @RequiredServices({
 	@RequiredService(name="clockservice", type=IClockService.class),
-	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=RequiredService.SCOPE_GLOBAL),
+	@RequiredService(name="chatservices", type=IChatService.class, scope=ServiceScope.GLOBAL), // multiple=true,
 	@RequiredService(name="regservice", type=IRegistryServiceE3.class)
 })
 @Arguments({
@@ -57,7 +59,8 @@ public class ChatE5Agent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 		IFuture<IRegistryServiceE3>	regservice	= agent.getFeature(IRequiredServicesFeature.class).getService("regservice");

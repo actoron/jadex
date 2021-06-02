@@ -32,17 +32,17 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 	 */
 	public IFuture<Void> execute(ServiceInvocationContext sic)
 	{
-//		if(sic.getMethod().getName().equals("ma1"))
-//			System.out.println("ggghhh");
+//		if(sic.getMethod().getName().indexOf("invoke")!=-1)
+//			System.out.println("herere");
 		
 		try
 		{
-			// Must set nextinvoc and service call as it is not unknown if
+			// Must set nextinvoc and service call as it is not known if
 			// a) the method is directly the business logic or
 			// b) the method jumps from required to provided interceptor chain
 				
-//			if(sic.getMethod().getName().indexOf("addB")!=-1)
-//				System.out.println("ggggg");
+			//if(sic.getMethod().getName().indexOf("method")!=-1)
+			//	System.out.println("ggggg");
 			
 			// Problem that the object could be an rmi proxy itself that delegates the call
 			// Is this case the switch (current becomes next) must not occur
@@ -158,8 +158,7 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 //			if(sic.getMethod().getName().indexOf("Void")!=-1)
 //				System.out.println("e: "+sic.getMethod()+" "+sic.getObject()+" "+sic.getArgumentArray());
 
-			Throwable	t	= e instanceof InvocationTargetException
-					? ((InvocationTargetException)e).getTargetException() : e;
+			Throwable t = e instanceof InvocationTargetException? ((InvocationTargetException)e).getTargetException() : e;
 			
 			if(DEBUG)
 				e.printStackTrace();
@@ -176,7 +175,7 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			}
 			else
 			{
-				Future<?>	fut	= SFuture.getFuture(sic.getMethod().getReturnType());
+				Future<?> fut = SFuture.getFuture(sic.getMethod().getReturnType());
 				if(t instanceof Error)
 				{
 					fut.setException(new ErrorException((Error)t));

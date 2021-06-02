@@ -27,6 +27,8 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.runtime.impl.GoalDroppedException;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -67,7 +69,8 @@ public class JokeAgent
 	@Belief
 	protected List<String> slogans;
 	
-	@AgentCreated
+//	@AgentCreated
+	@OnInit
 	public void init()
 	{
 		slogans = new ArrayList<String>();
@@ -76,7 +79,8 @@ public class JokeAgent
 		slogans.add("The sun makes you smile");
 	}
 	
-	@AgentBody
+//	@AgentBody
+	@OnStart
 	public void body()
 	{
 		AchieveMoodGoal g = new AchieveMoodGoal(Mood.HAPPY);
@@ -230,13 +234,13 @@ public class JokeAgent
 		}
 	}
 	
-	@Plan(trigger=@Trigger(factaddeds="slogans"))
+	@Plan(trigger=@Trigger(factadded="slogans"))
 	public void printNewSlogan(ChangeInfo<String> ci)
 	{
 		System.out.println("Added new slogan: "+ci.getValue());
 	}
 	
-	@Plan(trigger=@Trigger(factchangeds="usermood"))
+	@Plan(trigger=@Trigger(factchanged="usermood"))
 	public void adaptMoodGui()
 	{
 		gui.setMood(usermood);

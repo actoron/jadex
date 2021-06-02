@@ -11,7 +11,6 @@ import jadex.base.Starter;
 import jadex.base.test.IAbortableTestSuite;
 import jadex.base.test.util.STest;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -25,7 +24,6 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITuple2Future;
 import junit.framework.TestResult;
 
 
@@ -66,11 +64,14 @@ public class ComponentStartTest extends ComponentTest
 	 * 
 	 * @param cid The cid, set as soon as known.
 	 */
-	protected void componentStarted(ITuple2Future<IComponentIdentifier, Map<String, Object>> fut)
+	protected void componentStarted(IFuture<IExternalAccess> fut)
 	{
-		try
+		// For start-test kill component after some delay. Let base test collect the result (start exception vs. finished vs. timeout)
+//		System.out.println("component start test 0: "+filename);
+		fut.then(exta ->
 		{
-			final IComponentIdentifier cid = fut.getFirstResult();
+//			IComponentIdentifier	cid = exta.getId();
+//			System.out.println("component start test 1: "+filename+", "+cid);
 
 			// Wait some time (simulation and real time) and kill the component
 			// afterwards.
@@ -86,10 +87,13 @@ public class ComponentStartTest extends ComponentTest
 						// System.out.println("destroying1 "+cid);
 						try
 						{
-							platform.killComponent(cid).get();
+//							System.out.println("component start test 2: "+exta.getId());
+							exta.killComponent().get();
+//							System.out.println("component start test 3: "+exta.getId());
 						}
 						catch(ComponentTerminatedException e)
 						{
+//							System.out.println("component start test 4: "+exta.getId());
 							// ignore, if agent killed itself already
 						}
 						// if(cid.getName().indexOf("ParentProcess")!=-1)
@@ -133,19 +137,7 @@ public class ComponentStartTest extends ComponentTest
 					return ia.getFeature(IExecutionFeature.class).waitForDelay(delay, true);
 				}
 			}).addResultListener(lis);
-		}
-		catch(ComponentTerminatedException cte)
-		{
-			// Ignore if component already terminated.
-		}
-		catch(RuntimeException e)
-		{
-			// Ignore if component already terminated.
-			if(!(e.getCause() instanceof ComponentTerminatedException))
-			{
-				throw e;
-			}
-		}
+		});
 	}
 
 	/**
@@ -174,7 +166,7 @@ public class ComponentStartTest extends ComponentTest
 	 */
 	public static void main(String[] args) throws IOException
 	{
-		IExternalAccess platform = Starter.createPlatform(STest.getDefaultTestConfig()).get();
+		IExternalAccess platform = Starter.createPlatform(STest.getLocalTestConfig(ComponentStartTest.class)).get();
 //		IComponentManagementService cms = platform.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
 
 		String filename = null;

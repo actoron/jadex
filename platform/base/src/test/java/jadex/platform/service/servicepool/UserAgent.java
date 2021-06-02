@@ -7,9 +7,11 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.servicepool.IServicePoolService;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
@@ -20,7 +22,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -43,7 +44,7 @@ import jadex.micro.annotation.Results;
 	@RequiredService(name="aser", type=IAService.class),
 	@RequiredService(name="bser", type=IBService.class)
 })
-@ComponentTypes(@ComponentType(name="spa", filename="jadex.platform.service.servicepool.ServicePoolAgent.class"))
+@ComponentTypes(@ComponentType(name="spa", clazz=ServicePoolAgent.class))
 @Configurations(@Configuration(name="default", components=@Component(type="spa")))
 
 @Results(@Result(name="testresults", clazz=Testcase.class))
@@ -59,7 +60,8 @@ public class UserAgent
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody
+	@OnStart
+	//@AgentBody
 	public IFuture<Void> body()
 	{
 		final Future<Void> ret = new Future<Void>();

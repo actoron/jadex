@@ -6,6 +6,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.beans.PropertyChangeSupport;
 import jadex.micro.annotation.Agent;
@@ -26,7 +27,8 @@ public class ObjectConditionBDI
 	@Belief 
 	protected Bean mybean = bean;
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 //		this.mybean = bean;

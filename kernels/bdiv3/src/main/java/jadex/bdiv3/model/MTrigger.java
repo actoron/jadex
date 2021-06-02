@@ -46,6 +46,7 @@ public class MTrigger
 	protected List<String> ieventnames;
 	protected List<String> goalnames;
 	protected List<String> goalfinishednames;
+	protected Map<String, UnparsedExpression> goalmatchnames;
 	
 	/** The trigger condition. */
 	protected MCondition condition;
@@ -220,6 +221,24 @@ public class MTrigger
 		this.goalnames = goalnames;
 	}
 
+	/**
+	 *  Add a goal match before preprecessing (i.e. unresolved name).
+	 */
+	public void addGoalNameMatchExpression(String goalname, UnparsedExpression match)
+	{
+		if(goalmatchnames==null)
+			this.goalmatchnames = new HashMap<String, UnparsedExpression>();
+		goalmatchnames.put(goalname, match);
+	}
+	
+	/**
+	 *  Get goal match expressions for preprecessing.
+	 */
+	public Map<String, UnparsedExpression> getGoalNameMatchExpressions()
+	{
+		return goalmatchnames;
+	}
+	
 	/**
 	 *  Add a goal name.
 	 */

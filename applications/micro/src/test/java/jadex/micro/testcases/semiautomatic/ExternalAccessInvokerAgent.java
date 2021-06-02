@@ -9,6 +9,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -30,7 +31,8 @@ public class ExternalAccessInvokerAgent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 		SwingUtilities.invokeLater(new Runnable()
@@ -42,7 +44,7 @@ public class ExternalAccessInvokerAgent
 				final IComponentIdentifier cid = agentselector.selectAgent(null);
 				if(cid!=null)
 				{
-					agent.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
+					agent.getExternalAccessAsync(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 					{
 						public void resultAvailable(IExternalAccess ea)
 						{

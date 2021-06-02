@@ -10,9 +10,9 @@ import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -34,7 +34,8 @@ public class ExternalPlanBDI
 	{
 	}
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	protected void body()
 	{
 		try
@@ -52,7 +53,8 @@ public class ExternalPlanBDI
 	/**
 	 *  Called when agent is killed.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void	destroy(IInternalAccess agent)
 	{
 		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));

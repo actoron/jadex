@@ -46,7 +46,7 @@ public interface IServiceIdentifier
 	 *  Get the visibility scope.
 	 *  @return The visibility scope.
 	 */
-	public String getScope();
+	public ServiceScope getScope();
 	
 	/**
 	 *  Get the (security) network names.

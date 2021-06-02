@@ -99,7 +99,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	/**
 	 *  Transfer state from another clock to this clock.
 	 */
-	protected void copyFromClock(IClock oldclock)
+	public void copyFromClock(IClock oldclock)
 	{
 		super.copyFromClock(oldclock);
 		

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
@@ -49,7 +49,7 @@ public class JadexMavenRunner
 ////			"org.activecomponents.jadex:jadex-runtimetools:2.0"
 //		};
 		
-		IComponentIdentifier	cid	= new BasicComponentIdentifier("dummy");
+		IComponentIdentifier	cid	= new ComponentIdentifier("dummy");
 		MavenDependencyResolverService	mh	= new MavenDependencyResolverService(cid);
 		IResourceIdentifier[]	rids	= new IResourceIdentifier[paths.length];	// [gids.length];
 		for(int i=0; i<rids.length; i++)

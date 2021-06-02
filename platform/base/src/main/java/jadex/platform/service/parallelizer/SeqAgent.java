@@ -13,8 +13,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=ISequentialService.class, 
-	implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=ISequentialService.class))
 public class SeqAgent implements ISequentialService
 {
 	/**

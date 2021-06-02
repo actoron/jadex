@@ -3,7 +3,7 @@
  */
 package org.activecomponents.udp.asymciphers;
 
-import org.spongycastle.crypto.params.AsymmetricKeyParameter;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 
 /**
  *  Interface for a public key cipher.

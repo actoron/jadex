@@ -15,9 +15,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.registryv2.ISuperpeerStatusService;
+import jadex.bridge.service.types.registry.ISuperpeerStatusService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
@@ -120,12 +120,14 @@ public abstract class AbstractInfrastructureTest
 	
 	/**
 	 *  Wait until all clients have connected to super peer.
-	 *  @param platforms The super peer (first value) and other platforms that need to connect.
+	 *  @param sp	The super peer.
+	 *  @param clients Platforms that need to connect.
 	 */
 	protected void	waitForSuperpeerConnections(IExternalAccess sp, IExternalAccess... clients)
 	{
-		ISuperpeerStatusService	status	= sp.searchService(new ServiceQuery<>(ISuperpeerStatusService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		ISuperpeerStatusService	status	= sp.searchService(new ServiceQuery<>(ISuperpeerStatusService.class, ServiceScope.PLATFORM)).get();
 		ISubscriptionIntermediateFuture<IComponentIdentifier>	connected	= status.getRegisteredClients();
+		
 		Set<IComponentIdentifier>	platformids	= new LinkedHashSet<>();
 		for(IExternalAccess ea: clients)
 		{
@@ -134,13 +136,13 @@ public abstract class AbstractInfrastructureTest
 //		System.out.println("Waiting for cids: " + Arrays.toString(platformids.toArray()));
 		while(!platformids.isEmpty())
 		{
-			long timeout = Starter.getDefaultTimeout(sp.getId().getRoot());
+			long timeout = Starter.getScaledDefaultTimeout(sp.getId().getRoot(), 3);
 			if (timeout <= 0)
 				timeout = 30000;
-//			System.out.println("Waiting for next cid, remaining: " + Arrays.toString(platformids.toArray()));
-			IComponentIdentifier	cid	= connected.getNextIntermediateResult(timeout, true);
+//			System.err.println("waitForSuperpeerConnections0: Waiting for next cid, remaining: " +this+", "+connected+", "+ Arrays.toString(platformids.toArray())+", "+Thread.currentThread());
+			IComponentIdentifier	cid	= connected.getNextIntermediateResult(timeout, Starter.isRealtimeTimeout(sp.getId(), true));
 			platformids.remove(cid.getRoot());
-//			System.out.println(sp.getId()+" got connection from "+cid.getRoot());
+//			System.err.println("waitForSuperpeerConnections1:"+this+", "+sp.getId()+" got connection from "+cid.getRoot());
 		}
 	}
 }

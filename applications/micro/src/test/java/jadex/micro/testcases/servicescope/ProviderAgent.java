@@ -1,6 +1,6 @@
 package jadex.micro.testcases.servicescope;
 
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -13,7 +13,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=IExampleService.class, scope=RequiredServiceInfo.SCOPE_APPLICATION))
+@ProvidedServices(@ProvidedService(type=IExampleService.class, scope=ServiceScope.APPLICATION))
 public class ProviderAgent implements IExampleService
 {
 	/**

@@ -27,7 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.activecomponents.udp.asymciphers.KeyExchangeGenerator;
-import org.spongycastle.crypto.digests.SHA512Digest;
+import org.bouncycastle.crypto.digests.SHA512Digest;
 
 public class Connection
 {

@@ -7,9 +7,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
+
+import jadex.commons.collection.LRU;
 
 /**
  *  Class using the internal fast class path scanner to provide
@@ -20,7 +25,8 @@ public class SClassReader
 {
 	//-------- cached access --------
 	
-//	protected static final Map<String, Object>	CI	CACHE	= Collections.synchronizedMap(new LinkedHashMap<>()); 
+//	protected static final Map<String, Object>	CI	CACHE	= Collections.synchronizedMap(new LinkedHashMap<>());
+	protected static final Map<ClassLoader, Map<String, ClassInfo>> CI_NAME_CACHE = Collections.synchronizedMap(new WeakHashMap<>());
 	
 	/**
 	 *  Get infos about a class.
@@ -28,7 +34,7 @@ public class SClassReader
 	 *  @param inputstream The input stream of the class file. 
 	 *  @return The class infos.
 	 */
-	public static final ClassInfo getClassInfo(String cachekey, InputStream inputstream)
+	public static final ClassInfo getClassInfo(String cachekey, InputStream inputstream, Date lastmodified)
 	{
 		Object	ret;
 //		if(CICACHE.containsKey(cachekey))
@@ -52,6 +58,8 @@ public class SClassReader
 		
 		if(ret instanceof ClassInfo)
 		{
+			if (((ClassInfo) ret).getLastModified() == null && lastmodified != null)
+				((ClassInfo) ret).setLastModified(lastmodified);
 			return (ClassInfo)ret;
 		}
 		else
@@ -71,6 +79,44 @@ public class SClassReader
 	public static final ClassInfo getClassInfo(InputStream inputstream)
 	{
 		return getClassInfo(inputstream, false, false);
+	}
+	
+	public static final ClassInfo getClassInfo(String classname, ClassLoader cl)
+	{
+		return getClassInfo(classname, cl, false, false);
+	}
+	
+	public static final ClassInfo getClassInfo(String classname, ClassLoader cl, boolean includefields, boolean includemethods)
+	{
+		synchronized(CI_NAME_CACHE)
+		{
+			Map<String, ClassInfo> cache = CI_NAME_CACHE.get(cl);
+			if (cache != null)
+			{
+				ClassInfo ci = cache.get(classname);
+				if (ci != null)
+					return ci;
+			}
+			else
+			{
+				CI_NAME_CACHE.put(cl, new LRU<>(50));
+			}
+		}
+		ClassInfo ret = null;
+		String s = classname.replace(".", "/") + ".class";
+		InputStream is = cl.getResourceAsStream(s);
+		if(is != null)
+			ret = getClassInfo(is, includefields, includemethods);
+		
+		if(ret != null)
+		{
+			synchronized(CI_NAME_CACHE)
+			{
+				CI_NAME_CACHE.get(cl).put(classname, ret);
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -106,11 +152,37 @@ public class SClassReader
 			{
 			}
 			
-			skip(is, 2);
+			classnameindex = is.readUnsignedShort();
+			try
+			{
+				byte[] ref = strings.get(classnameindex);
+				if (ref != null)
+				{
+					byte[] enc = strings.get(SUtil.bytesToShort(ref, 0) & 0xFFFF);
+					if (enc != null)
+					{
+						String superclassname = decodeModifiedUtf8(enc);
+						superclassname = superclassname.replace('/', '.');
+						ret.setSuperClassName(superclassname);
+					}
+				}
+			}
+			catch (Exception e)
+			{
+			}
 			
 			int ifacecount = is.readUnsignedShort();
+			List<String> ifaces = new ArrayList<>();
+			for (int i = 0; i < ifacecount; ++i)
+			{
+				int index = is.readUnsignedShort();
+				String iname = decodeModifiedUtf8(strings.get(SUtil.bytesToShort(strings.get(index), 0) & 0xFFFF));
+				iname = iname.replace('/', '.');
+				ifaces.add(iname);
+			}
+			ret.setInterfaceNames(ifaces);
 			
-			skip(is, ifacecount << 1);
+//			skip(is, ifacecount << 1);
 			
 			if (includefields)
 				ret.setFieldInfos(readFields(is, strings));
@@ -171,6 +243,10 @@ public class SClassReader
 //	            	ret.put(i, is.readUTF());
 	                break;
 	            case 3:
+	            	buf = new byte[4];
+	            	is.readFully(buf);
+	            	ret.put(i, buf);
+	            	break;
 	            case 4:
 	            case 9:
 	            case 10:
@@ -393,17 +469,35 @@ public class SClassReader
         int tag = is.read() & 0xFF;
         switch (tag)
         {
-	        case 'B':
 	        case 'C':
 	        case 'D':
 	        case 'F':
 	        case 'I':
 	        case 'J':
 	        case 'S':
-	        case 'Z':
-	        case 'c':
+	        case 'B':
 	        {
 	        	skip(is, 2);
+	        	break;
+	        }
+	        case 'Z':
+	        {
+	        	int ind = is.readUnsignedShort();
+	        	byte[] enc = strings.get(ind);
+	        	int val = SUtil.bytesToInt(enc);
+	        	ret = val == 0 ? false : true;
+	        	break;
+	        }
+	        case 'c':
+	        {
+	        	int classind = is.readUnsignedShort();
+	        	byte[] enc = strings.get(classind);
+	        	if (enc != null)
+	        	{
+	        		enc = strings.get(classind);
+	        		if (enc != null)
+	        			ret = new ClassInfo(convertTypeName(decodeModifiedUtf8(enc)), null);
+	        	}
 	        	break;
 	        }
 	        case 's':
@@ -483,6 +577,21 @@ public class SClassReader
     		len -= is.skip(len);
     }
     
+    protected static final Map<String, String> BASE_TYPE_MAP;
+    static
+    {
+    	 Map<String, String> convmap = new HashMap<>();
+    	 convmap.put("B","byte");
+    	 convmap.put("C","char");
+    	 convmap.put("D","double");
+    	 convmap.put("F","float");
+    	 convmap.put("S","short");
+    	 convmap.put("I","int");
+    	 convmap.put("J","long");
+    	 convmap.put("Z","boolean");
+    	 BASE_TYPE_MAP = Collections.unmodifiableMap(convmap);
+    }
+    
     /**
      *  Converts a type name to Java style.
      *  @param type Internal name.
@@ -492,7 +601,22 @@ public class SClassReader
     {
     	if (type == null)
     		return null;
-    	return type.substring(1, type.length() - 1).replace('/', '.');
+    	
+    	String ret = BASE_TYPE_MAP.get(type);
+    	if (ret == null)
+    	{
+	    	try
+	    	{
+	    		type = type.substring(1, type.length() - 1).replace('/', '.');
+	    	}
+	    	catch (Exception e)
+	    	{
+//	    		e.printStackTrace();
+	    	}
+    	}
+    	if (ret == null)
+    		ret = type;
+    	return ret;
     }
     
     /**
@@ -838,6 +962,77 @@ public class SClassReader
     }
     
     /**
+     *  Class for infos about a class with full filename.
+     */
+    public static class ClassFileInfo
+    {
+    	/** The class info. */
+    	protected ClassInfo classinfo;
+    	
+    	/** The filename. */
+    	protected String filename;
+    	
+    	/**
+    	 *  Create a new info.
+    	 */
+		public ClassFileInfo() 
+		{
+		}
+    	
+    	/**
+    	 *  Create a new info.
+    	 * @param classinfo
+    	 * @param filename
+    	 */
+		public ClassFileInfo(ClassInfo classinfo, String filename) 
+		{
+			this.classinfo = classinfo;
+			this.filename = filename;
+		}
+
+		/**
+		 * @return the classinfo
+		 */
+		public ClassInfo getClassInfo() 
+		{
+			return classinfo;
+		}
+
+		/**
+		 * @param classinfo the classinfo to set
+		 */
+		public void setClassInfo(ClassInfo classinfo) 
+		{
+			this.classinfo = classinfo;
+		}
+
+		/**
+		 * @return the filename
+		 */
+		public String getFilename() 
+		{
+			return filename;
+		}
+
+		/**
+		 * @param filename the filename to set
+		 */
+		public void setFilename(String filename) 
+		{
+			this.filename = filename;
+		}
+
+		/**
+		 *  Get the string representation.
+		 *  @return The string representation.
+		 */
+		public String toString() 
+		{
+			return "ClassFileInfo [filename=" + filename + "]";
+		} 
+    }
+    
+    /**
      *  Class for infos about a class.
      */
     public static class ClassInfo extends AnnotatedEntity
@@ -845,11 +1040,20 @@ public class SClassReader
     	/** The class name. */
     	protected String classname;
     	
+    	/** The super class name. */
+    	protected String superclassname;
+    	
+    	/** Class interfaces. */
+    	protected List<String> interfacenames;
+    	
     	/** Field infos, if available. */
     	protected List<FieldInfo> fieldinfos;
     	
     	/** Method infos, if available. */
     	protected List<MethodInfo> methodinfos;
+    	
+    	/** Last modified date of the class file if available. */
+    	protected Date lastmodified;
     	
     	/**
     	 *  Create a new classinfo.
@@ -874,6 +1078,24 @@ public class SClassReader
 		public String getClassName()
 		{
 			return classname;
+		}
+		
+		/**
+		 *  Get the superclass name.
+		 *  @return the superclass name.
+		 */
+		public String getSuperClassName()
+		{
+			return superclassname;
+		}
+		
+		/**
+		 *  Get the interface names.
+		 *  @return The interface names.
+		 */
+		public List<String> getInterfaceNames()
+		{
+			return interfacenames;
 		}
 		
 		/**
@@ -940,6 +1162,24 @@ public class SClassReader
 		}
 		
 		/**
+		 *  Set the superclass name.
+		 *  @param classname the superclass name to set
+		 */
+		protected void setSuperClassName(String superclassname)
+		{
+			this.superclassname = superclassname;
+		}
+		
+		/**
+		 *  Set the interface names.
+		 *  @param interfacenames the interface names to set
+		 */
+		protected void setInterfaceNames(List<String> interfacenames)
+		{
+			this.interfacenames = interfacenames;
+		}
+		
+		/**
 		 *  Set the field infos.
 		 *  @param fieldinfos the field infos to set
 		 */
@@ -955,6 +1195,23 @@ public class SClassReader
 		protected void setMethodInfos(List<MethodInfo> methodinfos)
 		{
 			this.methodinfos = methodinfos;
+		}
+		
+		/**
+		 *  Gets the last modified date if it was supplied.
+		 *  @return Last modified date if available, null otherwise.
+		 */
+		public Date getLastModified()
+		{
+			return lastmodified;
+		}
+		
+		/**
+		 *  Sets the last modified date.
+		 */
+		public void setLastModified(Date lastmodified)
+		{
+			this.lastmodified = lastmodified;
 		}
 
 		/**
@@ -975,7 +1232,7 @@ public class SClassReader
     	protected String type;
     	
     	/** Annotations nested in this annotation. */
-    	Map<String, Object> values;
+    	protected Map<String, Object> values;
     	
     	/**
     	 *  Creates the info.

@@ -3,19 +3,16 @@ package jadex.micro.testcases.nflatency;
 import java.util.Collection;
 import java.util.Map;
 
-import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.MethodInfo;
@@ -27,8 +24,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.TupleResult;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Properties;
@@ -43,8 +40,8 @@ import jadex.micro.testcases.TestAgent;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="ts", type=ITestService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL),
-	@RequiredService(name="aser", type=ITestService.class, multiple=true, scope=RequiredServiceInfo.SCOPE_GLOBAL,
+	@RequiredService(name="ts", type=ITestService.class, scope=ServiceScope.GLOBAL),
+	@RequiredService(name="aser", type=ITestService.class, scope=ServiceScope.GLOBAL, // multiple=true,
 		nfprops=@NFRProperty(value=LatencyProperty.class, methodname="methodA", methodparametertypes=long.class))
 })
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
@@ -57,18 +54,18 @@ public class NFLatencyTestAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+//		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
 		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
-				agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
+//				agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
 				tc.addReport(result);
 				testRemote(2).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
-						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
+//						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -105,13 +102,7 @@ public class NFLatencyTestAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		disableLocalSimulationMode().get();
-		
-//		createPlatform(null)
-		IPlatformConfiguration config = STest.getDefaultTestConfig();
-		config.getExtendedPlatformConfiguration().setSimul(false);
-		config.getExtendedPlatformConfiguration().setSimulation(false);
-		createPlatform(config, null).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
+		setupRemotePlatform(false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
@@ -123,17 +114,17 @@ public class NFLatencyTestAgent extends TestAgent
 //					{
 						CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{platform.getId()})).setFilename("jadex.platform.service.remote.ProxyAgent.class");
 						agent.createComponent(ci).addResultListener(
-							new Tuple2Listener<IComponentIdentifier, Map<String, Object>>()
+							new IResultListener<IExternalAccess>()
 //							new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 						{
-							public void firstResultAvailable(IComponentIdentifier result)
+							public void resultAvailable(IExternalAccess result)
 							{
-								performTest(result, testno, false)
+								result.waitForTermination().then(res ->
+								{
+									System.out.println("sec");
+								});
+								performTest(platform.getId(), testno, false)
 									.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
-							}
-							public void secondResultAvailable(Map<String,Object> result) 
-							{
-								System.out.println("sec");
 							}
 							public void exceptionOccurred(Exception exception)
 							{
@@ -202,14 +193,14 @@ public class NFLatencyTestAgent extends TestAgent
 //		IFuture<ITestService> fut = agent.getServiceContainer().getService(ITestService.class, cid);
 		
 		// Add awarenessinfo for remote platform
-//		IAwarenessManagementService awa = agent.getServiceProvider().searchService( new ServiceQuery<>( IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+//		IAwarenessManagementService awa = agent.getServiceProvider().searchService( new ServiceQuery<>( IAwarenessManagementService.class, ServiceScope.PLATFORM)).get();
 //		AwarenessInfo info = new AwarenessInfo(cid.getRoot(), AwarenessInfo.STATE_ONLINE, -1, 
 //			null, null, null, SReflect.getInnerClassName(this.getClass()));
 //		awa.addAwarenessInfo(info).get();
 		
 		
 		IIntermediateFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).getServices("aser");
-		fut.addResultListener(new IIntermediateResultListener<ITestService>()
+		fut.addResultListener(new IntermediateEmptyResultListener<ITestService>()
 		{
 			boolean called;
 			public void intermediateResultAvailable(ITestService result)

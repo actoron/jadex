@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jadex.base.Starter;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -12,10 +12,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IPojoComponentFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
@@ -23,7 +20,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
@@ -51,7 +47,8 @@ public class AgentCreationAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 //		System.out.println("body");
@@ -63,7 +60,6 @@ public class AgentCreationAgent
 		
 		if(args.get("num")==null)
 		{
-			IClockService clock = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 			System.gc();
 			try
 			{
@@ -72,7 +68,7 @@ public class AgentCreationAgent
 			catch(InterruptedException e){}
 			
 			Long startmem = Long.valueOf(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
-			Long starttime = Long.valueOf(clock.getTime());
+			Long starttime = Long.valueOf(System.currentTimeMillis());
 			args.put("num", Integer.valueOf(1));
 			args.put("startmem", startmem);
 			args.put("starttime", starttime);
@@ -103,14 +99,14 @@ public class AgentCreationAgent
 			args.put("num", Integer.valueOf(num+1));
 //			System.out.println("Args: "+num+" "+args);
 
-			agent.createComponent(
-				new CreationInfo(null, args, nested ? agent.getId() : null, null, null, null, null, null, agent.getDescription().getResourceIdentifier())
-				.setName(createPeerName(num+1, agent.getId())).setFilename(AgentCreationAgent.this.getClass().getName()+".class"), null);
+			IExternalAccess creator = nested ? agent : agent.getExternalAccess(agent.getId().getRoot());
+			creator.createComponent(
+				new CreationInfo(null, args, agent.getDescription().getResourceIdentifier())
+				.setName(createPeerName(num+1, agent.getId())).setFilename(AgentCreationAgent.this.getClass().getName()+".class"));
 		}
 		else
 		{
-			IClockService clock = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-			final long end = clock.getTime();
+			final long end = System.currentTimeMillis();
 			
 			System.gc();
 			try
@@ -139,10 +135,10 @@ public class AgentCreationAgent
 			// If nested, use initial component to kill others
 //			else
 			{
-//				IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//				IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 				String	initial	= createPeerName(1, agent.getId());
-				IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
-				agent.getExternalAccess(cid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess>()
+				IComponentIdentifier	cid	= new ComponentIdentifier(initial, agent.getId().getRoot());
+				agent.getExternalAccessAsync(cid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess exta)
 					{
@@ -151,8 +147,7 @@ public class AgentCreationAgent
 							@Classname("deletePeers")
 							public IFuture<Void> execute(final IInternalAccess ia)
 							{
-								IClockService clock = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-								((AgentCreationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).deletePeers(max, clock.getTime(), dur, pera, omem, upera, max, nested);
+								((AgentCreationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).deletePeers(max, System.currentTimeMillis(), dur, pera, omem, upera, max, nested);
 								return IFuture.DONE;
 							}
 						});
@@ -189,9 +184,9 @@ public class AgentCreationAgent
 	{
 		final String name = createPeerName(cnt, agent.getId());
 //		System.out.println("Destroying peer: "+name);
-//		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
-		agent.killComponent(aid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Map<String, Object>>()
+//		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
+		IComponentIdentifier aid = new ComponentIdentifier(name, agent.getId().getRoot());
+		agent.getExternalAccess(aid).killComponent().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Map<String, Object>>()
 		{
 			public void resultAvailable(Map<String, Object> results)
 			{
@@ -215,8 +210,7 @@ public class AgentCreationAgent
 	protected void killLastPeer(final int max, final long killstarttime, final double dur, final double pera, 
 		final long omem, final double upera)
 	{
-		IClockService cs = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-		long killend = cs.getTime();
+		long killend = System.currentTimeMillis();
 		System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
 		double killdur = ((double)killend-killstarttime)/1000.0;
 		final double killpera = killdur/(max-1);

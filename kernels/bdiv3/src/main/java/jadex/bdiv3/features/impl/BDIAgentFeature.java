@@ -131,6 +131,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	{
 		super(component, cinfo);
 		
+		// todo: should not use getFeature() in constructor :-( move to init?!
+		
 		Object pojo = getComponent().getFeature(IPojoComponentFeature.class).getPojoAgent();
 		ASMBDIClassGenerator.checkEnhanced(pojo.getClass());
 		this.bdimodel = (BDIModel)getComponent().getModel().getRawModel();
@@ -481,8 +483,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
-				throw new RuntimeException(e);
+				SUtil.throwUnchecked(e);
 			}
 		}
 	}
@@ -1024,6 +1025,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			{
 				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, IBDIClassGenerator.AGENT_FIELD_NAME);
 //				System.out.println("res: "+res);
+				res.getFirstEntity().setAccessible(true);
 				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
 				if(agent==null) 
 				{
@@ -1054,19 +1056,15 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					catch(Exception e)
 					{
 						e.printStackTrace();
-						throw new RuntimeException(e);
+						SUtil.throwUnchecked(e);
 					}					
 					
 					return;
 				}
 			}
-			catch(RuntimeException e)
-			{
-				throw e;
-			}
 			catch(Exception e)
 			{
-				throw new RuntimeException(e);
+				SUtil.throwUnchecked(e);
 			}
 		}
 
@@ -1604,24 +1602,21 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 			try
 			{
-				Field	f	= caps[i].getFirstEntity().getField(getComponent().getClassLoader());
-				f.setAccessible(true);
-				final Object capa = f.get(agent);
-				
-				String globalname;
-				try
+				// Navigate though field(s) and remember inner capability object and globalname (i.e. path)
+				FieldInfo	finfo	= caps[i].getFirstEntity();
+				Object	capa	= agent;
+				String globalname	= null;
+				while(finfo!=null)
 				{
-					Field	g	= agent.getClass().getDeclaredField(IBDIClassGenerator.GLOBALNAME_FIELD_NAME);
-					g.setAccessible(true);
-					globalname	= (String)g.get(agent);
+					Field	f	= finfo.getField(getComponent().getClassLoader());
+					f.setAccessible(true);
+					capa	= f.get(capa);
 					globalname	= globalname==null ? f.getName() : globalname+MElement.CAPABILITY_SEPARATOR+f.getName();
+					finfo	= finfo.getInner();
 				}
-				catch(Exception e)
-				{
-					throw SUtil.throwUnchecked(e);
-				}
-				
-				injectAgent(getInternalAccess(), capa, caps[i].getSecondEntity(), globalname);
+				final Object fcapa = capa;
+								
+				injectAgent(getInternalAccess(), fcapa, caps[i].getSecondEntity(), globalname);
 				
 				// Todo: capability features?
 //				MicroInjectionComponentFeature.injectServices(capa, caps[i].getSecondEntity(), getComponent())
@@ -1634,7 +1629,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //						{
 //							public void customResultAvailable(Void result)
 //							{
-								invokeInitCalls(capa);
+								invokeInitCalls(fcapa);
 						
 								initCapabilities(agent, caps, i+1)
 									.addResultListener(new DelegationResultListener<Void>(ret));
@@ -1952,7 +1947,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public void removeBeliefListener(String name, IBeliefListener listener)
 	{
-		name	= bdimodel.getCapability().getBeliefReferences().containsKey(name) ? bdimodel.getCapability().getBeliefReferences().get(name) : name;
+		name = bdimodel.getCapability().getBeliefReferences().containsKey(name) ? bdimodel.getCapability().getBeliefReferences().get(name) : name;
 		String rulename = name+"_belief_listener_"+System.identityHashCode(listener);
 		getRuleSystem().getRulebase().removeRule(rulename);
 	}
@@ -2446,6 +2441,20 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
 			events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
 		}
+	}
+	
+	/**
+	 *  Create belief event from a belief name.
+	 *  Checks if belief exists and creates event type.
+	 */
+	public static EventType	createBeliefEvent(MCapability mcapa, String belname, String eventname)
+	{
+		belname = belname.replace(".", "/");
+		MBelief mbel = mcapa.getBelief(belname);
+		if(mbel==null)
+			throw new RuntimeException("No such belief: "+belname);
+		
+		return new EventType(new String[]{eventname, belname});
 	}
 	
 	/**

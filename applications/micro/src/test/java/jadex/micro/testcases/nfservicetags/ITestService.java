@@ -10,7 +10,7 @@ import jadex.commons.future.IFuture;
  */
 // per default use component argument 'tag' (shortcut for the second)
 @NFProperties(@NFProperty(value=TagProperty.class)) 
-//@NFProperties(@NFProperty(value=TagProperty.class, parameters=@NameValue(name=TagProperty.ARGUMENT, value="\"tag\"")))
+//@NFProperties(@NFProperty(value=TagProperty.class, parameters=@NameValue(name=TagProperty.ARGUMENT, value="\"tag\""))) // == TagProperty.NAME
 
 // directly add 'mytag'
 //@NFProperties(@NFProperty(value=TagProperty.class, parameters=@NameValue(name=TagProperty.NAME, value="\"mytag\"")))

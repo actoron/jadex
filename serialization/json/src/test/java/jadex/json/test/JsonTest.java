@@ -8,6 +8,7 @@ import java.util.Set;
 
 import jadex.commons.transformation.A;
 import jadex.commons.transformation.B;
+import jadex.transformation.jsonserializer.JsonString;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
@@ -41,6 +42,21 @@ public class JsonTest extends jadex.commons.transformation.Test
 		JsonTest t = new JsonTest();
 		t.performTests(1);
 		t.testExcludes();
+		t.testRawJson();
+	}
+	
+	/**
+	 *  Test raw JSON handling.
+	 */
+	public void testRawJson()
+	{
+		String json = "{ \"fruit\": \"Apple\", \"size\": \"Large\", \"color\": \"Red\" }";
+		JsonString jsonstring = new JsonString(json);
+		String ret = JsonTraverser.objectToString(jsonstring, null, false);
+		assertTrue(ret.equals(json));
+		
+		Object output = JsonTraverser.objectFromString(json, null, JsonString.class);
+		assertTrue(output instanceof JsonString);
 	}
 	
 	/**
@@ -54,7 +70,7 @@ public class JsonTest extends jadex.commons.transformation.Test
 		exs.add("b");
 		ex.put(A.class, exs);
 		String ret = JsonTraverser.objectToString(a, null, false, ex);
-		System.out.println("ret: " + ret);
+//		System.out.println("ret: " + ret);
 		
 		assertTrue(ret.contains("\"s\""));
 		assertTrue(!ret.contains("\"b\":"));

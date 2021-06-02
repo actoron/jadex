@@ -9,8 +9,9 @@ import javax.swing.SwingUtilities;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.GuiClass;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SReflect;
@@ -18,7 +19,6 @@ import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -32,10 +32,10 @@ import jadex.micro.annotation.RequiredServices;
 @Description("This agent offers a helpline for getting information about missing persons.")
 @RequiredServices({
 	@RequiredService(name="clockservice", type=IClockService.class),
-	@RequiredService(name="remotehelplineservices", type=IHelpline.class, multiple=true, scope=RequiredServiceInfo.SCOPE_NETWORK),
-	@RequiredService(name="localhelplineservices", type=IHelpline.class, multiple=true, scope=RequiredServiceInfo.SCOPE_PLATFORM)
+	@RequiredService(name="remotehelplineservices", type=IHelpline.class, scope=ServiceScope.NETWORK), //multiple=true,
+	@RequiredService(name="localhelplineservices", type=IHelpline.class, scope=ServiceScope.PLATFORM) //multiple=true,
 })
-@ProvidedServices(@ProvidedService(type=IHelpline.class, implementation=@Implementation(HelplineService.class), scope=RequiredServiceInfo.SCOPE_NETWORK))
+@ProvidedServices(@ProvidedService(type=IHelpline.class, implementation=@Implementation(HelplineService.class), scope=ServiceScope.NETWORK))
 @GuiClass(HelplineViewerPanel.class)
 @Agent
 public class HelplineAgent
@@ -54,7 +54,8 @@ public class HelplineAgent
 	/**
 	 *  Called once after agent creation.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void>	agentCreated()
 	{
 //		this.infos = new MultiCollection(new HashMap(), TreeSet.class);
@@ -128,9 +129,9 @@ public class HelplineAgent
 //		return new MicroAgentMetaInfo("This agent offers a helpline for getting information about missing persons.", null, 
 //			new IArgument[]{new Argument("infos", "Initial information records.", "InformationEntry[]")}
 //			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.helpline.HelplineViewerPanel"}),
-//			new RequiredServiceInfo[]{new RequiredServiceInfo("clockservice", IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM),
-//			new RequiredServiceInfo("remotehelplineservices", IHelpline.class, true, true, RequiredServiceInfo.SCOPE_GLOBAL),
-//			new RequiredServiceInfo("localhelplineservices", IHelpline.class, true, true, RequiredServiceInfo.SCOPE_PLATFORM)}, 
+//			new RequiredServiceInfo[]{new RequiredServiceInfo("clockservice", IClockService.class, ServiceScope.PLATFORM),
+//			new RequiredServiceInfo("remotehelplineservices", IHelpline.class, true, true, ServiceScope.GLOBAL),
+//			new RequiredServiceInfo("localhelplineservices", IHelpline.class, true, true, ServiceScope.PLATFORM)}, 
 //			new ProvidedServiceInfo[]{new ProvidedServiceInfo(IHelpline.class)});
 //	}
 }

@@ -14,6 +14,9 @@ import java.util.Scanner;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.HttpConnectionManager;
 import jadex.commons.future.DefaultResultListener;
@@ -23,12 +26,10 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -79,7 +80,8 @@ public class DirectoryDownloaderAgent
 	protected long	interval;
 	
 	/** The thread pool for asynchronous download. */
-	@AgentServiceSearch(lazy=false)
+	//@AgentServiceSearch(lazy=false)
+	@OnService
 	protected IDaemonThreadPoolService	tp;
 	
 	/** The connection manager for open connections. */
@@ -90,8 +92,9 @@ public class DirectoryDownloaderAgent
 	/**
 	 *  Start the agent.
 	 */
-	@AgentCreated
-	public void	start()
+//	@AgentCreated
+	@OnInit
+	public void	init()
 	{
 		conman	= new HttpConnectionManager();
 	}
@@ -99,7 +102,8 @@ public class DirectoryDownloaderAgent
 	/**
 	 *  Terminate the agent.
 	 */
-	@AgentKilled
+//	@AgentKilled
+	@OnEnd
 	public void	shutdown()
 	{
 		conman.dispose();
@@ -108,7 +112,8 @@ public class DirectoryDownloaderAgent
 	/**
 	 *  Execute the agent behavior.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void	body()
 	{
 		final Future<Void>	updated = new Future<Void>();

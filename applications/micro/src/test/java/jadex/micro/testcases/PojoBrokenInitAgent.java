@@ -1,5 +1,6 @@
 package jadex.micro.testcases;
 
+import jadex.bridge.service.annotation.OnInit;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -15,7 +16,8 @@ public class PojoBrokenInitAgent
 	/**
 	 *  Init the agent.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> agentCreated()
 	{
 		throw new RuntimeException("Exception in init.");

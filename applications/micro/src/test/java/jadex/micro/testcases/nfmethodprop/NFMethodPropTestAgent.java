@@ -4,20 +4,19 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.sensor.service.ExecutionTimeProperty;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.MethodInfo;
-import jadex.commons.SReflect;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -48,14 +47,15 @@ public class NFMethodPropTestAgent extends JunitAgentTest
 	/**
 	 *  The agent body. 
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		ITestService ser = (ITestService)agent.getFeature(IRequiredServicesFeature.class).getService("testser").get();
 		
 		final List<TestReport> results = new ArrayList<TestReport>();
-		final long wa = SReflect.isAndroid() ? 5000 : 500;
-		final long wb = SReflect.isAndroid() ? 10000 : 1000;
+		final long wa = Starter.getScaledDefaultTimeout(agent.getId(), 0.05);
+		final long wb = wa*2;
 		
 		for(int i=0; i<5; i++)
 		{

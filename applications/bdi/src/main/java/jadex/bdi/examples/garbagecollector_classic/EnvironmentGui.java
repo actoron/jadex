@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import jadex.bdiv3x.features.IBDIXAgentFeature;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -109,6 +110,12 @@ public class EnvironmentGui	extends JFrame
 					}
 				}));
 				return IFuture.DONE;
+			}
+		}).catchEx(ex -> 
+		{
+			if(ex instanceof ComponentTerminatedException)
+			{
+				SwingUtilities.invokeLater(() -> dispose());
 			}
 		});
 	}

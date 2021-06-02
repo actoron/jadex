@@ -5,16 +5,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IBootstrapFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
@@ -75,7 +72,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	// This constructor is used by the Starter class and the ADFChecker plugin. 
 	public ComponentComponentFactory(String providerid)
 	{
-		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
+		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new ComponentModelLoader(null);
 		this.features	= SComponentFactory.DEFAULT_FEATURES;
 	}
@@ -322,6 +319,6 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	protected ILibraryService getLibraryService()
 	{
-		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class).setMultiplicity(0));
 	}
 }

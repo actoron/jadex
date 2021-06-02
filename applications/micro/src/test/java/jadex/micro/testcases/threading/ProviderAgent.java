@@ -2,6 +2,7 @@ package jadex.micro.testcases.threading;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -15,7 +16,7 @@ import jadex.micro.annotation.ProvidedServices;
  * 
  */
 @Agent
-@ProvidedServices(@ProvidedService(type=ITestService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=ITestService.class, scope=ServiceScope.GLOBAL))
 @Service
 public class ProviderAgent implements ITestService
 {

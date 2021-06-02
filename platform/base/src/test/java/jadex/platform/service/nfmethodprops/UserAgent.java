@@ -8,11 +8,12 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.sensor.service.ExecutionTimeProperty;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.servicepool.IServicePoolService;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.DelegationResultListener;
@@ -20,7 +21,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -30,7 +30,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-import jadex.platform.service.servicepool.IServicePoolService;
 
 /**
  *
@@ -72,7 +71,8 @@ public class UserAgent
 	/**
 	 *  The agent body. 
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		registerServices().get();

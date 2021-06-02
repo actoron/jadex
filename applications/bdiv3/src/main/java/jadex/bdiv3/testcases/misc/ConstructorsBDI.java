@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bdiv3.BDIAgentFactory;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -49,7 +50,8 @@ public class ConstructorsBDI	extends ConstructorsSuper
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void	body()
 	{
 		TestReport	tr	= new TestReport("#1", "Test if constructor calls work.");

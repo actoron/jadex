@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.IGoal;
-import jadex.commons.future.IFuture;
 
 /**
  *  Public methods for working with BDI agents.

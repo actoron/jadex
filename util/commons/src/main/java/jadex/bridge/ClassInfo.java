@@ -137,7 +137,7 @@ public class ClassInfo
 		{
 			type = SReflect.classForName0(type!=null? SReflect.getClassName(type): typename, cl);
 			// Todo: assert that classloader is always the same -> currently reload required for bdi class rewriting?
-			assert type!=null || classloader==null : "Try to load type :"+getTypeName()+" with wrong classloader: "+classloader+", "+cl;
+			//assert type!=null || classloader==null : "Try to load type :"+getTypeName()+" with wrong classloader: "+classloader+", "+cl;
 			if(type!=null)
 				classloader = cl;
 		}
@@ -157,7 +157,7 @@ public class ClassInfo
 		{
 			type = SReflect.findClass0(type!=null? SReflect.getClassName(type): typename, imports, cl);
 			// Todo: assert that classloader is always the same -> currently reload required for bdi class rewriting?
-			assert type!=null || classloader==null : "Try to load type :"+getTypeName()+" with wrong classloader: "+classloader+", "+cl;
+			//assert type!=null || classloader==null : "Try to load type :"+getTypeName()+" with wrong classloader: "+classloader+", "+cl;
 			if(type!=null)
 				classloader = cl;
 		}

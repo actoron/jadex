@@ -14,6 +14,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -22,30 +24,29 @@ import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
-import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
+import jadex.bridge.service.types.awareness.IAwarenessService;
 import jadex.commons.Boolean3;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
 
 /**
- *  Agent that provides the security service.
+ *  Agent that provides transport address resolution (platform id -> transport addresses).
  */
-@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.TRUE, name="address"))
-@ProvidedServices(@ProvidedService(type=ITransportAddressService.class, scope=RequiredService.SCOPE_PLATFORM))
+@Agent(name="address",
+	autoprovide=Boolean3.TRUE,
+	autostart=Boolean3.TRUE)
+@ProvidedServices(@ProvidedService(type=ITransportAddressService.class, scope=ServiceScope.PLATFORM))
 @Service(system=true)
 public class TransportAddressAgent implements ITransportAddressService
 {
@@ -53,7 +54,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	protected static final long CACHE_VALIDITY_DUR = 10*60*1000;
 	
 	/** Freshness limit for previously failed renewed searches. */
-	protected static final long CACHE_INVALIDITY_DUR = 5000;
+	protected static final long MAX_CACHE_INVALIDITY_DUR = 5000;
 	
 	/** Maximum number of peers to ask for addresses. */
 	protected static final int ASK_ALL_LIMIT = 3;
@@ -69,7 +70,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	protected Map<IComponentIdentifier, IFuture<List<TransportAddress>>> searches;
 	
 	/** Freshness state of the cache. */
-	protected Map<IComponentIdentifier, Long> freshness;
+	protected Map<IComponentIdentifier, SearchDelay> freshness;
 	
 	/** The managed addresses: target platform -> (transport name -> transport addresses) */
 	protected Map<IComponentIdentifier, LinkedHashSet<TransportAddress>> addresses;
@@ -98,14 +99,15 @@ public class TransportAddressAgent implements ITransportAddressService
 	/**
 	 *  Initializes the service.
 	 */
-	@AgentCreated
-	public IFuture<Void> start()
+	//@AgentCreated
+	@OnInit
+	public IFuture<Void> init()
 	{
 		localaddresses = new LinkedHashSet<TransportAddress>();
 		addresses = new HashMap<IComponentIdentifier, LinkedHashSet<TransportAddress>>();
 		manualaddresses = new HashMap<IComponentIdentifier, LinkedHashSet<TransportAddress>>();
 		addresssubs = new LinkedHashSet<SubscriptionIntermediateFuture<Tuple2<TransportAddress, Boolean>>>(); 
-		freshness = new HashMap<IComponentIdentifier, Long>();
+		freshness = new HashMap<IComponentIdentifier, SearchDelay>();
 		searches = new HashMap<IComponentIdentifier, IFuture<List<TransportAddress>>>();
 		
 		return IFuture.DONE;
@@ -206,7 +208,7 @@ public class TransportAddressAgent implements ITransportAddressService
 			ret.setResult(addrs);
 			
 			if (freshness.get(platformid) == null ||
-				freshness.get(platformid) > System.currentTimeMillis())
+				freshness.get(platformid).getExpirationTime() < System.currentTimeMillis())
 			{
 				final Future<List<TransportAddress>> fret = new Future<List<TransportAddress>>();
 				
@@ -230,13 +232,10 @@ public class TransportAddressAgent implements ITransportAddressService
 							//if (ret == null && !hasSuperPeer())
 							if (ret == null)
 							{
-								ret = searchAddressesByAskPassiveAwareness(platformid);
+								ret = searchAddressesByAskAwareness(platformid);
 								
 								if (ret == null)
 								ret = searchAddressesByAskRemote(platformid);
-								
-								if (ret == null)
-									ret = searchAddressesByAskAwareness(platformid);
 								
 								// Case not needed?
 //								if (ret == null)
@@ -262,15 +261,18 @@ public class TransportAddressAgent implements ITransportAddressService
 					
 					public void resultAvailable(List<TransportAddress> result)
 					{
-						if (result != null)
-							freshness.put(platformid, System.currentTimeMillis() + CACHE_VALIDITY_DUR );
-						else
+						SearchDelay delay = freshness.get(platformid);
+						
+						if (delay == null ||
+							(delay.isValid() && result == null) ||
+							(!delay.isValid() && result != null))
 						{
-							freshness.put(platformid, System.currentTimeMillis() + CACHE_INVALIDITY_DUR );
-//							throw new Error(agent.getComponentIdentifier() + " FAILED: " + platformid);
+							delay = new SearchDelay(result != null);
 						}
 						
-//						System.out.println("Resolved addresses for " + platformid + ": " + Arrays.toString(result.toArray()));
+						freshness.put(platformid, delay.updateExpirationTime());
+						
+//						System.out.println("Resolved addresses for " + platformid + ": " + result);
 						fret.setResult(filterAddresses(result, transporttype));
 					}
 				});
@@ -383,7 +385,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	protected void updateFromLocalAwareness(IComponentIdentifier platformid)
 	{
 		IAwarenessManagementService awa = agent.getFeature(IRequiredServicesFeature.class)
-			.searchLocalService(new ServiceQuery<>(IAwarenessManagementService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+			.getLocalService(new ServiceQuery<>(IAwarenessManagementService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 		if(awa!=null)
 		{
 			DiscoveryInfo info = awa.getCachedPlatformInfo(platformid).get();
@@ -422,7 +424,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		List<TransportAddress> ret = null;
 		try
 		{
-			ServiceQuery<ITransportAddressService> query = new ServiceQuery<ITransportAddressService>(ITransportAddressService.class, RequiredService.SCOPE_COMPONENT, platformid);
+			ServiceQuery<ITransportAddressService> query = new ServiceQuery<ITransportAddressService>(ITransportAddressService.class, ServiceScope.COMPONENT, platformid);
 			
 			ITransportAddressService rtas = agent.getFeature(IRequiredServicesFeature.class).searchService(query).get();
 			if (rtas != null)
@@ -443,7 +445,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	 *  @param platformid The platform ID.
 	 *  @return The addresses.
 	 */
-	protected List<TransportAddress> searchAddressesByAskPassiveAwareness(IComponentIdentifier platformid)
+	protected List<TransportAddress> searchAddressesByAskAwareness(IComponentIdentifier platformid)
 	{
 		if (!pawalookup)
 			return null;
@@ -452,8 +454,8 @@ public class TransportAddressAgent implements ITransportAddressService
 		
 		try
 		{
-			Collection<IPassiveAwarenessService> awas = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IPassiveAwarenessService.class));
-			for (IPassiveAwarenessService awa : awas)
+			Collection<IAwarenessService> awas = agent.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>(IAwarenessService.class));
+			for (IAwarenessService awa : awas)
 			{
 				try
 				{
@@ -478,32 +480,6 @@ public class TransportAddressAgent implements ITransportAddressService
 	}
 	
 	/**
-	 *  Searches for addresses using super peer.
-	 * 
-	 *  @param platformid The platform ID.
-	 *  @return The addresses.
-	 */
-	protected List<TransportAddress> searchAddressesByAskAwareness(IComponentIdentifier platformid)
-	{
-		if (!awalookup)
-			return null;
-		
-		List<TransportAddress> ret = null;
-		IAwarenessManagementService awa = agent.getFeature(IRequiredServicesFeature.class)
-			.searchLocalService(new ServiceQuery<>(IAwarenessManagementService.class).setMultiplicity(Multiplicity.ZERO_ONE));
-		if(awa!=null)
-		{
-			DiscoveryInfo info = awa.getPlatformInfo(platformid).get();
-			if (info != null)
-				ret = info.getAddresses();
-
-			addAddresses(ret);
-		}
-		
-		return ret;
-	}
-	
-	/**
 	 *  Randomly ask other platforms for addresses (search of last resort).
 	 *  
 	 *  @param platformid The platform ID.
@@ -515,22 +491,12 @@ public class TransportAddressAgent implements ITransportAddressService
 			return null;
 		
 		final Future<List<TransportAddress>> ret = new Future<List<TransportAddress>>();
-		ServiceQuery<ITransportAddressService> query = (new ServiceQuery<>(ITransportAddressService.class)).setScope(RequiredService.SCOPE_GLOBAL);
+		ServiceQuery<ITransportAddressService> query = (new ServiceQuery<>(ITransportAddressService.class)).setScope(ServiceScope.GLOBAL);
 		final ITerminableIntermediateFuture<ITransportAddressService> fut = agent.getFeature(IRequiredServicesFeature.class).searchServices(query);
-		fut.addIntermediateResultListener(new IIntermediateResultListener<ITransportAddressService>()
+		fut.addResultListener(new IntermediateEmptyResultListener<ITransportAddressService>()
 		{
 			/** The peers. */
 			protected List<ITransportAddressService> peers = new ArrayList<ITransportAddressService>();
-			
-			
-			
-			public void exceptionOccurred(Exception exception)
-			{
-			}
-			
-			public void resultAvailable(Collection<ITransportAddressService> result)
-			{
-			}
 			
 			public void intermediateResultAvailable(ITransportAddressService result)
 			{
@@ -685,5 +651,68 @@ public class TransportAddressAgent implements ITransportAddressService
 			}
 		}
 		return ret;
+	}
+	
+	/**
+	 *  A delay for further searches.
+	 *
+	 */
+	protected class SearchDelay
+	{
+		/** Current wait time before another search is attempted */
+		protected float currentwaittime = 0.125f;
+		
+		/** Expiration time of the current delay */
+		protected long expiration;
+		
+		/** Flag, if the current result is valid. */
+		protected boolean valid;
+		
+		/**
+		 *  Creates the delay.
+		 * 
+		 *  @param valid Flag, if the current result is valid.
+		 */
+		public SearchDelay(boolean valid)
+		{
+			this.valid = valid;
+		}
+		
+		/**
+		 *  Returns if the delay is for a valid result.
+		 *  @return True, if valid.
+		 */
+		public boolean isValid()
+		{
+			return valid;
+		}
+		
+		/**
+		 *  Returns the current wait time in ms.
+		 *  
+		 *  @return The current wait time in ms.
+		 */
+		public long getExpirationTime()
+		{
+			return expiration;
+		}
+		
+		/**
+		 *  Doubles the wait time.
+		 *  @param maxwait Maximum wait time.
+		 *  @return The object itself.
+		 */
+		public SearchDelay updateExpirationTime()
+		{
+			if (valid)
+				expiration = System.currentTimeMillis() + CACHE_VALIDITY_DUR;
+			else
+			{
+				currentwaittime += currentwaittime;
+				currentwaittime = Math.min(currentwaittime, MAX_CACHE_INVALIDITY_DUR);
+				expiration = System.currentTimeMillis() + (long) currentwaittime;
+			}
+			return this;
+		}
 	}
 }

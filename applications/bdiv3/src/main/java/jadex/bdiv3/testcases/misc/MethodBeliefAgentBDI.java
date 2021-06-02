@@ -9,6 +9,7 @@ import jadex.bdiv3.runtime.impl.BeliefAdapter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -53,7 +54,8 @@ public class MethodBeliefAgentBDI
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void	body(final IInternalAccess agent)
 	{
 		final TestReport	tr	= new TestReport("#1", "Test if method beliefs work.");

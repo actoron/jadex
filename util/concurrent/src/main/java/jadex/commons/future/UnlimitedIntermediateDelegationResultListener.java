@@ -63,4 +63,16 @@ public class UnlimitedIntermediateDelegationResultListener<E> implements IInterm
 	{
 		// the query is not finished after the status quo is delivered
 	}
+	
+	/**
+	 *  Declare that the future result count is available.
+	 *  This method is only called for intermediate futures,
+	 *  i.e. when this method is called it is guaranteed that the
+	 *  intermediateResultAvailable method will be called as
+	 *  often as the result count indicates.
+	 */
+	public void maxResultCountAvailable(int max) 
+	{
+		// not forwarded as only part of overall result
+	}
 }

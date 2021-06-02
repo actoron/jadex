@@ -1,6 +1,8 @@
 package jadex.micro.testcases.semiautomatic.compositeservice;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -16,7 +18,7 @@ import jadex.micro.annotation.RequiredServices;
  *  The user agent uses services for testing them.
  */
 @Description("This agent uses an add service.")
-@RequiredServices(@RequiredService(name="addservice", type=IAddService.class, scope=RequiredService.SCOPE_PLATFORM))
+@RequiredServices(@RequiredService(name="addservice", type=IAddService.class, scope=ServiceScope.PLATFORM))
 @Agent
 public class UserAgent
 {
@@ -27,7 +29,8 @@ public class UserAgent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 		agent.getFeature(IRequiredServicesFeature.class).getService("addservice").addResultListener(new DefaultResultListener()

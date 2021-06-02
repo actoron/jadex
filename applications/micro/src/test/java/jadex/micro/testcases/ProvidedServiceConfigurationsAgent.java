@@ -5,14 +5,14 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Implementation;
@@ -24,7 +24,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test if in configurations provided service implementations can be overridden.
  */ 
-@ProvidedServices(@ProvidedService(type=IAService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IAService.class))
 @Configurations({
 	@Configuration(name="a", providedservices=@ProvidedService(type=IAService.class, 
 		implementation=@Implementation(expression="$pojoagent.getService()"))),
@@ -41,7 +41,8 @@ public class ProvidedServiceConfigurationsAgent extends JunitAgentTest implement
 	/**
 	 *  Agent created.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -70,7 +71,8 @@ public class ProvidedServiceConfigurationsAgent extends JunitAgentTest implement
 	/**
 	 *  The body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 		return IFuture.DONE;

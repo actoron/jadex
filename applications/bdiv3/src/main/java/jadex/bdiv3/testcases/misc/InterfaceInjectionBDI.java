@@ -6,6 +6,7 @@ import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.IBDIAgent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Boolean3;
@@ -21,7 +22,8 @@ public abstract class InterfaceInjectionBDI implements IBDIAgent
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void	body(IInternalAccess ia)
 	{
 		TestReport tr1 = new TestReport("#1", "Test if interface injection works.");

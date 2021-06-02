@@ -14,7 +14,7 @@
 	
 	<!-- Jadex websocket server setup. Listener starts websocket at path from ws_url context parameter. -->
 	<listener>
-    	<listener-class>com.actoron.webservice.WebSocketInitListener</listener-class>
+    	<listener-class>org.activecomponents.webservice.WebSocketInitListener</listener-class>
 	</listener>
 	<context-param>
 		<param-name>ws_url</param-name>
@@ -22,6 +22,6 @@
 	</context-param>
 	<context-param>
 		<param-name>ws_component_0</param-name>
-		<param-value>com.actoron.shortmessages.ShortMessageAgent.class</param-value>
+		<param-value>org.activecomponents.shortmessages.ShortMessageAgent.class</param-value>
 	</context-param>
 </web-app>  

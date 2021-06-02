@@ -15,10 +15,10 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.Result;
@@ -96,7 +96,8 @@ public class InnerClassChangeBDI
 	/**
 	 *  The plan body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		agent.getFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
@@ -112,7 +113,8 @@ public class InnerClassChangeBDI
 	/**
 	 *  Called when agent is killed.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void	destroy(IInternalAccess agent)
 	{
 		for(TestReport ter: tr)

@@ -11,18 +11,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import jadex.base.Starter;
-import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITargetResolver;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.component.impl.remotecommands.IMethodReplacement;
@@ -50,7 +48,6 @@ import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.types.cms.PlatformComponent;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.commons.IChangeListener;
@@ -63,12 +60,10 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.ImmutableProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
-import jadex.javaparser.SJavaParser;
 
 /**
  *  This class implements the rmi handling. It mainly supports:
@@ -104,7 +99,7 @@ public class RemoteReferenceModule
 		refs.put(Inet4Address.class, tf);
 		refs.put(Inet6Address.class, tf);
 		refs.put(IComponentIdentifier.class, tf);
-		refs.put(BasicComponentIdentifier.class, tf);
+		refs.put(ComponentIdentifier.class, tf);
 		Class<?> ti = SReflect.classForName0("jadex.xml.TypeInfo", RemoteReferenceModule.class.getClassLoader());
 		if(ti!=null)
 			refs.put(ti, tf);
@@ -244,7 +239,7 @@ public class RemoteReferenceModule
 
 //		Object tcid = target instanceof IExternalAccess? (Object)((IExternalAccess)target).getModel().getFullName(): target.getClass();
 		// todo: repair cache for external access
-		Object tcid = target instanceof IExternalAccess? null: target.getClass();
+		Object tcid = target instanceof IService? target.getClass(): null;
 		
 //		ProxyInfo pi;
 		ProxyReference ret;
@@ -302,10 +297,10 @@ public class RemoteReferenceModule
 		// todo: dgc, i.e. remember that target is a remote object (for which a proxyinfo is sent away).
 			
 		ProxyInfo ret = new ProxyInfo(remoteinterfaces);
-		Map<String, Object> properties = null;
+		//Map<String, Object> properties = null;
 		
 		// Hack! as long as registry is not there
-		String[] imports = null;
+		//String[] imports = null;
 //		ClassLoader	cl	= null;
 		
 		// todo: remove support for properties?! or fix 
@@ -475,7 +470,7 @@ public class RemoteReferenceModule
 					{
 						try
 						{
-							IMethodReplacement	mr	= (IMethodReplacement)rep.newInstance();
+							IMethodReplacement	mr	= (IMethodReplacement)rep.getConstructor().newInstance();
 							ret.addMethodReplacement(new MethodInfo(methods[j]), mr);
 						}
 						catch(Exception e)
@@ -706,12 +701,7 @@ public class RemoteReferenceModule
 		// Create a remote reference if not yet available.
 //		if(ret==null)
 		{
-			if(target instanceof IExternalAccess)
-			{
-				ret = new RemoteReference(((IExternalAccess)target).getId(), ((IExternalAccess)target).getId());
-//				System.out.println("component ref: "+ret);
-			}
-			else if(target instanceof IService)
+			if(target instanceof IService)
 			{
 				ret = new RemoteReference(((IService)target).getServiceId().getProviderId(), ((IService)target).getServiceId());
 //				System.out.println("service ref: "+ret);
@@ -748,6 +738,11 @@ public class RemoteReferenceModule
 			{
 				RemoteMethodInvocationHandler rmih = (RemoteMethodInvocationHandler)ProxyFactory.getInvocationHandler(target);
 				ret	= rmih.getProxyReference().getRemoteReference();
+			}
+			else if(target instanceof IExternalAccess)
+			{
+				ret = new RemoteReference(((IExternalAccess)target).getId(), ((IExternalAccess)target).getId());
+//				System.out.println("component ref: "+ret);
 			}
 			else
 			{
@@ -859,7 +854,7 @@ public class RemoteReferenceModule
 //				public IFuture<IExternalAccess> execute(IInternalAccess ia)
 //				{
 //					final Future<IExternalAccess> ret = new Future<IExternalAccess>();
-//					ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//					ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 //	//						.addResultListener(component.createResultListener(new IResultListener()
 //					{
@@ -886,7 +881,7 @@ public class RemoteReferenceModule
 			}
 			ret	= access.getExternalAccess();
 			
-//			access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//			access.searchService( new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
 //			{
 //				public void customResultAvailable(IComponentManagementService cms) 
@@ -946,7 +941,7 @@ public class RemoteReferenceModule
 	 *  Get a proxy for a proxy reference.
 	 *  @param pr The proxy reference.
 	 */
-	public Object getProxy(ProxyReference pr, ClassLoader classloader, boolean tolerant)
+	public Object getProxy(ProxyReference pr, ClassLoader classloader)
 	{
 		Object ret;
 		
@@ -989,11 +984,6 @@ public class RemoteReferenceModule
 				if(cl!=null)
 				{
 					tmp.add(cl);
-				}
-				else if(tolerant)
-				{
-					if(!tmp.contains(IBrokenProxy.class))
-						tmp.add(IBrokenProxy.class);
 				}
 				else 
 				{
@@ -1766,13 +1756,13 @@ public class RemoteReferenceModule
 	{
 		if(processors==null)
 		{
-			processors = Collections.synchronizedList(Traverser.getDefaultProcessors());
+			List<ITraverseProcessor> newprocs = Collections.synchronizedList(Traverser.getDefaultProcessors());
 			// Problem: if micro agent implements a service it cannot
 			// be determined if the service or the agent should be transferred.
 			// Per default a service is assumed.
 
 			// All proxies?!
-			processors.add(processors.size()-1, new ImmutableProcessor()
+			newprocs.add(newprocs.size()-1, new ImmutableProcessor()
 			{
 				@Override
 				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
@@ -1781,7 +1771,7 @@ public class RemoteReferenceModule
 				}
 			});
 			
-			processors.add(processors.size()-1, new ITraverseProcessor()
+			newprocs.add(newprocs.size()-1, new ITraverseProcessor()
 			{
 				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 				{
@@ -1795,7 +1785,7 @@ public class RemoteReferenceModule
 			});
 			
 			// Insert before FieldProcessor that is always applicable
-			processors.add(processors.size()-1, new ITraverseProcessor()
+			newprocs.add(newprocs.size()-1, new ITraverseProcessor()
 			{
 				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 				{
@@ -1810,7 +1800,7 @@ public class RemoteReferenceModule
 			});
 			
 			// Add processor for streams
-			processors.add(processors.size()-1, new ITraverseProcessor()
+			newprocs.add(newprocs.size()-1, new ITraverseProcessor()
 			{
 				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 				{
@@ -1846,7 +1836,7 @@ public class RemoteReferenceModule
 			});
 			
 			// Add processor for streams
-			processors.add(processors.size()-1, new ITraverseProcessor()
+			newprocs.add(newprocs.size()-1, new ITraverseProcessor()
 			{
 				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 				{
@@ -1879,8 +1869,12 @@ public class RemoteReferenceModule
 					return ocon;
 				}
 			});
+			
+			processors = newprocs;
 		}
-		return new ArrayList(processors);
+		
+//		return new ArrayList(processors);
+		return processors;
 	}
 	
 	/**

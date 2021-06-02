@@ -10,6 +10,7 @@ import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.gui.GuiCreator;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
@@ -48,7 +49,8 @@ public class HuntPlan extends Plan
 		myLoc = (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
 
 		jf = (JointField)getBeliefbase().getBelief("potential_field").getFact();
-		pf = (PotentialFrame)getBeliefbase().getBelief("potential_window").getFact();
+//		pf = (PotentialFrame)getBeliefbase().getBelief("potential_window").getFact();
+		pf = (PotentialFrame)((GuiCreator)getBeliefbase().getBelief("gui").getFact()).getGui();
 
 		prey = (ISpaceObject)getBeliefbase().getBelief("next_sheep").getFact();
 

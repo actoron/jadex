@@ -1,0 +1,79 @@
+Home|Home
+Privacy|Datenschutz
+Imprint|Impressum
+About|Über
+Remember password|Passwort merken
+Platform password|Plattformpasswort
+Connected Platforms|Verbundene Plattformen
+This page shows a self-updating list of remote platforms known to this Jadex platform.|Diese Seite zeigt eine sich selbst aktualisierende Plattformliste an.
+Connected|Verbunden
+
+# Source: registryview.js
+Show only global services and queries|Nur globale Dienste und Queries anzeigen
+Service Type|Diensttyp
+Provided By|Angeboten von
+Publication Scope|Sichtbarkeit des Dienstes
+Networks|Netzwerke
+Security|Absicherung
+Connected|Verbunden
+Protocol|Protokoll
+Service Type|Diensttyp
+Query Owner|Query-Besitzer
+Search Scope|Sichtbarkeit der Suche
+Services|Dienste
+Platforms|Plattformen
+
+# Source: Starter Plugin
+Components|Komponenten
+Available Models|Verfügbare Modelle
+Settings|Einstellungen
+Filename|Dateiname
+Configuration|Konfiguration
+Comp. name|Komp.name
+Auto generate|Autogenerieren
+Suspended|Angehalten
+Synchronous|Synchron
+Monitoring|Überwachung
+COARSE|Grob
+MEDIUM|Mittel
+FINE|Fein
+
+# Source: Old "Messages"
+Home|Home
+Privacy|Datenschutz
+Imprint|Impressum
+About|Über
+
+# Source: Security Plugin
+General Settings|Allgemeine Einstellungen
+Use secret|Geheimnis verwenden
+Print secret|Geheimnis ausgeben
+Platform Secret (Password, Key, Certificate)|Plattformgeheimnis (Passwort, Schlüssel, Zertifikat)
+Network Name|Netzwerkname
+Network Secret|Netzwerkgeheimnis
+Remove Network|Netzwerk entfernen
+Key|Schlüssel
+Password|Passwort
+X509 Certificates|X509 Zertifikate
+Encoded Secret|Kodiertes Geheimnis
+Generate Key|Schlüssel erzeugen
+Password (min. 16 characters, 24 recommended)|Passwort (min. 16 Zeichen, 24 empfohlen)
+Derive Key|Schlüssel ableiten
+Password (min. 10 characters)|Passwort (min. 10 Zeichen)
+Secret (Password, Key, Certificate) in Jadex format (pw:, key:, pem:)|Geheimnis (Passwort, Schlüssel, Zertifikat) im Jadex Format (pw:, key:, pem:)
+Add Network|Netzwerk hinzufügen
+Roles|Rollen
+Role|Rolle
+Entity|Entität
+Add|Hinzufügen
+Remove|Entfernen
+# X.509 Nomenclatura, check translation?
+Subject Common Name|Allgemeiner Name
+Subject Distinguished Name|Spezieller Name
+Type|Typ
+Trusted Platform Names|Vertrauenwürdige Plattformnamen
+Trusted Platform Name|Vertrauenwürdiger Plattformname
+Name Authorities|Namenzertifizierungsstellen
+Refresh|Aktualisieren
+Search models...|Modelle suchen...
+

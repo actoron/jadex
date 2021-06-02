@@ -55,10 +55,10 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.transformation.annotations.Classname;
@@ -104,11 +104,11 @@ public class SRemoteGui
 				try
 				{
 					final RequiredServiceInfo[]	ris	= ia.getFeature0(IRequiredServicesFeature.class)==null? null: ((IInternalRequiredServicesFeature)ia.getFeature(IRequiredServicesFeature.class)).getServiceInfos();
-					ProvidedServiceInfo[]	pis	= null;
-					IServiceIdentifier[]	sis	= null;
+					ProvidedServiceInfo[] pis = null;
+					IServiceIdentifier[] sis = null;
 					
 					ServiceQuery<IService>	query	= new ServiceQuery<IService>((Class<IService>)null).setProvider(ia.getId());
-					Collection<IService>	result	= ia.getFeature0(IRequiredServicesFeature.class)==null? null: (ia.getFeature(IRequiredServicesFeature.class)).searchLocalServices(query);
+					Collection<IService>	result	= ia.getFeature0(IRequiredServicesFeature.class)==null? null: (ia.getFeature(IRequiredServicesFeature.class)).getLocalServices(query);
 					if(result!=null)
 					{
 						pis	= new ProvidedServiceInfo[result.size()];
@@ -122,7 +122,7 @@ public class SRemoteGui
 							sis[i] = service.getServiceId();
 							pis[i]	= new ProvidedServiceInfo(service.getServiceId().getServiceName(), 
 //								service.getId().getServiceType(), null, null);
-								sis[i].getServiceType().getType(ia.getClassLoader(), ia.getModel().getAllImports()), null, sis[i].getScope(), null, null);
+								sis[i].getServiceType().getType(ia.getClassLoader(), ia.getModel().getAllImports()), null, sis[i].getScope(), null, null, null, null);
 						}
 						
 						ret.setResult(new Object[]{pis, ris, sis});
@@ -183,7 +183,7 @@ public class SRemoteGui
 //		
 //		try
 //		{
-//			access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//			access.searchService( new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //			{
 //				public void customResultAvailable(IComponentManagementService	cms)
@@ -205,7 +205,7 @@ public class SRemoteGui
 //									final Future<Void>	ret	= new Future<Void>();
 //									try
 //									{
-//										ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//										ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //											.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //										{
 //											public void customResultAvailable(IComponentManagementService cms)
@@ -245,7 +245,7 @@ public class SRemoteGui
 //	public static IFuture<Void>	deregisterRemoteCMSListener(final IExternalAccess access, final IComponentIdentifier cid, final String id0)
 //	{
 //		final Future<Void>	ret	= new Future<Void>();
-//		access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//		access.searchService( new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //		{
 //			public void customResultAvailable(IComponentManagementService cms)
@@ -263,7 +263,7 @@ public class SRemoteGui
 //								final Future<Void>	ret	= new Future<Void>();
 //								try
 //								{
-//									ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//									ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //										.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //									{
 //										public void customResultAvailable(IComponentManagementService cms)
@@ -425,7 +425,7 @@ public class SRemoteGui
 				try
 				{
 					final URL	url	= SUtil.toURL(filename);
-					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 					ls.getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, Tuple2<URL, IResourceIdentifier>>(ret)
 					{
 						public void customResultAvailable(List<IResourceIdentifier> rids)
@@ -535,7 +535,7 @@ public class SRemoteGui
 				final Future<Void>	ret	= new Future<Void>();
 				try
 				{
-					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 					try
 					{
 						ls.removeURL(null, SUtil.toURL(path));
@@ -1091,7 +1091,7 @@ public class SRemoteGui
 												{
 													if(model!=null && model.getReport()==null)
 													{
-														ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+														ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 														ls.getClassLoader(model.getResourceIdentifier())
 															.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Boolean>(ret)
 														{
@@ -1160,7 +1160,7 @@ public class SRemoteGui
 				final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 				try
 				{
-					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 					ls.getClassLoader(modelrid).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Map<String, Object>>(ret)
 					{
 						public void customResultAvailable(ClassLoader cl)
@@ -1225,7 +1225,7 @@ public class SRemoteGui
 				try
 				{
 					final URL	url	= SUtil.toURL(filename);
-					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 					if(!tl)
 					{
 						// todo: workspace=true?
@@ -1293,7 +1293,7 @@ public class SRemoteGui
 						soc.writeFromInputStream(fis, sourceaccess);
 						
 						ITerminableIntermediateFuture<Long> fut = targetds.uploadFile(soc.getInputConnection(), target, sourcefile.getName());
-						fut.addResultListener(new IIntermediateResultListener<Long>()
+						fut.addResultListener(new IntermediateEmptyResultListener<Long>()
 						{
 							long	lasttime	= System.currentTimeMillis();
 							public void intermediateResultAvailable(final Long result)
@@ -1322,6 +1322,11 @@ public class SRemoteGui
 							public void exceptionOccurred(final Exception exception)
 							{
 								ret.setException(exception);
+							}
+							
+							public void maxResultCountAvailable(int max) 
+							{
+								ret.setMaxResultCount(max);
 							}
 						});
 					}

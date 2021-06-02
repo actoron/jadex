@@ -154,6 +154,8 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	{
 		boolean ret = true;
 		
+//		System.out.println("got message " + incomingmessage.getClass().getName() + " " + incomingmessage.getConversationId() + " " + incomingmessage.getMessageId() + " " + nextstep + " " + System.identityHashCode(this));
+		
 		if (nextstep == 0 && incomingmessage instanceof InitialHandshakeFinalMessage)
 		{
 //			ts = System.currentTimeMillis();
@@ -167,7 +169,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), sem);
 			nextstep = 1;
 		}
-		else if (nextstep == 0 && incomingmessage instanceof StartExchangeMessage)
+		else if (nextstep == -1 && incomingmessage instanceof StartExchangeMessage)
 		{
 			StartExchangeMessage sem = (StartExchangeMessage) incomingmessage;
 			
@@ -195,7 +197,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			}
 			
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
-			nextstep = 2;
+			nextstep = -2;
 			
 			hashednetworknames = getHashedNetworkNames(agent.getInternalNetworks().keySet(), challenge);
 		}
@@ -235,9 +237,9 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			reply.setPlatformNameSig(getPlatformNameSignature(pubkey, agent.getInternalPlatformNameCertificate()));
 			
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
-			nextstep = 3;
+			nextstep = 2;
 		}
-		else if (nextstep == 2 && incomingmessage instanceof KeyExchangeMessage)
+		else if (nextstep == -2 && incomingmessage instanceof KeyExchangeMessage)
 		{
 			KeyExchangeMessage kx = (KeyExchangeMessage) incomingmessage;
 			
@@ -277,9 +279,9 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			reply.setPlatformNameSig(getPlatformNameSignature(pubkey, agent.getInternalPlatformNameCertificate()));
 			
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
-			nextstep = 4;
+			nextstep = -3;
 		}
-		else if (nextstep == 3 && incomingmessage instanceof KeyExchangeMessage)
+		else if (nextstep == 2 && incomingmessage instanceof KeyExchangeMessage)
 		{
 			KeyExchangeMessage kx = (KeyExchangeMessage) incomingmessage;
 			
@@ -297,8 +299,9 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs(), agent.getInternalNetworks());
 			setupSecInfos(remoteid, authnets, platformauth, authenticatedpfname, agent);
 			
-			if (agent.getInternalRefuseUnauth() && !secinf.hasDefaultAuthorization())
-				throw new SecurityException("Unauthenticated connection not allowed.");
+			// Removed, checked during setupsecinf
+//			if (agent.getInternalRefuseUnauth() && (secinf.getRoles() == null || secinf.getRoles().isEmpty()))
+//				throw new SecurityException("Unauthenticated connection not allowed.");
 			
 			nonceprefix = Pack.littleEndianToInt(challenge, 0);
 			nonceprefix = ~nonceprefix;
@@ -316,10 +319,10 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			agent.sendSecurityHandshakeMessage(kx.getSender(), rdy);
 			
 			ret = false;
-			nextstep = 5;
+			nextstep = Integer.MAX_VALUE;
 //			System.out.println("Handshake took: " + (System.currentTimeMillis() - ts));
 		}
-		else if (nextstep == 4 && incomingmessage instanceof ReadyMessage)
+		else if (nextstep == -3 && incomingmessage instanceof ReadyMessage)
 		{
 			key = generateChaChaKey();
 //			System.out.println("Shared Key2: " + Arrays.toString(key) + " " + secinf.isAuthenticated());
@@ -332,7 +335,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			authsuite = null;
 			
 			ret = false;
-			nextstep = 5;
+			nextstep = Integer.MIN_VALUE;
 		}
 		else
 		{
@@ -340,6 +343,16 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Sets if the suite represents the initializer.
+	 * @param initializer True, if initializer.
+	 */
+	public void setInitializer(boolean initializer)
+	{
+		if (initializer)
+			nextstep = -1;
 	}
 	
 	/**
@@ -859,7 +872,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		{
 			super(sender, conversationid);
 		}
-
+		
 		/**
 		 *  Gets the challenge.
 		 *

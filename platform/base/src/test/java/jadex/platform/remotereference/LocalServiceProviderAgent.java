@@ -1,12 +1,12 @@
 package jadex.platform.remotereference;
 
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -16,7 +16,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Imports("jadex.micro.*")
-@ProvidedServices(@ProvidedService(type=ILocalService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=ILocalService.class, scope=ServiceScope.GLOBAL))
 @Service
 public class LocalServiceProviderAgent implements ILocalService
 {

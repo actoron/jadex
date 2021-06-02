@@ -1,5 +1,7 @@
 package jadex.bridge.service.search;
 
+import jadex.bridge.service.IService;
+
 /**
  *  Service event used if the service registry is used in event mode.
  *
@@ -34,8 +36,15 @@ public class ServiceEvent<T>
 	 */
 	public ServiceEvent(T service, int eventtype)
 	{
+		// todo: refactor to not using a changing type of T (service id and service)
+		// service event is created with service identifier
+		// processServiceEvent in RequiredServiceComponentFeature converts it to a service proxy
+		
 		this.service = service;
 		this.type = eventtype;
+		
+		if(eventtype==SERVICE_REMOVED && service instanceof IService)
+			System.out.println("here");
 	}
 
 	/**
@@ -76,6 +85,8 @@ public class ServiceEvent<T>
 	public void setService(T service)
 	{
 		this.service = service;
+		if(this.type==SERVICE_REMOVED && service instanceof IService)
+			System.out.println("here");
 	}
 
 	/**

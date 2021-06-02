@@ -2,6 +2,8 @@ package jadex.micro.testcases.nfcallreturn;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -14,17 +16,18 @@ import jadex.micro.annotation.ProvidedServices;
  * 
  */
 @Agent
-@ProvidedServices(@ProvidedService(type=ITestService.class))
+@ProvidedServices(@ProvidedService(type=ITestService.class, scope=ServiceScope.GLOBAL))
 @Service
 public class ProviderAgent implements ITestService
 {
 //	@Agent
 //	protected MicroAgent agent;
 	
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void created(IInternalAccess agent)
 	{
-		agent.getLogger().severe("Agent created: "+agent.getDescription());
+//		agent.getLogger().severe("Agent created: "+agent.getDescription());
 	}
 
 	/**

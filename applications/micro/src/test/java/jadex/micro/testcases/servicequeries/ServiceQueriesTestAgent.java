@@ -1,7 +1,6 @@
 package jadex.micro.testcases.servicequeries;
 
 import java.util.Collection;
-import java.util.Map;
 
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
@@ -12,7 +11,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -20,25 +19,19 @@ import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Properties;
-import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.TestAgent;
 
 
 /**
- *  The user agent uses service queries. 
+ *  Test if an open ended query finds the right number of available services.
  */
 @Agent(keepalive=Boolean3.FALSE)
-@RequiredServices(
-{
-	//@RequiredService(name="exaser", type=IExampleService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
-})
 @Results(@Result(name="testresults", clazz=Testcase.class))
 // Todo: long timeouts really necessary?
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 2)")}) // cannot use $component.getId() because is extracted from test suite :-(
@@ -61,27 +54,30 @@ public class ServiceQueriesTestAgent extends TestAgent
 		
 		IRequiredServicesFeature rsf = agent.getFeature(IRequiredServicesFeature.class);
 		
-		// Create user as subcomponent -> should be able to find the service with publication scope application
+		// Create user as subcomponent -> should be able to find the service with publication scope application 
+		final int[] num = new int[]{0};
 		final int cnt = 3;
 		IComponentIdentifier[] cids = new IComponentIdentifier[cnt];
-		final TestReport tr = new TestReport("#1", "Test if ");
+		
+		final TestReport tr = new TestReport(local?"#1":"#2", "Test if "+(local?"local":"remote")+" services can be found by query");
+		
 		try
 		{
-			ISubscriptionIntermediateFuture<IExampleService> queryfut = rsf.addQuery(new ServiceQuery<>(IExampleService.class, local? RequiredServiceInfo.SCOPE_PLATFORM: RequiredServiceInfo.SCOPE_GLOBAL));
-			queryfut.addResultListener(new IIntermediateResultListener<IExampleService>()
+			ISubscriptionIntermediateFuture<IExampleService> queryfut = rsf.addQuery(
+				new ServiceQuery<>(IExampleService.class, local? ServiceScope.APPLICATION: ServiceScope.GLOBAL));
+			queryfut.addResultListener(new IntermediateEmptyResultListener<IExampleService>()
 			{
-				int num = 0;
 				public void exceptionOccurred(Exception exception)
 				{
 					if(exception instanceof FutureTerminatedException)
 					{
-						if(num==cnt)
+						if(num[0]==cnt)
 						{
 							tr.setSucceeded(true);
 						}
 						else
 						{
-							tr.setFailed("Wrong number of results: "+cnt);
+							tr.setFailed("Wrong number of results: expected "+cnt+" but was "+num[0]);
 						}
 					}
 					else
@@ -101,7 +97,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 //					System.out.println("thread: " + IComponentIdentifier.LOCAL.get() +" on comp thread: " + agent.getFeature0(IExecutionFeature.class).isComponentThread());
 					if(platform.getId().getRoot().equals(((IService)result).getServiceId().getProviderId().getRoot()))
 					{
-						num++;
+						num[0]++;
 					}
 					else
 					{
@@ -116,19 +112,24 @@ public class ServiceQueriesTestAgent extends TestAgent
 			});
 
 			// The creation info is important to be able to resolve the class/model
-			CreationInfo ci = platform.getId().getPlatformName().equals(agent.getId().getPlatformName())
-				? new CreationInfo(agent.getId(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
+			CreationInfo ci = new CreationInfo(agent.getModel().getResourceIdentifier());
 
+			IExternalAccess creator = platform.getId().getPlatformName().equals(agent.getId().getPlatformName()) ? agent : platform;
 			for(int i=0; i<cnt; i++)
 			{
-				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = platform.createComponent(ci.setFilename(ProviderAgent.class.getName()+".class"));
-				cids[i] = fut.getFirstResult(Starter.getDefaultTimeout(agent.getId()), true);
+				
+				IFuture<IExternalAccess> fut = creator.createComponent(ci.setFilename(ProviderAgent.class.getName()+".class"));
+				cids[i] = fut.get(Starter.getDefaultTimeout(agent.getId()), Starter.isRealtimeTimeout(agent.getId(), true)).getId();
 			}
 			
 			// Wait some time and then terminate query
 			
 			long start = System.currentTimeMillis();
-			agent.getFeature(IExecutionFeature.class).waitForDelay(local? 1000: 11000, true).get();
+			int	loop	= 100;
+			for(int i=0; i<loop && num[0]<cnt; i++)
+			{
+				agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledDefaultTimeout(agent.getId().getRoot(), 1.0/loop), Starter.isRealtimeTimeout(agent.getId(), true)).get();
+			}
 			System.out.println("wait dur: "+(System.currentTimeMillis()-start));
 			
 			queryfut.terminate();
@@ -147,7 +148,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 			{
 				for(int i=0; i<cids.length; i++)
 				{
-					platform.killComponent(cids[i]).get();
+					platform.getExternalAccess(cids[i]).killComponent().get();
 				}
 			}
 			catch(Exception e)

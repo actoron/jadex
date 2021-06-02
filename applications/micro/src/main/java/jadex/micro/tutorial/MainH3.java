@@ -23,7 +23,7 @@ public class MainH3
 			"-gui", "false",
 			"-welcome", "false",
 			"-cli", "false",
-			"-printpass", "false"
+			"-printsecret", "false"
 		};
 		String[]	newargs	= new String[defargs.length+args.length];
 		System.arraycopy(defargs, 0, newargs, 0, defargs.length);
@@ -40,7 +40,7 @@ public class MainH3
 		// Get the CMS service from the platform
 		// Start the chat component
 		
-		IExternalAccess ea = platform.createComponent(new CreationInfo().setFilename(ChatD2Agent.class.getName()+".class"), null).get();
+		IExternalAccess ea = platform.createComponent(new CreationInfo().setFilename(ChatD2Agent.class.getName()+".class")).get();
 		System.out.println("Started chat component: "+ea);
 	}
 }

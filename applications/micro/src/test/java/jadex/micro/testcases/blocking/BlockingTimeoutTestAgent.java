@@ -10,6 +10,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.Boolean3;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
@@ -29,7 +30,8 @@ public class BlockingTimeoutTestAgent extends JunitAgentTest
 	/**
 	 *  Execute the agent
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void	execute(IInternalAccess agent)
 	{
 		List<TestReport>	tests	= new ArrayList<TestReport>();

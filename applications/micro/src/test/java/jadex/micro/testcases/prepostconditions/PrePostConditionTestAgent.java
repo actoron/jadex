@@ -8,6 +8,7 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.commons.SReflect;
@@ -31,7 +32,7 @@ import jadex.micro.annotation.Results;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=IContractService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IContractService.class))
 @Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
 public class PrePostConditionTestAgent extends JunitAgentTest implements IContractService
 {
@@ -42,7 +43,8 @@ public class PrePostConditionTestAgent extends JunitAgentTest implements IContra
 	/**
 	 *  The body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body()
 	{
 		final Future<Void> ret = new Future<Void>();

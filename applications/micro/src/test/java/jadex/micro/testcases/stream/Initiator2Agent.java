@@ -9,12 +9,14 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Properties;
 import jadex.micro.testcases.TestAgent;
 
 /**
@@ -24,13 +26,15 @@ import jadex.micro.testcases.TestAgent;
 //@RequiredServices(
 //{
 //	@RequiredService(name="msgservice", type=IMessageService.class, 
-//		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+//		binding=@Binding(scope=ServiceScope.PLATFORM)),
 //	@RequiredService(name="cms", type=IComponentManagementService.class, 
-//		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+//		binding=@Binding(scope=ServiceScope.PLATFORM))
 //})
 //@ComponentTypes(
 //	@ComponentType(name="receiver", filename="jadex/micro/testcases/stream/Receiver2Agent.class")
 //)
+// Use larger timeout so we can reduce default timeout on build slave
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class Initiator2Agent extends TestAgent
 {
 	protected IInputConnection icon;
@@ -40,21 +44,20 @@ public class Initiator2Agent extends TestAgent
 	 */
 	protected IFuture<Void> performTests(final Testcase tc)
 	{
-		disableLocalSimulationMode().get();
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+//		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
 		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
-				agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
+//				agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
 				tc.addReport(result);
 				testRemote(2).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
-						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
+//						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -116,13 +119,13 @@ public class Initiator2Agent extends TestAgent
 		final Future<Map<String, Object>> resfut = new Future<Map<String, Object>>();
 		IResultListener<Map<String, Object>> reslis = new DelegationResultListener<Map<String,Object>>(resfut);
 		
-		agent.getLogger().severe("Testagent create receiver: "+agent.getDescription());
+//		agent.getLogger().severe("Testagent create receiver: "+agent.getDescription());
 		createComponent("jadex/micro/testcases/stream/Receiver2Agent.class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				agent.getLogger().severe("Testagent create receiver done: "+agent.getDescription());
+//				agent.getLogger().severe("Testagent create receiver done: "+agent.getDescription());
 				IMessageFeature mf = agent.getFeature(IMessageFeature.class);
 				mf.createInputConnection(agent.getId(), cid, null)
 					.addResultListener(new ExceptionDelegationResultListener<IInputConnection, TestReport>(ret)

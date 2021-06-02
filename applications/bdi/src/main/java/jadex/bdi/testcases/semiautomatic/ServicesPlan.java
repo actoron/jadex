@@ -4,10 +4,9 @@ import java.net.URL;
 
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.service.PublishInfo;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.publish.IPublishService;
 
@@ -30,8 +29,8 @@ public class ServicesPlan extends Plan
 		waitFor(500);
 		
 		// Call service internally
-		IPrintHelloService phs = getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(
-			IPrintHelloService.class, RequiredServiceInfo.SCOPE_COMPONENT_ONLY));
+		IPrintHelloService phs = getAgent().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(
+			IPrintHelloService.class, ServiceScope.COMPONENT_ONLY));
 		phs.printHello();
 		
 		// Call service via REST

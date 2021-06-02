@@ -1,0 +1,27 @@
+<div class="actwtable section">
+	<h3 id="HConnectedPlatforms">Provided Services</h3>
+	<p>
+		This page shows a self-updating list of provided services currently registered at this superpeer.
+	</p>
+	<table ng-controller="Services" ng-class="{'down': superpeerDown}">
+		<tbody>
+			<tr>
+				<th>Service Type</th>
+				<th>Provided By</th>
+				<th>Tags</th>
+				<th>Publication Scope</th>
+ 				<th>Networks</th>
+				<th>Security</th>
+			</tr>
+			<tr ng-repeat="x in services | orderBy: cidOrder"
+				ng-class="{'connecting': !x.connected}">
+				<td>{{x.type}}</td>
+				<td>{{x.providerId.name | cid}}</td>
+ 				<td>{{x.tags | networks}}</td>
+				<td>{{x.scope.toLowerCase()}}</td>
+ 				<td>{{x.networkNames | networks}}</td>
+				<td>{{x.unrestricted && 'unrestricted' || 'restricted'}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

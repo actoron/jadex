@@ -12,14 +12,13 @@ import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
-import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 
 /**
  *  Default plan for realizing a service call.
@@ -75,7 +74,7 @@ public class ServiceCallPlan
 //		IIntermediateFuture<Object> services = agent.getServiceContainer().getServices(service);
 		IIntermediateFuture<Object> services = agent.getFeature(IRequiredServicesFeature.class).getServices(service);
 		
-		services.addResultListener(new IIntermediateResultListener<Object>()
+		services.addResultListener(new IntermediateEmptyResultListener<Object>()
 		{
 			int opencalls = 0;
 			boolean fini = false;

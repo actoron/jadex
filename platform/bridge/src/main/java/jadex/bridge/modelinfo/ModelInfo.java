@@ -1,10 +1,13 @@
 package jadex.bridge.modelinfo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
@@ -30,6 +33,12 @@ public class ModelInfo extends Startable implements IModelInfo
 	
 	/** The package. */
 	protected String packagename;
+	
+	/** The predecessors. */
+	protected String[] predecessors;
+	
+	/** The predecessors. */
+	protected String[] successors;
 	
 	/** The imports. */
 	protected List<String> imports;
@@ -153,6 +162,22 @@ public class ModelInfo extends Startable implements IModelInfo
 	public String getName()
 	{
 		return name;
+	}
+	
+	/**
+	 *  Get required predecessors (dependencies).
+	 */
+	public String[] getPredecessors()
+	{
+		return predecessors;
+	}
+	
+	/**
+	 *  Get declared successors (dependencies).
+	 */
+	public String[] getSuccessors()
+	{
+		return successors;
 	}
 	
 	/**
@@ -450,6 +475,52 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+	
+	/**
+	 *  Adds required predecessors (dependencies).
+	 */
+	public void addPredecessors(String[] predecessors)
+	{
+		if (this.predecessors != null && this.predecessors.length > 0)
+		{
+			Set<String> tmp = new HashSet<>();
+			tmp.addAll(Arrays.asList(this.predecessors));
+			tmp.addAll(Arrays.asList(predecessors));
+			predecessors = tmp.toArray(new String[tmp.size()]);
+		}
+		this.predecessors = predecessors;
+	}
+	
+	/**
+	 *  Set required predecessors (dependencies).
+	 */
+	public void setPredecessors(String[] predecessors)
+	{
+		this.predecessors = predecessors;
+	}
+	
+	/**
+	 *  Adds required predecessors (dependencies).
+	 */
+	public void addSuccessors(String[] successors)
+	{
+		if(this.successors != null && this.successors.length > 0)
+		{
+			Set<String> tmp = new HashSet<>();
+			tmp.addAll(Arrays.asList(this.successors));
+			tmp.addAll(Arrays.asList(successors));
+			successors = tmp.toArray(new String[tmp.size()]);
+		}
+		this.successors = successors;
+	}
+	
+	/**
+	 *  Set declared successors (dependencies).
+	 */
+	public void setSuccessors(String[] successors)
+	{
+		this.successors = successors;
 	}
 
 	/**

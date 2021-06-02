@@ -1,7 +1,7 @@
 package jadex.micro.testcases;
 
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 
 /**
  *  Test what happens if an exception is thrown in body.
@@ -20,7 +20,8 @@ public class PojoBodyExceptionAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 //		System.out.println("execute ExceptionTest ...");

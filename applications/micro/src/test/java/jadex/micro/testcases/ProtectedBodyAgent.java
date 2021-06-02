@@ -1,5 +1,7 @@
 package jadex.micro.testcases;
 
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
@@ -15,7 +17,8 @@ public class ProtectedBodyAgent
 	/**
 	 *  Init the agent.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void agentCreated()
 	{
 //		System.out.println("invoked created");
@@ -24,7 +27,8 @@ public class ProtectedBodyAgent
 	/**
 	 *  Perform the tests
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	protected void executeBody()
 	{
 		System.out.println("invoked body");

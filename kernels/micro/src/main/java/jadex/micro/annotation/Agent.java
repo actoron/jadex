@@ -29,6 +29,18 @@ public @interface Agent
 	 */
 	public Boolean3 suspend() default Boolean3.NULL;
 	
+	/**
+	 *  Required predecessors (dependencies).
+	 */
+//	public Class<?>[] predecessors() default {};
+	public String[] predecessors() default {};
+	
+	/**
+	 *  Declared successors (dependencies).
+	 */
+//	public Class<?>[] successors() default {};
+	public String[] successors() default {};
+	
 //	/**
 //	 *  Specify if the component is a master and leads to killing of parent when stopped.
 //	 */
@@ -67,7 +79,12 @@ public @interface Agent
 	/**
 	 *  Auto-start this agent on platform startup.
 	 */
-	public Autostart autostart() default @Autostart();
+	public Boolean3 autostart() default Boolean3.NULL;
+	
+	/**
+	 *  Default name for the started component.
+	 */
+	public String name() default "";
 	
 	/**
 	 *  The agent type. 

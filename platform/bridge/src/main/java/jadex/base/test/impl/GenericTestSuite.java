@@ -4,6 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
 
 import jadex.base.IPlatformConfiguration;
+import jadex.base.Starter;
 import jadex.base.test.IAbortableTestSuite;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
@@ -22,9 +23,8 @@ public abstract class GenericTestSuite extends TestSuite implements IAbortableTe
 
 	private IPlatformConfiguration		config;
 
-	private String[]					components;
 
-	public GenericTestSuite(Class... clazzes)
+	public GenericTestSuite(Class<?>... clazzes)
 	{
 		this(false, clazzes);
 	}
@@ -34,7 +34,7 @@ public abstract class GenericTestSuite extends TestSuite implements IAbortableTe
 		this(false, components);
 	}
 
-	public GenericTestSuite(boolean justStartComponents, Class... clazzes)
+	public GenericTestSuite(boolean justStartComponents, Class<?>... clazzes)
 	{
 		this(justStartComponents, toName(clazzes));
 	}
@@ -42,8 +42,7 @@ public abstract class GenericTestSuite extends TestSuite implements IAbortableTe
 
 	public GenericTestSuite(boolean justStartComponents, String... components)
 	{
-		this.components = components;
-		this.config = STest.getDefaultTestConfig();
+		this.config = STest.getLocalTestConfig(getClass());
 		for(String component : components)
 		{
 			if(!component.endsWith(".class"))
@@ -69,7 +68,7 @@ public abstract class GenericTestSuite extends TestSuite implements IAbortableTe
 		this.config = config;
 	}
 
-	private static String[] toName(Class[] clazzes)
+	private static String[] toName(Class<?>[] clazzes)
 	{
 		String[] components = new String[clazzes.length];
 		for(int i = 0; i < clazzes.length; i++)
@@ -82,7 +81,7 @@ public abstract class GenericTestSuite extends TestSuite implements IAbortableTe
 	@Override
 	public void run(TestResult result)
 	{
-		IExternalAccess sharedPlatform = STest.createPlatform(config);
+		IExternalAccess sharedPlatform = Starter.createPlatform(config).get();
 		access = sharedPlatform;
 		super.run(result);
 		access.killComponent();

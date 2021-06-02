@@ -1,18 +1,18 @@
 package jadex.micro.testcases.servicescope;
 
-import java.util.Map;
-
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.Boolean3;
-import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.RequiredService;
@@ -27,7 +27,7 @@ import jadex.micro.annotation.Results;
 @Agent(keepalive=Boolean3.FALSE)
 @RequiredServices(
 {
-	@RequiredService(name="exaser", type=IExampleService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)
+	@RequiredService(name="exaser", type=IExampleService.class, scope=ServiceScope.PLATFORM)
 })
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class ServiceScopeTestAgent extends JunitAgentTest
@@ -38,7 +38,8 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		final Testcase tc = new Testcase();
@@ -49,8 +50,8 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 		TestReport tr = new TestReport("#1", "Test if service with scope application can be found when provider is child of user");
 		try
 		{
-			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(new CreationInfo(agent.getId()).setFilename(ProviderAgent.class.getName()+".class"));
-			cid = fut.getFirstResult();
+			IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setFilename(ProviderAgent.class.getName()+".class"));
+			cid = fut.get().getId();
 			IExampleService ser = (IExampleService)agent.getFeature(IRequiredServicesFeature.class).getService("exaser").get();
 //			System.out.println("Correct: could find service: "+ser.getInfo().get());
 			tr.setSucceeded(true);
@@ -66,7 +67,7 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 			try
 			{
 				if(cid!=null)
-					agent.killComponent(cid).get();
+					agent.getExternalAccess(cid).killComponent().get();
 			}
 			catch(Exception e)
 			{
@@ -79,8 +80,8 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 		tr = new TestReport("#1", "Test if service with scope application can be found when provider is sibling");
 		try
 		{
-			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(new CreationInfo(agent.getModel().getResourceIdentifier()).setFilename(ProviderAgent.class.getName()+".class"));
-			cid = fut.getFirstResult();
+			IFuture<IExternalAccess> fut = agent.getExternalAccess(agent.getId().getRoot()).createComponent(new CreationInfo(agent.getModel().getResourceIdentifier()).setFilename(ProviderAgent.class.getName()+".class"));
+			cid = fut.get().getId();
 			IExampleService ser = (IExampleService)agent.getFeature(IRequiredServicesFeature.class).getService("exaser").get();
 			System.out.println("Problem: could find hidden service: "+ser.getInfo().get());
 			tr.setFailed("Problem: could find hidden service");
@@ -96,7 +97,7 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 			try
 			{
 				if(cid!=null)
-					agent.killComponent(cid).get();
+					agent.getExternalAccess(cid).killComponent().get();
 			}
 			catch(Exception e)
 			{
@@ -106,4 +107,5 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 		
 		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 	}
+	
 }

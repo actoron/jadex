@@ -12,6 +12,7 @@ import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -28,7 +29,6 @@ import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
 
 
 
@@ -37,12 +37,12 @@ import jadex.micro.annotation.RequiredService;
  */
 @Description("This agent represents a proxy for a remote component.")
 @Arguments(@Argument(name="component", clazz=IComponentIdentifier.class, defaultvalue="null", description="The component id of the remote component/platform."))
-@ProvidedServices(@ProvidedService(type=IProxyAgentService.class, scope=RequiredService.SCOPE_PLATFORM))
+@ProvidedServices(@ProvidedService(type=IProxyAgentService.class, scope=ServiceScope.PLATFORM))
 @NFProperties(@NFProperty(ProxyLatencyProperty.class))
 @Service
 @Agent
 //@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, multiple=true,
-//	binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, dynamic=true),
+//	binding=@Binding(scope=ServiceScope.GLOBAL, dynamic=true),
 //	nfprops=@NFRProperty(value=LatencyProperty.class, methodname="getConnectionState")))
 public class ProxyAgent	implements IProxyAgentService
 {
@@ -54,7 +54,7 @@ public class ProxyAgent	implements IProxyAgentService
 	
 	/**  The remote component identifier. */
 	@AgentArgument("component")
-	protected IComponentIdentifier	rcid;
+	protected IComponentIdentifier rcid;
 	
 	/** The remote cms. */
 	protected ILibraryService rcms;
@@ -80,7 +80,7 @@ public class ProxyAgent	implements IProxyAgentService
 //				ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
 //				next.setProperty("debugsource", "ProxyAgent.agentCreated()");
 				
-				agent.getExternalAccess(agent.getId().getRoot())
+				agent.getExternalAccessAsync(agent.getId().getRoot())
 					.addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess pl)
@@ -166,7 +166,7 @@ public class ProxyAgent	implements IProxyAgentService
 	/**
 	 *  Get the component identifier of the remote platform.
 	 */
-	public IFuture<IComponentIdentifier>	getRemoteComponentIdentifier()
+	public IFuture<IComponentIdentifier> getRemoteComponentIdentifier()
 	{
 //		return new Future<IComponentIdentifier>(((RemoteServiceContainer)getServiceContainer()).getRemoteComponentIdentifier());
 		return new Future<IComponentIdentifier>(rcid);
@@ -176,7 +176,7 @@ public class ProxyAgent	implements IProxyAgentService
 	 *  Set or update the component identifier of the remote platform,
 	 *  i.e., top reflect new transport addresses.
 	 */
-	public IFuture<Void>	setRemoteComponentIdentifier(IComponentIdentifier cid)
+	public IFuture<Void> setRemoteComponentIdentifier(IComponentIdentifier cid)
 	{
 //		((RemoteServiceContainer)getServiceContainer()).setRemoteComponentIdentifier(cid);
 		rcid = cid;
@@ -202,7 +202,7 @@ public class ProxyAgent	implements IProxyAgentService
 			}
 		};
 
-//		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, ServiceScope.PLATFORM))
 //			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, State>(ret)
 //		{
 //			public void customResultAvailable(IComponentManagementService cms)
@@ -210,7 +210,7 @@ public class ProxyAgent	implements IProxyAgentService
 //				ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
 //				next.setProperty("debugsource", "ProxyAgent.getConnectionState()");
 //				
-				agent.getExternalAccess(rcid).addResultListener(new IResultListener<IExternalAccess>()
+				agent.getExternalAccessAsync(rcid).addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess result) 
 					{
@@ -239,7 +239,7 @@ public class ProxyAgent	implements IProxyAgentService
 	/**
 	 *  Refresh the latency value.
 	 */
-	public IFuture<Void>	refreshLatency()
+	public IFuture<Void> refreshLatency()
 	{
 //		if(getAgentAdapter().isExternalThread())
 //			System.out.println("gagagaggagaq");
@@ -251,7 +251,7 @@ public class ProxyAgent	implements IProxyAgentService
 //			next.setProperty("debugsource", "ProxyAgent.refreshLatency()");
 			
 //			rcms.getExternalAccess(rcid)
-			agent.getExternalAccess(rcid)
+			agent.getExternalAccessAsync(rcid)
 				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)

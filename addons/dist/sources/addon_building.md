@@ -1,0 +1,1 @@
+To build a Jadex addon, you need to unpack the sources of a non-addon Jadex distribution (e.g. *minimal*) into the same folder as the addon sources.

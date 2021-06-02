@@ -14,6 +14,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 
 /**
@@ -74,7 +75,7 @@ public class FlattenMultiplexCollector implements IMultiplexCollector
 			if(result instanceof IIntermediateFuture)
 			{
 				final Future<Void> call = new Future<Void>();
-				IIntermediateResultListener<Object> lis = new IIntermediateResultListener<Object>()
+				IIntermediateResultListener<Object> lis = new IntermediateEmptyResultListener<Object>()
 				{
 					public void intermediateResultAvailable(Object result)
 					{
@@ -176,6 +177,15 @@ public class FlattenMultiplexCollector implements IMultiplexCollector
 		{
 			setFinished();
 		}
+	}
+
+	/**
+	 * 
+	 */
+	public void maxResultCountAvailable(int max) 
+	{
+		if(fut instanceof IntermediateFuture)
+			((IntermediateFuture)fut).setMaxResultCount(max);
 	}
 	
 	/**

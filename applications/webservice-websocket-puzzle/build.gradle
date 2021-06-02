@@ -7,5 +7,7 @@ apply plugin: 'eclipse-wtp'
 
 dependencies 
 {
+	// must be runtime. otherwise dependencies are not deployed
 	api project(':platform:webservice-websocket')
 }
+

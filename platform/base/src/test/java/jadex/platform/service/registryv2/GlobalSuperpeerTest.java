@@ -1,5 +1,9 @@
 package jadex.platform.service.registryv2;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
@@ -7,6 +11,7 @@ import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.security.PemKeyPair;
 import jadex.commons.security.SSecurity;
+import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 
 /**
@@ -30,7 +35,7 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 	public static final IPlatformConfiguration	RELAYCONF;
 	
 	/** Fixed port for SSP platform. */
-	public static final int sspport	= SSecurity.getSecureRandom().nextInt(Short.MAX_VALUE*2-1024)+1025; 
+	public static final int sspport	= SSecurity.getSecureRandom().nextInt(Short.MAX_VALUE*2-1024)+1025;
 
 	static
 	{
@@ -39,45 +44,56 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		AbstractAuthenticationSecret clientsecret = AbstractAuthenticationSecret.fromKeyPair(ca, true);
 		AbstractAuthenticationSecret serversecret = AbstractAuthenticationSecret.fromKeyPair(cert, false, ca);
 		
-		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig();
-		baseconf.setValue("superpeerclient.awaonly", false);
-		baseconf.setValue("superpeerclient.pollingrate", WAITFACTOR/2); 	// -> 1500 millis.
-		baseconf.setValue("superpeerclient.contimeout", WAITFACTOR/2); 	// -> 1500 millis.
-		baseconf.setValue("passiveawarenessintravm", false);
-		baseconf.setValue("passiveawarenesscatalog", true);
-		baseconf.setValue("rt", true);
-		baseconf.setValue("platformurls", "intravm://ssp@localhost:"+sspport);
-		baseconf.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name);
-		baseconf.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass);
-		// Remote only -> no simulation please
-		baseconf.getExtendedPlatformConfiguration().setSimul(false);
-		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
-//		baseconf.setValue("security.debug", true);
+		IPlatformConfiguration	baseconf	= STest.createDefaultTestConfig(GlobalSuperpeerTest.class)
+			.setValue("superpeerclient.awaonly", false)
+			.setValue("superpeerclient.contimeout", WAITFACTOR*2)
+			.setValue("intravmawareness", false)
+			.setValue("catalogawareness", true)
+			.setValue("rt", true)
+			.setValue("platformurls", "intravm://GlobalSuperpeerTestSSP@localhost:"+sspport);
+		
+		List<String>	networks	= new ArrayList<>(Arrays.asList(baseconf.getNetworkNames()));
+		networks.add(0, SecurityAgent.GLOBAL_NETWORK_NAME);
+		List<String>	secrets	= new ArrayList<>(Arrays.asList(baseconf.getNetworkSecrets()));
+		secrets.add(0, clientsecret.toString());
+
+		baseconf.setNetworkNames(networks.toArray(new String[networks.size()]))
+			.setNetworkSecrets(secrets.toArray(new String[secrets.size()]))
+//			.getExtendedPlatformConfiguration()
+//				.setDebugFutures(true)
+//			.setValue("superpeer.debugservices", "ITestService")
+//			.setValue("superpeerclient.debugservices", "IRoutingService")
+//			.setValue("superpeer.debugservices", true)
+//			.setValue("security.debug", true)
+			;
 			
-		CLIENTCONF	= baseconf.clone();
-		CLIENTCONF.setPlatformName("client_*");
-//		CLIENTCONF.setLogging(true);
-//		CLIENTCONF.setValue("rt.debug", true);
+		CLIENTCONF	= baseconf.clone()
+			.setPlatformName("GlobalSuperpeerTestClient");
+//			.setLogging(true);
+//			.setValue("rt.debug", true);
 		
-		PROCONF	= baseconf.clone();
-		PROCONF.addComponent(NetworkProviderAgent.class);
-		PROCONF.addComponent(LocalProviderAgent.class);
-		PROCONF.setPlatformName("provider_*");
+		PROCONF	= baseconf.clone()
+			.addComponent(GlobalProviderAgent.class)
+			.addComponent(NetworkProviderAgent.class)
+			.addComponent(LocalProviderAgent.class)
+			.setPlatformName("GlobalSuperpeerTestProvider");
+//			.setLogging(true);
 		
-		SPCONF	= baseconf.clone();
-		SPCONF.setValue("superpeer", true);
-		SPCONF.setPlatformName("SP_*");
+		SPCONF	= baseconf.clone()
+			.setValue("superpeer", true)
+			.setPlatformName("GlobalSuperpeerTestSP");
 //		SPCONF.setValue("rt.debug", true);
 //		SPCONF.setLogging(true);
 		
-		RELAYCONF	= baseconf.clone();
-		RELAYCONF.setValue("superpeer", true);
-		RELAYCONF.setValue("supersuperpeer", true);
-		RELAYCONF.setValue("rt.forwarding", true);
-		RELAYCONF.setValue("intravm.port", sspport);
-		RELAYCONF.setPlatformName("ssp");
-		RELAYCONF.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME);
-		RELAYCONF.setNetworkSecrets(serversecret.toString());
+		RELAYCONF	= baseconf.clone()
+			.setValue("superpeer", true)
+			.setValue("supersuperpeer", true)
+			.setValue("rt.forwarding", true)
+			.setValue("intravm.port", sspport)
+			.setValue("uniquename", false)	// hardcoded name in other configs
+			.setPlatformName("GlobalSuperpeerTestSSP")
+			.setNetworkNames(SecurityAgent.GLOBAL_NETWORK_NAME)
+			.setNetworkSecrets(serversecret.toString());
 //		RELAYCONF.setLogging(true);
 //		RELAYCONF.setValue("rt.debug", true);
 //		RELAYCONF.setValue("status", true);
@@ -94,17 +110,20 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		super(false, CLIENTCONF, PROCONF, SPCONF, RELAYCONF);
 	}
 	
-	// debug test
+	//-------- extra tests (in addition to inherited tests) --------
 	
 	/**
 	 *  Test if client can find local SP by using SSP.
 	 */
-//	@Test	// TODO: fix abstract transport create connection retry?
+	@Test
 	public void testClientFirstConnection()
 	{
-		IExternalAccess	client	= createPlatform(CLIENTCONF);
-		IExternalAccess	relay	= createPlatform(RELAYCONF);
-		waitForSuperpeerConnections(relay, client);
+		STest.runSimLocked(CLIENTCONF, ia ->
+		{
+			IExternalAccess	client	= ia.getExternalAccess();
+			IExternalAccess	relay	= createPlatform(RELAYCONF);
+			waitForSuperpeerConnections(relay, client);			
+		});
 	}
 
 	/**
@@ -113,9 +132,55 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 	@Test
 	public void testRelayFirstConnection()
 	{
-		IExternalAccess	relay	= createPlatform(RELAYCONF);
-		IExternalAccess	client	= createPlatform(CLIENTCONF);
-		waitForSuperpeerConnections(relay, client);
+		STest.runSimLocked(RELAYCONF, ia ->
+		{
+			IExternalAccess	relay	= ia.getExternalAccess();
+			IExternalAccess	client	= createPlatform(CLIENTCONF);
+			waitForSuperpeerConnections(relay, client);			
+		});
+	}
+	
+	/**
+	 *  Test that clean disconnection works over relay
+	 */
+	@Test
+	public void testProviderCleanDisconnection()
+	{		
+		if(spconf!=null)
+		{
+			STest.runSimLocked(sspconf!=null ? sspconf : spconf, ia ->
+			{
+				// Start SSP, SP and provider and wait for connections.
+				IExternalAccess	ssp	= sspconf!=null ? ia.getExternalAccess() : null;
+				IExternalAccess	sp	= sspconf!=null ? createPlatform(spconf) : ia.getExternalAccess();
+		
+				// Shutdown transport of provider first to trigger dirty disconnection (i.e. SP is not informed of superpeerclient shutdown)
+				// -> disconnection should happen when no-timeout forward commands fail eventually
+				IExternalAccess	provider	= createPlatform(proconf);
+				waitForProviderDisconnection(provider, false, ssp, sp);				
+			});
+		}
+	}
+
+	/**
+	 *  Test that dirty disconnection works over relay
+	 */
+	@Test
+	public void testProviderDirtyDisconnection()
+	{		
+		if(spconf!=null)
+		{
+			STest.runSimLocked(sspconf!=null ? sspconf : spconf, ia ->
+			{
+				// Start SSP, SP and provider and wait for connections.
+				IExternalAccess	ssp	= sspconf!=null ? ia.getExternalAccess() : null;
+				IExternalAccess	sp	= sspconf!=null ? createPlatform(spconf) : ia.getExternalAccess();
+	
+				// Shutdown transport of provider first to trigger dirty disconnection (i.e. SP is not informed of superpeerclient shutdown)
+				// -> disconnection should happen when no-timeout forward commands fail eventually
+				IExternalAccess	provider	= createPlatform(proconf);
+				waitForProviderDisconnection(provider, true, ssp, sp);
+			});
+		}
 	}
 }
-

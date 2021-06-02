@@ -13,16 +13,8 @@ import java.util.logging.Logger;
  */
 public final class LoggerFilterStore extends ArrayList<Object> implements Filter
 {
-	/**
-	 *  ID
-	 */
-	public static final int ID = 23070273;
-	
-	/**
-	 * 
-	 */
-	public static final long serialVersionUID = ID;
-	
+	private static final long serialVersionUID = -1120016223808401812L;
+
 	/** Hold the logger to prevent GC, weak-referenced globally. */
 	protected static Logger instance = null;
 	
@@ -65,7 +57,7 @@ public final class LoggerFilterStore extends ArrayList<Object> implements Filter
 				if (instance == null)
 				{
 					// Must hold instance, global loggers are weakly-referenced.
-					instance = Logger.getLogger(String.valueOf(ID));
+					instance = Logger.getLogger(String.valueOf(SecurityProviderStore.ID));
 					if (instance.getFilter() == null)
 					{
 						LoggerFilterStore fs = new LoggerFilterStore();
@@ -86,7 +78,7 @@ public final class LoggerFilterStore extends ArrayList<Object> implements Filter
 	@SuppressWarnings("unchecked")
 	public static final ArrayList<Object> getStore()
 	{
-		Logger lfs = Logger.getLogger(String.valueOf(ID));
+		Logger lfs = Logger.getLogger(String.valueOf(SecurityProviderStore.ID));
 		return (ArrayList<Object>) lfs.getFilter();
 	}
 }

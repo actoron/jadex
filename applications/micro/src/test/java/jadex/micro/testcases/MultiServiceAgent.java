@@ -6,6 +6,7 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DelegationResultListener;
@@ -48,7 +49,8 @@ public class MultiServiceAgent extends JunitAgentTest implements IAddService, IS
 	/**
 	 *  Search for the two services and check if they work as expected.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 		final Future<Void>	ret	= new Future<Void>();

@@ -4,6 +4,7 @@ import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
@@ -11,10 +12,12 @@ import jadex.bdiv3.annotation.ServicePlan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.moneypainter.RichAgent.GetOneEuro;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
@@ -26,7 +29,7 @@ import jadex.micro.annotation.RequiredServices;
  * 
  */
 @Agent(type=BDIAgentFactory.TYPE)
-@RequiredServices(@RequiredService(name="getser", type=IPaintMoneyService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
+@RequiredServices(@RequiredService(name="getser", type=IPaintMoneyService.class, scope=ServiceScope.PLATFORM))
 @Plans(@Plan(trigger=@Trigger(goals=GetOneEuro.class), body=@Body(service=@ServicePlan(name="getser"))))
 public class RichAgent
 {
@@ -41,7 +44,8 @@ public class RichAgent
 	@Belief
 	protected int money;
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new BecomeRich()).get();
@@ -65,10 +69,17 @@ public class RichAgent
 		}
 	}
 	
-//	@Goal(excludemode=Goal.ExcludeMode.Never, retrydelay=1000)
-	@Goal(recur=true, recurdelay=1000)
+	@Goal(excludemode=ExcludeMode.Never, retrydelay=1000)
+	//@Goal(recur=true, recurdelay=1000)
 	public class GetOneEuro
 	{
+		@GoalParameter
+		protected String agent;
+		
+		public GetOneEuro(String agent)
+		{
+			this.agent = agent;
+		}
 	}
 	
 	@Plan(trigger=@Trigger(goals=BecomeRich.class))
@@ -82,7 +93,7 @@ public class RichAgent
 			int cnt = 0;
 			public void resultAvailable(Object result)
 			{
-				System.out.println("getoneeuro fini: "+result);
+				System.out.println("Get money goal success: "+result);
 				money++;
 //				incMoney();
 				proceed();
@@ -105,11 +116,11 @@ public class RichAgent
 		};
 		for(int i=0; i<max; i++)
 		{
-			GetOneEuro goal = new GetOneEuro();
+			GetOneEuro goal = new GetOneEuro(agent.getId().getLocalName());
 			plan.dispatchSubgoal(goal).addResultListener(lis);
 		}
 		fut.get();
-		System.out.println("distribute work fini: "+money+" "+target);
+		//System.out.println("distribute work fini: "+money+" "+target);
 	}
 	
 	protected void incMoney()
@@ -117,11 +128,11 @@ public class RichAgent
 		money++;
 	}
 	
-	@Plan(trigger=@Trigger(goalfinisheds=BecomeRich.class))
+/*	@Plan(trigger=@Trigger(goalfinisheds=BecomeRich.class))
 //	public void printRich(BecomeRich goal) // Injection works but cannot access RGoal from pojo at this point
 	public void printRich(IGoal goal)
 	{
-//		System.out.println("Become rich finished: "+goal);
+		System.out.println("Become rich finished: "+goal);
 		
 //		if(agent.getComponentFeature(IBDIAgentFeature.class).getGoal(goal).isSucceeded())
 		if(goal.isSucceeded())
@@ -132,6 +143,6 @@ public class RichAgent
 		{
 			System.out.println("I have made only "+money+" euros, planned were "+target);
 		}
-	}
+	}*/
 }
 

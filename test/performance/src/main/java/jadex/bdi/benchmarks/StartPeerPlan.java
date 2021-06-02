@@ -3,7 +3,7 @@ package jadex.bdi.benchmarks;
 import java.util.Map;
 
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.collection.SCollection;
@@ -84,7 +84,7 @@ public class StartPeerPlan extends Plan
 			long upera = (used-startmem.longValue())/max/1024;
 			System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 
-			long end = getTime();
+			long end = System.currentTimeMillis();
 			System.out.println("Last peer created. "+max+" agents started.");
 			double dur = ((double)end-starttime.longValue())/1000.0;
 			double pera = dur/max;
@@ -93,7 +93,7 @@ public class StartPeerPlan extends Plan
 //			waitFor(300000);
 
 			// Delete prior agents.
-			long	killstarttime	= getTime();
+			long	killstarttime	= System.currentTimeMillis();
 			for(int cnt=max; cnt>0; cnt--)
 			{
 				if(cnt!=num)
@@ -104,7 +104,7 @@ public class StartPeerPlan extends Plan
 					System.out.println("Successfully destroyed peer: "+name);
 				}
 			}
-			long killend = getTime();
+			long killend = System.currentTimeMillis();
 			System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
 			double killdur = ((double)killend-killstarttime)/1000.0;
 			double killpera = killdur/(max-1);
@@ -147,14 +147,14 @@ public class StartPeerPlan extends Plan
 	 */
 	protected IComponentIdentifier serviceCreateAgent(String name, Map<String, Object> args)
 	{
-//		IComponentManagementService ces = getInterpreter().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//		IComponentManagementService ces = getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 //		SyncResultListener lis = new SyncResultListener();
 //		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(args), lis, null);
 //		IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
 		
-		IComponentIdentifier aid = getAgent().createComponent(
+		IComponentIdentifier aid = getAgent().getExternalAccess(getComponentIdentifier().getParent()).createComponent(
 			new CreationInfo(null, args, getComponentDescription().getResourceIdentifier()).setName(name).setFilename("/jadex/bdi/benchmarks/AgentCreation.agent.xml"))
-			.getFirstResult();
+			.get().getId();
 		return aid;
 	}
 	
@@ -165,7 +165,7 @@ public class StartPeerPlan extends Plan
 	 */
 	protected void serviceDestroyAgent(String name)
 	{
-//		IComponentManagementService ces = getInterpreter().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//		IComponentManagementService ces = getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 
 //		final IComponentManagementService ces = (IComponentManagementService)getAgent()
 //			.getFeature(IRequiredServicesFeature.class).getService("cms").get();
@@ -175,8 +175,8 @@ public class StartPeerPlan extends Plan
 //		lis.waitForResult();
 		
 //		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
-		IComponentIdentifier aid = new BasicComponentIdentifier(name, getComponentIdentifier().getRoot());
-		IFuture<Map<String, Object>> ret = getAgent().killComponent(aid);
+		IComponentIdentifier aid = new ComponentIdentifier(name, getComponentIdentifier().getRoot());
+		IFuture<Map<String, Object>> ret = getAgent().getExternalAccess(aid).killComponent();
 		ret.get();
 	}
 }

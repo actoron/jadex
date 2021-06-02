@@ -5,7 +5,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.ICommand;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -20,7 +22,6 @@ import jadex.commons.future.PullSubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -29,7 +30,7 @@ import jadex.micro.annotation.ProvidedServices;
  * 
  */
 @Agent
-@ProvidedServices(@ProvidedService(type=ITestService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=ITestService.class, scope=ServiceScope.GLOBAL))
 @Service
 public class ProviderAgent implements ITestService
 {
@@ -54,7 +55,7 @@ public class ProviderAgent implements ITestService
 	 */
 	public ITerminableFuture<Void> method2()
 	{
-		TerminableFuture<Void> ret = (TerminableFuture<Void>)SFuture.getNoTimeoutFuture(TerminableFuture.class, agent);
+		TerminableFuture<Void> ret = new TerminableFuture<Void>();
 //		System.out.println("Called tmethod2");
 		doCall(ret);
 		return ret;
@@ -65,7 +66,7 @@ public class ProviderAgent implements ITestService
 	 */
 	public IIntermediateFuture<Void> method3()
 	{
-		final IntermediateFuture<Void> ret = (IntermediateFuture<Void>)SFuture.getNoTimeoutFuture(IntermediateFuture.class, agent);
+		final IntermediateFuture<Void> ret = new IntermediateFuture<Void>();
 //		System.out.println("Called imethod3");
 		doCall(ret);
 		return ret;
@@ -76,7 +77,7 @@ public class ProviderAgent implements ITestService
 	 */
 	public ISubscriptionIntermediateFuture<Void> method4()
 	{
-		final SubscriptionIntermediateFuture<Void> ret = (SubscriptionIntermediateFuture<Void>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
+		final SubscriptionIntermediateFuture<Void> ret = new SubscriptionIntermediateFuture<Void>();
 //		System.out.println("Called smethod4");
 		doCall(ret);
 		return ret;
@@ -111,28 +112,24 @@ public class ProviderAgent implements ITestService
 	 */
 	protected void doCall(final Future<?> ret)
 	{
-//		SFuture.avoidCallTimeouts(ret, agent.getExternalAccess());
-		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		long to = sc.getTimeout();
-
-//		System.out.println("Timeout is: " + to);
 		
-		boolean realtime = sc.isRemoteCall(agent.getId());
+		SFuture.avoidCallTimeouts(ret, agent, to, 0.5, false);
 		
-		System.out.println(agent + " isRemote / Realtime: " + realtime);
+		System.out.println("Timeout is: " + to);		
 	
-		final long wait = to>0? to*2: 0;
-		final long startwait = System.currentTimeMillis();
+		final long wait = to>0? (long)(to*1.2): 0;
+		final long startwait = agent.getLocalService(IClockService.class).getTime();
 //		System.out.println("waiting: "+wait+", "+System.currentTimeMillis());
 		agent.getFeature(IExecutionFeature.class).waitForDelay(wait, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				System.out.println("waited: "+ (System.currentTimeMillis() - startwait));
+				System.out.println("waited: "+ (agent.getLocalService(IClockService.class).getTime() - startwait));
 				ret.setResultIfUndone(null);
 				return IFuture.DONE;
 			}
-		}, realtime);
+		});
 	}
 }

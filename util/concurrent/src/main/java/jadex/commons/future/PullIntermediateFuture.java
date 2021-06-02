@@ -5,12 +5,10 @@ import jadex.commons.ICommand;
 
 
 /**
- *  Intermediate future that can be terminated from caller side. 
- *  A termination request leads to setException() being 
- *  called with a FutureTerminatedException.
- *  
- *  The future can be supplied with a command that
- *  gets executed if terminate is called.
+ *  Intermediate future with pull mechanism.
+ *  Allows for pulling results by the caller.
+ *  In this way a pull intermediate future is 
+ *  similar to an iterator.
  */
 public class PullIntermediateFuture<E> extends TerminableIntermediateFuture<E> 
 	implements IPullIntermediateFuture<E>
@@ -65,6 +63,8 @@ public class PullIntermediateFuture<E> extends TerminableIntermediateFuture<E>
 	 */
 	public void pullIntermediateResult()
 	{
+		if(isDone())
+			throw new IllegalStateException("Cannot pull new intermediate results when future already finished");
 		pullcmd.execute(this);
 	}
 }

@@ -1,5 +1,6 @@
 package jadex.bdi.testcases.goals;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
@@ -36,7 +37,7 @@ public class GoalConditionsPlan	extends Plan
 		// Now triggering goal creation (still no plan due to invalid context).
 		getBeliefbase().getBelief("creation").setFact(Boolean.TRUE);
 
-		waitFor(10); // Hack! Wait for consequences being executed :-(
+		waitFor(Starter.getScaledDefaultTimeout(getComponentIdentifier(), 0.01)); // Hack! Wait for consequences being executed :-(
 		
 		report	= new TestReport("trigger_creation", "Triggering goal creation", true, null);
 		if(getGoalbase().getGoals("test").length!=1)
@@ -90,7 +91,7 @@ public class GoalConditionsPlan	extends Plan
 		getBeliefbase().getBelief("creation").setFact(Boolean.FALSE);
 		getBeliefbase().getBelief("creation").setFact(Boolean.TRUE);
 		
-		waitFor(10); // Hack! Wait for consequences being executed :-(
+		waitFor(Starter.getScaledDefaultTimeout(getComponentIdentifier(), 0.01)); // Hack! Wait for consequences being executed :-(
 		
 		goal = getGoalbase().getGoals("test")[0];
 		report	= new TestReport("trigger_creation2", "Triggering goal creation again", true, null);
@@ -126,7 +127,7 @@ public class GoalConditionsPlan	extends Plan
 
 		// Required: allow work plan to be aborted, such that goal is no longer in process.
 		// Is correct to use waitFor() here, because other user code is executed (WorkPlan.aborted()), which should not interleaved with this plan.
-		waitFor(10);
+		waitFor(Starter.getScaledDefaultTimeout(getComponentIdentifier(), 0.01));
 		
 		// Now triggering goal context again to restart plan.
 		getBeliefbase().getBelief("context").setFact(Boolean.TRUE);

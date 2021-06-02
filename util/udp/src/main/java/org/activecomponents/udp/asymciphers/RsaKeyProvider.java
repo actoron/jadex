@@ -11,9 +11,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.activecomponents.udp.IKeyProvider;
 import org.activecomponents.udp.IThreadExecutor;
 import org.activecomponents.udp.SUdpUtil;
-import org.spongycastle.crypto.AsymmetricCipherKeyPair;
-import org.spongycastle.crypto.generators.RSAKeyPairGenerator;
-import org.spongycastle.crypto.params.RSAKeyGenerationParameters;
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
+import org.bouncycastle.crypto.params.RSAKeyGenerationParameters;
 
 /**
  *

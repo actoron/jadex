@@ -1,5 +1,6 @@
 package jadex.base;
 
+import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -9,25 +10,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
-import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.Cause;
-import jadex.bridge.ClassInfo;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
-import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.VersionInfo;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
+import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.ServiceQuery;
@@ -36,37 +44,36 @@ import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
-import jadex.bridge.service.types.cms.CMSStatusEvent;
+import jadex.bridge.service.types.cms.CmsState;
+import jadex.bridge.service.types.cms.CmsState.CmsComponentState;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IBootstrapFactory;
-import jadex.bridge.service.types.cms.InitInfo;
-import jadex.bridge.service.types.cms.LockEntry;
+import jadex.bridge.service.types.cms.PlatformComponent;
 import jadex.bridge.service.types.cms.SComponentManagementService;
+import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.serialization.ISerializationServices;
+import jadex.bridge.service.types.settings.IPlatformSettings;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bytecode.vmhacks.VmHacks;
-import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
-import jadex.commons.Tuple3;
 import jadex.commons.collection.BlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
 import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.future.CallSequentializer;
+import jadex.commons.concurrent.JavaThreadPool;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.transformation.traverser.TransformSet;
 import jadex.javaparser.SJavaParser;
 
@@ -98,60 +105,36 @@ public class Starter
     /** The used to store the current network names. */
     public static String DATA_NETWORKNAMESCACHE = "networknamescache";
 
-    
-    /** The CMS component map. */
-    public static String DATA_COMPONENTMAP = "componentmap";
+    /** The CMS state. */
+    public static String DATA_CMSSTATE = "cmsstate";
 
     /** Constant for default timeout name. */
     public static String DATA_DEFAULT_TIMEOUT = "default_timeout";
-
-    /** The CMS initinfos. */
-    public static String DATA_INITINFOS = "initinfos";
-    
-    /** The CMS child counts. */
-    public static String DATA_CHILDCOUNTS = "childcounts";
-    
-    /** The CMS cleanup commands. */
-    public static String DATA_CLEANUPFUTURES = "cleanupfutures";
-    
-    /** The CMS cleanup commands. */
-    /**	The local filename cache (tuple(parent filename, child filename) -> local typename)*/
-    public static String  DATA_LOCALTYPES = "localtypes";
-    
-    /**	The CMS classloader cache (rid -> classloader)*/
-    public static String  DATA_CLASSLOADERS = "classloaders";
-    
-    /**	The CMS model cache (Tuple2<String, ClassLoader> -> Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>)*/
-    public static String  DATA_MODELCACHE = "modelcache";
-    
-    /** The CMS cid counts. */
-    public static String DATA_CIDCOUNTS = "cidcounts";
-    
-    /** The CMS cid counts. */
-    public static String DATA_LOCKENTRIES = "lockentries";
-    
-    /** The CMS listeners. */
-    public static String DATA_CMSLISTENERS = "listeners";
-    
-    /** The CMS lock. */
-    public static String DATA_CMSSEQ = "cmsseq";
-    
     
     /** The bootstrap component factory. */
     public static String DATA_PLATFORMACCESS = "$platformaccess";
     
+    /** The platform settings. */
+    public static String DATA_PLATFORMSETTINGS = "$platformsettings";
+    
     /** The bootstrap component factory. */
     public static String DATA_BOOTSTRAPFACTORY = "$bootstrapfactory";
     
+    /** The weak set of invoked init, start or shutdown methods - to not invoke twice. */
+    public static String DATA_INVOKEDMETHODS = "INVOKEDMETHODS";
+    
+    /** The cache of component models found by scanning available resources. */
+    public static String DATA_COMPONENTMODELS = "componentmodels";
+    public static String DATA_KERNELFILTERS = "kernelfilters";
+
     
     // todo: cannot be used because registry needs to know when superpeer changes (remap queries)
 //    /** Constant for the superpeer. */
 //    public static String DATA_SUPERPEER = "superpeer";
-
     
-
 	/** Global platform data. For each platform stored by  */
-    protected static final IRwMap<IComponentIdentifier, IRwMap<String, Object>> platformmem = new RwMapWrapper<IComponentIdentifier, IRwMap<String, Object>>(new HashMap<IComponentIdentifier, IRwMap<String, Object>>());
+    protected static final IRwMap<IComponentIdentifier, IRwMap<String, Object>> platformmem = 
+    	new RwMapWrapper<IComponentIdentifier, IRwMap<String, Object>>(new HashMap<IComponentIdentifier, IRwMap<String, Object>>());
 //	protected static final Map<IComponentIdentifier, Map<String, Object>> platformmem = new HashMap<IComponentIdentifier, Map<String, Object>>();
 
 //	/** The shutdown in progress flag. */
@@ -176,8 +159,11 @@ public class Starter
 	// keytool -import -trustcacerts -alias startcom.ca -file ca.crt
 	// // wget http://www.startssl.com/certs/sub.class1.server.ca.crt
 	// // keytool -import -alias startcom.ca.sub -file sub.class1.server.ca.crt
-//	static
-//	{
+	static
+	{
+		// set secure random to non-blocking entropy source
+		SUtil.ensureNonblockingSecureRandom();
+		
 //		try
 //		{
 //			Class<?> cl = SReflect.findClass0("jadex.platform.service.security.SSecurity", null, null);
@@ -192,7 +178,7 @@ public class Starter
 //		{
 //			System.out.println("Error adding startssl certificate to truststore: "+e.getMessage());
 //		}
-//	}
+	}
 	
 	/**
 	 *  Unescape a string.
@@ -273,7 +259,7 @@ public class Starter
 //				args.put("component", remotecid);
 //				CreationInfo ci = new CreationInfo(args);
 //				ci.setDaemon(true);
-//				IComponentManagementService	cms	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//				IComponentManagementService	cms	= ia.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 //				cms.createComponent(platformname, "jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
 //				return IFuture.DONE;
 //			}
@@ -325,6 +311,7 @@ public class Starter
 //					}
 //				}, 5000);
 	}
+
 	
 	/**
 	 *  Create the platform.
@@ -369,24 +356,85 @@ public class Starter
 	 *  @param config The PlatformConfiguration object.
 	 *  @return The external access of the root component.
 	 */
-	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration pconfig, final String[] args)
+	public static IFuture<IExternalAccess> createPlatform(IPlatformConfiguration pconfig, String... args)
 	{
 		return createPlatform(pconfig, parseArgs(args));
 	}
 
 	/**
+	 *  Get a boolean value from args (otherwise return default value passed as arg).
+	 *  Any non-boolean, non-null value (e.g. a string) is also considered 'true'. 
+	 *  @param args The args map.
+	 *  @param argname The argument name.
+	 *  @param conf The platform config.
+	 *  @return The arg value.
+	 */
+	public static boolean getBooleanValueWithArgs(Map<String, Object> args, String argname, IPlatformConfiguration conf)
+	{
+		Object val	= null;
+		if(args!=null)
+		{
+			val = args.get(argname);
+		}
+		
+		if(val==null)
+		{
+			val	= conf.getValue(argname, null);
+			if(val instanceof String)
+			{
+				try
+				{
+					val = SJavaParser.evaluateExpression((String)val, null);
+				}
+				catch(Exception e)
+				{
+//					System.out.println("Argument parse exception using as string: " + argname + " \"" + val + "\"");
+				}
+			}
+		}
+		
+		return val instanceof Boolean ? (Boolean)val : val!=null;
+	}
+	
+	/**
 	 *  Create the platform.
 	 *  @param config The PlatformConfiguration object.
 	 *  @return The external access of the root component.
 	 */
-	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration pconfig, final Map<String, Object> args)
+	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration pconfig, Map<String, Object> pargs)
 	{
+		//  When already on other component's thread -> run new platform component init on extra executor to avoid conflicts (i.e. which local cid is correct!?) 
+		if(IInternalExecutionFeature.LOCAL.get()!=null)
+		{
+			// TODO: service call for platform creation used anywhere?
+			ServiceCall sc = CallAccess.getCurrentInvocation();
+			ServiceCall scn = CallAccess.getNextInvocation();
+			
+			Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
+			getExecutionService(IInternalExecutionFeature.LOCAL.get()).execute(() ->
+			{
+				CallAccess.setCurrentInvocation(sc);
+				CallAccess.setNextInvocation(scn);
+				
+				createPlatform(pconfig, pargs).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+				return false;
+			});
+			return ret;
+		}
+		
+		// Make all argument keys lower case.
+		final Map<String, Object> args = pargs != null ? new HashMap<>() : null;
+		if (args != null)
+		{
+			for (Map.Entry<String, Object> entry : pargs.entrySet())
+				args.put(entry.getKey() != null ? entry.getKey().toLowerCase() : null, entry.getValue()); 
+		}
+		
+//		System.out.println("Java Version: " + System.getProperty("java.version"));
 		final IPlatformConfiguration config = pconfig!=null? pconfig: PlatformConfigurationHandler.getDefault();
 		
-//		if(!Boolean.TRUE.equals(config.getValues().get("bisimulation")))
-//			System.out.println("no bisim");
-		
-		config.setReadOnly(true);
+		// Once a config is used to create a platform it must not be altered (performance optimization to avoid unnecessary copying of configs).
+		PlatformConfigurationHandler.makeImmutable(config);
 		
 		if(config.getExtendedPlatformConfiguration().isDropPrivileges())
 			VmHacks.get().tryChangeUser(null);
@@ -394,11 +442,11 @@ public class Starter
 //		IRootComponentConfiguration rootconf = config.getRootConfig();
 		
 		// pass configuration parameters to static fields:
-		MethodInvocationInterceptor.DEBUG = config.getExtendedPlatformConfiguration().getDebugServices();
-		ExecutionComponentFeature.DEBUG = config.getExtendedPlatformConfiguration().getDebugSteps();
+		MethodInvocationInterceptor.DEBUG = getBooleanValueWithArgs(args, "debugservices", config);
+		ExecutionComponentFeature.DEBUG = getBooleanValueWithArgs(args, "debugsteps", config);
+		Future.NO_STACK_COMPACTION	= getBooleanValueWithArgs(args, "nostackcompaction", config);
 //		Future.NO_STACK_COMPACTION	= true;
-		Future.NO_STACK_COMPACTION	= config.getExtendedPlatformConfiguration().getNoStackCompaction();
-		Future.DEBUG = config.getExtendedPlatformConfiguration().getDebugFutures(); 
+		Future.DEBUG = getBooleanValueWithArgs(args, "debugfutures", config); 
 		
 //		new FastClasspathScanner(new String[]
 //		      {"com.xyz.widget", "com.xyz.gizmo" })  // Whitelisted package prefixes
@@ -488,36 +536,43 @@ public class Starter
 				String pfname = args!=null && args.containsKey(IPlatformConfiguration.PLATFORM_NAME)? (String)args.get(IPlatformConfiguration.PLATFORM_NAME): config.getPlatformName();
 //				Object pfname = config.getValue(RootComponentConfiguration.PLATFORM_NAME);
 //				rootConfig.setValue(RootComponentConfiguration.PLATFORM_NAME, pfname);
-				final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname.toString(): null);
-				if(IComponentIdentifier.LOCAL.get()==null)
-					IComponentIdentifier.LOCAL.set(cid);
+				final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname: null,
+					Boolean.TRUE.equals(config.getValue("uniquename", model)));
+				
+				assert IComponentIdentifier.LOCAL.get()==null;
+				IComponentIdentifier.LOCAL.set(cid);
+				
+				boolean readonlysettings = Boolean.TRUE.equals(config.getValue("settings.readonly", model))
+					|| args!=null && Boolean.TRUE.equals(args.get("settings.readonly"));
+				IPlatformSettings settings = (IPlatformSettings) SReflect.newInstance("jadex.platform.service.settings.PlatformSettings", cid, readonlysettings);
+				putPlatformValue(cid, DATA_PLATFORMSETTINGS, settings);
+				
+				// Check if platform with same name exists in VM
+				if(getPlatformValue(cid, DATA_PLATFORMACCESS)!=null)
+				{
+					ret.setException(new IllegalArgumentException("Platform already exists: "+cid));
+					return ret;
+				}
 				
 //				Class<?> pcclass = pc instanceof Class ? (Class<?>)pc : SReflect.classForName(pc.toString(), cl);
 //				final IPlatformComponentAccess component = (IPlatformComponentAccess)pcclass.newInstance();
 				final IPlatformComponentAccess component = SComponentManagementService.createPlatformComponent(cl);
+//				CmsComponentState compstate = new CmsComponentState();
+//				((CmsState) getPlatformValue(cid, DATA_CMSSTATE)).getComponentMap().put(cid, compstate);
 				
-				/** Here */
-//					rootconf.setPlatformAccess(component);
+//				rootconf.setPlatformAccess(component);
 				putPlatformValue(cid, DATA_PLATFORMACCESS, component);
 				putPlatformValue(cid, DATA_BOOTSTRAPFACTORY, cfac);
 //					putPlatformValue(cid, IPlatformConfiguration.PLATFORMARGS, args);
 				putPlatformValue(cid, IPlatformConfiguration.PLATFORMCONFIG, config);
 				putPlatformValue(cid, IPlatformConfiguration.PLATFORMMODEL, model);
 				
-				// All cms state uses the same lock
-				ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
+				putPlatformValue(cid, DATA_CMSSTATE, new CmsState());
+				CmsComponentState compstate = new CmsComponentState();
+				compstate.setAccess(component);
+				((CmsState) getPlatformValue(cid, DATA_CMSSTATE)).getComponentMap().put(cid, compstate);
 				
-				putPlatformValue(cid, DATA_COMPONENTMAP, new RwMapWrapper<>(new HashMap<IComponentIdentifier, IPlatformComponentAccess>(), lock));
-				putPlatformValue(cid, DATA_INITINFOS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, InitInfo>(), lock));
-				putPlatformValue(cid, DATA_CHILDCOUNTS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, Integer>(), lock));
-				putPlatformValue(cid, DATA_CLEANUPFUTURES, new RwMapWrapper<>(new HashMap<IComponentIdentifier, IFuture<Map<String, Object>>>(), lock));
-				putPlatformValue(cid, DATA_LOCALTYPES, new RwMapWrapper<>(new HashMap<Tuple, String>(), lock));
-				putPlatformValue(cid, DATA_CLASSLOADERS, new RwMapWrapper<>(new LRU<IResourceIdentifier, ClassLoader>(500), lock));
-				putPlatformValue(cid, DATA_MODELCACHE, new RwMapWrapper<>(new LRU<Tuple2<String, ClassLoader>, Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>>(500), lock));
-				putPlatformValue(cid, DATA_CIDCOUNTS, new RwMapWrapper<>(new HashMap<String, Integer>(), lock));
-				putPlatformValue(cid, DATA_CHILDCOUNTS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, Integer>(), lock));
-				putPlatformValue(cid, DATA_LOCKENTRIES, new RwMapWrapper<>(new HashMap<IComponentIdentifier, LockEntry>(), lock));
-				putPlatformValue(cid, DATA_CMSLISTENERS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>>(), lock));
+				putPlatformValue(cid, DATA_INVOKEDMETHODS, Collections.synchronizedMap(new WeakHashMap<Object, Set<String>>()));
 				
 				// does not work as create with subscomponents is recursive
 //					/** The sequentializer to execute getNewFactory() one by one and not interleaved. */
@@ -583,7 +638,7 @@ public class Starter
 				
 				final CMSComponentDescription desc = new CMSComponentDescription(cid).setType(ctype).setModelName(model.getFullName())
 					.setResourceIdentifier(model.getResourceIdentifier()).setCreationTime(System.currentTimeMillis()).setCreator(caller)
-					.setMonitoring(monitoring).setFilename(model.getFilename());
+					.setMonitoring(monitoring).setFilename(model.getFilename()).setSystemComponent(SComponentManagementService.isSystemComponent(model, null, null));
 
 				putPlatformValue(cid, DATA_REALTIMETIMEOUT, config.getValue(DATA_REALTIMETIMEOUT, model));
 //					rootConfig.setValue(PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getValue(PlatformConfiguration.DATA_REALTIMETIMEOUT));
@@ -595,7 +650,7 @@ public class Starter
 				try
 				{
 					Class<?> serialservclass = Class.forName("jadex.platform.service.serialization.SerializationServices", true, cl);
-					ISerializationServices servs = (ISerializationServices) serialservclass.getConstructor(IComponentIdentifier.class).newInstance(cid);
+					ISerializationServices servs = (ISerializationServices)serialservclass.getConstructor(IComponentIdentifier.class).newInstance(cid);
 					putPlatformValue(cid, DATA_SERIALIZATIONSERVICES, servs);
 				}
 				catch (Exception e)
@@ -606,7 +661,6 @@ public class Starter
 				putPlatformValue(cid, DATA_TRANSPORTCACHE, Collections.synchronizedMap(new LRU<IComponentIdentifier, Tuple2<ITransportService, Integer>>(2000)));
 				
 				putPlatformValue(cid, DATA_DEFAULT_TIMEOUT, config.getDefaultTimeout());
-				putPlatformValue(cid, IClockService.BISIMULATION_CLOCK_FLAG, config.getValue("bisimulation", model));
 
 				Map<String, Object> argsmap = config==null? new HashMap<String, Object>(): config.getValues();
 				if(args!=null)
@@ -623,17 +677,25 @@ public class Starter
 				Collection<IComponentFeatureFactory> features = cfac.getComponentFeatures(model).get();
 				component.create(cci, features);
 
-				initRescueThread(cid, config);	// Required for bootstrapping init.
+				// Required for bootstrapping init.
+				IInternalExecutionFeature	exe	= (IInternalExecutionFeature)component.getInternalAccess().getFeature(IExecutionFeature.class);
+				exe.setManual(true);
 
 				IBootstrapFactory fac = (IBootstrapFactory)SComponentManagementService.getComponentFactory(cid);
+				
+				// Empty init can be overridden by users
+				if(config.getInitCommand()!=null)
+					config.getInitCommand().execute(cid);
 				
 				fac.startService(component.getInternalAccess(), rid).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 				{
 					public void customResultAvailable(Void result)
 					{
-						SComponentManagementService.removeInitInfo(cid);
-						SComponentManagementService.getComponents(cid).put(cid, component);
-					
+//						SComponentManagementService.removeInitInfo(cid);
+//						CmsComponentState compstate = new CmsComponentState();
+//						((CmsState) getPlatformValue(cid, DATA_CMSSTATE)).getComponentMap().put(cid, compstate);
+//						compstate.setAccess(component);
+//						SComponentManagementService.getComponents(cid).put(cid, component);
 						component.init().addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
 						{
 							public void customResultAvailable(Void result)
@@ -642,7 +704,7 @@ public class Starter
 								List comps = config.getComponents();
 								if(args!=null && args.containsKey("component"))
 								{
-									comps	= (List<?>)args.get("component");
+									comps = (List<?>)args.get("component");
 									if(config.getComponents()!=null)
 									{
 										comps.addAll((List<?>)config.getComponents());
@@ -654,6 +716,10 @@ public class Starter
 								{
 									public void customResultAvailable(Void result)
 									{
+										if(Boolean.TRUE.equals(component.getInternalAccess().getArgument("printversion")))
+										{
+											System.out.println(VersionInfo.getInstance());											
+										}
 										if(Boolean.TRUE.equals(config.getValue(IPlatformConfiguration.WELCOME, model)))
 										{
 											long startup = System.currentTimeMillis() - starttime;
@@ -673,13 +739,31 @@ public class Starter
 								});
 							}
 						});
-						
-						if(cid.equals(IComponentIdentifier.LOCAL.get()))
-						{
-							IComponentIdentifier.LOCAL.set(null);
-						}
 					}
 				});
+				
+				// Manually bootstrap platform execution until execution service is available
+				IProvidedServicesFeature	prov	= component.getInternalAccess().getFeature(IProvidedServicesFeature.class);
+				while(prov.getProvidedService(IExecutionService.class)==null
+					|| !((IService)prov.getProvidedService(IExecutionService.class)).isValid().get().booleanValue())
+				{
+					if(!exe.execute())
+					{
+						// execution stopped before init complete!?
+						throw new IllegalStateException("Boostrapping failed: "+component.getInternalAccess());
+					}
+				}
+				
+				// Rare case when createPlatform called from non-component future listener notification
+				// Run scheduled init steps before starting platform executor to avoid parallel execution
+				FutureHelper.notifyStackedListeners();
+				
+				// End bootstrapping and kick of platform executor
+				exe.setManual(false);
+				// Rescue thread is shared by all components of platform and used e.g.
+				// for component termination listener notification after component executor is already stopped
+				initRescueThread(cid, config); 
+				exe.wakeup();
 			}
 	//		System.out.println("Model: "+model);
 		}
@@ -712,11 +796,15 @@ public class Starter
 		return ret;
 	}
 	
+	/** Counters for generating unique names of platforms. */
+	protected static Map<String, Integer>	UNIQUENAMES	= new HashMap<>();
+	
 	/**
 	 *  Internal method to create a component identifier.
 	 *  @param pfname The platform name.
+	 *  @param unique	When true, keeps track of already created names and creates a name that is unique in this VM.
 	 */
-	protected static IComponentIdentifier createPlatformIdentifier(String pfname)
+	public static IComponentIdentifier createPlatformIdentifier(String pfname, boolean unique)
 	{
 		// Build platform name.
 		String	platformname	= null; 
@@ -745,31 +833,53 @@ public class Starter
 		{
 			platformname = "platform_*";
 		}
-		Random	rnd	= new Random();
-		StringBuffer	buf	= new StringBuffer();
-		StringTokenizer	stok	= new StringTokenizer(platformname, "*+", true);
-		while(stok.hasMoreTokens())
+		
+		if(unique)
 		{
-			String	tok	= stok.nextToken();
-			if(tok.equals("+"))
+			Integer	num;
+			synchronized(UNIQUENAMES)
 			{
-				buf.append(Integer.toString(rnd.nextInt(36), 36));
+				num	= UNIQUENAMES.get(platformname);
+				if(num==null)
+				{
+					num	= 0;
+				}
+				else
+				{
+					num++;
+				}
+				UNIQUENAMES.put(platformname, num);
 			}
-			else if(tok.equals("*"))
-			{
-				buf.append(Integer.toString(rnd.nextInt(36), 36));
-				buf.append(Integer.toString(rnd.nextInt(36), 36));
-				buf.append(Integer.toString(rnd.nextInt(36), 36));
-			}
-			else
-			{
-				buf.append(tok);
-			}
+			platformname	+= "_$"+num;
 		}
-		platformname = buf.toString();
+		else
+		{
+			Random	rnd	= new Random();
+			StringBuffer	buf	= new StringBuffer();
+			StringTokenizer	stok	= new StringTokenizer(platformname, "*+", true);
+			while(stok.hasMoreTokens())
+			{
+				String	tok	= stok.nextToken();
+				if(tok.equals("+"))
+				{
+					buf.append(Integer.toString(rnd.nextInt(36), 36));
+				}
+				else if(tok.equals("*"))
+				{
+					buf.append(Integer.toString(rnd.nextInt(36), 36));
+					buf.append(Integer.toString(rnd.nextInt(36), 36));
+					buf.append(Integer.toString(rnd.nextInt(36), 36));
+				}
+				else
+				{
+					buf.append(tok);
+				}
+			}
+			platformname = SUtil.intern(buf.toString());
+		}
 		
 		// Create an instance of the component.
-		return new BasicComponentIdentifier(platformname);
+		return new ComponentIdentifier(platformname).getRoot();
 	}
 	
 	/**
@@ -809,7 +919,7 @@ public class Starter
 				// must have : if both are presents otherwise all is configname
 				if(!comp.endsWith(")"))
 				{
-					throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>)[:<args>]]) : "+components.get(i));
+					throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>[:<args>])] : "+components.get(i));
 				}
 
 				int i3 = comp.indexOf(":");
@@ -853,7 +963,7 @@ public class Starter
 			ci.setName(name);
 			ci.setFilename(comp);
 			
-			instance.createComponent(ci, null)
+			instance.createComponent(ci)
 				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
@@ -955,6 +1065,8 @@ public class Starter
 	 */
 	public synchronized static void scheduleRescueStep(IComponentIdentifier cid, Runnable run)
 	{
+		StackTraceElement[]	ste	= Thread.currentThread().getStackTrace();
+//		System.out.println("rescue step for "+cid+" called from "+ste[2]);
 		Tuple2<BlockingQueue, Thread> tup = rescuethreads!=null ? rescuethreads.get(cid.getRoot()) : null;
 		if(tup!=null)
 		{
@@ -1033,7 +1145,7 @@ public class Starter
 										Map<String, Object>	args = new HashMap<String, Object>();
 										args.put("component", remote.getId().getRoot());
 										CreationInfo ci = new CreationInfo(args);
-										local.createComponent(ci.setFilename("\"jadex/platform/service/remote/ProxyAgent.class\""), null).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+										local.createComponent(ci.setFilename("\"jadex/platform/service/remote/ProxyAgent.class\"")).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 										
 //										local.searchService( new ServiceQuery<>(IComponentManagementService.class))
 //											.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
@@ -1054,7 +1166,7 @@ public class Starter
 				});
 			}
 		});
-		/*remote.searchService( new ServiceQuery<>( ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+		/*remote.searchService( new ServiceQuery<>( ITransportAddressService.class, ServiceScope.PLATFORM)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(ITransportAddressService remotetas) throws Exception
 			{
@@ -1062,7 +1174,7 @@ public class Starter
 				{
 					public void customResultAvailable(final List<TransportAddress> remoteaddrs) throws Exception
 					{
-						local.searchService( new ServiceQuery<>( ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+						local.searchService( new ServiceQuery<>( ITransportAddressService.class, ServiceScope.PLATFORM)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
 						{
 							public void customResultAvailable(ITransportAddressService localtas) throws Exception
 							{
@@ -1070,7 +1182,7 @@ public class Starter
 								{
 									public void customResultAvailable(Void result) throws Exception
 									{
-										local.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+										local.searchService( new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 											.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 										{
 											public void customResultAvailable(final IComponentManagementService localcms)
@@ -1120,6 +1232,20 @@ public class Starter
 		return ret;
 	}
 
+
+	/**
+	 * Get a platform argument, i.e. global Jadex setting value as defined by arguments of jadex.platform.PlatformAgent.
+	 *
+	 * @param platform An id of any component on the platform. 
+	 * @param arg The argument name.
+	 * @return The value.
+	 */
+	public static Object getPlatformArgument(IComponentIdentifier cid, String arg)
+	{
+		IPlatformComponentAccess	platform	= (IPlatformComponentAccess)getPlatformValue(cid, DATA_PLATFORMACCESS);
+		return platform.getInternalAccess().getArgument(arg);
+	}
+	
 	/**
 	 * Get a global platform value.
 	 *
@@ -1132,14 +1258,14 @@ public class Starter
 		IRwMap<String, Object> mem = platformmem.get(platform.getRoot());
 		if(mem == null)
 		{
-			platformmem.writeLock().lock();
+			platformmem.getWriteLock().lock();
 			mem = platformmem.get(platform.getRoot());
 			if (mem == null)
 			{
 				mem = new RwMapWrapper<String, Object>(new HashMap<String, Object>());
 				platformmem.put(platform, mem);
 			}
-			platformmem.writeLock().unlock();
+			platformmem.getWriteLock().unlock();
 		}
 		mem.put(key, value);
 	}
@@ -1169,14 +1295,20 @@ public class Starter
 	{
 		platformmem.remove(platform.getRoot());
 	}
-
+	
+	public static final IPlatformSettings getPlatformSettings(IComponentIdentifier platform)
+	{
+		return (IPlatformSettings) getPlatformValue(platform, DATA_PLATFORMSETTINGS);
+	}
+	
 	/**
 	 * Get the default timeout.
 	 */
 	public static long getDefaultTimeout(IComponentIdentifier platform)
 	{
-		return platform!=null && hasPlatformValue(platform, DATA_DEFAULT_TIMEOUT)
-			? ((Long)getPlatformValue(platform, DATA_DEFAULT_TIMEOUT)).longValue()
+		Long	platform_timeout	= platform!=null ? (Long)getPlatformValue(platform, DATA_DEFAULT_TIMEOUT) : null;
+		return  platform_timeout!=null
+			? platform_timeout.longValue()
 			: SUtil.DEFTIMEOUT;
 	}
 
@@ -1198,12 +1330,16 @@ public class Starter
 	}
 
 	/**
-	 * Check if the real time timeout flag is set for a platform.
+	 *  Check if the real time / non-real time timeout flag is set for a platform.
+	 *  By default some timeouts are real time (e.g. network communication) and others are clock dependent (e.g. agent.waitFor...).
+	 *  The "realtimetimeout" platform setting (default=null) allows forcing all timeouts to real time (true) or clock dependent (false).
+	 *  @param cid	Use platform setting of the given component.
+	 *  @param def	The default value to be returned when flag is null in platform config.  
 	 */
-	public static boolean isRealtimeTimeout(IComponentIdentifier platform)
+	public static boolean isRealtimeTimeout(IComponentIdentifier cid, boolean def)
 	{
-		// Hack!!! Should default to false?
-		return !Boolean.FALSE.equals(getPlatformValue(platform, DATA_REALTIMETIMEOUT));
+		Object	val	= getPlatformValue(cid, DATA_REALTIMETIMEOUT);
+		return val==null ? def : Boolean.TRUE.equals(val);
 	}
 
 	/**
@@ -1384,7 +1520,275 @@ public class Starter
 //	{
 //		parseArg(key, val, this);
 //	}
-
+	
+	//-------- Helper methods for no platform mode --------
+	
+	// moved to BaseService
+	/**
+	 *  Create the necessary platform service replacements.
+	 *  @return The services (execution and clock).
+	 * /
+	public static Tuple2<IExecutionService, IClockService> createServices()
+	{
+		IComponentIdentifier pcid = Starter.createPlatformIdentifier(null);
+		IThreadPool threadpool = new JavaThreadPool(true);
+		ExecutionService es = new ExecutionService(pcid, threadpool);
+		es.startService().get();
+		ClockService cs = new ClockService(pcid, null, threadpool);
+		cs.startService().get();
+		return new Tuple2<IExecutionService, IClockService>(es, cs);
+	}*/
+	
+	/**
+	 *  Create an agent based on filename, agent factory and platform services.
+	 *  @param filename The model filename.
+	 *  @param es The execution service.
+	 *  @param cs The clock service.
+	 *  @return External access of the created agent.
+	 */
+	public static IFuture<IExternalAccess> createAgent(String filename, IComponentFactory cfac, IExecutionService es, IClockService cs)
+	{
+		Future<IExternalAccess> ret = new Future<>();
+				
+		IComponentIdentifier pcid = ((IService)es).getServiceId().getProviderId();
+		
+		if(Starter.getPlatformValue(pcid, IExecutionService.class.getName())==null)
+			Starter.putPlatformValue(pcid, IExecutionService.class.getName(), es);
+		if(Starter.getPlatformValue(pcid, IClockService.class.getName())==null)
+			Starter.putPlatformValue(pcid, IClockService.class.getName(), cs);
+		if(Starter.getPlatformValue(pcid, Starter.DATA_INVOKEDMETHODS)==null)
+			Starter.putPlatformValue(pcid, Starter.DATA_INVOKEDMETHODS, Collections.synchronizedMap(new WeakHashMap<Object, Set<String>>()));
+		
+		IModelInfo model = cfac.loadModel(filename, null, null).get();
+		String ctype = cfac.getComponentType(filename, null, model.getResourceIdentifier()).get();
+		
+		ComponentIdentifier cid = new ComponentIdentifier(SUtil.createPlainRandomId(filename, 6)+"@"+pcid);
+		
+		CMSComponentDescription desc = new CMSComponentDescription(cid).setType(ctype).setModelName(model.getFullName())
+			.setResourceIdentifier(model.getResourceIdentifier()).setCreationTime(System.currentTimeMillis())
+			.setFilename(model.getFilename()).setSystemComponent(SComponentManagementService.isSystemComponent(model, null, null));
+		
+		// create component from model
+		ComponentCreationInfo cci = new ComponentCreationInfo(model, null, null, desc, null, null);
+		Collection<IComponentFeatureFactory> features = cfac.getComponentFeatures(model).get();
+		
+		IPlatformComponentAccess component = SComponentManagementService.createPlatformComponent(Starter.class.getClassLoader(),
+			new PlatformComponent() 
+		{
+			public IFuture<Map<String, Object>> killComponent(IComponentIdentifier cid)
+			{
+				Future<Map<String, Object>> ret = new Future<>();
+				
+				//agent.getLogger().info("Terminating component: "+cid.getName());
+				IResultListener<Void> cc = new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						//System.out.println("Killed: " + cid);
+						cont();
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+						ret.setException(exception);
+					}
+					
+					protected void cont()
+					{
+						IArgumentsResultsFeature arf = getFeature0(IArgumentsResultsFeature.class);
+						if(arf!=null)
+						{
+							ret.setResult(arf.getResults());
+						}
+						else
+						{
+							ret.setResult(Collections.EMPTY_MAP);
+						}
+					}
+				};
+				
+				shutdown().addResultListener(cc);
+				return ret;
+			}
+		});
+		
+		component.create(cci, features);
+		component.init().then(x ->
+		{
+			//long end = System.currentTimeMillis();
+			//System.out.println("init took "+(end-start)+" ms, thread: "+Thread.currentThread());
+			
+			ret.setResult(component.getInternalAccess());
+			
+			component.body().get();
+			
+			// Shutdown is called via killComponent()
+			//component.shutdown().get();
+		}).catchEx(ret);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Test if agent runs in no platform mode.
+	 *  @param agent The agent.
+	 *  @return True, if runs in no platform mode.
+	 */
+	public static boolean isNoPlatformMode(IInternalAccess agent)
+	{
+		return Starter.getPlatformValue(agent.getId().getRoot(), IExecutionService.class.getName())!=null;
+	}
+	
+	/**
+	 *  Get the clock service.
+	 *  @return The clock service.
+	 */
+	public static IClockService getClockService(IInternalAccess ia)
+	{
+		IInternalRequiredServicesFeature rs = ((IInternalRequiredServicesFeature)ia.getFeature0(IRequiredServicesFeature.class));
+		if(rs!=null)
+		{
+			return rs.getRawService(IClockService.class);
+		}
+		else
+		{
+			// no platform variant
+			return (IClockService)Starter.getPlatformValue(ia.getId().getRoot(), IClockService.class.getName());
+		}
+	}
+	
+	/**
+	 *  Get the execution service.
+	 *  @return The execution service.
+	 */
+	public static IExecutionService getExecutionService(IInternalAccess ia)
+	{
+		IInternalRequiredServicesFeature rs = ((IInternalRequiredServicesFeature)ia.getFeature0(IRequiredServicesFeature.class));
+		if(rs!=null)
+		{
+			return rs.getRawService(IExecutionService.class);
+		}
+		else
+		{
+			// no platform variant
+			return (IExecutionService)Starter.getPlatformValue(ia.getId().getRoot(), IExecutionService.class.getName());
+		}
+	}
+	
+	/**
+	 *  Create the necessary platform service replacements.
+	 *  @return The services (execution and clock).
+	 */
+	public static Tuple2<IExecutionService, IClockService> createServices()
+	{
+		try
+		{
+			IComponentIdentifier pcid = Starter.createPlatformIdentifier(null, false);
+			IThreadPool threadpool = new JavaThreadPool(true);
+			Class<IExecutionService> esc = SReflect.findClass("jadex.noplatform.services.ExecutionService", null, Starter.class.getClassLoader());
+			Constructor<IExecutionService> ces = esc.getConstructor(new Class[]{IComponentIdentifier.class, IThreadPool.class});
+			IExecutionService es = ces.newInstance(new Object[]{pcid, threadpool});
+			((IInternalService)es).startService().get();
+			Class<IClockService> ccs = SReflect.findClass("jadex.noplatform.services.ClockService", null, Starter.class.getClassLoader());
+			Constructor<?>[] cocs = ccs.getConstructors();
+			IClockService cs = (IClockService)cocs[0].newInstance(new Object[]{pcid, null, threadpool});
+			((IInternalService)cs).startService().get();
+			//ExecutionService es = new ExecutionService(pcid, threadpool);
+			//es.startService().get();
+			//ClockService cs = new ClockService(pcid, null, threadpool);
+			//cs.startService().get();
+			return new Tuple2<IExecutionService, IClockService>(es, cs);
+		}
+		catch(Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
+	}
+	
+	/**
+	 *  Creating a platform with minimal overhead
+	 */
+	/*public static IFuture<IExternalAccess> createPlatform()
+	{
+		Future<IExternalAccess> ret = new Future<>();
+	
+		Logger rootlogger = LogManager.getLogManager().getLogger("");
+		rootlogger.setLevel(Level.SEVERE);
+		
+		long start = System.currentTimeMillis();
+		
+		IComponentIdentifier cid = Starter.createPlatformIdentifier(null);
+		//System.out.println("platfrom cid: "+cid);
+		
+		// create helper stuff: service registry, serialization 
+		
+		Map<String, Object> argsmap = new HashMap<String, Object>();
+		Starter.putPlatformValue(cid, IPlatformConfiguration.PLATFORMARGS, argsmap);
+		ServiceRegistry reg = new ServiceRegistry();
+		Starter.putPlatformValue(cid, Starter.DATA_SERVICEREGISTRY, reg);
+		Starter.putPlatformValue(cid, Starter.DATA_SERIALIZATIONSERVICES, new SerializationServices(cid));
+		CmsState cmsstate = new CmsState();
+		Starter.putPlatformValue(cid, Starter.DATA_CMSSTATE, cmsstate);
+		Starter.putPlatformValue(cid, Starter.DATA_INVOKEDMETHODS, Collections.synchronizedMap(new WeakHashMap<Object, Set<String>>()));
+	
+		// Create necessary platform services
+		
+		IThreadPool threadpool = new JavaThreadPool(false);
+		
+		ExecutionService es = new ExecutionService(cid, threadpool);
+		es.startService().get();
+		reg.addLocalService(es);
+		
+		ClockService cs = new ClockService(cid, null, threadpool);
+		cs.startService().get();
+		reg.addLocalService(cs);
+		
+		//LibraryService ls = new LibraryService(cid);
+		//ls.startService().get();
+		//reg.addLocalService(ls);
+		
+		// create platform component 
+		
+		// load model
+		//String modelname = "jadex.micro.MinimalAgent";
+		String modelname = "jadex.micro.KernelMicroAgent";
+		IComponentFactory cfac = new MicroAgentFactory("rootid");
+		IModelInfo model = cfac.loadModel(modelname, null, null).get();
+		String ctype = cfac.getComponentType(modelname, null, model.getResourceIdentifier()).get();
+		CMSComponentDescription desc = new CMSComponentDescription(cid).setType(ctype).setModelName(model.getFullName())
+			.setResourceIdentifier(model.getResourceIdentifier()).setCreationTime(System.currentTimeMillis())
+			.setFilename(model.getFilename()).setSystemComponent(SComponentManagementService.isSystemComponent(model, null, null));
+		
+		// create component from model
+		
+		ComponentCreationInfo cci = new ComponentCreationInfo(model, null, null, desc, null, null);
+		Collection<IComponentFeatureFactory> features = cfac.getComponentFeatures(model).get();
+		
+		IPlatformComponentAccess component = SComponentManagementService.createPlatformComponent(NoPlatformStarter.class.getClassLoader());
+		
+		// needed for cms
+		CmsComponentState coms = new CmsComponentState();
+		coms.setAccess(component);
+		cmsstate.getComponentMap().put(cid, coms);
+		
+		component.create(cci, features);
+		component.init().thenAccept(x ->
+		{
+			ret.setResult(component.getPlatformComponent().getExternalAccess());
+			long end = System.currentTimeMillis();
+			
+			System.out.println("platform start took "+(end-start)+" ms, thread: "+Thread.currentThread());
+			
+			component.body().get();
+			//System.out.println("platform shutdown");
+			//component.shutdown().get();
+			//System.out.println("platform end");
+		}).exceptionally(ret);
+		
+		//return 
+		return ret;
+	}*/
 	
 }
 

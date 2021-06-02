@@ -9,9 +9,9 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.DelegationResultListener;
@@ -36,7 +36,8 @@ public class ShortMessageService implements IShortMessageService
 	/**
 	 *  Init of service
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public void init()
 	{
 		IUserService us = component.getFeature(IProvidedServicesFeature.class).getProvidedService(IUserService.class);

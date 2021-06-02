@@ -58,6 +58,8 @@ public class PullSubscriptionIntermediateFuture<E> extends SubscriptionIntermedi
 	 */
 	public void pullIntermediateResult()
 	{
+		if(isDone())
+			throw new IllegalStateException("Cannot pull new intermediate results when future already finished");
 		pullcmd.execute(this);
 	}
 }

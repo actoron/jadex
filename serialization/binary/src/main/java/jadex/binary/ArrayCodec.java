@@ -163,7 +163,7 @@ public class ArrayCodec extends AbstractCodec
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
-		Class compclazz = clazz.getComponentType();
+		Class<?> compclazz = clazz.getComponentType();
 		
 		if (compclazz.isPrimitive())
 			processRawMode(object, compclazz, ec, processors, traverser, ec);

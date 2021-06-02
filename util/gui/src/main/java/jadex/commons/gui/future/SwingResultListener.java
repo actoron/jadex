@@ -1,10 +1,9 @@
 package jadex.commons.gui.future;
 
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.IFunctionalExceptionListener;
-import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
@@ -32,7 +31,7 @@ public class SwingResultListener<E> implements IUndoneResultListener<E>, IFuture
 	 * @param listener The listener.
 	 * @param exceptionListener The listener that is called on exceptions.
 	 */
-	public SwingResultListener(final IFunctionalResultListener<E> listener)
+	public SwingResultListener(final Consumer<E> listener)
 	{
 		this(listener, null);
 	}
@@ -43,18 +42,18 @@ public class SwingResultListener<E> implements IUndoneResultListener<E>, IFuture
 	 * @param listener The listener.
 	 * @param exceptionListener The listener that is called on exceptions.
 	 */
-	public SwingResultListener(final IFunctionalResultListener<E> listener, final IFunctionalExceptionListener exceptionListener)
+	public SwingResultListener(final Consumer<E> listener, final Consumer<Exception> exceptionListener)
 	{
 		this(new DefaultResultListener<E>()
 		{
 			public void resultAvailable(E result)
 			{
-				listener.resultAvailable(result);
+				listener.accept(result);
 			}
 			public void exceptionOccurred(Exception exception)
 			{
 				if (exceptionListener != null) {
-					exceptionListener.exceptionOccurred(exception);
+					exceptionListener.accept(exception);
 				} else {
 					super.exceptionOccurred(exception);
 				}

@@ -94,7 +94,7 @@ public class ServiceCall
 	/**
 	 *  Get the invocation data for the next service call.
 	 */
-	public static ServiceCall	getNextInvocation()
+	public static ServiceCall getNextInvocation()
 	{
 		return NEXT.get();
 	}
@@ -104,7 +104,7 @@ public class ServiceCall
 	 *  to the current execution context.
 	 *  @return The service call instance or null.
 	 */
-	public static ServiceCall	getCurrentInvocation()
+	public static ServiceCall getCurrentInvocation()
 	{
 		return CURRENT.get();
 	}
@@ -114,7 +114,7 @@ public class ServiceCall
 	 *  to the current execution context.
 	 *  @return The service call instance or null.
 	 */
-	public static ServiceCall	getLastInvocation()
+	public static ServiceCall getLastInvocation()
 	{
 		return LAST.get();
 	}

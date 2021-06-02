@@ -5,8 +5,6 @@ import javax.swing.SwingUtilities;
 
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IMultiKernelListener;
-import jadex.commons.future.IFuture;
-import jadex.commons.gui.future.SwingDefaultResultListener;
 
 /**
  *  Listener for Kernel Updates.

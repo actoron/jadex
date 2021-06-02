@@ -5,16 +5,15 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
-import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -137,6 +136,7 @@ public abstract class Test extends TestCase
 				testClass();
 				testClassInfo();
 				testDate();
+				testDateFormat();
 				testUUID();
 				testInnerClass();
 				testURL();
@@ -166,6 +166,7 @@ public abstract class Test extends TestCase
 				testBeanWithIncludedPrivateFields();
 				testBeanWithIncludedSinglePrivateFields();
 				testBeanWithIncludedInheritedPrivateFields();
+				testBeanWithIncludedStaticFinalField();
 				testSelfReferenceBean();
 
 				testOptionalsPrimitive();
@@ -202,7 +203,7 @@ public abstract class Test extends TestCase
 		//(new RuntimeException()).printStackTrace();
 		Object written = doWrite(wo);
 		
-//		System.out.println("written is:"+new String((byte[])written));
+//		System.out.println("written is:"+new String((byte[])written, "UTF-8"));
 		
 		Object ro = doRead(written);
 		
@@ -816,6 +817,24 @@ public abstract class Test extends TestCase
 	}
 	
 	/**
+	 *  Test if date format transfer works.
+	 */
+	public void testDateFormat() throws Exception
+	{
+		doWriteAndRead(DateFormat.getDateTimeInstance(),
+			new Comparator<DateFormat>()
+		{
+			@Override
+			public int compare(DateFormat df1, DateFormat df2)
+			{
+				// Hack!!! Currently date formats are not unmarshalled as equal, but output should be the same.
+				Date	d	= new Date();
+				return  df1.format(d).compareTo(df2.format(d));
+			}
+		});
+	}
+	
+	/**
 	 *  Test if color transfer works.
 	 */
 	public void testColor() throws Exception
@@ -1072,6 +1091,16 @@ public abstract class Test extends TestCase
 	}
 
 	/**
+	 *  Test if writer writes included private bean fields (when @Include is used).
+	 */
+	public void testBeanWithIncludedStaticFinalField() throws Exception
+	{
+		I i = new I("test\n");
+
+		doWriteAndRead(i);
+	}
+
+	/**
 	 *  Test if special characters can be transferred.
 	 */
 	public void testSpecialCharacter() throws Exception
@@ -1293,7 +1322,7 @@ public abstract class Test extends TestCase
 			Object booleanOptional = ofMethod.invoke(optionalClass, true);
 			doWriteAndRead(booleanOptional);
 
-			Object nullOptional = emptyMethod.invoke(optionalClass, null);
+			Object nullOptional = emptyMethod.invoke(optionalClass);
 			doWriteAndRead(nullOptional);
 		}
 	}

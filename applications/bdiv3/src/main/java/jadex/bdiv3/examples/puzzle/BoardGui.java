@@ -104,14 +104,21 @@ public class BoardGui extends JFrame
 //					}
 //				});
 				
-				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
-					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
-				{
-					public void intermediateResultAvailable(IMonitoringEvent result)
-					{
-						BoardGui.this.dispose();
-					}
-				}));
+//				if(ia.getFeature0(IMonitoringComponentFeature.class)!=null)
+//				{
+//					ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+//						.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
+//					{
+//						public void intermediateResultAvailable(IMonitoringEvent result)
+//						{
+//							BoardGui.this.dispose();
+//						}
+//					}));
+//				}
+//				else
+//				{
+					ia.waitForTermination().then(x->BoardGui.this.dispose());
+//				}
 				
 				return IFuture.DONE;
 			}

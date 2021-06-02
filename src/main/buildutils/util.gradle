@@ -19,70 +19,12 @@ def isAddon(selecteddists) {
 	return isaddon
 }
 
-def isAndroidProject(project) {
-    project.hasProperty("androidProject") && project.property("androidProject") == 'true'
-}
-
-def isAndroidLibraryProject(project) {
-    project.hasProperty("androidLibraryProject") && project.property("androidLibraryProject") == 'true'
-}
-
 def isWebApplicationProject(project) {
     project.hasProperty("webArchiveProject") && project.property("webArchiveProject") == 'true'
 }
 
 def isTestParallel(project) {
     project.hasProperty("testParallel") && project.property("testParallel") == 'true'
-}
-
-def onVariant(Project project, String variantName, Closure c) {
-    onAllVariants(project) {variant ->
-        if (variant.buildType.name.equals(variantName)) {
-            c(variant)
-        }
-    }
-}
-
-def onAllVariants(Project project, Closure c) {
-    if (isAndroidLibraryProject(project)) {
-        project.android.libraryVariants.all {variant ->
-            c(variant)
-        }
-    } else {
-        project.android.applicationVariants.all {variant ->
-            c(variant)
-        }
-    }
-}
-
-/**
- * Calls given closure with the output object of the given project.
- * This ensures that the output is already configured when the callback is called.
- * @param project
- * @param c callback
- * @return void
- */
-def onVariantOutput(Project project, String variantName, Closure c) {
-    onVariant(project, variantName) { variant ->
-        def output = variant.outputs.find({ o -> o.name.contains(variantName)})
-        c(output)
-    }
-}
-
-def getReleaseVariant(project) {
-    if (isAndroidLibraryProject(project)) {
-        project.android.libraryVariants.all {variant ->
-            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
-                return variant
-            }
-        }
-    } else {
-        project.android.applicationVariants.all {variant ->
-            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
-                return variant
-            }
-        }
-    }
 }
 
 /**
@@ -93,50 +35,6 @@ def getProjectDepth(proj) {
 		return 0;
 	return proj.path.split(':').length - 1
 }
-
-/**
- * Recursively check for dependencies with apiNoAndroidRuntime scope and exclude them from the project
- * @param project
- * @param dep
- * @param alreadyChecked
- * @return
- */
-def excludeNonAndroidRuntimeFromApk(Project project, Dependency dep, List alreadyChecked = [], parentDep = null) {
-//    configurations.'default'.exclude group: 'org.ow2.asm', module: 'asm-all'
-    if (parentDep == null) {
-        parentDep = dep;
-    }
-    if (!(dep instanceof DefaultProjectDependency) || alreadyChecked.contains(dep)) {
-        // terminate
-    } else {
-        alreadyChecked.add(dep)
-        // recurse to children
-        dep.dependencyProject.configurations.all {conf ->
-            conf.dependencies.all {
-                childDep ->
-                    excludeNonAndroidRuntimeFromApk(project, childDep, alreadyChecked, parentDep)
-            }
-        }
-
-//        println "recursed to: $dep.name"
-//        println "android deps: $dep.dependencyProject.configurations.apiNoAndroidRuntime.dependencies"
-        // exclude direct children
-        dep.dependencyProject.configurations.apiNoAndroidRuntime.dependencies.all {
-            exDep ->
-//                println "excluding $exDep.group:$exDep.name"
-                project.configurations.all { conf ->
-                    def relevantName = conf.name.toLowerCase()
-                    if (relevantName.contains('apk') || relevantName.contains('runtime')) {
-                        conf.exclude(group: exDep.group, module: exDep.name)
-                    }
-                }
-//                project.configurations.'default'.exclude(group: exDep.group, module: exDep.name)
-//                project.configurations.'runtime'.exclude(group: exDep.group, module: exDep.name)
-        }
-    }
-
-}
-
 
 /**
  * Add scope mapping for parent configurations of given configuration.
@@ -159,17 +57,16 @@ def excludeNonAndroidRuntimeFromApk(Project project, Dependency dep, List alread
 //}
 
 /**
- * Adds schema processing tasks:
- * 1. Generate schemadocs using XSLT
- * 2. Copy schemas to build dir and filter schema for version
- * @param project
- * @return
+ * Adds schema processing tasks for generating files to be uploaded
+ * 1. Generate schemadoc using XSLT
+ * 2. Copy and filter release XSDs to build dir, putting the current $jadex_build_version value in content and name
+ * 3. Copy and filter dev XSDs to build dir, puting the '${jadex_build_version}' (literally) in the name
  */
 def addSchemaTasks(Project project) {
-    project.tasks.create('schemadocs').doLast {
+    project.tasks.create('schemadoc').doLast {
         ant.xslt(
                 basedir: "${project.projectDir}/src/main/schema/",
-                destdir: "${project.buildDir}/schemadocs/",
+                destdir: "${project.buildDir}/schemadoc/",
 //                extension: "-${project.version}.html",
                 extension: ".html",
                 force: "true",
@@ -177,35 +74,54 @@ def addSchemaTasks(Project project) {
                 includes: "*.xsd"
         )
     }
-    project.assemble.dependsOn += project.schemadocs
+	project.schemadoc.inputs.files(project.fileTree(dir: "src/main/schema/", include: '*.xsd'))
+	project.schemadoc.outputs.dir("${project.buildDir}/schemadoc/")
+	
     project.tasks.create('processSchemas').doLast {
-        ant.copy todir: file("$project.buildDir/tmp/schemas"),
-                {
-                    resources
-                            {
-                                fileset dir: 'src/main/schema', includes: project.rootProject.ext.filterfiles, erroronmissingdir: false
-                            }
-
-                    filterset begintoken: '${', endtoken: '}',
-                            {
-                                filter token: 'jadex_build_version', value: jadex_build_version
-                            }
-                }
-        copy {
-            // rename filtered file to x-3.0-SNAPSHOT
-            from file("$project.buildDir/tmp/schemas")
-            into file("$project.buildDir/schemas")
-            rename '(.+)\\.(.+)', "\$1-$jadex_build_version.\$2"
+		// rename and filter files to x-3.0-SNAPSHOT
+        ant.copy(todir: file("$project.buildDir/schemas"))
+        {
+            fileset(
+				dir: 'src/main/schema',
+				includes: project.rootProject.ext.filterfiles,
+				erroronmissingdir: false
+			)
+            filterset(begintoken: '${', endtoken: '}')
+            {
+                filter(token: 'jadex_build_version', value: jadex_build_version)
+            }
+			mapper(
+				type: 'regexp',
+				from: '(.+)\\.(.+)',
+				to:	"\\1-$jadex_build_version.\\2"
+			)
         }
-        copy {
-            // copy original unfiltered file and rename to -${jadex_build_version}
-            from file("$project.projectDir/src/main/schema/")
-            into file("$project.buildDir/devschemas")
-            rename '(.+)\\.(.+)', '\$1-\\${jadex_build_version}.\$2'
+	}
+	project.processSchemas.inputs.files(project.fileTree(dir: "src/main/schema/", include: '*.xsd'))
+	project.processSchemas.outputs.dir("${project.buildDir}/schemas/")
+	
+    project.tasks.create('processDevSchemas').doLast {
+		// copy original unfiltered file and rename to -${jadex_build_version}
+        ant.copy(todir: file("$project.buildDir/devschemas"))
+        {
+            fileset(
+				dir: 'src/main/schema',
+				includes: project.rootProject.ext.filterfiles,
+				erroronmissingdir: false
+			)
+			mapper(
+				type: 'regexp',
+				from: '(.+)\\.(.+)',
+				to:	'\\1-${jadex_build_version}.\\2'
+			)
         }
     }
-    project.processSchemas.dependsOn += project.schemadocs
-    project.processResources.dependsOn += project.processSchemas
+	project.processDevSchemas.inputs.files(project.fileTree(dir: "src/main/schema/", include: '*.xsd'))
+	project.processDevSchemas.outputs.dir("${project.buildDir}/devschemas/")
+
+    //project.assemble.dependsOn += project.schemadoc	// outputs only required for publishing
+    //project.assemble.dependsOn += project.processSchemas	// outputs only required for publishing
+    //project.assemble.dependsOn += project.processDevSchemas	// outputs only required for publishing
 }
 
 ext.classPathWarningsShownFor = [:]
@@ -263,41 +179,21 @@ def getDetachedConfiguration(Project p, Configuration c) {
 }
 
 //def getSourceDir(project) {
-//    if (isAndroidProject(project)) {
-//        project.android.sourceSets.main.java.srcDirs
-//    } else {
 //        project.sourceSets.main.allJava
-//    }
 //}
 //
 //// only return java sources
 //// (getSourceDir includes xml, bpmn, aidl, ... which is wrong for javadoc generation)
 //def getOnlyJavaSources(project) {
-//    if (isAndroidProject(project)) {
-//    	getReleaseVariant(project).javaCompile.source
-//    } else {
 //        project.sourceSets.main.allJava
-//    }
 //}
 //
 //def getResourcesDir(project) {
-//    if (isAndroidProject(project)) {
-//        project.android.sourceSets.main.res.srcDirs
-//    } else {
 //        project.sourceSets.main.resources
-//    }
 //}
 //
 //def getCompileClassPath(project) {
-//    if (isAndroidProject(project)) {
-//        if (isAndroidLibraryProject(project)) {
-//            project.android.libraryVariants.javaCompile.classpath
-//        } else {
-//            project.android.applicationVariants.javaCompile.classpath
-//        }
-//    } else {
 //        project.sourceSets.main.compileClasspath
-//    }
 //}
 
 //def calledWithTask(fulltaskname)
@@ -306,46 +202,19 @@ def getDetachedConfiguration(Project p, Configuration c) {
 //    return result
 //}
 
-def androidSdkExists() {
-    def androidHome = System.env.'ANDROID_HOME'
-    if (androidHome != null && !androidHome.isEmpty()) {
-        def adb = new File(androidHome + File.separator + "platform-tools")
-        return adb.exists() && adb.isDirectory();
-    }
-    return false;
-}
-
 /**
  * Add a javadoc task to the given project.
  * The output of the javadoc jar will be included in the project artifacts list.
  * @param p
  * @return
  */
-def addJavaDocJarTask(Project p) {
-    if (isAndroidProject(p)) {
-        def javadocsTask = p.tasks.create ('androidjavadocs', Javadoc) {
-            source = p.android.sourceSets.main.java.srcDirs
-            include( "**/*.java" )
-            classpath += p.files(p.android.getBootClasspath().join(File.pathSeparator))
-            ext.androidJar = "${p.android.sdkDirectory}/platforms/${p.android.compileSdkVersion}/android.jar"
-            classpath += files(ext.androidJar)
-        }
-
-        p.tasks.create('androidjavadocsJar', Jar) {
-        	baseName = getArtifactName(p)
-            classifier = 'javadoc'
-            dependsOn javadocsTask
-            from javadocsTask.destinationDir
-        }
-
-    } else {
+def addJavadocJarTask(Project p) {
         def javadocJar = p.tasks.create('javadocJar', Jar) {
-        	baseName = getArtifactName(p)
+        	archiveBaseName = getArtifactName(p)
             classifier = 'javadoc'
             from p.javadoc
         }
         p.artifacts {archives javadocJar}
-    }
 }
 
 /**
@@ -355,21 +224,13 @@ def addJavaDocJarTask(Project p) {
  * @return
  */
 def addSourcesJarTask(Project p) {
-    if (isAndroidProject(p)) {
-        p.tasks.create('androidsourcesJar', Jar) {
-        	baseName = getArtifactName(p)
-            classifier = 'sources'
-            from p.android.sourceSets.main.java.srcDirs
-        }
-
-    } else {
         def sourcesJar = p.tasks.create('sourcesJar', Jar) {
-        	baseName = getArtifactName(p)
+        	archiveBaseName = getArtifactName(p)
             classifier = 'sources'
             from p.sourceSets.main.allSource
+			outputs.cacheIf { true }
         }
         p.artifacts {archives sourcesJar}
-    }
 }
 
 def addEclipseWorkarounds(project) {
@@ -378,11 +239,6 @@ def addEclipseWorkarounds(project) {
 	
 	def dep = project.dependencies.create(fileTree(dir: new File(project.projectDir, '/libs') , include: '*.jar'))
 	conf.dependencies.add(dep)
-	
-	conf.dependencies.add(project.dependencies.create(project.ext.libraries.android))				
-	conf.dependencies.add(project.dependencies.create(project.ext.libraries.android_test))
-	conf.dependencies.add(project.dependencies.create(project.ext.libraries.android_support))
-	conf.dependencies.add(project.dependencies.create(project.ext.libraries.android_compat))
 	
 	project.apply plugin: 'eclipse'
 //	project.apply plugin: 'com.github.ksoichiro.eclipse.aar'
@@ -411,17 +267,7 @@ def addEclipseWorkarounds(project) {
 				srcDir 'src/test/java'
 			}
 		}
-	}
-	
-	
-	// Configure eclipse-aar plugin
-//	project.eclipseAar {
-//	    // See "Configurations" for details
-//	    androidTarget = 'android-21'
-//	    aarDependenciesDir = 'aarDependencies'
-//	    // Set to true if you use Andmore. Default is false
-//	    andmore = true
-//	}
+	}	
 }
 
 
@@ -456,6 +302,97 @@ def getArtifactName(project) {
     return ret
 }
 
+def diffZips(zip1, zip2) {
+	if(!new File(zip1).exists())
+		return zip1 + " does not exist";
+	if(!new File(zip2).exists())
+		return zip2 + " does not exist";
+	def diff	= "";
+	def entries	= new HashMap();
+	new java.util.zip.ZipFile(zip1).stream()
+		.forEach {e -> entries.put(e.getName(), e.getCrc()+':'+e.getSize())}
+	new java.util.zip.ZipFile(zip2).stream()
+		.forEach {e ->
+			def e2	= entries.remove(e.getName());
+			if(e2==null)
+				diff	+= "\nUnexpected entry: "+e;
+			else if(!e2.equals(e.getCrc()+':'+e.getSize()))
+				diff	+= "\nChanged entry (crc:size): "+e+", old="+e2+" new="+e.getCrc()+':'+e.getSize();
+//			else
+//				println 'Matched entry '+zip1.getName()+ '/' +e.getName() + '(' + e2 + ')'
+		}
+	entries.keySet().stream().forEach {e -> diff+="\nMissing entry: "+e}
+	return diff;
+}
+
+// rezip a file after it has been created by a task
+def createRezipTask(task, file) {
+//	println 'Scheduling rezip of file ' + file + ' created by ' + task
+	// Unzip after archive is built.
+	def newname	= 'rebuild/'+task.name+file.name
+	def rebuilddir	= new File(task.project.buildDir, newname)
+	task.doLast {
+//		println 'Unzipping generated ' + file.getCanonicalPath()
+		rebuilddir.mkdirs()
+		ant.unzip(src: file, dest: rebuilddir)
+	}
+	// Rezip after task completed
+	task.finalizedBy task.project.tasks.create([name: newname.replace('/', '_'), type: Zip]) {
+		destinationDir file.parentFile
+		archiveName file.name
+		from(rebuilddir) { includes = ['*/**'] }
+//		doLast { println 'Rezipped generated ' + file.getCanonicalPath() }
+	}
+}
+
+/**
+ * Replicates the distsDir removed in Gradle 6.0.
+ */
+def getDistsDir(proj) {
+	return new File(proj.buildDir, proj.distsDirName)
+}
+
+/**
+ * Parse a URI into its components.
+ * see, e.g., https://tools.ietf.org/html/draft-ietf-secsh-scp-sftp-ssh-uri-04
+ * Examples:
+ * https://myserver.com/path -> {host: "myserver.com", port: -1, user: "", password: "", fingerprint: "", url: "https://myserver.com/path"}
+ * https://a@myserver.com/path -> {host: "myserver.com", port: -1, user: "a", password: "", fingerprint: "", url: "https://myserver.com/path"}
+ * ssh://a:b;fingerprint=SHA256-ABC@myserver.com:22000  -> {host: "myserver.com", port: 22000, user: "a", password: "b", fingerprint: "SHA256:ABC", url: "ssh://myserver.com:22000"}
+ */
+def parseURLWithCredentials(urlstring) {
+	def ret = [:];
+	def uri	= new URI(urlstring)
+	ret.host = uri.host;
+	ret.port = uri.port
+    ret.user = ''
+    ret.password = ''
+    ret.fingerprint = ''
+    def String userinfo = uri.userInfo
+    if(userinfo!=null)
+    {
+		def String[] split = userinfo.split(":|;")
+		//println 'userinfo: ' + split
+        ret.user = split.length>0 ? split[0] : ''
+        ret.password = split.length>1 ? split[1] : ''
+        
+        for(int i=2; i<split.length; i++)
+        {
+        	if(split[i].startsWith('fingerprint='))
+        	{
+        		// Fingerprint info according to https://tools.ietf.org/html/draft-ietf-secsh-scp-sftp-ssh-uri-04
+        		ret.fingerprint	= split[i].substring('fingerprint='.length()).replace('-', ':')
+        		//println 'fingerprint: ' + ret.fingerprint
+        	}
+        }
+	}
+
+	// URL without extra info (e.g. no password for security reasons)
+	ret.url	= uri.scheme + '://' + uri.host + (uri.port!=-1 ? ':' + uri.port : '') + (uri.rawPath!=null ? uri.rawPath : '') + (uri.rawQuery!=null ? '?' + uri.rawQuery : '') + (uri.rawFragment!=null ? '#' + uri.rawFragment : '')
+	//println 'url: ' + ret.url
+		
+	return ret;
+}
 
 // make functions externally visible
 
@@ -463,23 +400,21 @@ ext {
 	isApp = this.&isApp
 	isCommercial = this.&isCommercial
 	isAddon = this.&isAddon
-    isAndroidProject = this.&isAndroidProject
-    isAndroidLibraryProject = this.&isAndroidLibraryProject
     isWebApplicationProject = this.&isWebApplicationProject
     getProjectDepth = this.&getProjectDepth
     isTestParallel = this.&isTestParallel
-    androidSdkExists = this.&androidSdkExists
-    onVariant = this.&onVariant
-    onVariantOutput = this.&onVariantOutput
     addSchemaTasks = this.&addSchemaTasks
     setBootClassPath = this.&setBootClassPath
-    excludeNonAndroidRuntimeFromApk = this.&excludeNonAndroidRuntimeFromApk
 //    addParentScopeMappings = this.&addParentScopeMappings
     getDetachedConfiguration = this.&getDetachedConfiguration
-    addJavaDocJarTask = this.&addJavaDocJarTask
+    addJavadocJarTask = this.&addJavadocJarTask
     addSourcesJarTask = this.&addSourcesJarTask
     addEclipseWorkarounds = this.&addEclipseWorkarounds
     getVar = this.&getVar
     singularize = this.&singularize
     getArtifactName = this.&getArtifactName
+    diffZips = this.&diffZips
+	createRezipTask	= this.&createRezipTask
+	getDistsDir = this.&getDistsDir
+	parseURLWithCredentials = this.&parseURLWithCredentials
 }

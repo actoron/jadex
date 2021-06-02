@@ -15,10 +15,10 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -41,7 +41,8 @@ public class BeliefSetBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	@OnStart
+	//@AgentBody
 	public void body()
 	{
 		tr[0] = new TestReport("#1", "Test if add trigger on belief sets work.");
@@ -63,7 +64,8 @@ public class BeliefSetBDI
 	/**
 	 *  Called when agent is killed.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void	destroy(IInternalAccess agent)
 	{
 		for(TestReport ter: tr)
@@ -75,14 +77,14 @@ public class BeliefSetBDI
 	}
 	
 	// todo: plan creation condition?!
-	@Plan(trigger=@Trigger(factaddeds="names"))
+	@Plan(trigger=@Trigger(factadded="names"))
 	protected void printAddedFact(ChangeEvent event, RPlan rplan)
 	{
 		System.out.println("fact added: "+event.getValue()+" "+event.getSource()+" "+rplan);
 		tr[0].setSucceeded(true);
 	}
 	
-	@Plan(trigger=@Trigger(factremoveds="names"))
+	@Plan(trigger=@Trigger(factremoved="names"))
 	protected void printRemFact(ChangeEvent event, RPlan rplan)
 	{
 		System.out.println("fact removed: "+event.getValue()+" "+event.getSource()+" "+rplan);

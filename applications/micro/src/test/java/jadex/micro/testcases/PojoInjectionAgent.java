@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.IFuture;
@@ -34,7 +35,8 @@ public class PojoInjectionAgent extends JunitAgentTest implements IAService
 	@ServiceComponent
 	protected PojoInjectionAgent pojo;
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body()
 	{
 //		System.out.println("pojo is: "+pojo);

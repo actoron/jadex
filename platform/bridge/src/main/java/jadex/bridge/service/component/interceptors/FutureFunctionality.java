@@ -136,7 +136,7 @@ public class FutureFunctionality
 	/**
 	 *  Optionally alter a result.
 	 */
-	public Object	handleResult(Object result)	throws Exception
+	public Object handleResult(Object result) throws Exception
 	{
 		return result;
 	}
@@ -144,9 +144,16 @@ public class FutureFunctionality
 	/**
 	 *  Optionally alter a result.
 	 */
-	public Object	handleIntermediateResult(Object result)	throws Exception
+	public Object handleIntermediateResult(Object result) throws Exception
 	{
 		return result;
+	}
+	
+	/**
+	 *  Perform code after an intermediate result has been added.
+	 */
+	public void handleAfterIntermediateResult(Object result) throws Exception
+	{
 	}
 	
 	/**
@@ -409,8 +416,10 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingPullSubscriptionIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			func.handleAfterIntermediateResult(result);
+			return ret;
 		}
 		catch(Exception e)
 		{
@@ -529,7 +538,7 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 	 *  Overwritten to change result, if necessary.
 	 */
 	@Override
-	protected boolean	doSetResult(Collection<Object> result, boolean undone)
+	protected boolean doSetResult(Collection<Object> result, boolean undone)
 	{
 		try
 		{
@@ -556,13 +565,15 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 	 *  Overwritten to change result, if necessary.
 	 */
 	@Override
-	protected boolean	doAddIntermediateResult(Object result, boolean undone)
+	protected boolean doAddIntermediateResult(Object result, boolean undone)
 	{
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingPullIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			func.handleAfterIntermediateResult(result);
+			return ret;
 		}
 		catch(Exception e)
 		{
@@ -657,6 +668,37 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	/** The future functionality. */
 	protected FutureFunctionality func;
 	
+//	//-------- debugging --------
+//	ISubscriptionIntermediateFuture<?> mysrc;
+//	List<Object>	myresults	= new ArrayList<>();
+//	@Override
+//	public String toString()
+//	{
+//		return super.toString() + "(storeforfirst="+storeforfirst+", src="+mysrc+", results="+results+", ownresults="+ownresults+", myresults="+myresults+")";
+//	}
+//	@Override
+//	protected void	storeResult(Object result, boolean scheduled)
+//	{
+//		if((""+result).contains("IMarkerService"))
+//		{
+//			try
+//			{
+//				myresults.add(result);
+//				super.storeResult(result, scheduled);
+//			}
+//			finally
+//			{
+//				Logger.getLogger(getClass().getName()).info("storeResult: "+this+", "+result+", "+IComponentIdentifier.LOCAL.get());
+//			}
+//		}
+//		else
+//		{
+//			super.storeResult(result, scheduled);
+//		}
+//	}
+//	//-------- debugging end --------
+
+	
 	/**
 	 * 
 	 */
@@ -672,6 +714,8 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	 */
 	public DelegatingSubscriptionIntermediateDelegationFuture(ISubscriptionIntermediateFuture<?> src, FutureFunctionality func)
 	{
+//		this.mysrc	= src;	// for debugging only
+		
 		if(func==null)
 			throw new IllegalArgumentException("Func must not null.");
 		this.func = func;
@@ -711,16 +755,23 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	@Override
 	protected boolean	doAddIntermediateResult(Object result, boolean undone)
 	{
+//		if((""+result).contains("IMarkerService"))
+////			|| (""+result).contains("PartDataChunk"))
+//		{
+//			Logger.getLogger(getClass().getName()).info("add: "+this+", "+result+", "+IComponentIdentifier.LOCAL.get());
+//		}
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingSubscriptionIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			func.handleAfterIntermediateResult(result);
+			return ret;
 		}
 		catch(Exception e)
 		{
 			return doSetException(e, func.isUndone(undone));
-		}		
+		}
 	}
 
 	/**
@@ -818,7 +869,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	 *  Overwritten to change result, if necessary.
 	 */
 	@Override
-	protected boolean	doSetResult(Collection<Object> result, boolean undone)
+	protected boolean doSetResult(Collection<Object> result, boolean undone)
 	{
 		try
 		{
@@ -850,8 +901,10 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingTerminableIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			func.handleAfterIntermediateResult(result);
+			return ret;
 		}
 		catch(Exception e)
 		{
@@ -1023,6 +1076,15 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
  */
 class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 {
+	//-------- debugging --------
+	@Override
+	public String toString()
+	{
+		return super.toString() + "(listeners="+listeners+")";
+	}
+	//-------- debugging end --------
+
+	
 	/** The future functionality. */
 	protected FutureFunctionality func;
 	
@@ -1069,9 +1131,18 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 	{
 		try
 		{
+//			//-------- debugging --------
+//			if((""+result).contains("PartDataChunk"))
+//			{
+//				System.out.println("DelegatingIntermediateFuture.doAddIntermediateResult: "+this+", "+result+", "+IComponentIdentifier.LOCAL.get());
+//			}
+//			//-------- debugging end --------
+			
 			result = func.handleIntermediateResult(result);
-			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingIntermediateFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			func.handleAfterIntermediateResult(result);
+			return ret;
 		}
 		catch(Exception e)
 		{
@@ -1157,7 +1228,21 @@ class DelegatingFuture extends Future<Object>
 	@Override
     protected void	executeNotification(IResultListener<Object> listener, ICommand<IResultListener<Object>> command)
     {
-		func.scheduleForward(command, listener);
+		if((""+listener).indexOf("Heisenbug")!=-1)
+			System.err.println("exe0: "+this+", "+command+", "+listener+", "+func.getClass());
+		try
+		{
+			func.scheduleForward(command, listener);
+		}
+		finally
+		{
+			if((""+listener).indexOf("Heisenbug")!=-1)
+			{
+				System.err.println("exe1: "+this+", "+command+", "+listener);
+				Thread.dumpStack();
+			}
+		}
+
     }
 };
 
@@ -1222,8 +1307,10 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 		try
 		{
 			result = (TupleResult)func.handleIntermediateResult(result);
-			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingTupleFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			func.handleAfterIntermediateResult(result);
+			return ret;
 		}
 		catch(Exception e)
 		{

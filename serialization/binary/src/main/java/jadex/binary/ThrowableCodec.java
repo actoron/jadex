@@ -38,7 +38,8 @@ public class ThrowableCodec extends AbstractCodec
 	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
 		Object ret = null;
-		String msg = (String)SBinarySerializer.decodeObject(context);
+//		String msg = (String)SBinarySerializer.decodeObject(context);
+		String msg = context.readString();
 		Throwable cause = (Throwable)SBinarySerializer.decodeObject(context);
 
 		try
@@ -151,7 +152,8 @@ public class ThrowableCodec extends AbstractCodec
 	{
 		Throwable t = (Throwable)object;
 		
-		traverser.doTraverse(t.getMessage(), String.class, preprocessors, processors, mode, ec.getClassLoader(), ec);
+		ec.writeString(t.getMessage());
+//		traverser.doTraverse(t.getMessage(), String.class, preprocessors, processors, mode, ec.getClassLoader(), ec);
 	
 		Object val = t.getCause();
 		traverser.doTraverse(val, val!=null? val.getClass(): Throwable.class, preprocessors, processors, mode, targetcl, ec);

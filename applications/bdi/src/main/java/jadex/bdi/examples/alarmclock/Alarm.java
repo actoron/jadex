@@ -147,10 +147,8 @@ public class Alarm implements Cloneable, Serializable
 	public URL getFilenameUrl()
 	{
 		URL ret = null;
-		try
+		try(ResourceInfo	rinfo	= SUtil.getResourceInfo0(getFilename(), Alarm.class.getClassLoader()))
 		{
-			//ResourceInfo	rinfo	= SUtil.getResourceInfo0("jadex/examples/alarmclock/alarm.mp3");
-			ResourceInfo	rinfo	= SUtil.getResourceInfo0(getFilename(), Alarm.class.getClassLoader());
 			if(rinfo == null)
 			{
 				System.out.println("Resource not found: " + getFilename());

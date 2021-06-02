@@ -2,18 +2,21 @@ package jadex.micro.examples.constructorstart;
 
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 
 /**
- * 
+ *  This example shows how to create an agent via the pojo agent
+ *  instead of the class/filename of the agent.
+ *  
+ *  platform.addComponent(pojo) can be used for that purpose 
+ *  instead of platform.createComponent(info/class).
  */
 @Agent
 public class StarterAgent
 {
 	/**
-	 * 
+	 *  Create a new pojo agent.
 	 */
 	public StarterAgent()
 	{
@@ -23,7 +26,7 @@ public class StarterAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	@OnStart
 	public void body()
 	{
 		System.out.println("body");
@@ -37,6 +40,6 @@ public class StarterAgent
 	public static void main(String[] args)
 	{
 		IExternalAccess platform = Starter.createPlatform().get();
-		IExternalAccess agent = platform.createComponent(new CreationInfo().setPojo(new StarterAgent()), null).get();
+		IExternalAccess agent = platform.addComponent(new StarterAgent()).get();
 	}
 }

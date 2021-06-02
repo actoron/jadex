@@ -474,7 +474,8 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			String methodname = prefixes[i]+name.substring(0, 1).toUpperCase()+name.substring(1);
 			try
 			{
-				method = object.getClass().getMethod(methodname, new Class[0]);
+				Class<?> clazz = object.getClass();
+				method = SReflect.getExportedMethod(clazz, methodname, new Class[0]);
 			}
 			catch(Exception e)
 			{

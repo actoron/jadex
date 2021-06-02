@@ -10,6 +10,9 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
@@ -38,9 +41,9 @@ import jadex.micro.examples.messagequeue.Event;
  */
 @Agent
 @Service
-@ProvidedServices({@ProvidedService(type = IMessageQueueReplicableService.class, implementation = @Implementation(expression = "$pojoagent")),
-	@ProvidedService(type = IMessageQueueReplicationService.class, implementation = @Implementation(expression = "$pojoagent")) })
-@RequiredServices(@RequiredService(type = IMessageQueueReplicationService.class, multiple = true, scope = RequiredService.SCOPE_GLOBAL, name = "replication"))
+@ProvidedServices({@ProvidedService(type = IMessageQueueReplicableService.class),
+	@ProvidedService(type = IMessageQueueReplicationService.class) })
+@RequiredServices(@RequiredService(type = IMessageQueueReplicationService.class, scope = ServiceScope.GLOBAL, name = "replication")) // multiple = true,
 @Arguments(@Argument(name = "searchinterval", clazz = Integer.class, defaultvalue = "1000"))
 public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableService, IMessageQueueReplicationService 
 {
@@ -68,7 +71,8 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	/**
 	 * Called on agent creation.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void agentCreated() 
 	{
 		this.localsubscribers = new HashMap<String, List<SubscriptionIntermediateFuture<Event>>>();
@@ -77,7 +81,8 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 		this.id = agent.getId().getName();
 	}
 
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void agentBody() 
 	{
 		// Constantly searches for new occurring replication services

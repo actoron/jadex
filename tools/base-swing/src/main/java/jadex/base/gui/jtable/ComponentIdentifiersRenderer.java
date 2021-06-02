@@ -7,7 +7,6 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.SReflect;
 
 
@@ -38,7 +37,7 @@ public class ComponentIdentifiersRenderer extends DefaultTableCellRenderer
 		
 		String content = cid.getName();
 		String tooltip = "<b>" + cid.getName() + "</b>";
-		String[] addresses = cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null;
+		String[] addresses = null;//cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null;
 		for(int i=0; addresses!=null && i<addresses.length; i++)
 		{
 			tooltip += "<br>" + addresses[i];
@@ -51,7 +50,7 @@ public class ComponentIdentifiersRenderer extends DefaultTableCellRenderer
 				cid = (IComponentIdentifier)it.next();
 				content += ", " + cid.getName();
 				tooltip += "<br><b>" + cid.getName() + "</b>";
-				addresses = cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null;
+				addresses = null;//cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null;
 				for(int j=0; addresses!=null && j<addresses.length; j++)
 				{
 					tooltip += "<br>" + addresses[j];

@@ -17,7 +17,7 @@ public class OpenSslAesCtrRandom extends SecureRandom
 	{
 		if (!isEnabled())
 			throw new IllegalStateException("OpenSslAesCtrRandom: OpenSSL not found.");
-		reseed(null);
+		reseedPrng((byte[]) null);
 	}
 	
 	private byte[] buffer;
@@ -37,7 +37,7 @@ public class OpenSslAesCtrRandom extends SecureRandom
 			if (numbytes < 0)
 			{
 				byte[] carryover = aesctr.nextBytes();
-				reseed(carryover);
+				reseedPrng(carryover);
 			}
 			else
 			{
@@ -55,7 +55,7 @@ public class OpenSslAesCtrRandom extends SecureRandom
 	/**
 	 *  Reseeds the PRNG.
 	 */
-	public void reseed(byte[] carryover)
+	public void reseedPrng(byte[] carryover)
 	{
 		byte[] key = new byte[32];
 		SSecurity.getEntropySource().getEntropy(key);

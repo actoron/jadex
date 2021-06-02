@@ -9,6 +9,8 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Value;
 import jadex.bridge.service.component.IProvidedServicesFeature;
@@ -38,7 +40,7 @@ import jadex.micro.annotation.Results;
 @ProvidedServices(@ProvidedService(name="aservice", type=IAService.class, implementation=
 	@Implementation(expression="$pojoagent", interceptors=@Value("$pojoagent.provinter"))))
 @RequiredServices(@RequiredService(name="aservice", type=IAService.class, 
-	scope=RequiredService.SCOPE_COMPONENT_ONLY, interceptors=@Value("$pojoagent.reqinter")))
+	scope=ServiceScope.COMPONENT_ONLY, interceptors=@Value("$pojoagent.reqinter")))
 @Service(IAService.class)
 @Agent
 public class InterceptorAgent extends JunitAgentTest implements IAService
@@ -52,7 +54,8 @@ public class InterceptorAgent extends JunitAgentTest implements IAService
 	/**
 	 *  Just finish the test by setting the result and killing the agent.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 		final Future<Void> ret = new Future<Void>();

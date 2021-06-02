@@ -37,7 +37,7 @@ public class PlatformConfigurationTest
 //		rootConfig.setSaveOnExit(false);
 //		rootConfig.setWelcome(false);
 //		config.setAutoShutdown(false);
-//		rootConfig.setPrintPass(false);
+//		rootConfig.setPrintSecret(false);
 //		long timeout = Starter.getDefaultTimeout(null);
 		
 		

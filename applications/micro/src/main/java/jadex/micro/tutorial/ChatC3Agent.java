@@ -1,6 +1,7 @@
 package jadex.micro.tutorial;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
@@ -26,7 +27,8 @@ public class ChatC3Agent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 //		IFuture<IComponentManagementService>	cms	= requiredServicesFeature.getService("cms");
@@ -34,7 +36,7 @@ public class ChatC3Agent
 //		{
 //			public void resultAvailable(final IComponentManagementService cms)
 //			{
-		SComponentManagementService.getComponentDescriptions(agent)
+		SComponentManagementService.getComponentDescriptions(agent.getId())
 //		cms.getComponentDescriptions()
 		.addResultListener(
 			new DefaultResultListener<IComponentDescription[]>()

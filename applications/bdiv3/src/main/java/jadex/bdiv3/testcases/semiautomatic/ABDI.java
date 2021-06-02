@@ -8,6 +8,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
@@ -48,7 +49,8 @@ public class ABDI extends AABDI
 		}
 	}
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body()
 	{
 		IFuture<Cnt1Goal> fut1 = agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Cnt1Goal());

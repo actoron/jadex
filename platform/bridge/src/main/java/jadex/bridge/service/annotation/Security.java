@@ -15,13 +15,13 @@ public @interface Security
 	//-------- constants --------
 	
 	/** The unrestricted role (access is granted to all), e.g. used for chat. */
-	public static final String	UNRESTRICTED	= "__jadex-role-unrestricted__";
+	public static final String	UNRESTRICTED = "__jadex-role-unrestricted__";
 
 	/** The default role that is assigned to services without security annotation and granted in all authenticated networks. */
-	public static final String	DEFAULT	= "__jadex-role-default__";
+	public static final String	TRUSTED	= "trusted";
 
 	/** The admin role that is required by all jadex system services, e.g. CMS. */
-	public static final String	ADMIN	= "__jadex-role-admin__";
+	public static final String	ADMIN	= "admin";
 	
 	//-------- properties --------
 	
@@ -30,5 +30,5 @@ public @interface Security
 	 *  Custom role(s): Allow only authentication secrets (e.g. network or platform key)
 	 *  that are locally given at least one of the requested roles.
 	 */
-	public String[] roles()	default DEFAULT;
+	public String[] roles()	default TRUSTED;
 }

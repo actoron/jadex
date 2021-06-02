@@ -1,5 +1,6 @@
 package jadex.bridge.service.search;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,7 +17,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
@@ -54,6 +56,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	/** Map for looking up local services using the service identifier. */
 	protected Map<IServiceIdentifier, IService> localserviceproxies;
 	
+	/** The query change subscribers. */
+	protected List<ISubscriptionIntermediateFuture<QueryEvent>> querysubs;
+	
 	//-------- methods --------
 	
 	/**
@@ -66,6 +71,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		this.indexer = new Indexer<>(new ServiceKeyExtractor(), false, ServiceKeyExtractor.SERVICE_KEY_TYPES);
 		this.queries = new Indexer<ServiceQueryInfo<?>>(new QueryInfoExtractor(), true, QueryInfoExtractor.QUERY_KEY_TYPES_INDEXABLE);
 		this.localserviceproxies = new HashMap<>();
+		this.querysubs = new ArrayList<>();
 	}
 	
 	/**
@@ -75,13 +81,16 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //	@SuppressWarnings("unchecked")
 	public IServiceIdentifier searchService(final ServiceQuery<?> query)
 	{
-//		if(query.toString().indexOf("IEnvironment")!=-1)
+//		if(query.toString().indexOf("ISecurity")!=-1)
 //			System.out.println("sdgo");
 		
 		IServiceIdentifier ret = null;
-		if(!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		if(!ServiceScope.NONE.equals(query.getScope()))
 		{
 			Set<IServiceIdentifier> sers = getServices(query);
+			
+			if(query.toString().indexOf("IComponentFac")!=-1 && sers.size()==0)
+				System.out.println("found: "+sers);
 			
 //			Set<IServiceIdentifier> ownerservices = null;
 //			rwlock.readLock().lock();
@@ -119,7 +128,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	public Set<IServiceIdentifier> searchServices(ServiceQuery<?> query)
 	{
 		Set<IServiceIdentifier> ret = null;
-		if(!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		if(!ServiceScope.NONE.equals(query.getScope()))
 		{
 			ret = getServices(query);
 			
@@ -229,13 +238,13 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public void updateService(IServiceIdentifier service)
 	{
-		if (service == null)
+		if(service == null)
 		{
 			rwlock.writeLock().lock();
 			Set<IServiceIdentifier> services = indexer.getAllValues();
 			try
 			{
-				for (IServiceIdentifier ser : services)
+				for(IServiceIdentifier ser : services)
 				{
 					indexer.removeValue(ser);
 					indexer.addValue(ser);
@@ -246,7 +255,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				rwlock.writeLock().unlock();
 			}
 			
-			for (IServiceIdentifier ser : services)
+			for(IServiceIdentifier ser : services)
 				checkQueries(ser, ServiceEvent.SERVICE_CHANGED);
 		}
 		else
@@ -267,12 +276,45 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	}
 	
 	/**
+	 *  Updates a service if the service meta-information
+	 *  has changes.
+	 *  
+	 *  @param service The service (null = all).
+	 */
+	public void updateService(IServiceIdentifier service, String propname)
+	{
+		if(indexer.isIndexed(propname) && service==null)
+		{
+			rwlock.writeLock().lock();
+			Set<IServiceIdentifier> services = indexer.getAllValues();
+			try
+			{
+				indexer.updateIndex(propname);
+			}
+			finally
+			{
+				rwlock.writeLock().unlock();
+			}
+			
+			// todo: get only changed?!
+			for(IServiceIdentifier ser : services)
+				checkQueries(ser, ServiceEvent.SERVICE_CHANGED);
+		}
+		else
+		{
+			updateService(service);
+		}
+	}
+	
+	/**
 	 *  Remove a service from the registry.
 	 *  @param sid The service id.
 	 */
 	// write
 	public void removeService(IServiceIdentifier service)
 	{
+		//System.out.println("removing service: "+service);
+		
 		Lock lock = rwlock.writeLock();
 		lock.lock();
 		try
@@ -511,14 +553,16 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				rwlock.writeLock().unlock();
 			}
 			
-			for (IServiceIdentifier ser : SUtil.notNull(sers))
+			for(IServiceIdentifier ser : SUtil.notNull(sers))
 			{
-				if (checkRestrictions(query, ser))
+				if(checkRestrictions(query, ser))
 				{
 					dispatchQueryEvent(ret, ser, ServiceEvent.SERVICE_ADDED);
 				}
 			}
 		}
+		
+		notifyQueryListeners(new QueryEvent(query, QueryEvent.QUERY_ADDED));
 		
 		return fut;
 	}
@@ -548,6 +592,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			rwlock.writeLock().unlock();
 		}
+		
+		notifyQueryListeners(new QueryEvent(query, QueryEvent.QUERY_REMOVED));
 	}
 	
 	/**
@@ -692,9 +738,19 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		Future<Void> ret = new Future<Void>();
 		
-		List<Tuple2<String, String[]>> spec = ((QueryInfoExtractor) queries.getKeyExtractor()).getIndexerSpec(ser);
-		
-		Set<ServiceQueryInfo<?>> sqis = queries.getValuesInverted(spec);
+		List<Tuple2<String, String[]>> spec = null;
+		Set<ServiceQueryInfo<?>> sqis = null;
+		rwlock.readLock().lock();
+		try
+		{
+			spec = ((QueryInfoExtractor)queries.getKeyExtractor()).getIndexerSpec(ser);
+			
+			sqis = queries.getValuesInverted(spec);
+		}
+		finally
+		{
+			rwlock.readLock().unlock();
+		}
 		
 //		Set<ServiceQueryInfo<?>> r1 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, ser.getServiceType().toString());
 //		Set<ServiceQueryInfo<?>> r2 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, "null");
@@ -706,12 +762,12 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //		
 		if(sqis!=null)
 		{
-			for (ServiceQueryInfo<?> sqi : sqis)
+			for(ServiceQueryInfo<?> sqi : sqis)
 			{
 				ServiceQuery<?> query = sqi.getQuery();
 				
 				//ServiceEvent.CLASSINFO.getTypeName().equals(query.getReturnType().getTypeName()));
-				if (checkRestrictions(query, ser))
+				if(checkRestrictions(query, ser))
 				{
 					dispatchQueryEvent(sqi, ser, eventtype);
 				}
@@ -729,14 +785,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected void dispatchQueryEvent(ServiceQueryInfo<?> queryinfo, IServiceIdentifier ser, int eventtype)
 	{
 		ServiceQuery<?> query = queryinfo.getQuery();
-		if (query.isEventMode())
+		if(query.isEventMode())
 		{
 			ServiceEvent<IServiceIdentifier> event = new ServiceEvent<>(ser, eventtype);
-			((TerminableIntermediateFuture<ServiceEvent<IServiceIdentifier>>) queryinfo.getFuture()).addIntermediateResultIfUndone(event);
+			((TerminableIntermediateFuture<ServiceEvent<IServiceIdentifier>>)queryinfo.getFuture()).addIntermediateResultIfUndone(event);
 		}
-		else if (ServiceEvent.SERVICE_ADDED==eventtype)
+		else if(ServiceEvent.SERVICE_ADDED==eventtype)
 		{
-			((TerminableIntermediateFuture<IServiceIdentifier>) queryinfo.getFuture()).addIntermediateResultIfUndone(ser);
+			((TerminableIntermediateFuture<IServiceIdentifier>)queryinfo.getFuture()).addIntermediateResultIfUndone(ser);
 		}
 	}
 	
@@ -761,59 +817,62 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		boolean ret = false;
 		
-		String scope = query.getScope();
-		
+		ServiceScope scope = query.getScope();
+				
 //		IComponentIdentifier searchstart	= query.getProvider()!=null ? query.getProvider()
 //			: query.getPlatform()!=null ? query.getPlatform() : query.getOwner();
 		IComponentIdentifier searchstart = query.getSearchStart() != null ? query.getSearchStart() : query.getOwner();
 		
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+		if(ServiceScope.GLOBAL.equals(scope))
 		{
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_NETWORK.equals(scope))
-		{
-			// todo: fixme
-			ret = true;
-		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(scope))
+		else if(ServiceScope.NETWORK.equals(scope))
 		{
 			// todo: fixme
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION_NETWORK.equals(scope))
+		else if(ServiceScope.APPLICATION_GLOBAL.equals(scope))
 		{
 			// todo: fixme
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
+		else if(ServiceScope.APPLICATION_NETWORK.equals(scope))
+		{
+			// todo: fixme
+			ret = true;
+		}
+		else if(ServiceScope.PLATFORM.equals(scope))
 		{
 			// Test if searcher and service are on same platform
 			ret = searchstart.getPlatformName().equals(ser.getProviderId().getPlatformName());
 		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
+		else if(ServiceScope.APPLICATION.equals(scope))
 		{
 			IComponentIdentifier sercid = ser.getProviderId();
 			ret = sercid.getPlatformName().equals(searchstart.getPlatformName())
 				&& getApplicationName(sercid).equals(getApplicationName(searchstart));
 		}
-		else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
+		else if(ServiceScope.COMPONENT.equals(scope))
 		{
 			IComponentIdentifier sercid = ser.getProviderId();
 			ret = getDotName(sercid).endsWith(getDotName(searchstart));
 		}
-		else if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
+		else if(ServiceScope.COMPONENT_ONLY.equals(scope))
 		{
 			// only the component itself
 			ret = ser.getProviderId().equals(searchstart);
 		}
-		else if(RequiredServiceInfo.SCOPE_PARENT.equals(scope))
+		else if(ServiceScope.PARENT.equals(scope))
 		{
 			// check if parent of searcher reaches the service
 			IComponentIdentifier sercid = ser.getProviderId();
 			String subname = getSubcomponentName(searchstart);
 			ret = sercid.getName().endsWith(subname);
 		}
+		
+		//if(query.getServiceType()!=null && query.getServiceType().toString().indexOf("Calc")!=-1)
+		//	System.out.println("calc check: "+query.getOwner()+" "+scope+" "+ser+" "+ret);
 		
 		return ret;
 	}
@@ -825,55 +884,66 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		boolean ret = false;
 		
-		String scope = ser.getScope()!=null? ser.getScope(): RequiredServiceInfo.SCOPE_PLATFORM;
+		ServiceScope scope = ser.getScope()!=null && !ServiceScope.DEFAULT.equals(ser.getScope())?
+			ser.getScope(): ServiceScope.PLATFORM;
 		
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+		if(ServiceScope.GLOBAL.equals(scope))
 		{
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_NETWORK.equals(scope))
-		{
-			// todo: fixme
-			ret = true;
-		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(scope))
+		else if(ServiceScope.NETWORK.equals(scope))
 		{
 			// todo: fixme
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION_NETWORK.equals(scope))
+		else if(ServiceScope.APPLICATION_GLOBAL.equals(scope))
 		{
 			// todo: fixme
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
+		else if(ServiceScope.APPLICATION_NETWORK.equals(scope))
+		{
+			// todo: fixme
+			ret = true;
+		}
+		else if(ServiceScope.PLATFORM.equals(scope))
 		{
 			// Test if searcher and service are on same platform
 			ret = query.getOwner().getPlatformName().equals(ser.getProviderId().getPlatformName());
 		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
+		else if(ServiceScope.APPLICATION.equals(scope))
 		{
 			// todo: special case platform service with app scope
 			IComponentIdentifier sercid = ser.getProviderId();
 			ret = sercid.getPlatformName().equals(query.getOwner().getPlatformName())
 				&& getApplicationName(sercid).equals(getApplicationName(query.getOwner()));
 		}
-		else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
+		else if(ServiceScope.COMPONENT.equals(scope))
 		{
 			IComponentIdentifier sercid = ser.getProviderId();
 			ret = getDotName(query.getOwner()).endsWith(getDotName(sercid));
 		}
-		else if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
+		else if(ServiceScope.COMPONENT_ONLY.equals(scope))
 		{
 			// only the component itself
 			ret = ser.getProviderId().equals(query.getOwner());
 		}
-		else if(RequiredServiceInfo.SCOPE_PARENT.equals(scope))
+		else if(ServiceScope.PARENT.equals(scope))
 		{
+			//if(query.getServiceType()!=null && query.getServiceType().toString().indexOf("Calc")!=-1)
+			//	System.out.println("found");
+				
 			// check if parent of service reaches the searcher
 			IComponentIdentifier sercid = ser.getProviderId();
 			String subname = getSubcomponentName(sercid);
-			ret = getDotName(query.getOwner()).endsWith(subname);
+			String owner = getDotName(query.getOwner());
+			ret = owner.equals(subname) || owner.endsWith(":"+subname);
+			// Must include delimiter to avoid special cases like
+			// DistributedServicePoolAgent:MandelbrotAgent:DESKTOP-TMQFG7J_tyg
+			// ServicePoolAgent:MandelbrotAgent:DESKTOP-TMQFG7J_tyg
+			// delivering true
+			
+			//System.out.println("parent check: "+subname+" "+getDotName(query.getOwner())+" "+ret);
 		}
 		
 		return ret;
@@ -907,13 +977,34 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		rwlock.readLock().lock();
 		try
 		{
-			Set<IServiceIdentifier> ret = indexer.getValues(query.getIndexerSearchSpec());
+			Tuple2<Set<IServiceIdentifier>, Object> res = indexer.getValues(query.getIndexerSearchSpec());
+			Set<IServiceIdentifier> ret = res==null? null: res.getFirstEntity();
+			//if(res!=null && res.getFirstEntity()!=null && res.getFirstEntity().size()>0 && query.getServiceType()!=null && query.getServiceType().toString().indexOf("IComponentF")!=-1)
+			//	System.out.println("micro kernel start bug: "+res.getSecondEntity());
+			
 			return ret;
 		}
 		finally
 		{
 			rwlock.readLock().unlock();
 		}
+		
+		/*try
+		{
+			rwlock.readLock().tryLock(5, TimeUnit.SECONDS);
+			Set<IServiceIdentifier> ret = indexer.getValues(query.getIndexerSearchSpec());
+			return ret;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		finally
+		{
+			//System.out.println("getServices end: "+query);
+			rwlock.readLock().unlock();
+		}*/
 	}
 	
 	/**
@@ -971,6 +1062,67 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		if((idx = ret.indexOf('@'))!=-1)
 			ret = ret.substring(idx + 1);
 		return ret;
+	}
+	
+	/**
+	 *  Subscribe for query events.
+	 */
+	public ISubscriptionIntermediateFuture<QueryEvent> subscribeToQueries()
+	{
+		final SubscriptionIntermediateFuture<QueryEvent> fut = new SubscriptionIntermediateFuture<>();
+		
+		fut.setTerminationCommand(new TerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				querysubs.remove(fut);
+			}
+		});
+		
+		rwlock.writeLock().lock();
+		try
+		{
+			querysubs.add(fut);
+			
+		}
+		finally
+		{
+			rwlock.writeLock().unlock();
+		}
+		
+		Set<ServiceQueryInfo<?>> qs = getAllQueries();
+		for(ServiceQueryInfo<?> qi : SUtil.notNull(qs))
+		{
+			QueryEvent event = new QueryEvent(qi.getQuery(), QueryEvent.QUERY_ADDED);
+			fut.addIntermediateResultIfUndone(event);
+		}
+		
+		return fut;
+	}
+	
+	/**
+	 *  Notify all listeners.
+	 *  @param fut
+	 *  @param type
+	 */
+	protected void notifyQueryListeners(QueryEvent event)
+	{
+		List<SubscriptionIntermediateFuture<QueryEvent>> qis;
+		rwlock.writeLock().lock();
+		try
+		{
+			qis = new ArrayList<>();
+			querysubs.addAll(qis);
+		}
+		finally
+		{
+			rwlock.writeLock().unlock();
+		}
+		
+		for(SubscriptionIntermediateFuture<QueryEvent> fut: qis)
+		{
+			fut.addIntermediateResultIfUndone(event);
+		}
 	}
 	
 	/**

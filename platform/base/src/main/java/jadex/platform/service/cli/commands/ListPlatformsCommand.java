@@ -6,13 +6,13 @@ import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.remote.IProxyAgentService.State;
 import jadex.commons.SUtil;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.future.SwingResultListener;
@@ -70,8 +70,8 @@ public class ListPlatformsCommand extends ACliCommand
 		
 		final boolean state = args.containsKey("-s");
 		
-		comp.searchServices( new ServiceQuery<>(IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new SwingIntermediateResultListener<IProxyAgentService>(new IIntermediateResultListener<IProxyAgentService>()
+		comp.searchServices( new ServiceQuery<>(IProxyAgentService.class, ServiceScope.PLATFORM))
+			.addResultListener(new SwingIntermediateResultListener<IProxyAgentService>(new IntermediateEmptyResultListener<IProxyAgentService>()
 		{
 			protected int ongoing = 0;
 			protected boolean finished = false;

@@ -11,6 +11,7 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -34,7 +35,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Agent that uses a multiplexed service.
  */
-@RequiredServices(@RequiredService(name="ms", type=IExampleService.class, multiple=true))
+@RequiredServices(@RequiredService(name="ms", type=IExampleService.class)) // multiple=true
 //	multiplextype=IMultiplexExampleService.class))	// TODO? removed in v4
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Agent
@@ -49,7 +50,8 @@ public class MultiinvokeTestAgent extends JunitAgentTest
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body()
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -182,6 +184,10 @@ public class MultiinvokeTestAgent extends JunitAgentTest
 		{
 			tr.setFailed(exception);
 			endlis.resultAvailable(null);
+		}
+		
+		public void maxResultCountAvailable(int max) 
+		{
 		}
 	}
 	

@@ -24,9 +24,11 @@ dependencies
 										   ':environments:envsupport-opengl',
 //										   ':platform:maven',
 										   ':environments:envsupport-jmonkey',' :platform:webservice',
-										   ':transports:relaytransport',
-										   ':transports:websockettransport',
-										   ':platform:webservice-desktop',
+										   ':transports:relay',
+										   ':transports:websocket',
+										   ':platform:webservice',
+										   ':platform:webservice-nano',
+										   ':platform:webservice-websocket'
 										   // For IDEs: include manually to choose impl.
 //										   ':platform:webservice-desktop-jetty',
 //										   ':platform:webservice-desktop-grizzly',

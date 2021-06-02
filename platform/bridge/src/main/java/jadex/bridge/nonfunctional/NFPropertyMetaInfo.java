@@ -1,5 +1,6 @@
 package jadex.bridge.nonfunctional;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.nonfunctional.INFProperty.Target;
 
 
@@ -12,10 +13,10 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	protected String name;
 	
 	/** Type of the property. */
-	protected Class<?> type;
+	protected ClassInfo type;
 	
 	/** Unit of the property value. */
-	protected Class<?> unit;
+	protected ClassInfo unit;
 	
 	/** Flag indicating if the property is dynamic. */
 	protected boolean dynamic;
@@ -42,7 +43,7 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	 *  
 	 *  @param name Name of the property.
 	 */
-	public NFPropertyMetaInfo(String name, Class<?> type)
+	public NFPropertyMetaInfo(String name, ClassInfo type)
 	{
 		this.name = name;
 		this.type = type;
@@ -55,10 +56,30 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	 */
 	public NFPropertyMetaInfo(String name, Class<?> type, Class<?> unit, boolean dynamic)
 	{
+		this(name, type!=null? new ClassInfo(type): null, unit!=null? new ClassInfo(unit): null, dynamic);
+	}
+	
+	/**
+	 *  Creates a meta info.
+	 *  
+	 *  @param name Name of the property.
+	 */
+	public NFPropertyMetaInfo(String name, ClassInfo type, ClassInfo unit, boolean dynamic)
+	{
 		this.name = name;
 		this.type = type;
 		this.unit = unit;
 		this.dynamic = dynamic;
+	}
+	
+	/**
+	 *  Creates a meta info.
+	 *  
+	 *  @param name Name of the property.
+	 */
+	public NFPropertyMetaInfo(String name, Class<?> type, Class<?> unit, boolean dynamic, long updaterate, boolean realtime, Target target)
+	{
+		this(name, type!=null? new ClassInfo(type): null, unit!=null? new ClassInfo(unit): null, dynamic, updaterate, realtime, target);
 	}
 	
 	/**
@@ -71,7 +92,7 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	 *  @param updaterate Update rate of the property.
 	 *  @param target Target of the property.
 	 */
-	public NFPropertyMetaInfo(String name, Class<?> type, Class<?> unit, boolean dynamic, long updaterate, boolean realtime, Target target)
+	public NFPropertyMetaInfo(String name, ClassInfo type, ClassInfo unit, boolean dynamic, long updaterate, boolean realtime, Target target)
 	{
 		this.name = name;
 		this.type = type;
@@ -97,7 +118,7 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	 *
 	 *  @return The type of the property.
 	 */
-	public Class<?> getType()
+	public ClassInfo getType()
 	{
 		return type;
 	}
@@ -107,7 +128,7 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	 *
 	 *  @return The unit of the property.
 	 */
-	public Class<?> getUnit()
+	public ClassInfo getUnit()
 	{
 		return unit;
 	}
@@ -158,7 +179,7 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	 *
 	 *  @param type The type.
 	 */
-	public void setType(Class<?> type)
+	public void setType(ClassInfo type)
 	{
 		this.type = type;
 	}
@@ -168,7 +189,7 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	 *
 	 *  @param unit The unit of the property.
 	 */
-	public void setUnit(Class<?> unit)
+	public void setUnit(ClassInfo unit)
 	{
 		this.unit = unit;
 	}

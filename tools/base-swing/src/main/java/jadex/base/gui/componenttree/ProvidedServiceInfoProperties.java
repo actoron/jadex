@@ -63,7 +63,7 @@ public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 	{
 		getTextField("Name").setText(service.getName());
 		getTextField("Type").setText(service.getType().getTypeName());
-		getTextField("Scope").setText(sid!=null? sid.getScope(): "");
+		getTextField("Scope").setText(sid!=null? sid.getScope().name(): "");
 //		getTextField("Implementation").setText();
 
 		if(service.getType().getType0()==null)
@@ -72,7 +72,7 @@ public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 			{
 				public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
 				{
-					ILibraryService ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					ILibraryService ls	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 					ls.getClassLoader(sid.getResourceIdentifier())
 						.addResultListener(new SwingDefaultResultListener<ClassLoader>()
 					{

@@ -3,17 +3,17 @@ package jadex.platform.service.cli.commands;
 import java.util.Collection;
 import java.util.Map;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
@@ -79,10 +79,10 @@ public class SwitchPlatformCommand extends ACliCommand
 		}
 		else
 		{
-			final IComponentIdentifier cid = new BasicComponentIdentifier((String)args.get(null));
+			final IComponentIdentifier cid = new ComponentIdentifier((String)args.get(null));
 			
-			comp.searchServices( new ServiceQuery<>(IInternalCliService.class, RequiredServiceInfo.SCOPE_GLOBAL))
-				.addResultListener(new IIntermediateResultListener<IInternalCliService>()
+			comp.searchServices(new ServiceQuery<>(IInternalCliService.class, ServiceScope.GLOBAL))
+				.addResultListener(new IntermediateEmptyResultListener<IInternalCliService>()
 			{
 				boolean found = false;
 				public void intermediateResultAvailable(final IInternalCliService cliser)
@@ -91,7 +91,7 @@ public class SwitchPlatformCommand extends ACliCommand
 					if(plat.equals(cid) && !ret.isDone())
 					{
 						found = true;
-						comp.getExternalAccess(plat).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IInternalCliService>(ret)
+						comp.getExternalAccessAsync(plat).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IInternalCliService>(ret)
 						{
 							public void customResultAvailable(IExternalAccess exta)
 							{

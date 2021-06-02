@@ -239,7 +239,7 @@ public class LogService implements ILogService
 	
 	protected static final void dispatchLogServiceEvent(IServiceProvider provider, final IComponentChangeEvent cce)
 	{
-		provider.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILogService.class, RequiredServiceInfo.SCOPE_GLOBAL)).addResultListener(new DefaultResultListener()
+		provider.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILogService.class, ServiceScope.GLOBAL)).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

@@ -11,7 +11,7 @@ public class ServiceCallEvent
 {
 	public static enum Type
 	{
-		CALL, RESULT, EXCEPTION, INTERMEDIATE_RESULT, FINISHED;//FORWARD_CMD, BACKWARD_CMD;
+		CALL, RESULT, EXCEPTION, INTERMEDIATE_RESULT, FINISHED, MAX;//FORWARD_CMD, BACKWARD_CMD;
 	}
 	
 	//-------- attributes --------

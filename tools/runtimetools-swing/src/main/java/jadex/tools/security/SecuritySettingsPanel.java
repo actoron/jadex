@@ -2,7 +2,6 @@ package jadex.tools.security;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,6 +30,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import jadex.base.Starter;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
@@ -39,14 +39,13 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.ISecurityService;
-import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.bridge.service.types.settings.IPlatformSettings;
 import jadex.commons.ICommand;
 import jadex.commons.Properties;
-import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -55,11 +54,7 @@ import jadex.commons.gui.JWizard;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.jtable.StringArrayTableModel;
 import jadex.commons.security.PemKeyPair;
-import jadex.commons.security.SSecurity;
-import jadex.platform.service.registryv2.SuperpeerClientAgent;
-import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
-import jadex.platform.service.security.auth.AbstractX509PemSecret;
-import jadex.platform.service.security.auth.X509PemStringsSecret;
+import jadex.platform.service.security.SecurityAgent;
 
 /**
  *  Settings for security service.
@@ -73,7 +68,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	protected IExternalAccess jccaccess;
 	
 	/** The settings service. */
-	protected ISettingsService settingsservice;
+	protected IPlatformSettings settings;
 	
 	/** The security service. */
 	protected ISecurityService secservice;
@@ -128,8 +123,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IComponentIdentifier targetpf = sid.getProviderId().getRoot();
-				secservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISecurityService.class).setScope(RequiredServiceInfo.SCOPE_PLATFORM).setSearchStart(targetpf)).get();
-				settingsservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class).setScope(RequiredServiceInfo.SCOPE_PLATFORM).setSearchStart(targetpf)).get();
+				secservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISecurityService.class).setScope(ServiceScope.PLATFORM).setSearchStart(targetpf)).get();
+				settings = Starter.getPlatformSettings(ia.getId());
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -148,12 +143,12 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						main.add("Trusted Platform Names", createTrustedNamesPanel());
 						
 						certtree = new CertTree();
-						certtree.load(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
+						certtree.load(settings.loadFile(DEFAULT_CERT_STORE));
 						certtree.setSaveCommand(new ICommand<byte[]>()
 						{
 							public void execute(byte[] store)
 							{
-								settingsservice.saveFile(DEFAULT_CERT_STORE, store).get();
+								settings.saveFile(DEFAULT_CERT_STORE, store);
 							}
 						});
 						main.add("Certificate Store", certtree);
@@ -268,7 +263,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 
 			public void actionPerformed(ActionEvent e)
 			{
-				byte[] oldstore = settingsservice.loadFile(DEFAULT_CERT_STORE).get();
+				byte[] oldstore = settings.loadFile(DEFAULT_CERT_STORE);
 				SecretWizard wizard = new SecretWizard(oldstore);
 				
 				wizard.addTerminationListener(new AbstractAction()
@@ -714,7 +709,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 				adddialog.getContentPane().setLayout(new BorderLayout());
 				
 				CertTree nacerttree = new CertTree();
-				nacerttree.load(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
+				nacerttree.load(settings.loadFile(DEFAULT_CERT_STORE));
 				
 				adddialog.getContentPane().add(nacerttree, BorderLayout.CENTER);
 				
@@ -725,8 +720,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 					public void actionPerformed(ActionEvent e)
 					{
 						PemKeyPair keypair = nacerttree.getSelectedCert();
-						settingsservice.saveFile(DEFAULT_CERT_STORE, nacerttree.save()).get();
-						certtree.load(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
+						settings.saveFile(DEFAULT_CERT_STORE, nacerttree.save());
+						certtree.load(settings.loadFile(DEFAULT_CERT_STORE));
 						adddialog.dispose();
 						if (keypair != null)
 						{
@@ -964,7 +959,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	 */
 	protected void setNetwork()
 	{
-		byte[] oldstore = settingsservice.loadFile(DEFAULT_CERT_STORE).get();
+		byte[] oldstore = settings.loadFile(DEFAULT_CERT_STORE);
 		SecretWizard wizard = new SecretWizard(oldstore);
 		//wizard.setEntity(nwn);
 		wizard.setEntityType("the network name");
@@ -1006,7 +1001,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	 */
 	protected void writeCertStore(byte[] newstore)
 	{
-		settingsservice.saveFile(DEFAULT_CERT_STORE, newstore).get();
+		settings.saveFile(DEFAULT_CERT_STORE, newstore);
 		certtree.load(newstore);
 	}
 	
@@ -1061,7 +1056,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 							
 							for (Map.Entry<String, Collection<String>> entry : nws.entrySet())
 							{
-								if (entry.getValue() != null && entry.getValue().size() > 0 && !SuperpeerClientAgent.GLOBAL_NETWORK_NAME.equals(entry.getKey()))
+								if (entry.getValue() != null && entry.getValue().size() > 0 && !SecurityAgent.GLOBAL_NETWORK_NAME.equals(entry.getKey()))
 								{
 									for (String secret : entry.getValue())
 									{
@@ -1152,55 +1147,56 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				final Set<String> nas = secservice.getNameAuthorities().get();
-				final Set<String> custom = secservice.getCustomNameAuthorities().get();
+				final String[][] info = secservice.getNameAuthoritiesInfo().get();
+				
+//				final Set<String> nas = secservice.getNameAuthorities().get();
+//				final Set<String> custom = secservice.getCustomNameAuthorities().get();
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
 					{
-						String[][] table = null;
-						if (nas != null && nas.size() > 0)
-						{
-							table = new String[nas.size()][3];
-							nacerts.clear();
-							
-							int i = 0;
-							for (String cert : nas)
-							{
-								String subjectid = null;
-								String dn = null;
-								InputStream is = null;
-								try
-								{
-									subjectid = SSecurity.getCommonName(SSecurity.readCertificateFromPEM(cert).getSubject());
-									dn = SSecurity.readCertificateFromPEM(cert).getSubject().toString();
-								}
-								catch (Exception e)
-								{
-								}
-								finally
-								{
-									SUtil.close(is);
-								}
-								
-								nacerts.put(dn, cert);
-								
-								table[i][0] = subjectid != null ? subjectid : "";
-								table[i][1] = dn != null ? dn : "";
-								table[i][2] = custom.contains(cert) ? "Custom CA" : "Java CA";
-								++i;
-							}
-						}
-						else
-						{
-							table = new String[0][0];
-						}
-						
-						StringArrayTableModel model = new StringArrayTableModel(table);
+//						String[][] table = null;
+//						if(nas != null && nas.size() > 0)
+//						{
+//							table = new String[nas.size()][3];
+//							nacerts.clear();
+//							
+//							int i = 0;
+//							for (String cert : nas)
+//							{
+//								String subjectid = null;
+//								String dn = null;
+//								InputStream is = null;
+//								try
+//								{
+//									subjectid = SSecurity.getCommonName(SSecurity.readCertificateFromPEM(cert).getSubject());
+//									dn = SSecurity.readCertificateFromPEM(cert).getSubject().toString();
+//								}
+//								catch (Exception e)
+//								{
+//								}
+//								finally
+//								{
+//									SUtil.close(is);
+//								}
+//								
+//								nacerts.put(dn, cert);
+//								
+//								table[i][0] = subjectid != null ? subjectid : "";
+//								table[i][1] = dn != null ? dn : "";
+//								table[i][2] = custom.contains(cert) ? "Custom CA" : "Java CA";
+//								++i;
+//							}
+//						}
+//						else
+//						{
+//							table = new String[0][0];
+//						}
+//						
+						StringArrayTableModel model = new StringArrayTableModel(info);
 						model.setColumnNames(new String[] { "Subject Common Name", "Subject Distinguished Name", "Type" });
 						natable.setModel(model);
-						
 					}
 				});
 				

@@ -1,7 +1,8 @@
 package jadex.microservice.examples.pojoservice;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.micro.annotation.Agent;
@@ -17,12 +18,13 @@ public class UserAgent
 	/**
 	 *  The agent body is called once on agent startup.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body(IInternalAccess agent)
 	{
 		try
 		{
-			PojoMicroservice ser = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( PojoMicroservice.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+			PojoMicroservice ser = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(PojoMicroservice.class, ServiceScope.PLATFORM)).get();
 			System.out.println(ser.sayHello("Lars"));
 		}
 		catch(Exception e)

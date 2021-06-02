@@ -133,4 +133,14 @@ public abstract class RFinishableElement extends RProcessableElement implements 
 	{
 		return isSucceeded() || isFailed();
 	}
+	
+	/**
+	 *  Check if the element is currently part of the agent's reasoning.
+	 *  E.g. the bases are always adopted and all of their contents such as goals, plans and beliefs.
+	 */
+	public boolean	isAdopted()
+	{
+		// TODO: is this right?
+		return !isFinished();
+	}
 }

@@ -36,6 +36,7 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -44,9 +45,9 @@ import jadex.micro.annotation.RequiredServices;
 
 @RequiredServices(
 {
-	@RequiredService(name="treatvictimservices", type=ITreatVictimsService.class, multiple=true),
-	@RequiredService(name="extinguishfireservices", type=IExtinguishFireService.class, multiple=true),
-	@RequiredService(name="clearchemicalsservices", type=IClearChemicalsService.class, multiple=true)
+	@RequiredService(name="treatvictimservices", type=ITreatVictimsService.class), //, multiple=true
+	@RequiredService(name="extinguishfireservices", type=IExtinguishFireService.class), //, multiple=true
+	@RequiredService(name="clearchemicalsservices", type=IClearChemicalsService.class) //, multiple=true
 })
 @Plans(
 {
@@ -81,7 +82,8 @@ public class CommanderAgent
 	/**
 	 * 
 	 */
-	@AgentBody
+	@OnStart
+	//@AgentBody
 	public void body()
 	{
 		while(true)

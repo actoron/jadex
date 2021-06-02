@@ -16,14 +16,14 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.rules.eca.ChangeInfo;
@@ -48,7 +48,8 @@ public class WaitBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		tr[0] = new TestReport("#1", "Test waitForFactAdded");
@@ -88,7 +89,8 @@ public class WaitBDI
 	/**
 	 *  Called when agent is killed.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void	destroy(IInternalAccess agent)
 	{
 		for(TestReport ter: tr)
@@ -213,7 +215,7 @@ public class WaitBDI
 //	/**
 //	 *  Plan that waits with waitqueue for addition of a name.
 //	 */
-//	@Plan(waitqueue=@Trigger(factaddeds="names"))
+//	@Plan(waitqueue=@Trigger(factadded="names"))
 //	protected IFuture<Void> waitqueuePlan(final RPlan rplan)
 //	{
 //		final Future<Void> ret = new Future<Void>();

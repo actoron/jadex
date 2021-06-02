@@ -25,7 +25,7 @@ import jadex.javaparser.SJavaParser;
  */
 public class PlatformConfigurationHandler implements InvocationHandler
 {
-	/** Readonly flag. */
+	/** Readonly flag means that the config has been used to start a platform and is now immutable. */
 	protected boolean readonly;
 	
 	/** The map of values. */
@@ -166,7 +166,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 	{
-		Object ret = null;
+		Object ret = proxy;	// default to builder pattern
 		
 		String mname = method.getName();
 		
@@ -339,7 +339,15 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		if(readonly)
 			throw new RuntimeException("Config is readonly");
 	}
-	
+
+	/**
+	 *  Check the readonly state.
+	 */
+	protected static void makeImmutable(IPlatformConfiguration config)
+	{
+		((PlatformConfigurationHandler)ProxyFactory.getInvocationHandler(config)).readonly	= true;
+	}	
+
 	/**
 	 *  Get the key for a method name.
 	 *  @param mname The method name.
@@ -845,6 +853,13 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		config.getExtendedPlatformConfiguration().setWsTransport(false);
 		config.getExtendedPlatformConfiguration().setRelayTransport(false);
 		// rootConfig.setSslTcpTransport(false);
+		config.setValue("intravmawareness", false);
+		config.setValue("catalogawareness", false);
+		config.setValue("multicastawareness", false);
+		config.setValue("broadcastawareness", false);
+		config.setValue("localhostawareness", false);
+
+		config.setValue("platformproxies", false);
 
 		config.setValue("kernel_multi", false);
 		config.setValue("kernel_micro", true);
@@ -900,7 +915,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 
 		// Registry & Awareness
 		config.setSuperpeerClient(true);
-		config.setValue("passiveawarenesscatalog", true);	// Catalog for SSPs
+		config.setValue("catalogawareness", true);	// Catalog for SSPs
 
 		return config;
 	}
@@ -917,7 +932,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		
 		// Registry & Awareness
 		config.setSuperpeerClient(true);
-		config.setValue("passiveawarenessmulticast", true);
+		config.setValue("multicastawareness", true);
 
 		return config;
 	}

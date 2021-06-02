@@ -6,6 +6,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
@@ -36,7 +38,7 @@ import jadex.micro.annotation.RequiredServices;
 })
 @RequiredServices({
 	@RequiredService(name="chat_intern", type=IChatGuiService.class),
-	@RequiredService(name="chat_extern", type=IChatGuiService.class, scope=RequiredService.SCOPE_PLATFORM)
+	@RequiredService(name="chat_extern", type=IChatGuiService.class, scope=ServiceScope.PLATFORM)
 })
 public class EchoChatAgent
 {
@@ -46,7 +48,7 @@ public class EchoChatAgent
 	@Agent
 	protected IInternalAccess	agent;
 	
-	/** The gui service for controlling the inner chat component. */
+	/** The gui service for controlling the inner chat component. $config is replaced by "intern" or "extern" */
 	@AgentServiceSearch(name="%{\"chat_\"+$config}")
 	protected IChatGuiService	chat;
 	
@@ -55,7 +57,8 @@ public class EchoChatAgent
 	/**
 	 *  Register to inner chat at startup.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void	start()
 	{
 		chat.status(IChatService.STATE_IDLE, null, new IComponentIdentifier[0]);	// Change state from away to idle.
@@ -105,10 +108,10 @@ public class EchoChatAgent
 			System.out.print(".");
 			if(i%100==0)
 				System.out.println("\n "+i+": ");
-			IComponentIdentifier cid = pl.createComponent(new CreationInfo().setFilename(EchoChatAgent.class.getName()+".class")).getFirstResult();
+			IComponentIdentifier cid = pl.createComponent(new CreationInfo().setFilename(EchoChatAgent.class.getName()+".class")).get().getId();
 			try
 			{
-				pl.killComponent(cid).get();
+				pl.getExternalAccess(cid).killComponent().get();
 			}
 			catch(Exception e)
 			{
@@ -124,6 +127,6 @@ public class EchoChatAgent
 //		{
 //		}
 		
-		System.out.println("fini");
+		//System.out.println("fini");
 	}
 }

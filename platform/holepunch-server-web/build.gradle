@@ -1,3 +1,5 @@
+description 'Jadex holepunch server web'
+
 apply plugin: 'war'
 apply plugin: 'eclipse-wtp'
 

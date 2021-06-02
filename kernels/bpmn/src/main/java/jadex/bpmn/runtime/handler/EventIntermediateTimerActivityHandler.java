@@ -1,5 +1,6 @@
 package jadex.bpmn.runtime.handler;
 
+import jadex.base.Starter;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.ComponentTerminatedException;
@@ -29,9 +30,10 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	 */
 	public void	doWait(final MActivity activity, final IInternalAccess instance, final ProcessThread thread, final long duration)
 	{
-		final Future<ITimer>	wifuture	= new Future<ITimer>(); 
-		IClockService cs	= instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
-		ITimedObject	to	= new ITimedObject()
+		final Future<ITimer> wifuture = new Future<ITimer>(); 
+		IClockService cs = Starter.getClockService(instance);
+		//IClockService cs = instance.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class));
+		ITimedObject to	= new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{

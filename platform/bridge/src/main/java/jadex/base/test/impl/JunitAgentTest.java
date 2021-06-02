@@ -1,17 +1,15 @@
 package jadex.base.test.impl;
 
-import java.util.Map;
-
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
+import jadex.base.Starter;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.future.IResultListener;
 
 /**
- * Junit compatible test class to be extended either by agents that provide test results
- * or by separate classes that provide a name of an agent that provides test results using the constructor.
+ *  Junit compatible test class to be extended either by agents that provide test results
+ *  or by separate classes that provide a name of an agent that provides test results using the constructor.
  */
 public abstract class JunitAgentTest extends ComponentTestLazyPlatform 
 {
@@ -22,19 +20,10 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
      */
     public JunitAgentTest() 
     {
+    	this("");	// Hack!!! cannot get class before this() or super()
 //      Logger.getLogger("ComponentTest").log(Level.INFO, "Trying to guess TestAgent name...");
         String className = this.getClass().getName();
         this.comp = extendWithClassIfNeeded(className);
-        this.config = STest.getDefaultTestConfig();
-    }
-
-    /**
-     * Constructor.
-     * @param clazz class (agent) to test
-     */
-    public JunitAgentTest(Class<?> clazz) 
-    {
-        this(clazz.getName() + ".class");
     }
 
     /**
@@ -44,17 +33,7 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
     public JunitAgentTest(String component) 
     {
         super(extendWithClassIfNeeded(component), null);
-        this.config = STest.getDefaultTestConfig();
-    }
-
-
-    /**
-     * Set platform config.
-     * @param config
-     */
-    public void setConfig(IPlatformConfiguration config) 
-    {
-        this.config = config;
+        this.config = STest.createDefaultTestConfig(getClass());
     }
 
     /**
@@ -69,7 +48,7 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
     @Override
     public void runBare() 
     {
-        IExternalAccess platform = STest.createPlatform(getConfig());
+        IExternalAccess platform = Starter.createPlatform(getConfig().clone()).get();
         setPlatform(platform);
         super.runBare();
         platform.killComponent();

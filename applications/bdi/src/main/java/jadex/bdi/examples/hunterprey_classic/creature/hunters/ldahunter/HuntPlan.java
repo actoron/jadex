@@ -9,6 +9,7 @@ import jadex.bdi.examples.hunterprey_classic.creature.hunters.ldahunter.potentia
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
+import jadex.commons.gui.GuiCreator;
 
 
 /**
@@ -44,7 +45,8 @@ public class HuntPlan extends Plan
 		myLoc = myself.getLocation();
 
 		jf = (JointField)getBeliefbase().getBelief("potential_field").getFact();
-		pf = (PotentialFrame)getBeliefbase().getBelief("potential_window").getFact();
+//		pf = (PotentialFrame)getBeliefbase().getBelief("potential_window").getFact();
+		pf = (PotentialFrame)((GuiCreator)getBeliefbase().getBelief("gui").getFact()).getGui();
 
 		prey = (Prey)getBeliefbase().getBelief("next_sheep").getFact();
 

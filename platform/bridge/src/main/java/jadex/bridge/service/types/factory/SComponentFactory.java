@@ -1,13 +1,19 @@
 package jadex.bridge.service.types.factory;
 
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.stream.Collectors;
 
+import jadex.base.Starter;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.FactoryFilter;
 import jadex.bridge.IComponentIdentifier;
@@ -40,14 +46,27 @@ import jadex.bridge.service.component.ProvidedServicesComponentFeature;
 import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.library.ILibraryServiceListener;
+import jadex.commons.ComposedFilter;
+import jadex.commons.FileFilter;
+import jadex.commons.IFilter;
+import jadex.commons.SClassReader;
+import jadex.commons.SClassReader.AnnotationInfo;
+import jadex.commons.SClassReader.ClassInfo;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.javaparser.SJavaParser;
 
 
 
@@ -60,7 +79,7 @@ public class SComponentFactory
 	//-------- todo: move somewhere else? --------
 	
 	/** The default component features. */
-	public static final Collection<IComponentFeatureFactory>	DEFAULT_FEATURES;
+	public static final Collection<IComponentFeatureFactory> DEFAULT_FEATURES;
 	
 	static
 	{
@@ -144,12 +163,26 @@ public class SComponentFactory
 					Set<Class<?>> sucs = fac.getSuccessors();
 					for(Class<?> suc: sucs)
 					{
-						dr.addDependency(facsmap.get(suc), facsmap.get(fac.getType()));
+						if(facsmap.get(fac.getType())!=null && facsmap.get(suc)!=null)
+						{
+							dr.addDependency(facsmap.get(suc), facsmap.get(fac.getType()));
+						}
+//						else
+//						{
+//							System.out.println("Declared dependency not found, ignoring: "+suc+" "+fac.getType());
+//						}
 					}
 					Set<Class<?>> pres = fac.getPredecessors();
 					for(Class<?> pre: pres)
 					{
-						dr.addDependency(facsmap.get(fac.getType()), facsmap.get(pre));
+						if(facsmap.get(pre)!=null && facsmap.get(fac.getType())!=null)
+						{
+							dr.addDependency(facsmap.get(fac.getType()), facsmap.get(pre));
+						}
+//						else
+//						{
+//							System.out.println("Declared dependency not found, ignoring: "+pre+" "+fac.getType());
+//						}
 					}
 				}
 				// Save original dependency of the feature
@@ -209,6 +242,7 @@ public class SComponentFactory
 			throw new IllegalArgumentException("Model must not be null.");
 		if(model.length()==0)
 			throw new IllegalArgumentException();
+		
 		return exta.scheduleStep(new IComponentStep<IModelInfo>()
 		{
 			@Classname("loadModel")
@@ -216,34 +250,41 @@ public class SComponentFactory
 			{
 				final Future<IModelInfo> ret = new Future<IModelInfo>();
 				
-				IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
-				fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
+				SComponentManagementService.getResourceIdentifier(model, rid, ia).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, IModelInfo>(ret) 
 				{
-					public void customResultAvailable(IComponentFactory fac)
+					@Override
+					public void customResultAvailable(IResourceIdentifier result) throws Exception 
 					{
-						fac.loadModel(model, null, rid)
-							.addResultListener(new DelegationResultListener<IModelInfo>(ret));
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						if(exception instanceof ServiceNotFoundException)
+						IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
+						fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
 						{
-							ret.setResult(null);
-						}
-						else
-						{
-							super.exceptionOccurred(exception);
-						}
+							public void customResultAvailable(IComponentFactory fac)
+							{
+								fac.loadModel(model, null, rid).addResultListener(new DelegationResultListener<IModelInfo>(ret));
+							}
+							
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								if(exception instanceof ServiceNotFoundException)
+//								{
+//									System.out.println("No factory found: "+model+" "+rid);
+//									ret.setResult(null);
+//								}
+//								else
+//								{
+//									super.exceptionOccurred(exception);
+//								}
+//							}
+						}));
 					}
-				}));
+				});
 				
 				return ret;
 			}
 		});
 	}
 	
-//	Collection<IComponentFactory> facs = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//	Collection<IComponentFactory> facs = agent.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>( IComponentFactory.class, ServiceScope.PLATFORM));
 //	FactoryFilter facfilter = new FactoryFilter(filename, null, rid);
 //	
 //	SFilter.applyFilter(facs, facfilter).addResultListener(new IResultListener<Collection<IComponentFactory>>()
@@ -283,14 +324,14 @@ public class SComponentFactory
 			public IFuture<Boolean> execute(final IInternalAccess ia)
 			{
 				final Future<Boolean> ret = new Future<Boolean>();
-//				ia.getServiceContainer().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//				ia.getServiceContainer().searchService( new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 //					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 //				{
 //					public void customResultAvailable(Object result)
 //					{
 //						final ILibraryService ls = (ILibraryService)result;
 						
-//						(IServiceProvider)ia.getServiceContainer().searchService( new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid)))
+//						(IServiceProvider)ia.getServiceContainer().searchService( new ServiceQuery<>( IComponentFactory.class, ServiceScope.PLATFORM, new FactoryFilter(model, null, rid)))
 //						ia.getServiceContainer().searchService( new ServiceQuery<>( new ComponentFactorySelector(model, null, rid)))
 						IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
 						fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, Boolean>(ret)
@@ -383,17 +424,19 @@ public class SComponentFactory
 //				if(model.endsWith("application.xml"))
 //					System.out.println("model2:"+model);
 		
-//				final long start = System.currentTimeMillis(); 
+				final long start = System.currentTimeMillis(); 
 				final Future<Boolean> ret = new Future<Boolean>();
 				ea.searchServices(new ServiceQuery<>(IComponentFactory.class))
 					.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, Boolean>(ret)
 				{
 					public void customResultAvailable(Collection<IComponentFactory> facs)
 					{
-//						long dur = System.currentTimeMillis()-start; 
-//						System.out.println("needed search: "+dur);
-//						System.out.println("found facs: "+facs.size());
+						long dur = System.currentTimeMillis()-start; 
+						//System.out.println("needed search: "+dur+" "+ea);
+						if(facs.size()==0)
+							System.out.println("found facs: "+facs.size());
 						
+						// todo: refactor to hide inner factories
 						facs = reorderMultiFactory(facs);
 						
 //						if(model.endsWith("application.xml"))
@@ -446,6 +489,7 @@ public class SComponentFactory
 		
 		if(i>=facts.length)
 		{
+			//System.out.println("found no fac: "+model+" "+SUtil.arrayToString(facts));
 			ret.setResult(Boolean.FALSE);
 		}
 		else
@@ -472,9 +516,9 @@ public class SComponentFactory
 			{
 				public void customResultAvailable(Boolean result)
 				{
-					//System.out.println("model: "+model+" "+result+" "+facts[i]);
 					if(result!=null && result.booleanValue())
 					{
+						//System.out.println("found model: "+model+" "+result+" "+facts[i]);
 						ret.setResult(result);
 					}
 					else
@@ -503,7 +547,7 @@ public class SComponentFactory
 			public IFuture<Boolean> execute(final IInternalAccess ia)
 			{
 				final Future<Boolean> ret = new Future<Boolean>();
-//				ia.getServiceContainer().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//				ia.getServiceContainer().searchService( new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 //					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 //				{
 //					public void customResultAvailable(Object result)
@@ -511,7 +555,7 @@ public class SComponentFactory
 //						final ILibraryService ls = (ILibraryService)result;
 						
 //						SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, 
-//							RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid))
+//							ServiceScope.PLATFORM, new FactoryFilter(model, null, rid))
 //						ia.getServiceContainer().searchService( new ServiceQuery<>( new ComponentFactorySelector(model, null, rid)))
 						getFactory(new FactoryFilter(model, null, rid), ia)
 							.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, Boolean>(ret)
@@ -557,7 +601,7 @@ public class SComponentFactory
 			{
 				final Future<byte[]> ret = new Future<byte[]>();
 //				IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), 
-//					IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(type));
+//					IComponentFactory.class, ServiceScope.PLATFORM, new FactoryFilter(type));
 //				ia.getServiceContainer().searchService( new ServiceQuery<>( new ComponentFactorySelector(type)))
 				IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(type), ia);
 				fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, byte[]>(ret)
@@ -629,7 +673,7 @@ public class SComponentFactory
 			public IFuture<Object> execute(final IInternalAccess ia)
 			{
 				final Future<Object> ret = new Future<Object>();
-				Collection<IComponentFactory> result	= ia.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
+				Collection<IComponentFactory> result	= ia.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>(IComponentFactory.class));
 				boolean found = false;
 				if(result!=null)
 				{
@@ -706,14 +750,15 @@ public class SComponentFactory
 	 */
 	public static IFuture<IComponentFactory> getFactory(final FactoryFilter filter, IInternalAccess ia)
 	{
-		Collection<IComponentFactory> facs = ia.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
+		Collection<IComponentFactory> facs = ia.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>(IComponentFactory.class));
+		//System.out.println("getFactory: "+facs);
 		if(facs!=null && facs.size()>0)
 		{
 			return doFindFactory(reorderMultiFactory(facs).iterator(), filter);
 		}
 		else
 		{
-			return new Future<IComponentFactory>(new ServiceNotFoundException(""+filter));
+			return new Future<IComponentFactory>(new ServiceNotFoundException("facs="+facs+", filter="+filter));
 		}
 	}
 	
@@ -724,8 +769,8 @@ public class SComponentFactory
 	{
 		if(facs.hasNext())
 		{
-			IComponentFactory	fac	= facs.next();
-			IFuture<Boolean>	match	= filter.filter(fac);
+			IComponentFactory fac = facs.next();
+			IFuture<Boolean> match = filter.filter(fac);
 			if(match.isDone())
 			{
 				// Synchronous version
@@ -753,8 +798,7 @@ public class SComponentFactory
 						}
 						else
 						{
-							doFindFactory(facs, filter)
-								.addResultListener(new DelegationResultListener<>(ret));
+							doFindFactory(facs, filter).addResultListener(new DelegationResultListener<>(ret));
 						}
 					}
 				});
@@ -763,7 +807,7 @@ public class SComponentFactory
 		}
 		else
 		{
-			return new Future<>(new ServiceNotFoundException(""+filter));
+			return new Future<IComponentFactory>(new ServiceNotFoundException("filter="+filter));
 		}
 	}
 	
@@ -795,5 +839,353 @@ public class SComponentFactory
 				ret.add(multi);
 		}
 		return ret;
+	}
+	
+	/** Filter for scanning for kernel agent class files. */
+	protected static FileFilter ffilter = new FileFilter("$", false, ".class")
+		.addFilenameFilter(new IFilter<String>()
+	{
+		public boolean filter(String fn)
+		{
+			return fn.startsWith("Kernel");
+		}
+	});
+	
+	/** Filter for scanning for kernel agent class infos. */
+	protected static IFilter<ClassInfo>	cfilter	= new IFilter<ClassInfo>()
+	{
+		public boolean filter(ClassInfo ci) 
+		{
+			return ci.hasAnnotation("jadex.micro.annotation.Agent");
+		}
+	};
+	
+	/**
+	 *  Scan files for kernel components.
+	 *  @return (suffix -> classname)
+	 */
+	public static Collection<IFilter<Object>> scanForKernelFilters(List<URL> urls)
+	{
+		List<IFilter<Object>> ret = new ArrayList<IFilter<Object>>();
+		urls = new ArrayList<URL>(urls);
+		
+//		System.out.println("urls2: "+urls2.size());
+//		for(URL u: urls2)
+//			System.out.println(u);
+		for(Iterator<URL> it=urls.iterator(); it.hasNext(); )
+		{
+			String u = it.next().toString();
+			if(u.indexOf("jre/lib/ext")!=-1
+			//	|| u.indexOf("jadex")==-1
+				|| u.indexOf("SYSTEMCPRID")!=-1)
+			{
+				it.remove();
+			}
+		}
+		
+		//System.out.println("scan: "+urls2.size());
+		
+//		System.out.println("urls: "+urls);
+		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls.toArray(new URL[urls.size()]), ffilter, cfilter);
+
+		for(ClassInfo ci: cis)
+		{
+			IFilter<Object> f = getKernelFilter(ci);
+			if(f!=null)
+			{
+				//System.out.println("adding filter for: "+ci);
+				ret.add(f);
+			}
+			/*else
+			{
+				System.out.println("omitting: "+ci);
+			}*/
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Add infos about a kernel to the map.
+	 */
+	public static IFilter<Object> getKernelFilter(ClassInfo ci)
+	{
+		IFilter<Object> ret = null;
+		
+		AnnotationInfo ai = ci.getAnnotation("jadex.micro.annotation.Properties");
+		if(ai!=null)
+		{
+			Object[] vals = (Object[])ai.getValue("value");
+			if(vals!=null)
+			{
+				for(Object val: vals)
+				{
+					AnnotationInfo a = (AnnotationInfo)val;
+					String name = (String)a.getValue("name");
+					
+					if("kernel.filter".equals(name))
+					{
+						String value = (String)a.getValue("value");
+						ret = (IFilter)SJavaParser.evaluateExpression(value, null);
+						break; // we prefer filter against types
+					}
+					else if("kernel.types".equals(name))
+					{
+						String value = (String)a.getValue("value");
+						Object v = SJavaParser.evaluateExpression(value, null);
+						if(v instanceof String)
+						{
+							String type = (String)v;
+							
+							ret = new IFilter<Object>() 
+							{
+								public boolean filter(Object obj) 
+								{
+									String file = null;
+									boolean ret = false;
+									if(obj instanceof String)
+										file = (String)obj;
+									else if(obj instanceof JarEntry)
+										file = ((JarEntry)obj).getName();
+									else if(obj instanceof File)
+										file = ((File)obj).getAbsolutePath();
+										
+									if(file!=null)
+										ret = file.endsWith(type);
+									//if(ret)
+									//	System.out.println("found: "+file);
+									return ret;
+								}
+							};
+						}
+						else if(v instanceof String[])
+						{
+							String[] types = (String[])v;
+							
+							ret = new IFilter<Object>() 
+							{
+								public boolean filter(Object obj) 
+								{
+									String file = null;
+									boolean ret = false;
+									if(obj instanceof String)
+										file = (String)obj;
+									else if(obj instanceof JarEntry)
+										file = ((JarEntry)obj).getName();
+									else if(obj instanceof File)
+										file = ((File)obj).getAbsolutePath();
+										
+									if(file!=null)
+									{
+										for(String type: types)
+										{
+											ret = file.endsWith(type);
+											if(ret)
+												break;
+										}
+									}
+									if(ret)
+										System.out.println("found: "+file);
+									return ret;
+								}
+							};
+						}
+//						System.out.println("foound: "+ci.getClassname()+" "+Arrays.toString(types));
+					}
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Scans for component models and returns them as stream.
+	 *  @return Collection<String[](filename, classname)>>
+	 */
+	public static ISubscriptionIntermediateFuture<Collection<String[]>> getComponentModelsAsStream(IInternalAccess component)
+	{
+		Object models = (Collection<Collection<String[]>>)Starter.getPlatformValue(component.getId().getRoot(), Starter.DATA_COMPONENTMODELS);
+		if(models instanceof Collection)
+		{
+			Collection<Collection<String[]>> models2 = (Collection<Collection<String[]>>)models;
+			SubscriptionIntermediateFuture<Collection<String[]>> ret = new SubscriptionIntermediateFuture<Collection<String[]>>();
+			for(Iterator<Collection<String[]>> it=models2.iterator(); it.hasNext(); )
+			{
+				ret.addIntermediateResult(it.next());
+			}
+			// Set finished not really necessary due to max
+			ret.setFinishedIfUndone();
+			return ret;
+		}
+		else if(models instanceof IFuture)
+		{
+			return (ISubscriptionIntermediateFuture<Collection<String[]>>)models;
+		}
+		else //if(models==null)
+		{
+			Collection<Collection<String[]>> allres = new ArrayList<Collection<String[]>>();
+			SubscriptionIntermediateDelegationFuture<Collection<String[]>> ret = new SubscriptionIntermediateDelegationFuture<Collection<String[]>>();
+			Starter.putPlatformValue(component.getId().getRoot(), Starter.DATA_COMPONENTMODELS, ret);
+			component.searchService(new ServiceQuery<ILibraryService>(ILibraryService.class)).then(ls ->
+			{
+				ls.getAllURLs().then(urls ->
+				{
+					//System.out.println("urls are: "+urls);
+					getComponentModelsAsStream(component, urls.toArray(new URL[urls.size()])).next(res ->
+					{
+						ret.addIntermediateResult(res);
+						allres.add(res);
+						//System.out.println("ires: "+res);
+					})
+					.max(max -> {/*System.out.println("max: "+max);*/ ret.setMaxResultCount(max);})
+					.finished(v ->
+					{
+						Starter.putPlatformValue(component.getId().getRoot(), Starter.DATA_COMPONENTMODELS, allres);
+						ret.setFinishedIfUndone();
+						//System.out.println("fini");
+					})
+					.catchEx(ret);
+				})
+				.catchEx(ret);
+			})
+			.catchEx(ret);
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Scans for component models and returns them as stream.
+	 *  @return Collection<String[](filename, classname)>>
+	 */
+	public static ISubscriptionIntermediateFuture<Collection<String[]>> getComponentModelsAsStream(IInternalAccess component, URL[] urls)
+	{
+		SubscriptionIntermediateFuture<Collection<String[]>> ret = new SubscriptionIntermediateFuture<>();
+		
+		urls = SUtil.removeSystemUrls(urls);	
+		final List<URL> urllist = SUtil.arrayToList(urls);
+		final Iterator<URL> it = (Iterator<URL>)urllist.iterator();
+		//System.out.println("getComponentModelsAsStream: "+l.size());
+		final int cnt[] = new int[1];
+		
+		//System.out.println("max to: "+urllist.size()+" "+urllist);
+		ret.setMaxResultCount(urllist.size());
+		
+		IComponentStep<List<String[]>> step = new IComponentStep<List<String[]>>()
+		{
+			public IFuture<List<String[]>> execute(IInternalAccess ia)
+			{
+				Future<List<String[]>> ret = new Future<>();
+				List<String[]> res = new ArrayList<String[]>();
+				
+				URL u = it.next();
+				URL[] url = new URL[]{u};
+				
+				IFilter<Object>[] filters = getKernelFilters(component, urllist).toArray(new IFilter[0]);
+				IFilter fil = new ComposedFilter(filters, ComposedFilter.OR);
+
+				try
+				{
+					Set<SClassReader.ClassFileInfo> cis = SReflect.scanForClassFileInfos(url, null, fil);
+					res = cis.stream().map(a -> new String[]{a.getFilename(), a.getClassInfo().getClassName()}).collect(Collectors.toList());
+				}
+				catch(Exception e)
+				{
+					System.out.println("scan class file infos: "+e);
+				}
+					
+				//IIntermediateFuture<String> fut = scanForFilesAsync(url[0], mff);
+				//fut.next(er -> res.add(new String[]{er, er}))
+				//	.finished(v -> ret.setResult(res))
+				//	.catchEx(ex -> ret.setException(ex));
+				
+				String[] res2 = SUtil.EMPTY_STRING_ARRAY;
+				try
+				{
+					res2 = SReflect.scanForFiles(url, fil);
+				}
+				catch(Exception e)
+				{
+					System.out.println("scan files: "+e);
+				}
+				
+				for(String r: res2)
+					res.add(new String[]{r, r});
+			
+				//if(res.size()>0)
+				//	System.out.println("found for: "+url[0]+" "+res.size());
+				
+				ret.setResult(res);
+				
+				return ret;
+			}
+		};
+		
+		component.scheduleStep(step).addResultListener(new IResultListener<List<String[]>>()
+		{
+			public void resultAvailable(List<String[]> res)
+			{
+				//System.out.println("resa: "+it.hasNext()+" "+urllist+" "+urllist.size());
+				ret.addIntermediateResult(res);
+				if(it.hasNext())
+				{
+					cnt[0]++;
+					//System.out.println("cnt: "+cnt[0]+"/"+urllist.size()+" "+res.size());
+					component.scheduleStep(step).addResultListener(this);
+				}
+				else
+				{
+					//System.out.println("getComponentModelsAsStream finished");
+					ret.setFinished();
+				}
+			}
+		
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setExceptionIfUndone(exception);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get all kernel files, i.e. specs to start a kernel.
+	 */
+	public static Collection<IFilter<Object>> getKernelFilters(IInternalAccess component, List<URL> urls)
+	{
+		Collection<IFilter<Object>> kernelfilters = (Collection<IFilter<Object>>)Starter.getPlatformValue(component.getId().getRoot(), Starter.DATA_KERNELFILTERS);
+		if(kernelfilters==SReflect.NULL)
+		{
+			kernelfilters = SComponentFactory.scanForKernelFilters(urls);
+			Starter.putPlatformValue(component.getId(), Starter.DATA_KERNELFILTERS, kernelfilters);
+		}
+		else if(kernelfilters==null)
+		{
+			kernelfilters = SComponentFactory.scanForKernelFilters(urls);
+			Starter.putPlatformValue(component.getId(), Starter.DATA_KERNELFILTERS, kernelfilters);
+			
+			// install library listener for enabling rescan on any resource change
+			component.searchService(new ServiceQuery<ILibraryService>(ILibraryService.class)).then(ls -> 
+			{
+				ls.addLibraryServiceListener(new ILibraryServiceListener() 
+				{
+					public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier parid, IResourceIdentifier rid) 
+					{
+						Starter.putPlatformValue(component.getId(), Starter.DATA_KERNELFILTERS, SReflect.NULL);
+						Starter.putPlatformValue(component.getId(), Starter.DATA_COMPONENTMODELS, null);
+						return IFuture.DONE;
+					}					
+					
+					public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier parid, IResourceIdentifier rid, boolean removable) 
+					{
+						Starter.putPlatformValue(component.getId(), Starter.DATA_KERNELFILTERS, SReflect.NULL);
+						Starter.putPlatformValue(component.getId(), Starter.DATA_COMPONENTMODELS, null);
+						return IFuture.DONE;
+					}
+				});
+			}).catchEx(ex -> ex.printStackTrace());
+		}
+		return kernelfilters;
 	}
 }

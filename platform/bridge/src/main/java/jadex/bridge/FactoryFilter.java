@@ -72,8 +72,7 @@ public class FactoryFilter implements IAsyncFilter<IComponentFactory>
 		}
 		else
 		{
-			fac.isLoadable(model, imports, rid)
-				.addResultListener(new DelegationResultListener<Boolean>(ret));
+			fac.isLoadable(model, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret));
 		}
 		
 		return ret;
@@ -128,4 +127,9 @@ public class FactoryFilter implements IAsyncFilter<IComponentFactory>
 		return ret;		
 	}
 
+	@Override
+	public String toString()
+	{
+		return getClass().getSimpleName()+"("+model+")";
+	}
 }

@@ -71,8 +71,8 @@ public class NFPropertyProvider implements INFPropertyProvider
 		
 		if(getParentId()!=null)
 		{
-//			IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-			getInternalAccess().getExternalAccess(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
+//			IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
+			getInternalAccess().getExternalAccessAsync(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
 			{
 				public void customResultAvailable(IExternalAccess component) 
 				{
@@ -175,8 +175,8 @@ public class NFPropertyProvider implements INFPropertyProvider
 		{
 			if(getParentId()!=null)
 			{
-//				IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-				getInternalAccess().getExternalAccess(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyMetaInfo>(ret)
+//				IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
+				getInternalAccess().getExternalAccessAsync(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyMetaInfo>(ret)
 				{
 					public void customResultAvailable(IExternalAccess component) 
 					{
@@ -220,8 +220,8 @@ public class NFPropertyProvider implements INFPropertyProvider
 		{
 			if(getParentId()!=null)
 			{
-//				IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-				getInternalAccess().getExternalAccess(getParentId()).addResultListener(new ComponentResultListener<IExternalAccess>(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+//				IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
+				getInternalAccess().getExternalAccessAsync(getParentId()).addResultListener(new ComponentResultListener<IExternalAccess>(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 				{
 					public void customResultAvailable(IExternalAccess pacomponent) 
 					{
@@ -268,8 +268,8 @@ public class NFPropertyProvider implements INFPropertyProvider
 		{
 			if(getParentId()!=null)
 			{
-//				IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-				getInternalAccess().getExternalAccess(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+//				IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
+				getInternalAccess().getExternalAccessAsync(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 				{
 					public void customResultAvailable(IExternalAccess component) 
 					{
@@ -277,6 +277,52 @@ public class NFPropertyProvider implements INFPropertyProvider
 						res.addResultListener(new DelegationResultListener<T>(ret));
 					}
 				});
+			}
+			else
+			{
+				ret.setException(new RuntimeException("Property not found: "+name));
+			}
+		}	
+		
+		return ret;
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public IFuture<String> getNFPropertyPrettyPrintValue(String name) 
+	{
+		final Future<String> ret = new Future<String>();
+		
+		INFProperty<?, ?> prop = (INFProperty<?, ?>) (nfproperties != null? nfproperties.get(name) : null);
+		
+		if(prop != null)
+		{
+			try
+			{
+				prop.getPrettyPrintValue().addResultListener(new DelegationResultListener<String>(ret));
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else 
+		{
+			if(getParentId()!=null)
+			{
+//				IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
+				getInternalAccess().getExternalAccessAsync(getParentId()).addResultListener(new ComponentResultListener<IExternalAccess>(new ExceptionDelegationResultListener<IExternalAccess, String>(ret)
+				{
+					public void customResultAvailable(IExternalAccess pacomponent) 
+					{
+						IFuture<String> res = pacomponent.getNFPropertyPrettyPrintValue(name);
+						res.addResultListener(new ComponentResultListener<String>(new DelegationResultListener<String>(ret), component));
+					}
+				}, component));
 			}
 			else
 			{
@@ -417,4 +463,6 @@ public class NFPropertyProvider implements INFPropertyProvider
 	{
 		return component;
 	}
+
+	
 }

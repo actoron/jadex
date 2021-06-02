@@ -21,7 +21,7 @@ import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CMSStatusEvent.CMSCreatedEvent;
@@ -31,6 +31,7 @@ import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 
@@ -102,16 +103,12 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 		});
 		
 		cmslistener	= cmshandler.addCMSListener(access.getId().getRoot());
-		cmslistener.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+		cmslistener.addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 		{
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-			}
-
-			@Override
-			public void resultAvailable(Collection<CMSStatusEvent> result)
-			{
+				System.out.println("Exception occurred: "+exception);
 			}
 
 			@Override
@@ -166,11 +163,6 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 					});
 				}
 			}
-
-			@Override
-			public void finished()
-			{
-			}
 		});
 		
 		final Runnable action = new Runnable()
@@ -183,8 +175,8 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 				valmap.put(null, self);
 				((DefaultListModel)pllist.getModel()).add(0, self);
 				
-				access.searchServices( new ServiceQuery<>(IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-					.addResultListener(new SwingIntermediateResultListener<IProxyAgentService>(new IIntermediateResultListener<IProxyAgentService>()
+				access.searchServices( new ServiceQuery<>(IProxyAgentService.class, ServiceScope.PLATFORM))
+					.addResultListener(new SwingIntermediateResultListener<IProxyAgentService>(new IntermediateEmptyResultListener<IProxyAgentService>()
 				{
 					public void intermediateResultAvailable(final IProxyAgentService ser)
 					{
@@ -192,10 +184,10 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 						addPlatform(ser);
 					}
 					
-					public void finished()
-					{
-//						System.out.println("fini");
-					}
+//					public void finished()
+//					{
+////						System.out.println("fini");
+//					}
 					
 					public void resultAvailable(Collection<IProxyAgentService> result)
 					{

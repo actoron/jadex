@@ -26,10 +26,11 @@ import jadex.commons.gui.JPlaceholderTextField;
 import jadex.commons.gui.JWizard;
 import jadex.commons.gui.SGUI;
 import jadex.commons.security.PemKeyPair;
+import jadex.commons.security.SCryptParallel;
+import jadex.commons.security.SSecurity;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 import jadex.platform.service.security.auth.KeySecret;
 import jadex.platform.service.security.auth.PasswordSecret;
-import jadex.platform.service.security.auth.SCryptParallel;
 import jadex.platform.service.security.auth.X509PemStringsSecret;
 
 /**
@@ -43,14 +44,7 @@ public class SecretWizard extends JWizard
 	/** ID */
 	private static final long serialVersionUID = 5314846699201632703L;
 
-	/** SCrypt work factor / hardness for password strengthening. */
-	protected static final int SCRYPT_N = 131072;
 	
-	/** SCrypt block size. */
-	protected static final int SCRYPT_R = 8;
-	
-	/** SCrypt parallelization. */
-	protected static final int SCRYPT_P = 4;
 	
 	/** Entity type which is the secret owner. */
 	protected String entitytype;
@@ -153,6 +147,8 @@ public class SecretWizard extends JWizard
 		node.addChild(finish);
 		choice.addChild(node);
 		
+		choice.addChild(finish);
+		
 		reset();
 		next();
 	}
@@ -253,7 +249,6 @@ public class SecretWizard extends JWizard
 							tsalt = pw.getBytes(SUtil.UTF8);
 						final byte[] salt = tsalt;
 						
-						
 						setAllButtonsEnabled(false);
 						randbutton.setEnabled(false);
 						pwbutton.setEnabled(false);
@@ -261,12 +256,14 @@ public class SecretWizard extends JWizard
 						{
 							public void run()
 							{
-								final byte[] keydata = SCryptParallel.generate(pw.getBytes(SUtil.UTF8), salt, SCRYPT_N, SCRYPT_R, SCRYPT_P, 32);
+								byte[] key = SSecurity.deriveKeyFromPassword(pw, salt);
+								
+								//final byte[] keydat = SCryptParallel.generate(pw.getBytes(SUtil.UTF8), salt, SCRYPT_N, SCRYPT_R, SCRYPT_P, 32);
 								SwingUtilities.invokeLater(new Runnable()
 								{
 									public void run()
 									{
-										keyfield.setNonPlaceholderText(new String(Base64.encodeNoPadding(keydata), SUtil.ASCII));
+										keyfield.setNonPlaceholderText(new String(Base64.encodeNoPadding(key), SUtil.UTF8));
 										setAllButtonsEnabled(true);
 										randbutton.setEnabled(true);
 										pwbutton.setEnabled(true);

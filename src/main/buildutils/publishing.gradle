@@ -1,25 +1,77 @@
-apply plugin: 'maven-publish'
-
+//apply plugin: 'maven-publish'
 apply plugin: 'signing'
+apply plugin: 'de.marcphilipp.nexus-publish'
 
-// needs to be applied after android and java plugins:
-apply plugin: 'com.jfrog.bintray' // publish to bintray
+// -------------------------------------
+// ---------- Repositories -------------
+// -------------------------------------
 
-project.rootProject.plugins.apply('io.codearte.nexus-staging') // auto-close nexus-oss staging
-
-project.rootProject.afterEvaluate {
-    nexusStaging {
-        packageGroup = "org.activecomponents" //optional if packageGroup == project.getGroup()
-        stagingProfileId = "5bcba2b9075ec8" //when not defined will be got from server using "packageGroup"
-        username = getVar('centraluser', project)
-        password = getVar('centralpassword', project)
-    }
+if(project.hasProperty('repos'))
+{
+	for(String repo: repos.split(","))
+	{
+		// Parse credentials from environment
+        def repourl = getVar('repo' + repo, project)
+        def repoaccess = parseURLWithCredentials(repourl)
+    	//println 'publishing to: ' + repoaccess.url
+        //println 'repouser: ' + repoaccess.user
+ 	    //println 'repopassword: ' + repoaccess.password
+		            
+	
+		// Settings for staging when publishing to central repo
+		if("central".equals(repo))
+		{
+			project.rootProject.plugins.apply('io.codearte.nexus-staging') // auto-close nexus-oss staging
+			
+			project.rootProject.afterEvaluate {
+			    nexusStaging {
+			        packageGroup = "org.activecomponents" //optional if packageGroup == project.getGroup()
+			        stagingProfileId = "5bcba2b9075ec8" //when not defined will be got from server using "packageGroup"
+			        username = repoaccess.user
+			        password = repoaccess.password
+			    }	   
+			}
+			
+			nexusPublishing {
+				repositories {
+			    	sonatype() {
+			        	connectTimeout = Duration.ofMinutes(10)
+			        	clientTimeout = Duration.ofMinutes(10)
+			        	username = repoaccess.user
+			        	password = repoaccess.password
+			        }
+			    }
+			}
+	    }
+	    
+		// Settings for non-staging publications like nexus.actoron.com
+		else
+		{
+			publishing
+			{
+		        repositories 
+		        {
+		            maven {
+		                url repoaccess.url
+		                credentials {
+		                    username repoaccess.user
+		                    password repoaccess.password
+		                }
+		            }
+		        }
+		    }
+		}
+	}
 }
 
-class PomConfig {
-    static def common = {
+// -------------------------------------
+// ---------- POM contents -------------
+// -------------------------------------
+
+def common() {
+	return {
         scm {
-            url 'http://jadex.svn.sourceforge.net/viewvc/jadex/'
+            url 'https://github.com/actoron/jadex.git'
         }
 
         url 'https://www.activecomponents.org'
@@ -70,18 +122,10 @@ class PomConfig {
         }
 
     }
+}
 
-    static def gpl = {
-        licenses {
-            license {
-                name 'GPL-3.0'
-                url 'https://gnu.org/licenses/gpl-3.0'
-                distribution 'repo'
-            }
-        }
-    }
-
-    static def commercial = {
+def commercial() {
+	return {
         licenses {
             license {
                 name 'Actoron GmbH Commercial Licence'
@@ -90,175 +134,172 @@ class PomConfig {
     }
 }
 
+def gpl() {
+	return {
+		licenses {
+			license {
+				name 'GPL-3.0'
+				url 'https://gnu.org/licenses/gpl-3.0'
+				distribution 'repo'
+			}
+		}
+	}
+}
+
+
 // -------------------------------------
 // ------------ PUBLISH ----------------
 // -------------------------------------
 
-def canPublishToNexus = isCommercial(project) && repo_commercial || !isCommercial(project) && repo_noncommercial
+def canSign = project.hasProperty('signing.secretKeyRingFile') || getVar("signingKey", project)!=null
 
-// Selects the projects to publish, add a better heuristic here if available
-def includedproject = getProjectDepth(project) > 1
-// Empty project
-includedproject &= !project.path.equals(':android:applications')
+//println getVar("signingKey", project)
 
-if (project.hasProperty('signing.secretKeyRingFile')) {
-    signing {
-        sign configurations.archives
-// uncomment with gradle 4.8
-// signing poms with maven-publish is supported with gradle 4.8, however, 4.8 seems to be incompatible with bintray 1.8 :/
-//            sign publishing.publications.MyPublication
+//// Selects the projects to publish, add a better heuristic here if available
+//def includedproject = getProjectDepth(project) > 1
+
+def configurePom(pom) {
+    pom.withXml {
+        def root = asNode()
+        root.appendNode('description', project.description)
+        root.appendNode('name', project.name)
+        if (!root.get('packaging').isEmpty()) 
+        {
+            root.remove(root.get('packaging'))
+        }
+        root.children().last() + common()
+        root.children().last() + gpl()
     }
+}
 
-
-    // remove once on gradle 4.8:
-    // generate pom so it can be signed with gradle < 4.8
-    // see https://medium.com/@nmauti/sign-and-publish-on-maven-central-a-project-with-the-new-maven-publish-gradle-plugin-22a72a4bfd4b
-    model {
-        tasks.generatePomFileForMyPublicationPublication {
-            destination = file("$buildDir/generated-pom.xml")
-            //enabled = includedproject // pom must be built even if not used :(
-        }
-        tasks.publishMyPublicationPublicationToMavenLocal {
-            dependsOn project.tasks.signArchives
-            enabled = includedproject
-        }
-        if (canPublishToNexus) {
-            tasks.publishMyPublicationPublicationToMavenRepository {
-                dependsOn project.tasks.signArchives
-                enabled = includedproject
-            }
-        }
-        tasks.bintrayUpload {
-            dependsOn project.tasks.signArchives
-            enabled = includedproject
-        }
+/**
+ * Sign the (single) output of another task.
+ */
+def createSignTask(origtask, classi, exten) {
+    def signtask = project.tasks.create('sign' + origtask.name.capitalize(), Sign) {
+    	outputs.cacheIf { true }
+   		dependsOn origtask
     }
-
-    // remove once on gradle 4.8:
-    project.tasks.signArchives.signatureFiles.each {
-        if (it instanceof Artifact) {
-            artifact(it) {
-                def matcher = it.file =~ /-(sources|javadoc)\.jar\.asc$/
-                if (matcher.find()) {
-                    classifier = matcher.group(1)
-                } else {
-                    classifier = null
-                }
-                extension = 'jar.asc'
-            }
-        }
-    }
+    signtask.sign(classi, origtask.outputs.files.singleFile)
+    
+    // Change name of signature file to not include version number -> allows caching across version as long as jar contents haven't changed
+    if(origtask instanceof AbstractArchiveTask) {
+	    signtask.signatures.each { sig ->
+	    	sig.name	= origtask.archiveBaseName.get() + (classi!=null ? '-' + classi : '') + '.' + exten + sig.name.substring(sig.name.lastIndexOf('.'))
+	    }
+	}
+	
+	signtask.signatureFiles.each { sigfile ->
+		publishing.publications.mavenJava.artifact(sigfile)
+		{
+			builtBy signtask
+			classifier classi
+			extension exten + sigfile.name.substring(sigfile.name.lastIndexOf('.'))
+		}
+	}
+	// Signatory getting created for each task takes a long time -> reuse one signatory for all tasks
+	project.afterEvaluate {
+		def signat	= rootProject.ext.signatory
+		if(signat==null) {
+			signat	= signtask.signatory
+			rootProject.ext.signatory	= signat
+		} else {
+			signtask.setSignatory(signat)
+		}
+	}
 }
 
 publishing {
-    if (project.hasProperty('repouser')) {
-        if (canPublishToNexus) {
-            repositories {
-                def repo
-
-                if (isCommercial(project) && repo_commercial) {
-                    repo = repo_commercial
-                } else if (!isCommercial(project) && repo_noncommercial) {
-                    repo = repo_noncommercial
-                }
-                maven {
-                    url repo
-                    credentials {
-                        username repouser
-                        password repopassword
-                    }
-                }
-            }
-        }
-    }
 
     publications {
-        MyPublication(MavenPublication) {
-            if (isWebApplicationProject(project)) {
-                from components.web
-            } else if (!isAndroidProject(project)) {
-                from components.java
-            }
-
-            // somehow artifacts are lost when publishing with maven-publish, re-add all jars:
-            project.tasks.withType(Jar) {
-                def matcher = (it.name =~ /.*(javadoc|sources).*/)
-                if (matcher.matches()) {
-//                println "adding artifact: $it , classifier: ${matcher[0][1]}"
-                    artifact(it) {
-                        classifier matcher[0][1]
-                    }
-                }
-            }
-
-            //groupId group
-            groupId isCommercial(project) ? 'com.actoron.jadex' : 'org.activecomponents.jadex'
-            //artifactId project.name
-            artifactId getArtifactName(project)
-			//println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
-            version project.version
-            pom.withXml {
-                def root = asNode()
-                root.appendNode('description', project.description)
-                root.appendNode('name', project.name)
-                if (isAndroidProject(project)) {
-                    root.get('packaging').get(0).setValue('aar')
-                    def dependenciesNode = asNode().appendNode('dependencies')
-                    project.configurations.implementation.allDependencies.each {
-                        // Ensure dependencies such as fileTree are not included.
-                        if (it.name != 'unspecified') {
-                            def dependencyNode = dependenciesNode.appendNode('dependency')
-                            dependencyNode.appendNode('groupId', it.group)
-                            dependencyNode.appendNode('artifactId', it.name)
-                            dependencyNode.appendNode('version', it.version)
+    	// publish plugin requires each subproject having mavenJava
+    
+    	mavenJava(MavenPublication)
+    	{
+	        if(canSign)
+    		{ 
+    			// Sign archives and pom in separate tasks as archive signing can be cached while pom signing cannot, when jadex version changes.
+    			createSignTask(generatePomFileForMavenJavaPublication, null, 'pom')
+    		}
+    		
+    		// Disable generation of module.json
+    		tasks.matching { it.name == "generateMetadataFileFor${name.capitalize()}Publication" }.all {
+    			onlyIf { false }
+    		}
+    		
+        	if(gradle.ext.webprojects.contains(project.getPath()))
+            {
+    			from components.web
+		        if(canSign)
+		        { 
+        			createSignTask(war, null, 'war')
+    			
+                  	// default artifact is xyz.war so add xyz.jar xyz-sources.jar and xyz-javadoc.jar for maven central to be happy
+        			project.tasks.withType(Jar) 
+                    {
+                        if(it.name.equals('jar') || it.name.equals('sourcesJar') || it.name.equals('javadocJar')) 
+                        {
+                            def arti 	= artifact(it)
+                            createSignTask(it, arti.classifier, arti.extension)
                         }
                     }
                 }
-                root.children().last() + PomConfig.common
-                root.children().last() + PomConfig.gpl
-
-                // remove once on gradle 4.8:
-                // signing workaround for gradle 4.7:
-                def pomFile = file("${project.buildDir}/generated-pom.xml")
-                writeTo(pomFile)
-                def pomAscFile = signing.sign(pomFile).signatureFiles[0]
-                artifact(pomAscFile) {
-                    classifier = null
-                    extension = 'pom.asc'
+    		}
+    		else
+    		{
+    			from components.java
+		        if(canSign)
+		        { 
+        			createSignTask(jar, null, 'jar')
+        			
+                   	// add xyz-sources.jar and xyz-javadoc.jar for maven central to be happy
+        			project.tasks.withType(Jar) 
+                    {
+                        if(it.name.equals('sourcesJar') || it.name.equals('javadocJar')) 
+                        {
+                            def arti 	= artifact(it)
+                            createSignTask(it, arti.classifier, arti.extension)
+                        }
+                    }
                 }
-            }
-        }
+    		}
+    		
+    		//groupId group
+			groupId isCommercial(project) ? 'com.actoron.jadex' : 'org.activecomponents.jadex'
+			//artifactId project.name
+			artifactId getArtifactName(project)
+			//println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
+			version project.version
+			configurePom(pom)
+    	}
+	}
+//}
+
+//publishing {
+    //publications {
+    //    mavenJava(MavenPublication) {
+    //        from components.java
+    //    }
+    //}
+    repositories {
+        mavenLocal()
     }
 }
 
-if (!isCommercial(project)) {
-    bintray {
-        user = getVar('BINTRAY_USER', project)
-        key = getVar('BINTRAY_KEY', project)
-        configurations = ['archives']
-        publish = false
-        publications = ['MyPublication']
-        pkg {
-            repo = 'jadex'
-            name = 'jadex'
-            licenses = ['GPL-3.0']
-            vcsUrl = 'http://jadex.svn.sourceforge.net/viewvc/jadex/'
-            websiteUrl = 'https://www.activecomponents.org'
-            desc = 'Jadex Active Components Platform'
-            version {
-                name = jadex_build_version
-                released = new Date()
-                vcsTag = jadex_build_version
-                if (getVar('centraluser', project) != null) {
-                    mavenCentralSync {
-                        sync = false //[Default: true] Determines whether to sync the version to Maven Central.
-                        user = getVar('centraluser', project) //OSS user token: mandatory
-                        password = getVar('centralpassword', project) //OSS user password: mandatory
-                        close = '0'
-                        //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
-                    }
-                }
-            }
-        }
-    }
+if(canSign) {
+	signing {
+		// for signing with keys by environment variables https://docs.gradle.org/current/userguide/signing_plugin.html
+		//def signingKey1 = findProperty("signingKey")
+		//def signingPassword1 = findProperty("signingPassword")
+		//println("sign key1: "+signingKey1)
+		
+		
+		def signingKey = getVar("signingKey", project)
+		def signingPassword = getVar("signingPassword", project)
+		//println("sign key2: "+signingKey)
+		useInMemoryPgpKeys(signingKey, signingPassword)
+
+		// Sign archives and pom in separate tasks as archive signing can be cached while pom signing cannot, when jadex version changes.
+		//sign publishing.publications.mavenJava
+	}
 }

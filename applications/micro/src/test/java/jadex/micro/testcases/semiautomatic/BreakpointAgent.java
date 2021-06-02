@@ -3,6 +3,7 @@ package jadex.micro.testcases.semiautomatic;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.Breakpoint;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -26,7 +27,8 @@ public class BreakpointAgent
 	/**
 	 *  Execute a series of steps.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 //		step	= "hop";	// first step

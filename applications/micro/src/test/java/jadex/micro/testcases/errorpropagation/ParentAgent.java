@@ -5,11 +5,11 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentChildKilled;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -37,7 +37,8 @@ public class ParentAgent extends JunitAgentTest
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	protected void body()
 	{
 //		System.out.println("Created parent: "+agent.getId());
@@ -66,7 +67,8 @@ public class ParentAgent extends JunitAgentTest
 		//agent.createComponent(new CreationInfo().setFilename(desc.getFilename()).setParent(agent.getId()), null);
 	}
 	
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	protected void killed()
 	{
 		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(trs.length, trs));

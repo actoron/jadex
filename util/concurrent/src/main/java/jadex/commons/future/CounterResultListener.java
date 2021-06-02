@@ -1,6 +1,5 @@
 package jadex.commons.future;
 
-
 /**
  *  Counter result listener for counting a specified number of resultAvailable calls.
  */
@@ -26,8 +25,8 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	/** The undone flag. */
 	protected boolean undone;
 
-	/** Listener that is called on intermediate results. */
-	protected IFunctionalResultListener<E>	intermediateResultListener;
+//	/** Listener that is called on intermediate results. */
+//	protected Consumer<E>	intermediateResultListener;
 	
 	//-------- constructors --------
 	
@@ -37,11 +36,11 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	 * @param num The number of sub callbacks.
 	 * @param countReachedListener Functional listener called when the count is
 	 *        reached.
-	 */
+	 * /
 	public CounterResultListener(int num, IFunctionalResultListener<Void> countReachedListener)
 	{
 		this(num, countReachedListener, null);
-	}
+	}*/
 
 	/**
 	 * Create a new counter listener.
@@ -51,11 +50,11 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	 *        reached.
 	 * @param exListener The listener that is called on exceptions. Passing
 	 *        <code>null</code> enables default exception logging.
-	 */
+	 * /
 	public CounterResultListener(int num, IFunctionalResultListener<Void> countReachedListener, IFunctionalExceptionListener exListener)
 	{
 		this(num, countReachedListener, null, exListener);
-	}
+	}*/
 	
 	/**
 	 * Create a new counter listener.
@@ -67,11 +66,11 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	 *        intermediate results.
 	 * @param exListener The listener that is called on exceptions. Passing
 	 *        <code>null</code> enables default exception logging.
-	 */
+	 * /
 	public CounterResultListener(int num, IFunctionalResultListener<Void> countReachedListener, IFunctionalResultListener<E> intermediateResultListener, IFunctionalExceptionListener exListener)
 	{
 		this(num, false, countReachedListener, intermediateResultListener, exListener);
-	}
+	}*/
 
 	/**
 	 * Create a new counter listener.
@@ -90,11 +89,11 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	 * @param ignorefailures Flag whether to ignore failures.
 	 * @param countReachedListener Functional listener called when the count is
 	 *        reached.
-	 */
+	 * /
 	public CounterResultListener(int num, boolean ignorefailures, IFunctionalResultListener<Void> countReachedListener)
 	{
 		this(num, ignorefailures, SResultListener.createResultListener(countReachedListener));
-	}
+	}*/
 
 	/**
 	 * Create a new counter listener.
@@ -105,11 +104,11 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	 *        reached.
 	 * @param exListener The listener that is called on exceptions. Passing
 	 *        <code>null</code> enables default exception logging.
-	 */
+	 * /
 	public CounterResultListener(int num, boolean ignorefailures, IFunctionalResultListener<Void> countReachedListener, IFunctionalExceptionListener exListener)
 	{
 		this(num, ignorefailures, SResultListener.createResultListener(countReachedListener, exListener));
-	}
+	}*/
 	
 	/**
 	 * Create a new counter listener.
@@ -122,12 +121,12 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	 *        intermediate results, can be <code>null</code>.
 	 * @param exListener The listener that is called on exceptions. Passing
 	 *        <code>null</code> enables default exception logging.
-	 */
+	 * /
 	public CounterResultListener(int num, boolean ignorefailures, IFunctionalResultListener<Void> countReachedListener, IFunctionalResultListener<E> intermediateResultListener, IFunctionalExceptionListener exListener)
 	{
 		this(num, ignorefailures, SResultListener.createResultListener(countReachedListener, exListener));
 		this.intermediateResultListener = intermediateResultListener;
-	}
+	}*/
 	
 	/**
 	 *  Create a new counter listener.
@@ -261,10 +260,10 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	 */
 	public void intermediateResultAvailable(E result)
 	{
-		if(intermediateResultListener != null)
-		{
-			intermediateResultListener.resultAvailable(result);
-		}
+//		if(intermediateResultListener != null)
+//		{
+//			intermediateResultListener.accept(result);
+//		}
 	}
 	
 	/**

@@ -54,7 +54,7 @@ public class StaxXMLReporterWrapper implements jadex.xml.stax.XMLReporter
 	 */
 	public static jadex.xml.stax.XMLReporter fromXMLReporter(javax.xml.stream.XMLReporter reporter)
 	{
-		return new StaxXMLReporterWrapper(reporter);
+		return reporter==null ? null : new StaxXMLReporterWrapper(reporter);
 	}
 
 }

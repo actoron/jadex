@@ -9,6 +9,8 @@ import jadex.application.EnvironmentService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.IFilter;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -39,7 +41,8 @@ public class FireflyAgent
 	/**
 	 *  Init method.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void agentCreated()
 	{
 //		System.out.println("firefly created: "+agent.getId());
@@ -48,7 +51,8 @@ public class FireflyAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 //		System.out.println("firefly body: "+agent.getId());

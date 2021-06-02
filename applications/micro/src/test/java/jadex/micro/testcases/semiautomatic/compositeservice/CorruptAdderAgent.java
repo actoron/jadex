@@ -3,6 +3,7 @@ package jadex.micro.testcases.semiautomatic.compositeservice;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.component.interceptors.AbstractApplicableInterceptor;
@@ -36,7 +37,8 @@ public class CorruptAdderAgent
 	/**
 	 * 
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> agentCreated()
 	{
 		IService addser = (IService)agent.getFeature(IProvidedServicesFeature.class).getProvidedServices(IAddService.class)[0];

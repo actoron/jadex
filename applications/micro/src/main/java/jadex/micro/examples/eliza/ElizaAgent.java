@@ -14,6 +14,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
@@ -23,12 +24,12 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -50,8 +51,9 @@ public class ElizaAgent
 	protected IInternalAccess	agent;
 	
 	/** The gui service for controlling the inner chat component. */
-	@AgentServiceSearch
-	protected IChatGuiService	chat;
+	//@AgentServiceSearch
+	@OnService
+	protected IChatGuiService chat;
 	
 	/** Each contact gets its own eliza conversation. */
 	protected Map<IComponentIdentifier, Tuple2<ElizaParse, Long>>	conversations;
@@ -61,7 +63,8 @@ public class ElizaAgent
 	/**
 	 *  Register to inner chat at startup.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void	start()
 	{
 		this.conversations	= new HashMap<IComponentIdentifier, Tuple2<ElizaParse,Long>>();

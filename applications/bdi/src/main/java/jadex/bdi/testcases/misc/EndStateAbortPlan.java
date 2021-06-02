@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
@@ -25,17 +26,17 @@ public class EndStateAbortPlan extends Plan
 		// Create worker agent.
 		IComponentIdentifier	worker	= getAgent()
 			.createComponent(
-			new CreationInfo(getComponentIdentifier()).setFilename("/jadex/bdi/testcases/misc/EndStateAbortWorker.agent.xml")).getFirstResult();
+			new CreationInfo().setFilename("/jadex/bdi/testcases/misc/EndStateAbortWorker.agent.xml")).get().getId();
 		
 		// Wait to allow worker to start plan
-		waitFor(100);
+		waitFor(Starter.getScaledDefaultTimeout(getComponentIdentifier(), 0.02));
 
 		// Kill worker and wait for result.
 		TestReport	report	= new TestReport("termination", "Test if the worker agent terminates with timeout.");
 		try
 		{
 //			System.out.println("destroying worker: "+worker);
-			agent.killComponent(worker).get();
+			agent.getExternalAccess(worker).killComponent().get();
 //			System.out.println("destroyed worker: "+worker);
 			report.setFailed("Worker agent terminated without timeout.");
 		}
@@ -50,7 +51,7 @@ public class EndStateAbortPlan extends Plan
 //		try
 //		{
 //			System.out.println("waiting for worker exit: "+worker);
-			waitFor(100);
+			waitFor(Starter.getScaledDefaultTimeout(getComponentIdentifier(), 0.02));
 //			System.out.println("waited for worker exit: "+worker);
 //		}
 //		catch(RuntimeException e)

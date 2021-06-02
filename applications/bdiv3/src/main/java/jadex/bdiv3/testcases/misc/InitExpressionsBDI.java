@@ -6,6 +6,7 @@ import jadex.base.test.Testcase;
 import jadex.bdiv3.BDIAgentFactory;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -50,7 +51,8 @@ public class InitExpressionsBDI
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody//(keepalive=false)
+	//@AgentBody//(keepalive=false)
+	@OnStart
 	public void	body()
 	{
 		TestReport	tr1	= new TestReport("#1", "Test if field expression works.");

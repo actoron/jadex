@@ -1,7 +1,5 @@
 package jadex.bridge.service.types.simulation;
 
-import java.lang.reflect.Field;
-
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
@@ -26,43 +24,27 @@ public class SSimulation
 	 *  Simulation blocking means the clock will not advance until the future is done.
 	 *  This allows synchronizing external threads (e.g. swing) with the simulation execution.
 	 */
-	public static void	addBlocker(IFuture<?> adblock)
+	public static boolean	addBlocker(IFuture<?> adblock)
 	{
+		boolean	blocked	= false;
+		
 		IInternalAccess	ia	= ExecutionComponentFeature.LOCAL.get();
 		if(isSimulating(ia))
 		{
 			try
 			{
 				debugBlocker();
-				ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
+				ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISimulationService.class))
 					.addAdvanceBlocker(adblock).get();
 			}
 			catch(ThreadDeath td)
 			{
 				// happens after successful get() wakeup in notifications caused by component died (endagenda.setResult()), grrr -> ignore so blocker gets removed.
 			}
+			blocked	= true;
 		}
-		else if(isBisimulating(ia))
-		{
-			try
-			{
-				Field	f	= Class.forName("jadex.platform.service.simulation.SimulationAgent").getDeclaredField("bisimservice");
-				f.setAccessible(true);
-				ISimulationService	simserv	= (ISimulationService)f.get(null);
-				try
-				{
-					simserv.addAdvanceBlocker(adblock).get();
-				}
-				catch(ThreadDeath td)
-				{
-					// happens after successful get() wakeup in notifications caused by component died (endagenda.setResult()), grrr -> ignore so blocker gets removed.
-				}
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
+		
+		return blocked;
 	}
 
 	/**
@@ -81,7 +63,7 @@ public class SSimulation
 			try
 			{
 				debugBlocker();
-				ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
+				ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISimulationService.class))
 					.addAdvanceBlocker(adblock).get();
 			}
 			catch(ThreadDeath td)
@@ -89,40 +71,10 @@ public class SSimulation
 				// happens after successful get() wakeup in notifications caused by component died (endagenda.setResult()), grrr -> ignore so blocker gets removed.
 			}
 		}
-		else if(isBisimulating(ia))
-		{
-			try
-			{
-				Field	f	= Class.forName("jadex.platform.service.simulation.SimulationAgent").getDeclaredField("bisimservice");
-				f.setAccessible(true);
-				ISimulationService	simserv	= (ISimulationService)f.get(null);  
-				adblock	= new Future<>();
-				try
-				{
-					simserv.addAdvanceBlocker(adblock).get();
-				}
-				catch(ThreadDeath td)
-				{
-					// happens after successful get() wakeup in notifications caused by component died (endagenda.setResult()), grrr -> ignore so blocker gets removed.
-				}
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
 		
 		return adblock;
 	}
 
-	/**
-	 *  Check if running in bisimulation.
-	 */
-	public static boolean	isBisimulating(IInternalAccess ia)
-	{
-		return ia!=null && Boolean.TRUE.equals(Starter.getPlatformValue(ia.getId().getRoot(), IClockService.BISIMULATION_CLOCK_FLAG));
-	}
-	
 	/**
 	 *  Check if running in (single platform) simulation.
 	 */

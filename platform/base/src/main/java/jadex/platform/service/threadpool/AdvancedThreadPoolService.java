@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.annotation.ServiceShutdown;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.ChangeEvent;
@@ -115,7 +115,8 @@ public class AdvancedThreadPoolService extends BasicService implements IThreadPo
 	 *  
 	 *  @return Null, when done.
 	 */
-	@ServiceShutdown
+	//@ServiceShutdown
+	@OnEnd
 	public IFuture<Void> shutdown()
 	{
 		dispose();

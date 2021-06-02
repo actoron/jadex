@@ -112,7 +112,7 @@
 	<properties>
 		<property name="clock" class="IFuture">
 			SServiceProvider.getService($component,
-			IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			IClockService.class, ServiceScope.PLATFORM)
 		</property>
 	</properties>
 

@@ -27,7 +27,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -35,11 +35,10 @@ import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.CMSStatusEvent;
-import jadex.bridge.service.types.cms.CMSStatusEvent.CMSCreatedEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -282,33 +281,24 @@ public class HelplinePanel extends JPanel
 				final Future<IHelpline>	ret	= new Future<IHelpline>();
 				try
 				{
-					IHelpline	helpline	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class).setProvider(new BasicComponentIdentifier(person, ia.getId())));
+					IHelpline	helpline	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IHelpline.class).setProvider(new ComponentIdentifier(person, ia.getId())));
 					ret.setResult(helpline);
 				}
 				catch(ServiceNotFoundException snfe)
 				{
-					CreationInfo ci	= new CreationInfo(Collections.singletonMap("person", (Object)person), ia.getId()).setFilename(HelplineAgent.class.getName()+".class").setName(person);
-					ia.createComponentWithResults(ci)
-						.addResultListener(new IntermediateDefaultResultListener<CMSStatusEvent>()
+					CreationInfo ci	= new CreationInfo(Collections.singletonMap("person", (Object)person)).setFilename(HelplineAgent.class.getName()+".class").setName(person);
+					ia.createComponent(ci)
+						.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IHelpline>(ret)
 					{
 						@Override
-						public void intermediateResultAvailable(CMSStatusEvent event)
+						public void customResultAvailable(IExternalAccess access)
 						{
-							if(event instanceof CMSCreatedEvent)
+							IHelpline	helpline	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IHelpline.class).setProvider(access.getId()));
+							if(helpline==null)
 							{
-								IHelpline	helpline	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class).setProvider(event.getComponentIdentifier()));
-								if(helpline==null)
-								{
-									exceptionOccurred(new RuntimeException("No service after creation for "+person));
-								}
-								ret.setResult(helpline);
+								exceptionOccurred(new RuntimeException("No service after creation for "+person));
 							}
-						}
-						
-						@Override
-						public void exceptionOccurred(Exception exception)
-						{
-							ret.setException(exception);
+							ret.setResult(helpline);
 						}
 					});
 				}

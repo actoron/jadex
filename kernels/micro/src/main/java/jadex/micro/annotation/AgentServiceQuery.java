@@ -5,12 +5,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import jadex.bridge.service.ServiceScope;
+
 /**
  *  Injects a service into a field or a method of a component.
  *  The referenced service must be declared with a {@link RequiredService} annotation.
+ *  
+ *  Use @OnService instead
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
+@Deprecated
 public @interface AgentServiceQuery
 {
 //	/**
@@ -54,13 +59,13 @@ public @interface AgentServiceQuery
 	 */
 	public Class<?> type() default Object.class;
 	
-	/** 
-	 *  Flag if multiple services should be returned. 
-	 */
-	public boolean multiple() default true; 
+//	/** 
+//	 *  Flag if multiple services should be returned. 
+//	 */
+//	public boolean multiple() default true; 
 	
 	/**
 	 *  The search scope.
 	 */
-	public String scope() default "";
+	public ServiceScope scope() default ServiceScope.DEFAULT;
 }

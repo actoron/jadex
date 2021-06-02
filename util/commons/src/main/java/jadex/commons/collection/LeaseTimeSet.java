@@ -71,7 +71,7 @@ public class LeaseTimeSet<E> implements ILeaseTimeSet<E>
 	protected Map<E, Tuple2<Long, Long>> times = new HashMap<E, Tuple2<Long, Long>>();
 	
 	/** The timer. */
-	protected IDelayRunner	timer;
+	protected IDelayRunner timer;
 	
 	/** The leasetime. */
 	protected long leasetime;
@@ -142,6 +142,14 @@ public class LeaseTimeSet<E> implements ILeaseTimeSet<E>
 	public static <E> ILeaseTimeSet<E> createLeaseTimeCollection(long leasetime, ICommand<Tuple2<E, Long>> removecmd)
 	{
 		return new SynchronizedLeaseTimeCollection<E>(new LeaseTimeSet<>(leasetime, removecmd));
+	}
+	
+	/**
+	 *  Create a lease time collection.
+	 */
+	public static <E> ILeaseTimeSet<E> createLeaseTimeCollection(long leasetime, boolean passive, ICommand<Tuple2<E, Long>> removecmd)
+	{
+		return  passive? new PassiveLeaseTimeSet<>(leasetime, removecmd): new SynchronizedLeaseTimeCollection<E>(new LeaseTimeSet<>(leasetime, removecmd));
 	}
 	
 	/**
@@ -521,10 +529,13 @@ public class LeaseTimeSet<E> implements ILeaseTimeSet<E>
 									if(delta<=0)
 									{
 //										System.out.println("removed: "+etime+" "+first+" "+System.currentTimeMillis());
-										remove(first);
-		//								entryDeleted(first);
-										if(removecmd!=null)
+										int sb = entries.size();
+										boolean rem = remove(first);
+										int sa = entries.size();
+										System.out.println("sa/sb: "+sa+" "+sb);
+										if(rem && removecmd!=null)
 											removecmd.execute(new Tuple2<E, Long>(first, lease));
+		//								entryDeleted(first);
 									}
 									else
 									{

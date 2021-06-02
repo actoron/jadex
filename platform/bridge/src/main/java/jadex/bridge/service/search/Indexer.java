@@ -14,7 +14,7 @@ import java.util.Set;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceKeyExtractor.SetWrapper;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SUtil;
@@ -53,14 +53,27 @@ public class Indexer<T>
 	}
 	
 	/**
+	 *  Test if a property is indexed per name.
+	 *  @param indexname The index name.
+	 *  @return True, if is indexed.
+	 */
+	public boolean isIndexed(String indexname)
+	{
+		return indexedvalues.containsKey(indexname);
+	}
+	
+	/**
 	 *  Get values per specification. 'And' relates to inter-term, i.e. example
 	 *  type=ICMS, tags=a,b means an object must have both fulfilled. For multi-valued
 	 *  intra-term values it can be 'and' or 'or' as well.
 	 *  @param spec The key values (first element is key name and array are values)
 	 *  @return The values matching the spec.
 	 */
-	public Set<T> getValues(List<Tuple3<String, String[], Boolean>> spec)
+	public Tuple2<Set<T>, Object> getValues(List<Tuple3<String, String[], Boolean>> spec)
 	{
+		//System.out.println("spec: "+spec);
+		List<Set<T>> valuesets = null;
+		
 		Set<T> ret = null;
 		if(spec == null || spec.size() == 0)
 		{
@@ -68,7 +81,6 @@ public class Indexer<T>
 		}
 		else
 		{
-			List<Set<T>> valuesets = null;
 			int speccount = 0;
 			for(Iterator<Tuple3<String, String[], Boolean>> it = spec.iterator(); it.hasNext();)
 			{
@@ -88,19 +100,32 @@ public class Indexer<T>
 					if(tup.getThirdEntity()==null || tup.getThirdEntity())
 					{
 						// AND treatment. All sets are added to the set
+						
+						// Elements that have been added with ALWAYS value
+						Set<T> always = index.get(IKeyExtractor.MATCH_ALWAYS);
+						
 						for(String key: tup.getSecondEntity())
 						{
 							Set<T> iset = index.get(key);
 							
 							if(iset == null || iset.isEmpty())
-								return null;
+								iset = always;
+							else if(always!=null)
+								iset.addAll(always);
+							
+							if(iset == null || iset.isEmpty())
+								return new Tuple2(ret, valuesets);
 							
 							valuesets.add(iset);
-						}
+						}						
 					}
 					else // or
 					{
+						Set<T> always = index.get(IKeyExtractor.MATCH_ALWAYS);
+						
 						Set<T> tmp = new HashSet<T>();
+						if(always!=null)
+							tmp.addAll(always);
 						
 						for(String key: tup.getSecondEntity())
 						{
@@ -109,8 +134,9 @@ public class Indexer<T>
 							if(iset != null)
 								tmp.addAll(iset);
 						}
-						if(!tmp.isEmpty())
-							valuesets.add(tmp);
+						
+						//if(!tmp.isEmpty()) // must always be added because otherwise no results are removed!
+						valuesets.add(tmp);
 					}
 				}
 			}
@@ -128,6 +154,7 @@ public class Indexer<T>
 						}
 					});
 				}
+				//System.out.println("indexer.getValues(): "+valuesets);
 				
 				int i = 0;
 				for(i = 0; i < valuesets.size() && (ret == null || ret.size() < INTERSECT_CUTOFF); ++i)
@@ -150,7 +177,7 @@ public class Indexer<T>
 				
 				// If all were used directly return intersection result
 				if(ret != null && i == speccount)
-					return ret;
+					return new Tuple2(ret, valuesets);
 			}
 			
 			if(ret == null)
@@ -165,7 +192,7 @@ public class Indexer<T>
 			}
 		}
 		
-		return ret;
+		return new Tuple2(ret, valuesets);
 	}
 	
 	/**
@@ -307,7 +334,6 @@ public class Indexer<T>
 		// Add value to set of all values
 		values.add(value);
 		
-		// Add value to 
 		if(indexedvalues != null)
 		{
 			for(Map.Entry<String, Map<String, Set<T>>> entry: indexedvalues.entrySet())
@@ -444,7 +470,7 @@ public class Indexer<T>
 				Set<String> svals = totest.get(keyname);
 				
 				// All tags of query must be contained in service
-				if(mode==null || mode)
+				if(mode==null || mode) // TRUE=AND
 				{
 					for(String val: vs)
 					{
@@ -457,7 +483,7 @@ public class Indexer<T>
 					boolean found = false;
 					for(String val: vs)
 					{
-						if(svals.contains(val))
+						if(svals!=null && svals.contains(val))
 						{
 							found = true;
 							break;
@@ -565,7 +591,7 @@ public class Indexer<T>
 				}
 				else if(QueryInfoExtractor.KEY_TYPE_PROVIDER.equals(keytype))
 				{
-					if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(query.getScope()))
+					if(ServiceScope.COMPONENT_ONLY.equals(query.getScope()))
 						ret = new SetWrapper<String>(query.getSearchStart() != null ? query.getSearchStart().toString() : query.getOwner().toString());
 				}
 				else if(QueryInfoExtractor.KEY_TYPE_PLATFORM.equals(keytype))

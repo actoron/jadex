@@ -6,6 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.ServiceScope;
 
 /**
  *  The name (for referencing/overriding).
@@ -27,7 +28,7 @@ public @interface Publish
 	/**
 	 *  The scope user to find the publish service.
 	 */
-	public String publishscope() default RequiredService.SCOPE_PLATFORM;
+	public ServiceScope publishscope() default ServiceScope.PLATFORM;
 	
 	/**
 	 *  Flag if the service should be published to multiple locations.

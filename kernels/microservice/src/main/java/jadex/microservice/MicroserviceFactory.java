@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -122,7 +122,7 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	// This constructor is used by the Starter class and the ADFChecker plugin. 
 	public MicroserviceFactory(String providerid)
 	{
-		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
+		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new MicroserviceModelLoader();
 	}
 	
@@ -272,9 +272,8 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 				{
 					public void customResultAvailable(ClassLoader cl)
 					{
-						try
+						try(ResourceInfo ri = loader.getResourceInfo0(model, imports, cl))
 						{
-							ResourceInfo ri = loader.getResourceInfo0(model, imports, cl);
 							if(ri==null)
 							{
 								ret.setResult(Boolean.FALSE);
@@ -566,6 +565,6 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	 */
 	protected ILibraryService getLibraryService()
 	{
-		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 	}
 }

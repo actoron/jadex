@@ -13,11 +13,11 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceShutdown;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -26,8 +26,8 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.SGUI;
 
 /**
@@ -54,14 +54,15 @@ public class GenerateService implements IGenerateService
 	protected GeneratePanel panel;
 	
 	/** The service pool manager for calculation services. */
-	protected ServicePoolManager	manager;
+	protected ServicePoolManager manager;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service.
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public void start()
 	{
 //		System.out.println("start: "+agent.getAgentName());
@@ -151,15 +152,14 @@ public class GenerateService implements IGenerateService
 				if(delay==null)
 					delay = Long.valueOf(5000);
 				
-				agent.createComponent(
-					new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{delay}), 
-					agent.getId().getParent()).setFilename("jadex/micro/examples/mandelbrot/CalculateAgent.class"), null)
+				agent.getExternalAccess(agent.getId().getParent()).createComponent(
+					new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{delay})).setFilename("jadex/micro/examples/mandelbrot/CalculateAgent.class"))
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IExternalAccess>(ret)
 				{
 					// Component created, now get the calculation service.
 					public void customResultAvailable(IExternalAccess result)
 					{
-						result.searchService(new ServiceQuery<>(ICalculateService.class, RequiredServiceInfo.SCOPE_COMPONENT_ONLY)).addResultListener(
+						result.searchService(new ServiceQuery<>(ICalculateService.class, ServiceScope.COMPONENT_ONLY)).addResultListener(
 							agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<ICalculateService>(ret)
 						{
 							public void customResultAvailable(ICalculateService result)
@@ -177,7 +177,8 @@ public class GenerateService implements IGenerateService
 	/**
 	 *  Stop the service.
 	 */
-	@ServiceShutdown
+	//@ServiceShutdown
+	@OnEnd
 	public IFuture<Void>	shutdown()
 	{
 //		System.out.println("shutdown: "+agent.getAgentName());
@@ -273,7 +274,7 @@ public class GenerateService implements IGenerateService
 		final int number	= areas.size();
 		manager.setMax(data.getParallel());
 		manager.performTasks(areas, true, data).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
-			new IIntermediateResultListener<Object>()
+			new IntermediateEmptyResultListener<Object>()
 		{
 			int	cnt	= 0;
 			

@@ -9,8 +9,11 @@ dependencies
 	api project(':kernels:component')
 	api project(':kernels:application')
 	api project(':platform:webservice')
-//	api project(':platform:webservice-desktop')
-	api project(':platform:webservice-desktop-grizzly') // todo: do not depend on specific server
+	api project(':platform:webservice-grizzly') // todo: do not depend on specific server
+//	api project(':platform:webservice-nano') 
 	
 	api 'org.codehaus.jackson:jackson-mapper-asl:1.9.3'
+	api 'javax.xml.bind:jaxb-api:2.3.1'
+	api 'javax.xml.ws:jaxws-api:2.3.1'
+	api 'jakarta.jws:jakarta.jws-api:1.1.1'
 }

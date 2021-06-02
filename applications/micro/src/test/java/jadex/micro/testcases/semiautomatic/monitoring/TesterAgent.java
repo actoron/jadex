@@ -8,6 +8,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -44,7 +45,8 @@ public class TesterAgent implements ITestService
 	/**
 	 * 
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		if(agent.getConfiguration().equals("created"))
@@ -54,7 +56,7 @@ public class TesterAgent implements ITestService
 		}
 		else
 		{	
-//			IMonitoringService mons = agent.getServiceProvider().searchService( new ServiceQuery<>( IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+//			IMonitoringService mons = agent.getServiceProvider().searchService( new ServiceQuery<>( IMonitoringService.class, ServiceScope.PLATFORM)).get();
 //			mons.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(new IFilter<IMonitoringEvent>()
 //			{
 //				public boolean filter(IMonitoringEvent obj)
@@ -78,12 +80,12 @@ public class TesterAgent implements ITestService
 						ThreadSuspendable sus = new ThreadSuspendable();
 						
 						CreationInfo ci = new CreationInfo("created", null);
-						ci.setParent(agent.getId());
+//						ci.setParent(agent.getId());
 						ci.setResourceIdentifier(agent.getModel().getResourceIdentifier());
 						final String name =  TesterAgent.class.getName()+".class";
 						
-						IExternalAccess eaa = agent.createComponent(ci.setFilename(name), null).get();
-						IExternalAccess eab = agent.createComponent(ci.setFilename(name), null).get();
+						IExternalAccess eaa = agent.createComponent(ci.setFilename(name)).get();
+						IExternalAccess eab = agent.createComponent(ci.setFilename(name)).get();
 					
 						IComponentDescription desca = eaa.scheduleStep(new IComponentStep<IComponentDescription>()
 						{

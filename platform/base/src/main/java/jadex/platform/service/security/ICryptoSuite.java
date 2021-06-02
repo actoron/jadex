@@ -1,5 +1,6 @@
 package jadex.platform.service.security;
 
+import jadex.bridge.JadexVersion;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
 
@@ -44,6 +45,13 @@ public interface ICryptoSuite
 	public boolean isExpiring();
 	
 	/**
+	 *  Returns the creation time of the crypto suite.
+	 *  
+	 *  @return The creation time.
+	 */
+	public long getCreationTime();
+	
+	/**
 	 *  Handles handshake messages.
 	 *  
 	 *  @param agent The security agent object.
@@ -67,4 +75,22 @@ public interface ICryptoSuite
 	 *  @param id Handshake ID.
 	 */
 	public void setHandshakeId(String id);
+	
+	/**
+	 *  Gets the version of the remote Jadex platform.
+	 *  @return The Jadex version.
+	 */
+	public JadexVersion getRemoteVersion();
+	
+	/**
+	 *  Sets the version of the remote Jadex platform.
+	 *  @param jadexversion The Jadex version.
+	 */
+	public void setRemoteVersion(JadexVersion jadexversion);
+	
+	/**
+	 *  Sets if the suite represents the protocol initializer.
+	 * @param initializer True, if initializer.
+	 */
+	public void setInitializer(boolean initializer);
 }

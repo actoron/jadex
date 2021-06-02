@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cli.ICliService;
 import jadex.bridge.service.types.email.Email;
@@ -98,7 +99,8 @@ public class CliEmailAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body()
 	{
 		final Future<Void> ret = new Future<Void>();

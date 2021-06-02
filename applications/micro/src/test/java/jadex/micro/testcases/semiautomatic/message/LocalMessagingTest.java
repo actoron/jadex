@@ -5,7 +5,7 @@ import java.util.HashMap;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
 
@@ -29,7 +29,7 @@ public class LocalMessagingTest
 		//cms.createComponent(SenderAgent.class.getName()+".class",
 		access.createComponent(
 			new CreationInfo(new HashMap<String, Object>(){{
-				put("receiver", (Object)new BasicComponentIdentifier("Receiver", access.getId()));
+				put("receiver", (Object)new ComponentIdentifier("Receiver", access.getId()));
 				put("count", 100000);
 			}}).setFilename(BenchmarkAgent.class.getName()+".class")).get();
 	}

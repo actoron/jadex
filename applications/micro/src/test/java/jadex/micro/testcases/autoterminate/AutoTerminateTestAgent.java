@@ -14,11 +14,12 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
-import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.commons.SReflect;
+import jadex.bridge.service.types.cms.InitInfo;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -39,18 +40,18 @@ import jadex.micro.testcases.TestAgent;
  */
 @Service
 @Agent
-@ProvidedServices(@ProvidedService(type=IAutoTerminateService.class))
+@ProvidedServices(@ProvidedService(type=IAutoTerminateService.class, scope=ServiceScope.GLOBAL))
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
-public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateService
+public class AutoTerminateTestAgent extends	TestAgent implements IAutoTerminateService
 {
 	//-------- attributes --------
 	
 	/** The test reports. */
-	protected List<TestReport>	reports	= new ArrayList<TestReport>();
+	protected List<TestReport> reports = new ArrayList<TestReport>();
 	
 	/** The agent. */
 	@Agent
-	protected IInternalAccess	agent;
+	protected IInternalAccess agent;
 	
 	/** The finished future. */
 	protected Future<Void>	ret;
@@ -67,14 +68,11 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 	{
 		ret	= new Future<Void>();
 		this.tc	= tc;
-		if(SReflect.isAndroid()) 
-		{
-			tc.setTestCount(1);
-		} 
-		else 
-		{
-			tc.setTestCount(3);
-		}
+		tc.setTestCount(3);
+		
+		InitInfo ii = SComponentManagementService.getState(agent.getId().getRoot()).getComponent(agent.getId()).getInitInfo();
+		if(ii!=null)
+			System.out.println("ii: "+ii.getInitFuture().isDone());
 		
 //		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
 		setupLocalTest(SubscriberAgent.class.getName()+".class", null)
@@ -82,20 +80,17 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 		{
 			public void customResultAvailable(IComponentIdentifier result)
 			{
-				if(!SReflect.isAndroid()) 
-				{
 //					agent.getLogger().severe("Testagent test remote1: "+agent.getComponentDescription());
-					setupRemoteTest(SubscriberAgent.class.getName()+".class", "self", null, false)
-						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				setupRemoteTest(SubscriberAgent.class.getName()+".class", "self", null, false)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier result)
 					{
-						public void customResultAvailable(IComponentIdentifier result)
-						{
 //							agent.getLogger().severe("Testagent test remote2: "+agent.getComponentDescription());
-							setupRemoteTest(SubscriberAgent.class.getName()+".class", "platform", null, true);
-							// keep future open -> is set in check finished.
-						}
-					});
-				}
+						setupRemoteTest(SubscriberAgent.class.getName()+".class", "platform", null, true);
+						// keep future open -> is set in check finished.
+					}
+				});
 			}
 		});
 		
@@ -107,7 +102,7 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 	 */
 	public ISubscriptionIntermediateFuture<String>	subscribe()
 	{
-		final TestReport	report	= new TestReport("#"+reports.size()+1,
+		final TestReport report	= new TestReport("#"+reports.size()+1,
 			reports.size()==0 ? "Test local automatic subscription termination: "+ServiceCall.getCurrentInvocation().getCaller()
 			: reports.size()==1 ? "Test remote automatic subscription termination: "+ServiceCall.getCurrentInvocation().getCaller()
 			: "Test remote offline automatic subscription termination: "+ServiceCall.getCurrentInvocation().getCaller());
@@ -115,7 +110,7 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 		
 //		agent.getLogger().severe("test: "+report.getDescription()+", "+Starter.getDefaultTimeout(agent.getComponentIdentifier()));
 		
-		waitForRealtimeDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.25),
+		agent.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.25),
 			new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -147,14 +142,14 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 			}
 		});
 		
-		// sending ping every second
-		waitForRealtimeDelay(1000, new IComponentStep<Void>()
+		// sending ping every second (by default)
+		agent.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.0/30), new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(ret.addIntermediateResultIfUndone("ping"))
 				{
-					waitForRealtimeDelay(1000, this);
+					agent.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.0/30), this);
 				}
 				
 				return IFuture.DONE;
@@ -209,7 +204,7 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 //                {
 //                    public void customResultAvailable(ITransportComponentIdentifier cid)
 //                    {
-						createComponent(filename, null, config, exta.getId(), reslis)
+						createComponent(filename, null, config, exta.getId(), exta, reslis)
 							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 //                    }
 //                });
@@ -238,7 +233,7 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.createComponent(new CreationInfo().setFilename(AutoTerminateTestAgent.class.getCanonicalName() + ".class")).getSecondResult();
+					ia.createComponent(new CreationInfo().setFilename(AutoTerminateTestAgent.class.getCanonicalName() + ".class")).get().waitForTermination().get();
 					System.out.println("Step done.");
 					return IFuture.DONE;
 				}

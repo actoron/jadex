@@ -19,12 +19,14 @@ import jadex.bdiv3.features.impl.BDILifecycleAgentFeature;
 import jadex.bdiv3.features.impl.BDIMonitoringComponentFeature;
 import jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature;
 import jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.component.impl.ArgumentsResultsComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
@@ -49,6 +51,9 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgentFactory;
 import jadex.micro.annotation.Agent;
+import jadex.micro.features.impl.MicroInjectionComponentFeature;
+import jadex.micro.features.impl.MicroPojoComponentFeature;
+import jadex.micro.features.impl.MicroServiceInjectionComponentFeature;
 
 
 /**
@@ -56,6 +61,42 @@ import jadex.micro.annotation.Agent;
  */
 public class BDIAgentFactory extends BasicService implements IComponentFactory, IBootstrapFactory
 {
+	//-------- constants for noplatform variant --------
+	
+	/** The default component features. */
+	public static final Collection<IComponentFeatureFactory> NOPLATFORM_DEFAULT_FEATURES;
+	
+	static
+	{
+		Collection<IComponentFeatureFactory> def_features = new ArrayList<IComponentFeatureFactory>();
+		
+		// exchanged
+		def_features.add(new ComponentFeatureFactory(IExecutionFeature.class, BDIExecutionComponentFeature.class));
+		
+		//def_features.add(new ComponentFeatureFactory(IMonitoringComponentFeature.class, MonitoringComponentFeature.class));
+		def_features.add(new ComponentFeatureFactory(IArgumentsResultsFeature.class, ArgumentsResultsComponentFeature.class));
+		//def_features.add(PropertiesComponentFeature.FACTORY);	// After args for logging
+		//def_features.add(new ComponentFeatureFactory(IRequiredServicesFeature.class, RequiredServicesComponentFeature.class));
+		//def_features.add(new ComponentFeatureFactory(IProvidedServicesFeature.class, ProvidedServicesComponentFeature.class));
+		//def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class, SubcomponentsComponentFeature.class, new Class[]{IProvidedServicesFeature.class}, null));
+		//def_features.add(new ComponentFeatureFactory(IMessageFeature.class, MessageComponentFeature.class));
+		//def_features.add(RemoteExecutionComponentFeature.FACTORY);	// After message for adding handler
+		//def_features.add(NFPropertyComponentFeature.FACTORY);
+		
+		// added
+		def_features.add(MicroPojoComponentFeature.FACTORY);
+		def_features.add(MicroInjectionComponentFeature.FACTORY);
+		def_features.add(MicroServiceInjectionComponentFeature.FACTORY);
+		
+		// exchanged
+		def_features.add(BDILifecycleAgentFeature.FACTORY);
+		
+		// added
+		def_features.add(BDIAgentFeature.FACTORY);
+
+		NOPLATFORM_DEFAULT_FEATURES = Collections.unmodifiableCollection(def_features);
+	}
+	
 	//-------- constants --------
 	
 	/** The BDI agent model type name (human readable for display). */
@@ -140,7 +181,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 			}
 		};
 		
-		features	= SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MicroAgentFactory.MICRO_FEATURES, BDI_FEATURES));
+		features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MicroAgentFactory.MICRO_FEATURES, BDI_FEATURES));
 	}
 	
 	/**
@@ -150,7 +191,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	// This constructor is used by the Starter class and the ADFChecker plugin. 
 	public BDIAgentFactory(String providerid)
 	{
-		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
+		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new BDIModelLoader();
 	}
 	
@@ -170,7 +211,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public IFuture<Void> startService()
 	{
-		libservice	= provider.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		libservice	= provider.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 		libservice.addLibraryServiceListener(libservicelistener);	// TODO: wait for future?
 		return BDIAgentFactory.super.startService();
 	}
@@ -203,6 +244,15 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model)
 	{
 		return new Future<Collection<IComponentFeatureFactory>>(features);
+	}
+	
+	/**
+	 *  Set the features.
+	 *  @param features The features to set.
+	 */
+	public void setFeatures(Collection<IComponentFeatureFactory> features)
+	{
+		this.features = new ArrayList<IComponentFeatureFactory>(features);
 	}
 	
 	//-------- IAgentFactory interface --------
@@ -243,9 +293,6 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 			{
 				ClassLoader cl = getClass().getClassLoader();
 				IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
-				
-				if(model.indexOf("Block")!=-1)
-					System.out.println("model2: "+mi);
 				
 				ret.setResult(mi);
 			}
@@ -325,7 +372,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 * 	Get the model type from the class info.
 	 *  @return null, if no BDI model.
 	 */
-	public String getLoadableType(ClassInfo ci)
+	public static String getLoadableType(ClassInfo ci)
 	{
 		String	ret	= null;
 		AnnotationInfo ai	= ci.getAnnotation(Agent.class.getName());
@@ -386,9 +433,8 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 				{
 					public void customResultAvailable(ClassLoader cl)
 					{
-						try
+						try(ResourceInfo ri = loader.getResourceInfo0(model, imports, cl))
 						{
-							ResourceInfo ri = loader.getResourceInfo0(model, imports, cl);
 							if(ri==null)
 							{
 								ret.setResult(null);
@@ -423,7 +469,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	protected ILibraryService getLibraryService()
 	{
-		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 	}
 	
 	/**

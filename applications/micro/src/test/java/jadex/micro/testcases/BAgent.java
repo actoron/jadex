@@ -7,7 +7,7 @@ import jadex.base.test.TestReport;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -17,7 +17,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
@@ -26,11 +25,11 @@ import jadex.micro.annotation.Results;
 /**
  *  Simple test agent with one service.
  */
-@ProvidedServices(@ProvidedService(type=IBService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IBService.class))
 //@Results(@Result(name="exception", typename="Exception"))
 @Results(@Result(name="testcases", clazz=List.class))
 @Service(IBService.class)
-@Agent
+@Agent(predecessors="jadex.micro.testcases.AAgent")
 public class BAgent implements IBService
 {
 	@ServiceComponent
@@ -40,12 +39,13 @@ public class BAgent implements IBService
 	 *  Init service method.
 	 */
 	@ServiceStart
+//	@OnStart
 	public IFuture<Void> start()
 	{
 		final List<TestReport> tests = new ArrayList<TestReport>();
 
 		final Future<Void> ret = new Future<Void>();
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IAService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IAService.class, ServiceScope.PLATFORM))
 			.addResultListener(new IResultListener<IAService>()
 		{
 			public void resultAvailable(IAService ser)

@@ -8,10 +8,10 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.commons.SReflect;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -30,14 +30,14 @@ import jadex.micro.testcases.TestAgent;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="ts", type=ITestService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL)
+	@RequiredService(name="ts", type=ITestService.class, scope=ServiceScope.GLOBAL)
 })
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 10)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class ThreadingTestAgent extends TestAgent
 {
 	private int maxlocal = 10000;
 	private int maxremote = 1000;
-	
+
 	/**
 	 *  Perform the tests.
 	 */
@@ -45,25 +45,25 @@ public class ThreadingTestAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(SReflect.isAndroid()) 
+		/*if(SReflect.isAndroid()) 
 		{
 			// reduce number of threads for android
 			maxlocal /=100;
 			maxremote /=100;
-		}
+		}*/
 		
-		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+//		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
 		testLocal(1, maxlocal).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
-				agent.getLogger().severe("Testagent test rmeote: "+agent.getDescription());
+//				agent.getLogger().severe("Testagent test rmeote: "+agent.getDescription());
 				tc.addReport(result);
 				testRemote(2, maxremote).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
-						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
+//						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -171,12 +171,12 @@ public class ThreadingTestAgent extends TestAgent
 		{
 			public void customResultAvailable(final ITestService ts)
 			{
-				final long start = System.currentTimeMillis();
+				final long start = agent.getLocalService(IClockService.class).getTime();
 				invoke(ts, 0, max).addResultListener(new ExceptionDelegationResultListener<Integer, TestReport>(ret)
 				{
 					public void customResultAvailable(Integer result)
 					{
-						long dur = System.currentTimeMillis()-start;
+						long dur = agent.getLocalService(IClockService.class).getTime()-start;
 						System.out.println("Needed per call [ms]: "+((double)dur)/max);
 						System.out.println("Calls per second: "+((double)max)/dur*1000);
 						if(result==0)

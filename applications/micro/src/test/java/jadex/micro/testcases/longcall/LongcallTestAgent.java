@@ -14,10 +14,10 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.commons.SReflect;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -42,7 +42,7 @@ import jadex.micro.testcases.TestAgent;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="ts", type=ITestService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL)
+	@RequiredService(name="ts", type=ITestService.class, scope=ServiceScope.GLOBAL)
 })
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 10)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class LongcallTestAgent extends TestAgent
@@ -50,9 +50,9 @@ public class LongcallTestAgent extends TestAgent
 	/**
 	 *  The test count.
 	 */
-	protected int	getTestCount()
+	protected int getTestCount()
 	{
-		return SReflect.isAndroid() ? 6 : 12;
+		return 12;
 	}
 	
 	/**
@@ -62,7 +62,7 @@ public class LongcallTestAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+//		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
 		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(Collection<TestReport> result)
@@ -84,35 +84,27 @@ public class LongcallTestAgent extends TestAgent
 			
 			public void proceed()
 			{
-				if(SReflect.isAndroid()) 
+//					agent.getLogger().severe("Testagent test rmeote: "+agent.getDescription());
+				testRemote(3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
-					// skip remote tests
-					ret.setResult(null);
-				} 
-				else 
-				{
-					agent.getLogger().severe("Testagent test rmeote: "+agent.getDescription());
-					testRemote(3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
+					public void customResultAvailable(Collection<TestReport> result)
 					{
-						public void customResultAvailable(Collection<TestReport> result)
-						{
-							for(TestReport tr: result)
-								tc.addReport(tr);
-							ret.setResult(null);
-						}
-						
-						public void finished()
-						{
-							agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
-							ret.setResult(null);
-						}
-						
-						public void intermediateResultAvailable(TestReport result)
-						{
-							tc.addReport(result);
-						}
-					}));
-				}
+						for(TestReport tr: result)
+							tc.addReport(tr);
+						ret.setResult(null);
+					}
+					
+					public void finished()
+					{
+//							agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
+						ret.setResult(null);
+					}
+					
+					public void intermediateResultAvailable(TestReport result)
+					{
+						tc.addReport(result);
+					}
+				}));
 			}
 		}));
 		
@@ -259,12 +251,11 @@ public class LongcallTestAgent extends TestAgent
 			final TestReport tr = new TestReport("#"+cnt, "Test if long call works with normal timeout.");
 
 			Method m = ITestService.class.getMethod("method"+cnt, new Class[0]);
-			System.out.println("calling method "+cnt+": "+System.currentTimeMillis());
+			final long start	= agent.getLocalService(IClockService.class).getTime();
+			System.out.println("calling method "+cnt+": "+start);
 			
 			// set timeout to low value to avoid long waiting in test
 			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledDefaultTimeout(agent.getId(), 0.1));
-			
-			final long start	= System.currentTimeMillis();
 			Object	fut	= m.invoke(ts, new Object[0]);
 			
 			if(fut instanceof ISubscriptionIntermediateFuture)
@@ -277,7 +268,8 @@ public class LongcallTestAgent extends TestAgent
 					
 					public void finished()
 					{
-						System.out.println("rec result "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						long time	= agent.getLocalService(IClockService.class).getTime() - start;
+						System.out.println("rec result "+cnt+": "+time);
 						tr.setSucceeded(true);
 						ret.addIntermediateResult(tr);
 						proceed();
@@ -290,7 +282,8 @@ public class LongcallTestAgent extends TestAgent
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						System.out.println("rec exception "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						long time	= agent.getLocalService(IClockService.class).getTime() - start;
+						System.out.println("rec exception "+cnt+": "+time);
 						exception.printStackTrace();
 						tr.setFailed("Exception: "+exception);
 						ret.addIntermediateResult(tr);
@@ -300,6 +293,10 @@ public class LongcallTestAgent extends TestAgent
 					public void commandAvailable(Object command)
 					{
 						// ignore timer updates
+					}
+					
+					public void maxResultCountAvailable(int max) 
+					{
 					}
 					
 					public void proceed()
@@ -321,7 +318,8 @@ public class LongcallTestAgent extends TestAgent
 				{
 					public void resultAvailable(Object result)
 					{
-						System.out.println("rec result "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						long end	= agent.getLocalService(IClockService.class).getTime();
+						System.out.println("rec result "+cnt+": "+(end-start)+", "+end);
 						tr.setSucceeded(true);
 						ret.addIntermediateResult(tr);
 						proceed();
@@ -329,7 +327,8 @@ public class LongcallTestAgent extends TestAgent
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						System.out.println("rec exception "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						long end	= agent.getLocalService(IClockService.class).getTime();
+						System.out.println("rec exception "+cnt+": "+(end-start)+", "+end);
 						exception.printStackTrace();
 						tr.setFailed("Exception: "+exception);
 						ret.addIntermediateResult(tr);

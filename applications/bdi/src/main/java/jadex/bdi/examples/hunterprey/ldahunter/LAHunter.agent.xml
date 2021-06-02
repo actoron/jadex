@@ -51,10 +51,17 @@
 		    </fact>
 		</belief>
 
+		<!-- 
 		<belief name="potential_window" class="PotentialFrame">
 			<fact>
 				new PotentialFrame($scope.getExternalAccess(), "World of "+$scope.getAgentName())
 			</fact>
+		</belief>
+		 -->
+		
+		<belief name="gui" class="jadex.commons.gui.GuiCreator">
+			<fact>new jadex.commons.gui.GuiCreator(PotentialFrame.class, new Class[]{jadex.bridge.IExternalAccess.class, java.lang.String.class}, 
+				new Object[]{$scope.getExternalAccess(), "World of "+$scope.getAgentName()})</fact>
 		</belief>
 
 	</beliefs>

@@ -33,6 +33,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.ASMifier;
+import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import jadex.bdiv3.exceptions.JadexBDIGenerationException;
@@ -107,8 +108,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			
 			done.put(clname, cn);
 			
-//			TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out))
-//			TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));
+			//TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));
+			//TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));
 //			CheckClassAdapter cc = new CheckClassAdapter(cw);
 			
 			final String iclname = clname.replace(".", "/");
@@ -226,8 +227,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 
 			    public MethodVisitor visitMethod(int access, final String methodname, String desc, String signature, String[] exceptions)
 				{
-//					if(clname.indexOf("PlanPrecondition")!=-1)
-//						System.out.println(desc+" "+methodname);
+					//if(clname.indexOf("ComponentPlanBDI")!=-1)
+					//	System.out.println(desc+" "+methodname);
 					
 					return new MethodVisitor(api, super.visitMethod(access, methodname, desc, signature, exceptions))
 					{
@@ -368,15 +369,19 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				is = SUtil.getResource(fname, cl);
 				ClassReader cr = new ClassReader(is);
 
-//				TraceClassVisitor tcv2 = new TraceClassVisitor(cv, new PrintWriter(System.out));
+				//TraceClassVisitor tcv2 = new TraceClassVisitor(cv, new PrintWriter(System.out));
 //				TraceClassVisitor tcv3 = new TraceClassVisitor(null, new PrintWriter(System.out));
 //				cr.accept(tcv2, 0);
 				cr.accept(cv, 0);
 				transformClassNode(cn, iclname, model, dummycl, done);
+				
+				//TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));	
+				
 				cn.accept(cw);
+				
 				byte[] data = cw.toByteArray();
 				
-//				CheckClassAdapter.verify(new ClassReader(data), true, new PrintWriter(System.out));
+				//CheckClassAdapter.verify(new ClassReader(data), true, new PrintWriter(System.out));
 				
 				// Find correct cloader for injecting the class.
 				// Probes to load class without loading class.
@@ -390,16 +395,26 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				}
 				
 				ClassLoader found = null;
-				for(ClassLoader tmpcl: pas)
+				if(ClassLoader.getSystemClassLoader().getResource(fname)!=null)
 				{
-					if(tmpcl.getResource(fname)!=null)
+					// If the system classloader has the class, it MUST be enhanced there
+					// because all classloaders use it as parent even if setParent(null) was
+					// called on them.
+					found = ClassLoader.getSystemClassLoader();
+				}
+				else
+				{
+					for(ClassLoader tmpcl: pas)
 					{
-						found = tmpcl;
-						break;
+						if(tmpcl.getResource(fname)!=null)
+						{
+							found = tmpcl;
+							break;
+						}
 					}
 				}
 				
-//				System.out.println("toClass: "+clname+" "+found);
+				//System.out.println("toClass: "+clname+" "+found);
 				Class<?> loadedclass = toClass(clname, data, found, null);
 				if (loadedclass != null && !isEnhanced(loadedclass))
 					loadedclass = toClass(clname, data, found, null, true);
@@ -929,7 +944,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //			method.setAccessible(true);
 			try
 			{
-				if (redefine && VmHacks.get().hasIndirectRedefinition())
+				if(redefine && VmHacks.get().hasIndirectRedefinition())
 				{
 					ret = Class.forName(name, true, loader);
 					ret = VmHacks.get().redefineClassIndirect(ret, data);

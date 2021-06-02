@@ -6,6 +6,7 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.commons.Boolean3;
@@ -29,7 +30,8 @@ public class ProServiceDetectTestAgent extends JunitAgentTest implements ITestSe
 	/** 
 	 * The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body(IInternalAccess agent)
 	{
 		// test if agent has the provided service

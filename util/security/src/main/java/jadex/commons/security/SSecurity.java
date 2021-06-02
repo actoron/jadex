@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +17,8 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.logging.Logger;
+
+import javax.net.ssl.TrustManagerFactory;
 
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Object;
@@ -97,6 +100,7 @@ import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.security.random.SecureThreadedRandom;
@@ -127,12 +131,46 @@ public class SSecurity
 	/** Enable this to test the seeding fallback, do not change, used by tests only. */
 	protected static boolean TEST_ENTROPY_FALLBACK = false;
 	
+	/** SCrypt work factor / hardness for password strengthening. */
+	protected static final int SCRYPT_N = 131072;
+	
+	/** SCrypt block size. */
+	protected static final int SCRYPT_R = 8;
+	
+	/** SCrypt parallelization. */
+	protected static final int SCRYPT_P = 4;
+	
 	static
 	{
-		if (SUtil.SECURE_RANDOM != getSecureRandom())
+		SUtil.ensureNonblockingSecureRandom();
+		getSecureRandom();
+		
+		/*if(SReflect.isAndroid())
 		{
-			SUtil.SECURE_RANDOM = SECURE_RANDOM;
-		}
+			// Probe for a weird bug caused by the interaction between
+			// Java 9+, Android and Bouncycastle
+			try
+			{
+	            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+	            tmf.init((KeyStore) null);
+			}
+			catch (Exception e)
+			{
+				// Bug appears to be there, attempt fix...
+				String oldstoretype = System.getProperty("javax.net.ssl.trustStoreType");
+				System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+				try
+				{
+		            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		            tmf.init((KeyStore) null);
+				}
+				catch (Exception e1)
+				{
+					// The fix did not work, restore initial state...
+					System.setProperty("javax.net.ssl.trustStoreType", oldstoretype);
+				}
+			}
+		}*/
 	}
 	
 	/**
@@ -262,7 +300,7 @@ public class SSecurity
 									Logger.getLogger("jadex").warning("Unable to find OS entropy source, using fallback...");
 									ENTROPY_FALLBACK_WARNING_DONE = true;
 								}
-								ret = SUtil.getJavaDefaultSecureRandom().generateSeed(output.length);
+								ret = SecureRandom.getSeed(output.length);
 							}
 							
 							System.arraycopy(ret, 0, output, 0, output.length);
@@ -927,7 +965,7 @@ public class SSecurity
 		prngs.add(generateSecureRandom());
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
-		prngs.add(SUtil.getJavaDefaultSecureRandom());
+		prngs.add(new SecureRandom());
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
 		final SecureRandom[] randsources = prngs.toArray(new SecureRandom[prngs.size()]);
@@ -1289,7 +1327,24 @@ public class SSecurity
 		}
 	}
 	
-//	/**
+	/**
+	 *  Derive a key from a password via scrypt.
+	 *  @param pw The password.
+	 *  @param salt The salt.
+	 *  @return The key.
+	 */
+	public static byte[] deriveKeyFromPassword(String pw, byte[] salt)
+	{
+		if(pw==null)
+			throw new IllegalArgumentException();
+		
+		if(salt==null)
+			salt = pw.getBytes(SUtil.UTF8);
+		final byte[] keydata = SCryptParallel.generate(pw.getBytes(SUtil.UTF8), salt, SCRYPT_N, SCRYPT_R, SCRYPT_P, 32);
+		return keydata;
+	}
+	
+	//	/**
 //	 *  Main for testing.
 //	 */
 //	public static void main(String[] args)

@@ -3,10 +3,10 @@
  */
 package org.activecomponents.udp.symciphers;
 
-import org.spongycastle.crypto.engines.AESFastEngine;
-import org.spongycastle.crypto.modes.EAXBlockCipher;
-import org.spongycastle.crypto.params.AEADParameters;
-import org.spongycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.engines.AESFastEngine;
+import org.bouncycastle.crypto.modes.EAXBlockCipher;
+import org.bouncycastle.crypto.params.AEADParameters;
+import org.bouncycastle.crypto.params.KeyParameter;
 
 /**
  *  Class representing AES in EAX mode.

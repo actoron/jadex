@@ -5,9 +5,9 @@ package jadex.platform.service.cli.commands;
 
 import java.util.Map;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.SUtil;
@@ -78,14 +78,14 @@ public class SetSecretCommand extends ACliCommand
 		{
 			final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 			
-			comp.searchService( new ServiceQuery<>( ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			comp.searchService( new ServiceQuery<>( ISecurityService.class, ServiceScope.PLATFORM))
 				.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 			{
 				public void customResultAvailable(final ISecurityService ss)
 				{
 					if(plat!=null)
 					{
-						ss.setPlatformSecret(new BasicComponentIdentifier(plat), pass);
+						ss.setPlatformSecret(new ComponentIdentifier(plat), pass);
 //						ss.setPlatformPassword(new BasicComponentIdentifier(plat), pass)
 //							.addResultListener(new DelegationResultListener<Void>(ret));
 					}

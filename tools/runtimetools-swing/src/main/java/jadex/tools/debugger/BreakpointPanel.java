@@ -6,7 +6,6 @@ import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import javax.swing.AbstractCellEditor;
@@ -35,8 +34,8 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IChangeListener;
 import jadex.commons.SUtil;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.jtable.TableSorter;
 
@@ -85,16 +84,12 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 		this.access = access;
 	
 		sub	= cmshandler.addCMSListener(access.getId());
-		sub.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+		sub.addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 		{
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-			}
-
-			@Override
-			public void resultAvailable(Collection<CMSStatusEvent> result)
-			{
+				System.out.println("Exception occurred: "+exception);
 			}
 
 			@Override
@@ -111,11 +106,6 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 						}
 					});
 				}
-			}
-
-			@Override
-			public void finished()
-			{
 			}
 		});
 		
@@ -286,8 +276,8 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 					{
 						bps.remove(breakpoints.get(sorter.modelIndex(rowIndex)));
 					}
-					access.setComponentBreakpoints(
-						description.getName(), (String[])bps.toArray(new String[bps.size()]));
+					access.getExternalAccess(description.getName())
+						.setComponentBreakpoints((String[])bps.toArray(new String[bps.size()]));
 				}
 			});
 			return	ret;

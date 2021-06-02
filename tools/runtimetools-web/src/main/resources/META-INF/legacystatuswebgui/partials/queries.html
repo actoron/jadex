@@ -1,0 +1,21 @@
+<div class="actwtable section">
+	<h3 id="HConnectedPlatforms">Active Service Queries</h3>
+	<p>
+		This page shows a self-updating list of currently registered service search queries.
+	</p>
+	<table ng-controller="Queries">
+		<tbody>
+			<tr>
+				<th>Service Type</th>
+				<th>Query Owner</th>
+				<th>Search Scope</th>
+			</tr>
+			<tr ng-repeat="x in queries | orderBy: 'scope' | orderBy: 'serviceType.value' | orderBy: 'owner.name'"
+				ng-class="{'connecting': !x.connected}">
+				<td>{{x.serviceType.value}}</td>
+				<td>{{x.owner.name | cid}}</td>
+				<td>{{x.scope.value.toLowerCase()}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

@@ -12,8 +12,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class RwMapWrapper<K, V> implements IRwMap<K, V>
 {
-	/** The lock. */
-	protected ReadWriteLock rwlock;
+	protected RwAutoLock rwautolock;
 	
 	/** The wrapped map. */
 	protected Map<K, V> map;
@@ -35,7 +34,7 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	 */
 	public RwMapWrapper(Map<K, V> map, ReadWriteLock lock)
 	{
-		this.rwlock = lock;
+		this.rwautolock = new RwAutoLock(lock);
 		this.map = map;
 	}
 	
@@ -47,8 +46,7 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	 */
 	public RwMapWrapper(Map<K, V> map, boolean fair)
 	{
-		rwlock = new ReentrantReadWriteLock(fair);
-		this.map = map;
+		this(map, new ReentrantReadWriteLock(fair));
 	}
 
 	/**
@@ -56,10 +54,10 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	 */
 	public int size()
 	{
-		rwlock.readLock().lock();
-		int ret = map.size();
-		rwlock.readLock().unlock();
-		return ret;
+		try(IAutoLock l = rwautolock.readLock())
+		{
+			return map.size();
+		}
 	}
 
 	/**
@@ -67,10 +65,10 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	 */
 	public boolean isEmpty()
 	{
-		rwlock.readLock().lock();
-		boolean ret = map.isEmpty();
-		rwlock.readLock().unlock();
-		return ret;
+		try(IAutoLock l = rwautolock.readLock())
+		{
+			return map.isEmpty();
+		}
 	}
 
 	/**
@@ -78,10 +76,10 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	 */
 	public boolean containsKey(Object key)
 	{
-		rwlock.readLock().lock();
-		boolean ret = map.containsKey(key);
-		rwlock.readLock().unlock();
-		return ret;
+		try(IAutoLock l = rwautolock.readLock())
+		{
+			return map.containsKey(key);
+		}
 	}
 
 	/**
@@ -89,10 +87,10 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	 */
 	public boolean containsValue(Object value)
 	{
-		rwlock.readLock().lock();
-		boolean ret = map.containsValue(value);
-		rwlock.readLock().unlock();
-		return ret;
+		try(IAutoLock l = rwautolock.readLock())
+		{
+			return map.containsValue(value);
+		}
 	}
 
 	/**
@@ -100,10 +98,10 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	 */
 	public V get(Object key)
 	{
-		rwlock.readLock().lock();
-		V ret = map.get(key);
-		rwlock.readLock().unlock();
-		return ret;
+		try(IAutoLock l = rwautolock.readLock())
+		{
+			return map.get(key);
+		}
 	}
 
 	/**
@@ -111,10 +109,10 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	 */
 	public V put(K key, V value)
 	{
-		rwlock.writeLock().lock();
-		V ret = map.put(key, value);
-		rwlock.writeLock().unlock();
-		return ret;
+		try(IAutoLock l = rwautolock.writeLock())
+		{
+			return map.put(key, value);
+		}
 	}
 
 	/**
@@ -122,10 +120,10 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	 */
 	public V remove(Object key)
 	{
-		rwlock.writeLock().lock();
-		V ret = map.remove(key);
-		rwlock.writeLock().unlock();
-		return ret;
+		try(IAutoLock l = rwautolock.writeLock())
+		{
+			return map.remove(key);
+		}
 	}
 
 	/**
@@ -133,9 +131,10 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	 */
 	public void putAll(Map<? extends K, ? extends V> m)
 	{
-		rwlock.writeLock().lock();
-		map.putAll(m);
-		rwlock.writeLock().unlock();
+		try(IAutoLock l = rwautolock.writeLock())
+		{
+			map.putAll(m);
+		}
 	}
 
 	/**
@@ -143,9 +142,10 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	 */
 	public void clear()
 	{
-		rwlock.writeLock().lock();
-		map.clear();
-		rwlock.writeLock().unlock();
+		try(IAutoLock l = rwautolock.writeLock())
+		{
+			map.clear();
+		}
 	}
 
 	/**
@@ -176,19 +176,35 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	}
 	
 	/**
+	 *  Locks the read lock for resource-based locking.
+	 */
+	public IAutoLock readLock()
+	{
+		return rwautolock.readLock();
+	}
+	
+	/**
+	 *  Locks the write lock for resource-based locking.
+	 */
+	public IAutoLock writeLock()
+	{
+		return rwautolock.writeLock();
+	}
+	
+	/**
 	 *  Gets the read lock for manual locking.
 	 */
-	public Lock readLock()
+	public Lock getReadLock()
 	{
-		return rwlock.readLock();
+		return rwautolock.getReadLock();
 	}
 	
 	/**
 	 *  Gets the write lock for manual locking.
 	 */
-	public Lock writeLock()
+	public Lock getWriteLock()
 	{
-		return rwlock.writeLock();
+		return rwautolock.getWriteLock();
 	}
 	
 	/**
@@ -197,6 +213,6 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	 */
 	public ReadWriteLock getLock()
 	{
-		return rwlock;
+		return rwautolock.getLock();
 	}
 }

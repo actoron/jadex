@@ -18,12 +18,14 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.servicepool.IServicePoolService;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -41,7 +43,6 @@ import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.platform.service.servicepool.IServicePoolService;
 import jadex.platform.service.servicepool.PoolServiceInfo;
 import jadex.platform.service.servicepool.ServicePoolAgent;
 
@@ -80,7 +81,8 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 	/**
 	 *  Called once after agent creation.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -95,7 +97,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 			{
 				IGlobalPoolStrategy str = psi.getPoolStrategy()==null? new ConstantGlobalPoolStrategy(): (IGlobalPoolStrategy)psi.getPoolStrategy();
 //				CreationInfo ci = psi.getArguments()!=null? new CreationInfo(psi.getArguments()): null;
-				addServiceType(psi.getServicetype().getType(agent.getClassLoader(), agent.getModel().getAllImports()), psi.getWorkermodel(), psi.getCreationInfo(), str).addResultListener(lis);
+				addServiceType(psi.getServiceType().getType(agent.getClassLoader(), agent.getModel().getAllImports()), psi.getWorkermodel(), psi.getCreationInfo(), str).addResultListener(lis);
 			}
 		}
 		else
@@ -117,7 +119,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		// Create one service manager per service type
 		GlobalPoolServiceManager manager = new GlobalPoolServiceManager(agent, servicetype, componentmodel, info, strategy);
 		managers.put(servicetype, manager);
-		IServicePoolService ser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IServicePoolService.class));
+		IServicePoolService ser = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IServicePoolService.class));
 		// todo: fix if more than one service type should be supported by one worker (not intended)
 		if(info==null)
 		{
@@ -127,21 +129,21 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		{
 			info.setResourceIdentifier(agent.getModel().getResourceIdentifier());
 		}
-		ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null);
+		ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null, ServiceScope.PARENT, null, null, null, null);
 		info.setProvidedServiceInfos(new ProvidedServiceInfo[]{psi});
 		ser.addServiceType(servicetype,
 			new DefaultPoolStrategy(strategy.getWorkersPerProxy(), 35000, strategy.getWorkersPerProxy()),	// Is this correct???
-			componentmodel, info, null, RequiredServiceInfo.SCOPE_PARENT).addResultListener(new DelegationResultListener<Void>(ret)
+			componentmodel, info, null, ServiceScope.PARENT).addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result) 
 			{
 				// Add to global pool with magic targetresolver for intelligent proxy
-				ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null, null, null, null);
+				ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null);
 				List<UnparsedExpression> props = new ArrayList<UnparsedExpression>();
 				props.add(new UnparsedExpression(ITargetResolver.TARGETRESOLVER, GlobalServicePoolTargetResolver.class.getName()+".class"));
 				psi.setProperties(props);
 				Object service = ProxyFactory.newProxyInstance(agent.getClassLoader(), new Class[]{servicetype}, new ForwardHandler(servicetype));
-				agent.getFeature(IProvidedServicesFeature.class).addService(null, servicetype, service, null, RequiredServiceInfo.SCOPE_PARENT).addResultListener(new DelegationResultListener<Void>(ret));
+				agent.getFeature(IProvidedServicesFeature.class).addService(null, servicetype, service, null, ServiceScope.PARENT).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception) 
@@ -160,7 +162,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 	public IFuture<Void> removeServiceType(final Class<?> servicetype)
 	{
 		final Future<Void> ret = new Future<Void>();
-		IServicePoolService ser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IServicePoolService.class));
+		IServicePoolService ser = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IServicePoolService.class));
 		managers.remove(servicetype);
 		ser.removeServiceType(servicetype).addResultListener(new DelegationResultListener<Void>(ret)
 		{
@@ -234,8 +236,8 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
-			IService poolser = (IService)agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IServicePoolService.class));
-			IService ser = (IService)agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype).setProvider(poolser.getServiceId().getProviderId()));
+			IService poolser = (IService)agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IServicePoolService.class));
+			IService ser = (IService)agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(servicetype).setProvider(poolser.getServiceId().getProviderId()));
 			return method.invoke(ser, args);
 		}
 	}

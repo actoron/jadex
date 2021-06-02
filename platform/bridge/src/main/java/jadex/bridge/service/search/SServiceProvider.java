@@ -12,6 +12,7 @@ import jadex.bridge.nonfunctional.search.IRankingSearchTerminationDecider;
 import jadex.bridge.nonfunctional.search.IServiceRanker;
 import jadex.bridge.nonfunctional.search.ServiceRankingDelegationResultListener;
 import jadex.bridge.nonfunctional.search.ServiceRankingDelegationResultListener2;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -77,7 +78,7 @@ public class SServiceProvider
 //	 */
 //	public static <T> IFuture<T> getDeclaredService(IInternalAccess component, Class<T> type)
 //	{
-//		return getService(component, type, RequiredServiceInfo.SCOPE_LOCAL, true);
+//		return getService(component, type, ServiceScope.LOCAL, true);
 //	}
 //	
 //	/**
@@ -97,7 +98,7 @@ public class SServiceProvider
 //	 */
 //	public static <T> IFuture<T> getDeclaredService(IInternalAccess component, Class<T> type, boolean proxy)
 //	{
-//		return getService(component, type, RequiredServiceInfo.SCOPE_LOCAL, proxy);
+//		return getService(component, type, ServiceScope.LOCAL, proxy);
 //	}
 //	
 //	/**
@@ -275,7 +276,7 @@ public class SServiceProvider
 ////	 */
 ////	public static <T> IFuture<T> getServiceUpwards(IExternalAccess provider, Class<T> type)
 ////	{
-////		return getService(provider, type, RequiredServiceInfo.SCOPE_UPWARDS);
+////		return getService(provider, type, ServiceScope.UPWARDS);
 ////	}
 //	
 //	/**
@@ -284,7 +285,7 @@ public class SServiceProvider
 //	 */
 //	public static <T> IFuture<T> getDeclaredService(IExternalAccess provider, Class<T> type)
 //	{
-//		return getService(provider, type, RequiredServiceInfo.SCOPE_LOCAL);
+//		return getService(provider, type, ServiceScope.LOCAL);
 //	}
 //	
 //	/**
@@ -949,9 +950,9 @@ public class SServiceProvider
 //	{
 //		checkThreadAccess(component, proxy);
 //		
-//		ServiceQuery<T> query = new ServiceQuery<T>(type, RequiredServiceInfo.SCOPE_PLATFORM, target, component.getComponentIdentifier(), null, null);
+//		ServiceQuery<T> query = new ServiceQuery<T>(type, ServiceScope.PLATFORM, target, component.getComponentIdentifier(), null, null);
 //		T ret = ServiceRegistry.getRegistry(component).searchService(query);
-////		T ret = SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), RequiredServiceInfo.SCOPE_PLATFORM, new IFilter<T>() 
+////		T ret = SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), ServiceScope.PLATFORM, new IFilter<T>() 
 ////		{
 ////			public boolean filter(T obj) 
 ////			{
@@ -1090,7 +1091,7 @@ public class SServiceProvider
 ////		 */
 ////		public static <T> IFuture<T> getServiceUpwards(IInternalAccess provider, Class<T> type)
 ////		{
-////			return getService(provider, type, RequiredServiceInfo.SCOPE_UPWARDS);
+////			return getService(provider, type, ServiceScope.UPWARDS);
 ////		}
 //	
 //	/**
@@ -1099,7 +1100,7 @@ public class SServiceProvider
 //	 */
 //	public static <T> IFuture<T> getDeclaredService(IInternalAccess component, ClassInfo type)
 //	{
-//		return getService(component, type, RequiredServiceInfo.SCOPE_LOCAL, true);
+//		return getService(component, type, ServiceScope.LOCAL, true);
 //	}
 //	
 //	
@@ -1139,7 +1140,7 @@ public class SServiceProvider
 //				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter, null);
 //				IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type.getType(component.getClassLoader())): new DelegationResultListener<T>(ret);
 //				ServiceRegistry.getRegistry(component).searchServiceAsync(query).addResultListener(new ComponentResultListener<T>(lis, component));
-////				if(!RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+////				if(!ServiceScope.GLOBAL.equals(scope))
 ////				{
 ////					if(filter==null)
 ////					{
@@ -1193,14 +1194,14 @@ public class SServiceProvider
 //			{
 //				IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type.getType(component.getClassLoader())): new DelegationResultListener<T>(ret);
 //				IServiceRegistry reg = ServiceRegistry.getRegistry(component.getComponentIdentifier().getRoot());
-//				String scope = component.getComponentIdentifier().getRoot().equals(cid.getRoot()) ? RequiredServiceInfo.SCOPE_PLATFORM : RequiredServiceInfo.SCOPE_GLOBAL;
+//				String scope = component.getComponentIdentifier().getRoot().equals(cid.getRoot()) ? ServiceScope.PLATFORM : ServiceScope.GLOBAL;
 //				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, cid, component.getComponentIdentifier(), null);
 //				reg.searchServiceAsync(query).addResultListener(lis);
 //			}
 //		});
 //		
 //		return ret;
-////		return getService(component, cid, RequiredServiceInfo.SCOPE_LOCAL, type, proxy);
+////		return getService(component, cid, ServiceScope.LOCAL, type, proxy);
 //	}
 //	
 //	/**
@@ -1242,7 +1243,7 @@ public class SServiceProvider
 ////				// local component?
 ////				else if(cid.getRoot().equals(component.getComponentIdentifier().getRoot()))
 ////				{
-////					component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+////					component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 ////						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
 ////					{
 ////						public void customResultAvailable(IComponentManagementService cms)
@@ -1276,7 +1277,7 @@ public class SServiceProvider
 ////				{
 ////					IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type.getType(component.getClassLoader())): new DelegationResultListener<T>(ret);
 ////					
-////					IRemoteServiceManagementService rms	= component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+////					IRemoteServiceManagementService rms	= component.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( IRemoteServiceManagementService.class, ServiceScope.PLATFORM));
 ////					IFuture<T> fut = rms.getServiceProxy(component.getComponentIdentifier(), cid, type, scope, null);
 ////					fut.addResultListener(new ComponentResultListener<T>(lis, component));
 ////				}
@@ -1323,7 +1324,7 @@ public class SServiceProvider
 //				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter, null);
 //				IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type.getType(component.getClassLoader())): new IntermediateDelegationResultListener<T>(ret);
 //				ServiceRegistry.getRegistry(component).searchServicesAsync(query).addResultListener(new IntermediateComponentResultListener<T>(lis, component));
-////				if(!RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+////				if(!ServiceScope.GLOBAL.equals(scope))
 ////				{
 ////					if(filter==null)
 ////					{
@@ -1358,7 +1359,7 @@ public class SServiceProvider
 //	 */
 //	public static <T> IFuture<T> getDeclaredService(IInternalAccess component, ClassInfo type, boolean proxy)
 //	{
-//		return getService(component, type, RequiredServiceInfo.SCOPE_LOCAL, proxy);
+//		return getService(component, type, ServiceScope.LOCAL, proxy);
 //	}
 //	
 //	//-------- external access method duplicates --------
@@ -1482,7 +1483,7 @@ public class SServiceProvider
 //	 */
 //	public static <T> IFuture<T> getDeclaredService(IExternalAccess provider, ClassInfo type)
 //	{
-//		return getService(provider, type, RequiredServiceInfo.SCOPE_LOCAL);
+//		return getService(provider, type, ServiceScope.LOCAL);
 //	}
 //	
 //	/**
@@ -1560,69 +1561,70 @@ public class SServiceProvider
 	 *  @return External access proxy.
 	 */
 	// TODO: remove?
-	// NO!!!
-	public static IExternalAccess getExternalAccessProxy(final IInternalAccess component, final IComponentIdentifier providerid)
-	{
-		Object ret = ProxyFactory.newProxyInstance(component.getClassLoader(), 
-			new Class[]{IExternalAccess.class}, new InvocationHandler()
-		{
-			protected IExternalAccess access;
-			
-			public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
-			{
-				Object ret = null;
-				
-				if(access==null)
-				{
-//					System.out.println("comp is: "+component+" prov: "+providerid);
-//					IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-
-					if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
-					{
-						ret = SFuture.getFuture(method.getReturnType());
-						final Future<IExternalAccess> sret = (Future<IExternalAccess>)ret;
-						
-						component.getExternalAccess(providerid).addResultListener(new IResultListener<IExternalAccess>()
-						{
-							public void resultAvailable(IExternalAccess result) 
-							{
-								access = result;
-								Object res;
-								try
-								{
-									res = method.invoke(access, args);
-									((Future<IExternalAccess>)res).addResultListener(new DelegationResultListener<IExternalAccess>((Future<IExternalAccess>)sret));
-								}
-								catch(Exception e)
-								{
-									((Future<IExternalAccess>)sret).setException(e);
-								}
-							}
-	
-							public void exceptionOccurred(Exception exception)
-							{
-								component.getLogger().warning(exception.getMessage());
-							}
-						});
-						
-					}
-					else
-					{
-						access = component.getExternalAccess(providerid).get();
-						ret = method.invoke(access, args);
-					}
-				}
-				else
-				{
-					ret = method.invoke(access, args);
-				}
-				
-				return ret;
-			}
-		});
-		
-		return (IExternalAccess)ret;
-	}
+	// NO!!! YES!
+//	public static IExternalAccess getExternalAccessProxy(final IInternalAccess component, final IComponentIdentifier providerid)
+//	{
+//		return SComponentManagementService.getExternalAccess(providerid, component);
+//		Object ret = ProxyFactory.newProxyInstance(component.getClassLoader(), 
+//			new Class[]{IExternalAccess.class}, new InvocationHandler()
+//		{
+//			protected IExternalAccess access;
+//			
+//			public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
+//			{
+//				Object ret = null;
+//				
+//				if(access==null)
+//				{
+////					System.out.println("comp is: "+component+" prov: "+providerid);
+////					IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//
+//					if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
+//					{
+//						ret = SFuture.getFuture(method.getReturnType());
+//						final Future<IExternalAccess> sret = (Future<IExternalAccess>)ret;
+//						
+//						component.getExternalAccessAsync(providerid).addResultListener(new IResultListener<IExternalAccess>()
+//						{
+//							public void resultAvailable(IExternalAccess result) 
+//							{
+//								access = result;
+//								Object res;
+//								try
+//								{
+//									res = method.invoke(access, args);
+//									((Future<IExternalAccess>)res).addResultListener(new DelegationResultListener<IExternalAccess>((Future<IExternalAccess>)sret));
+//								}
+//								catch(Exception e)
+//								{
+//									((Future<IExternalAccess>)sret).setException(e);
+//								}
+//							}
+//	
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								component.getLogger().warning(exception.getMessage());
+//							}
+//						});
+//						
+//					}
+//					else
+//					{
+//						access = component.getExternalAccessAsync(providerid).get();
+//						ret = method.invoke(access, args);
+//					}
+//				}
+//				else
+//				{
+//					ret = method.invoke(access, args);
+//				}
+//				
+//				return ret;
+//			}
+//		});
+//		
+//		return (IExternalAccess)ret;
+//	}
 }
 
 

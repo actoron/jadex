@@ -1,4 +1,4 @@
-description 'The Jadex kernel extension agr allows for using the agent group role model.'
+description 'The Jadex kernel extension AGR allows for using the agent group role model.'
 
 dependencies
 {

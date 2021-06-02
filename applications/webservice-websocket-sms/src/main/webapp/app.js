@@ -1,6 +1,6 @@
-var msgser = "com.actoron.shortmessages.IShortMessageService";
-var userser = "com.actoron.shortmessages.IUserService";
-var clientser = "com.actoron.shortmessages.IClientService";
+var msgser = "org.activecomponents.shortmessages.IShortMessageService";
+var userser = "org.activecomponents.shortmessages.IUserService";
+var clientser = "org.activecomponents.shortmessages.IClientService";
 var token = null;
 var loggedinemail = null;
 var loggedinname = null;
@@ -19,7 +19,7 @@ window.onload = function()
 function login(email, pass)
 {
 	// send a message to the followers
-	//var user = {email: email, password: pass, __classname:"com.actoron.shortmessages.User"};
+	//var user = {email: email, password: pass, __classname:"org.activecomponents.shortmessages.User"};
 	var user = createUser(null, email, pass);
     jadex.getService(userser, Scopes.SCOPE_GLOBAL).then(function(service) 
 	{
@@ -301,7 +301,7 @@ function refreshAll()
 
 function createUser(name, email, pass)
 {
-	//return {name: name, email: email, password: pass, __classname:"com.actoron.shortmessages.User"};
+	//return {name: name, email: email, password: pass, __classname:"org.activecomponents.shortmessages.User"};
 	return {name: name, email: email, password: pass};
 }
 

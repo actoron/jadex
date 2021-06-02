@@ -8,6 +8,7 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.quickstart.treasureisland.environment.Treasure;
 import jadex.bdiv3.quickstart.treasureisland.environment.TreasureHunterEnvironment;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -69,7 +70,8 @@ public class TreasureHunterB1BDI
 	 *  Agent body is implemented as a loop that runs until no more treasures available.
 	 *  @param agent	The agent parameter is optional and allows to access bdi agent functionality.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void	body(IBDIAgentFeature agent)
 	{
 		// Continue until no more treasures.

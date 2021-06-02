@@ -5,9 +5,11 @@ import java.util.List;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.types.ecarules.IRuleEngineService;
 import jadex.bridge.service.types.ecarules.IRulebaseEvent;
 import jadex.bridge.service.types.ecarules.IRulebaseService;
+import jadex.commons.Boolean3;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -17,6 +19,7 @@ import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentServiceSearch;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -47,7 +50,8 @@ public class ClientRuleSystemAgent implements IRuleEngineService
 	/**
 	 *  Init method.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void init()
 	{
 		this.rulesystem = new RuleSystem(agent);
@@ -57,7 +61,8 @@ public class ClientRuleSystemAgent implements IRuleEngineService
 	/**
 	 * 
 	 */
-	@AgentServiceSearch
+	//@AgentServiceSearch
+	@OnService(query = Boolean3.FALSE)
 	public void	setRulebaseService(IRulebaseService rbser)
 	{
 		final ISubscriptionIntermediateFuture<IRulebaseEvent> subscription = rbser.subscribeToRulebase();

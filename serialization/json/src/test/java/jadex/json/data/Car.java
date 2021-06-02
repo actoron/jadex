@@ -8,14 +8,14 @@ import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.transformation.jsonserializer.JsonTraverser;
-import jadex.transformation.jsonserializer.processors.read.JsonArrayProcessor;
-import jadex.transformation.jsonserializer.processors.read.JsonBeanProcessor;
-import jadex.transformation.jsonserializer.processors.read.JsonClassProcessor;
-import jadex.transformation.jsonserializer.processors.read.JsonCollectionProcessor;
-import jadex.transformation.jsonserializer.processors.read.JsonMapProcessor;
-import jadex.transformation.jsonserializer.processors.read.JsonPrimitiveProcessor;
-import jadex.transformation.jsonserializer.processors.read.JsonURIProcessor;
-import jadex.transformation.jsonserializer.processors.read.JsonURLProcessor;
+import jadex.transformation.jsonserializer.processors.JsonArrayProcessor;
+import jadex.transformation.jsonserializer.processors.JsonBeanProcessor;
+import jadex.transformation.jsonserializer.processors.JsonClassProcessor;
+import jadex.transformation.jsonserializer.processors.JsonCollectionProcessor;
+import jadex.transformation.jsonserializer.processors.JsonMapProcessor;
+import jadex.transformation.jsonserializer.processors.JsonPrimitiveProcessor;
+import jadex.transformation.jsonserializer.processors.JsonURIProcessor;
+import jadex.transformation.jsonserializer.processors.JsonURLProcessor;
 
 /**
  * 

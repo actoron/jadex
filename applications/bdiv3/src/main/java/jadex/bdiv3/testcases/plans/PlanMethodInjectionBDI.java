@@ -15,6 +15,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -33,7 +34,8 @@ public abstract class PlanMethodInjectionBDI implements IBDIAgent
 	
 	final TestReport tr = new TestReport("#1", "Test if injection of change event works for plan method.");
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		items.add(2);
@@ -49,7 +51,7 @@ public abstract class PlanMethodInjectionBDI implements IBDIAgent
 		});
 	}
 	
-	@Plan(trigger=@Trigger(factaddeds="items"))
+	@Plan(trigger=@Trigger(factadded="items"))
 	public void	somePlan(ChangeEvent event, Integer value, int v2) 
 	{
 		System.out.println("plan invoked " + PlanMethodInjectionBDI.this + " for reason " + event+", "+value);

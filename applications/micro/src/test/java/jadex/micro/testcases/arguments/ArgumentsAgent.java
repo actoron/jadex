@@ -5,9 +5,9 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentResult;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -34,15 +34,11 @@ public class ArgumentsAgent extends JunitAgentTest
 	@AgentResult
 	protected String someresult;
 
-	public ArgumentsAgent() 
-	{
-		super(ArgumentsAgent.class);
-	}
-
 	/**
 	 * The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		TestReport tr1 = new TestReport("#1", "Test if all arguments can be found.");

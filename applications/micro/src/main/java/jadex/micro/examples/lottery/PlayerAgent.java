@@ -4,26 +4,27 @@ import java.util.Collection;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 @Agent
-@RequiredServices(@RequiredService(name="ls", type=ILotteryService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL))
+@RequiredServices(@RequiredService(name="ls", type=ILotteryService.class, scope=ServiceScope.GLOBAL))
 public class PlayerAgent
 {
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
-//		final ILotteryService ls = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILotteryService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+//		final ILotteryService ls = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILotteryService.class, ServiceScope.GLOBAL)).get();
 		final ILotteryService ls = (ILotteryService)SFuture.getFirstResultAndTerminate(
 			agent.getFeature(IRequiredServicesFeature.class).addQuery("ls"));
 		
@@ -31,13 +32,13 @@ public class PlayerAgent
 //		{
 //			public IFuture<ILotteryService> execute(Void args)
 //			{
-//				return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILotteryService.class, RequiredServiceInfo.SCOPE_GLOBAL));
+//				return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILotteryService.class, ServiceScope.GLOBAL));
 //			}
 //		}, 10, 3000).get();
 		
 		ITerminableIntermediateFuture<String> sub = ls.subscribeToLottery();
 		
-		sub.addIntermediateResultListener(new IIntermediateResultListener<String>()
+		sub.addResultListener(new IntermediateEmptyResultListener<String>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
@@ -52,6 +53,10 @@ public class PlayerAgent
 			public void intermediateResultAvailable(String item)
 			{
 //				System.out.println("Item offered: "+item);
+				
+				long delay = (long)(Math.random()*5000);
+				System.out.println("Thinking for "+(delay/1000.0)+" s :"+agent.getId());
+				agent.waitForDelay(delay).get();
 				
 				System.out.println(agent.getId()+": "+(ls.claimItem(item).get()? "I won item: ": "I did not win item: ")+item);
 			}

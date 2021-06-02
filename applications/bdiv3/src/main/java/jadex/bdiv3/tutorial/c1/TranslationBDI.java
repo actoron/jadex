@@ -52,7 +52,7 @@ public class TranslationBDI
 //	/**
 //	 *  Add a new word pair to the dictionary.
 //	 */
-//	@Plan(trigger=@Trigger(factaddeds="wordtable"))
+//	@Plan(trigger=@Trigger(factadded="wordtable"))
 //	public void checkWordPairPlan(Map.Entry<String, String> wordpair)
 //	{
 //		if(wordpair.getKey().equals("bugger"))
@@ -62,7 +62,7 @@ public class TranslationBDI
 	/**
 	 *  Add a new word pair to the dictionary.
 	 */
-	@Plan(trigger=@Trigger(factaddeds="wordtable"))
+	@Plan(trigger=@Trigger(factadded="wordtable"))
 	public void checkWordPairPlan(ChangeEvent<ChangeInfo<String>> event)
 	{
 		ChangeInfo<String>	change	= event.getValue();

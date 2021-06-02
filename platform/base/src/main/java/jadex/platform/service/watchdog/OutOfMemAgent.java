@@ -6,6 +6,7 @@ import java.util.List;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -27,7 +28,8 @@ public class OutOfMemAgent	implements IComponentStep<Void>
 	/**
 	 *  Main behavior just accumulates 1MB-sized objects.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> execute(IInternalAccess ia)
 	{
 		if(objects.size()%100==0)

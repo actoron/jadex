@@ -209,6 +209,12 @@ public class JarAsDirectory	extends File
 		return entry==null ? lastmodified : entry.getTime();
 	}
 	
+	@Override
+	public long length()
+	{
+		return entry==null ? super.length() : entry.getSize();
+	}
+	
 	//-------- extra methods --------
 
 	/**

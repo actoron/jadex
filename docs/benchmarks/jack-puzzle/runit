@@ -1,9 +1,0 @@
-#!/bin/sh
-#
-# Try:	./runit
-#	./runit -Dchoice=all
-#	./runit -Dchoice=same
-#	./runit -Dchoice=alter
-
-CLASSPATH=$CLASSPATH:.
-java $1 Sokrates $2 $3

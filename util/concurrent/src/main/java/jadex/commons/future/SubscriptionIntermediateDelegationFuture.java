@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.function.Consumer;
 
 import jadex.commons.SUtil;
 
@@ -20,41 +21,61 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	//-------- attributes --------
 	
 	/** The local results for a single thread. */
-    protected Map<Thread, List<E>>	ownresults;
+    protected Map<Thread, List<E>> ownresults;
 	
     /** Flag if results should be stored till first listener is. */
-    protected boolean storeforfirst;
+    protected boolean storeforfirst = true;
 	
+    /** The number of results. */
+    protected int resultssize;
+    
 	/**
 	 *  Create a new future.
 	 */
 	public SubscriptionIntermediateDelegationFuture()
 	{
-		storeforfirst = true;
 	}
 	
 	/**
 	 *  Create a new future.
 	 */
-	public SubscriptionIntermediateDelegationFuture(ITerminableIntermediateFuture<?> src)
+	public SubscriptionIntermediateDelegationFuture(ITerminableIntermediateFuture<E> src)
 	{
-		super(src);
-		storeforfirst = true;
+		super();
+		//super(src); does not work as storeforfirst is not yet set :-(
+		src.addResultListener(new TerminableIntermediateDelegationResultListener<E>(this, src));
 	}
 	
 	//-------- methods (hack!!! copied from subscription future) --------
 	
 	/**
+	 *  Unsupported for subscriptions.
+	 * /
+	@Override
+	public void setMaxResultCount(int max)
+	{
+		throw new UnsupportedOperationException("Subscription futures do not allow max result setting.");
+	}*/
+	
+	/**
 	 *  Add a result.
 	 *  @param result The result.
+	 *  @param scheduled	True, if any listener notification has been scheduled for this result. (used for subscription futures to check for lost values)
 	 */
-	
-	protected void storeResult(E result)
+	@Override
+	protected void	storeResult(E result, boolean scheduled)
 	{
-//		System.out.println("store: "+result);
-		// Store results only if necessary for first listener.
+		resultssize++;
+		
+		// Store results only if not yet any listener added or thread waiting
 		if(storeforfirst)
-			super.storeResult(result);
+		{
+			super.storeResult(result, scheduled);
+		}
+		else if(!scheduled && ownresults==null)
+		{
+			throw new RuntimeException("lost value: "+result);
+		}
 		
 		if(ownresults!=null)
 		{
@@ -67,6 +88,15 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 		resumeIntermediate();
 	}
 	
+	/** 
+     *  Get the number of results already collected.
+     *  @return The number of results.
+     */
+    protected int getResultCount()
+    {
+    	return resultssize;
+    }
+	
 	/**
 	 *  Add a listener which is only informed about new results,
 	 *  i.e. the initial results are not posted to this listener,
@@ -75,48 +105,38 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	public void	addQuietListener(IResultListener<Collection<E>> listener)
 	{
     	if(!(listener instanceof IIntermediateResultListener))
-    	{
     		throw new IllegalArgumentException("Subscription futures require intermediate listeners.");
-    	}
     	
     	super.addResultListener(listener);		
 	}
 
-	Exception e;
 	
 	/**
      *  Add a result listener.
-     *  @param listener The listener.
+     *  @param listsner The listener.
      */
+	@Override
     public void	addResultListener(IResultListener<Collection<E>> listener)
     {
     	if(!(listener instanceof IIntermediateResultListener))
-    	{
     		throw new IllegalArgumentException("Subscription futures require intermediate listeners.");
-    	}
     	
-//    	if(storeforfirst)
-//    		e = new RuntimeException();
-//    	
-//    	if(!storeforfirst && listeners!=null && listeners.size()>=0)
-//    	{
-//    		e.printStackTrace();
-//    		System.out.println("adding listener: "+this+" "+listener);
-//    	}
+//    	System.out.println("adding listener: "+this+" "+listener);
     	
-      	boolean first;
+    	super.addResultListener(listener);
+    	
+    	boolean first;
     	synchronized(this)
 		{
 			first = storeforfirst;
-			storeforfirst	= false;
+			storeforfirst = false;
+			//System.out.println("store false: "+this);
 		}
-    	super.addResultListener(listener);
     	
 		if(first)
-		{
-			results=null;
-		}
+			results = null;
     }
+	
     /**
      *  Get the intermediate results that are available.
      *  Note: The semantics of this method is different to the normal intermediate future
@@ -182,9 +202,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	boolean	suspend;
 		ISuspendable caller = ISuspendable.SUSPENDABLE.get();
 	   	if(caller==null)
-	   	{
 	   		caller = new ThreadSuspendable();
-	   	}
 
 		List<E>	ownres;
 
@@ -193,6 +211,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 			if(storeforfirst)
 			{
 				storeforfirst	= false;
+				//System.out.println("store false: "+this);
 				ownres	= results;
 				results	= null;
 			}
@@ -212,7 +231,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 				ownresults.put(Thread.currentThread(), ownres);
 			}
 			
-    		ret	= !ownres.isEmpty();
+    		ret	= !ownres.isEmpty() || isDone() && getException()!=null;
     		suspend	= !ret && !isDone();
     		if(suspend)
     		{
@@ -254,9 +273,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	boolean	suspend	= false;
 		ISuspendable caller = ISuspendable.SUSPENDABLE.get();
 	   	if(caller==null)
-	   	{
 	   		caller = new ThreadSuspendable();
-	   	}
 
 		List<E>	ownres;
 
@@ -265,6 +282,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 			if(storeforfirst)
 			{
 				storeforfirst	= false;
+				//System.out.println("store false: "+this);
 				ownres	= results;
 				results	= null;
 			}
@@ -290,16 +308,16 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     		}
     		else if(isDone())
     		{
-    			throw new NoSuchElementException("No more intermediate results"
-    				+ (getException()==null ? "." : ": exception="+SUtil.getExceptionStacktrace(getException())));
+    			if(getException()!=null)
+    				throw SUtil.throwUnchecked(getException());
+    			else
+    				throw new NoSuchElementException("No more intermediate results.");
     		}
     		else
     		{
     			suspend	= true;
 	    	   	if(icallers==null)
-	    	   	{
 	    	   		icallers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
-	    	   	}
 	    	   	icallers.put(caller, CALLER_QUEUED);
     		}
     	}
@@ -325,4 +343,93 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	
     	return ret;
     }
+    
+	/**
+	 *  Called on exception.
+	 *  @param consumer The function called with the exception.
+	 */
+    public IIntermediateFuture<E> catchEx(final Consumer<? super Exception> consumer, Class<?> futuretype)
+    {
+		IResultListener reslis = new IntermediateEmptyResultListener()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				 consumer.accept(exception);
+			}
+		};
+		addQuietListener(reslis);
+		
+        return this;
+    }
+    
+    /**
+	 *  Called on exception.
+	 *  @param delegate The future the exception will be delegated to.
+	 */
+	public <T> IIntermediateFuture<E> catchEx(Future<T> delegate)
+	{
+		IResultListener reslis = new IntermediateEmptyResultListener()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				delegate.setException(exception);
+			}
+		};
+		addQuietListener(reslis);
+		
+		return this;
+	}
+	
+	/**
+	 *  Called on exception.
+	 *  @param delegate The future the exception will be delegated to.
+	 * /
+	public IFuture<E> catchErr(final Consumer<? super Exception> consumer)
+    {
+        return catchErr(consumer, null);
+    }*/
+	
+	// todo: subscriptions need special treatment for first listener
+	
+    // next is a consuming listener and must not be overridden
+	/**
+     *  Called when the next intermediate value is available.
+     *  @param function Called when value arrives.
+     *  @return The future for chaining.
+     * /
+	public IIntermediateFuture<? extends E> next(Consumer<? super E> function)
+	
+	/**
+     *  Called when the maximum number of results is available.
+     *  @param function Called when max value arrives.
+     *  @return The future for chaining.
+     */
+	public IIntermediateFuture<? extends E> max(Consumer<Integer> function)
+	{
+		addQuietListener(new IntermediateEmptyResultListener<E>()
+		{
+			public void maxResultCountAvailable(int max) 
+			{
+				function.accept(max);
+			}
+		});
+		return this;
+	}
+	
+	/**
+     *  Called when the future is finished.
+     *  @param function Called when max value arrives.
+     *  @return The future for chaining.
+     */
+	public IIntermediateFuture<? extends E> finished(Consumer<Void> function)
+	{
+		addQuietListener(new IntermediateEmptyResultListener<E>()
+		{
+			public void finished() 
+			{
+				function.accept(null);
+			}
+		});
+		return this;
+	}
 }

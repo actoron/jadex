@@ -14,13 +14,13 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.rules.eca.ChangeInfo;
@@ -65,7 +65,8 @@ public class InnerClassBeliefChangeBDI
 	    fut.setResult("hello");
 	}
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		agent.getFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
@@ -81,7 +82,8 @@ public class InnerClassBeliefChangeBDI
 	/**
 	 *  Called when agent is killed.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void	destroy(IInternalAccess agent)
 	{
 		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
@@ -99,7 +101,7 @@ public class InnerClassBeliefChangeBDI
 //		this.ack = ack;
 //	}
 	
-	@Plan(trigger=@Trigger(factchangeds="ack"))
+	@Plan(trigger=@Trigger(factchanged="ack"))
 	private class AckPlan
 	{
 	    @PlanAPI

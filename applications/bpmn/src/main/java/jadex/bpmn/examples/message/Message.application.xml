@@ -23,8 +23,10 @@
 	</arguments>
 	
 	<componenttypes>
-		<componenttype name="Sender" filename="jadex/bpmn/examples/message/MessageSending.bpmn"/>
-		<componenttype name="Receiver" filename="jadex/bpmn/examples/message/MessageReceival.bpmn"/>
+		<!-- <componenttype name="Sender" filename="jadex/bpmn/examples/message/MessageSending.bpmn"/>
+		<componenttype name="Receiver" filename="jadex/bpmn/examples/message/MessageReceival.bpmn"/>-->
+		<componenttype name="Sender" filename="jadex/bpmn/examples/message/MessageSending.bpmn2"/>
+		<componenttype name="Receiver" filename="jadex/bpmn/examples/message/MessageReceival.bpmn2"/>
 	</componenttypes>
 	
 	<configurations>

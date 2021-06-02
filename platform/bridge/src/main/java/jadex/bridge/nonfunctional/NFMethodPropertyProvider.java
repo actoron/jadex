@@ -113,8 +113,8 @@ public class NFMethodPropertyProvider extends NFPropertyProvider implements INFM
 		
 		if(getParentId()!=null)
 		{
-//			IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-			getInternalAccess().getExternalAccess(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
+//			IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
+			getInternalAccess().getExternalAccessAsync(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
 			{
 				public void customResultAvailable(IExternalAccess component) 
 				{
@@ -247,6 +247,35 @@ public class NFMethodPropertyProvider extends NFPropertyProvider implements INFM
 		else
 		{
 			ret = (Future<T>)getNFPropertyValue(name, unit);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service method.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this service method.
+	 */
+	public IFuture<String> getMethodNFPropertyPrettyPrintValue(MethodInfo method, String name) 
+	{
+		Future<String> ret = new Future<String>();
+		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
+		INFProperty<?, ?> prop = (INFProperty<?, ?>) (nfmap != null? nfmap.get(name) : null);
+		if(prop != null)
+		{
+			try
+			{
+				prop.getPrettyPrintValue().addResultListener(new DelegationResultListener<String>(ret));
+			}
+			catch (Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret = (Future<String>)getNFPropertyPrettyPrintValue(name);
 		}
 		return ret;
 	}

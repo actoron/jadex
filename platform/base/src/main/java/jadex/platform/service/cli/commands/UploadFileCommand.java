@@ -6,14 +6,14 @@ import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Map;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.filetransfer.IFileTransferService;
@@ -23,8 +23,8 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
@@ -76,7 +76,7 @@ public class UploadFileCommand extends ACliCommand
 		final String s = (String)args.get("-s");
 		final String d = (String)args.get("-d");
 		final String pname = (String)args.get("-p");
-		final IComponentIdentifier p = pname==null? null: new BasicComponentIdentifier(pname);
+		final IComponentIdentifier p = pname==null? null: new ComponentIdentifier(pname);
 		
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 		
@@ -95,7 +95,7 @@ public class UploadFileCommand extends ACliCommand
 							final File source = new File(s);
 							final FileInputStream fis = new FileInputStream(source);
 							ServiceOutputConnection soc = new ServiceOutputConnection();
-							soc.writeFromInputStream(fis, comp).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<Long>()
+							soc.writeFromInputStream(fis, comp).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<Long>()
 							{
 								public void intermediateResultAvailable(Long result) 
 								{
@@ -115,7 +115,7 @@ public class UploadFileCommand extends ACliCommand
 								}
 							}));
 							ITerminableIntermediateFuture<Long> fut = ds.uploadFile(soc.getInputConnection(), d, source.getName());
-							fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<Long>()
+							fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<Long>()
 							{
 								long last = 0;
 								public void intermediateResultAvailable(final Long result)
@@ -173,8 +173,8 @@ public class UploadFileCommand extends ACliCommand
 		if(cid!=null)
 		{
 			// global search not a good idea due to long timeout but what to do else?
-			ia.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IFileTransferService.class, RequiredServiceInfo.SCOPE_GLOBAL))
-				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<IFileTransferService>()
+			ia.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IFileTransferService.class, ServiceScope.GLOBAL))
+				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<IFileTransferService>()
 			{
 				public void intermediateResultAvailable(IFileTransferService result)
 				{
@@ -206,7 +206,7 @@ public class UploadFileCommand extends ACliCommand
 			}));
 			
 			// does not work due to cid has no address
-//			ia.getServiceContainer().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//			ia.getServiceContainer().searchService( new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //				.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IDeploymentService>(ret)
 //			{
 //				public void customResultAvailable(final IComponentManagementService cms)
@@ -219,7 +219,7 @@ public class UploadFileCommand extends ACliCommand
 //							{
 //								public IFuture<IDeploymentService> execute(IInternalAccess ia)
 //								{
-//									return ia.getServiceContainer().searchService(IDeploymentService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//									return ia.getServiceContainer().searchService(IDeploymentService.class, ServiceScope.PLATFORM);
 //								}
 //							}).addResultListener(new DelegationResultListener<IDeploymentService>(ret));
 //						}
@@ -229,7 +229,7 @@ public class UploadFileCommand extends ACliCommand
 		}
 		else
 		{
-			ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IFileTransferService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IFileTransferService.class, ServiceScope.PLATFORM))
 				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IFileTransferService>(ret)));
 		}
 		

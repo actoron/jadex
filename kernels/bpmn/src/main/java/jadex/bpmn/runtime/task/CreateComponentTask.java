@@ -30,6 +30,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 
 /**
  *  Task for creating a component.
@@ -89,7 +90,7 @@ public class CreateComponentTask implements ITask
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-//		IComponentManagementService cms	= instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//		IComponentManagementService cms	= instance.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IComponentManagementService.class));
 		String name = (String)context.getParameterValue("name");
 		String model = (String)context.getParameterValue("model");
 		String config = (String)context.getParameterValue("configuration");
@@ -120,7 +121,7 @@ public class CreateComponentTask implements ITask
 		}
 //				System.out.println("args: "+args);
 		
-		IIntermediateResultListener<Tuple2<String, Object>> lis = new IIntermediateResultListener<Tuple2<String, Object>>()
+		IIntermediateResultListener<Tuple2<String, Object>> lis = new IntermediateEmptyResultListener<Tuple2<String, Object>>()
 		{
 			protected Map<String, Object> results;
 			
@@ -216,18 +217,24 @@ public class CreateComponentTask implements ITask
 		// todo: rid
 		// todo: monitoring
 		PublishEventLevel elm = monitoring!=null && monitoring.booleanValue() ? PublishEventLevel.COARSE: PublishEventLevel.OFF;
-		CreationInfo ci = new CreationInfo(config, args, sub? instance.getId() : null, 
-			suspend, synchronous, elm,
-			instance.getModel().getAllImports(), bindings,
-			instance.getModel().getResourceIdentifier());
+		CreationInfo ci = new CreationInfo(config, args, instance.getModel().getResourceIdentifier());
 		ci.setFilename(model);
+		ci.setSuspend(suspend);
+		ci.setSynchronous(synchronous);
+		ci.setMonitoring(elm);
+		ci.setImports(instance.getModel().getAllImports());
+		ci.setRequiredServiceBindings(bindings);
 		ci.setName(name);
-		instance.createComponent(ci, lis)
+		ci.setSuspend(true);
+		IExternalAccess creator = sub ? instance : instance.getExternalAccess(instance.getId().getRoot());
+		creator.createComponent(ci)
 			.addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(creationfuture)
 		{
 			@Override
 			public void customResultAvailable(IExternalAccess result) throws Exception
 			{
+				result.subscribeToResults().addResultListener(lis);
+				result.resumeComponent();
 				creationfuture.setResult(result.getId());
 			}
 		}));
@@ -262,7 +269,7 @@ public class CreateComponentTask implements ITask
 		{
 			public void resultAvailable(final IComponentIdentifier cid)
 			{
-				IFuture<Map<String, Object>> fut = instance.killComponent(cid);
+				IFuture<Map<String, Object>> fut = instance.getExternalAccess(cid).killComponent();
 				fut.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 				{
 					public void customResultAvailable(Map<String, Object> result)

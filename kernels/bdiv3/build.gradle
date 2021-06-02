@@ -1,4 +1,4 @@
-description 'BDIV3 Kernel that supports annotated POJOs and uses byte code manipulation for performance improvements.'
+description 'BDIV3 Kernel supports belief-desire-intention (BDI) agents in XML as well as in annotated Java POJOs and uses byte code manipulation for performance improvements.'
 
 dependencies
 {

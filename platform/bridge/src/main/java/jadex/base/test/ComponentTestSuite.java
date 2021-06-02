@@ -1,14 +1,16 @@
 package jadex.base.test;
 
+import java.awt.BorderLayout;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,9 +18,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
@@ -38,7 +43,6 @@ import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.commons.SNonAndroid;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
@@ -56,8 +60,8 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	//-------- constants --------
 	
 	/** Run all tests on the same platform. */
-	// Set to true for old behavior 
-	public static final boolean	SAME_PLATFORM	= false;
+	// Set to true for old behavior (speeds up old BDI tests)
+	public static final boolean	SAME_PLATFORM	= true;
 	
 //	/**
 //	 *  The default test platform arguments.
@@ -83,7 +87,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //		"-cli", "false",
 ////		"-persist", "true", // for testing persistence
 ////		"-deftimeout", "-1",
-//		"-printpass", "false",
+//		"-printsecret", "false",
 //		"-superpeerclient", "false",
 //		"-wstransport", "false",
 //		"-relaytransport", "false",
@@ -186,26 +190,29 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 			timer	= new Timer(true);
 			timer.schedule(new TimerTask()
 			{
+				@SuppressWarnings("deprecation")	// for Thread.stop()
 				public void run()
 				{
 					aborted	= true;
 					System.out.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
-					if(!SReflect.isAndroid())
+					//if(!SReflect.isAndroid())
 					{
 						try
 						{
-							runner.stop(new RuntimeException("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms)."));
+							runner.stop();
+							// Broken in Java 11, method removed.
+							//runner.stop(new RuntimeException("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms)."));
 						}
 						catch(UnsupportedOperationException e)
 						{
 							runner.stop();
 						}
 					}
-					else
+					/*else
 					{
 						System.err.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
 						System.exit(1);
-					}
+					}*/
 				}
 			}, timeout);
 		}
@@ -256,10 +263,11 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //			args = newargs;
 //		}
 //		
-		IPlatformConfiguration conf = STest.getDefaultTestConfig();
-//		IPlatformConfiguration conf = Starter.processArgs(args);
-//		this.timeout	= Starter.getDefaultTimeout(null);	// Initial timeout for starting platform.
-		this.timeout	= conf.getDefaultTimeout();	// Initial timeout for starting platform.
+		IPlatformConfiguration conf = STest.getLocalTestConfig(getName());	// Avoid dependencies to created platforms
+		
+		// Initial timeout for starting platform.
+		// Use larger timeout so we can reduce default timeout on build slave
+		this.timeout	= Starter.getScaledDefaultTimeout(null, 10);
 		startTimer();
 
 		if (tests != null) 
@@ -326,7 +334,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 				this.timeout = Starter.getScaledDefaultTimeout(platform.getId(), 1 + 0.05 * scanForTestCases.size()); // Timeout
 																																			// for
 				startTimer();
-				Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + project[rootIndex] + " (scan timeout: " + timeout + ")");
+//				Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + project[rootIndex] + " (scan timeout: " + timeout + ")");
 				for(String abspath : scanForTestCases)
 				{
 					boolean exclude = false;
@@ -367,10 +375,10 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 
 								if(istest)
 								{
-									System.out.print(".");
+//									System.out.print(".");
 									if(runtests)
 									{
-										ComponentTest test = SAME_PLATFORM ? new ComponentTest(platform, model, this) : new ComponentTest(conf, args, roots, platform, model, this);
+										ComponentTest test = SAME_PLATFORM ? new ComponentTest(platform, model, this) : new ComponentTest(STest.getLocalTestConfig(abspath), args, roots, platform, model, this);
 										test.setName(abspath);
 										addTest(test);
 										if(ctimeout == Timeout.NONE || test.getTimeout() == Timeout.NONE)
@@ -385,7 +393,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 								}
 								else if(startable && model.getReport() == null)
 								{
-									System.out.print(".");
+//									System.out.print(".");
 									if(start)
 									{
 										ComponentStartTest test = new ComponentStartTest(platform, model, this);
@@ -406,7 +414,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 								}
 								else if(load)
 								{
-									System.out.print(".");
+//									System.out.print(".");
 									ComponentLoadTest test = new ComponentLoadTest(model, model.getReport());
 									test.setName(abspath);
 									addTest(test);
@@ -422,6 +430,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 							
 							else if(load)
 							{
+								@SuppressWarnings("serial")
 								ComponentLoadTest test = new ComponentLoadTest(abspath, new IErrorReport()
 								{
 									public String getErrorText()
@@ -450,7 +459,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 
 				stopTimer();
 				Future.DEBUG = originalDebug;
-				Logger.getLogger("ComponentTestSuite").info("Finished Building Suite for " + project[rootIndex] + ", cumulated execution timeout is: " + ctimeout);
+//				Logger.getLogger("ComponentTestSuite").info("Finished Building Suite for " + project[rootIndex] + ", cumulated execution timeout is: " + ctimeout);
 			}
 		}
 		this.timeout = ctimeout;
@@ -469,7 +478,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	{
 		List<String> result = new ArrayList<String>();
 
-		if (SReflect.isAndroid())
+		/*if(SReflect.isAndroid())
 		{
 			try
 			{
@@ -514,7 +523,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 				e.printStackTrace();
 			}
 		}
-		else
+		else*/
 		{
 			List<File>	todo	= new LinkedList<File>();
 //			if(path.toString().indexOf("micro")!=-1)
@@ -582,15 +591,22 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	{
 		try
 		{
-			platform.killComponent().get();
+//			System.out.println("SUITE KILLING PLATFORM: "+getName());
+			platform.killComponent().get(Starter.getDefaultTimeout(platform.getId()), true);
+//			System.out.println("SUITE KILLED PLATFORM: "+getName());
 		}
 		catch(Exception e)
 		{
+			System.out.println("SUITE FAILED KILLING PLATFORM: "+getName()+", "+e);
+			e.printStackTrace();
 			result.addError(this, e);
 		}
 		platform	= null;
 		
-		clearAWT();
+//		System.out.println("SUITE CLEARING AWT: "+getName());
+		if(!clearAWT())
+			System.out.println("SUITE FAILED CLEANING AWT: "+getName());
+//		System.out.println("SUITE CLEARED AWT: "+getName());
 		
 		stopTimer();
 	}
@@ -598,12 +614,9 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	/**
 	 *  Workaround for AWT/Swing memory leaks.
 	 */
-	public static void	clearAWT()
+	public static boolean	clearAWT()
 	{
-		if(SReflect.HAS_GUI)
-		{
-			SNonAndroid.clearAWT();
-		}
+		return !SReflect.HAS_GUI || internalClearAWT();
 	}
 
 	/**
@@ -663,4 +676,87 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //		System.out.println("Test added: "+test);
 //		super.addTest(test);
 //	}
+	
+	/**
+	 *  Workaround for AWT/Swing memory leaks.
+	 */
+	public static boolean	internalClearAWT()
+	{
+		// Java Bug not releasing the last focused window, see:
+		// http://www.lucamasini.net/Home/java-in-general-/the-weakness-of-swing-s-memory-model
+		// http://bugs.sun.com/view_bug.do?bug_id=4726458
+		
+//		final Future<Void>	disposed	= new Future<Void>();
+		final Semaphore sem = new Semaphore(0);
+		
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						final JFrame f	= new JFrame("dummy");
+						f.getContentPane().add(new JButton("Dummy"), BorderLayout.CENTER);
+						f.pack();
+						f.setVisible(true);
+						
+						javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								f.dispose();
+								javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+								{
+									public void actionPerformed(ActionEvent e)
+									{
+//										System.out.println("cleanup dispose");
+										KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+										sem.release();
+//										disposed.setResult(null);
+									}
+								});
+								t.setRepeats(false);
+								t.start();
+
+							}
+						});
+						t.setRepeats(false);
+						t.start();
+					}
+				});
+				t.setRepeats(false);
+				t.start();
+			}
+		});
+		
+//		disposed.get(new ThreadSuspendable(), BasicService.getDefaultTimeout());
+//		disposed.get(new ThreadSuspendable(), 30000);
+//		disposed.get(30000);
+		try
+		{
+			return sem.tryAcquire(30000, TimeUnit.MILLISECONDS);
+		}
+		catch (InterruptedException e)
+		{
+			return false;
+		}
+		
+//		// Another bug not releasing the last drawn window.
+//		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6857676
+//		
+//		try
+//		{
+//			Class<?> clazz	= Class.forName("sun.java2d.pipe.BufferedContext");
+//			Field	field	= clazz.getDeclaredField("currentContext");
+//			field.setAccessible(true);
+//			field.set(null, null);
+//		}
+//		catch(Throwable e)
+//		{
+//			e.printStackTrace();
+//		}
+
+	}
 }

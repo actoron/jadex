@@ -14,11 +14,10 @@ import javax.servlet.http.HttpSession;
 
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.micro.annotation.RequiredService;
 import jadex.web.examples.puzzle.Board;
 import jadex.web.examples.puzzle.HighscoreEntry;
 import jadex.web.examples.puzzle.IPuzzleService;
@@ -64,7 +63,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 		};
 		int	timeout	= 30000;
 		platform = Starter.createPlatform(args).get(timeout);
-		puzzle = platform.searchService(new ServiceQuery<>(IPuzzleService.class, RequiredService.SCOPE_PLATFORM)).get(timeout);
+		puzzle = platform.searchService(new ServiceQuery<>(IPuzzleService.class, ServiceScope.PLATFORM)).get(timeout);
 	}
 	
 	/**
@@ -213,7 +212,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 			}
 			
 			// Save platform settings in case of server crash
-			ISettingsService	settings	= platform.searchService( new ServiceQuery<>( ISettingsService.class, RequiredService.SCOPE_PLATFORM)).get(timeout);
+			ISettingsService	settings	= platform.searchService( new ServiceQuery<>( ISettingsService.class, ServiceScope.PLATFORM)).get(timeout);
 			settings.saveProperties().get(timeout);
 			
 			view	= "/WEB-INF/jsp/puzzle/highscore.jsp";

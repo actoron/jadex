@@ -3,15 +3,16 @@ package jadex.micro.examples.messagequeue.replicated;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.examples.messagequeue.Event;
@@ -20,7 +21,7 @@ import jadex.micro.examples.messagequeue.Event;
 /**
  * 
  */
-@Agent
+@Agent(predecessors="jadex.micro.examples.messagequeue.replicated.ReplicatedMessageQueueAgent")
 @RequiredServices(@RequiredService(name = "mq", type = IMessageQueueReplicableService.class))
 @Arguments(@Argument(name = "topic", clazz = String.class, defaultvalue = "\"default_topic\""))
 public class UserAgent
@@ -32,7 +33,8 @@ public class UserAgent
 	protected IInternalAccess					agent;
 
 	/** The message queue. */
-	@AgentServiceSearch
+	//@AgentServiceSearch
+	@OnService
 	protected IMessageQueueReplicableService	mq;
 
 	/** The topic argument. */
@@ -44,7 +46,8 @@ public class UserAgent
 	/**
 	 * The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		final ISubscriptionIntermediateFuture<Event> fut = mq.subscribe(topic);
@@ -90,6 +93,6 @@ public class UserAgent
 				return IFuture.DONE;
 			}
 		};
-		agent.getFeature(IExecutionFeature.class).waitForDelay(1000, step);
+		agent.waitForDelay(1000, step);
 	}
 }

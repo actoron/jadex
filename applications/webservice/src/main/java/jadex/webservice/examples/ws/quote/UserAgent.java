@@ -16,6 +16,8 @@ import javax.swing.SwingUtilities;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -23,8 +25,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -49,7 +49,8 @@ public class UserAgent
 	/**
 	 *  Called when agent is born.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void>	cret	= new Future<Void>();
@@ -128,7 +129,8 @@ public class UserAgent
 	/**
 	 *  Called when the agent is killed.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public IFuture<Void>	cleanup()
 	{
 		final Future<Void>	ret	= new Future<Void>();

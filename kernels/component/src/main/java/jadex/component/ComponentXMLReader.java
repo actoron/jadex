@@ -2,6 +2,7 @@ package jadex.component;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -9,6 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.ClassInfo;
@@ -31,6 +33,7 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -139,6 +142,42 @@ public class ComponentXMLReader
 		}
 	};
 	
+	public static final IStringObjectConverter scopeconv	= new IStringObjectConverter()
+	{
+		@Override
+		public Object convertString(String val, Object context) throws Exception
+		{
+			return val!=null ? ServiceScope.valueOf(val.toUpperCase()) : ServiceScope.DEFAULT;
+		}
+	};
+	
+	public static final IObjectStringConverter rescopeconv	= new IObjectStringConverter()
+	{
+		@Override
+		public String convertObject(Object val, Object context)
+		{
+			return ((ServiceScope)val).name().toLowerCase();
+		}
+	};
+
+	public static final IStringObjectConverter stringtostringarray	= new IStringObjectConverter()
+	{
+		@Override
+		public Object convertString(String val, Object context) throws Exception
+		{
+			return val!=null ? val.split("\\s*,\\s*") : null;
+		}
+	};
+	
+	public static final IObjectStringConverter stringarraytostring	= new IObjectStringConverter()
+	{
+		@Override
+		public String convertObject(Object val, Object context)
+		{
+			return val!=null ? Arrays.asList((String[])val).stream().collect(Collectors.joining(", ")): null;
+		}
+	};
+
 	/**
 	 *  Parse expression text.
 	 */
@@ -335,17 +374,19 @@ public class ComponentXMLReader
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(ModelInfo.class), 
 			new MappingInfo(null, "description", null,
 				new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE))
+					new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("predecessors", "predecessors"), new AttributeConverter(stringtostringarray, stringarraytostring)),
+					new AttributeInfo(new AccessInfo("successors", "successors"), new AttributeConverter(stringtostringarray, stringarraytostring))
 				}, 
 				new SubobjectInfo[]{
-				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "argument")}), new AccessInfo(new QName(uri, "argument"), "argument")),
-				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "result")}), new AccessInfo(new QName(uri, "result"), "result")),
-				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "container")}), new AccessInfo(new QName(uri, "container"), "container")),
-				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "providedservice")}), new AccessInfo(new QName(uri, "providedservice"), "providedService")),
-				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "requiredservice")}), new AccessInfo(new QName(uri, "requiredservice"), "requiredService")),
-				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype")}), new AccessInfo(new QName(uri, "componenttype"), "subcomponentType")),
-				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "property")}), new AccessInfo(new QName(uri, "property"), "property", null, null)),//, new BeanAccessInfo(putprop, null, "map", getname))),
-				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "nfproperties"), new QName(uri, "nfproperty")}), new AccessInfo(new QName(uri, "nfproperty"), "NFProperty")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "argument")}), new AccessInfo(new QName(uri, "argument"), "argument")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "result")}), new AccessInfo(new QName(uri, "result"), "result")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "container")}), new AccessInfo(new QName(uri, "container"), "container")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "providedservice")}), new AccessInfo(new QName(uri, "providedservice"), "providedService")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "requiredservice")}), new AccessInfo(new QName(uri, "requiredservice"), "requiredService")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype")}), new AccessInfo(new QName(uri, "componenttype"), "subcomponentType")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "property")}), new AccessInfo(new QName(uri, "property"), "property", null, null)),//, new BeanAccessInfo(putprop, null, "map", getname))),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "nfproperties"), new QName(uri, "nfproperty")}), new AccessInfo(new QName(uri, "nfproperty"), "NFProperty")),
 			}), null, new BeanObjectReaderHandler()));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(ConfigurationInfo.class), 
@@ -402,7 +443,8 @@ public class ComponentXMLReader
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "providedservice")}), 
 			new ObjectInfo(ProvidedServiceInfo.class),
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv)),
+					new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv)),
+					new AttributeInfo(new AccessInfo("scope", "scope"), new AttributeConverter(scopeconv, rescopeconv))
 			}, null), null, new BeanObjectReaderHandler()));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "implementation")), new ObjectInfo(ProvidedServiceImplementation.class, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
@@ -432,6 +474,7 @@ public class ComponentXMLReader
 			new MappingInfo(null, null, null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("componentname", "componentName")),
 				new AttributeInfo(new AccessInfo("componenttype", "componentType")),
+				new AttributeInfo(new AccessInfo("scope", "scope"), new AttributeConverter(scopeconv, rescopeconv))
 //				new AttributeInfo(new AccessInfo("creationname", "creationName")),
 //				new AttributeInfo(new AccessInfo("creationtype", "creationType")),
 			},

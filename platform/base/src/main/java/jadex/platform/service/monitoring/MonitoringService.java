@@ -7,9 +7,9 @@ import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.commons.IFilter;
@@ -81,7 +81,8 @@ public class MonitoringService implements IMonitoringService
 	/**
 	 *  Notify subscribers that monitoring service is terminated.
 	 */
-	@ServiceShutdown
+	//@ServiceShutdown
+	@OnEnd
 	public IFuture<Void> shutdown()
 	{
 		Future<Void> ret = new Future<Void>();

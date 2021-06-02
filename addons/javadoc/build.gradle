@@ -18,5 +18,5 @@ dependencies
 	api project(':kernels:micro')
 	api project(':kernels:microservice')
 	api project(':platform:webservice')
-	api project(':serialization:xml')
+	api project(':serialization:traverser')
 }

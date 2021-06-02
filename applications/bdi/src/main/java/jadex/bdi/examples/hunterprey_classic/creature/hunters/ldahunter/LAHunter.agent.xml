@@ -55,10 +55,17 @@
 		    </fact>
 		</belief>
 
+		<!-- 
 		<belief name="potential_window" class="PotentialFrame">
 			<fact>
-				new PotentialFrame($scope.getExternalAccess(), "World of "+$beliefbase.my_self.getName())
+				new PotentialFrame($scope.getExternalAccess(), "Classic world of "+$beliefbase.my_self.getName())
 			</fact>
+		</belief>
+		 -->
+		
+		<belief name="gui" class="jadex.commons.gui.GuiCreator">
+			<fact>new jadex.commons.gui.GuiCreator(PotentialFrame.class, new Class[]{jadex.bridge.IExternalAccess.class, java.lang.String.class}, 
+				new Object[]{$scope.getExternalAccess(), "Classic world of "+$beliefbase.my_self.getName()})</fact>
 		</belief>
 
 		<!-- The following beliefs are automatically updated by the capability. -->

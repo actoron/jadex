@@ -24,7 +24,7 @@ public class MainH4
 			"-gui", "false",
 			"-welcome", "false",
 			"-cli", "false",
-			"-printpass", "false"
+			"-printsecret", "false"
 		};
 		String[]	newargs	= new String[defargs.length+args.length];
 		System.arraycopy(defargs, 0, newargs, 0, defargs.length);
@@ -39,7 +39,7 @@ public class MainH4
 		System.out.println("Started platform: "+platform.getId());
 		
 		// Start the chat component
-		IExternalAccess exta = platform.createComponent(new CreationInfo().setFilename(ChatD2Agent.class.getName()+".class"), null).get();
+		IExternalAccess exta = platform.createComponent(new CreationInfo().setFilename(ChatD2Agent.class.getName()+".class")).get();
 		System.out.println("Started chat component: "+exta);
 		
 		// Fetch the chat service

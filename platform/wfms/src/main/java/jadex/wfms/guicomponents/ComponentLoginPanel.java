@@ -19,7 +19,7 @@ public class ComponentLoginPanel extends AbstractLoginPanel
 	
 	protected IFuture discoverWfms()
 	{
-		return SServiceProvider.getServices(provider, IExternalWfmsService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+		return SServiceProvider.getServices(provider, IExternalWfmsService.class, ServiceScope.GLOBAL);
 	}
 	
 	protected IFuture getWfmsName(IExternalWfmsService wfms)

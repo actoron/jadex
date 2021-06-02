@@ -8,6 +8,7 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.Future;
@@ -30,7 +31,8 @@ public class NoServiceAgent extends JunitAgentTest
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentBody
+	@OnStart
+	//@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		final Future<Void> ret = new Future<Void>();

@@ -23,7 +23,8 @@
 			<targetcondition>$beliefbase.money==$beliefbase.target</targetcondition>
 		</achievegoal>
 		
-		<achievegoal name="getoneeuro" recur="true" recurdelay="1000"/>
+		<!-- <achievegoal name="getoneeuro" recur="true" recurdelay="1000"/> -->
+		<achievegoal name="getoneeuro" retry="true" retrydelay="1000" exclude="never"/>
  	</goals>
 
 	<plans>
@@ -63,7 +64,7 @@
 	</plans>
 
 	<services>
-		<requiredservice name="paintservices" class="IPaintMoneyService" multiple="true">
+		<requiredservice name="paintservices" class="IPaintMoneyService" >
 			<binding scope="platform"/>
 		</requiredservice>
 	</services>

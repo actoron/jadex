@@ -6,6 +6,8 @@ import java.util.Random;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
@@ -31,6 +33,7 @@ public class LotteryAgent implements ILotteryService
 	protected Collection<SubscriptionIntermediateFuture<String>> subscriptions = new ArrayList<SubscriptionIntermediateFuture<String>>();
 	
 	@AgentBody
+	//@OnStart
 	public void body()
 	{
 		Random r = new Random();
@@ -54,6 +57,7 @@ public class LotteryAgent implements ILotteryService
 	}
 	
 	@AgentKilled
+	//@OnEnd
 	public void killed()
 	{
 		for(TerminableIntermediateFuture<String> sub: subscriptions)

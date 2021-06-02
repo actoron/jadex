@@ -1,0 +1,29 @@
+quicktest:
+  stage: test
+  only:
+    - master
+  variables:
+    GIT_STRATEGY: fetch
+    GIT_DEPTH: "1"
+  script:
+    - gradlew -Pdist=publishdists clean test -x javadoc -x processSchemas --info --stacktrace --no-daemon --continue
+  tags:
+    - win
+  cache:
+    paths:
+      - binaries/
+      
+testreport:
+  stage: deploy
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - gradlew testReport
+  tags:
+    - win
+  artifacts:
+    paths:
+      - testreport
+  only:
+    - master
+  when: always

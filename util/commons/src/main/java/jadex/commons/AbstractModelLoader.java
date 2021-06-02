@@ -30,7 +30,7 @@ public abstract class AbstractModelLoader
 	 */
 	public AbstractModelLoader(String[] extensions)
 	{
-		this(extensions, SReflect.isAndroid() ? 12 : 450);
+		this(extensions, 450);
 	}
 	
 	/**
@@ -270,30 +270,14 @@ public abstract class AbstractModelLoader
 			Tuple	keytuple	= new Tuple(keys);
 			
 			ResourceInfo	info	= null;
-			cached	= modelcache.get(keytuple);
-//			System.out.println("hit: "+name+" "+cached);
-			// If model is in cache, check at most every three seconds if file on disc is newer.
-			if(cached!=null && cached.getLastChecked()+3000<System.currentTimeMillis())
+			try
 			{
-				info	= extension!=null ? getResourceInfo(name, extension, imports, classloader) : getResourceInfo(name, imports, classloader);
-				if(cached.getLastModified()<info.getLastModified())
+				cached	= modelcache.get(keytuple);
+	//			System.out.println("hit: "+name+" "+cached);
+				// If model is in cache, check at most every three seconds if file on disc is newer.
+				if(cached!=null && cached.getLastChecked()+3000<System.currentTimeMillis())
 				{
-					cached	= null;
-				}
-				else
-				{
-					cached.setLastChecked(System.currentTimeMillis());
-					info.cleanup();
-				}
-			}
-	
-			if(cached==null && info==null)
-			{
-				// Lookup cache by resolved filename.
-				info	= extension!=null ? getResourceInfo(name, extension, imports, classloader) : getResourceInfo(name, imports, classloader);
-				cached	= modelcache.get(new Tuple(new Object[]{info.getFilename()}));
-				if(cached!=null)
-				{
+					info	= extension!=null ? getResourceInfo(name, extension, imports, classloader) : getResourceInfo(name, imports, classloader);
 					if(cached.getLastModified()<info.getLastModified())
 					{
 						cached	= null;
@@ -301,35 +285,53 @@ public abstract class AbstractModelLoader
 					else
 					{
 						cached.setLastChecked(System.currentTimeMillis());
-						info.cleanup();
 					}
-	
+				}
+		
+				if(cached==null && info==null)
+				{
+					// Lookup cache by resolved filename.
+					info	= extension!=null ? getResourceInfo(name, extension, imports, classloader) : getResourceInfo(name, imports, classloader);
+					cached	= modelcache.get(new Tuple(new Object[]{info.getFilename()}));
+					if(cached!=null)
+					{
+						if(cached.getLastModified()<info.getLastModified())
+						{
+							cached	= null;
+						}
+						else
+						{
+							cached.setLastChecked(System.currentTimeMillis());
+						}
+		
+						// Associate cached model to new key (name/extension/imports).
+						modelcache.put(keytuple, cached);
+					}
+				}
+					
+				// Not found: load from disc and store in cache.
+				if(cached==null)
+				{
+					try
+					{
+						cached	= doLoadModel(name, imports, info, classloader, context);
+					}
+					catch(Exception e)
+					{
+						cached	= new BrokenModel(e, info);
+					}
+					
+					// Store by filename also, to avoid reloading with different imports.
+					modelcache.put(new Tuple(new Object[]{info.getFilename()}), cached);
+					
 					// Associate cached model to new key (name/extension/imports).
 					modelcache.put(keytuple, cached);
 				}
 			}
-				
-			// Not found: load from disc and store in cache.
-			if(cached==null)
+			finally
 			{
-				try
-				{
-					cached	= doLoadModel(name, imports, info, classloader, context);
-				}
-				catch(Exception e)
-				{
-					cached	= new BrokenModel(e, info);
-				}
-				finally
-				{
-					info.cleanup();
-				}
-				
-				// Store by filename also, to avoid reloading with different imports.
-				modelcache.put(new Tuple(new Object[]{info.getFilename()}), cached);
-				
-				// Associate cached model to new key (name/extension/imports).
-				modelcache.put(keytuple, cached);
+				if(info!=null)
+					info.close();
 			}
 		}
 		

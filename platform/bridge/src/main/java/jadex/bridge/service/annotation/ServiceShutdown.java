@@ -7,7 +7,10 @@ import java.lang.annotation.Target;
 
 /**
  *  Annotation for pojo service shutdown method.
+ *
+ *  use: @OnEnd
  */
+@Deprecated
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ServiceShutdown

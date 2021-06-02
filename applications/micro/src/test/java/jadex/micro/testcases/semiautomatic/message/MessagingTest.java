@@ -37,7 +37,7 @@ public class MessagingTest
 		
 		// Start receiver.
 		IExternalAccess	pf_receiver	= Starter.createPlatform(config).get();		
-		IComponentIdentifier cid_receiver = pf_receiver.createComponent(new CreationInfo().setFilename(receiver.getName()+".class")).getFirstResult();
+		IComponentIdentifier cid_receiver = pf_receiver.createComponent(new CreationInfo().setFilename(receiver.getName()+".class")).get().getId();
 				
 		// Start sender with receiver CID.
 		IExternalAccess	pf_sender;

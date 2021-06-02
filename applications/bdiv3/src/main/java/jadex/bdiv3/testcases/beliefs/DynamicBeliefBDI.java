@@ -10,6 +10,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -42,7 +43,7 @@ public class DynamicBeliefBDI
 	/**
 	 *  Plan that reacts on belief changes of num2.
 	 */
-	@Plan(trigger=@Trigger(factchangeds="num2"))
+	@Plan(trigger=@Trigger(factchanged="num2"))
 	protected void successPlan(int num)
 	{
 		System.out.println("plan activated: num2 changed to "+num);
@@ -54,7 +55,8 @@ public class DynamicBeliefBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		num1 = 2;

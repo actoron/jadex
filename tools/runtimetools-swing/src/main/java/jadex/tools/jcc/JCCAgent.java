@@ -10,7 +10,9 @@ import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -24,21 +26,16 @@ import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Properties;
 import jadex.tools.chat.ChatPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
 import jadex.tools.libtool.LibraryServicePlugin;
-import jadex.tools.registry.RegistryComponentPlugin;
 import jadex.tools.security.SecurityServicePlugin;
 import jadex.tools.simcenter.SimulationServicePlugin;
 import jadex.tools.starter.StarterPlugin;
-import jadex.tools.testcenter.TestCenterPlugin;
 
 /**
  *  Micro component for opening the JCC gui.
@@ -49,9 +46,9 @@ import jadex.tools.testcenter.TestCenterPlugin;
 	@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true", description="Save settings on exit?"),
 	@Argument(name="platforms", clazz=String.class, defaultvalue="null", description="Show JCC for platforms matching this name.")
 })
-@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="jcc"))
+@Agent(name="jcc", autostart=Boolean3.TRUE)
 @Properties(@NameValue(name="system", value="true"))
-public class JCCAgent	implements IComponentStep<Void>
+public class JCCAgent implements IComponentStep<Void>
 {
 	//-------- constants --------
 	
@@ -63,29 +60,34 @@ public class JCCAgent	implements IComponentStep<Void>
 	
 	//-------- attributes --------
 	
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
+	
 	/** The saveonexit argument. */
 	@AgentArgument
-	protected boolean	saveonexit;
+	protected boolean saveonexit;
 	
 	/** The platforms argument. */
 	@AgentArgument
-	protected String	platforms;
+	protected String platforms;
 	
 	/** The control center. */
 	protected ControlCenter	cc;
 	
 	/** Number of tries, when connecting initially to remote platforms. */
-	protected int	tries;
+	protected int tries;
 	
 	/** True when initially connected to a remote platform.. */
-	protected boolean	connected;
+	protected boolean connected;
 	
 	//-------- micro agent methods --------
 	
 	/**
 	 *  Open the gui on agent startup.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void>	execute(final IInternalAccess agent)
 	{
 		final Future<Void>	ret	= new Future<Void>();
@@ -132,7 +134,7 @@ public class JCCAgent	implements IComponentStep<Void>
 			{
 				agent.getLogger().info("Searching for platforms matching '"+platforms+"'.");
 				
-				agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ILibraryService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+				agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ILibraryService.class, ServiceScope.GLOBAL))
 					.addResultListener(new TimeoutIntermediateResultListener<ILibraryService>(RETRY_DELAY, agent.getExternalAccess(),
 						new IntermediateExceptionDelegationResultListener<ILibraryService, Void>(ret)
 				{
@@ -142,7 +144,7 @@ public class JCCAgent	implements IComponentStep<Void>
 						if(cid.getName().startsWith(platforms))
 						{
 							connected = true;
-							agent.getExternalAccess(cid)
+							agent.getExternalAccessAsync(cid)
 								.addResultListener(new IResultListener<IExternalAccess>()
 							{
 								public void resultAvailable(IExternalAccess platform)
@@ -199,8 +201,9 @@ public class JCCAgent	implements IComponentStep<Void>
 	/**
 	 *  Close the gui on agent shutdown.
 	 */
-	@AgentKilled
-	public IFuture<Void>	agentKilled(IInternalAccess agent)
+	//@AgentKilled
+	@OnEnd
+	public IFuture<Void> agentKilled(IInternalAccess agent)
 	{
 //		System.out.println("JCC agent killed");
 		Future<Void>	ret	= new Future<Void>();
@@ -213,7 +216,7 @@ public class JCCAgent	implements IComponentStep<Void>
 		{
 			ret.setResult(null);
 		}
-
+		
 		return ret;
 	}
 	
@@ -221,7 +224,7 @@ public class JCCAgent	implements IComponentStep<Void>
 	 *  Get the control center.
 	 */
 	// Used for test case.
-	public ControlCenter	getControlCenter()
+	public ControlCenter getControlCenter()
 	{
 		return cc;
 	}

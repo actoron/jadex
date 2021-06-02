@@ -118,7 +118,7 @@ public class SimCenterPanel extends JPanel
 //	{
 //		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 //		
-//		jcc.getJCCAccess().getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//		jcc.getJCCAccess().getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 //		{
 //			public void customResultAvailable(IComponentManagementService cms)

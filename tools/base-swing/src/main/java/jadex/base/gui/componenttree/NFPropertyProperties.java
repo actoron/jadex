@@ -14,10 +14,8 @@ import javax.swing.JTextField;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -133,11 +131,11 @@ public class NFPropertyProperties extends PropertiesPanel
 		});
 		
 		getTextField("Name").setText(propmi.getName());
-		getTextField("Type").setText(SReflect.getUnqualifiedTypeName(propmi.getType().getName()));
+		getTextField("Type").setText(propmi.getType().getClassNameOnly());
 		if(propmi.getUnit()!=null)
 		{
-			getTextField("Unit").setText(SReflect.getUnqualifiedTypeName(propmi.getUnit().getName()));
-			Class<?> ucl = propmi.getUnit();
+			getTextField("Unit").setText(propmi.getUnit().getClassNameOnly());
+			Class<?> ucl = propmi.getUnit().getType(this.getClass().getClassLoader()); // hmm, which classloader?!
 			if(Enum.class.isAssignableFrom(ucl))
 			{
 				Object[] vals = ucl.getEnumConstants();

@@ -1,5 +1,6 @@
 package jadex.bdi.testcases.plans;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.bdiv3x.runtime.Plan;
 
@@ -11,11 +12,11 @@ public class CountdownTesterPlan extends Plan
 {
 	/**
 	 * The body method is called on the
-	 * instatiated plan instance from the scheduler.
+	 * instantiated plan instance from the scheduler.
 	 */
 	public void body()
 	{
-		waitFor(300);
+		waitFor(Starter.getScaledDefaultTimeout(getComponentIdentifier(), 0.02));
 		TestReport tr = new TestReport("#1", "Test plan context condition.");
 		if(getPlanbase().getPlans().length==1)
 		{

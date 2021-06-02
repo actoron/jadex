@@ -121,7 +121,6 @@ public class TaskActivityHandler extends DefaultActivityHandler
 	 *  @param thread The process thread.
 	 *  @param info The info object.
 	 */
-
 	public void cancel(MActivity activity, IInternalAccess instance, ProcessThread thread)
 	{
 		thread.setCanceled(true);

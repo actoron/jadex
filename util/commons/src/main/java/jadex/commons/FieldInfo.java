@@ -20,6 +20,9 @@ public class FieldInfo
 	/** The field (cached). */
 	protected Field field;
 	
+	/** The inner field info, if any (used only for nested sub-sub-capabilities). */
+	protected FieldInfo inner;
+	
 	/**
 	 *  Create a new FieldInfo. 
 	 */
@@ -35,6 +38,15 @@ public class FieldInfo
 		this.name = field.getName();
 		this.classname = field.getDeclaringClass().getName();
 		this.typename = field.getType().getName();
+	}
+	
+	/**
+	 *  Create a new nested FieldInfo. 
+	 */
+	public FieldInfo(Field field, FieldInfo inner)
+	{
+		this(field);
+		this.inner	= inner;
 	}
 	
 	/**
@@ -151,5 +163,13 @@ public class FieldInfo
 	public void setTypeName(String typename)
 	{
 		this.typename = typename;
+	}
+	
+	/**
+	 *  Get the inner field info, if any.
+	 */
+	public FieldInfo	getInner()
+	{
+		return inner;
 	}
 }

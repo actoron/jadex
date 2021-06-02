@@ -31,6 +31,7 @@ import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.IndexMap;
@@ -549,19 +550,21 @@ public class SBpmnModelWriter
 					out.print(escapeString(iface));
 				}
 				
-				if (rs.isMultiple())
+				//if (rs.isMultiple())
+				if(rs.getMax()>1)
 				{
 					out.print("\" multi=\"");
-					out.print(escapeString(String.valueOf(rs.isMultiple())));
+//					out.print(escapeString(String.valueOf(rs.isMultiple())));
+					out.print(escapeString(String.valueOf(rs.getMax()>1)));
 				}
 				
 				if (rs.getDefaultBinding() != null)
 				{
-					String scope = rs.getDefaultBinding().getScope();
-					if (scope != null && scope.length() > 0)
+					ServiceScope scope = rs.getDefaultBinding().getScope();
+//					if (scope != null && scope.length() > 0)
 					{
 						out.print("\" scope=\"");
-						out.print(escapeString(scope));
+						out.print(escapeString(scope.name()));
 					}
 					
 					// dropped in v4???
@@ -837,11 +840,10 @@ public class SBpmnModelWriter
 							out.print("<jadex:requiredserviceconfiguration name=\"");
 							out.print(escapeString(rs.getName()));
 							
-							if (rs.getDefaultBinding().getScope() != null &&
-								rs.getDefaultBinding().getScope().length() > 0)
+							if (rs.getDefaultBinding().getScope() != null)
 							{
 								out.print("\" scope=\"");
-								out.print(escapeString(rs.getDefaultBinding().getScope()));
+								out.print(escapeString(rs.getDefaultBinding().getScope().name()));
 							}
 							
 							out.println("\"/>");

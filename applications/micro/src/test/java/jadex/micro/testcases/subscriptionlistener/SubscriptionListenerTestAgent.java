@@ -1,14 +1,20 @@
 package jadex.micro.testcases.subscriptionlistener;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -60,7 +66,7 @@ public class SubscriptionListenerTestAgent extends TestAgent
 							tr.setFailed("Wrong vals: "+vals1+", "+vals2);
 						}
 						
-						platform.killComponent(provider)
+						platform.getExternalAccess(provider).killComponent()
 							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
 						{
 							public void customResultAvailable(Map<String, Object> map)
@@ -74,5 +80,32 @@ public class SubscriptionListenerTestAgent extends TestAgent
 		});
 		
 		return ret;
+	}
+
+	/**
+	 *  Main for reproducing termination heisenbug.
+	 */
+	public static void main(String[] args)
+	{
+		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimal();
+		CreationInfo ci = new CreationInfo().setFilenameClass(SubscriptionListenerTestAgent.class);
+		IExternalAccess	platform	= Starter.createPlatform(config).get();
+		
+		while(true)
+		{
+			List<IFuture<IExternalAccess>>	agents	= new ArrayList<>();
+			
+			// Start many agents
+			for(int i=0; i<1; i++)
+			{
+				agents.add(platform.createComponent(ci));				
+			}
+			
+			// Wait for all agents started
+			agents.stream().forEach(agent -> agent.get());
+			
+			// Wait for all agents finished
+			agents.stream().forEach(agent -> agent.get().waitForTermination().get(30000));
+		}
 	}
 }

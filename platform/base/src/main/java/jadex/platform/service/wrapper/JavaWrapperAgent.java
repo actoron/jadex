@@ -9,6 +9,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
@@ -20,7 +21,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -30,11 +31,10 @@ import jadex.micro.annotation.RequiredServices;
  *  Wrapper for executing Java programs.
  */
 @Agent
-@ProvidedServices(@ProvidedService(type=IJavaWrapperService.class,
-	implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IJavaWrapperService.class))
 @RequiredServices({
-	@RequiredService(name="tpservice", type=IThreadPoolService.class, scope=RequiredService.SCOPE_PLATFORM),
-	@RequiredService(name="libservice", type=ILibraryService.class, scope=RequiredService.SCOPE_PLATFORM)
+	@RequiredService(name="tpservice", type=IThreadPoolService.class, scope=ServiceScope.PLATFORM),
+	@RequiredService(name="libservice", type=ILibraryService.class, scope=ServiceScope.PLATFORM)
 })
 @Service
 public class JavaWrapperAgent	implements	IJavaWrapperService
@@ -46,11 +46,13 @@ public class JavaWrapperAgent	implements	IJavaWrapperService
 	protected IInternalAccess	agent;
 	
 	/** The thread pool service. */
-	@AgentServiceSearch(lazy=false)
+	//@AgentServiceSearch(lazy=false)
+	@OnService
 	protected IThreadPoolService	tpservice;
 	
 	/** The library service. */
-	@AgentServiceSearch
+	//@AgentServiceSearch
+	@OnService
 	protected ILibraryService	libservice;
 	
 	//-------- IJavaWrapperService interface --------

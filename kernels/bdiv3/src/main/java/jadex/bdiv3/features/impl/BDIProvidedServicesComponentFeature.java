@@ -1,6 +1,5 @@
 package jadex.bdiv3.features.impl;
 
-import java.lang.reflect.Proxy;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,6 +18,8 @@ import jadex.bridge.service.component.ProvidedServicesComponentFeature;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SimpleParameterGuesser;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.javaparser.SimpleValueFetcher;
 
 /**
@@ -40,7 +41,7 @@ public class BDIProvidedServicesComponentFeature extends ProvidedServicesCompone
 	 *  Init a service.
 	 *  Overriden to allow for service implementations as BPMN processes using signal events.
 	 */
-	protected Object createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher) throws Exception
+	public IFuture<Object> createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher)
 	{
 		// todo: cleanup this HACK!!!
 		if(getComponent().getFeature0(IPojoComponentFeature.class)!=null)
@@ -68,17 +69,18 @@ public class BDIProvidedServicesComponentFeature extends ProvidedServicesCompone
 		}
 		
 		// Support special case that BDI should implement provided service with plans.
-		Object ret = null;
+		Future<Object> ret = new Future<>();
 		ProvidedServiceImplementation impl = info.getImplementation();
 		if(impl!=null && impl.getClazz()!=null && impl.getClazz().getType(getComponent().getClassLoader()).equals(IBDIAgent.class))
 		{
 			Class<?> iface = info.getType().getType(getComponent().getClassLoader());
-			ret = ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{iface}, 
+			Object res = ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{iface}, 
 				new BDIServiceInvocationHandler(getInternalAccess(), iface));
+			ret.setResult(res);
 		}
 		else
 		{
-			ret = super.createServiceImplementation(info, fetcher);
+			super.createServiceImplementation(info, fetcher).delegate(ret);
 		}
 		
 //		hackguesser = null;

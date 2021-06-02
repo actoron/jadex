@@ -32,10 +32,10 @@ public class ProviderAgent implements ITestService
 //	@AgentBody
 //	public void body()
 //	{
-////		ITestService ts = SServiceProvider.getTaggedService(agent, ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM, "mytag1", "mytag2").get(); 
-////		Collection<ITestService> ts = SServiceProvider.getTaggedServices(agent, ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM, TagProperty.PLATFORM_NAME, TagProperty.JADEX_VERSION).get(); 
+////		ITestService ts = SServiceProvider.getTaggedService(agent, ITestService.class, ServiceScope.PLATFORM, "mytag1", "mytag2").get(); 
+////		Collection<ITestService> ts = SServiceProvider.getTaggedServices(agent, ITestService.class, ServiceScope.PLATFORM, TagProperty.PLATFORM_NAME, TagProperty.JADEX_VERSION).get(); 
 //
-//		Collection<ITestService> ts = SServiceProvider.getTaggedServices(agent, ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM, TagProperty.PLATFORM_NAME).get(); 
+//		Collection<ITestService> ts = SServiceProvider.getTaggedServices(agent, ITestService.class, ServiceScope.PLATFORM, TagProperty.PLATFORM_NAME).get(); 
 //		
 //		System.out.println("Found: "+ts);
 //		

@@ -50,6 +50,7 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
@@ -741,6 +742,7 @@ public class BpmnXMLReader
 								{
 									exp = parser.parseExpression(val, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
 								}
+								System.out.println("setpropreader: "+name+" "+exp);
 								act.setPropertyValue(name, exp);
 							}
 							
@@ -1514,7 +1516,7 @@ public class BpmnXMLReader
 							// todo: interceptors, proxytype
 							
 							RequiredServiceBinding binding = new RequiredServiceBinding(null, compname, comptype, 
-									scope, null, proxytype==null || proxytype.length()==0? 
+									ServiceScope.valueOf(scope), null, proxytype==null || proxytype.length()==0? 
 										BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED: proxytype);
 							bindings.put(name, binding);
 						}
@@ -1673,7 +1675,7 @@ public class BpmnXMLReader
 							}
 							
 							// todo: support publish
-							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim, null, null, null);
+							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim);
 							mi.addProvidedService(psi);
 							
 							if(table.getRowSize()>4)
@@ -1702,7 +1704,7 @@ public class BpmnXMLReader
 											psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null, null);
 										}
 										// todo: support publish
-										ci.addProvidedService(new ProvidedServiceInfo(name, type, psim, null, null, null));
+										ci.addProvidedService(new ProvidedServiceInfo(name, type, psim));
 									}
 								}
 							}
@@ -1731,12 +1733,12 @@ public class BpmnXMLReader
 								RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
 								if(binding==null)
 									throw new RuntimeException("Unknown binding: "+bindingname);
-								rsi = new RequiredServiceInfo(name, type, multiple, binding, null, null);
+								rsi = new RequiredServiceInfo(name, type, -2, -2, binding, null, null); // multiple
 							}
 							else
 							{
 								rsi = new RequiredServiceInfo(name, type);
-								rsi.setMultiple(multiple);
+								//rsi.setMultiple(multiple);
 							}
 							mi.addRequiredService(rsi);
 							
@@ -1758,12 +1760,12 @@ public class BpmnXMLReader
 											RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
 											if(binding==null)
 												throw new RuntimeException("Unknown binding: "+bindingname);
-											rsi = new RequiredServiceInfo(name, type, multiple, binding, null, null);
+											rsi = new RequiredServiceInfo(name, type, -2, -2, binding, null, null);
 										}
 										else
 										{
 											rsi = new RequiredServiceInfo(name, type);
-											rsi.setMultiple(multiple);
+											//rsi.setMultiple(multiple);
 										}
 										ci.addRequiredService(rsi);
 									}

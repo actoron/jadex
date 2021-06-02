@@ -7,6 +7,6 @@ dependencies
 	api 'org.ow2.asm:asm:6.2.1'
 	api 'org.ow2.asm:asm-tree:6.2.1'
 	api 'org.ow2.asm:asm-util:6.2.1'
-	apiNoAndroidRuntime 'net.java.dev.jna:jna:4.5.1'
+	api 'net.java.dev.jna:jna:4.5.1'
 }
 

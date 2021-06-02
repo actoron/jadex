@@ -51,10 +51,8 @@ public class CategoryChartDataConsumer extends AbstractChartDataConsumer
 		String bgimagefn = (String)getProperty("bgimage");
 		if(bgimagefn!=null)
 		{
-			try
+			try(ResourceInfo rinfo = getResourceInfo(bgimagefn, getSpace().getExternalAccess().getModelAsync().get().getAllImports(), getSpace().getClassLoader()))
 			{
-				ClassLoader cl = getSpace().getClassLoader();
-				ResourceInfo rinfo = getResourceInfo(bgimagefn, getSpace().getExternalAccess().getModelAsync().get().getAllImports(), cl);
 				Image image = ImageIO.read(rinfo.getInputStream());
 				rinfo.getInputStream().close();
 				

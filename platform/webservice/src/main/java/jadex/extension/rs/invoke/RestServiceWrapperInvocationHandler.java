@@ -101,9 +101,9 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 	{
 		final Future<Object> ret = new Future<Object>();
 			
-		CreationInfo ci = new CreationInfo(agent.getId());
+		CreationInfo ci = new CreationInfo();
 		ci.setFilename("jadex/extension/rs/invoke/RestServiceInvocationAgent.class");
-		agent.createComponent(ci, null)
+		agent.createComponent(ci)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
 		{
 			public void customResultAvailable(IExternalAccess exta) 
@@ -233,7 +233,7 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 								MultivaluedMap<String, String> ps = (MultivaluedMap<String, String>)targetparams;
 								for(String key: ps.keySet())
 								{
-									wt = wt.queryParam(key, ps.get(key).toArray(new String[0]));
+									wt = wt.queryParam(key, (Object[])ps.get(key).toArray(new String[0]));
 								}
 							}
 							

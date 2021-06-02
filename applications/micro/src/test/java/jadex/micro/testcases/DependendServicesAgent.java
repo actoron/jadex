@@ -14,6 +14,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SUtil;
@@ -26,8 +28,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -64,7 +64,8 @@ public class DependendServicesAgent extends JunitAgentTest
     /**
      *  Init code.
      */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
     public IFuture<Void> agentCreated()
     {
         final Future<Void> ret = new Future<Void>();
@@ -89,11 +90,13 @@ public class DependendServicesAgent extends JunitAgentTest
 						}
 						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(3, (TestReport[])tests.toArray(new TestReport[tests.size()])));
 						
+		            	System.out.println("kill 1");
 						agent.killComponent();
                     }
                     
                     public void exceptionOccurred(Exception exception)
                     {
+		            	System.out.println("kill 2");
 						agent.killComponent(exception);
                     }
                 }));
@@ -106,6 +109,7 @@ public class DependendServicesAgent extends JunitAgentTest
 					{
 						public void intermediateResultAvailable(IMonitoringEvent result)
 						{
+                        	System.out.println("del0: "+child.getId()+" "+result);
 							child.getResultsAsync().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Map<String, Object>>()
                             {
                                 public void resultAvailable(Map<String, Object> res)
@@ -129,6 +133,7 @@ public class DependendServicesAgent extends JunitAgentTest
 					});
                 }
 //                ret.setException(null);	// ???
+            	System.out.println("init done 1");
                 ret.setResult(null);
             }
         }));
@@ -138,7 +143,8 @@ public class DependendServicesAgent extends JunitAgentTest
     /**
      *  The agent body.
      */
-	@AgentBody
+	//@AgentBody
+	@OnStart
     public IFuture<Void> executeBody()
     {
         getChildrenAccesses().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Collection<IExternalAccess>>()
@@ -148,6 +154,7 @@ public class DependendServicesAgent extends JunitAgentTest
                 IExternalAccess[] childs = (IExternalAccess[])result.toArray(new IExternalAccess[0]);
                 for(int i=0; i<childs.length; i++)
                 {
+	            	System.out.println("kill child: "+childs[i]);
                     childs[i].killComponent();
                 }
             }
@@ -172,7 +179,7 @@ public class DependendServicesAgent extends JunitAgentTest
 					new DelegationResultListener<Collection<IExternalAccess>>(ret));
 				for(int i=0; !ret.isDone() && i<children.length; i++)
 				{
-					agent.getExternalAccess(children[i]).addResultListener(crl);
+					agent.getExternalAccessAsync(children[i]).addResultListener(crl);
 				}
 			}
 		});

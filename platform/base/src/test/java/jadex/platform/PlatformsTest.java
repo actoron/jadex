@@ -1,7 +1,6 @@
 package jadex.platform;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +19,7 @@ import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CMSStatusEvent.CMSTerminatedEvent;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.javaparser.SJavaParser;
 
 /**
@@ -46,8 +45,10 @@ public class PlatformsTest //extends TestCase
 		"-gui", "false",
 		"-saveonexit", "false",
 		"-welcome", "false",
-		"-printpass", "false",
-		"-superpeerclient", "false", // TODO: fails on shutdown due to auto restart
+		"-printsecret", "false",
+		"-multicastawareness", "false", // avoid interference with other tests
+		"-broadcastawareness", "false", // avoid interference with other tests
+		"-catalogawareness", "false", // avoid interference outside world
 //		"-deftimeout", ""+TIMEOUT
 	};
 	
@@ -68,18 +69,18 @@ public class PlatformsTest //extends TestCase
 	 */
 	public static void main(String[] args)
 	{
-		IExternalAccess	ea	= Starter.createPlatform("-gui", "false","-logging","true").get();
-		ea.killComponent().get();
+//		IExternalAccess	ea	= Starter.createPlatform("-gui", "false","-logging","true").get();
+//		ea.killComponent().get();
 		
 //		System.out.println("guiclass: "+ jadex.commons.SReflect.classForName0("jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel",
 //		   	jadex.platform.service.library.LibraryService.class.getClassLoader()));
 //		
-//		PlatformsTest test = new PlatformsTest();
-//		for(int i=0; i<10000; i++)
-//		{
-//			System.out.println("Run: "+i);
-//			test.testPlatforms();
-//		}
+		PlatformsTest test = new PlatformsTest();
+		for(int i=0; i<10000; i++)
+		{
+			System.out.println("Run: "+i);
+			test.testPlatforms();
+		}
 	}
 	
 	/**
@@ -88,7 +89,8 @@ public class PlatformsTest //extends TestCase
 	@Test
 	public void	testPlatforms()
 	{
-		long timeout = Starter.getDefaultTimeout(null);
+		// Use larger timeout so we can reduce default timeout on build slave
+		long timeout = Starter.getScaledDefaultTimeout(null, 5);
 		long[] starttimes = new long[PLATFORMS.length/2+1];
 		long[] shutdowntimes = new long[PLATFORMS.length/2+1];
 		IModelInfo	defmodel	= null;	// Model of default platform to compare others to.
@@ -101,13 +103,13 @@ public class PlatformsTest //extends TestCase
 				args	= (String[])SUtil.joinArrays(args, new String[]
 				{
 					"-componentfactory", PLATFORMS[(i-1)*2],
-					"-conf", PLATFORMS[(i-1)*2+1],
+					"-conf", PLATFORMS[(i-1)*2+1]
 				});
 			}
 			
 			long start = System.currentTimeMillis();
 			IExternalAccess	platform = (IExternalAccess)Starter.createPlatform(args).get(timeout);
-			timeout = Starter.getDefaultTimeout(platform.getId());
+//			timeout = Starter.getDefaultTimeout(platform.getId());
 			starttimes[i] = System.currentTimeMillis()-start;
 //			System.out.println("Started platform: "+i);
 			
@@ -122,18 +124,8 @@ public class PlatformsTest //extends TestCase
 			
 			final Future<Void>	fut	= new Future<Void>();
 			
-			platform.listenToComponent(platform.getId()).addIntermediateResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+			platform.listenToComponent().addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 			{
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-				
-				@Override
-				public void resultAvailable(Collection<CMSStatusEvent> result)
-				{
-				}
-				
 				@Override
 				public void intermediateResultAvailable(CMSStatusEvent result)
 				{
@@ -142,14 +134,9 @@ public class PlatformsTest //extends TestCase
 						fut.setResult(null);
 					}
 				}
-				
-				@Override
-				public void finished()
-				{
-				}
 			});
 			
-//			IComponentManagementService cms = platform.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
+//			IComponentManagementService cms = platform.searchService(new ServiceQuery<>(IComponentManagementService.class, ServiceScope.PLATFORM)).get(timeout);
 //			cms.listenToComponent(platform.getId()).addIntermediateResultListener(new IIntermediateResultListener<IComponentManagementService.CMSStatusEvent>()
 //			{
 //				@Override

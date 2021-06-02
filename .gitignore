@@ -8,6 +8,7 @@ bin
 *.copy
 keystore
 jadex_certstore.zip
+platform_auto.conf
 *.settings.xml
 settings_*
 alarmclock_settings.ser
@@ -54,3 +55,10 @@ jadex-platform-standalone-launch/highscore.dmp
 /tools/runtimetools-swing/jcc.settings.json
 /platform/webservice-websocket/node_modules
 /fastbuild.bat
+/broken build 1
+/broken build 2
+/broken build 3
+/broken build 4 (hang)
+/editors/bpmn/config
+build2
+build3

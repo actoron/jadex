@@ -31,6 +31,16 @@ public interface IModelInfo
 	public String getName();
 	
 	/**
+	 *  Get required predecessors (dependencies).
+	 */
+	public String[] getPredecessors();
+	
+	/**
+	 *  Get declared successors (dependencies).
+	 */
+	public String[] getSuccessors();
+	
+	/**
 	 *  Get the package name.
 	 *  @return The package name.
 	 */

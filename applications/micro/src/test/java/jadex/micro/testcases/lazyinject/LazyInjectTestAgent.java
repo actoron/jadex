@@ -13,24 +13,21 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.commons.Boolean3;
 import jadex.commons.future.DefaultTuple2ResultListener;
-import jadex.commons.future.IFunctionalExceptionListener;
-import jadex.commons.future.IFunctionalIntermediateFinishedListener;
-import jadex.commons.future.IFunctionalIntermediateResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -60,7 +57,8 @@ public class LazyInjectTestAgent extends JunitAgentTest
 	@Agent
 	protected IInternalAccess agent;
 
-	@AgentServiceSearch(lazy=true)
+	//@AgentServiceSearch(lazy=true)
+	@OnService(lazy = Boolean3.TRUE)
 	protected ITestService ts;
 	
 	protected List<TestReport>	reports	= new ArrayList<TestReport>();
@@ -69,7 +67,8 @@ public class LazyInjectTestAgent extends JunitAgentTest
 	/**
 	 *
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		intermediateFutureTest();
@@ -100,7 +99,7 @@ public class LazyInjectTestAgent extends JunitAgentTest
 		final TestReport tr2 = new TestReport("#2", "Test if functional listener works.");
 		reports.add(tr2);
 
-		fut.addIntermediateResultListener(new IFunctionalIntermediateResultListener<String>() 
+		/*fut.addIntermediateResultListener(new IFunctionalIntermediateResultListener<String>() 
 		{
 			@Override
 			public void intermediateResultAvailable(String result) 
@@ -133,6 +132,30 @@ public class LazyInjectTestAgent extends JunitAgentTest
 				tr2.setFailed(exception);
 				checkFinished();
 			}
+		});*/
+		
+		fut.next(result ->
+		{
+			System.out.println("first: " + result);
+			if ("hello".equals(result)) 
+			{
+				tr2.setSucceeded(true);
+			} 
+			else 
+			{
+				tr2.setFailed("Received wrong results.");
+			}
+			checkFinished();
+		}).finished(Void ->
+		{
+			// should not happen as finish is never called
+			tr2.setFailed(new Exception("finish unexpected"));
+			checkFinished();
+		}).catchEx(exception -> 
+		{
+			System.out.println("ex: "+exception);
+			tr2.setFailed(exception);
+			checkFinished();
 		});
 
 	}
@@ -232,7 +255,7 @@ public class LazyInjectTestAgent extends JunitAgentTest
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.createComponent(new CreationInfo().setFilename(LazyInjectTestAgent.class.getCanonicalName() + ".class")).getSecondResult();
+					ia.createComponent(new CreationInfo().setFilename(LazyInjectTestAgent.class.getCanonicalName() + ".class")).get().waitForTermination().get();
 					System.out.println("Step done.");
 					return IFuture.DONE;
 				}

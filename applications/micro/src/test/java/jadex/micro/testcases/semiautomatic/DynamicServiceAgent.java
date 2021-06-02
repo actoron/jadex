@@ -5,6 +5,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.commons.future.Future;
@@ -25,7 +26,8 @@ public class DynamicServiceAgent
 	/**
 	 *  Perform the agents actions.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 		final Future<Void> ret = new Future<Void>();

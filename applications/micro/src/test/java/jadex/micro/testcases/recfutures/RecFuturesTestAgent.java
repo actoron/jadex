@@ -14,10 +14,10 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -27,7 +27,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -69,19 +68,12 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 	/**
 	 * 
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		final Testcase tc = new Testcase();
-		if(SReflect.isAndroid()) 
-		{
-			System.out.println("Running on android, setting test nr to 1");
-			tc.setTestCount(1);
-		} 
-		else 
-		{
-			tc.setTestCount(2);	
-		}
+		tc.setTestCount(2);	
 		
 		final Future<TestReport> ret = new Future<TestReport>();
 		ret.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<TestReport>()
@@ -124,22 +116,14 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
-				if(SReflect.isAndroid()) 
+				testRemote(2, 100, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
-					System.out.println("Running on android, so skipping remote tests.");
-					ret.setResult(null);
-				}
-				else
-				{
-					testRemote(2, 100, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+					public void customResultAvailable(TestReport result)
 					{
-						public void customResultAvailable(TestReport result)
-						{
-							tc.addReport(result);
-							ret.setResult(null);
-						}
-					}));
-				}
+						tc.addReport(result);
+						ret.setResult(null);
+					}
+				}));
 			}
 		}));
 		
@@ -205,14 +189,12 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 		// Start platform
 		try
 		{
-			disableLocalSimulationMode().get();
-			
 			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
 				"-saveonexit", "false", "-welcome", "false", "-awareness", "false",
 	//			"-logging_level", "java.util.logging.Level.INFO",
-				"-gui", "false", "-simulation", "false", "-printpass", "false",
+				"-gui", "false", "-simulation", "false", "-printsecret", "false",
 				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
 			}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
@@ -280,8 +262,8 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //		System.out.println("Using rid: "+rid);
 		final boolean	local	= root.equals(agent.getId().getRoot());
-		jadex.bridge.service.types.cms.CreationInfo	ci	= new jadex.bridge.service.types.cms.CreationInfo(local ? agent.getId() : root, rid);
-		agent.createComponent(ci.setFilename(AAgent.class.getName()+".class"), null)
+		jadex.bridge.service.types.cms.CreationInfo	ci	= new jadex.bridge.service.types.cms.CreationInfo(rid);
+		agent.getExternalAccess(local ? agent.getId() : root).createComponent(ci.setFilename(AAgent.class.getName()+".class"))
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)

@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import jadex.base.IPlatformConfiguration;
-import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -17,27 +14,25 @@ import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IPullIntermediateFuture;
 import jadex.commons.future.IPullSubscriptionIntermediateFuture;
-import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-import jadex.micro.testcases.RemoteTestBaseAgent;
+import jadex.micro.testcases.TestAgent;
 
 /**
  *  The invoker agent tests if intermediate results are directly delivered 
@@ -47,7 +42,8 @@ import jadex.micro.testcases.RemoteTestBaseAgent;
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Description("The invoker agent tests if pull results are directly " +
 	"delivered back to the invoker in local and remote case.")
-public class PullResultTestAgent extends RemoteTestBaseAgent
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
+public class PullResultTestAgent extends TestAgent
 {
 	//-------- attributes --------
 	
@@ -59,8 +55,9 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
-	public void body()
+	//@AgentBody
+	@OnStart
+	public IFuture<Void> body()
 	{
 		final Testcase tc = new Testcase();
 //		if(SReflect.isAndroid()) 
@@ -71,26 +68,9 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 //		{
 //			tc.setTestCount(4);
 //		}
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 		
 		final Future<Void> ret = new Future<Void>();
-		ret.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-//				System.out.println("tests finished");
-
-				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
-				agent.killComponent();				
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println(agent.getFeature(IExecutionFeature.class).isComponentThread()+" "+agent.getId());
-				
-				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
-				agent.killComponent();	
-			}
-		}));
 //					
 //		testLocal(1, 100, 3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport[], Void>(ret)
 //		{
@@ -116,6 +96,8 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 //				}
 //			}
 //		}));
+					
+		return ret;
 	}
 	
 	/**
@@ -124,14 +106,13 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 	 */
 	protected IFuture<TestReport[]> testLocal(final int testno, final long delay, final int max)
 	{
-		disableLocalSimulationMode().get();
 		final Future<TestReport[]> ret = new Future<TestReport[]>();
-		performTestA(agent.getId().getRoot(), testno, delay, max)
+		performTestA(agent.getId().getRoot(), null, testno, delay, max)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 		{
 			public void customResultAvailable(final TestReport result1)
 			{
-				performTestB(agent.getId().getRoot(), testno+1, delay, max)
+				performTestB(agent.getId().getRoot(), null, testno+1, delay, max)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 				{
 					public void customResultAvailable(final TestReport result2)
@@ -155,20 +136,16 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		// Start platform
 		try
 		{
-			disableLocalSimulationMode().get();
-			
-			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
+//			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
 //	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 //			Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
 //				"-saveonexit", "false", "-welcome", "false", "-awareness", "false",
 //	//			"-logging_level", "java.util.logging.Level.INFO",
-//				"-gui", "false", "-simulation", "false", "-simul", "false", "-printpass", "false",
+//				"-gui", "false", "-simulation", "false", "-simul", "false", "-printsecret", "false",
 //				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
 //			}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
-			IPlatformConfiguration conf = STest.getDefaultTestConfig();
-			conf.getExtendedPlatformConfiguration().setSimul(false);
-			conf.getExtendedPlatformConfiguration().setSimulation(false);
-			Starter.createPlatform(conf).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
+			
+			setupRemotePlatform(true).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<IExternalAccess, TestReport[]>(ret)
 			{
 				public void customResultAvailable(final IExternalAccess platform)
@@ -178,12 +155,12 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 					{
 						public void customResultAvailable(Void result)
 						{
-							performTestA(platform.getId(), testno, delay, max)
+							performTestA(platform.getId(), platform, testno, delay, max)
 								.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 							{
 								public void customResultAvailable(final TestReport result1)
 								{
-									performTestB(platform.getId(), testno+1, delay, max)
+									performTestB(platform.getId(), platform, testno+1, delay, max)
 										.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 									{
 										public void customResultAvailable(final TestReport result2)
@@ -220,7 +197,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 	 *  - invoke the service
 	 *  - wait with intermediate listener for results 
 	 */
-	protected IFuture<TestReport> performTestA(final IComponentIdentifier root, final int testno, final long delay, final int max)
+	protected IFuture<TestReport> performTestA(final IComponentIdentifier root, IExternalAccess platform, final int testno, final long delay, final int max)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 
@@ -238,15 +215,12 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		
 		// Start service agent
 		// Hack!!! TODO: use some internal/external access for fetching service???
-		@SuppressWarnings("unchecked")
-		IClockService clock	= (IClockService)ServiceRegistry.getRegistry(root)
-			.getLocalService(ServiceRegistry.getRegistry(root).searchService(new ServiceQuery<>(IClockService.class).setNetworkNames(null)));
 		IResourceIdentifier	rid	= new ResourceIdentifier(
 			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //		System.out.println("Using rid: "+rid);
 		final boolean	local	= root.equals(agent.getId().getRoot());
-		CreationInfo ci	= new CreationInfo(local ? agent.getId() : root, rid).setFilename(PullResultProviderAgent.class.getName()+".class");
-		agent.createComponent(ci, null)
+		CreationInfo ci	= new CreationInfo(rid).setFilename(PullResultProviderAgent.class.getName()+".class");
+		(local ? agent.getExternalAccess() : platform).createComponent(ci)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)
@@ -262,7 +236,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 						System.out.println("Invoking");
 						IPullIntermediateFuture<String> fut = service.getResultsA(max);
 						
-						fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
+						fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<String>()
 						{
 							protected List<String> res = new ArrayList<String>();
 							
@@ -323,7 +297,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 	 *  - invoke the service
 	 *  - wait with intermediate listener for results 
 	 */
-	protected IFuture<TestReport> performTestB(final IComponentIdentifier root, final int testno, final long delay, final int max)
+	protected IFuture<TestReport> performTestB(final IComponentIdentifier root, IExternalAccess platform,  final int testno, final long delay, final int max)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 
@@ -344,9 +318,9 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		IResourceIdentifier	rid	= new ResourceIdentifier(
 			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 		final boolean	local	= root.equals(agent.getId().getRoot());
-		CreationInfo	ci	= new CreationInfo(local ? agent.getId() : root, rid).setFilename(PullResultProviderAgent.class.getName()+".class");
-		System.out.println("create: "+ci.getParent()+", "+rid);
-		agent.createComponent(ci, null)
+		CreationInfo	ci	= new CreationInfo(rid).setFilename(PullResultProviderAgent.class.getName()+".class");
+		System.out.println("create: "+rid);
+		(local ? agent.getExternalAccess() : platform).createComponent(ci)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)
@@ -361,7 +335,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 						System.out.println("Invoking B");
 						IPullSubscriptionIntermediateFuture<String> fut2 = service.getResultsB(max);
 						
-						fut2.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
+						fut2.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateEmptyResultListener<String>()
 						{
 							protected List<String> res = new ArrayList<String>();
 							
@@ -375,7 +349,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 								System.out.println("finished: ");
 								TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
 								tr.setReason("Exception did not occur");
-								agent.killComponent(exta.getId());
+								agent.getExternalAccess(exta.getId()).killComponent();
 								ret.setResult(tr);
 							}
 							public void resultAvailable(Collection<String> result)
@@ -383,12 +357,12 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 								System.out.println("resultAvailable: "+result);
 								TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
 								tr.setReason("Exception did not occur");
-								agent.killComponent(exta.getId());
+								agent.getExternalAccess(exta.getId()).killComponent();
 								ret.setResult(tr);
 							}
 							public void exceptionOccurred(Exception exception)
 							{
-								System.out.println("exceptionOccurred: "+exception);
+								System.out.println("exceptionOccurred (ok if FutureTerminatedException): "+exception);
 								
 								TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
 								if(exception instanceof FutureTerminatedException)
@@ -399,7 +373,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 								{
 									tr.setReason("Other exception: ("+exception);
 								}
-								agent.killComponent(exta.getId());
+								agent.getExternalAccess(exta.getId()).killComponent();
 								ret.setResult(tr);
 							}
 						}));

@@ -13,18 +13,14 @@ import java.util.Set;
 
 import javax.swing.SwingUtilities;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CMSStatusEvent.CMSTerminatedEvent;
@@ -32,7 +28,6 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.IFilter;
 import jadex.commons.IPropertyObject;
@@ -42,12 +37,11 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.meta.IPropertyMetaDataSet;
 import jadex.extension.envsupport.IObjectCreator;
 import jadex.extension.envsupport.MEnvSpaceInstance;
@@ -463,10 +457,10 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 //						(ia.getServiceContainer(), IComponentManagementService.class).get(new ThreadSuspendable()));
 					if(owner.indexOf("@")!=-1)
 //						ownerid	= ces.createComponentIdentifier((String)owner, false);
-						ownerid	= new BasicComponentIdentifier((String)owner);
+						ownerid	= new ComponentIdentifier((String)owner);
 					else
 //						ownerid	= ces.createComponentIdentifier((String)owner, true);
-						ownerid	= new BasicComponentIdentifier((String)owner, ia.getId());
+						ownerid	= new ComponentIdentifier((String)owner, ia.getId());
 					
 					Map props = MEnvSpaceType.convertProperties(mprops, fetcher);
 					this.addInitialAvatar(ownerid, (String)MEnvSpaceType.getProperty(mobj, "type"), props);
@@ -646,19 +640,9 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						ia.getClassLoader(), killonexit!=null ? killonexit.booleanValue() : true);
 					observercenters.add(oc);
 					
-					getExternalAccess().listenToComponent(getExternalAccess().getId())
-						.addIntermediateResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+					getExternalAccess().listenToComponent()
+						.addResultListener(new IntermediateEmptyResultListener<CMSStatusEvent>()
 					{
-						@Override
-						public void exceptionOccurred(Exception exception)
-						{
-						}
-						
-						@Override
-						public void resultAvailable(Collection<CMSStatusEvent> result)
-						{
-						}
-						
 						@Override
 						public void intermediateResultAvailable(CMSStatusEvent result)
 						{
@@ -672,11 +656,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 									}
 								});
 							}
-						}
-						
-						@Override
-						public void finished()
-						{
 						}
 					});
 					
@@ -699,9 +678,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 							MEnvSpaceType.setProperties(persp, props, fetcher);
 							
 							IFuture<Void>	fut	= oc.addPerspective((String)MEnvSpaceType.getProperty(sourcepers, "name"), persp);
-							
-							SSimulation.addBlocker(fut);
-
 							fut.addResultListener(crl2);
 						}
 						catch(Exception e)
@@ -1714,7 +1690,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 									// SUtil.createUniqueId(compotype, 3) might lead to conflicts due to race conditions. Use object id as it is really unique.
 //											IComponentIdentifier cid = cms.generateComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
 									// todo: can fail?
-									IComponentIdentifier cid = new BasicComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getId());
+									IComponentIdentifier cid = new ComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getId());
 //											IComponentIdentifier cid = new ComponentIdentifier("dummy@hummy");
 									// Hack!!! Should have actual description and not just name and local type!?
 									CMSComponentDescription desc = new CMSComponentDescription();
@@ -1722,8 +1698,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 									desc.setLocalType(compotype);
 									setOwner(ret.getId(), desc);
 //									System.out.println("env create: "+cid);
-									IFuture	future	= exta.createComponent(
-										new CreationInfo(null, null, getExternalAccess().getId(), false, model.getAllImports()).setFilename(filename).setName(cid.getLocalName()), null);
+									IFuture<IExternalAccess> future = exta.createComponent(
+										new CreationInfo().setImports(model.getAllImports()).setFilename(filename).setName(cid.getLocalName()));
 									future.addResultListener(new IResultListener()
 									{
 										public void resultAvailable(Object result)
@@ -1869,7 +1845,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				AvatarMapping mapping = getAvatarMapping(componenttype, objecttype);
 				if(mapping.isKillComponent())
 				{
-					getExternalAccess().killComponent(desc.getName());
+					getExternalAccess().getExternalAccess(desc.getName()).killComponent();
 				}
 			}
 		}
@@ -2602,7 +2578,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	protected IFuture getComponentType(final IComponentIdentifier cid)
 	{
 		final Future ret = new Future();
-		getExternalAccess().getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
+		getExternalAccess().getExternalAccessAsync(cid).addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -2873,11 +2849,12 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 
 		final Future<Void>	ret	= new Future<Void>();
 		
-		initSpace().addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
+		initSpace().addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
-//				System.out.println("inited space");
+				if(ia.getModel().getFullName().equals("jadex.micro.examples.hunterprey.HunterPrey"))
+					System.out.println(ia.getModel().getFullName()+" initedSpace() done. Now subscribing... "+ia.isComponentThread());
 				
 //				ia.addComponentListener(new IComponentListener()
 //				{
@@ -2922,16 +2899,13 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 //				System.out.println("sub add: "+this);
 				sub.addResultListener(new IIntermediateFutureCommandResultListener<IMonitoringEvent>()
 				{
-					public void resultAvailable(Collection<IMonitoringEvent> result)
-					{
-					}
-					
 					public void intermediateResultAvailable(IMonitoringEvent result)
 					{
 //						System.out.println("rec: "+result);
 						if(result.getType().equals(IMonitoringEvent.TYPE_SUBSCRIPTION_START))
 						{
-//							System.out.println("space subscribed");
+							if(ia.getModel().getFullName().equals("jadex.micro.examples.hunterprey.HunterPrey"))
+								System.out.println(ia.getModel().getFullName()+" space subscribed");
 							ret.setResult(null);
 						}
 						else if(result.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))
@@ -2944,8 +2918,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 							componentRemoved((IComponentDescription)result.getProperty("details"));
 						}
 					}
-					
-				    public void finished()
+
+					public void finished()
 				    {
 //				    	System.out.println("fini");
 				    }
@@ -2959,9 +2933,17 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				    {
 				    	// ignore timer updates
 				    }
+				    
+				    public void resultAvailable(Collection<IMonitoringEvent> result) 
+				    {
+				    }
+				    
+				    public void maxResultCountAvailable(int max) 
+				    {
+				    }
 				});
 			}
-		}));	
+		});
 		return ret;
 	}
 	
@@ -2987,7 +2969,11 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					{
 						ocs[i].dispose();
 					}
-					ret.setResult(null);
+					ia.scheduleStep(ia ->
+					{
+						ret.setResult(null);
+						return IFuture.DONE;
+					});
 				}
 				catch(Exception e)
 				{

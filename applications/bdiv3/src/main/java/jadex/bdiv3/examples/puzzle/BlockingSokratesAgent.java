@@ -21,6 +21,7 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
@@ -42,7 +43,7 @@ public class BlockingSokratesAgent
 	
 	/** The puzzle board. */
 	@Belief
-	protected IBoard	board	= new JackBoard();
+	protected IBoard board = new JackBoard();
 	
 	/** The number of tried moves. */
 	protected int	triescnt;
@@ -62,7 +63,8 @@ public class BlockingSokratesAgent
 	/**
 	 *  Setup the gui and start playing.
 	 */
-	@AgentBody//(keepalive=false)
+	//@AgentBody//(keepalive=false)
+	@OnStart
 	public void	body(IInternalAccess agent)
 	{
 		strategy = agent.getConfiguration();
@@ -172,10 +174,8 @@ public class BlockingSokratesAgent
 			board.move(move);
 					
 			if(delay>0)
-			{
 				plan.waitFor(delay).get();
-			}
-				
+			
 			plan.dispatchSubgoal(new MoveGoal()).get();
 		}
 		
@@ -191,9 +191,7 @@ public class BlockingSokratesAgent
 			print("Failed "+move, depth);
 			board.takeback();
 			if(delay>0)
-			{
 				plan.waitFor(delay).get();
-			}
 		}
 
 		/**

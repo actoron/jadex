@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.misc;
 
 import jadex.bdiv3.BDIAgentFactory;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
@@ -18,7 +19,8 @@ public class NotEnhancedBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		if(agent==null)

@@ -14,7 +14,7 @@ import jadex.bdiv3x.features.BDIXAgentFeature;
 import jadex.bdiv3x.features.BDIXArgumentsResultsComponentFeature;
 import jadex.bdiv3x.features.BDIXLifecycleAgentFeature;
 import jadex.bdiv3x.features.BDIXMessageComponentFeature;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -104,7 +104,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 	// This constructor is used by the Starter class and the ADFChecker plugin. 
 	public BDIXComponentFactory(String providerid)
 	{
-		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
+		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new BDIXModelLoader();
 	}
 	
@@ -140,7 +140,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 		{
 			public void customResultAvailable(Void result)
 			{
-				libservice	= provider.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+				libservice	= provider.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ILibraryService.class));
 				loader = new BDIXModelLoader();
 				
 				libservicelistener = new ILibraryServiceListener()

@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import org.bouncycastle.util.Pack;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
@@ -181,10 +181,10 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractChaCha20Poly1305Suite
 			
 			public IComponentIdentifier getComponentIdentifier()
 			{
-				return new BasicComponentIdentifier("TestComp");
+				return new ComponentIdentifier("TestComp");
 			}
 		};
-		InitialHandshakeFinalMessage ihr = new InitialHandshakeFinalMessage(fakeagent.getComponentIdentifier(), "1234", "");
+		InitialHandshakeFinalMessage ihr = new InitialHandshakeFinalMessage(fakeagent.getComponentIdentifier(), "1234", "", null);
 		
 		Curve448ChaCha20Poly1305Suite s1 = new Curve448ChaCha20Poly1305Suite();
 		Curve448ChaCha20Poly1305Suite s2 = new Curve448ChaCha20Poly1305Suite();

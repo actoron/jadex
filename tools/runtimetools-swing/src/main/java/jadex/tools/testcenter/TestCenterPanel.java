@@ -47,6 +47,7 @@ import jadex.base.SRemoteGui;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -298,7 +299,7 @@ public class TestCenterPanel extends JSplitPanel
 					, "Save")==JFileChooser.APPROVE_OPTION)
 				{
 //					SServiceProvider.getService(plugin.getJCC().getJCCAccess().getServiceProvider(),
-//						ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
+//						ILibraryService.class, ServiceScope.PLATFORM).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 //					{
 //						public void customResultAvailable(Object result)
 					plugin.getJCC().getClassLoader(null).addResultListener(new SwingDefaultResultListener<ClassLoader>(TestCenterPanel.this)
@@ -1246,11 +1247,22 @@ public class TestCenterPanel extends JSplitPanel
 					Map	args	= new HashMap();
 					args.put("timeout", timeout);
 					// Todo: Use remote component for parent if any
-					CreationInfo ci = new CreationInfo(args, plugin.getJCC().getPlatformAccess().getId());
+					CreationInfo ci = new CreationInfo(args);
 					ci.setResourceIdentifier(name.getSecondEntity());
 					ci.setFilename(name.getFirstEntity());
-					plugin.getJCC().getPlatformAccess().createComponent(ci, res)
-						.addResultListener(new SwingDelegationResultListener(ret));
+					plugin.getJCC().getPlatformAccess().createComponent(ci)
+						.addResultListener(new IResultListener<IExternalAccess>()
+						{
+							public void resultAvailable(IExternalAccess result)
+							{
+								result.waitForTermination().addResultListener(res);
+								ret.setResult(result.getId());
+							}
+							public void exceptionOccurred(Exception exception)
+							{
+								ret.setException(exception);
+							}
+						});
 					
 					// Todo: timeout -> force destroy of component
 					ret.addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
@@ -1292,7 +1304,7 @@ public class TestCenterPanel extends JSplitPanel
 //				public void customResultAvailable(IComponentManagementService cms)
 //				{
 //					System.out.println("destroying: "+testcase);
-					plugin.getJCC().getJCCAccess().killComponent(testcase)
+					plugin.getJCC().getJCCAccess().getExternalAccess(testcase).killComponent()
 //					cms.destroyComponent(testcase)
 						.addResultListener(new SwingExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 					{
@@ -1313,7 +1325,7 @@ public class TestCenterPanel extends JSplitPanel
 		/**
 		 *  Callback result listener for (local or remote) test results.
 		 */
-		public class TestResultListener		implements IRemoteResultListener<Collection<Tuple2<String, Object>>>
+		public class TestResultListener implements IRemoteResultListener<Map<String, Object>>
 		{
 			//-------- attributes --------
 			
@@ -1344,18 +1356,19 @@ public class TestCenterPanel extends JSplitPanel
 			/**
 			 *  Result of test execution.
 			 */
-			public void resultAvailable(Collection<Tuple2<String, Object>> result)
+			public void resultAvailable(Map<String, Object> result)
 			{
 				Map<String, Object> resmap = null;
 				Testcase res = null;
 				if(result!=null)
 				{
-					resmap = new HashMap<String, Object>();
-					for(Iterator<Tuple2<String, Object>> it=result.iterator(); it.hasNext(); )
-					{
-						Tuple2<String, Object> tup = it.next();
-						resmap.put(tup.getFirstEntity(), tup.getSecondEntity());
-					}
+					resmap = result;
+//							new HashMap<String, Object>();
+//					for(Iterator<Tuple2<String, Object>> it=result.iterator(); it.hasNext(); )
+//					{
+//						Tuple2<String, Object> tup = it.next();
+//						resmap.put(tup.getFirstEntity(), tup.getSecondEntity());
+//					}
 					res = (Testcase)resmap.get("testresults");
 				}
 //				Testcase	res	= (Testcase)((Map)result).get("testresults");

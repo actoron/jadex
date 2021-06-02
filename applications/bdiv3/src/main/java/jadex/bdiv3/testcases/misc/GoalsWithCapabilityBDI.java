@@ -10,6 +10,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.testcases.misc.TestCapability.TestGoal;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -33,7 +34,8 @@ public class GoalsWithCapabilityBDI
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody//(keepalive=false)
+	//@AgentBody//(keepalive=false)
+	@OnStart
 	public void	body(final IInternalAccess agent)
 	{
 		final TestReport tr	= new TestReport("#1", "Test if capability goals work.");

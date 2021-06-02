@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
@@ -27,7 +29,7 @@ import jadex.micro.annotation.RequiredServices;
 	implementation=@Implementation(ChatServiceD1.class)))
 @RequiredServices({
 	@RequiredService(name="clockservice", type=IClockService.class),
-	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=RequiredService.SCOPE_PLATFORM)
+	@RequiredService(name="chatservices", type=IChatService.class, scope=ServiceScope.PLATFORM) // multiple=true,
 })
 public class ChatD1Agent
 {
@@ -43,7 +45,8 @@ public class ChatD1Agent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 		IFuture<Collection<IChatService>>	chatservices	= requiredServicesFeature.getServices("chatservices");

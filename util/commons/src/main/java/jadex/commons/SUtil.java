@@ -1,5 +1,6 @@
 package jadex.commons;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -9,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
@@ -17,11 +19,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
@@ -35,11 +39,10 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
-import java.security.Provider.Service;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.text.DateFormat;
@@ -67,6 +70,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
+import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.jar.Attributes;
@@ -79,8 +83,15 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileSystemView;
+
+import jadex.commons.collection.IAutoLock;
+import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.LRU;
+import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.collection.SCollection;
+import jadex.commons.collection.WeakKeyValueMap;
 import jadex.commons.random.FastThreadedRandom;
 
 
@@ -133,22 +144,6 @@ public class SUtil
 	
 	/** Access to secure random source. */
 	public static volatile SecureRandom SECURE_RANDOM = null;
-	
-	static
-	{
-		getSecureRandom();
-		if (Security.getProvider("Jadex") == null)
-		{
-			Security.insertProviderAt(new Provider("Jadex", 1.0, "")
-			{
-				{
-					putService(new Service(this, "SecureRandom", "ChaCha20", "jadex.commons.JadexSecureRandomSpi", null, null));
-				}
-				private static final long serialVersionUID = -3208767101511459503L;
-				
-			}, 1);
-		}
-	}
 	
 	/** The mime types. */
 	protected volatile static Map<String, String> MIMETYPES;
@@ -213,13 +208,10 @@ public class SUtil
 	 * Mapping from single characters to encoded version for displaying on
 	 * xml-style interfaces.
 	 */
-	protected static final Map<String, String>			htmlwraps;
+	protected static final Map<String, String> htmlwraps;
 	
-	/** Cached AndroidUtils */
-	protected static volatile AndroidUtils androidutils;
-
 	/** Holds the single characters. */
-	protected static final String			seps;
+	protected static final String seps;
 	
 
 	/** An empty enumeration. */
@@ -429,6 +421,7 @@ public class SUtil
 	
 	/** Default timeout e.g. from environment. */
 	public static final long DEFTIMEOUT;
+	public static final long DEFTIMEOUT_DEFAULT = 30000;
 	static
 	{
 		// Set deftimeout from environment, if set.
@@ -454,7 +447,7 @@ public class SUtil
 		
 		Long ret = dtoprop!=null? Long.parseLong(dtoprop): null;
 		if(ret==null)
-			ret = SReflect.isAndroid() ? 60000L : 30000;
+			ret = DEFTIMEOUT_DEFAULT;
 		DEFTIMEOUT	= ret;
 	}
 
@@ -480,7 +473,7 @@ public class SUtil
 					}
 					catch (Throwable t)
 					{
-						SECURE_RANDOM = getJavaDefaultSecureRandom();
+						SECURE_RANDOM = new SecureRandom();
 					}
 				}
 			}
@@ -768,6 +761,21 @@ public class SUtil
 		// Should try comparable first, for consistency???
 		return val1 == val2 || val1 != null && val1.equals(val2);
 	}
+	
+	/**
+	 * Test if two arrays are content equal or both null.
+	 * 
+	 * @param array1 The first array.
+	 * @param array2 The second array.
+	 * @return True when the arrays are content equal.
+	 */
+	public static final boolean arrayEmptyOrNull(Object array)
+	{
+		if (array != null)
+			return Array.getLength(array) == 0;
+			
+		return true;
+	}
 
 	/**
 	 * Test if two arrays are content equal or both null.
@@ -842,6 +850,23 @@ public class SUtil
 			str.append(array);
 		}
 		return str.toString();
+	}
+	
+	/**
+	 *  Create a map copy with all keys in lowercase.
+	 *  @param map The original map.
+	 *  @return The converted map.
+	 */
+	public static <T> Map<String, T> convertMapKeysToLowercase(Map<String, T> map)
+	{
+		Map<String, T> ret = new HashMap<>();
+		
+		for(Map.Entry<String, T> entry: SUtil.notNull(map).entrySet())
+		{
+			ret.put(entry.getKey().toLowerCase(), entry.getValue());
+		}
+		
+		return ret;
 	}
 
 	/**
@@ -1348,7 +1373,7 @@ public class SUtil
 				if(url.getProtocol().equals("file"))
 				{
 					// Find out default encoding (might fail in applets).
-					String encoding = "ISO-8859-1";
+					String encoding = "UTF-8";
 					try
 					{
 						encoding = System.getProperty("file.encoding");
@@ -1450,8 +1475,9 @@ public class SUtil
 	/**
 	 *  Copy all data from input to output stream.
 	 */
-	public static void copyStream(InputStream is, OutputStream os) 
+	public static int copyStream(InputStream is, OutputStream os) 
 	{
+		int ret = 0;
 		try
 		{
 	        byte[] buf = new byte[10 * 1024];
@@ -1459,6 +1485,7 @@ public class SUtil
 	        while((len = is.read(buf)) != -1) 
 	        {
 	            os.write(buf, 0, len);
+	            ret += len;
 	        }
 		}
 		catch(RuntimeException e)
@@ -1469,6 +1496,8 @@ public class SUtil
 		{
 			throw new RuntimeException(e);
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -1676,12 +1705,12 @@ public class SUtil
 
 		Set<URL> cps = new LinkedHashSet<URL>(); 
 	
-		if(SReflect.isAndroid()) 
-		{
-			cps.addAll(androidUtils().collectDexPathUrls(classloader));
-		} 
-		else 
-		{
+//		if(SReflect.isAndroid()) 
+//		{
+//			cps.addAll(androidUtils().collectDexPathUrls(classloader));
+//		} 
+//		else 
+//		{
 			StringTokenizer stok = new StringTokenizer(System.getProperty("java.class.path"), System.getProperty("path.separator"));
 			while(stok.hasMoreTokens())
 			{
@@ -1753,7 +1782,7 @@ public class SUtil
 //					cps.add(urls[i]);
 //			}
 			cps.addAll(collectClasspathURLs(classloader));
-		}
+		//}
 		
 		return new ArrayList<URL>(cps);
 	}
@@ -1772,21 +1801,19 @@ public class SUtil
 	/**
 	 *  Collect all URLs belonging to a class loader.
 	 */
-	protected static void	collectClasspathURLs(ClassLoader classloader, Set<URL> set, Set<String> jarnames)
+	protected static void collectClasspathURLs(ClassLoader classloader, Set<URL> set, Set<String> jarnames)
 	{
 		assert classloader!=null;
 		
 		if(classloader.getParent()!=null)
-		{
 			collectClasspathURLs(classloader.getParent(), set, jarnames);
-		}
 		
 		if(classloader instanceof URLClassLoader)
 		{
 			URL[] urls = ((URLClassLoader)classloader).getURLs();
 			for(int i=0; i<urls.length; i++)
 			{
-				String	name	= SUtil.getFile(urls[i]).getName();
+				String name = SUtil.getFile(urls[i]).getName();
 				if(name.endsWith(".jar"))
 				{
 					String jarname	= getJarName(name);
@@ -1800,41 +1827,58 @@ public class SUtil
 				collectManifestURLs(urls[i], set, jarnames);
 			}
 		}
-		
-//		else
-//		{
-//			try
-//			{
-//				// Hack for java 9 -> Doesn't work -> not accessible :(
-//				Field	ucpf	= SReflect.getField(classloader.getClass(), "ucp");
-//				ucpf.setAccessible(true);
-//				Object	ucp	=	ucpf.get(classloader);
-//				Field	pathf	= SReflect.getField(ucp.getClass(), "path");
-//				pathf.setAccessible(true);
-//				@SuppressWarnings("unchecked")
-//				List<File>	path	= (List<File>)pathf.get(ucp);
-//				for(File f: path)
-//				{
-//					String	name	= f.getName();
-//					if(name.endsWith(".jar"))
-//					{
-//						String jarname	= getJarName(name);
-//						jarnames.add(jarname);
-//					}
-//				}
-//				
-//				for(File f: path)
-//				{
-//					set.add(f.toURI().toURL());
-//					collectManifestURLs(f.toURI().toURL(), set, jarnames);
-//				}
-//
-//			}
-//			catch(Throwable t)
-//			{
-//				t.printStackTrace();
-//			}
-//		}
+		else if(ClassLoader.getSystemClassLoader().equals(classloader))
+		{
+			String classpath = System.getProperty("java.class.path");
+			String[] entries = classpath.split(File.pathSeparator);
+			for(int i = 0; i < entries.length; i++) 
+			{
+				try
+				{
+					URL url = Paths.get(entries[i]).toAbsolutePath().toUri().toURL();
+					set.add(url);
+				}
+				catch(MalformedURLException e)
+				{
+					System.out.println("url problem: "+entries[i]);
+				}
+			}
+			//System.out.println("found for system classloader: "+set);
+		}
+		/*else
+		{
+			try
+			{
+				// Hack for java 9 -> Doesn't work -> not accessible :(
+				Field ucpf = SReflect.getField(classloader.getClass(), "ucp");
+				ucpf.setAccessible(true);
+				Object ucp = ucpf.get(classloader);
+				Field pathf = SReflect.getField(ucp.getClass(), "path");
+				pathf.setAccessible(true);
+				@SuppressWarnings("unchecked")
+				List<File>	path	= (List<File>)pathf.get(ucp);
+				for(File f: path)
+				{
+					String name = f.getName();
+					if(name.endsWith(".jar"))
+					{
+						String jarname	= getJarName(name);
+						jarnames.add(jarname);
+					}
+				}
+				
+				for(File f: path)
+				{
+					set.add(f.toURI().toURL());
+					collectManifestURLs(f.toURI().toURL(), set, jarnames);
+				}
+
+			}
+			catch(Throwable t)
+			{
+				t.printStackTrace();
+			}
+		}*/
 	}
 	
 	/**
@@ -2553,18 +2597,24 @@ public class SUtil
 	 * @param transporturi Transport-style URI (tcp-mtp://hostpart:port or tcp-mtp://[h:o:s:t%scope]:port for ipv6)
 	 * @return URI
 	 */
-	public static URI toURI(String transporturi) {
+	public static URI toURI(String transporturi) 
+	{
 		URI ret = null;
-		try {
+		try 
+		{
 			// by default, transporturis should be valid URIs.
 			ret = new URI(transporturi);
-			if (ret.getHost() == null) { // URI may not throw, but instead use the whole string as "authority" :(
+			if (ret.getHost() == null) 
+			{ // URI may not throw, but instead use the whole string as "authority" :(
 				throw new URISyntaxException(transporturi, "No hostname found while converting to URI");
 			}
-		} catch (URISyntaxException e) {
+		} 
+		catch (URISyntaxException e) 
+		{
 			// for backword compatibility, handle wrongly formatted IPv6 transport "addresses"
 			// see https://www.ietf.org/rfc/rfc2732.txt for correct format.
-			if (transporturi.contains("%") && !transporturi.contains("[")) {
+			if (transporturi.contains("%") && !transporturi.contains("[")) 
+			{
 //				tcp-mtp://fe80:0:0:0:8cf:5aff:feeb:f199%eth0:42716
 				int schemaend = transporturi.indexOf("://");
 				int portdiv = transporturi.lastIndexOf(':');
@@ -2577,21 +2627,63 @@ public class SUtil
 				{
 					port = Integer.parseInt(transporturi.substring(portdiv+1));
 				}
-					try 
-					{
-						ret =  new URI(scheme, null, hostname, port, null, null, null);
-//						System.out.println("silently converted wrongly formatted URI: " + transporturi);
-					} 
-					catch (URISyntaxException e1) 
-					{
-						e1.printStackTrace();
-						rethrowAsUnchecked(e);
-					}
-				} 
-				else 
+				try 
 				{
+					ret =  new URI(scheme, null, hostname, port, null, null, null);
+//						System.out.println("silently converted wrongly formatted URI: " + transporturi);
+				} 
+				catch (URISyntaxException e1) 
+				{
+					e1.printStackTrace();
 					rethrowAsUnchecked(e);
 				}
+			} 
+			else 
+			{
+				rethrowAsUnchecked(e);
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Converts a file URL to a File,
+	 *  returns null if invalid.
+	 *  
+	 *  @param url The URL.
+	 *  @return File or null if invalid.
+	 */
+	public static final File toFile(URL url)
+	{
+		File ret = null;
+		URI uri = toURI0(url);
+		if (uri != null)
+		{
+			ret = new File(uri);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Converts a file URL to a File,
+	 *  returns null if invalid.
+	 *  
+	 *  @param url The URL.
+	 *  @return File or null if invalid.
+	 */
+	public static final File toFile0(URL url)
+	{
+		File ret = null;
+		URI uri = toURI0(url);
+		if (uri != null)
+		{
+			try
+			{
+				ret = new File(uri);
+			}
+			catch (RuntimeException e)
+			{
+			}
 		}
 		return ret;
 	}
@@ -2929,7 +3021,7 @@ public class SUtil
 	/**
 	 *  Get bytes as human readable string.
 	 */
-	public static String	bytesToString(long bytes)
+	public static String bytesToString(long bytes)
 	{
 		String ret;
 		if(bytes>0)
@@ -3120,6 +3212,82 @@ public class SUtil
 			}
 		}
 		return file;
+	}
+	
+	/** The pool used for interning strings. */
+	static final IRwMap<String, String> internpool = new RwMapWrapper<String, String>(new WeakKeyValueMap<>());
+	
+	/**
+	 *  Optimized version of String.intern() that actually uses String.intern() but
+	 *  provides faster lookups if the String is already interned.
+	 * 
+	 *  @param string The String being interned.
+	 *  @return The interned String.
+	 */
+	public static final String intern(String string)
+	{
+		String ret = internpool.get(string);
+		if (ret == null)
+		{
+			try (IAutoLock l = internpool.writeLock())
+			{
+				ret = internpool.get(string);
+				if (ret == null)
+				{
+					ret = string.intern();
+					internpool.put(ret, ret);
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Removes the (.jar) URLs contained in directories associated
+	 *  with the JVM.
+	 *  
+	 *  @param urls The input URLs.
+	 *  
+	 *  @return URLs without the system path URLs.
+	 */
+	public static final URL[] removeSystemUrls(URL[] urls)
+	{
+		Set<String> bootpaths = new HashSet<>();
+		
+		// Java 8 or lower boot cp with rt.jar etc.
+		String cp = System.getProperty("sun.boot.class.path");
+		if (cp != null && cp.length() > 0)
+			bootpaths.addAll(Arrays.asList(cp.split(":")));
+		
+		// ext libraries
+		cp = System.getProperty("java.ext.dirs");
+		if (cp != null && cp.length() > 0)
+			bootpaths.addAll(Arrays.asList(cp.split(":")));
+		
+		Set<File> javalibdirs = new HashSet<>();
+		
+		for (String bp : bootpaths)
+		{
+			File bpf = new File(bp);
+			if (bpf.isDirectory())
+				javalibdirs.add(bpf);
+			else
+				javalibdirs.add(bpf.getParentFile());
+		}
+		
+		ArrayList<URL> tmpurl = new ArrayList<>();
+		if (urls != null)
+		{
+			for (URL url : urls)
+			{
+				File urlfile = SUtil.getFile(url);
+				if (urlfile == null || !javalibdirs.contains(urlfile.getParentFile()))
+					tmpurl.add(url);
+	//			else
+	//				System.out.println("Excluded: " + url);
+			}
+		}
+		return tmpurl.toArray(new URL[tmpurl.size()]);
 	}
 	
 	/**
@@ -3453,13 +3621,85 @@ public class SUtil
 	public static short getNetworkPrefixLength(InetAddress iadr)
 	{
 		short ret = -1;
-		if(!SReflect.isAndroid() || androidUtils().getAndroidVersion() > 8)
+		try
 		{
-			ret	= SNonAndroid.getNetworkPrefixLength(iadr);
+			NetworkInterface ni = NetworkInterface.getByInetAddress(iadr);
+			List<InterfaceAddress> iads = ni.getInterfaceAddresses();
+			if(iads!=null)
+			{
+				for(int i=0; i<iads.size() && ret==-1; i++)
+				{
+					InterfaceAddress ia = iads.get(i);
+					if(ia.getAddress() instanceof Inet4Address)
+						ret = ia.getNetworkPrefixLength();
+				}
+			}
+			
+		}
+		catch(Exception e)
+		{
+//				e.printStackTrace();
 		}
 		
 		return ret;
 	}
+	
+	/**
+	 * Get the network ips.
+	 */
+	public static List<InetAddress> getNetworkIps()
+	{
+		List<InetAddress> ret = new ArrayList<InetAddress>();
+		try
+		{
+			// Generate network identifiers
+			for(NetworkInterface ni : SUtil.getNetworkInterfaces())
+			{
+				for(InterfaceAddress ifa : ni.getInterfaceAddresses())
+				{
+					if(ifa != null) // Yes, there may be a null in the list. grrr.
+					{
+						InetAddress addr = ifa.getAddress();
+						// System.out.println("addr: "+addr+" "+addr.isAnyLocalAddress()+" "+addr.isLinkLocalAddress()+" "+addr.isLoopbackAddress()+" "+addr.isSiteLocalAddress()+", "+ni.getDisplayName());
+
+						if(addr.isLoopbackAddress())
+						{
+							// ignore
+						}
+						else if(addr.isLinkLocalAddress())
+						{
+							// ignore
+						}
+						else
+						// if(addr.isSiteLocalAddress()) or other
+						{
+							// Hack!!! Use sensible default prefix when -1 or 128
+							// due to JDK bug on windows
+							// http://bugs.sun.com/view_bug.do?bug_id=6707289
+							short prefix = ifa.getNetworkPrefixLength();
+							if(prefix==-1 || prefix==128 && addr instanceof Inet4Address)
+							{
+								prefix	= 24;
+							}
+							InetAddress ad = SUtil.getNetworkIp(addr, prefix);
+							ret.add(ad);
+						}
+					}
+				}
+			}
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+
+		return ret;
+	}
+
 	
 	/**
 	 *  Copy an array.
@@ -3836,7 +4076,7 @@ public class SUtil
 	 */
 	public static File	getHomeDirectory()
 	{
-		return SReflect.isAndroid() ? new File(System.getProperty("user.home")) : SNonAndroid.getHomeDirectory();		
+		return FileSystemView.getFileSystemView().getHomeDirectory();		
 	}
 	
 	/**
@@ -3844,8 +4084,7 @@ public class SUtil
 	 */
 	public static File	getDefaultDirectory()
 	{
-		// Todo: default directory on android?
-		return SReflect.isAndroid() ? new File(System.getProperty("user.home")) : SNonAndroid.getDefaultDirectory();		
+		return FileSystemView.getFileSystemView().getDefaultDirectory();		
 	}
 	
 	/**
@@ -3853,8 +4092,7 @@ public class SUtil
 	 */
 	public static File	getParentDirectory(File file)
 	{
-		// Todo: parent directory on android?
-		return SReflect.isAndroid() ? file.getParentFile() : SNonAndroid.getParentDirectory(file);		
+		return FileSystemView.getFileSystemView().getParentDirectory(file);	
 	}
 
 	/**
@@ -3862,8 +4100,7 @@ public class SUtil
 	 */
 	public static File[]	getFiles(File file, boolean hiding)
 	{
-		// Todo: hidden files on android?
-		return SReflect.isAndroid() ? file.listFiles() : SNonAndroid.getFiles(file, hiding);		
+		return FileSystemView.getFileSystemView().getFiles(file, hiding);	
 	}
 	
 	/**
@@ -3901,7 +4138,7 @@ public class SUtil
 	 */
 	public static boolean isFloppyDrive(File file)
 	{
-		return SReflect.isAndroid() ? false : SNonAndroid.isFloppyDrive(file);
+		return FileSystemView.getFileSystemView().isFloppyDrive(file);
 	}
 
 	/**
@@ -3910,18 +4147,28 @@ public class SUtil
 	 */
 	public static String getDisplayName(File file)
 	{
-		return SReflect.isAndroid() ? null : SNonAndroid.getDisplayName(file);
+		return FileSystemView.getFileSystemView().getSystemDisplayName(file);
 	}
 
 	/**
-	 *  Test if a call is running on a gui (e.g. Swing or Android UI) thread.
-	 *  Currently returns false on android.
+	 *  Test if a call is running on the swing thread.
 	 */
 	public static boolean isGuiThread()
 	{
-		// Todo: ask android helper for android UI thread.
-		return SReflect.isAndroid() ? false : SNonAndroid.isGuiThread();
+		try
+		{
+			return SReflect.HAS_GUI
+				// pre-check because isEventDispatchThread is slow
+				&& Thread.currentThread().getName().startsWith("AWT-EventQueue")
+				&& SwingUtilities.isEventDispatchThread();
+		}
+		catch(Exception e)
+		{
+			// null pointer exception thrown by swing: http://bugs.java.com/view_bug.do?bug_id=8143287
+			return false;
+		}
 	}
+
 	
 	/**
 	 *  Escape a java string.
@@ -4312,7 +4559,7 @@ public class SUtil
 	{
 		assert url.getProtocol().equals("file");
 		
-		File	file;
+		File file;
 		try
 		{
 			file = new File(URLDecoder.decode(url.getFile(), "UTF-8"));
@@ -4475,7 +4722,7 @@ public class SUtil
 			fis = new FileInputStream(file);
 			ret = readStream(fis);
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
 			close(fis);
 			throwUnchecked(e);
@@ -4506,6 +4753,9 @@ public class SUtil
 		}
 
 		buf.flush();
+		
+		// InputStream is exhausted, close ok? Seems reasonable...
+		close(is);
 
 		return buf.toByteArray();
 	}
@@ -4567,6 +4817,47 @@ public class SUtil
 		{
 			rethrowAsUnchecked(e);
 		}
+	}
+	
+	/**
+	 *  Reads a (text) stream line-wise and returns lines as array.
+	 *  @param is InputStream.
+	 *  @return Array of lines.
+	 */
+	public static String[] readStreamLines(InputStream is)
+	{
+		return readStreamLines(is, null);
+	}
+	
+	/**
+	 *  Reads a (text) stream line-wise and returns lines as array.
+	 *  @param is InputStream.
+	 *  @param encoding Character encoding, defaults to UTF8 if null.
+	 *  @return Array of lines.
+	 */
+	public static String[] readStreamLines(InputStream is, Charset encoding)
+	{
+		encoding = encoding == null ? UTF8 : encoding;
+		String[] ret = null;
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, encoding)))
+		{
+			List<String> lines = new ArrayList<>();
+			String line = reader.readLine();
+			while (line != null)
+			{
+				lines.add(line);
+				line = reader.readLine();
+			}
+			ret = lines.toArray(new String[lines.size()]);
+		}
+		catch (Exception e)
+		{
+			throw throwUnchecked(e);
+		}
+		
+		close(is);
+		
+		return ret;
 	}
 	
 	/**
@@ -4810,10 +5101,9 @@ public class SUtil
 		for(int i=0; ret==null && i<adrs.length; i++)
 		{
 			// Use first real, i.e. non-tunnel, mac address
-			if(!"[0, 0, 0, 0, 0, 0, 0, -32]".equals(adrs[i]))
-			{
+			//if(!"[0, 0, 0, 0, 0, 0, 0, -32]".equals(adrs[i]))
+			if(!"00:00:00:00:00:00:00:e0".equals(adrs[i].toLowerCase()))	
 				ret	= adrs[i];
-			}
 		}
 		return ret;
 	}
@@ -4826,12 +5116,37 @@ public class SUtil
 	{
 		if(macs==null)
 		{
-			if(!SReflect.isAndroid() || androidUtils().getAndroidVersion() > 8)
+			TreeSet<String> res = new TreeSet<String>(new Comparator<String>()
 			{
-				macs	= SNonAndroid.getMacAddresses();
-			} else {
-				macs = new String[0];
+				public int compare(String o1, String o2)
+				{
+					return o1.compareTo(o2);
+				}
+			});
+			
+			try
+			{
+				List<NetworkInterface> nis = SUtil.getNetworkInterfaces();
+				for(NetworkInterface ni: nis)
+				{
+					byte[] hwa = ni.getHardwareAddress();
+					if(hwa!=null && hwa.length>0)
+					{
+						//String mac = Arrays.toString(hwa);
+						String mac = SUtil.getMacAddressAsString(hwa);
+						if(!res.contains(mac))
+						{
+							res.add(mac);
+						}
+					}
+				}
 			}
+			catch(Exception e)
+			{
+//					e.printStackTrace();
+			}
+				
+			macs = res.isEmpty()? new String[0]: (String[])res.toArray(new String[res.size()]);
 		}
 		
 		return macs;
@@ -4945,7 +5260,7 @@ public class SUtil
 			{
 				if (appdir == null)
 				{
-					if (SReflect.isAndroid())
+					/*if (SReflect.isAndroid())
 					{
 						try
 						{
@@ -4978,106 +5293,13 @@ public class SUtil
 						}
 					}
 					else
-					{
+					{*/
 						appdir = (new File("")).getAbsoluteFile();
-					}
+					//}
 				}
 			}
 		}
 		return appdir;
-	}
-	
-	/**
-	 * Get the AndroidUtils, if available.
-	 * @return AndroidUtils
-	 */
-	public static AndroidUtils androidUtils() 
-	{
-		if (SReflect.isAndroid() && androidutils == null)
-		{
-			synchronized (SUtil.class)
-			{
-				if(androidutils == null && SReflect.isAndroid())
-				{
-					Class<?> clazz = SReflect.classForName0("jadex.android.commons.AndroidUtilsImpl", SReflect.class.getClassLoader());
-					try
-					{
-						androidutils = (AndroidUtils) clazz.newInstance();
-					}
-					catch(InstantiationException e)
-					{
-						e.printStackTrace();
-					}
-					catch(IllegalAccessException e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		return androidutils;
-	}
-	
-	public interface AndroidUtils {
-
-		/**
-		 * Get Android API version. Possible values:
-		 * http://developer.android.com/reference/android/os/Build.VERSION_CODES.html
-		 * 
-		 * @return Android API version
-		 */
-		int getAndroidVersion();
-
-		/**
-		 * Traverse the Hierarchy of the given classloader and collect all
-		 * DexPaths that are found as URLs.
-		 * @param classloader
-		 * @return URLs
-		 */
-		Collection<? extends URL> collectDexPathUrls(ClassLoader classloader);
-
-		/**
-		 * Checks whether the Platform has the necessary classes to provide XML
-		 * encoding and decoding support.
-		 * @return true, if platform supports xml
-		 */
-		boolean hasXmlSupport();
-
-		/**
-		 * Looks up the ClassLoader Hierarchy and tries to find a JadexDexClassLoader in it.
-		 * @param cl
-		 * @return {@link ClassLoader} or <code>null</code>, if none found.
-		 */
-		ClassLoader findJadexDexClassLoader(ClassLoader cl);
-
-		/**
-		 * Creates an URL object from a given Path to an android APK file
-		 * @param apkPath
-		 * @return {@link URL}
-		 * @throws MalformedURLException
-		 */
-		URL urlFromApkPath(String apkPath) throws MalformedURLException;
-		
-		/**
-		 * Retrieves the APK Path from a given URL, if its an Android APK URL.
-		 * @param url
-		 * @return {@link String}
-		 */
-		String apkPathFromUrl(URL url);
-
-		/**
-		 * Get all Classes in a dex file as Enumeration.
-		 * @param dexFile the dex file
-		 * @return Enumeration of full-qualified classnames
-		 * @throws IOException
-		 */
-		Enumeration<String> getDexEntries(File dexFile) throws IOException;
-
-		/**
-		 * Check whether the current Thread is the android UI thread.
-		 * @return true, if current thread is ui main thread.
-		 */
-		boolean runningOnUiThread();
 	}
 	
 //	/**
@@ -5689,21 +5911,6 @@ public class SUtil
 	}
 	
 	/**
-	 *  Helper method to allow iterating over possibly null array.
-	 */
-	public static <T> T[] notNull(T[] array)
-	{
-		if(array!=null)
-		{
-			return array;
-		}
-		else
-		{
-			return (T[]) Array.newInstance(array.getClass().getComponentType(), 0);
-		}
-	}
-	
-	/**
 	 *  Helper to find first matching key (if any) for a value (identity check).
 	 */
 	public static <K, V> K	findKeyForValue(Map<K, V> map, V value)
@@ -5922,47 +6129,6 @@ public class SUtil
 	    return -1;
 	}
 	
-	/** The Java default secure random. */
-	protected static volatile SecureRandom JAVA_DEFAULT_SECURE_RANDOM;
-	
-	/**
-	 *  Creates Java default algorithm secure random.
-	 */
-	public static final SecureRandom getJavaDefaultSecureRandom()
-	{
-		if (JAVA_DEFAULT_SECURE_RANDOM == null)
-		{
-			synchronized(SUtil.class)
-			{
-				if (JAVA_DEFAULT_SECURE_RANDOM == null)
-				{
-					String alg = "SHA1PRNG";
-					Provider p = Security.getProvider("SUN");
-					if (p != null)
-					{
-						for (Service serv : p.getServices())
-						{
-				            if (serv.getType().equals("SecureRandom"))
-				            {
-				                alg = serv.getAlgorithm();
-				                break;
-				            }
-				        }
-					}
-					try
-					{
-						JAVA_DEFAULT_SECURE_RANDOM = SecureRandom.getInstance(alg);
-					}
-					catch (NoSuchAlgorithmException e)
-					{
-						throw SUtil.throwUnchecked(e);
-					}
-				}
-			}
-		}
-		return JAVA_DEFAULT_SECURE_RANDOM;
-	}
-	
 	/**
 	 *  Tests if the OS is Windows.
 	 *  @return True, if Windows.
@@ -5991,6 +6157,92 @@ public class SUtil
 	    {
 	        return string;
 	    }
+	}
+	
+	/**
+	 *  Determine the location of the local computer
+	 *  using some GeoIP web service.
+	 *  @return The location as [<city>][, ][<country>] depending on what's available.
+	 */
+	public static String	getGeoIPLocation()
+	{
+		try
+		{
+			// These free-to-try geoip services have (almost) the same result format.
+//			Scanner scanner	= new Scanner(new URL("http://ipinfo.io/json").openStream(), "UTF-8");
+//			Scanner scanner	= new Scanner(new URL("http://api.petabyet.com/geoip/").openStream(), "UTF-8");
+			Scanner scanner	= new Scanner(new URL("http://ip-api.com/json").openStream(), "UTF-8");
+			
+			// Very simple JSON parsing, matches ..."key": "value"... parts to find country and city.
+			String	country	= null;
+			String	city	= null;
+			scanner.useDelimiter(",");
+			while(scanner.findWithinHorizon("\"([^\"]*)\"[^:]*:[^\"]*\"([^\"]*)\"", 0)!=null)
+			{
+				String	key	= scanner.match().group(1);
+				String	val	= scanner.match().group(2);
+				if("country".equals(key)
+					|| "country_name".equals(key))
+				{
+					country	= val;
+				}
+				else if("city".equals(key))
+				{
+					city	= val;
+				}
+			}
+			scanner.close();
+			
+			return city!=null
+				? country!=null ? city+", "+country : city
+				: country!=null ? country : "unknown";
+		}
+		catch(Exception e)
+		{
+			return "unknown";
+		}
+	}
+
+	
+	/**
+	 *  Ensures SecureRandom use is nonblocking in all cases.
+	 *  Must be called before first new SecureRandom() use.
+	 *  Safe to call multiple times.
+	 *  
+	 *  Note: On certain systems like Linux, SecureRandom ends up
+	 *  using /dev/random as a entropy source for initialization.
+	 *  This has the severe disadvantage of blocking indefinitely
+	 *  once the entropy pool "runs out of entropy" (whatever that
+	 *  means). Calling this method prevents this undesirable behavior.
+	 */
+	public static void ensureNonblockingSecureRandom()
+	{
+		Provider p = Security.getProvider("SUN");
+		if (p != null)
+		{
+			Object nonblocking = p.get("SecureRandom.NativePRNGNonBlocking");
+			Object defnative = p.get("SecureRandom.NativePRNG");
+			if (nonblocking != defnative && nonblocking != null && defnative != null)
+				p.put("SecureRandom.NativePRNG", nonblocking);
+		}
+	}
+	
+	/**
+	 *  Convert a mac address to a string.
+	 *  @param mac The address.
+	 *  @return The string.
+	 */
+	public static String getMacAddressAsString(byte[] mac)
+	{
+		StringBuilder sb = new StringBuilder(18);
+	    for(byte b : mac) 
+	    {
+	        if(sb.length() > 0)
+	        	sb.append(':');
+	        sb.append(String.format("%02x", b));
+	    }
+	    
+	    return sb.toString();
 	}
 	
 	/**

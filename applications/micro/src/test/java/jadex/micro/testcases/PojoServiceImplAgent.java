@@ -6,6 +6,7 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -36,7 +37,8 @@ public class PojoServiceImplAgent extends JunitAgentTest implements IAService
 	/** 
 	 * The body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		IProvidedServicesFeature psf = agent.getFeature(IProvidedServicesFeature.class);

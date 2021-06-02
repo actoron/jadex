@@ -9,6 +9,7 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -31,7 +32,8 @@ public class ParameterGuesserTestAgent extends JunitAgentTest
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody()
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body()
 	{
 		TestReport tr1 = test(1, ProviderAgent.class.getName()+".class");
@@ -50,7 +52,7 @@ public class ParameterGuesserTestAgent extends JunitAgentTest
 		TestReport tr = new TestReport(""+no, " Test if the parameter guesser works correctly when using injection annotations.");
 		try
 		{
-			IComponentIdentifier cid = agent.createComponent(new CreationInfo(agent.getId()).setFilename(model)).getFirstResult();
+			IComponentIdentifier cid = agent.createComponent(new CreationInfo().setFilename(model)).get().getId();
 
 			IInjectionTestService ser = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IInjectionTestService.class).setProvider(cid)).get();
 

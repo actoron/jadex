@@ -2,7 +2,6 @@ package jadex.binary;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
@@ -96,11 +95,11 @@ public class OptionalCodec extends AbstractCodec
 	{
 		init();
 		try {
-			Boolean isPresent = (Boolean) isPresentMethod.invoke(object, null);
+			Boolean isPresent = (Boolean) isPresentMethod.invoke(object);
 			ec.writeBoolean(isPresent);
 
 			if (isPresent) {
-				Object subObject = getMethod.invoke(object, null);
+				Object subObject = getMethod.invoke(object);
 				traverser.doTraverse(subObject, null, preprocessors, processors, mode, targetcl, ec);
 			}
 		} catch (Exception e) {

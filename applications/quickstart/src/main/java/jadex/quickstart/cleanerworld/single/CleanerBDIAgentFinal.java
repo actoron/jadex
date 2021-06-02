@@ -18,9 +18,9 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.CheckNotNull;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
 import jadex.quickstart.cleanerworld.environment.IChargingstation;
 import jadex.quickstart.cleanerworld.environment.ICleaner;
 import jadex.quickstart.cleanerworld.environment.IWaste;
@@ -56,7 +56,7 @@ public class CleanerBDIAgentFinal
 	private Set<ICleaner>	others	= new LinkedHashSet<>();
 	
 	/** The sensor gives access to the environment. */
-	private SensorActuator	actsense	= new SensorActuator(wastes, wastebins, stations, others);
+	private SensorActuator	actsense	= new SensorActuator();
 	
 	/** Knowledge about myself. Managed by SensorActuator object. */
 	@Belief
@@ -75,9 +75,15 @@ public class CleanerBDIAgentFinal
 	 *  The body is executed when the agent is started.
 	 *  @param bdifeature	Provides access to bdi specific methods
 	 */
-	@AgentBody
+	@OnStart	// This annotation informs the Jadex platform to call this method once the agent is started
 	private void	exampleBehavior(IBDIAgentFeature bdifeature)
 	{
+		// Tell the sensor to update the belief sets
+		actsense.manageWastesIn(wastes);
+		actsense.manageWastebinsIn(wastebins);
+		actsense.manageChargingstationsIn(stations);
+		actsense.manageCleanersIn(others);
+		
 		// Open a window showing the agent's perceptions
 		if(sensorgui)
 			new SensorGui(actsense).setVisible(true);

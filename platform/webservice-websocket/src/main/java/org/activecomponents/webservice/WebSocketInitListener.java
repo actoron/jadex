@@ -19,6 +19,9 @@ import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
 
+/**
+ *  Makes servlet context available.
+ */
 //@WebListener
 public class WebSocketInitListener implements ServletContextListener
 {
@@ -65,7 +68,7 @@ public class WebSocketInitListener implements ServletContextListener
 //					return null;
 					return new Configurator()
 					{
-						private ServerEndpointConfig.Configurator containerDefaultConfigurator;
+						private ServerEndpointConfig.Configurator configurator;
 
 						ServerEndpointConfig.Configurator fetchContainerDefaultConfigurator()
 						{
@@ -78,11 +81,11 @@ public class WebSocketInitListener implements ServletContextListener
 
 						ServerEndpointConfig.Configurator getContainerDefaultConfigurator()
 						{
-							if(this.containerDefaultConfigurator == null)
+							if(this.configurator == null)
 							{
-								this.containerDefaultConfigurator = fetchContainerDefaultConfigurator();
+								this.configurator = fetchContainerDefaultConfigurator();
 							}
-							return this.containerDefaultConfigurator;
+							return this.configurator;
 
 						}
 
