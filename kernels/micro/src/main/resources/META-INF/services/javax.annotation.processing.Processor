@@ -1,1 +1,2 @@
 jadex.micro.MicroAnnotationProcessor
+jadex.config.processor.ConfigProcessor

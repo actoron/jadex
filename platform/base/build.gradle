@@ -1,5 +1,20 @@
 description 'The Jadex platform package contains implementations of platform services as well as the platform component itself.'
 
+/*
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "com.diffplug.gradle:goomph:3.29.1"
+  }
+}
+
+apply plugin: "com.diffplug.eclipse.apt"
+*/
+
 dependencies
 {
 	api project(':util:commons')

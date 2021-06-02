@@ -65,9 +65,9 @@ public class MicroAnnotationProcessor	extends AbstractProcessor
 					    	if(elm.getKind()==ElementKind.CLASS)
 					    	{
 					    		Agent	agent	= elm.getAnnotation(Agent.class);
-					    		if(agent.autostart().value()!=Boolean3.NULL)
+					    		if(agent.autostart()!=Boolean3.NULL)
 					    		{
-					    			ps.println("        \""+elm+"\": "+agent.autostart().value().toString().toLowerCase()+",");
+					    			ps.println("        \""+elm+"\": "+agent.autostart().toString().toLowerCase()+",");
 					    		}
 					    	}
 					    }
