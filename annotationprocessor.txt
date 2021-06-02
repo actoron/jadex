@@ -1,0 +1,5 @@
+annonationprocessor use cases
+- generate platform_auto.conf
+- generate junit test agents with local/remote (extra annos required for junit agents)
+- bdiv3?
+- dependency injection (with dagger?), e.g. for services?
