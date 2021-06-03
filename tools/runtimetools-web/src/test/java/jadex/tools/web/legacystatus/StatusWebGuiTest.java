@@ -18,8 +18,11 @@ import jadex.base.Starter;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IMessageFeature;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 /**
  *  Test the web registry page.
@@ -35,10 +38,10 @@ public class StatusWebGuiTest
 		s.close();
 		
 		// Start platform with published status agent gui
-		IPlatformConfiguration	baseconf	= STest.createDefaultTestConfig(getClass());
+		IPlatformConfiguration	baseconf	= STest.createDefaultTestConfig(getClass())
+			.setValue("superpeerclient.awaonly", false);
 		IPlatformConfiguration	webguiconf	= baseconf.clone()
 			.setSuperpeer(true)
-    		.setValue("superpeerclient.awaonly", false)
 			.getExtendedPlatformConfiguration().setRsPublish(true)
 			.setValue("jettyrspublish", true)
 			.setValue("status", true)
@@ -84,8 +87,15 @@ public class StatusWebGuiTest
 			assertContainsField(con, "platform");
 			assertContainsField(con, "connected");
 			assertContainsField(con, "protocol");
-			dummy.killComponent().get();
 
+			// Check that queries can be retrieved.
+			dummy.addQuery(new ServiceQuery<>(IStatusService.class).setScope(ServiceScope.NETWORK));
+			String	query	= getUrlContent("http://localhost:"+port+"/status/subscribeToQueries");
+			System.out.println("query: "+query);
+			assertContainsField(query, "serviceType");
+			assertContainsField(query, "owner");
+			assertContainsField(query, "scope");
+			
 			// Check that provided services can be retrieved.
 			String	service	= getUrlContent("http://localhost:"+port+"/status/subscribeToServices");
 			System.out.println("service: "+service);
@@ -95,13 +105,8 @@ public class StatusWebGuiTest
 			assertContainsField(service, "scope");
 			assertContainsField(service, "networkNames");
 			assertContainsField(service, "unrestricted");
-
-			// Check that queries can be retrieved.
-			String	query	= getUrlContent("http://localhost:"+port+"/status/subscribeToQueries");
-			System.out.println("query: "+query);
-			assertContainsField(query, "serviceType");
-			assertContainsField(query, "owner");
-			assertContainsField(query, "scope");
+			
+			dummy.killComponent().get();
 		});
 	}
 

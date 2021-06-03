@@ -504,8 +504,6 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	 */
 	public ISubscriptionIntermediateFuture<QueryEvent>	subscribeToQueries()
 	{
-		System.out.println(agent+" subscribeToQueries");
-		
 		ISubscriptionIntermediateFuture<QueryEvent>	fut	= serviceregistry.subscribeToQueries();
 		SubscriptionIntermediateDelegationFuture<QueryEvent>	ret	= new SubscriptionIntermediateDelegationFuture<QueryEvent>(fut);
 		SFuture.avoidCallTimeouts(ret, agent);
