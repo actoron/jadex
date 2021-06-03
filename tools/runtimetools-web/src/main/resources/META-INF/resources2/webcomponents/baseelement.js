@@ -5,7 +5,8 @@ export class BaseElement extends LitElement
 	static app_singleton;
 	
 	static apppromise = new Promise((resolve,reject) => {
-		axios.get('/webcomponents/app.js').then(function(resp) {
+		// axios.get('/webcomponents/app.js') is better but does not work with path rewrite in proxy
+		axios.get('../webcomponents/app.js').then(function(resp) {
 			let appfun = new Function("return " + resp.data + "\n//# sourceURL=app.js\n");
 			try {
 				BaseElement.app_singleton = appfun();
