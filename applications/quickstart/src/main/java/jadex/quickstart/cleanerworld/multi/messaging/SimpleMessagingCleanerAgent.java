@@ -16,7 +16,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.OnMessage;
 import jadex.quickstart.cleanerworld.environment.ICleaner;
 import jadex.quickstart.cleanerworld.environment.SensorActuator;
-import jadex.quickstart.cleanerworld.environment.impl.Cleaner;
 import jadex.quickstart.cleanerworld.gui.SensorGui;
 
 /**
@@ -69,7 +68,7 @@ public class SimpleMessagingCleanerAgent
 	 *  @param agent Internal API object of this agent used to send a message.
 	 */
 	@Plan(trigger=@Trigger(factadded="others"))
-	public void cleanerAdded(Cleaner other, IInternalAccess agent)
+	public void cleanerAdded(ICleaner other, IInternalAccess agent)
 	{
 		// Messages can be sent to any agent.
 		// Each agent decides itself how to react to a message.

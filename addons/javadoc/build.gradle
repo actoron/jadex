@@ -19,4 +19,7 @@ dependencies
 	api project(':kernels:microservice')
 	api project(':platform:webservice')
 	api project(':serialization:traverser')
+
+	// Hack!!! referenced from e.g. applications-quickstart and gradle configure fails, when not found
+	api project(':distributions:minimal')
 }
