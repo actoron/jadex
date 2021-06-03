@@ -18,7 +18,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
-import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
@@ -57,7 +56,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected Map<IServiceIdentifier, IService> localserviceproxies;
 	
 	/** The query change subscribers. */
-	protected List<ISubscriptionIntermediateFuture<QueryEvent>> querysubs;
+	protected List<SubscriptionIntermediateFuture<QueryEvent>> querysubs;
 	
 	//-------- methods --------
 	
@@ -1075,7 +1074,16 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			public void terminated(Exception reason)
 			{
-				querysubs.remove(fut);
+				rwlock.writeLock().lock();
+				try
+				{
+					querysubs.remove(fut);
+					
+				}
+				finally
+				{
+					rwlock.writeLock().unlock();
+				}
 			}
 		});
 		
@@ -1112,7 +1120,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		try
 		{
 			qis = new ArrayList<>();
-			querysubs.addAll(qis);
+			qis.addAll(querysubs);
 		}
 		finally
 		{

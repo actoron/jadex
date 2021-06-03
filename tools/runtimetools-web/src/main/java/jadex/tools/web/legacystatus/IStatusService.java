@@ -7,7 +7,6 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.QueryEvent;
 import jadex.bridge.service.search.ServiceEvent;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.transport.PlatformData;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -32,10 +31,11 @@ public interface IStatusService
 	 *  Get registered queries of a given (set of) scope(s) or no scope for all queries.
 	 *  @return A list of queries.
 	 */
-	// No intermediate for easier REST?
-	// TODO: subscription in registry to get notified about new queries? -> please no polling!
-	public IFuture<Collection<ServiceQuery<?>>>	getQueries(String... scope);
 	public ISubscriptionIntermediateFuture<QueryEvent>	subscribeToQueries(String... scope);
+
+//	// No intermediate for easier REST?
+//	// TODO: subscription in registry to get notified about new queries? -> please no polling!
+//	public IFuture<Collection<ServiceQuery<?>>>	getQueries(String... scope);
 	
 //	/**
 //	 *  Get provided services of a given (set of) scope(s) or no scope for all services.

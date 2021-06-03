@@ -29,7 +29,7 @@ app.controller('Queries', [ '$scope', '$http',
 			});
 	}
 ]);
-app.controller('Queries', [ '$scope', '$http',
+/*app.controller('Queries', [ '$scope', '$http',
 	function($scope, $http) {
 		$http.get('status/getQueries',
 			{params: {'scope': JSON.stringify(["global","network"])},	// Stringify otherwise angular adds multiple singlevalued parameter occurrences, grrr.
@@ -39,7 +39,7 @@ app.controller('Queries', [ '$scope', '$http',
 			$scope.queries = response.data;
 		});
 	}
-]);
+]);*/
 
 /**
  *  Beautify cid representation for readability and sorting: platform (agent@platform).

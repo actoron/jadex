@@ -13,22 +13,19 @@ import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
-import jadex.bridge.VersionInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.QueryEvent;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.search.ServiceQueryInfo;
-import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.memstat.IMemstatService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.bridge.service.types.registry.ISuperpeerService;
+import jadex.bridge.service.types.registry.ISuperpeerStatusService;
 import jadex.bridge.service.types.transport.ITransportInfoService;
 import jadex.bridge.service.types.transport.PlatformData;
 import jadex.commons.Boolean3;
@@ -132,8 +129,13 @@ public class StatusAgent implements IStatusService
 	 */
 	public ISubscriptionIntermediateFuture<QueryEvent>	subscribeToQueries(String... scope)
 	{
+		// Delegate request to super peer registry, if any, or fail with SNFE otherwise 
+		ISubscriptionIntermediateFuture<QueryEvent>	fut	= agent.getLocalService(
+			new ServiceQuery<ISuperpeerStatusService>(ISuperpeerStatusService.class).setScope(ServiceScope.PLATFORM))
+				.subscribeToQueries();
+		
 		Set<String>	scopes	= scope==null ? null: new HashSet<String>(Arrays.asList(scope));
-		ISubscriptionIntermediateFuture<QueryEvent>	ret	= new SubscriptionIntermediateDelegationFuture<QueryEvent>(ServiceRegistry.getRegistry(agent.getId()).subscribeToQueries())
+		SubscriptionIntermediateDelegationFuture<QueryEvent>	ret	= new SubscriptionIntermediateDelegationFuture<QueryEvent>(fut)
 		{
 			@Override
 			public boolean doAddIntermediateResult(QueryEvent event, boolean undone)
@@ -149,6 +151,7 @@ public class StatusAgent implements IStatusService
 				return false;
 			}
 		};
+		SFuture.avoidCallTimeouts(ret, agent);
 		return ret;
 	}
 
@@ -218,28 +221,28 @@ public class StatusAgent implements IStatusService
 		return ret;
 	}
 	
-	/**
-	 *  Get registered queries of a given (set of) scope(s) or no scope for all queries.
-	 *  @return A list of queries.
-	 */
-	// No intermediate for easier REST?
-	// TODO: subscription in registry to get notified about new queries? -> please no polling!
-	public IFuture<Collection<ServiceQuery<?>>>	getQueries(String... scope)
-	{
-		Set<String>	scopes	= scope==null ? null: new HashSet<String>(Arrays.asList(scope));
-		IntermediateFuture<ServiceQuery<?>>	ret	= new IntermediateFuture<ServiceQuery<?>>();
-		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getId());
-		for(ServiceQueryInfo<?> sqi: reg.getAllQueries())
-		{
-			if(scopes==null || scopes.contains(sqi.getQuery().getScope().name().toLowerCase()))
-			{
-				ret.addIntermediateResult(sqi.getQuery());
-			}
-		}
-		ret.setFinished();
-
-		return ret;
-	}
+//	/**
+//	 *  Get registered queries of a given (set of) scope(s) or no scope for all queries.
+//	 *  @return A list of queries.
+//	 */
+//	// No intermediate for easier REST?
+//	// TODO: subscription in registry to get notified about new queries? -> please no polling!
+//	public IFuture<Collection<ServiceQuery<?>>>	getQueries(String... scope)
+//	{
+//		Set<String>	scopes	= scope==null ? null: new HashSet<String>(Arrays.asList(scope));
+//		IntermediateFuture<ServiceQuery<?>>	ret	= new IntermediateFuture<ServiceQuery<?>>();
+//		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getId());
+//		for(ServiceQueryInfo<?> sqi: reg.getAllQueries())
+//		{
+//			if(scopes==null || scopes.contains(sqi.getQuery().getScope().name().toLowerCase()))
+//			{
+//				ret.addIntermediateResult(sqi.getQuery());
+//			}
+//		}
+//		ret.setFinished();
+//
+//		return ret;
+//	}
 	
 //	/**
 //	 *  Get provided services of a given (set of) scope(s) or no scope for all services.

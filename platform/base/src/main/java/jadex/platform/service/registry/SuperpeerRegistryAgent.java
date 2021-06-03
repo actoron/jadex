@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
-import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -22,6 +21,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.IServiceRegistry;
+import jadex.bridge.service.search.QueryEvent;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
@@ -38,6 +38,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateEmptyResultListener;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
@@ -495,5 +496,19 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 		
 		SFuture.avoidCallTimeouts(reglis, agent);
 		return reglis;
+	}
+
+	/**
+	 *  Get registered queries.
+	 *  @return A stream of events for added/removed queries.
+	 */
+	public ISubscriptionIntermediateFuture<QueryEvent>	subscribeToQueries()
+	{
+		System.out.println(agent+" subscribeToQueries");
+		
+		ISubscriptionIntermediateFuture<QueryEvent>	fut	= serviceregistry.subscribeToQueries();
+		SubscriptionIntermediateDelegationFuture<QueryEvent>	ret	= new SubscriptionIntermediateDelegationFuture<QueryEvent>(fut);
+		SFuture.avoidCallTimeouts(ret, agent);
+		return ret;
 	}
 }
