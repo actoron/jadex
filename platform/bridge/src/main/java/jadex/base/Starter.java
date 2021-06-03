@@ -711,20 +711,16 @@ public class Starter
 									}
 								}
 								
-								startComponents(0, comps, component.getInternalAccess())
-									.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
+								IFuture<Void>	fut	= startComponents(0, comps, component.getInternalAccess());
+								fut.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
 								{
 									public void customResultAvailable(Void result)
 									{
-										if(Boolean.TRUE.equals(component.getInternalAccess().getArgument("printversion")))
-										{
-											System.out.println(VersionInfo.getInstance());											
-										}
 										if(Boolean.TRUE.equals(config.getValue(IPlatformConfiguration.WELCOME, model)))
 										{
 											long startup = System.currentTimeMillis() - starttime;
 											// platform.logger.info("Platform startup time: " + startup + " ms.");
-											System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
+											System.out.println(VersionInfo.getInstance().toString()+'\n'+desc.getName()+" platform startup time: " + startup + " ms.");
 	//										System.out.println(desc.getName()+" platform startup time: " + "799 ms.");
 										}
 										fret.setResult(component.getInternalAccess().getExternalAccess());

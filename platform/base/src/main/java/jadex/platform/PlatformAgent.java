@@ -87,7 +87,9 @@ import jadex.platform.service.threadpool.ThreadPoolService;
 	@Argument(name=UNIQUEIDS, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=PLATFORMPROXIES, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="simulation", clazz=boolean.class, defaultvalue="false"),
-	@Argument(name="printversion", clazz=boolean.class, defaultvalue="true", description="Print the Jadex version on startup and expose the version, where appropriate (e.g. REST headers).")
+	
+	// Added as argument here, due to cross cutting concern (hack?)
+	@Argument(name="showversion", clazz=boolean.class, defaultvalue="true", description="Expose the Jadex version where appropriate (e.g. REST headers).")
 })
 
 @ProvidedServices({

@@ -115,6 +115,7 @@ public class CliAgent implements ICliService, IInternalCliService
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				long ct = System.currentTimeMillis();
+				@SuppressWarnings("unchecked")
 				Tuple2<String, Integer>[] keys = (Tuple2<String, Integer>[])shells.keySet().toArray(new Tuple2[0]);
 				for(Tuple2<String, Integer> key: keys)
 				{
@@ -222,8 +223,8 @@ public class CliAgent implements ICliService, IInternalCliService
 					{
 //						ThreadSuspendable sus = new ThreadSuspendable();
 						final Tuple2<String, Integer> consess = new Tuple2<String, Integer>(SUtil.createUniqueId("consess"), Integer.valueOf(0));
-						System.out.println("Jadex shell (type 'h' for help)");
-						System.out.println(getShell(consess).getShellPrompt().get());
+						System.out.println("Jadex shell (type 'h' for help)\n"
+							+ getShell(consess).getShellPrompt().get());
 						// redirect System.in
 						try{SUtil.getOutForSystemIn();}catch(Exception e){}
 //						System.out.println("sysin: "+System.in+" "+System.in.getClass());

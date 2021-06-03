@@ -1562,7 +1562,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			response.addHeader("Expires", "-1");
 			
 			// Add Jadex version header, if enabled
-			if(Boolean.TRUE.equals(Starter.getPlatformArgument(component.getId(), "printversion")))
+			if(Boolean.TRUE.equals(Starter.getPlatformArgument(component.getId(), "showversion")))
 			{
 				response.addHeader(HEADER_JADEX_VERSION, VersionInfo.getInstance().toString());				
 			}
@@ -2379,7 +2379,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 			ret.append("<div class=\"powered\"> <span class=\"powered\">powered by</span> <span class=\"jadex\">");
 			// Add Jadex version header, if enabled
-			if(Boolean.TRUE.equals(Starter.getPlatformArgument(component.getId(), "printversion")))
+			if(Boolean.TRUE.equals(Starter.getPlatformArgument(component.getId(), "showversion")))
 			{
 				ret.append(VersionInfo.getInstance());
 			}
