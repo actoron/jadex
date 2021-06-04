@@ -5,7 +5,7 @@
 var app = angular.module('acservices', []);
 app.controller('Services', [ '$scope', '$http',
 	function($scope, $http) {
-		getIntermediate($http, 'status/subscribeToServices',
+		getIntermediate($http, 'api/subscribeToServices',
 			function(response)
 			{
 				updateService($scope, response.data);
@@ -18,7 +18,7 @@ app.controller('Services', [ '$scope', '$http',
 ]);
 app.controller('Queries', [ '$scope', '$http',
 	function($scope, $http) {
-		getIntermediate($http, 'status/subscribeToQueries',
+		getIntermediate($http, 'api/subscribeToQueries',
 			function(response)
 			{
 				updateQuery($scope, response.data);
@@ -29,17 +29,6 @@ app.controller('Queries', [ '$scope', '$http',
 			});
 	}
 ]);
-/*app.controller('Queries', [ '$scope', '$http',
-	function($scope, $http) {
-		$http.get('status/getQueries',
-			{params: {'scope': JSON.stringify(["global","network"])},	// Stringify otherwise angular adds multiple singlevalued parameter occurrences, grrr.
-			 data: '',	// Otherwise angular removes content type header required for json unpacking of arg (TODO: Jadex bug, should use something different than contetn type for get?)
-			 headers: {'Content-Type': 'application/json'}})
-		.then(function(response) {
-			$scope.queries = response.data;
-		});
-	}
-]);*/
 
 /**
  *  Beautify cid representation for readability and sorting: platform (agent@platform).

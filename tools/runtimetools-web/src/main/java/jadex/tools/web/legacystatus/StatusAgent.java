@@ -67,17 +67,32 @@ public class StatusAgent implements IStatusService
 	@AgentArgument
 	protected int	port	= 8081;
 	
+	@AgentArgument
+	protected String	path	= "/";
+	
 	@OnService(requiredservice = @RequiredService(min = 1, max = 1))
 	protected IFuture<Void> publish(IWebPublishService wps)
 	{
+		// Normalize path so that it starts and ends with '/'
+		if(!path.startsWith("/"))	path	= "/"+path;
+		if(!path.endsWith("/"))	path	= path+"/";
+		String	publishurl	= "[http://localhost:"+port+"]"+path;
+		
 		IServiceIdentifier sid = ((IService)agent.getProvidedService(IStatusService.class)).getServiceId();
 		@SuppressWarnings("unchecked")
 		IFuture<Void>	ret	= (IFuture<Void>)
-			wps.publishService(sid, new PublishInfo("[http://localhost:"+port+"/]status", IPublishService.PUBLISH_RS, null))
+		
+			// status REST api from agent
+			wps.publishService(sid, new PublishInfo(publishurl+"api", IPublishService.PUBLISH_RS, null))
 				.then(v ->
-			wps.publishResources("[http://localhost:"+port+"/]", "META-INF/legacystatuswebgui")
+
+			// status web app files from project
+			wps.publishResources(publishurl, "META-INF/legacystatuswebgui")
 				.then(w ->
-			wps.publishResources("[http://localhost:"+port+"/]", "META-INF/resources")));
+
+			// webjars contents from dependencies
+			wps.publishResources(publishurl, "META-INF/resources")));
+		
 		return ret;
 	}
 

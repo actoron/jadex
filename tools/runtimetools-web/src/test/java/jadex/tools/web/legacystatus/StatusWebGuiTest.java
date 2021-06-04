@@ -22,7 +22,6 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 
 /**
  *  Test the web registry page.
@@ -46,9 +45,12 @@ public class StatusWebGuiTest
 			.setValue("jettyrspublish", true)
 			.setValue("status", true)
 			.setValue("status.port", port)
+			.setValue("status.path", "sumsi")
 //			.setLogging(true)
 			;
 //			config.setValue("nanorspublish", false);
+		
+		String	publishurl	= "http://localhost:"+port+"/sumsi/";
 		
 		STest.runSimLocked(webguiconf, ia0 ->
 		{
@@ -62,7 +64,7 @@ public class StatusWebGuiTest
 			{
 				try
 				{
-					http	= getUrlContent("http://localhost:"+port+"/");
+					http	= getUrlContent(publishurl);
 				}
 				catch(Exception e)
 				{
@@ -80,9 +82,7 @@ public class StatusWebGuiTest
 			IExternalAccess	dummy	= Starter.createPlatform(baseconf).get();
 			dummy.scheduleStep(ia -> ia.getFeature(IMessageFeature.class).sendMessage("huhu", platform.getId())).get();
 			// Check that platforms can be retrieved.
-			// TODO: why empty initial response
-			String	con	= getUrlContent("http://localhost:"+port+"/status/subscribeToConnections");
-//			String	con	= getUrlContent("http://localhost:"+port+"/status/getConnectedPlatforms");
+			String	con	= getUrlContent(publishurl+"api/subscribeToConnections");
 			System.out.println("platform: "+con);
 			assertContainsField(con, "platform");
 			assertContainsField(con, "connected");
@@ -90,14 +90,14 @@ public class StatusWebGuiTest
 
 			// Check that queries can be retrieved.
 			dummy.addQuery(new ServiceQuery<>(IStatusService.class).setScope(ServiceScope.NETWORK));
-			String	query	= getUrlContent("http://localhost:"+port+"/status/subscribeToQueries");
+			String	query	= getUrlContent(publishurl+"api/subscribeToQueries");
 			System.out.println("query: "+query);
 			assertContainsField(query, "serviceType");
 			assertContainsField(query, "owner");
 			assertContainsField(query, "scope");
 			
 			// Check that provided services can be retrieved.
-			String	service	= getUrlContent("http://localhost:"+port+"/status/subscribeToServices");
+			String	service	= getUrlContent(publishurl+"api/subscribeToServices");
 			System.out.println("service: "+service);
 			assertContainsField(service, "type");
 			assertContainsField(service, "providerId");

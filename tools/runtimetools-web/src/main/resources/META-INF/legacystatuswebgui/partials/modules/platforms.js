@@ -3,7 +3,7 @@
 var app = angular.module('acplatforms', []);
 app.controller('ConnPlats', [ '$scope', '$http',
 	function($scope, $http) {
-		getIntermediate($http, 'status/subscribeToConnections',
+		getIntermediate($http, 'api/subscribeToConnections',
 			function(response)
 			{
 				updatePlatform($scope, response.data);
