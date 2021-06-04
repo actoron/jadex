@@ -128,7 +128,7 @@ class RegistryViewElement extends CidElement
 				}, 
 				function(table, event) 
 				{
-					var elem = event.service.serviceIdentifier;
+					var elem = event.service.serviceIdentifier!=null? event.service.serviceIdentifier: event.service;
 					self.getSubscription("Services").elements.push(elem);
 					if(self.global? elem.scope.toLowerCase()==="global": true)
 						table.rows().add([elem.type, self.beautifyCid(elem.providerId.name), elem.scope.toLowerCase(), self.beautifyNetworks(elem.networkNames), elem.unrestricted && 'unrestricted' || 'restricted']);
