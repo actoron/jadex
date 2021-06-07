@@ -31,6 +31,7 @@ import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.Event;
+import jadex.rules.eca.EventType;
 import jadex.rules.eca.RuleSystem;
 
 /**
@@ -488,7 +489,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		{
 			super(modelelement, agent);
 			String name = getModelElement().getName();
-			this.publisher = new EventPublisher(agent, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
+			this.publisher = new EventPublisher(agent, new EventType(ChangeEvent.FACTCHANGED,name), (MBelief)getModelElement());
 			if(modelelement.getDefaultFact()!=null)
 				setFact(SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader())
 					.getValue(CapabilityWrapper.getFetcher(getAgent(), modelelement.getDefaultFact().getLanguage())));
@@ -503,7 +504,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		{
 			super(modelelement, agent);
 			String name = getModelElement().getName();
-			this.publisher = new EventPublisher(agent, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
+			this.publisher = new EventPublisher(agent, new EventType(ChangeEvent.FACTCHANGED,name), (MBelief)getModelElement());
 			setFact(value);
 		}
 
@@ -637,8 +638,10 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 					inifacts.add(it.next());
 				}
 			}
-			this.facts = new ListWrapper<Object>(inifacts, agent, ChangeEvent.FACTADDED+"."+name, 
-				ChangeEvent.FACTREMOVED+"."+name, ChangeEvent.FACTCHANGED+"."+name, getModelElement());
+			this.facts = new ListWrapper<Object>(inifacts, agent,
+				new EventType(ChangeEvent.FACTADDED, name), 
+				new EventType(ChangeEvent.FACTREMOVED, name),
+				new EventType(ChangeEvent.FACTCHANGED, name), getModelElement());
 		}
 		
 		/**
@@ -651,8 +654,10 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			super(modelelement, agent);
 			
 			String name = getModelElement().getName();
-			this.facts = new ListWrapper<Object>(evaluateValues(), agent, ChangeEvent.FACTADDED+"."+name, 
-				ChangeEvent.FACTREMOVED+"."+name, ChangeEvent.FACTCHANGED+"."+name, getModelElement());
+			this.facts = new ListWrapper<Object>(evaluateValues(), agent, 
+				new EventType(ChangeEvent.FACTADDED, name), 
+				new EventType(ChangeEvent.FACTREMOVED, name),
+				new EventType(ChangeEvent.FACTCHANGED, name), getModelElement());
 		}
 		
 		/**
@@ -861,7 +866,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			else
 			{
 				RuleSystem rs = ((IInternalBDIAgentFeature)getAgent().getFeature(IBDIXAgentFeature.class)).getRuleSystem();
-				rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+getName(), new ChangeInfo<Object>(facts, facts, null)));
+				rs.addEvent(new Event(new EventType(ChangeEvent.BELIEFCHANGED, getName()), new ChangeInfo<Object>(facts, facts, null)));
 			}
 
 			// Push to result, if any.

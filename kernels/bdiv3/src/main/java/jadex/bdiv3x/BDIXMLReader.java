@@ -1040,7 +1040,7 @@ public class BDIXMLReader extends ComponentXMLReader
 					while(stok.hasMoreElements())
 					{
 						String tok = stok.nextToken();
-						cond.addEvent(new EventType(tok));
+						cond.addEvent(new EventType(tok.split("\\.")));
 					}
 				}
 				

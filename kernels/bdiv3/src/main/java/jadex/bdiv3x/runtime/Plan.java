@@ -22,7 +22,6 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MParameterElement;
-import jadex.bdiv3.runtime.BDIFailureException;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.IGoal;
@@ -209,7 +208,7 @@ public abstract class Plan
 		BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
 		MGoal mgoal = model.getCapability().getResolvedGoal(rplan.getModelElement().getCapabilityName(), type);
 		WaitAbstraction wa = new WaitAbstraction();
-		wa.addChangeEventType(ChangeEvent.GOALDROPPED+"."+mgoal.getName());
+		wa.addChangeEventType(new EventType(ChangeEvent.GOALDROPPED, mgoal.getName()));
 
 		ChangeEvent res = (ChangeEvent)rplan.getFromWaitqueue(wa);
 		if(res!=null)
@@ -952,12 +951,13 @@ public abstract class Plan
 		
 		IInternalBDIAgentFeature bdif = agent.getFeature(IInternalBDIAgentFeature.class);
 		WaitAbstraction wa = new WaitAbstraction();
-		wa.addChangeEventType(ChangeEvent.FACTCHANGED+"."+belname);
+		wa.addChangeEventType(new EventType(ChangeEvent.FACTCHANGED, belname));
 
-		ChangeEvent res = (ChangeEvent)rplan.getFromWaitqueue(wa);
+		@SuppressWarnings({"rawtypes", "unchecked"})
+		ChangeEvent<ChangeInfo> res = (ChangeEvent<ChangeInfo>)rplan.getFromWaitqueue(wa);
 		if(res!=null)
 		{
-			return res.getValue();
+			return res.getValue().getValue();
 		}
 		else
 		{
@@ -1000,12 +1000,13 @@ public abstract class Plan
 		
 		IInternalBDIAgentFeature bdif = agent.getFeature(IInternalBDIAgentFeature.class);
 		WaitAbstraction wa = new WaitAbstraction();
-		wa.addChangeEventType(ChangeEvent.FACTADDED+"."+belname);
+		wa.addChangeEventType(new EventType(ChangeEvent.FACTADDED, belname));
 
-		ChangeEvent res = (ChangeEvent)rplan.getFromWaitqueue(wa);
+		@SuppressWarnings({"rawtypes", "unchecked"})
+		ChangeEvent<ChangeInfo> res = (ChangeEvent<ChangeInfo>)rplan.getFromWaitqueue(wa);
 		if(res!=null)
 		{
-			return res.getValue();
+			return res.getValue().getValue();
 		}
 		else
 		{
@@ -1046,12 +1047,13 @@ public abstract class Plan
 		
 		IInternalBDIAgentFeature bdif = agent.getFeature(IInternalBDIAgentFeature.class);
 		WaitAbstraction wa = new WaitAbstraction();
-		wa.addChangeEventType(ChangeEvent.FACTREMOVED+"."+belname);
+		wa.addChangeEventType(new EventType(ChangeEvent.FACTREMOVED, belname));
 
-		ChangeEvent res = (ChangeEvent)rplan.getFromWaitqueue(wa);
+		@SuppressWarnings({"rawtypes", "unchecked"})
+		ChangeEvent<ChangeInfo> res = (ChangeEvent<ChangeInfo>)rplan.getFromWaitqueue(wa);
 		if(res!=null)
 		{
-			return res.getValue();
+			return res.getValue().getValue();
 		}
 		else
 		{
@@ -1309,7 +1311,7 @@ public abstract class Plan
 			BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
 			MGoal mgoal = model.getCapability().getResolvedGoal(
 				getRPlan().getModelElement().getCapabilityName(), type);
-			addChangeEventType(ChangeEvent.GOALDROPPED+"."+mgoal.getName());
+			addChangeEventType(new EventType(ChangeEvent.GOALDROPPED, mgoal.getName()));
 		}
 		
 		/**
@@ -1320,7 +1322,7 @@ public abstract class Plan
 			BDIXModel model = (BDIXModel)agent.getModel().getRawModel();
 			MGoal mgoal = model.getCapability().getResolvedGoal(
 				getRPlan().getModelElement().getCapabilityName(), type);
-			removeChangeEventType(ChangeEvent.GOALDROPPED+"."+mgoal.getName());
+			removeChangeEventType(new EventType(ChangeEvent.GOALDROPPED, mgoal.getName()));
 		}
 		
 		/**
@@ -1329,7 +1331,7 @@ public abstract class Plan
 		 */
 		public void addFactChanged(String beliefset)
 		{
-			addChangeEventType(ChangeEvent.FACTCHANGED+"."+beliefset);
+			addChangeEventType(new EventType(ChangeEvent.FACTCHANGED, beliefset));
 		}
 		
 		/**
@@ -1338,7 +1340,7 @@ public abstract class Plan
 		 */
 		public void addFactAdded(String beliefset)
 		{
-			addChangeEventType(ChangeEvent.FACTADDED+"."+beliefset);
+			addChangeEventType(new EventType(ChangeEvent.FACTADDED, beliefset));
 		}
 		
 		/**
@@ -1348,7 +1350,7 @@ public abstract class Plan
 		// Todo: currently not supported -> requires belief change rules in any agent (speed?)
 		public void addFactRemoved(String beliefset)
 		{
-			addChangeEventType(ChangeEvent.FACTREMOVED+"."+beliefset);
+			addChangeEventType(new EventType(ChangeEvent.FACTREMOVED, beliefset));
 		}
 		
 		/**
@@ -1357,7 +1359,7 @@ public abstract class Plan
 		 */
 		public void addBeliefChanged(String belief)
 		{
-			addChangeEventType(ChangeEvent.BELIEFCHANGED+"."+belief);
+			addChangeEventType(new EventType(ChangeEvent.BELIEFCHANGED, belief));
 		}
 		
 		/**
@@ -1412,7 +1414,7 @@ public abstract class Plan
 		 */
 		public void removeFactChanged(String beliefset)
 		{
-			removeChangeEventType(ChangeEvent.FACTCHANGED+"."+beliefset);
+			removeChangeEventType(new EventType(ChangeEvent.FACTCHANGED, beliefset));
 		}
 		
 		/**
@@ -1421,7 +1423,7 @@ public abstract class Plan
 		 */
 		public void removeFactAdded(String beliefset)
 		{
-			removeChangeEventType(ChangeEvent.FACTADDED+"."+beliefset);
+			removeChangeEventType(new EventType(ChangeEvent.FACTADDED, beliefset));
 		}
 		
 		/**
@@ -1430,7 +1432,7 @@ public abstract class Plan
 		 */
 		public void removeFactRemoved(String beliefset)
 		{
-			removeChangeEventType(ChangeEvent.FACTREMOVED+"."+beliefset);
+			removeChangeEventType(new EventType(ChangeEvent.FACTREMOVED, beliefset));
 		}
 		
 		/**
@@ -1439,7 +1441,7 @@ public abstract class Plan
 		 */
 		public void removeBeliefChanged(String belief)
 		{
-			removeChangeEventType(ChangeEvent.BELIEFCHANGED+"."+belief);
+			removeChangeEventType(new EventType(ChangeEvent.BELIEFCHANGED, belief));
 		}
 
 		/**
@@ -1538,7 +1540,7 @@ public abstract class Plan
 		 *  Add a change event type.
 		 *  @param eventtype The change event type.
 		 */
-		protected void addChangeEventType(String eventtype)
+		protected void addChangeEventType(EventType eventtype)
 		{
 			getWaitAbstraction().addChangeEventType(eventtype);
 			rplan.setupEventsRule(getWaitAbstraction().getChangeeventtypes());
@@ -1548,7 +1550,7 @@ public abstract class Plan
 		 *  Remove a change event type.
 		 *  @param eventtype The change event type.
 		 */
-		protected void removeChangeEventType(String eventtype)
+		protected void removeChangeEventType(EventType eventtype)
 		{
 			getWaitAbstraction().removeChangeEventType(eventtype);
 			rplan.setupEventsRule(getWaitAbstraction().getChangeeventtypes());

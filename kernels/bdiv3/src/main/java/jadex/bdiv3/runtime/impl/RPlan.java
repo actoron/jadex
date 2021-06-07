@@ -304,19 +304,19 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			
 			for(String belname: SUtil.notNull(wqtr.getFactAddeds()))
 			{
-				events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
+				events.add(new EventType(ChangeEvent.FACTADDED, belname));
 			}
 			for(String belname: SUtil.notNull(wqtr.getFactRemoveds()))
 			{
-				events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
+				events.add(new EventType(ChangeEvent.FACTREMOVED, belname));
 			}
 			for(String belname: SUtil.notNull(wqtr.getFactChangeds()))
 			{
-				events.add(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname}));
+				events.add(new EventType(ChangeEvent.FACTCHANGED, belname));
 			}			
 			for(MGoal goal: SUtil.notNull(wqtr.getGoalFinisheds()))
 			{
-				events.add(new EventType(new String[]{ChangeEvent.GOALDROPPED, goal.getName()}));
+				events.add(new EventType(ChangeEvent.GOALDROPPED, goal.getName()));
 			}
 			
 			if(!events.isEmpty())
@@ -335,7 +335,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //				rule.setEvents(events);
 //				ia.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem().getRulebase().addRule(rule);
 				
-				rplan.internalSetupEventsRule(events);
+				rplan.setupEventsRule(events);
 			}
 			
 			for(MInternalEvent mevent: SUtil.notNull(wqtr.getInternalEvents()))
@@ -1292,8 +1292,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		WaitAbstraction wa = new WaitAbstraction();
 		for(String evtype: evtypes)
 		{
-			EventType et = new EventType(new String[]{evtype, belname});
-			wa.addChangeEventType(et.toString());
+			EventType et = new EventType(evtype, belname);
+			wa.addChangeEventType(et);
 			ets.add(et);
 		}
 //		setWaitAbstraction(wa);
@@ -2001,24 +2001,10 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	}
 	
 	/**
-	 *  Set up a rule for the waitque to signal to what kinds of events this plan
-	 *  in principle reacts to.
-	 */
-	public void setupEventsRule(Collection<String> events)
-	{
-		List<EventType> evs = new ArrayList<EventType>();
-		for(String event: events)
-		{
-			evs.add(new EventType(event));
-		}
-		internalSetupEventsRule(evs);
-	}
-	
-	/**
 	 *  Set up a rule for the waitqueue to signal to what kinds of events this plan
 	 *  in principle reacts to.
 	 */
-	public void internalSetupEventsRule(List<EventType> events)
+	public void setupEventsRule(Collection<EventType> events)
 	{
 		final String rulename = getId()+"_waitqueue";
 		
@@ -2026,12 +2012,12 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		{
 			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 			{
-//				System.out.println("Added to waitqueue: "+event);
-				addToWaitqueue(new ChangeEvent(event));				
+				System.out.println("Added to waitqueue: "+event);
+				addToWaitqueue(new ChangeEvent(event));
 				return IFuture.DONE;
 			}
 		});
-		rule.setEvents(events);
+		rule.setEvents(events instanceof List ? (List<EventType>)events : new ArrayList<>(events));
 		getAgent().getFeature(IInternalBDIAgentFeature.class).getRuleSystem().getRulebase().updateRule(rule);
 	}
 	

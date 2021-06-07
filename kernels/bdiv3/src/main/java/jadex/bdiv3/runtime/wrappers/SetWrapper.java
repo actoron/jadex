@@ -18,15 +18,6 @@ public class SetWrapper<T> extends jadex.commons.collection.wrappers.SetWrapper<
 	 *  Create a new set wrapper.
 	 */
 	public SetWrapper(Set<T> delegate, IInternalAccess agent, 
-		String addevent, String remevent, String changeevent, MElement mbel)
-	{
-		this(delegate, agent, new EventType(addevent), new EventType(remevent), new EventType(changeevent), mbel);
-	}
-	
-	/**
-	 *  Create a new set wrapper.
-	 */
-	public SetWrapper(Set<T> delegate, IInternalAccess agent, 
 		EventType addevent, EventType remevent, EventType changeevent, MElement mbel)
 	{
 		super(delegate);

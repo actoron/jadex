@@ -295,7 +295,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		MBelief mbel = ((IInternalBDIAgentFeature)agent.getFeature(IBDIXAgentFeature.class)).getBDIModel().getCapability().getBelief(belname);
 		
 		RuleSystem rs = ((IInternalBDIAgentFeature)agent.getFeature(IBDIXAgentFeature.class)).getRuleSystem();
-		rs.addEvent(new jadex.rules.eca.Event(ChangeEvent.BELIEFCHANGED+"."+belname, new ChangeInfo<Object>(val, oldval, info)));
+		rs.addEvent(new jadex.rules.eca.Event(new EventType(ChangeEvent.BELIEFCHANGED, belname), new ChangeInfo<Object>(val, oldval, info)));
 		
 		publishToolBeliefEvent(agent, mbel);
 	}
@@ -835,17 +835,17 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 				if(val instanceof List)
 				{
 					String bname = mbel.getName();
-					mbel.setValue(getInternalAccess(), new ListWrapper((List<?>)val, getInternalAccess(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
+					mbel.setValue(getInternalAccess(), new ListWrapper((List<?>)val, getInternalAccess(), new EventType(ChangeEvent.FACTADDED, bname), new EventType(ChangeEvent.FACTREMOVED, bname), new EventType(ChangeEvent.FACTCHANGED, bname), mbel));
 				}
 				else if(val instanceof Set)
 				{
 					String bname = mbel.getName();
-					mbel.setValue(getInternalAccess(), new SetWrapper((Set<?>)val, getInternalAccess(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
+					mbel.setValue(getInternalAccess(), new SetWrapper((Set<?>)val, getInternalAccess(), new EventType(ChangeEvent.FACTADDED, bname), new EventType(ChangeEvent.FACTREMOVED, bname), new EventType(ChangeEvent.FACTCHANGED, bname), mbel));
 				}
 				else if(val instanceof Map)
 				{
 					String bname = mbel.getName();
-					mbel.setValue(getInternalAccess(), new MapWrapper((Map<?,?>)val, getInternalAccess(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
+					mbel.setValue(getInternalAccess(), new MapWrapper((Map<?,?>)val, getInternalAccess(), new EventType(ChangeEvent.FACTADDED, bname), new EventType(ChangeEvent.FACTREMOVED, bname), new EventType(ChangeEvent.FACTCHANGED, bname), mbel));
 				}
 			}
 			catch(RuntimeException e)
@@ -1382,7 +1382,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 					}
 					else
 					{
-						events.add(new EventType(new String[]{type, name}));
+						events.add(new EventType(type, name));
 					}
 				}
 			}

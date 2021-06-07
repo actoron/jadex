@@ -8,6 +8,7 @@ import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3x.runtime.RMessageEvent;
+import jadex.rules.eca.EventType;
 
 /**
  *  Object that indicates on which elements a plan is waiting. 
@@ -21,7 +22,7 @@ public class WaitAbstraction
 	protected Set<RElement> runtimeelements;
 
 	/** The event types. */
-	protected Set<String> changeeventtypes;
+	protected Set<EventType> changeeventtypes;
 	
 	/** The reply elements. */
 //	protected Set<Tuple2<RMessageEvent, Set<MMessageEvent>>> replyelements;
@@ -274,11 +275,11 @@ public class WaitAbstraction
 	/**
 	 * 
 	 */
-	public void addChangeEventType(String eventtype)
+	public void addChangeEventType(EventType eventtype)
 	{
 		if(changeeventtypes==null)
 		{
-			changeeventtypes = new HashSet<String>();
+			changeeventtypes = new HashSet<EventType>();
 		}
 		changeeventtypes.add(eventtype);
 	}
@@ -286,7 +287,7 @@ public class WaitAbstraction
 	/**
 	 * 
 	 */
-	public void removeChangeEventType(String eventtype)
+	public void removeChangeEventType(EventType eventtype)
 	{
 		if(changeeventtypes!=null)
 		{
@@ -298,7 +299,7 @@ public class WaitAbstraction
 	 *  Get the change event types.
 	 *  @return The changeeventtypes
 	 */
-	public Set<String> getChangeeventtypes()
+	public Set<EventType> getChangeeventtypes()
 	{
 		return changeeventtypes;
 	}
@@ -330,7 +331,7 @@ public class WaitAbstraction
 			{
 				String type = ((ChangeEvent)procelem).getType();
 				String src = (String)((ChangeEvent)procelem).getSource();
-				ret = changeeventtypes.contains(type+"."+src);
+				ret = changeeventtypes.contains(new EventType(type, src));
 			}
 		}
 		if(!ret && replyelements!=null && procelem instanceof RMessageEvent)

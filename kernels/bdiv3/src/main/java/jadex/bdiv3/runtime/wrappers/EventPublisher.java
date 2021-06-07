@@ -44,18 +44,9 @@ public class EventPublisher implements IEventPublisher
 	/**
 	 *  Create a new publisher.
 	 */
-	public EventPublisher(IInternalAccess agent, String changeevent, MElement melement)
+	public EventPublisher(IInternalAccess agent, EventType changeevent, MElement melement)
 	{
-		this(agent, null, null, new EventType(changeevent), melement);
-	}
-	
-	/**
-	 *  Create a new publisher.
-	 */
-	public EventPublisher(IInternalAccess agent, 
-		String addevent, String remevent, String changeevent, MElement melement)
-	{
-		this(agent, new EventType(addevent), new EventType(remevent), new EventType(changeevent), melement);
+		this(agent, null, null, changeevent, melement);
 	}
 	
 	/**
