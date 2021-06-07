@@ -57,9 +57,9 @@
 				</bindingoptions>
 			</parameter>
 			<unique/>
-			<!-- Create a new goal when a target was added
+			<!-- Use bindingotpions to create a new goal when a target was added
 				and the mission is going on. -->
-			<creationcondition beliefs="my_targets">
+			<creationcondition>
 			    true
 			</creationcondition>
 			<!-- Suspend the goal when some other target is nearer to the agent. -->

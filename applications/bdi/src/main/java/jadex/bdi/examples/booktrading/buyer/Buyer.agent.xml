@@ -50,7 +50,8 @@
 			    </bindingoptions>
 			</parameter>
 			<unique/>
-			<creationcondition beliefs="initial_orders">
+			<!-- Uses bindingoptions to create specific goal instances. -->			
+			<creationcondition>
 				true
 			</creationcondition>
 			<dropcondition>

@@ -25,6 +25,7 @@ dependencies
 
  	// Allow starting examples from Main.java without extra dependencies
  	runtimeOnly project(':distributions:minimal')
+ 	runtimeOnly project(':tools:runtimetools-swing')
 }
 
 //processResources

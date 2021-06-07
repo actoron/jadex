@@ -46,6 +46,7 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
@@ -973,6 +974,22 @@ public class BDIXMLReader extends ComponentXMLReader
 					}
 				}				
 				cond.initEvents(pe);
+				
+				// Add events from bindingoptions parameter expressions to also trigger goal creation conditions.
+				if((MGoal.CONDITION_CREATION+"condition").equals(ar.getTopStackElement().getTag().getLocalPart()))
+				{
+					List<EventType>	events	= cond.getEvents();
+					for(MParameter p: SUtil.notNull(pe.getParameters()))
+					{
+						if(p.getBindingOptions()!=null)
+						{
+							if(events==null)
+								events = new ArrayList<EventType>();
+							BDIAgentFeature.addExpressionEvents(p.getBindingOptions(), events, pe);
+						}
+					}
+					cond.setEvents(events);
+				}
 				
 				String bels = ar.getTopStackElement().getRawAttributes()==null? null: ar.getTopStackElement().getRawAttributes().get("beliefs");
 				if(bels!=null)

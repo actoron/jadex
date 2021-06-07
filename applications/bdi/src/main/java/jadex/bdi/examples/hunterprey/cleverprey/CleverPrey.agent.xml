@@ -77,7 +77,8 @@
 				</bindingoptions>
 			</parameter>
 			<unique/>
-			<creationcondition beliefs="food">
+			<!-- Use bindingoptions to create specific goal instances. -->
+			<creationcondition>
 			    true
 			</creationcondition>
 			<dropcondition>
