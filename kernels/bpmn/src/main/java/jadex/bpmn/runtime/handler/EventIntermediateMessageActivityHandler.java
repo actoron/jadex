@@ -43,7 +43,7 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 	 */
 	public void execute(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
-//		System.out.println("send message acticity2: "+activity);
+		//System.out.println("send message acticity2: "+activity);
 		
 		if(activity.isThrowing())
 		{
@@ -150,7 +150,7 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 		}
 
 		thread.setWaiting(true);
-		System.out.println("sending message: "+message);
+		//System.out.println("sending message: "+message);
 		
 		instance.getFeature(IMessageFeature.class).sendMessage(message, receivers)
 			.addResultListener(new IResultListener<Void>()

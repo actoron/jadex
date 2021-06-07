@@ -39,7 +39,7 @@
         <jadex:parameter direction="inout" name="i" type="int">0</jadex:parameter>
       </semantic:extensionElements>
     </semantic:task>
-    <semantic:intermediateCatchEvent name="Send Message" id="_cD3tsc-fEd6NWbZHdUI2WQ">
+    <semantic:intermediateThrowEvent name="Send Message" id="_cD3tsc-fEd6NWbZHdUI2WQ">
       <semantic:incoming>_cEBesc-fEd6NWbZHdUI2WQ</semantic:incoming>
       <semantic:outgoing>_0G1-gc-fEd6NWbZHdUI2WQ</semantic:outgoing>
       <semantic:messageEventDefinition/>
@@ -48,7 +48,7 @@
         <jadex:property name="message">&quot;hello&quot;</jadex:property>
         <jadex:property name="receiver">receivers</jadex:property>
       </semantic:extensionElements>
-    </semantic:intermediateCatchEvent>
+    </semantic:intermediateThrowEvent>
     <semantic:task name="Message Sent" id="_0Gs0kc-fEd6NWbZHdUI2WQ">
       <semantic:incoming>_0G1-gc-fEd6NWbZHdUI2WQ</semantic:incoming>
       <semantic:outgoing>_5-3ZMdBMEd6NWbZHdUI2WQ</semantic:outgoing>
