@@ -497,6 +497,9 @@ public class SBDIModel
 		{
 			Set<String> events = convertEvents(null, bel.getBeliefEvents(), bdimodel);
 			bel.setBeliefEvents(events);
+			
+			List<EventType> eventts = convertEventTypes(null, bel.getEvents(), bdimodel);
+			bel.setEvents(eventts);
 		}
 					
 		for(MGoal goal: bdimodel.getCapability().getGoals())
