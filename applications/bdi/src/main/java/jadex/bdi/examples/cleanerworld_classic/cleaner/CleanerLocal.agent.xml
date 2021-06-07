@@ -135,8 +135,7 @@
 			<unique/>
 			<!-- Create a new goal when new waste is seen and
 				the agent isnt already cleaning. -->
-			<!-- <creationcondition beliefs="wastes">-->
-			<creationcondition beliefs="wastes">
+			<creationcondition>
 				true
 			</creationcondition>
 			<!-- Suspend the goal when it is night. -->

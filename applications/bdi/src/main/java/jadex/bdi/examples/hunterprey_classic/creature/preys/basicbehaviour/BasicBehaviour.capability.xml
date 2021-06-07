@@ -92,7 +92,8 @@
 				</bindingoptions>
 			</parameter>
 			<unique/>
-			<creationcondition  beliefs="wastes">
+			<!-- Uses bindingoptions to create specific goal instances. -->
+			<creationcondition>
  				$beliefbase.eating_allowed
 			</creationcondition>
 			<deliberation>

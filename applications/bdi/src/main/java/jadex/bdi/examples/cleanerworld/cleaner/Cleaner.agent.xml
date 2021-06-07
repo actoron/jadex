@@ -126,13 +126,14 @@
 				<bindingoptions>$beliefbase.wastes</bindingoptions>
 			</parameter>
 			<unique/>
-			<creationcondition beliefs="wastes">
+			<!-- Uses bindingoptions to create specific goal instances. -->
+			<creationcondition>
 				true
 			</creationcondition>
 			<contextcondition>
 				$beliefbase.daytime
  			</contextcondition>
-			<dropcondition >
+			<dropcondition>
 				$beliefbase.myself.waste==null &amp;&amp;
 					!$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
  			</dropcondition>

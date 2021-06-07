@@ -63,6 +63,12 @@
 				<component type="DumbPrey" number="1" />
 			</components>
 		</configuration>
+		<configuration name="ClaasClever">
+			<components>
+				<component type="Environment" />
+				<component type="CleverPrey" number="1" />
+			</components>
+		</configuration>
 	</configurations>
 
 </applicationtype>

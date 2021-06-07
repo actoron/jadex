@@ -48,8 +48,8 @@
 				</bindingoptions>
 			</parameter>
 			<unique/>
-			<!-- Create one goal for each known disaster. -->
-			<creationcondition beliefs="disasters">
+			<!-- Use bindingotpions to create one goal for each known disaster. -->
+			<creationcondition>
 				true
 			</creationcondition>
 			<deliberation>
