@@ -39,7 +39,6 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -132,6 +131,7 @@ public class CommanderAgent
 		@GoalCreationCondition(rawevents=@RawEvent(value=ChangeEvent.FACTADDED, second="disasters"))
 		public HandleDisaster(ISpaceObject disaster)
 		{
+			System.out.println(agent+": handle disaster "+disaster);
 			this.disaster = disaster;
 		}
 		

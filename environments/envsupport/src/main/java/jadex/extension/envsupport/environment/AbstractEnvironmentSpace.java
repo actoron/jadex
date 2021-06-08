@@ -1697,14 +1697,14 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 									desc.setName(cid);
 									desc.setLocalType(compotype);
 									setOwner(ret.getId(), desc);
-//									System.out.println("env create: "+cid);
+									System.out.println("env create: "+cid+", "+exta.getDescription(exta.getId()).get().getState());
 									IFuture<IExternalAccess> future = exta.createComponent(
 										new CreationInfo().setImports(model.getAllImports()).setFilename(filename).setName(cid.getLocalName()));
 									future.addResultListener(new IResultListener()
 									{
 										public void resultAvailable(Object result)
 										{
-//											System.out.println("env created: "+result);
+											System.out.println("env created: "+result+", "+exta.getDescription(exta.getId()).get().getState()+", "+exta.getDescription(cid).get().getState());
 //											setOwner(ret.getId(), (IComponentIdentifier)result);
 										}
 										

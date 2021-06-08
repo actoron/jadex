@@ -42,6 +42,7 @@ public abstract class HandleForcesPlan
 	 */
 	public void	allocateForces(String servicename, String typename)
 	{		
+		System.out.println("allocateForces: "+servicename+", "+typename);
 		while(true)
 		{
 			final ISpaceObject disaster = goal.getDisaster();
@@ -70,21 +71,21 @@ public abstract class HandleForcesPlan
 						goal.getUnits().add(force);
 					
 						SendRescueForce sendforce = capa.new SendRescueForce(disaster, force);
-//						System.out.println("sendforce: "+capa.getBusyEntities().size()+" "+force);
+						System.out.println("sendforce: "+capa.getBusyEntities().size()+" "+force);
 						rplan.dispatchSubgoal(sendforce).addResultListener(new IResultListener<Object>()
 						{
 							public void resultAvailable(Object result)
 							{
 								goal.getUnits().remove(force);
 								capa.getBusyEntities().remove(provid);
-//								System.out.println("sendforce end ok: "+capa.getBusyEntities().size()+" "+force);
+								System.out.println("sendforce end ok: "+capa.getBusyEntities().size()+" "+force);
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
 								goal.getUnits().remove(force);
 								capa.getBusyEntities().remove(provid);
-//								System.out.println("sendforce end ex: "+capa.getBusyEntities().size()+" "+force+" "+exception);
+								System.out.println("sendforce end ex: "+capa.getBusyEntities().size()+" "+force+" "+exception);
 							}
 						});
 					}

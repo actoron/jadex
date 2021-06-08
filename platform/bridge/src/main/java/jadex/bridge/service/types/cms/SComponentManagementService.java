@@ -1244,6 +1244,9 @@ public class SComponentManagementService
 	 */
 	public static IFuture<Void> resumeComponent(final IComponentIdentifier cid, final boolean initresume, IInternalAccess agent)
 	{
+		if(cid.getName().indexOf("Ambulance")!=-1)
+			System.out.println("Resume "+cid);
+		
 		final Future<Void> ret = new Future<Void>();
 		
 		// Resume subcomponents
@@ -2145,12 +2148,17 @@ public class SComponentManagementService
 								compstate.setAccess(info.getComponent());
 							}
 							
+							if(cid.getName().indexOf("Ambulance")!=-1)
+								System.out.println("started0 "+cid);
+
 							// Register component at parent.
 							addSubcomponent(pad, ad, lmodel, agent)
 								.addResultListener(createResultListener(agent, new IResultListener<Void>()
 							{
 								public void resultAvailable(Void result)
 								{
+									if(cid.getName().indexOf("Ambulance")!=-1)
+										System.out.println("started1 "+cid);
 									// Registration finished -> reactivate component.
 									
 									// todo: can be called after listener has (concurrently) deregistered

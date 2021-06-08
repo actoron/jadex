@@ -245,6 +245,9 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 */
 	public IFuture<Void>	body()
 	{
+		if(getId().getName().indexOf("Ambulance")!=-1)
+			System.out.println("Body0 of "+getId());
+
 //		state = ComponentLifecycleState.BODY;
 		
 		IExecutionFeature exe	= getFeature(IExecutionFeature.class);
@@ -461,13 +464,16 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 */
 	protected IFuture<Void>	executeBodyOnFeatures(final Iterator<IComponentFeature> features)
 	{
+		if(getId().getName().indexOf("Ambulance")!=-1)
+			System.out.println("Body of "+getId());
+		
 		List<IFuture<Void>>	undones	= new ArrayList<IFuture<Void>>();
 		IFuture<Void>	ret	= IFuture.DONE;
 		while(!shutdown && ret.getException()==null && features.hasNext())
 		{
 			final IComponentFeature	cf	= features.next();
-//			if(getComponentIdentifier().getName().indexOf("Custom")!=-1)
-//				System.out.println("Body "+cf+" of "+getComponentIdentifier());
+			if(getId().getName().indexOf("Ambulance")!=-1)
+				System.out.println("Body "+cf+" of "+getId());
 			
 			// Execute user body on separate step to allow blocking get() and still execute the other bodies.
 			if(cf.hasUserBody())

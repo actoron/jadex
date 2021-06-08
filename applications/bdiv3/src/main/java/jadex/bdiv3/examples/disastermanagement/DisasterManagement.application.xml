@@ -170,7 +170,6 @@
 	<componenttypes>
 		<componenttype name="FireBrigade" filename="firebrigade/FireBrigadeAgent.class"/>
 		<componenttype name="Commander" filename="commander/CommanderAgent.class"/>
-		<!-- <componenttype name="Commander2" filename="commander2/Commander2.agent.xml"/> -->
 		<componenttype name="Ambulance" filename="ambulance/AmbulanceAgent.class"/>
 	</componenttypes>
 
