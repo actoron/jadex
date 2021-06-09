@@ -46,7 +46,7 @@ public class RuleSystem
 	protected Object context;
 	
 	/** The logger for rule warnings. */
-	protected Logger	logger;
+	protected Logger logger;
 	
 	/** The PropertyChangeManager to add/remove handlers and manage events */
 	protected PropertyChangeManager pcman;

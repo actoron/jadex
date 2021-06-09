@@ -107,6 +107,8 @@ public class PropertiesComponentFeature	extends	AbstractComponentFeature impleme
 				}
 			}
 			
+			//System.out.println("init of prop base done: "+getComponent().getId());
+			
 			return IFuture.DONE;
 		}
 		catch(Exception e)

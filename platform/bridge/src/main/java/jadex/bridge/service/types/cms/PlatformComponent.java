@@ -934,6 +934,9 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	{
 		if(logger==null)
 		{
+			//System.out.println("logger init for: "+getId());
+			//Thread.currentThread().dumpStack();
+			
 			// todo: problem: loggers can cause memory leaks
 			// http://bugs.sun.com/view_bug.do;jsessionid=bbdb212815ddc52fcd1384b468b?bug_id=4811930
 			String name = getLoggerName(getId());

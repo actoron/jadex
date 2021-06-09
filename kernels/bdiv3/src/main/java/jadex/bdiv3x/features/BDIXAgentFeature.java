@@ -128,7 +128,8 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		
 		this.bdimodel = (IBDIModel)getComponent().getModel();
 		this.capa = new RCapability(bdimodel.getCapability(), component);
-		this.rulesystem = new RuleSystem(null, component.getLogger(), true)
+		// Must NOT be done here, as propertyfeature is not inited and thus user logging settings are not available at this point
+		/*this.rulesystem = new RuleSystem(null, null, true) //component.getLogger()
 		{
 			public IFuture<Void> addEvent(IEvent event) 
 			{
@@ -146,7 +147,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 				
 				return ret;
 			}
-		};
+		};*/
 	}
 
 	/**
@@ -1227,6 +1228,28 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 	 */
 	public RuleSystem getRuleSystem()
 	{
+		if(rulesystem==null)
+		{
+			this.rulesystem = new RuleSystem(null, component.getLogger(), true)
+			{
+				public IFuture<Void> addEvent(IEvent event) 
+				{
+					// Implement atomic by changing the rule execution mode
+					RPlan rplan = RPlan.RPLANS.get();
+					
+					boolean	queue	= isQueueEvents();
+					if(rplan!=null && !queue && rplan.isAtomic())
+						setQueueEvents(true);
+					
+					IFuture<Void> ret = super.addEvent(event);
+					
+					if(queue!=isQueueEvents())
+						setQueueEvents(queue);
+					
+					return ret;
+				}
+			};
+		}
 		return rulesystem;
 	}
 	
