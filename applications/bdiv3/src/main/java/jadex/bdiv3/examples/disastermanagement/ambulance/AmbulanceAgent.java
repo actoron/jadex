@@ -22,12 +22,15 @@ import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 
 /**
  * 
@@ -40,7 +43,7 @@ import jadex.micro.annotation.AgentBody;
 	@Plan(trigger=@Trigger(goals=AmbulanceAgent.TreatVictims.class), body=@Body(TreatVictimPlan.class)),
 	@Plan(trigger=@Trigger(goals=AmbulanceAgent.GoHome.class), body=@Body(MoveToLocationPlan.class))
 })
-//@Configurations({@Configuration(name="default"), @Configuration(name="do_nothing")})
+@Configurations({@Configuration(name="do_nothing"), @Configuration(name="default")})
 public class AmbulanceAgent implements IEnvAccess
 {
 //	public static final String GOH = GoHome.class.getName();
@@ -56,15 +59,13 @@ public class AmbulanceAgent implements IEnvAccess
 	/**
 	 * 
 	 */
-	@AgentBody
-//	@OnStart
-//	@OnInit
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
-		System.out.println(agent+" start");
-//		if("default".equals(agent.getConfiguration()))
+		if("default".equals(agent.getConfiguration()))
 		{
-			agent.getFeature(IBDIAgentFeature.class).adoptPlan(new AmbulancePlan()).get();
+			agent.getFeature(IBDIAgentFeature.class).adoptPlan(new AmbulancePlan());
 		}
 	}
 	
@@ -143,7 +144,7 @@ public class AmbulanceAgent implements IEnvAccess
 		 */
 		public TreatVictims(Object disasterid)
 		{
-			System.out.println("created treat victims goal: "+disasterid);
+//			System.out.println("created treat victims goal: "+disasterid);
 			this.disaster = movecapa.getEnvironment().getSpaceObject(disasterid);
 		}
 

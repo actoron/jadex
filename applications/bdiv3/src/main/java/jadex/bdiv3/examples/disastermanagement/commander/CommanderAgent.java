@@ -131,7 +131,6 @@ public class CommanderAgent
 		@GoalCreationCondition(rawevents=@RawEvent(value=ChangeEvent.FACTADDED, second="disasters"))
 		public HandleDisaster(ISpaceObject disaster)
 		{
-			System.out.println(agent+": handle disaster "+disaster);
 			this.disaster = disaster;
 		}
 		

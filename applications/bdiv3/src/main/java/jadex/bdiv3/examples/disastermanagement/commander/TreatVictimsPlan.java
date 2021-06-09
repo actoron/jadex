@@ -30,11 +30,11 @@ public class TreatVictimsPlan
 	public void	body(SendRescueForce goal)
 	{
 		ISpaceObject disaster = (ISpaceObject)goal.getDisaster();
-		System.out.println("treat victims for: "+disaster);
+//		System.out.println("treat victims for: "+disaster);
 		ITreatVictimsService force = (ITreatVictimsService)goal.getRescueForce();
 		tv	= force.treatVictims(disaster.getId());
 		tv.get();
-		System.out.println("treat victims end for: "+disaster);
+//		System.out.println("treat victims end for: "+disaster);
 	}
 	
 	/**

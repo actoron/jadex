@@ -36,7 +36,7 @@ public class HandleDisasterPlan
 	public void	body(HandleDisaster goal)
 	{		
 		ISpaceObject disaster = (ISpaceObject)goal.getDisaster();
-		System.out.println("handle: "+disaster);
+//		System.out.println("handle: "+disaster);
 	
 		ClearChemicals cc = capa.new ClearChemicals(disaster);
 		IFuture<Void> ccfut = rplan.dispatchSubgoal(cc);

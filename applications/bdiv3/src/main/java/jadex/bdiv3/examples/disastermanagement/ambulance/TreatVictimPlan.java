@@ -47,7 +47,7 @@ public class TreatVictimPlan
 	@PlanBody
 	public void body()
 	{
-		System.out.println("treat vic plan for: "+goal);
+//		System.out.println("treat vic plan for: "+goal);
 		
 		Space2D	space	= (Space2D)capa.getMoveCapa().getEnvironment();
 		ISpaceObject myself	= capa.getMoveCapa().getMyself();
@@ -59,7 +59,7 @@ public class TreatVictimPlan
 		IVector2	targetpos	= DisasterType.getVictimLocation(disaster);
 		Move move = capa.getMoveCapa().new Move(targetpos);
 		rplan.dispatchSubgoal(move).get();
-		System.out.println("disaster reached: "+goal);
+//		System.out.println("disaster reached: "+goal);
 		
 		// Treat victim.
 		myself.setProperty("state", "treating_victim");
