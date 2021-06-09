@@ -18,15 +18,6 @@ public class MapWrapper<T, E> extends jadex.commons.collection.wrappers.MapWrapp
 	 *  Create a new set wrapper.
 	 */
 	public MapWrapper(Map<T, E> delegate, IInternalAccess agent, 
-		String addevent, String remevent, String changeevent, MElement mbel)
-	{
-		this(delegate, agent, new EventType(addevent), new EventType(remevent), new EventType(changeevent), mbel);
-	}
-	
-	/**
-	 *  Create a new set wrapper.
-	 */
-	public MapWrapper(Map<T, E> delegate, IInternalAccess agent, 
 		EventType addevent, EventType remevent, EventType changeevent, MElement mbel)
 	{
 		super(delegate);

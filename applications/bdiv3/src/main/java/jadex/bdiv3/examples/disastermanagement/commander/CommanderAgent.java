@@ -39,7 +39,6 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 

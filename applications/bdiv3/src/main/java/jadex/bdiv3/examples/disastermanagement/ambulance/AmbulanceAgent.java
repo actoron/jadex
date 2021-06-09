@@ -134,22 +134,11 @@ public class AmbulanceAgent implements IEnvAccess
 	 */
 	@Goal(deliberation=@Deliberation(cardinalityone=true),
 		publish=@Publish(type=ITreatVictimsService.class, method="treatVictims"))
-//	public static class TreatVictims
 	public class TreatVictims
 	{
 		/** The disaster. */
 		protected ISpaceObject disaster;
-//		protected Object disasterid;
 
-//		/**
-//		 *  Create a new TreatVictims. 
-//		 */
-//		public TreatVictims(ISpaceObject disaster)
-//		{
-////			System.out.println("created treat victims");
-//			this.disaster = disaster;
-//		}
-		
 		/**
 		 *  Create a new TreatVictims. 
 		 */

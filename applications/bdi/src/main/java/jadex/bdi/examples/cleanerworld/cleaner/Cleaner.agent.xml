@@ -143,8 +143,11 @@
 				<inhibits ref="achievecleanup" >
 					$goal.waste.equals($beliefbase.myself.waste) || $goal.waste.position==null || 
 					(!$ref.waste.equals($beliefbase.myself.waste) &amp;&amp; !($ref.waste.position==null) &amp;&amp;
-					$beliefbase.my_location.getDistance($goal.waste.position).getAsDouble()
-					&lt; $beliefbase.my_location.getDistance($ref.waste.position).getAsDouble())
+						($beliefbase.my_location.getDistance($goal.waste.position).getAsDouble()
+								&lt; $beliefbase.my_location.getDistance($ref.waste.position).getAsDouble()
+							|| $beliefbase.my_location.getDistance($goal.waste.position).getAsDouble()
+								== $beliefbase.my_location.getDistance($ref.waste.position).getAsDouble()
+									&amp;&amp; $goal.hashCode() &lt; $ref.hashCode()))
 				</inhibits>
 			</deliberation>
 			<targetcondition>

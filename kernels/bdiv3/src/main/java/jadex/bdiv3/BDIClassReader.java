@@ -1131,7 +1131,7 @@ public class BDIClassReader extends MicroClassReader
 						}
 						else
 						{
-							events.add(new EventType(new String[]{type, name}));
+							events.add(new EventType(type, name));
 						}
 					}
 				}

@@ -1,7 +1,5 @@
 package jadex.extension.envsupport.environment;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,7 +13,6 @@ import javax.swing.SwingUtilities;
 
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMonitoringComponentFeature;
@@ -32,11 +29,14 @@ import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.IFilter;
 import jadex.commons.IPropertyObject;
 import jadex.commons.IValueFetcher;
+import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
@@ -160,6 +160,9 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	protected MEnvSpaceInstance config;
 	protected IValueFetcher pfetcher;
 	
+	/** Futures of external tasks that need waiting for during init. */
+	protected FutureBarrier<Object>	initfutures;
+	
 
 	//-------- constructors --------
 	
@@ -206,11 +209,28 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	}
 	
 	/**
+	 *  Add a future of an asynchronous (i.e. external) task during space init (e.g. a component that is created for a space object).
+	 *  The space init future will wait for these futures.
+	 *  Does nothing, when space is not in init. 
+	 */
+	protected <T>	void	addInitFuture(IFuture<T> fut)
+	{
+		if(initfutures!=null)
+		{
+			@SuppressWarnings("unchecked")
+			IFuture<Object>	cfut	= (IFuture<Object>)fut;
+			initfutures.addFuture(cfut);
+		}
+	}
+	
+	/**
 	 *  Create a space.
 	 */
 	public IFuture<Void>	initSpace()
 	{
 		final Future<Void>	ret	= new Future<Void>();
+		assert this.initfutures==null;
+		this.initfutures	= new FutureBarrier<>();
 		
 //		if(ia.getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
 //			System.out.println("Initing space: "+this);
@@ -595,12 +615,9 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 			
 //			if(ia.getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
 //				System.out.println("Initing space observers: "+this);
-			Future<Void>	ocsdone	= new Future<Void>();
 			List observers = config.getPropertyList("observers");
 			if(observers!=null)
 			{
-				CounterResultListener<Void>	crl1	= new CounterResultListener<Void>(observers.size(), new DelegationResultListener<Void>(ocsdone));
-				
 				for(int i=0; i<observers.size(); i++)
 				{				
 					Map observer = (Map)observers.get(i);
@@ -659,11 +676,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						}
 					});
 					
-					Future<Void>	ocdone	= new Future<Void>();
-					ocdone.addResultListener(crl1);
-	
 					List perspectives = mspacetype.getPropertyList("perspectives");
-					CounterResultListener<Void>	crl2	= new CounterResultListener<Void>(perspectives.size(), new DelegationResultListener<Void>(ocdone));
 					for(int j=0; j<perspectives.size(); j++)
 					{
 						Map sourcepers = (Map)perspectives.get(j);
@@ -678,11 +691,11 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 							MEnvSpaceType.setProperties(persp, props, fetcher);
 							
 							IFuture<Void>	fut	= oc.addPerspective((String)MEnvSpaceType.getProperty(sourcepers, "name"), persp);
-							fut.addResultListener(crl2);
+							addInitFuture(fut);
 						}
 						catch(Exception e)
 						{
-							crl2.exceptionOccurred(e);
+							addInitFuture(new Future<Void>(e));
 						}
 					}
 					
@@ -691,12 +704,10 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 //						ia.getClassLoader(), plugins, killonexit!=null ? killonexit.booleanValue() : true);
 				}
 			}
-			else
-			{
-				ocsdone.setResult(null);
-			}
 			
-			ocsdone.addResultListener(new DelegationResultListener<Void>(ret)
+			FutureBarrier<Object>	fubar	= initfutures;
+			this.initfutures	= null;
+			fubar.waitFor().addResultListener(new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
 				{
@@ -734,6 +745,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 		}
 		catch(Exception e)
 		{
+			this.initfutures	= null;
 			ret.setException(e);
 		}
 
@@ -1647,9 +1659,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					}
 					catch(Exception e)
 					{
-						if(e instanceof RuntimeException)
-							throw (RuntimeException)e;
-						throw new RuntimeException(e);
+						SUtil.throwUnchecked(e);
 					}
 				}
 			}
@@ -1674,15 +1684,15 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					
 					final String compotype = componenttype;
 					
-					getExternalAccess().getFileName(compotype).addResultListener(new DefaultResultListener()
+					Future<IExternalAccess>	fut	= new Future<>();
+					addInitFuture(fut);
+					getExternalAccess().getFileName(compotype).addResultListener(new ExceptionDelegationResultListener<String, IExternalAccess>(fut)
 					{
-						public void resultAvailable(Object result)
+						public void customResultAvailable(String filename)
 						{
-							final String filename = (String)result;
-							
-							getExternalAccess().getModelAsync().addResultListener(new IResultListener<IModelInfo>()
+							getExternalAccess().getModelAsync().addResultListener(new ExceptionDelegationResultListener<IModelInfo, IExternalAccess>(fut)
 							{
-								public void resultAvailable(IModelInfo model) 
+								public void customResultAvailable(IModelInfo model) 
 								{
 									// cannot be dummy cid because agent calls getAvatar(cid) in init and needs its avatar
 									// the cid must be the final cid of the component hence it creates unique ids
@@ -1697,37 +1707,17 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 									desc.setName(cid);
 									desc.setLocalType(compotype);
 									setOwner(ret.getId(), desc);
-//									System.out.println("env create: "+cid);
+//									System.out.println("env create: "+cid+", "+exta.getDescription(exta.getId()).get().getState());
 									IFuture<IExternalAccess> future = exta.createComponent(
 										new CreationInfo().setImports(model.getAllImports()).setFilename(filename).setName(cid.getLocalName()));
-									future.addResultListener(new IResultListener()
-									{
-										public void resultAvailable(Object result)
-										{
-//											System.out.println("env created: "+result);
-//											setOwner(ret.getId(), (IComponentIdentifier)result);
-										}
-										
-										public void exceptionOccurred(final Exception exception)
-										{
-											exta.scheduleStep(new IComponentStep<Void>()
-											{
-												public IFuture<Void> execute(IInternalAccess ia)
-												{
-													// Todo: Propagate exception to kill application!
-													StringWriter	sw	= new StringWriter();
-													exception.printStackTrace(new PrintWriter(sw));
-													ia.getLogger().severe("Could not create component: "+compotype+"\n"+exception);
-													return IFuture.DONE;
-												}
-											});
-										}
-									});
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									exception.printStackTrace();
+									future.addResultListener(new DelegationResultListener<IExternalAccess>(fut));
+//									future.addResultListener(new IResultListener()
+//									{
+//										public void resultAvailable(Object result)
+//										{
+//											System.out.println("env created: "+result+", "+exta.getDescription(exta.getId()).get().getState()+", "+exta.getDescription(cid).get().getState());
+//										}
+//									});
 								}
 							});
 						}

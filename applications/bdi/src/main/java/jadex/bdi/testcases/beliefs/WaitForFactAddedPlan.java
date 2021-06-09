@@ -26,7 +26,7 @@ public class WaitForFactAddedPlan extends Plan
 				getLogger().info("waiting for facts to be added");
 				Object o = waitForFactAdded("beliefSetToAddFacts", 2000);
 				getLogger().info("added fact detected: " + o);
-				//System.out.println("added fact detected: " + o);
+				System.out.println("added fact detected: " + o);
 				counter++;
 				// Waiting here causes further fact adds in the meantime so that
 				// they cannot be detected without waitqueue

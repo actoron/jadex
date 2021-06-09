@@ -53,21 +53,20 @@ public class HandleDisasterPlan
 	}
 	
 	@PlanAborted
-	@PlanFailed
-	public void aborted(Exception e)
+	public void aborted()
 	{
-//		System.out.println("aborted: "+e+" "+this);
-//		e.printStackTrace();
+		System.out.println("aborted: "+this);
 	}
 	
-//	public void failed()
-//	{
-//		System.err.println("failed: "+this);
-//		if(getException()!=null)
-//		{
-//			getException().printStackTrace();
-//		}
-//	}
+	@PlanFailed
+	public void failed(Exception e)
+	{
+		System.err.println("failed: "+this);
+		if(e!=null)
+		{
+			e.printStackTrace();
+		}
+	}
 	
 //	/** The already assigned fire units. */
 //	protected List	fireunits;

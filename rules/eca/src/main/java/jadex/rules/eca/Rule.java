@@ -132,23 +132,7 @@ public class Rule<T> implements IRule<T>
 	{
 		this.events = events;
 	}
-	
-	/**
-	 *  Set the event types.
-	 *  @param events The event types.
-	 */
-	public void setEventNames(List<String> events)
-	{
-		this.events = new ArrayList<EventType>();
-		if(events!=null)
-		{
-			for(String ev: events)
-			{
-				this.events.add(new EventType(ev));
-			}
-		}
-	}
-	
+		
 	/**
 	 *  Get the event types.
 	 *  @retur The event types.

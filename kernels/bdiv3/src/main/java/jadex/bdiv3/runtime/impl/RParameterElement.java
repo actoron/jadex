@@ -27,6 +27,7 @@ import jadex.commons.SUtil;
 import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
+import jadex.rules.eca.EventType;
 
 /**
  *  Base element for elements with parameters such as:
@@ -286,7 +287,7 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		{
 			super(modelelement, agent);
 			this.name = name!=null? name: modelelement.getName();
-			this.publisher = new EventPublisher(agent, ChangeEvent.VALUECHANGED+"."+pename+"."+getName(), (MParameter)getModelElement());
+			this.publisher = new EventPublisher(agent, new EventType(ChangeEvent.VALUECHANGED, pename, getName()), (MParameter)getModelElement());
 		}
 		
 		/**
@@ -298,7 +299,7 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		{
 			super(modelelement, agent);
 			this.name = name!=null? name: modelelement.getName();
-			this.publisher = new EventPublisher(agent, ChangeEvent.VALUECHANGED+"."+pename+"."+getName(), (MParameter)getModelElement());
+			this.publisher = new EventPublisher(agent, new EventType(ChangeEvent.VALUECHANGED, pename, getName()), (MParameter)getModelElement());
 			
 			if(modelelement!=null && modelelement.getEvaluationMode()==EvaluationMode.PULL)
 			{
@@ -318,7 +319,7 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 			super(modelelement, agent);
 			this.name = name!=null? name: modelelement.getName();
 			// RParameterElement.this.getName()
-			this.publisher = new EventPublisher(agent, ChangeEvent.VALUECHANGED+"."+pename+"."+getName(), (MParameter)getModelElement());
+			this.publisher = new EventPublisher(agent, new EventType(ChangeEvent.VALUECHANGED, pename, getName()), (MParameter)getModelElement());
 			
 			setValue(value);
 		}
@@ -444,8 +445,10 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 				}
 			}
 			
-			setValues(new ListWrapper<Object>(vals!=null? inivals: new ArrayList<Object>(), getAgent(), ChangeEvent.VALUEADDED+"."+pename+"."+getName(), 
-				ChangeEvent.VALUEREMOVED+"."+pename+"."+getName(), ChangeEvent.VALUECHANGED+"."+pename+"."+getName(), getModelElement()));
+			setValues(new ListWrapper<Object>(vals!=null? inivals: new ArrayList<Object>(), getAgent(),
+				new EventType(ChangeEvent.VALUEADDED, pename, getName()), 
+				new EventType(ChangeEvent.VALUEREMOVED, pename, getName()), 
+				new EventType(ChangeEvent.VALUECHANGED, pename, getName()), getModelElement()));
 		}
 		
 		/**
@@ -462,8 +465,10 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 				this.inivals	= inivals;
 			}
 			
-			setValues(new ListWrapper<Object>(evaluateValues(inivals), getAgent(), ChangeEvent.VALUEADDED+"."+pename+"."+getName(), 
-				ChangeEvent.VALUEREMOVED+"."+pename+"."+getName(), ChangeEvent.VALUECHANGED+"."+pename+"."+getName(), getModelElement()));
+			setValues(new ListWrapper<Object>(evaluateValues(inivals), getAgent(), 
+				new EventType(ChangeEvent.VALUEADDED, pename, getName()), 
+				new EventType(ChangeEvent.VALUEREMOVED, pename, getName()), 
+				new EventType(ChangeEvent.VALUECHANGED, pename, getName()), getModelElement()));
 		}
 
 		/**

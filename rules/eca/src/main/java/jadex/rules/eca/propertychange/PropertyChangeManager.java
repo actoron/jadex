@@ -14,6 +14,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.Event;
+import jadex.rules.eca.EventType;
 import jadex.rules.eca.IEvent;
 
 /**
@@ -217,7 +218,7 @@ public class PropertyChangeManager
 				}
 				else
 				{
-					Event event = new Event(evt.getPropertyName(), new ChangeInfo<Object>(evt.getNewValue(), evt.getOldValue(), null));
+					Event event = new Event(new EventType(evt.getPropertyName()), new ChangeInfo<Object>(evt.getNewValue(), evt.getOldValue(), null));
 					addEvent(event);
 				}
 			}

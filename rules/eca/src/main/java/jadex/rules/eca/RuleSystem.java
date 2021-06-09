@@ -705,7 +705,7 @@ public class RuleSystem
 			
 			// Find event types
 			Annotation[][] paramannos = m.getParameterAnnotations();
-			List<String> events = new ArrayList<String>();
+			List<EventType> events = new ArrayList<>();
 			for(int j=0; j<paramannos.length; j++)
 			{
 				Annotation[] annos = paramannos[j];
@@ -713,15 +713,16 @@ public class RuleSystem
 				{
 					if(annos[k] instanceof jadex.rules.eca.annotations.Event)
 					{
-						String type = ((jadex.rules.eca.annotations.Event)annos[k]).value();
-						events.add(type);
+						String type = ((jadex.rules.eca.annotations.Event)annos[k]).type();
+						String value = ((jadex.rules.eca.annotations.Event)annos[k]).value();
+						events.add(type.length()>0 ? new EventType(type, value) : new EventType(value));
 					}
 				}
 			}
 			if(events.size()==0)
 				throw new RuntimeException("Event type not found: "+method);
 			
-			rule.setEventNames(events);
+			rule.setEvents(events);
 			
 			rule.setCondition(new jadex.rules.eca.MethodCondition(object, m));
 		}
@@ -777,7 +778,7 @@ class FetchFieldCommand implements IResultCommand<IEvent, Object>
 			Field f = object.getClass().getDeclaredField(name);
 			f.setAccessible(true);
 			Object content = f.get(object);
-			return new Event(name, content);
+			return new Event(new EventType(name), content);
 		}
 		catch(Exception e)
 		{

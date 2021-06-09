@@ -25,14 +25,6 @@ public class Event implements IEvent
 	/**
 	 *  Create a new event.
 	 */
-	public Event(String type, Object content)
-	{
-		this(new EventType(type), content);
-	}
-
-	/**
-	 *  Create a new event.
-	 */
 	public Event(EventType type, Object content)
 	{
 		this.type = type;

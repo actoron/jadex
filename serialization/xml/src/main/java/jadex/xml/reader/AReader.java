@@ -708,7 +708,7 @@ public abstract class AReader
 						catch(RuntimeException e)
 						{
 //							e.printStackTrace();
-							readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", topse, topse.getLocation());
+							readcontext.getReporter().report("Error during postprocessing: "+SUtil.getExceptionStacktrace(e), "postprocessor error", topse, topse.getLocation());
 						}
 					}
 					else
@@ -731,7 +731,7 @@ public abstract class AReader
 								catch(Exception e)
 								{
 //									e.printStackTrace();
-									readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", stack, ftopse!=null ? ftopse.getLocation() : readcontext.getLocation());
+									readcontext.getReporter().report("Error during postprocessing: "+SUtil.getExceptionStacktrace(e), "postprocessor error", stack, ftopse!=null ? ftopse.getLocation() : readcontext.getLocation());
 								}
 							}
 						});

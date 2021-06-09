@@ -2,7 +2,6 @@ package jadex.bdiv3.runtime.wrappers;
 
 import java.util.List;
 
-import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.MElement;
 import jadex.bridge.IInternalAccess;
 import jadex.rules.eca.EventType;
@@ -15,15 +14,6 @@ public class ListWrapper<T> extends jadex.commons.collection.wrappers.ListWrappe
 	/** The event publisher. */
 	protected IEventPublisher publisher;
 
-	/**
-	 *  Create a new list wrapper.
-	 */
-	public ListWrapper(List<T> delegate, IInternalAccess agent, 
-		String addevent, String remevent, String changeevent, MElement melem)
-	{
-		this(delegate, agent, new EventType(addevent), new EventType(remevent), new EventType(changeevent), melem);
-	}
-	
 	/**
 	 *  Create a new list wrapper.
 	 */
