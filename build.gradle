@@ -101,7 +101,6 @@ buildscript
     {
         mavenLocal()
         mavenCentral()
-        jcenter()
 		maven
 		{
 			url "https://maven.google.com"

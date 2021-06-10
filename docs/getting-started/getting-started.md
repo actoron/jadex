@@ -68,10 +68,9 @@ A minimal complete `build.gradle` could look like this:
 ```groovy
 apply plugin: 'java'
 
-def jadex_version = "4.0.171"
+def jadex_version = "4.0.238"
 
 repositories {
-    jcenter()
     mavenCentral()
 }
 
@@ -80,11 +79,10 @@ dependencies {
 }
 ```
 
-If you want to use our nightly builds, you need add another repository:
+If you want to use our nightly builds, you need to add another repository:
 
 ```groovy
 repositories {
-    jcenter()
     mavenCentral()
     maven
     {
@@ -96,21 +94,12 @@ repositories {
 
 ### Using Jadex in a new or existing Apache Maven Project:
 
-<!-- TODO: confirm Maven setup -->
-
 To use Jadex in a new or existing Maven project, add the following code to your build script's dependency section (set `jadexversion` to the desired version):
 
 ```xml
 <properties>
     <jadexversion>4.0.171</jadexversion>
 </properties>
-
-<repositories>
-    <repository>
-      <id>jcenter</id>
-      <url>https://jcenter.bintray.com/</url>
-    </repository>
-</repositories>
 
 <dependency>
     <groupId>org.activecomponents.jadex</groupId>
@@ -124,10 +113,6 @@ If you want to use our nightly builds, you need to add our repository:
 ```xml
 <repositories>
     <repository>
-      <id>jcenter</id>
-      <url>https://jcenter.bintray.com/</url>
-    </repository>
-    <repository>
         <id>jadex-oss-nightlies</id>
         <url>https://nexus.actoron.com/content/repositories/oss-nightlies</url>
     </repository>
@@ -136,17 +121,9 @@ If you want to use our nightly builds, you need to add our repository:
 
 ## Using IntelliJ IDEA
 
-<!-- TODO: can someone confirm this IntelliJ setup? -->
-
-Using IntelliJ IDEA for development with Jadex Active Components is not officially supported.
-If you still want to use IntelliJ IDEA, just try to import the Jadex Example Project - Gradle support is provided by IntelliJ.
-
-If you want to compile the Jadex source code, import the project included in sources.zip.
-To start Jadex with the JCC, create a new Run Configuration using the following parameters:
-
-- Main class: ```jadex.base.Starter```
-- Working directory: leave default
-- Use classpath of module: *jadex-platform-standalone-launch*
+You can also use IntelliJ IDEA for development with Jadex Active Components using the built-in Gradle support of IntelliJ.
+E.g. to import the Jadex Example Project choose "Projects" in the main/welcome window
+and then click "Open" and browse for the directory where you unpacked the example project.
 
 ## Eclipse Project Setup without Maven/Gradle
 
@@ -154,7 +131,7 @@ Sometimes you do not want to obtain the Jadex libraries automatically from a Mav
 In this lesson you will set up an initial eclipse environment that can be used to develop applications using locally available Jadex libraries (e.g. from a downloaded Jadex distribution).
 Please follow the instructions carefully and compare your setup to the screenshots to verify that everything went fine.
 
-(This kind of setup is only recommended, if the all of previous options are not possible.
+(This kind of setup is only recommended, if all of previous options are not possible.
 Not only are more manual steps needed.
 The setup also has some drawbacks:
 a) the source code of the Jadex libraries needs to attached manually, if needed, and

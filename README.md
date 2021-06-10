@@ -11,9 +11,12 @@ Read more about Active Components at <https://www.activecomponents.org> and visi
 
 Gradle:
 
-```implementation 'org.activecomponents.jadex:jadex-distribution-minimal:'+jadex_version```
+```groovy
+implementation 'org.activecomponents.jadex:jadex-distribution-minimal:'+jadex_version
+```
 
 Maven:
+
 ```xml
 <dependency>
     <groupId>org.activecomponents.jadex</groupId>

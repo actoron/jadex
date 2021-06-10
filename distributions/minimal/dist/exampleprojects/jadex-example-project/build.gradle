@@ -20,16 +20,9 @@ dependencies {
 repositories {
 	// Some default repositories for open source Java artifacts
 	mavenCentral()
-	jcenter()
 	
-	// Additional repositories (only required when using nightlies and/or pro version of Jadex).
+	// Optional repository for using nightly versions of Jadex.
 	maven {
 		url "https://nexus.actoron.com/content/repositories/oss-nightlies"
-	}
-	maven {
-		url "http://nexus.actoron.com/nexus/content/repositories/pro"
-	}
-	maven {
-		url "http://nexus.actoron.com/nexus/content/repositories/pro-nightlies"
 	}
 }
