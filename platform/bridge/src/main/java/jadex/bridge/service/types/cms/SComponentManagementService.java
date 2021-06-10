@@ -2104,8 +2104,7 @@ public class SComponentManagementService
 					
 					// Invoke create on platform component
 					component.create(cci, features);
-					
-					boolean tmpdoinit = false;
+
 					try(IAutoLock l = state.writeLock())
 					{
 						linkResults(resultlistener, component, agent);
@@ -2113,17 +2112,11 @@ public class SComponentManagementService
 						CmsComponentState compstate = new CmsComponentState();
 						state.getComponentMap().put(cid, compstate);
 						compstate.setInitInfo(new InitInfo(component, cinfo, resfut));
-						
-						// Start regular execution of inited component
-						// when this component is the outermost component, i.e. with no parent
-						// or the parent is already running
-						tmpdoinit = state.getInitInfo(agent.getId())==null;
-						
+
 						agent.getLogger().info("Starting component: "+cid.getName());
 		//				System.err.println("Pre-Init: "+cid);
 						
 					}
-					final boolean doinit = tmpdoinit;
 					
 					resfut.addResultListener(createResultListener(agent, new IResultListener<Void>()
 					{
@@ -2189,10 +2182,19 @@ public class SComponentManagementService
 									}
 									else
 									{
-										if(doinit)
+										// Start regular execution of inited component
+										// when this component is the outermost component, i.e. with no parent
+										// or the parent is already running
+										Future<Void> parentinitfut = null;
+										try (IAutoLock l = state.readLock())
 										{
-	//										System.out.println("start: "+cid);
-											resumeComponent(cid, true, agent);//.addResultListener(listener)
+											InitInfo parentinit = state.getInitInfo(agent.getId());
+											if (parentinit != null)
+												parentinitfut = parentinit.getInitFuture();
+										}
+										if (parentinitfut == null)
+										{
+											resumeComponent(cid, true, agent);
 										}
 									}
 								}
