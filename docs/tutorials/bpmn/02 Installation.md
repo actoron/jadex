@@ -5,14 +5,14 @@ In this chapter, you will learn how to start the Jadex BPMN editor. You will als
 ## Prerequisites
 
 - Download and install a recent Java environment from [http://www.oracle.com/technetwork/java/javase/downloads/index.html](http://www.oracle.com/technetwork/java/javase/downloads/index.html)  (if not already present).
-- Download and install a suitable eclipse distribution from [http://www.eclipse.org/downloads/](http://www.eclipse.org/downloads/)  (if not already present).Â 
+- Download and install a suitable eclipse distribution from [http://www.eclipse.org/downloads/](http://www.eclipse.org/downloads/)  (if not already present). 
 - Download the latest Jadex build .zip from [http://www.activecomponents.org/download/](http://www.activecomponents.org/download/)  and unpack it to a place of your choice (only necessary if you don't want to use maven).
 
 ## Exercise A1 - Eclipse Project Setup
 
 In this lesson you will set up an initial eclipse environment that will be used in the following lessions. Please follow the instructions carefully and compare your setup to the screenshots to verify that everything went fine.
 
-We will first describe how a setup is done based on downloaded Jadex, afterwards using maven. Thus, you can choose one of both options.Â Â 
+We will first describe how a setup is done based on downloaded Jadex, afterwards using maven. Thus, you can choose one of both options.  
 
 ### Alternative 1: Using Downloaded Jadex
 
@@ -26,7 +26,7 @@ Now we need to add the Jadex jars to the build path of our project. For this pur
 
 ### Alternative 2: Using Jadex via Maven
 
-Create a new maven project by right-clicking in the package explorer and selecting 'new' -&gt; 'other'. Choose 'Maven Project' and click 'next'. In the 'New Maven Project' dialog activate the checkbox 'create a simple project' and click 'next'.Â 
+Create a new maven project by right-clicking in the package explorer and selecting 'new' -&gt; 'other'. Choose 'Maven Project' and click 'next'. In the 'New Maven Project' dialog activate the checkbox 'create a simple project' and click 'next'. 
 
 ![02 Installation@3.png](02%20Installation/02%20Installation-3.png)
 
@@ -75,13 +75,13 @@ In this lesson we will create a launch configuration to start the Jadex platform
 
 ### Eclipse Launch Configuration
 
-Enter the 'run configurations' dialog again and create a new configuration for a Java application. You can name it e.g. 'Jadex Platform' and enter 'jadex.base.Starter' as main class. Instead you can of course also use the search dialog as shown below. Hit 'Run' to start the Jadex platform.Â 
+Enter the 'run configurations' dialog again and create a new configuration for a Java application. You can name it e.g. 'Jadex Platform' and enter 'jadex.base.Starter' as main class. Instead you can of course also use the search dialog as shown below. Hit 'Run' to start the Jadex platform. 
 
 ![02 Installation@7.png](02%20Installation/02%20Installation-7.png)
 
 ### Selecting and Starting a Process
 
-If you managed to successfully start the Jadex platform, the Jadex control center (JCC) window will appear (see below). The JCC is a management and debugging interface for the Jadex platform and the components that run on it.Â 
+If you managed to successfully start the Jadex platform, the Jadex control center (JCC) window will appear (see below). The JCC is a management and debugging interface for the Jadex platform and the components that run on it. 
 
 To execute a process you need to add the corresponding resource path to the JCC project. Right-click in the upper left area (called the model explorer, as it is used to browse for models of e.g. processes) and choose 'Add Path'.
 
@@ -95,11 +95,11 @@ The process will be executed, thereby printing some messages to the (eclipse) co
 
 ### Saving the JCC Project
 
-As you probably do not want to add the jar file again, each time you start the Jadex platform, you should save the current settings of the JCC. From the 'File' menu choose 'Save Settings'.Â 
+As you probably do not want to add the jar file again, each time you start the Jadex platform, you should save the current settings of the JCC. From the 'File' menu choose 'Save Settings'. 
 
 ### Using the Visual BPMN Debugger
 
-Jadex additionally provides a visual debugger for BPMN processes. We will show here how the tool can be used to control the execution of the helloworld process. As a first step we start the helloworld process again, but this time as suspended. For this purpose activate the 'Start suspended' checkbox in the 'Settings-Flags' section of the BPMN process model (on the right hand side of the JCC). After having started the process it will be displayed as suspended, which is indicated by a 'zzz' on the component icon.Â 
+Jadex additionally provides a visual debugger for BPMN processes. We will show here how the tool can be used to control the execution of the helloworld process. As a first step we start the helloworld process again, but this time as suspended. For this purpose activate the 'Start suspended' checkbox in the 'Settings-Flags' section of the BPMN process model (on the right hand side of the JCC). After having started the process it will be displayed as suspended, which is indicated by a 'zzz' on the component icon. 
 
 ![02 Installation@10.png](02%20Installation/02%20Installation-10.png)
 
@@ -107,7 +107,7 @@ Now we are ready to use the BPMN debugger. First we have to switch to the debugg
 
 ![02 Installation@11.png](02%20Installation/02%20Installation-11.png)
 
-To execute a step of the process two options are available. First, you can directly double-click activated elements in the visual process diagram. Such activated elements are displayed in green (in the figure above the start event is the only activated element). As an alternative you can press the 'Step' button at the bottom, which will execute a step of one process thread. If you want to determine which process thread is selected you have to select it in the 'processes table' above.Â Â Â Â 
+To execute a step of the process two options are available. First, you can directly double-click activated elements in the visual process diagram. Such activated elements are displayed in green (in the figure above the start event is the only activated element). As an alternative you can press the 'Step' button at the bottom, which will execute a step of one process thread. If you want to determine which process thread is selected you have to select it in the 'processes table' above.    
 
 You can also debug multiple processes at once. Try starting multiple instances of the process. Each of the created instances can be independently controlled in the debugger tool. A double-click on a process instance in the debugger opens/closes the debugger view for this process. An active debugger view is represented by a symbolic magnifying glass on the process icon. A single-click on such an icon will switch to the debugger view of this process instance.
 

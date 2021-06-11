@@ -1,19 +1,19 @@
 # Expressions
 
-For many elements (parameter values, default and initial facts of beliefs, etc.) the developer has to specify expressions in the ADF. The most important part of an expression is the expression string. In addition, some meta information can be attached to expressions, e.g., to specify the class the resulting value should have.Â 
+For many elements (parameter values, default and initial facts of beliefs, etc.) the developer has to specify expressions in the ADF. The most important part of an expression is the expression string. In addition, some meta information can be attached to expressions, e.g., to specify the class the resulting value should have. 
 
 ## Expression Syntax
 
 The expression language follows a Java-like syntax. In general, all of the *operators* of the Java language are supported (with the exception of assignment operators), while no other constructs can be used. Operators are, for example, math operators (+-**/%), logical operators (&&, ||, !), and method, or constructor invocations. Other unsupported constructs are loops, class declarations, variable declarations, if-then-else blocks, etc. As a rule you can use every Java code that can be contained in the right hand side of a variable assignment (e.g., *var* = &lt;expression&gt;). There are just two exceptions to this rule: Declarations of anonymous inner classes are not supported. Assignment operators (=, +=, **=...) as well as de- and increment operators (++, --) are not allowed, because they would violate declarativeness.
 
 In addition to the Java-like syntax, the language has some extensions: Parameters give access to specific elements depending on the context of the expression. OQL-like select statements allow to create complex queries, e.g., for querying the beliefbase. To simplify the Java statements in the expressions, imports can be declared in the ADF (see [Imports](04%20Imports.md)) that allow to use unqualified class names. The imports are defined once, and can be used for all expressions throughout the ADF.
-Â Â 
+  
 
 ## Expression Properties
 
-Expressions have properties which can be specified as attributes of the enclosing XML tag. The optional class attribute can be specified for any expression, and is used for cross checking the expression string against the expected return type. This allows to detect errors in the ADF already at load time, which could otherwise only be reported at runtime.Â 
+Expressions have properties which can be specified as attributes of the enclosing XML tag. The optional class attribute can be specified for any expression, and is used for cross checking the expression string against the expected return type. This allows to detect errors in the ADF already at load time, which could otherwise only be reported at runtime. 
 
-The evaluation mode influences when and how often the expression is evaluated at runtime. A "static" expression caches the value once the expression created, while the value of a "dynamic" expression is reevaluated for ervery access. The default values of these properties depend on the context in which the expression is used. E.g. initial facts of beliefs are usually static, while conditions are dynamic.Â Â Â 
+The evaluation mode influences when and how often the expression is evaluated at runtime. A "static" expression caches the value once the expression created, while the value of a "dynamic" expression is reevaluated for ervery access. The default values of these properties depend on the context in which the expression is used. E.g. initial facts of beliefs are usually static, while conditions are dynamic.   
 
 ## Reserved Variables
 
@@ -38,7 +38,7 @@ Within expressions, several variables can be accessed depending on the context t
 
 ## Expressions Examples
 
-Â 
+ 
 In the following, two example expressions are shown. Here the expressions are used to specifiy the facts of some beliefs. In fact there are many places besides beliefs in the ADF where expressions can be used. In the first case, the "starttime" fact expression is evaluated only once when the agent is born. The second belief represents the agent's lifetime and is recalculated on every access.
 
 ```xml
@@ -98,7 +98,7 @@ public void body
 ```
 
 *Evaluating an expression from a plan*
-Â 
+ 
 
 ## OQL-like Select Statements
 
@@ -114,12 +114,12 @@ from (<class>? <element> in)? <collection-expression>
 ```
 
 *Syntax of OQL-like select statements*
-Â Â Â Â 
+    
 
 &lt;p/&gt;
 The &lt;collection-expression&gt; has to evaluate to an object that can be iterated (an array or an object implementing *Iterator*, *Enumeration*, *Collection*, or *Map*). In the other expressions (result, where, ordering) the query variables can be accessed using &lt;element&gt;. When using "&lt;element&gt;" as result expression, the second "&lt;element&gt; in" part can be omitted for readability. While you are free to use any expression for the result and the ordering, the where clause, of course, has to evaluate to a boolean value.
 &lt;br/&gt;
- Â 
+  
 Some simple example queries (assuming that the beliefbase contains a belief set "persons", where each person has attributes "forename", "surname", "age", and "address") are shown in the code snippets below. The first query returns a *java.util.List* of all persons in the order they are contained in the belief set. The second query only returns persons that are older than 21. In this case a cast is used to invoke the *getAge()* method. The third example orders the returned list by the addresses of the persons, using a type declaration at the beginning of the query, and therefore does not need a cast for accessing the *getAddress()* method. The order-by implementation relies on the *java.lang.Comparable* interface. In the example, the addresses have to be comparable for the query to work. The next query shows that it is possible to use complex expressions to create the result elements. Note, that in this case, the "$person in" part cannot be ommited. The last example shows how to do a join. The expression returns a list of strings of any two (distinct) persons, which have the same address.
 
 ```java

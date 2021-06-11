@@ -22,7 +22,7 @@ Installation of the Platform App
 
 1. Download the Jadex platformApp from [nightly builds](http://www.activecomponents.org/download).
 2. Install it on your phone or emulator. For emulator, use `adb install jadex-android-platformapp-2.4-SNAPSHOT.apk`.
-    For installation on your phone, enable the *unknown sources* setting, located in *Â settings &gt; securityÂ *, download the APK to your phone and execute it.
+    For installation on your phone, enable the *unknown sources* setting, located in * settings &gt; security *, download the APK to your phone and execute it.
 
 The Platform App will create a Startup icon just like any other Android app.
 However, selecting this icon will not start the platform, instead, it is started by launching client applications.
@@ -58,7 +58,7 @@ For a quick start, use the example project *jadex-android-clientapp-example-mave
 - choose *File -&gt; Import -&gt; Maven -&gt; Existing Maven Projects*
 - select your workspace folder, select the *jadex-android-clientapp-example-maven* directory and click *next* / *finish* until import is completed
 
-- to build the project with maven **which is required as of jadex-android-2.4**, use the included launch config *Build clientapp example*Â 
+- to build the project with maven **which is required as of jadex-android-2.4**, use the included launch config *Build clientapp example* 
 - to run the maven build, use the included launch config *Run clientapp example* which will deploy and run the project on any Android devices plugged in or emulators running.
 
 ### The ClientApp

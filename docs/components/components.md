@@ -208,7 +208,7 @@ To declare subcomponents, you may use the ```@ComponentTypes``` annotation and t
 ```java
 @Configurations(@Configuration(name = "default", components =  {@Component(type = "MyChildAgent")}))
 @ComponentTypes(@ComponentType(name="MyChildAgent", clazz=ChildAgent.class))
-public class ParentAgent { â€¦
+public class ParentAgent { €¦
 ```
 
 Any services provided by subcomponents using the scope [ServiceScope.COMPONENT](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/bridge/service/RequiredServiceInfo.html) can then be accessed using the same scope in the parent component or any other subcomponents.

@@ -26,23 +26,23 @@ To describe the situations in which a new goal of the declared user type will be
 
 # Example Goal
 
-The following Figure shows an example goal using most of the features described above. It is a simplified example taken from the Hunter-Prey scenario (package jadex.bdi.examples.hunterprey) from the BasicBehaviour capability, common to all prey creatures. The goal is named "eat_food" and has one parameter $food, which is assigned from binding options taken from the food belief set. It is created whenever there is food (in the $food parameter) and the creature is allowed to eat (see creation condition). The goal is &lt;unique/&gt; meaning that the creature will not pursue two goals to eat the same food at the same time. Moreover, the &lt;deliberation&gt; settings specify that the eat_food goal is more important than the wander_around goal.Â 
+The following Figure shows an example goal using most of the features described above. It is a simplified example taken from the Hunter-Prey scenario (package jadex.bdi.examples.hunterprey) from the BasicBehaviour capability, common to all prey creatures. The goal is named "eat_food" and has one parameter $food, which is assigned from binding options taken from the food belief set. It is created whenever there is food (in the $food parameter) and the creature is allowed to eat (see creation condition). The goal is &lt;unique/&gt; meaning that the creature will not pursue two goals to eat the same food at the same time. Moreover, the &lt;deliberation&gt; settings specify that the eat_food goal is more important than the wander_around goal. 
 
 ```xml
 <achievegoal name="eat_food">
-Â Â <parameter name="food" class="ISpaceObject">
-Â Â Â Â <value>$food</value>
-Â Â </parameter>
-Â Â <unique/>
-Â Â <creationcondition language="jcl">
-Â Â Â Â $beliefbase.eating_allowed
-Â Â </creationcondition>
-Â Â <dropcondition language="jcl">
-Â Â Â Â !Arrays.asList($beliefbase.seen_food).contains($goal.food)
-Â Â </dropcondition>
-Â Â <deliberation>
-Â Â Â Â <inhibits ref="wander_around"/>
-Â Â </deliberation>
+  <parameter name="food" class="ISpaceObject">
+    <value>$food</value>
+  </parameter>
+  <unique/>
+  <creationcondition language="jcl">
+    $beliefbase.eating_allowed
+  </creationcondition>
+  <dropcondition language="jcl">
+    !Arrays.asList($beliefbase.seen_food).contains($goal.food)
+  </dropcondition>
+  <deliberation>
+    <inhibits ref="wander_around"/>
+  </deliberation>
 </achievegoal>
 ```
 
@@ -51,7 +51,7 @@ The following Figure shows an example goal using most of the features described 
 # BDI Flags
 
 The handling and the exposed behavior of goals can be adapted to the requirements of your application using the so called BDI flags as depicted in the table below. The flags can be specified as attributes of the different goal tags in the ADF. The retry flag indicates that the goal should be retried or redone, until it is reached, or no more plans are available, which can handle the goal. An optional waiting time (in milliseconds) can be specifed using the retrydelay. The exclude flag is used in conjunction with retry and indicates that, when retrying a goal, only plans should be called that where not already executed for that goal.
- Â 
+  
 
 | Name              | Default      | Possible Values     |
 |-------------------|--------------|---------------------|
@@ -75,13 +75,13 @@ Furthermore the goal introduce the recur flag and the recurdelay (in millisecond
 # Perform Goal
 
 Perform goals are conceived to be used when certain activities have to be done. Below, an example declaration from the cleaner world example is shown. You can see that the perform goal "patrol" refines some BDI flags to obtain the desired behavior. By allowing the goal to redo activities (retry="true"), it is assured that the agent does not conclude to knock off after having performed one patrol round, but instead patrols as long as it is night. Even when the agent only knows one patrol plan, it will reuse this plan and perform the same patrol rounds, because it is not allowed to exclude a plan (exclude="never").
- Â 
+  
 
 ```xml
 <performgoal name="performlookforwaste" retry="true" exclude="never">
-Â Â <contextcondition language="jcl">
-Â Â Â Â $beliefbase.daytime
-Â Â </contextcondition>
+  <contextcondition language="jcl">
+    $beliefbase.daytime
+  </contextcondition>
 </performgoal>
 ```
 
@@ -93,10 +93,10 @@ Achieve goals are used to reach some desired world state. Therfore, they extend 
 
 ```xml
 <achievegoal name="moveto">
-Â Â <parameter name="location" class="Location"/>
-Â Â <targetcondition>
-Â Â Â Â $beliefbase.my_location.isNear($goal.location)
-Â Â </targetcondition>
+  <parameter name="location" class="Location"/>
+  <targetcondition>
+    $beliefbase.my_location.isNear($goal.location)
+  </targetcondition>
 </achievegoal>
 ```
 
@@ -108,14 +108,14 @@ Query goals can be used to retrieve specified information. From the specificatio
 
 ```xml
 <querygoal name="query_wastebin" exclude="never">
-Â Â <parameter name="result" class="Wastebin" evaluationmode="push" direction="out">
-Â Â Â Â <value variable="$wastebin">
-Â Â Â Â Â Â Wastebin $wastebin &amp;&amp; !$wastebin.isFull()
-Â Â Â Â Â Â &amp;&amp; !(Wastebin $wastebin2 &amp;&amp; !$wastebin2.isFull()
-Â Â Â Â Â Â &amp;&amp; $beliefbase.my_location.getDistance($wastebin.getLocation())
-Â Â Â Â Â Â &gt; $beliefbase.my_location.getDistance($wastebin2.getLocation()))
-Â Â Â Â </value>
-Â Â </parameter>
+  <parameter name="result" class="Wastebin" evaluationmode="push" direction="out">
+    <value variable="$wastebin">
+      Wastebin $wastebin &amp;&amp; !$wastebin.isFull()
+      &amp;&amp; !(Wastebin $wastebin2 &amp;&amp; !$wastebin2.isFull()
+      &amp;&amp; $beliefbase.my_location.getDistance($wastebin.getLocation())
+      &gt; $beliefbase.my_location.getDistance($wastebin2.getLocation()))
+    </value>
+  </parameter>
 </querygoal>
 ```
 
@@ -129,21 +129,21 @@ Note that maintain goals differ from the other kinds of goals in that they do no
 
 The maintain goal "battery_loaded" shown below, makes sure that the cleaner agent recharges its battery whenever the charge state drops under 20%. To avoid the agent moving to the charging station and loading only until 21% (which satisfies the maintain condition), the extra target condition is used. It ensures that the agent stays loading until the battery is fully recharged.
 Note that in the example the "&amp;gt;" entity is used to escape the greater-than character ("&gt;") in XML.
- Â 
+  
 
 ```xml
 <maintaingoal name="maintainbatteryloaded">
-Â Â <deliberation>
-Â Â Â Â <inhibits ref="performlookforwaste" inhibit="when_in_process"/>
-Â Â Â Â <inhibits ref="achievecleanup" inhibit="when_in_process"/>
-Â Â Â Â <inhibits ref="performpatrol" inhibit="when_in_process"/>
-Â Â </deliberation>
-Â Â <maintaincondition language="jcl">
-Â Â Â Â $beliefbase.my_chargestate &gt; 0.2
-Â Â </maintaincondition>
-Â Â <targetcondition language="jcl">
-Â Â Â Â $beliefbase.my_chargestate &gt;= 1.0
-Â Â </targetcondition>
+  <deliberation>
+    <inhibits ref="performlookforwaste" inhibit="when_in_process"/>
+    <inhibits ref="achievecleanup" inhibit="when_in_process"/>
+    <inhibits ref="performpatrol" inhibit="when_in_process"/>
+  </deliberation>
+  <maintaincondition language="jcl">
+    $beliefbase.my_chargestate &gt; 0.2
+  </maintaincondition>
+  <targetcondition language="jcl">
+    $beliefbase.my_chargestate &gt;= 1.0
+  </targetcondition>
 </maintaingoal>
 ```
 
@@ -160,42 +160,42 @@ A subgoal is dispatched as child of the root goal of the plan, and remains in th
 ```java
 public void body()
 {
- Â //Â Create new top-level goal.
-Â Â IGoal goal1 = createGoal("mygoal");
-Â Â dispatchTopLevelGoal(goal1);
-Â Â ...
-Â Â // Create subgoal and wait for result.
-Â Â IGoal goal2 = createGoal("mygoal");
-Â Â dispatchSubgoalAndWait(goal2);
-Â Â Object val = goal2.getParameter("someoutparam").getValue();
-Â Â ...
- Â //Â Drop top-level goal.
-Â Â goal1.drop();
+  // Create new top-level goal.
+  IGoal goal1 = createGoal("mygoal");
+  dispatchTopLevelGoal(goal1);
+  ...
+  // Create subgoal and wait for result.
+  IGoal goal2 = createGoal("mygoal");
+  dispatchSubgoalAndWait(goal2);
+  Object val = goal2.getParameter("someoutparam").getValue();
+  ...
+  // Drop top-level goal.
+  goal1.drop();
 }
 ```
 
 *Dispatching goals from plan bodies*
- Â 
+  
 When dispatching and waiting for a subgoal from a standard plan, a goal failure will be indicated by a GoalFailureException being thrown. Normally, this exception need not be catched, because most plans depend on all of their subgoals to succeed. If the plan may provide alternatives to failed subgoals, you can use try/catch statements to recover from goal failures:*
 
 ```java
 public void body()
 {
-Â Â ...
- Â //Â Goal failure will cause plan to fail.
-Â Â 
+  ...
+  // Goal failure will cause plan to fail.
+  
   dispatchSubgoalAndWait(goal1);
 
-Â Â try
-Â Â {
-Â    //Â Goal failure will not cause plan to fail.
-Â Â Â Â dispatchSubgoalAndWait(goal2);
-Â Â }
-Â Â catch(GoalFailureException e)
-Â Â {
-Â Â Â Â // Recover from goal failure.
-Â Â Â Â ...
-Â Â }
+  try
+  {
+    // Goal failure will not cause plan to fail.
+    dispatchSubgoalAndWait(goal2);
+  }
+  catch(GoalFailureException e)
+  {
+    // Recover from goal failure.
+    ...
+  }
 }
 ```
 
@@ -203,7 +203,7 @@ public void body()
 
 # Goal Deliberation with "Easy Deliberation"
 
-One aspect of rational behavior is that agents can pursue multiple goals in parallel. Unlike other BDI systems, Jadex provides an architectural framework for deciding how goals interact and how an agent can autonomously decide which goals to pursue. This process is called goal deliberation, and is facilitated by the goal lifecycle (introduced in [Chapter 2, BDI Concepts](02%20Concepts.md)) and refined here to facilitate the understanding of the strategy. The life cycle introducess the *active*, *option*, and *suspended* states. The context condition of a goal specifies which goals can possibly be pursued, and which goals have to be suspended. A goal deliberation strategy then has the task to choose among the possible (i.e., not suspended) goals by activating some of them, while leaving the others as options (for later processing).Â 
+One aspect of rational behavior is that agents can pursue multiple goals in parallel. Unlike other BDI systems, Jadex provides an architectural framework for deciding how goals interact and how an agent can autonomously decide which goals to pursue. This process is called goal deliberation, and is facilitated by the goal lifecycle (introduced in [Chapter 2, BDI Concepts](02%20Concepts.md)) and refined here to facilitate the understanding of the strategy. The life cycle introducess the *active*, *option*, and *suspended* states. The context condition of a goal specifies which goals can possibly be pursued, and which goals have to be suspended. A goal deliberation strategy then has the task to choose among the possible (i.e., not suspended) goals by activating some of them, while leaving the others as options (for later processing). 
 
 ![](easydeliberation.png)
 
@@ -218,27 +218,27 @@ The following figure shows the dependencies between the goals of a cleaner agent
 ![](cleanergoals.png)
 *Figure 4: Example goal dependencies (taken from Cleanerworld scenario)*
 
-The dependencies can be naturally mapped to the goal specifications in the ADFÂ below:
+The dependencies can be naturally mapped to the goal specifications in the ADF below:
 
 ```xml
 <maintaingoal name="maintainbatteryloaded">
-Â Â <deliberation>
-Â Â Â Â <inhibits ref="performlookforwaste" inhibit="when_in_process"/>
-Â Â Â Â <inhibits ref="achievecleanup" inhibit="when_in_process"/>
-Â Â Â Â <inhibits ref="performpatrol" inhibit="when_in_process"/>
-Â Â </deliberation>
+  <deliberation>
+    <inhibits ref="performlookforwaste" inhibit="when_in_process"/>
+    <inhibits ref="achievecleanup" inhibit="when_in_process"/>
+    <inhibits ref="performpatrol" inhibit="when_in_process"/>
+  </deliberation>
 </maintaingoal>
 
 <achievegoal name="achievecleanup" retry="true" exclude="when_failed">
-Â Â <parameter name="waste" class="Waste" />
-Â Â <!--Â Omitted conditions for brevity.Â -->
-Â Â <deliberation cardinality="1">
-Â Â Â Â <inhibits ref="performlookforwaste"/>
-Â Â Â Â <inhibits ref="achievecleanup">
-Â Â Â Â Â Â $beliefbase.my_location.getDistance($goal.waste.getLocation())
-Â Â Â Â Â Â &lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
-Â Â Â Â </inhibits>
-Â Â </deliberation>
+  <parameter name="waste" class="Waste" />
+  <!-- Omitted conditions for brevity. -->
+  <deliberation cardinality="1">
+    <inhibits ref="performlookforwaste"/>
+    <inhibits ref="achievecleanup">
+      $beliefbase.my_location.getDistance($goal.waste.getLocation())
+      &lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
+    </inhibits>
+  </deliberation>
 </achievegoal>
 ```
 
@@ -246,7 +246,7 @@ The dependencies can be naturally mapped to the goal specifications in the ADFÂ 
 
 The &lt;inhibits&gt; tags are used to specify that the "maintainbatteryloaded" goal is more important than the other goals. As the "maintainbatteryloaded" is a maintain goal, it only needs to precede the other goals when it is in process, i.e., the cleaner is currently recharging its battery. The cardinality of the "achievecleanup" goal specifies, that the agent should only pursue one cleanup goal at the same time. The goal inhibits the "performlookforwaste" goal and additionally introduces a runtime inhibition relationship to other goals of its type. The expression contained in the inhibits declaration means that one "achievecleanup" goal should inhibit other instances of the "achievecleanup" goal, when its waste location is nearer to the agent.
 
- Â 
+  
 
 # Meta Goal
 
@@ -264,42 +264,42 @@ In the example below, adapted from the jadex.bdi.examples.puzzle example, for ev
 
 ```xml
 <goals>
-Â Â <achievegoal name="makemove">
-Â Â Â Â ...
-Â Â </achievegoal>
- Â 
-Â Â <metagoal name="choosemove" recalculate="false">
-Â Â Â Â <parameterset name="applicables" class="ICandidateInfo"/>
-Â Â Â Â <parameterset name="result" class="ICandidateInfo" direction="out"/>
-Â Â Â Â <trigger>
-Â Â Â Â Â Â <goal ref="makemove"/>
-Â Â Â Â </trigger>
-Â Â </metagoal>
+  <achievegoal name="makemove">
+    ...
+  </achievegoal>
+  
+  <metagoal name="choosemove" recalculate="false">
+    <parameterset name="applicables" class="ICandidateInfo"/>
+    <parameterset name="result" class="ICandidateInfo" direction="out"/>
+    <trigger>
+      <goal ref="makemove"/>
+    </trigger>
+  </metagoal>
 </goals>
 
 <plans>
-Â Â <plan name="move_plan">
-Â Â Â Â <parameter name="move" class="Move">
-Â Â Â Â Â Â <bindingoptions>$beliefbase.board.getPossibleMoves()</bindingoptions>
-Â Â Â Â </parameter>
-Â Â Â Â ...
-Â Â Â Â <trigger>
-Â Â Â Â Â Â <goal ref="makemove"/>
-Â Â Â Â </trigger>
-Â Â </plan>
- Â Â Â 
-Â Â <plan name="choose_move_plan">
-Â Â Â Â <parameterset name="applicables" class="ICandidateInfo">
-Â Â Â Â Â Â <goalmapping ref="choosemove.applicables"/>
-Â Â Â Â </parameterset>
-Â Â Â Â <parameterset name="result" class="ICandidateInfo" direction="out">
-Â Â Â Â Â Â <goalmapping ref="choosemove.result"/>
-Â Â Â Â </parameterset>
-Â Â Â Â <body clss="ChooseMovePlan"/>
-Â Â Â Â <trigger>
-Â Â Â Â Â Â <goal ref="choosemove"/>
-Â Â Â Â </trigger>
-Â Â </plan>
+  <plan name="move_plan">
+    <parameter name="move" class="Move">
+      <bindingoptions>$beliefbase.board.getPossibleMoves()</bindingoptions>
+    </parameter>
+    ...
+    <trigger>
+      <goal ref="makemove"/>
+    </trigger>
+  </plan>
+    
+  <plan name="choose_move_plan">
+    <parameterset name="applicables" class="ICandidateInfo">
+      <goalmapping ref="choosemove.applicables"/>
+    </parameterset>
+    <parameterset name="result" class="ICandidateInfo" direction="out">
+      <goalmapping ref="choosemove.result"/>
+    </parameterset>
+    <body clss="ChooseMovePlan"/>
+    <trigger>
+      <goal ref="choosemove"/>
+    </trigger>
+  </plan>
 </plans>
 ```
 
@@ -308,17 +308,17 @@ In the example below, adapted from the jadex.bdi.examples.puzzle example, for ev
 ```java
 public void body()
 {
-Â Â ICandidateInfo[] apps = (ICandidateInfo[])getParameterSet("applicables").getValues();
+  ICandidateInfo[] apps = (ICandidateInfo[])getParameterSet("applicables").getValues();
 
-Â Â ICandidateInfo sel = null;
- Â Â Â 
-Â Â for(int i = 0; i < apps.length; i++)
-Â Â {
- Â Â Â //Â Decide which plan to select, e.g. using the move parameter of the move_plan.
-Â Â Â Â Move move = (Move)apps[i].getPlan().getParameter("move").getValue();
-Â Â Â Â ...
-Â Â }
-Â Â getParameterSet("result").addValue(sel);
+  ICandidateInfo sel = null;
+    
+  for(int i = 0; i < apps.length; i++)
+  {
+    // Decide which plan to select, e.g. using the move parameter of the move_plan.
+    Move move = (Move)apps[i].getPlan().getParameter("move").getValue();
+    ...
+  }
+  getParameterSet("result").addValue(sel);
 }
 ```
 

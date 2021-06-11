@@ -33,7 +33,7 @@ If distribution is needed we used the approach of a separate environment. The en
 
 ### I have change the .java file, e.g. a plan. Why are my changes not reflected in the running Jadex system?
 
-Jadex relies on the Java class loading mechanism. This means that normally Java classes are loaded only once into the VM. You need to restart the Platform for taking the changes effect.Â 
+Jadex relies on the Java class loading mechanism. This means that normally Java classes are loaded only once into the VM. You need to restart the Platform for taking the changes effect. 
 
 ### How can I parametrize a component and set parameter values before starting?
 
@@ -69,7 +69,7 @@ If you find that you don't need goals for your application, consider using the m
 
 ### How can the agent become aware of or react to its own death?
 
-Jadex supports not only an initialization phase but also a termination phase. Whenever an agent is terminated its execution will not be immediately stopped. Instead the agent changes its state to "terminating", aborts all running goals and plans and activates elements declared in the end state. For details please have a look at ChapterÂ 13, Configurations.
+Jadex supports not only an initialization phase but also a termination phase. Whenever an agent is terminated its execution will not be immediately stopped. Instead the agent changes its state to "terminating", aborts all running goals and plans and activates elements declared in the end state. For details please have a look at Chapter 13, Configurations.
 
 If you want to be notified when an agent dies you can use an agent listener.
 

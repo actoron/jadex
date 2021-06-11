@@ -36,7 +36,7 @@ System.out.println("Started platform: "+platform.getComponentIdentifier());
 For starting the newly written class as a Java program in eclipse, right-click in the editor and choose *Run As -&gt; Java Application*.
 
 ![09 Application Integration@runas.png](runas.png)
-*Â Starting a Java application from eclipse*
+* Starting a Java application from eclipse*
 
 If everything is OK the JCC should appear. In addition to the normal Jadex outputs you should also see the 'Started platform: ...' line that was printed from the above code.
 
@@ -48,11 +48,11 @@ By default, the Jadex platform opens the JCC and prints some messages on the con
 
 You may have noticed in the previous exercise, that the *args* parameter of the *main(...)* method is passed to the *createPlatform(...)* method. Therefore we can adapt the eclipse launch configuration to supply arguments to the Jadex platform. In the following we want to stop the JCC from opening.
 
-- Open the run configuration created in the previous exercise (e.g. right-click in editor and choose Â *Run As -&gt; Run Configurations...*).
+- Open the run configuration created in the previous exercise (e.g. right-click in editor and choose  *Run As -&gt; Run Configurations...*).
 - Change to the *Arguments* tab and add the line '-gui false'.
 
 ![09 Application Integration@arguments.png](09Application%20Integration-arguments.png)
-*Â Changing launch arguments in eclipse*
+* Changing launch arguments in eclipse*
 
 - Run the application and check, that the JCC does not appear.
 

@@ -25,4 +25,4 @@ We will come back to this design in [05 Provided Services](05%20Provided%20Servi
 
 # Prerequisites
 
-Before you can start with this tutorial, please follow the steps in our [Getting Started](../../getting-started/getting-started.md#ide-setup)) section to setup your IDE.
+Before you can start with this tutorial, please follow the steps in our [Getting Started](../../getting-started/getting-started.md#ide-setup) section to setup your IDE.

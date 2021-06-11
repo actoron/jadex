@@ -17,8 +17,8 @@ The clock settings area shows details of the clock currently used by the platfor
 
 - *System clock:* directly corresponds to the computer clock and delivers a time value that corresponds directly to Java *System.currentTimeMillis()*.
 - *Continuous clock*: similar to the system clock, but allows for pausing the clock and also using a dilation that makes the clock run faster of slower than the system clock.
-- *Event-driven clock:Â *The event-driven clock uses timing events to advance the clock value, i.e. components that register timing events determine how fast the model time advances. Using event-driven clock as-fast-as-possible simulations are possible, i.e. the whole computation time is used and no unnessary waiting times exist any longer.
-- *Time-driven clock:Â *The time-driven clock advances the model time by adding a constant (and definable) tick size. In this way the simulation time is advanced regularly which may lead to unnecessary time events, i.e. time points at which no component has something to do. On the other hand this simulation type leads to more realistic observable behavior as no irregular time jumps are produced.
+- *Event-driven clock: *The event-driven clock uses timing events to advance the clock value, i.e. components that register timing events determine how fast the model time advances. Using event-driven clock as-fast-as-possible simulations are possible, i.e. the whole computation time is used and no unnessary waiting times exist any longer.
+- *Time-driven clock: *The time-driven clock advances the model time by adding a constant (and definable) tick size. In this way the simulation time is advanced regularly which may lead to unnecessary time events, i.e. time points at which no component has something to do. On the other hand this simulation type leads to more realistic observable behavior as no irregular time jumps are produced.
 
 **Start time:** The init time of the clock.
 

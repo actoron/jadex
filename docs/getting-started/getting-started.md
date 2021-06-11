@@ -211,5 +211,21 @@ public class HelloAgent {
 To start your applications developed with Jadex Active Components, you always need to start a [Jadex Platform](../platform/platform.md#starting-a-platform) and [start your Component(s)](../components/components.md#startup).
 As shown in the example above, you can combine these two steps by adding your agents/components to the config before starting the platform.
 
+## Starting Jadex Examples
+
+Jadex comes with many small and large example applications in the [example application directories](../../applications). To start these examples in you Gradle project, you need to add the dependency and afterwards refresh the Gradle project in eclipse, e.g.:
+
+```Groovy
+    implementation 'org.activecomponents.jadex:jadex-applications-micro:4.0.238'
+```
+
+![Refreshing the Gradle project](gradle_refresh.png "Refreshing the Gradle project")
+
+Now you can search for the `Main` classes of the available examples. Hit *CTRL-Shift-T* or choose *Navigate/Open Type...* from the menu. Entry `Main` in the appearing dialog and scroll down to the desired example:
+
+![Finding an example Main class](example_mains.png "Finding an example Main class")
+
+Open the chosen class, right-click on the new source file and choose "Run As -> Java Application".
+
 ---
 [[Up: Document Overview]](../index.md)

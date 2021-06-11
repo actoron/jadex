@@ -130,13 +130,13 @@ public class TimeProviderAgent implements ITimeService
 
 Start the Jadex platform and the time provider agent with the provided `main()` method. Afterwards (or beforehand) start the time user agent with its `main()` method. The two platforms will connect automatically and the time user will find the time provider and print out its time update messages.
 
-The details of the time provider agent are explained in the following subsections. Furthermore, you can see [Remote Communication](../../remote/remote.md#awareness)) for details on automatic platform discovery.
+The details of the time provider agent are explained in the following subsections. Furthermore, you can see [Remote Communication](../../remote/remote.md#awareness) for details on automatic platform discovery.
 
 ## Service Annotations
 
-The `@ProvidedService` annotation tells the Jadex runtime that this agent provides a service of type `ITimeService.class` and that it should be visible to all platforms world wide (`scope=ServiceScope.GLOBAL`). The `@Service` annotation furthermore states, that the agent class implements the service itself instead of having a separate class for the service implementation.
+The `@ProvidedService` annotation tells the Jadex runtime that this agent provides a service of type `ITimeService.class` and that it should be visible to all platforms world wide (`scope=ServiceScope.GLOBAL`). The `@Service` annotation states, that the agent class implements the service itself instead of having a separate class for the service implementation.
 
-See, e.g.,  [Services.Providing Services](../../services/services.md#providing-services)) for more details on the @ProvidedService annotation.
+See, e.g.,  [Services.Providing Services](../../services/services.md#providing-services) for more details on the @ProvidedService annotation.
 
 ## Object Attributes
 
@@ -146,7 +146,7 @@ The `subscriptions` field is a `java.util.Map` of the current subscriptions to t
 
 On each call, the `subscribe()` method creates a new subscription future object for the new subscriber and returns that object. The subcription future object is also added to the subscriptions list, so it can be notified about each new time message.
 
-Furthermore, a termination command is set on the subscription future. This command is executed when the subscription ends either due to a network error or when a client explicitly cancels the subscription. In the command, the time provider agent prints out a message and removes the subscription from the list.
+Furthermore, a termination command is set on the subscription future. This command is executed when the subscription ends either due to a network error or when a client explicitly terminates the subscription. In the command, the time provider agent prints out a message and removes the subscription from the list.
 
 ## The Agent Life Cycle
 
@@ -154,7 +154,7 @@ The notification behavior of the time provider is captured in the `body()` metho
 
 The repeated notification is modeled by a so called component step, which is scheduled using the `IInternalAccess` interface. Each Jadex component is internally operated by a set of features that handle the different aspects like execution and required or provided services. These features are bundled and made available through the so called internal access, that allows accessing the Jadex features of your component from your component code. The API of the available features can be found [here](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/bridge/IInternalAccess.html).
 
-Using the `repeatStep()` method of the execution feature, a step is scheduled every 5 seconds. In this step, the time provider iterates through all current subscriptions and sends the next time message using the `addIntermediateResultIfUndone()` method. The 'IfUndone' part threby states that errors should be ignored, e.g. when the subscription was just cancelled.
+Using the `repeatStep()` method of the execution feature, a step is scheduled every 5 seconds. In this step, the time provider iterates through all current subscriptions and sends the next time message using the `addIntermediateResultIfUndone()` method. The 'IfUndone' part thereby states that errors should be ignored, e.g. when the subscription was just terminated.
 
 ---
 [[Back: 03 Time User](03%20Time%20User.md) | [Next: 05 Summary](05%20Summary.md)]

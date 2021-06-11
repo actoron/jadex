@@ -15,7 +15,7 @@ In this chapter you will learn how to model your own processes. This chapter cov
 Exercise B1 - Creating a First Process
 ---------------------------------------------------
 
-In this lesson, you will create and execute a first process. First, start the Jadex BPMN editor using the run configuration created in the last section. The editor will automatically create a new unnamed BPMN model. To save the model under a custom name e.g. 'B1_simple' use 'Save as' in the 'File' menu. The destination folder should be located in the Java 'src' folder of your eclipse 'bpmntutorial' project, i.e. you need to navigate to the eclipse workspace to find it. For easy reference the tutorial files are named according to the corresponding lesson, but you are free to choose a different name.Â Â 
+In this lesson, you will create and execute a first process. First, start the Jadex BPMN editor using the run configuration created in the last section. The editor will automatically create a new unnamed BPMN model. To save the model under a custom name e.g. 'B1_simple' use 'Save as' in the 'File' menu. The destination folder should be located in the Java 'src' folder of your eclipse 'bpmntutorial' project, i.e. you need to navigate to the eclipse workspace to find it. For easy reference the tutorial files are named according to the corresponding lesson, but you are free to choose a different name.  
 
 ### Jadex Project Setup
 
@@ -51,7 +51,7 @@ You can also enter a package for your process. The package should always corresp
 Finally, you probably want to see that the process is really executed, when you click the start button. This can be achieved by changing the task in the process to print some text to the console. Open the diagram in the BPMN editor (if not already open) and add a 'Task' element. Selecting the task will show its properties in three tabs (Task, Properties, Parameters) in the lower area:
 
 - **Task:** In the task view you can enter the Java class that should be executed when the task is invoked. Below the classname usage information of the task is presented including a description and the used parameters.
-- **Properties:** Properties are settings that are directly related to the BPMN element, e.g. a time duration for a timer event. Thus, all BPMN elements of the same type expose the same properties.Â 
+- **Properties:** Properties are settings that are directly related to the BPMN element, e.g. a time duration for a timer event. Thus, all BPMN elements of the same type expose the same properties. 
 - **Parameters:** Input and output parameters for the activity.
 
 Jadex provides some ready-to-use task implementations, which can be choosen from the drop-down list.
@@ -62,7 +62,7 @@ Switch to the 'Class Path' tab and choose 'Add Project'. Here, choose the Jadex 
 The editor will automatically scan the folder structure for jars and add them to the classpath.
 You should see the Jadex jars in the dialog afterwards.
 After exiting the settings dialog you will see the editor refreshing its class cache used for the autocompletion.
-You can also manually start rescanning by pressing the refresh button ![03 Basic Processes@2.png](03%20Basic%20Processes/03%20Basic%20Processes-2.png)Â at the lower left of the editor panel.Â 
+You can also manually start rescanning by pressing the refresh button ![03 Basic Processes@2.png](03%20Basic%20Processes/03%20Basic%20Processes-2.png) at the lower left of the editor panel. 
 
 ![03 Basic Processes@3.png](03%20Basic%20Processes/03%20Basic%20Processes-3.png)
 
@@ -81,7 +81,7 @@ Save the model, refresh Eclipse and restart the Jadex platform. Observe that you
 Exercise B2 - Sequence of Tasks
 --------------------------------------------
 
-In this lesson you will learn how to execute tasks in sequence, i.e. one after another.Â 
+In this lesson you will learn how to execute tasks in sequence, i.e. one after another. 
 
 ### Creating Tasks and Flow Connectors
 
@@ -108,7 +108,7 @@ Second, the tasks 'Task 2a I' and 'Task 2a II' are parallel tasks, because of th
 
 ### Observing the Execution
 
-To see some results during the execution, you can make use of the PrintTask as in the previous lessons. You can also observe the execution of the process in the debugger.Â 
+To see some results during the execution, you can make use of the PrintTask as in the previous lessons. You can also observe the execution of the process in the debugger. 
 
 ![03 Basic Processes@8.png](03%20Basic%20Processes/03%20Basic%20Processes-8.png)
 
@@ -121,9 +121,9 @@ In this lesson, an XOR gateway is used to split the control flow into one of two
 
 ![03 Basic Processes@9.png](03%20Basic%20Processes/03%20Basic%20Processes-9.png)
 
-The process simulates the toss of a coin. Either the 'Head' activity should be executed or the 'Tail' activity. Note the use of the XOR gateway to distinguish between the two cases. The expression 'Math.random() &gt; 0.5' is Java code. To enter the condition expression, first click on the upper sequence flow. This will activate the properties tab in the lower area of the editor. In this view the expression can be placed in the 'Condition' input field.Â 
+The process simulates the toss of a coin. Either the 'Head' activity should be executed or the 'Tail' activity. Note the use of the XOR gateway to distinguish between the two cases. The expression 'Math.random() &gt; 0.5' is Java code. To enter the condition expression, first click on the upper sequence flow. This will activate the properties tab in the lower area of the editor. In this view the expression can be placed in the 'Condition' input field. 
 
-*Math.random()* is a function that generates a random value between 0 and 1. The expression is evaluated when the process is executed. When the expression is true (i.e. a value greater than 0.5 is generated) the upper path is chosen. Otherwise the lower path is chosen, called the default branch. The default branch is indicated by the small dash. You can set the default branch by activating the 'Default edge' checkbox in the properties panel.Â 
+*Math.random()* is a function that generates a random value between 0 and 1. The expression is evaluated when the process is executed. When the expression is true (i.e. a value greater than 0.5 is generated) the upper path is chosen. Otherwise the lower path is chosen, called the default branch. The default branch is indicated by the small dash. You can set the default branch by activating the 'Default edge' checkbox in the properties panel. 
 
 There are some more notable things about this process that you might have figured out yourself already. First, the XOR split does not have a corresponding XOR join, e.g. after the 'Head' and 'Tail' activities. Such a join is not necessary, because there are no multiple control flows executing at once. Remember that in the previous example, the AND join was the place where the process execution had to wait that the activities on both branches were completed before continuing the execution. An XOR join could be added for clarity in the B4 example process, e.g. to make the process more readable. Yet, at an XOR join the execution would not stop, because there is always *only one* incoming branch executed at all.
 
@@ -138,7 +138,7 @@ The subprocess element of the BPMN editor is used to specify both types of supro
 
 ### Defining a Subprocess
 
-Draw a new process diagram as shown below. The 'Print Finished' task should be a PrintTask that prints out some finished message. Instead of drawing tasks into to subprocess (as you would do with an internal subprocess), the file name of an external diagram is specified. The 'file' property is used for this purpose. Enter the file name of another process, e.g. 'B2_Sequence.bpmn'.Â 
+Draw a new process diagram as shown below. The 'Print Finished' task should be a PrintTask that prints out some finished message. Instead of drawing tasks into to subprocess (as you would do with an internal subprocess), the file name of an external diagram is specified. The 'file' property is used for this purpose. Enter the file name of another process, e.g. 'B2_Sequence.bpmn'. 
 
 ![03 Basic Processes@10.png](03%20Basic%20Processes/03%20Basic%20Processes-10.png)
 

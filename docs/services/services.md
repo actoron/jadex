@@ -139,7 +139,7 @@ The ```@Binding``` annotation defines parameters of the service binding that Jad
 
 |Parameter|Description|
 |---------|-----------|
-|*scope*| The [search scope](#service-scope) to find the required service. |
+|*scope*| The [search scope](#service-scopes) to find the required service. |
 |*dynamic*| If set to true, a new search will be initiated every time the required service is accessed. |
 |*create*| Set to true if the service should be instantiated by the local component |
 |*creationInfo*| ```@CreationInfo``` annotation, see [Advanced Service Topics](#auto-instantiation-of-required-services) |

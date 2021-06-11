@@ -7,15 +7,15 @@ Plans represent the agent's means to act in its environment. Therefore, the plan
 ![](jadexplansadf.png)
 
 *Figure 1: The Jadex plans XML schema part*
- Â 
+  
 In Figure 1 the XML schema part for the plans section is shown. Inside the &lt;plans&gt; tag an arbitrary number of plan heads denoted by the &lt;plan&gt; tag can be declared. For each plan head several attributes (as shown in the following Table) and contained elements can be defined. For each plan a name has to be provided. The priority of a plan describes its preference in comparison to other plans. Therefore it is used to determine which candidate plan will be chosen for a certain event occurence, favouring higher priority plans (random selection, if activated, applies only to plans of equal priority). Per default all applicable plans have a default priority of 0 and are selected in order of appearance (or randomly when the corresponding BDI flag is set).
 
 | Tag   |Attribute  |Required  |Default   |Possible Values            |
 | ------|-----------|----------|----------|---------------------------|
-| plan  |name       |yes       |Â          |Â                           |
+| plan  |name       |yes       |          |                           |
 | plan  |priority   |no        |0         |integer                    |
-| body  |impl       |no        |Â          |implementation class name  |
-| body  |class      |no        |Â          |implementation file name   |
+| body  |impl       |no        |          |implementation class name  |
+| body  |class      |no        |          |implementation file name   |
 | body  |type       |no        |standard  |standard, bpmn, ...       |
 
 *Important attributes of the plan and the body tag*
@@ -60,7 +60,7 @@ These events or goals can be further restricted, by specifying a match expressio
 
 *Figure 2: The Jadex plan trigger XML schema part*
 
-In addition to the reaction on certain event or goal types, it is also possible to define data-driven plan execution by using the &lt;condition&gt; tag. A trigger condition can consist of arbitrary boolean Jadex expressions, which may refer to certain beliefs when their states needs to be supervised. If only some specific belief needs to be monitored the &lt;factchanged&gt; tag can be used. In this respect a belief change is reported whenever the belief's new fact value is different from the value held before. Similarly, belief sets can be monitored for addition or removal of facts by using the tags &lt;factadded&gt; and &lt;factremoved&gt; respectively.Â 
+In addition to the reaction on certain event or goal types, it is also possible to define data-driven plan execution by using the &lt;condition&gt; tag. A trigger condition can consist of arbitrary boolean Jadex expressions, which may refer to certain beliefs when their states needs to be supervised. If only some specific belief needs to be monitored the &lt;factchanged&gt; tag can be used. In this respect a belief change is reported whenever the belief's new fact value is different from the value held before. Similarly, belief sets can be monitored for addition or removal of facts by using the tags &lt;factadded&gt; and &lt;factremoved&gt; respectively. 
 
 ## Defining Plan Applicability with Pre- and Context Conditions
 
@@ -81,12 +81,12 @@ To find out if the plan is applicable not only with respect to the current event
 ```
 
 *Example of a plan with context condition*
-Â Â Â 
+   
 
 ## Waitqueue
 
 When an event occurs, and triggers an execution step of a plan, it may take a while, before the plan step is actually executed, due to many plans being executed concurrently inside an agent. Therefore, it is sometimes possible, that a subsequent event, which might be relevant for a plan, is not dispatched to that plan, because it still has to execute previous plan step, and does not yet wait for the event. To avoid this, each plan has a waitqueue to collect such events. The waitqueue for a plan is set up using the &lt;waitqueue&gt; tag or the *getWaitqueue()* method in plan bodies. The waitqueue of a plan is always matched against events, although the plan may not currently wait for that specific event. The &lt;waitqueue&gt; tag provides support for waiting for finished goals and the occurrence of message and internal events. Events that match against the waitqueue of a plan are added to he plans internal waitqueue. They will be dispatched to the plan later, when it calls *waitFor()* or *getWaitqueue().getElements()*. You may have a look at the *jadex.bdi.runtime.IWaitqueue* interface for more details.
-Â Â 
+  
 
 ## Parameters, Binding, and Parameter Mapping
 
@@ -94,10 +94,10 @@ Similar to goals, plans may have parameters and parameter sets, which can store 
 
 ![](jadexplanparameteradf.png)
 
-*Figure 3: The Jadex plan parameters XML schema part*Â Â Â 
+*Figure 3: The Jadex plan parameters XML schema part*   
 
-Â 
-For (single valued) parameters it is possible to use binding options instead of an initial value. A binding option is an expression, that will be evaluated to a collection of values (supported are arrays or an object implementing *Iterator*, *Enumeration*, *Collection*, or *Map*). The binding options of a parameter therefore represent a set of possible initial values for that parameter. The cartesian product of all binding parameters (if there is more than one parameter with binding otpions) determines the number of candidate plans that is considered in the event dispatching process. (In mathematics, the Cartesian product (or direct product) of two sets X and Y, denoted X x Y, is the set of all possible ordered pairs whose first component is a member of X and whose second component is a member of Y. Example: The cartesian product of {1,2}x{3,4} is {(1,3),(1,4),(2,3),(2,4)}, cf. [Cartesian Product](http://en.wikipedia.org/wiki/Cartesian_product) ). Please note that the calculation of the cartesian product can easily lead to large numbers of applicable plans so that binding options should always be used with care. For example, the code example below shows a plan from the "puzzle" example, where for each possible move a plan instance is created. In addition to accessing the binding values like other parameters by writing *\$plan.paramname*, it is also possible to access the binding value directly via its name via Â *paramname*. This allows binding values also to be considered for evaluating the pre- and trigger condition, before the plan instance is created.
+ 
+For (single valued) parameters it is possible to use binding options instead of an initial value. A binding option is an expression, that will be evaluated to a collection of values (supported are arrays or an object implementing *Iterator*, *Enumeration*, *Collection*, or *Map*). The binding options of a parameter therefore represent a set of possible initial values for that parameter. The cartesian product of all binding parameters (if there is more than one parameter with binding otpions) determines the number of candidate plans that is considered in the event dispatching process. (In mathematics, the Cartesian product (or direct product) of two sets X and Y, denoted X x Y, is the set of all possible ordered pairs whose first component is a member of X and whose second component is a member of Y. Example: The cartesian product of {1,2}x{3,4} is {(1,3),(1,4),(2,3),(2,4)}, cf. [Cartesian Product](http://en.wikipedia.org/wiki/Cartesian_product) ). Please note that the calculation of the cartesian product can easily lead to large numbers of applicable plans so that binding options should always be used with care. For example, the code example below shows a plan from the "puzzle" example, where for each possible move a plan instance is created. In addition to accessing the binding values like other parameters by writing *\$plan.paramname*, it is also possible to access the binding value directly via its name via  *paramname*. This allows binding values also to be considered for evaluating the pre- and trigger condition, before the plan instance is created.
 
 ```xml
 
@@ -112,7 +112,7 @@ For (single valued) parameters it is possible to use binding options instead of 
 
 *Example binding parameter (from the puzzle example)*
 
-Â 
+ 
 A common use case for plan parameter(set)s is to capture parameter(set)s from a goal or event that triggered the plan. To make this relationship between event and plan parameters explicit, the &lt;internaleventmapping&gt;, &lt;messageeventmapping&gt;, and &lt;goalmapping&gt; tags can be used. A mapping definition contains a *ref* attribute denoting the event or goal parameter to be mapped. The reference is given in the form type.param, where type is the name of the goal or event, and *param* is the name of the goal or event parameter. When a plan parameter is mapped, the parameter properties like class and direction are ignored, as the values from the mapped parameter are used. Depending on the direction of the parameter, the default values of the plan parameter are automatically assigned from the event or goal (direction *in*, *inout*), and can also automatically be written back to a goal (direction out, inout), when the plan has finished. Note that when a plan reacts to more than one goal or event, you cannot just provide a mapping for one of these events. If you want to use a mapping for a parameter, you have to provide mappings for all events or goals handled by the plan.
 
 ## Implementing a Plan Body in Java
@@ -162,7 +162,7 @@ public void body()
 ```
 
 *Example plan body*
-Â Â Â Â Â Â Â 
+       
 
 ## Plan Success or Failure and BDI Exceptions
 
@@ -208,7 +208,7 @@ Regardless if standard or mobile plans are used, a plan is considered as failed 
 ## Atomic Blocks
 
 Standard plans might be interrupted whenever the agent regards it as necessary, e.g., when a belief has been changed leading to the adoption of a new goal. Sometimes it is desireable that a sequence of actions is considered as a single atomic action. For example when you change multiple beliefs at once, which might trigger some conditions, you may want to perform all changes before the conditions are evaluated. In standard plans, this can be achieved by using a pair of *startAtomic()* / *endAtomic()* calls around the code you want to execute as a whole. Note that you are not allowed to end the plan step inside an atomic block (e.g., by calling *waitFor()*).
-Â Â Â 
+   
 
 ```java
 

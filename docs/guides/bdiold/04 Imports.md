@@ -14,32 +14,32 @@ In the following some simple code snippets from an ADF are shown that demonstrat
 
 ```xml
 <imports>
-Â Â Â Â <!--Â Import only the HashMap class.Â -->
-Â Â Â Â <import>java.util.HashMap</import>
+    <!-- Import only the HashMap class. -->
+    <import>java.util.HashMap</import>
 
-Â Â Â Â <!--Â Import all classes of the awt package.Â -->
-Â Â Â Â <import>java.awt.**</import>
+    <!-- Import all classes of the awt package. -->
+    <import>java.awt.**</import>
 
-Â Â Â Â <!--Â Import a movement package containing, e.g., a Move capability.Â -->
-Â Â Â Â <import>movement.**</import>
-Â Â Â Â ...
+    <!-- Import a movement package containing, e.g., a Move capability. -->
+    <import>movement.**</import>
+    ...
 </imports>
 
 <capabilities>
-Â Â Â Â <!--Â Use the imported movement.Move capability.Â -->
-Â Â Â Â <capability name="movecap" file="Move"/>
+    <!-- Use the imported movement.Move capability. -->
+    <capability name="movecap" file="Move"/>
 </capabilities>
 
 <beliefs>
-Â Â Â Â <!--Â Use the imported java.util.HashMap.Â -->
-Â Â Â Â <belief name="data">
-Â Â Â Â Â Â Â Â <fact>new HashMap()</fact>
-Â Â Â Â </belief>
+    <!-- Use the imported java.util.HashMap. -->
+    <belief name="data">
+        <fact>new HashMap()</fact>
+    </belief>
 
-Â Â Â Â <!--Â Use the imported java.awt.Frame.Â -->
-Â Â Â Â <belief name="gui">
-Â Â Â Â Â Â Â Â <fact>new Frame()</fact>
-Â Â Â Â </belief>
+    <!-- Use the imported java.awt.Frame. -->
+    <belief name="gui">
+        <fact>new Frame()</fact>
+    </belief>
 </beliefs>
 
 ```

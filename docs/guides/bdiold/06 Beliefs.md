@@ -8,7 +8,7 @@ The beliefbase is the container for the facts known by the agent. Beliefs are us
 
 ![](jadexbeliefsadf.png)
 *Figure 1: The Jadex beliefs XML schema part*
-Â 
+ 
 
 ```xml
 ...
@@ -53,7 +53,7 @@ public void body()
 ```
 
 *A simple example of using a boolean belief*
-Â 
+ 
 
 # Dynamically Evaluated Beliefs
 
@@ -86,7 +86,7 @@ When setting the evaluation mode to 'push' the fact expression will be monitored
 To monitor conditions, an agent observes the beliefs and automatically reacts to changes of these beliefs, as necessary. Jadex is aware of manipulation operations that are executed directly on beliefs, e.g., by setting the fact of a belief, and of changes due to belief dependencies (i.e., a dynamically evaluated fact expression referencing another belief).
 
 On the other hand, when you retrieve a complex fact object from a belief or belief set and perform operations on it subsequently, the system cannot detect the changes made. To enable the system detecting these changes the standard Java beans event notification mechanism can be used. This means that the bean has to implement the add/removePropertyChangeListener() methods and has to fire property change events, whenever an important change has occurred. The belief will automatically add and remove itself as a property change listener on its facts. An example how to implement this functionality inside a Java bean is shown below.
-Â Â Â 
+   
 
 ```java
 

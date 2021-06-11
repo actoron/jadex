@@ -2,7 +2,7 @@
 
 ${SorryOutdated}
 
-The BDI programmer's guide is a reference to the concepts and constructs available, when programming Jadex agents. It is not meant as a step-by-step introduction to the programming of Jadex agents. For a step-by-step introduction consider working through the [BDIV3 Tutorial](../../tutorials/bdiv3/01%20Introduction.md))
+The BDI programmer's guide is a reference to the concepts and constructs available, when programming Jadex agents. It is not meant as a step-by-step introduction to the programming of Jadex agents. For a step-by-step introduction consider working through the [BDIV3 Tutorial](../../tutorials/bdiv3/01%20Introduction.md).
 
 # Overview
 
@@ -18,17 +18,17 @@ Please note that different languages are used for the agent specification in the
 
 ```xml
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
-Â Â Â Â Â Â Â xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-Â Â Â Â Â Â Â xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
- Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
-Â Â name="Buyer" package="jadex.bdi.examples.booktrading.buyer">
-Â Â ...
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+                           http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+  name="Buyer" package="jadex.bdi.examples.booktrading.buyer">
+  ...
 </agent>
 ```
 
 *Figure 2: Header of an agent definition file*
 
-The head of an ADF looks like shown in Figure 2. First, the agent tag specifies that the XML document follows the jadex-2.0.xsd schema definition which allows to verify that the document is not only well formed XML butalso a valid ADF. The name of the agent type is specified in the name attribute of the agent tag, which should match the file name without suffix (&lt;filename&gt;.agent.xml&lt;/filename&gt;). It is also used as default name for new agent instances, when the ADF is loaded in the starter panel of the Jadex Control Center. The package declaration specifies where the agent first searches for required classes (e.g., for plans or beliefs) and should correspond to the directory, the XML file is located in. Additionally required packages can be specified using the <imports&gt; tag.Â 
+The head of an ADF looks like shown in Figure 2. First, the agent tag specifies that the XML document follows the jadex-2.0.xsd schema definition which allows to verify that the document is not only well formed XML butalso a valid ADF. The name of the agent type is specified in the name attribute of the agent tag, which should match the file name without suffix (&lt;filename&gt;.agent.xml&lt;/filename&gt;). It is also used as default name for new agent instances, when the ADF is loaded in the starter panel of the Jadex Control Center. The package declaration specifies where the agent first searches for required classes (e.g., for plans or beliefs) and should correspond to the directory, the XML file is located in. Additionally required packages can be specified using the <imports&gt; tag. 
 
 ![](jadexagentadf.png)
 
@@ -38,4 +38,4 @@ Figure 3 above shows which elements can be specified inside an agent definition 
 
 It should be noted that, unless otherwise stated, the order of occurrence of the elements is prescribed by the underlying XML Schema. Therefore, you should not, e.g., declare plans before beliefs. Throughout this user guide figure like above will always denote the correct order of element appearence (from top to bottom). Of course, it is possible to omit those elements, which are not required for your agent.
 
-When an ADF is loaded, a model is created for the agent containing (e.g., beliefs, goals, plans) defined in the ADF. These model elements are kept hidden from the agent programmer who has access to the runtime elements only. In Jadex V2 the model is assumed to be unchangeable so that accessing model data should not be necessary (in case information is needed from the model the corresponding runtime elements should provide accessor methods to the needed info). When the agent is executed, instances of the model elements are created; so called runtime elements (package jadex.bdi.runtime, e.g., IBelief, IGoal, IPlan). This ensures that for modelled elements at runtime several instances (IGoal objects) can be created. For example, the buyer agent will instantiate new purchase book goal (IGoal) for each book to be bought, based on the goal specification in the ADF. Think of the relation between model elements and runtime elements as corresponding to the relation between java.lang.Class and java.lang.Object.Â 
+When an ADF is loaded, a model is created for the agent containing (e.g., beliefs, goals, plans) defined in the ADF. These model elements are kept hidden from the agent programmer who has access to the runtime elements only. In Jadex V2 the model is assumed to be unchangeable so that accessing model data should not be necessary (in case information is needed from the model the corresponding runtime elements should provide accessor methods to the needed info). When the agent is executed, instances of the model elements are created; so called runtime elements (package jadex.bdi.runtime, e.g., IBelief, IGoal, IPlan). This ensures that for modelled elements at runtime several instances (IGoal objects) can be created. For example, the buyer agent will instantiate new purchase book goal (IGoal) for each book to be bought, based on the goal specification in the ADF. Think of the relation between model elements and runtime elements as corresponding to the relation between java.lang.Class and java.lang.Object. 

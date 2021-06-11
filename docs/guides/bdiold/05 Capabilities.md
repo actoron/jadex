@@ -31,9 +31,9 @@ Note that the &lt;capability&gt; tag has *name* and *package* attributes. As the
 
 # Using Capabilities
 
-Â 
-Agents and capabilities may be composed of any number of subcapabilities which are referenced in a &lt;capabilities&gt; tag. To reference a capability, a local name and the location of the capability definition has to be supplied in the file attribute as absolute or relative file name or capability type name. Type names are resolved using the package and import declarations, and can therefore be unqualified or fully qualified. Capabilities from the jadex.bdi.planlib package, such as the DF capability, which have platform-specific implementations, must always be referenced using a fully qualified type name. Â Â 
-Â 
+ 
+Agents and capabilities may be composed of any number of subcapabilities which are referenced in a &lt;capabilities&gt; tag. To reference a capability, a local name and the location of the capability definition has to be supplied in the file attribute as absolute or relative file name or capability type name. Type names are resolved using the package and import declarations, and can therefore be unqualified or fully qualified. Capabilities from the jadex.bdi.planlib package, such as the DF capability, which have platform-specific implementations, must always be referenced using a fully qualified type name.   
+ 
 
 ```xml
 <agent ...>
@@ -60,7 +60,7 @@ The capability introduces a scoping of the BDI concepts. By default all beliefs,
 # Making an Element Accessible for the Outer Capability
 
 For this purpose the element must declare itself as exported (using the exported="true" attribute) in the inner capability. In the outer capability, a reference (e.g., &lt;beliefref&gt;) has to be declared, which directly references the original element (using dot notation "capname.belname") within the concrete tag. An example for an exported belief is shown below.
-Â Â Â 
+   
 
 ** Inner Capability A **
 
@@ -81,7 +81,7 @@ For this purpose the element must declare itself as exported (using the exported
 # Defining an Abstract Element
 
 This means the element itself provides no implementation and needs to be assigned from an outer capability. For this purpose an abstract element reference (e.g., &lt;beliefref&gt;) has to be declared. An outer capability can provide an implementation for this abstract element by defining a concrete element (or another reference) and assigning it to the abstract reference (using the &lt;assignto&gt; tag). In addition, the abstract element can be declared as optional (using the optional="true" attribute of the abstract tag) requiring no outer element assignment. At runtime, such unassigned abstract elements are not accessible, and trying to use them will result in runtime exceptions. For some of the elements (e.g., beliefs) it can be tested at runtime with the *isAccessible()* method from within plans, if a reference is connected.\
-Â Â Â 
+   
 
 ** Inner Capability A **
 

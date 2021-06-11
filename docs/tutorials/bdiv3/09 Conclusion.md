@@ -11,7 +11,7 @@ It does not cover aspects of goal deliberation, i.e. how a conflict free pursuit
 Jadex offers the built-in *Easy Deliberation* strategy for this purpose.
 The strategy allows to constrain the *cardinality* of active goals.
 Additionally, it is possible to define *inhibition links* between goals that allow to establish an ordering of goals.
-Inhibited goals are suspended and can be reactivated when the reason for their inhibition has vanished, e.g. another goal has finished processing.Â 
+Inhibited goals are suspended and can be reactivated when the reason for their inhibition has vanished, e.g. another goal has finished processing. 
 
 ## Plan Deliberation
 
@@ -25,7 +25,7 @@ Please have a look at the puzzle example (SokratesBDI) to see how it can be used
 ## Example Projects
 
 To learn more about Jadex BDIV3, please take a look at the application projects contained in the Jadex distribution.
-You can start them by loading the *jadex-application-bdiv3.jar* into the [JCC](../../tools/01%20Introduction.md#from-jadex-distribution)).
+You can start them by loading the *jadex-application-bdiv3.jar* into the [JCC](../../tools/01%20Introduction.md#from-jadex-distribution).
 
 The content of the new jar will be added as new node to the model tree on the left hand side.
 Next, you can expand the model tree by double clicking on the corresponding top-level node, which represents the jar-file.

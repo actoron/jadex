@@ -62,3 +62,5 @@ jadex-platform-standalone-launch/highscore.dmp
 /editors/bpmn/config
 build2
 build3
+/applications/bdi/OpenAL64.dll
+/applications/bdi/lwjgl64.dll

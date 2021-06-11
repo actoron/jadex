@@ -12,7 +12,7 @@ The rationale behind this is that we wanted to achieve language orthogonality be
 - **Inner Class**: in case of a non-static inner class allows for easy access of agent beliefs and fields
 - **Class**: facilitates reuse in different agents and projects
 
-For a plan, the triggering events and goals can be specified in the plan head to let the agent know what kinds of events this plan can handle. When an agent receives an event, the BDI reasoning engine builds up the so called applicable plan list (that are all plans which can handle the current event or goal) and candidate(s) are selected and instantiated for execution.Â 
+For a plan, the triggering events and goals can be specified in the plan head to let the agent know what kinds of events this plan can handle. When an agent receives an event, the BDI reasoning engine builds up the so called applicable plan list (that are all plans which can handle the current event or goal) and candidate(s) are selected and instantiated for execution. 
 
 Often a plan does some action and then wants to wait until the action has been done before continuing (e.g. dispatching a subgoal). Therefore a plan can use one of the various waitFor() methods of the plan API, that come in quite different flavors.
 The plan API can be retrieved as an object via two mechanisms:
@@ -21,7 +21,7 @@ The engine will automatically inject the plan API when a plan instance is create
 
 When using a method as plan this is not possible. Hence, the signature of the plan method can be used to retrieve the plan API just by adding a parameter of type [```IPlan```](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/bdiv3/runtime/IPlan.html).
 <x-hint title="parameters">
-Please note that in Jadex methods that are invoked by the framework can have any signature. The engine will do its best to [automatically determine](../../components/components.md#parameter-guesser)) which values are expected and set them as parameter values. If the engine does not find a suitable value of a given type the value will be null.
+Please note that in Jadex methods that are invoked by the framework can have any signature. The engine will do its best to [automatically determine](../../components/components.md#parameter-guesser) which values are expected and set them as parameter values. If the engine does not find a suitable value of a given type the value will be null.
 </x-hint>
 
 <!--# Exercise B1 - A Plan as Normal Java Class-->
@@ -85,7 +85,7 @@ Letting *eword* and *gword* being the English and German words respectively.
 
 - Add a field called *bdiFeature* to the agent class and annotate it with ```@AgentFeature```. The field should be of type ```IBDIAgentFeature```. This will let the engine automatically inject the BDI agent feature to the POJO agent class.
 
-Read more about features [here](../../components/components.md#component-features)).
+Read more about features [here](../../components/components.md#component-features).
 
 ```java
 @AgentFeature
@@ -142,7 +142,7 @@ Once again, in this lecture the same functionality will be created. But this tim
 Again, copy the agent file from the last lecture and do the following:
 
 - Copy the word table field from the inner to the agent class
-- Copy the init code for the word table to a newly created init method of the agent, annotated with ```@AgentCreated```. Read more about component lifecycles [here](../../components/components.md#component-lifecycle)).
+- Copy the init code for the word table to a newly created init method of the agent, annotated with ```@AgentCreated```. Read more about component lifecycles [here](../../components/components.md#component-lifecycle).
 
 ```java
 @AgentCreated
@@ -269,21 +269,21 @@ Besides the lifecycle methods that have been introduced in the former exercise a
 
 As preparation we can copy the agent from the last exercise and modify the following:
 
-- We add a field named *context* of boolean type and put an ```@Belief``` annotation above it. Details about the meaning of beliefs will be explained in the next chapter.Â 
+- We add a field named *context* of boolean type and put an ```@Belief``` annotation above it. Details about the meaning of beliefs will be explained in the next chapter. 
 
 ```java
   @Belief
   protected boolean context = true;
 ```
 
-- To access the waitFor methods we add another ```@AgentFeature``` of type ```IExecutionFeature``` to our agent.Â 
+- To access the waitFor methods we add another ```@AgentFeature``` of type ```IExecutionFeature``` to our agent. 
 
 ```java
   @AgentFeature
   protected IExecutionFeature execFeature;
 ```
 
-- In the agent body method we do not wait until plan completion. Instead we wait for one second and afterwards set the *context* field to false.Â 
+- In the agent body method we do not wait until plan completion. Instead we wait for one second and afterwards set the *context* field to false. 
 
 ```java
 try

@@ -4,13 +4,13 @@ In this section the *domain model* concepts will be presented in detail. Each co
 
 ## Space Type Definition
 
-All space types are defined with the &lt;spacetypes&gt; section of Jadex application descriptor. This section is an extension point (using xml-schema any element) and allows for custom space types to be plugged in. These specific space types typically come with their own Â schema definition and hence use tags within a separate namespace. For EnvSupport the outermost declaration is called &lt;env:envspacetype&gt; (using here 'env' as prefix for its namespace). The figure below shows the basic elements an environment is composed of.
+All space types are defined with the &lt;spacetypes&gt; section of Jadex application descriptor. This section is an extension point (using xml-schema any element) and allows for custom space types to be plugged in. These specific space types typically come with their own  schema definition and hence use tags within a separate namespace. For EnvSupport the outermost declaration is called &lt;env:envspacetype&gt; (using here 'env' as prefix for its namespace). The figure below shows the basic elements an environment is composed of.
 
 ![](envspacetype.png)
 
 *Figure 1 XML schema part for the environment space type*
 
-It can be seen that a space type is generally specified by declating *objecttypes*, *avatarmappings*, *actiontypes*, *tasktypes*, *processtypes*, *percepttypes*, *views*, *perspectives* and a *spaceexecutor*. For the domain model we will first cover the details of *objecttypes*, *actiontypes*, *tasktypes*, *processtypes* and the *spaceexecutor*. Before explaing these elements a we will have a short look on the envspacetype element itself.Â 
+It can be seen that a space type is generally specified by declating *objecttypes*, *avatarmappings*, *actiontypes*, *tasktypes*, *processtypes*, *percepttypes*, *views*, *perspectives* and a *spaceexecutor*. For the domain model we will first cover the details of *objecttypes*, *actiontypes*, *tasktypes*, *processtypes* and the *spaceexecutor*. Before explaing these elements a we will have a short look on the envspacetype element itself. 
 
 In this basic definition the type name, its implementation class and also its extent (using width, height and optionally depth) as well as its border mode (as subtag) can be included. Currently, two different implementations are available: the *ContinuousSpace2D* for a continuous 2d world and *Grid2D* for a 2d grid world consisting of a discrete raster. Both implementation are contained in the package 'jadex.application.space.envsupport.environment.space2d', which has to be imported if the classes are not referenced fully qualified. The border mode determines the behaviour of the space objects at the borders of the 2d field. If set to 'strict' the world ends at the borders, whereas if the 'torus' mode is used the space objects can cross\
 the borders and enter the field on the other side.
@@ -21,17 +21,17 @@ the borders and enter the field on the other side.
 
 *Figure 2 Object type xml schema part*
 
-Object types are the foundation for space object instances. They represent some kind of simple class (better struct as it cannot contain behaviour) definition for an object. Each object type has to be uniquely identified via a *name* attribute. An object type may contain an arbitrary number of property type declarations. A property is then described using attributes for a *name* and a *class*. Additionally, two flags can be used. The *dynamic* flag determines how a property value is interpreted at runtime. If set to false the initial value is evaluated once and the result is stored. Otherwise, the declared value is treated as dynamic expression, which is reevaluated on every access. The *event* flag can be used to tell the system that property change events should be generated whenever the property value changes. Please note that also the parametrization of many other elements is done using the property machanism as described above.Â 
+Object types are the foundation for space object instances. They represent some kind of simple class (better struct as it cannot contain behaviour) definition for an object. Each object type has to be uniquely identified via a *name* attribute. An object type may contain an arbitrary number of property type declarations. A property is then described using attributes for a *name* and a *class*. Additionally, two flags can be used. The *dynamic* flag determines how a property value is interpreted at runtime. If set to false the initial value is evaluated once and the result is stored. Otherwise, the declared value is treated as dynamic expression, which is reevaluated on every access. The *event* flag can be used to tell the system that property change events should be generated whenever the property value changes. Please note that also the parametrization of many other elements is done using the property machanism as described above. 
 
 In the following code snippet a short example for an object type is shown. It is the avatar type sentry of the marsworld example. It has proprties for its *vision* range, *speed* and *position*.
 
 ```xml
 <env:objecttype name="sentry">
-Â Â <env:property name="vision" class="double">0.1</env:property>
-Â Â <env:property name="speed" class="double">0.05</env:property>
-Â Â <env:property name="position" class="IVector2" dynamic="true">
-Â Â Â Â $space.getSpaceObjectsByType("homebase")[0].getProperty("position")
-Â Â </env:property>
+  <env:property name="vision" class="double">0.1</env:property>
+  <env:property name="speed" class="double">0.05</env:property>
+  <env:property name="position" class="IVector2" dynamic="true">
+    $space.getSpaceObjectsByType("homebase")[0].getProperty("position")
+  </env:property>
 </env:objecttype>
 ```
 
@@ -50,13 +50,13 @@ package jadex.application.space.envsupport.environment;
 
 public interface IObjectTask extends IPropertyObject
 {
-Â Â public void start(ISpaceObject obj);
+  public void start(ISpaceObject obj);
 
-Â Â public void shutdown(ISpaceObject obj);
+  public void shutdown(ISpaceObject obj);
 
-Â Â public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock);
+  public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock);
 
-Â Â public boolean isFinished(IEnvironmentSpace space, ISpaceObject obj);
+  public boolean isFinished(IEnvironmentSpace space, ISpaceObject obj);
 }
 ```
 
@@ -67,35 +67,35 @@ As an example below a move task from the cleanerworld example is shown. It basic
 ```java
 public class MoveTask extends AbstractTask
 {
-Â Â public static final String PROPERTY_DESTINATION = "destination";
-Â Â public static final String PROPERTY_SPEED = "speed";
-Â Â public static final String PROPERTY_VISION = "vision";
-Â Â public static final String PROPERTY_CHARGESTATE = "chargestate";
+  public static final String PROPERTY_DESTINATION = "destination";
+  public static final String PROPERTY_SPEED = "speed";
+  public static final String PROPERTY_VISION = "vision";
+  public static final String PROPERTY_CHARGESTATE = "chargestate";
 
-Â Â public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
-Â Â {
-Â Â Â Â IVector2 destination = (IVector2)getProperty(PROPERTY_DESTINATION);
-Â Â Â Â double speed = ((Number)obj.getProperty(PROPERTY_SPEED)).doubleValue();
-Â Â Â Â double maxdist = progress * speed * 0.001;
-Â Â Â Â double energy = ((Double)obj.getProperty(PROPERTY_CHARGESTATE)).doubleValue();
-Â Â Â Â IVector2 loc = (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
+  public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
+  {
+    IVector2 destination = (IVector2)getProperty(PROPERTY_DESTINATION);
+    double speed = ((Number)obj.getProperty(PROPERTY_SPEED)).doubleValue();
+    double maxdist = progress * speed * 0.001;
+    double energy = ((Double)obj.getProperty(PROPERTY_CHARGESTATE)).doubleValue();
+    IVector2 loc = (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
 
-Â Â Â Â IVector2 newloc = ((Space2D)space).getDistance(loc, destination).getAsDouble() <= maxdist?
-Â Â Â Â Â Â destination : destination.copy().subtract(loc).normalize().multiply(maxdist).add(loc);
+    IVector2 newloc = ((Space2D)space).getDistance(loc, destination).getAsDouble() <= maxdist?
+      destination : destination.copy().subtract(loc).normalize().multiply(maxdist).add(loc);
 
-Â Â Â Â if(energy > 0)
-Â Â Â Â {
-Â Â Â Â Â Â energy = Math.max(energy-maxdist/5, 0);
-Â Â Â Â Â Â obj.setProperty(PROPERTY_CHARGESTATE, new Double(energy));
-Â Â Â Â Â Â ((Space2D)space).setPosition(obj.getId(), newloc);
-Â Â Â Â }
-Â Â Â Â else
-Â Â Â Â {
-Â Â Â Â Â Â throw new RuntimeException("Energy too low.");\
-Â Â Â Â 
- Â 
-Â Â Â Â if(newloc==destination)
-Â Â Â Â Â Â setFinished(space, obj, true);
+    if(energy > 0)
+    {
+      energy = Math.max(energy-maxdist/5, 0);
+      obj.setProperty(PROPERTY_CHARGESTATE, new Double(energy));
+      ((Space2D)space).setPosition(obj.getId(), newloc);
+    }
+    else
+    {
+      throw new RuntimeException("Energy too low.");\
+    
+  
+    if(newloc==destination)
+      setFinished(space, obj, true);
 }
 ```
 
@@ -105,24 +105,24 @@ public class MoveTask extends AbstractTask
 
 *Figure 4 Process type xml schema part*
 
-A process type is very similar to a task type. It also represents dynamic behaviour, but on a global level, i.e. it is not connected to a specific environment object but to the environment as a whole. The process type definition is done again using a *name* and a *class* attribute optionally extended with properties as subtags. A process type implementation has to be compliant to the *ISpaceProcess* interface (package jadex.application.space.envsupport.environment). This interface is similar to the task interface and also contains methods for starting (*start()*) and terminating (*shutdown()*) the process. The space executor calls *execute()* in each step, so that this method should contain the application logic of the process. It does not have a isFinished() method as in most cases processes determine themselves that they do not want to run any longer. This can be achieved by calling *removeSpaceProcess()* on the environment.Â 
+A process type is very similar to a task type. It also represents dynamic behaviour, but on a global level, i.e. it is not connected to a specific environment object but to the environment as a whole. The process type definition is done again using a *name* and a *class* attribute optionally extended with properties as subtags. A process type implementation has to be compliant to the *ISpaceProcess* interface (package jadex.application.space.envsupport.environment). This interface is similar to the task interface and also contains methods for starting (*start()*) and terminating (*shutdown()*) the process. The space executor calls *execute()* in each step, so that this method should contain the application logic of the process. It does not have a isFinished() method as in most cases processes determine themselves that they do not want to run any longer. This can be achieved by calling *removeSpaceProcess()* on the environment. 
 
 ```java
 package jadex.application.space.envsupport.environment;
 
 public interface ISpaceProcess extends IPropertyObject
 {
-Â Â public void start(IClockService clock, IEnvironmentSpace space);
+  public void start(IClockService clock, IEnvironmentSpace space);
 
-Â Â public void shutdown(IEnvironmentSpace space);
+  public void shutdown(IEnvironmentSpace space);
 
-Â Â public void execute(IClockService clock, IEnvironmentSpace space);
+  public void execute(IClockService clock, IEnvironmentSpace space);
 }
 ```
 
 *ISpaceProcess interface*
 
-One frequent use case is the creation of domain objects by an environment process. For this purpose a customizable default implementation is provided by the *DefaultObjectCreationProcess* class (package jadex.application.space.envsupport.environment). It can be parametrized using the following parameters:Â Â 
+One frequent use case is the creation of domain objects by an environment process. For this purpose a customizable default implementation is provided by the *DefaultObjectCreationProcess* class (package jadex.application.space.envsupport.environment). It can be parametrized using the following parameters:  
 
 - **type:** The type of the object to be created (String, required).
 - **properties:** The initial properties of the object (Map, optional).
@@ -143,13 +143,13 @@ package jadex.application.space.envsupport.dataview;
 
 public interface IDataView
 {
-Â Â public void init(IEnvironmentSpace space, Map properties);
+  public void init(IEnvironmentSpace space, Map properties);
 
-Â Â public String getType();
+  public String getType();
 
-Â Â public Object[] getObjects();
+  public Object[] getObjects();
 
-Â Â public void update(IEnvironmentSpace space);
+  public void update(IEnvironmentSpace space);
 }
 ```
 

@@ -15,7 +15,7 @@ Third, this service provides a method *message()* that is called on all running 
 
 # Exercise D1 - Defining a service
 
-In this exercise we will create a basic chat service, attach it to the chat component and invoke it for testing purposes.Â 
+In this exercise we will create a basic chat service, attach it to the chat component and invoke it for testing purposes. 
 
 ## Defining the chat service interface
 
@@ -29,7 +29,7 @@ In this exercise we will create a basic chat service, attach it to the chat comp
 
 - Add a field of type ```IInternalAccess``` and name it *agent*. Also add a ```@ServiceComponent``` annotation above this field. Jadex will automatically inject the agent API to this field.
 
-- You can also [inject agent features directly into services](../../services/services.md#accessing-the-component)): Add a field of type ```IRequiredServicesFeature``` and name it *requiredServicesFeature*. Also add a ```@ServiceComponent``` annotation above this field.
+- You can also [inject agent features directly into services](../../services/services.md#accessing-the-component): Add a field of type ```IRequiredServicesFeature``` and name it *requiredServicesFeature*. Also add a ```@ServiceComponent``` annotation above this field.
 
 - Add a field of type *IClockService* and name it *clock*.
 
@@ -37,12 +37,12 @@ In this exercise we will create a basic chat service, attach it to the chat comp
 
 - Add the *message* method from the *IChatService* interface. The method will be called to let the chat service know about a new message. In the message body this new message should be printed out to the console. You can access the receiver's component name using ```agent.getComponentIdentifier().getLocalName()```. Concretely the output should look like: ```<receiver component name> received at <time> from: <sender> message: <text>```.
 
-- Add a public method called *startService* with no parameters and an *IFuture&lt;Void&gt;* return value. Place the ```@ServiceStart``` annotation above the method signature (see [service lifecycle](../../services/services.md#service-lifecycle)))
+- Add a public method called *startService* with no parameters and an *IFuture&lt;Void&gt;* return value. Place the ```@ServiceStart``` annotation above the method signature (see [service lifecycle](../../services/services.md#service-lifecycle))
 - In this case the method should assign the *format* with ```new SimpleDateFormat("hh:mm:ss")``` and the *clock* by fetching the clock service in the same way as in earlier lectures.
 - Please note that it is important that the method should return a future indicating when the init has been finished. As fetching the clock service is done asynchronously init has finished when the clock service has been assigned.
-- To ensure that the caller of the start method is notified also in case an error occurs and the service could not be found an ```ExceptionDelegationResultListener``` can be used (read more about it in the [Futures](../../futures/futures.md#special-result-listeners) chapter)) It will forward exceptions to the future that is passed to it.
+- To ensure that the caller of the start method is notified also in case an error occurs and the service could not be found an ```ExceptionDelegationResultListener``` can be used (read more about it in the [Futures](../../futures/futures.md#special-result-listeners) chapter) It will forward exceptions to the future that is passed to it.
 
-This init code for the clock should look like this:Â 
+This init code for the clock should look like this: 
 
 ```java
 format = new SimpleDateFormat("hh:mm:ss");
@@ -62,8 +62,8 @@ return ret;
 ## Defining the chat service component
 
 - Create a Java class file called *ChatD1Agent.java* by copying the agent from ChatC2Agent.
-- Add a second required service definition to the agent. For that purpose you have to change the required services specification to look like ```@RequiredServices({rs1, rs2})```, with rs1, rs2 representing the respective service definitions (see the [Services](../../services/services.md#using-services) Chapter)).
-  The first clock service specification can be kept and the second we will name *chatservices*. The type has to be declared as *IChatService* and as we wish to retrieve all chat services we need to set *multiple* to true. In the binding of the service we use scope *platform* again and additionally define it as *dynamic*. Making it dynamic disables caching former search results and will always deliver the currently available chat services to the caller.Â 
+- Add a second required service definition to the agent. For that purpose you have to change the required services specification to look like ```@RequiredServices({rs1, rs2})```, with rs1, rs2 representing the respective service definitions (see the [Services](../../services/services.md#using-services) Chapter).
+  The first clock service specification can be kept and the second we will name *chatservices*. The type has to be declared as *IChatService* and as we wish to retrieve all chat services we need to set *multiple* to true. In the binding of the service we use scope *platform* again and additionally define it as *dynamic*. Making it dynamic disables caching former search results and will always deliver the currently available chat services to the caller. 
 
 - Furthermore, we need to specifiy the provided service. We use the ```@ProvidedServices``` annotation and add one ```@ProvidedService``` annotation inside. For a provided service we have to define its interface using the type attribute and set it to *IChatService.class* in this case. In addition, a provided service should have an implementation which is defined using the ```@Implementation``` annotation. Here, we just directly specify the implementation class to *ChatServiceD1*. It should look like the following:
 
@@ -72,7 +72,7 @@ return ret;
 ```
 
 - The code of the agent body should be changed to fetch the chat services using the call ```requiredServicesFeature.getServices("chatservices")```. As result you will retrieve a *java.util.Collection* of the available chat services (at least the one our agent is offering itself).
-- Iterate through this collection and invoke the *message* method on each service with your own component name as sender (```agent.getComponentIdentifier().getName()```) and some arbitrary text as message content.Â 
+- Iterate through this collection and invoke the *message* method on each service with your own component name as sender (```agent.getComponentIdentifier().getName()```) and some arbitrary text as message content. 
 
 ## Verify the Component Behavior
 
@@ -165,10 +165,10 @@ clockservice.addResultListener(new SwingExceptionDelegationResultListener<IClock
 });
 ```
 
-- Add the *protected ChatGuiD2 createGui(IExternalAccess agent)* method and implement it by simply returning *new ChatGuiD2(agent)*.Â 
+- Add the *protected ChatGuiD2 createGui(IExternalAccess agent)* method and implement it by simply returning *new ChatGuiD2(agent)*. 
 
 - In order to dispose the user interface when the component is killed, a new method *shutdownService* needs to be created. Equip the method with the ```@ServiceShutdown``` annotation to let Jadex call the method when the service is terminated.
-- Within the method you should call *gui.dispose()* to close the user interface. You should call dispose from the Swing thread, which can be achieved by using ```SwingUtilities.invokeLater()``` and placing the dispose within the ```Runnable``` that has to be passed as parameter.Â 
+- Within the method you should call *gui.dispose()* to close the user interface. You should call dispose from the Swing thread, which can be achieved by using ```SwingUtilities.invokeLater()``` and placing the dispose within the ```Runnable``` that has to be passed as parameter. 
 
 - Finally the *message* method has to be adjusted that it does not print out the message but redirects it to user interface using the previouly defined gui method *addMessage*
 
@@ -203,14 +203,14 @@ So far we have used a very simple chat service interface. In this lecture we wil
 - Add a method *getUserProfile()* with no in parameters and *IFuture&lt;UserProfileD3&gt;* as return value.
 - Create a new Java class file *UserProfileD3* and add fields as well as public getter and setter methods for *String name*, *int age*, *boolean gender*, and *String description*.
 - Add an emtpy constructor and a field based constructor with all fields to the *UserProfileD3* class.
-- Override the *toString()* method and return a descriptive representation of the profile using its attributes.Â Â 
+- Override the *toString()* method and return a descriptive representation of the profile using its attributes.  
 
 ## Defining the chat service implementation
 
 - Create a Java class file called *ChatServiceD3.java*, let it inherit from *ChatServiceD2* and implement the new *IExtendedChatService*.
 - Add a field of type *UserProfileD3* with name *profile* and assign it a random generated user profile already as part of the variable declaration. (Hint: you could e.g. use a statically created list of predefined user profiles from which you select an entry using Math.random()\*num\_of\_profiles).
 - Implement the *getUserProfile()* method by returning *new Future&lt;UserProfileD3&gt;(profile)*, i.e. a future with the user profile.
-- Override the *createGui()* method and return a new gui version using *new ChatGuiD3(agent)*.Â 
+- Override the *createGui()* method and return a new gui version using *new ChatGuiD3(agent)*. 
 
 ## Defining the chat user interface
 
@@ -244,7 +244,7 @@ agent.scheduleStep(new IComponentStep<Void>()
 Use the JCC to start several chat agents. Check if the new *Profiles* button is present in the chat user interface and if hitting the button causes the profiles of currently online users to be printed out. Below a screenshot of the solution with imaginary profiles of three chatters are shown.
 
 ![AC Tutorial.05 Provided Services@profiles.png](profiles.png)
-Â 
+ 
 
 # Exercise D4 - Service Interceptor
 
@@ -254,8 +254,8 @@ In this lecture we will deal with service interceptors, which are a means for in
 
 - Create a new Java class file called *SpamInterceptorD4.java* and let it implement *IServiceInvocationInterceptor*.
 - Add method implementations for the defined method signatures in the interface.
-- The *isApplicable* method is used to check if the interceptor should be called for the current call. Here, we only want to intercept method calls to the *message* method. So in the method body you should use *Â context.getMethod().getName().equals("message")* to determine the result.Â 
-- In the *execute* method the functionality of an intercepted call should be placed. In order to check if the sender's name contains 'Bot' we need first to fetch the argument with the sender's name. This can be achieved using *(String)context.getArgumentArray()\[0\]*. The check itself can be performed by a substring containment operation using *sender.indexOf("Bot")!=-1*. In case this check is true we will not call the message method but return an exception immediately by returning *new Future((new RuntimeException("No spammers allowed.") ) )*. Additionally, you should print out to the console that a spammer call was blocked and the sender's name and message content. If the name is ok, we let the call pass by returning *context.invoke()*.Â 
+- The *isApplicable* method is used to check if the interceptor should be called for the current call. Here, we only want to intercept method calls to the *message* method. So in the method body you should use * context.getMethod().getName().equals("message")* to determine the result. 
+- In the *execute* method the functionality of an intercepted call should be placed. In order to check if the sender's name contains 'Bot' we need first to fetch the argument with the sender's name. This can be achieved using *(String)context.getArgumentArray()\[0\]*. The check itself can be performed by a substring containment operation using *sender.indexOf("Bot")!=-1*. In case this check is true we will not call the message method but return an exception immediately by returning *new Future((new RuntimeException("No spammers allowed.") ) )*. Additionally, you should print out to the console that a spammer call was blocked and the sender's name and message content. If the name is ok, we let the call pass by returning *context.invoke()*. 
 
 ## Defining the chat service component
 
@@ -305,4 +305,4 @@ ia.getServiceContainer().getServices("chatservices")
 
 ## Verify the Component Behavior
 
-Start two or more Jadex platforms and on each at least one chat agent. Send a chat message via a chat agent and observe if the message arrives also at the remote chatters. Simulate a network breakdown by right clicking on the rms component and selecting suspend (the rms is the remote management service component, which is responsible for remote service communication between platforms). Then choose a chat agent from another platform and send a message again. Ensure that the still available chatters get the message immediately and do not suffer from waiting for a timeout from the disconnected remote platform.Â 
+Start two or more Jadex platforms and on each at least one chat agent. Send a chat message via a chat agent and observe if the message arrives also at the remote chatters. Simulate a network breakdown by right clicking on the rms component and selecting suspend (the rms is the remote management service component, which is responsible for remote service communication between platforms). Then choose a chat agent from another platform and send a message again. Ensure that the still available chatters get the message immediately and do not suffer from waiting for a timeout from the disconnected remote platform. 

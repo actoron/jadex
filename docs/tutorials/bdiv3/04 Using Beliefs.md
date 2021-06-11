@@ -2,7 +2,7 @@
 
 An agent's beliefbase represents its knowledge about the world. The agent is aware of this knowledge and can use it to reason. On the one hand, the beliefs can drive the actions of an agent by e.g. initiating goals or plans and on the other hand the beliefs also control the ongoing behaviour by determining when a goal is achieved or by rendering plans applicable or not. In Jadex BDI V3 beliefs are represented in an object-oriented way as:
 
-- **Field**: This representation is the most common one and treats a field of an agent as its belief. The field can be of any type whereby special support exists for collection types and arrays.Â 
+- **Field**: This representation is the most common one and treats a field of an agent as its belief. The field can be of any type whereby special support exists for collection types and arrays. 
 - **Getter/Setter Method Pair**: Using a getter/setter pair as belief allows for putting additional logic into the getter or setter. It also allows for using beliefs without a field.
 - **Unimplemented Getter/Setter Method Pair**: Using a getter/setter pair that is declared ```native```, i.e. without implemention, can be used to have abstract beliefs in capabilities. Such abstract beliefs can already be used in the capability but its representation is assigned by the using agent (or capability). This is useful if the belief should be shared among different capabilities.
 
@@ -71,10 +71,10 @@ Start your translation agent and observe the output. You should see it printing 
 Besides normal beliefs it is sometimes helpful to have a belief that directly depends on other beliefs and is automatically reevaluated whenever one of the beliefs changes it relies on.
 For these so-called *dynamic beliefs* it is required that they are fields with an init expression directly in its declaration, i.e. e.g. ```private String name = othername+id```, assuming that *othername* and *id* are other beliefs.
 
-- Create a *TranslationBDI* class by copying it from the last exercise.Â 
+- Create a *TranslationBDI* class by copying it from the last exercise. 
 - Change the belief definition in two ways:
   - First already create the wordtable as part of the declaration.
-  - Second add a new belief named *alarm* of type boolean. The alarm expression should check if the wordtable contains the key 'bugger'.Â 
+  - Second add a new belief named *alarm* of type boolean. The alarm expression should check if the wordtable contains the key 'bugger'. 
 
 ```java
 @Belief
@@ -107,7 +107,7 @@ Start the agent and verify that it behaves the same way as in the last exercise.
 
 # Exercise C3 - Getter/Setter Belief
 
-In this and the following exercises in this chapter we will use a different example as it better fits to show further belief features. The example is a very simple clock which is able to print the current time to the standard out.Â 
+In this and the following exercises in this chapter we will use a different example as it better fits to show further belief features. The example is a very simple clock which is able to print the current time to the standard out. 
 
 - Create a file called *ClockBDI* and add the ```@Agent``` annotation to the class.
 - Add two fields. One called *time* of type ```long``` and another called *formatter* of type ```SimpleDateFormat```. The formatter can be initialized with ```new SimpleDateFormat("dd.MM.yyyy HH:mm:ss")```. It will be used to print the current time and date:
@@ -158,7 +158,7 @@ Start the agent and check that it prints out the current time.
 
 # Exercise C4 - Getter/Setter Belief without Field
 
-This lecture will show that you can use also a getter/setter belief without an underlying field representation.Â Â 
+This lecture will show that you can use also a getter/setter belief without an underlying field representation.  
 
 - Copy the clock agent from the last lecture and remove the time field.
 - Modify the getter method to just return the current time via ```System.currentTimeMillis()```.
@@ -172,7 +172,7 @@ Start the agent and check that it prints out the current time. Think about why i
 
 # Exercise C5 - Belief with Update Rate
 
-In order to print out the current time regularly and not just once we will use a belief with update rate. This means that the value of the belief is automatically reevaluated in certain time intervals.Â 
+In order to print out the current time regularly and not just once we will use a belief with update rate. This means that the value of the belief is automatically reevaluated in certain time intervals. 
 
 - Copy the agent file from the last exercise and keep the plan as well as the formatter. Everything else can be deleted (also the body method of the agent).
 - Add a belief named *time* of type ```long``` and assign it ```System.currentTimeMillis()```. Furthermore set the update rate in the belief annotation to *1000*, i.e. one second.

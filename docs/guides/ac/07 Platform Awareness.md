@@ -1,11 +1,11 @@
 # Platform Awareness
 
-Platform awareness allows for automatic discovery of other platforms in the network. Depending on the enabled discovery mechanisms a platform will be capable of detecting others only within the same LAN or also globally. In Jadex, awareness is introduced by so called proxy components, which are local component representatives of a remote platform. Having a proxy component of another platform will integrate this remote platform transparently, i.e. given that security settings do not restrict access to the remote platform, its services can be discovered and used by local components. The concept of proxy components makes handling interactions with remote components rather simple. On the one hand these proxies can be created automatically by the awareness component and on the other hand a proxy can also be created manually given that the platform name and transport addresses are known.Â Â 
+Platform awareness allows for automatic discovery of other platforms in the network. Depending on the enabled discovery mechanisms a platform will be capable of detecting others only within the same LAN or also globally. In Jadex, awareness is introduced by so called proxy components, which are local component representatives of a remote platform. Having a proxy component of another platform will integrate this remote platform transparently, i.e. given that security settings do not restrict access to the remote platform, its services can be discovered and used by local components. The concept of proxy components makes handling interactions with remote components rather simple. On the one hand these proxies can be created automatically by the awareness component and on the other hand a proxy can also be created manually given that the platform name and transport addresses are known.  
 
 ![07 Platform Awareness@awareness1.png](awareness1.png)
 *Proxy components in Starter*
 
-In the screenshot of the JCC Starter shown above, it can be seen that platform proxy components are shown as subcomponents of the *platforms* component. In this case three other platforms haven been detected called 'hans', "Lars-PC\_6cc", and 'Lars-PC\_76f'. The user interface also visualizes the state of the remote components. The first component is connected but password protected (lock icon) so that it cannot be directly accessed or inspected. The second platform was found but communication is disturbed, e.g. the other platform could have been terminated or a network or communication problem exists. The screenshot shows that a component named 'awa' exists, which is the default name for the awareness component.Â 
+In the screenshot of the JCC Starter shown above, it can be seen that platform proxy components are shown as subcomponents of the *platforms* component. In this case three other platforms haven been detected called 'hans', "Lars-PC\_6cc", and 'Lars-PC\_76f'. The user interface also visualizes the state of the remote components. The first component is connected but password protected (lock icon) so that it cannot be directly accessed or inspected. The second platform was found but communication is disturbed, e.g. the other platform could have been terminated or a network or communication problem exists. The screenshot shows that a component named 'awa' exists, which is the default name for the awareness component. 
 
 Awareness Architecture
 -----------------------------------
@@ -23,12 +23,12 @@ The awareness component is functionally split into a management and a discovery 
 - **Message discovery** (enabled per default, global network): Message discovery is based on message receipt of other platforms. Whenever a message is received the message service will forward it to this discovery agent which subsequently announces a new platform. Using message discovery is especially beneficial in asymmetric network settings, in which one partner can find the other but not vice versa. This e.g. occurs with broadcast or multicast in virtual networks using NAT (e.g. VirtualBox or Android emulator).
 - **Relay discovery** (enabled per default, global network): The relay discovery is based on a web server that is used as a common rendezvous point for the platforms, i.e. the web server distributes awareness infos among the currently connected nodes. Per default the relay uses a server from [URLRelay](https://www0.activecomponents.org/relay/). It is also possible to setup an own server using the Relay Standalone Distribution from the downloads section (Jadex Pro Only), which allows for building up private platform networks.
 
-*Note:Â * Experience has shown that the functioning of awareness mechanisms heavily depends of the concrete network infrastructure used. For this reason it is beneficial to enable multiple of them in order to get a robust setup.Â 
+*Note: * Experience has shown that the functioning of awareness mechanisms heavily depends of the concrete network infrastructure used. For this reason it is beneficial to enable multiple of them in order to get a robust setup. 
 
 Configuration
 --------------------------
 
-Awareness can be turned on/off by using:Â 
+Awareness can be turned on/off by using: 
 
 ```PlatformConfiguration.setAwareness()```
 
@@ -36,7 +36,7 @@ or on commandline:
 
 ```-awareness <true|false>```
 
-This will start the platform with or without the awareness component. If you want to disable awareness at runtime it is sufficient to kill the 'awa' component. On the other hand it is also possible to enable awareness at runtime by starting the awareness component (*jadex.base.service.awareness.management.AwarenessManagementAgent*) contained in the module *jadex-platform-base*. In addition to the global awareness setting it is also possible to determine the awareness mechanisms that should be used. This can be done by using:Â 
+This will start the platform with or without the awareness component. If you want to disable awareness at runtime it is sufficient to kill the 'awa' component. On the other hand it is also possible to enable awareness at runtime by starting the awareness component (*jadex.base.service.awareness.management.AwarenessManagementAgent*) contained in the module *jadex-platform-base*. In addition to the global awareness setting it is also possible to determine the awareness mechanisms that should be used. This can be done by using: 
 
 ```PlatformConfiguration.setAwaMechanisms()```
 
@@ -44,4 +44,4 @@ or on commandline:
 
 ```-awamechanisms new String\[\]{"Broadcast", "Multicast", "Message", "Relay"}```
 
-At runtime the currently active awareness mechanisms can be seen by looking at the subcomponents of the awareness management component. To deactivate or activate mechanisms at runtime again subcomponents can be started or stopped. Furthermore, the delay between awareness announcements can be configured using ```PlatformConfiguration.setAwaDelay()``` or the ```-awadelay``` parameter, which per default is 20 seconds. This delay is propagated down to all awareness mechanisms at startup. At runtime the awareness settings can be further customized. For this puropose the awareness settings JCC plugin is available.Â 
+At runtime the currently active awareness mechanisms can be seen by looking at the subcomponents of the awareness management component. To deactivate or activate mechanisms at runtime again subcomponents can be started or stopped. Furthermore, the delay between awareness announcements can be configured using ```PlatformConfiguration.setAwaDelay()``` or the ```-awadelay``` parameter, which per default is 20 seconds. This delay is propagated down to all awareness mechanisms at startup. At runtime the awareness settings can be further customized. For this puropose the awareness settings JCC plugin is available. 
