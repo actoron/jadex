@@ -46,6 +46,7 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.registry.ISearchQueryManagerService;
+import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.IFilter;
@@ -76,6 +77,7 @@ import jadex.platform.service.clock.ClockService;
 import jadex.platform.service.execution.AsyncExecutionService;
 import jadex.platform.service.execution.SyncExecutionService;
 import jadex.platform.service.security.SecurityAgent;
+import jadex.platform.service.settings.SettingsService;
 import jadex.platform.service.threadpool.ThreadPoolService;
 
 /**
@@ -98,8 +100,10 @@ import jadex.platform.service.threadpool.ThreadPoolService;
 	@ProvidedService(type=IDaemonThreadPoolService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(true), $component.getId())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IExecutionService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="PlatformAgent.createExecutionServiceImpl($args.asyncexecution, $args.simulation, $component)", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IClockService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="PlatformAgent.createClockServiceImpl($component)", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=ISettingsService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(SettingsService.class)),
 	@ProvidedService(type=ILibraryService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$args.libpath==null? new jadex.platform.service.library.LibraryService(): new jadex.platform.service.library.LibraryService(new java.net.URLClassLoader(jadex.commons.SUtil.toURLs($args.libpath), $args.baseclassloader==null ? jadex.platform.service.library.LibraryService.class.getClassLoader() : $args.baseclassloader))")),
 	@ProvidedService(type=IDependencyService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$args.maven_dependencies? jadex.platform.service.dependency.maven.MavenDependencyResolverService.class.newInstance(): new jadex.platform.service.library.BasicDependencyService()"))
+
 //	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="new jadex.bridge.service.types.cms.ComponentManagementService($platformaccess, $bootstrapfactory, $args.uniqueids)"))
 })
 
