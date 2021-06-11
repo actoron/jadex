@@ -319,6 +319,7 @@ public class ClockService extends BasicService implements IClockService
 //		System.out.println("start clock: "+this+component.getComponentFeature(IExecutionFeature.class).isComponentThread());
 		
 		final Future<Void> ret = new Future<Void>();
+		ret.then(res -> System.out.println("Clockservice ready!"));
 
 		threadpool = ((IInternalRequiredServicesFeature)component.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
 //		ISettingsService settings = component.getComponentFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>( ISettingsService.class, ServiceScope.PLATFORM));
