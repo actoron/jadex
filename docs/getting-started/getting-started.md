@@ -221,7 +221,7 @@ Jadex comes with many small and large example applications in the [example appli
 
 ![Refreshing the Gradle project](gradle_refresh.png "Refreshing the Gradle project")
 
-Now you can search for the `Main` classes of the available examples. Hit *CTRL-Shift-T* or choose *Navigate/Open Type...* from the menu. Entry `Main` in the appearing dialog and scroll down to the desired example:
+Now you can search for the `Main` classes of the available examples. Hit *CTRL-Shift-T* or choose *Navigate/Open Type...* from the menu. Enter `Main` in the appearing dialog and scroll down to the desired example:
 
 ![Finding an example Main class](example_mains.png "Finding an example Main class")
 
