@@ -34,7 +34,7 @@ import java.util.*;
 import jadex.bdiv3.annotation.*;
 import jadex.bdiv3.features.*;
 import jadex.bdiv3.runtime.*;
-import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
+import jadex.bridge.service.annotation.*;
 import jadex.micro.annotation.*;
 import jadex.quickstart.cleanerworld.environment.*;
 import jadex.quickstart.cleanerworld.gui.*;
@@ -42,7 +42,7 @@ import jadex.quickstart.cleanerworld.gui.*;
 /**
  *  BDI agent template.
  */
-@Agent(type="bdi")    // This annotation makes the Java class and agent and enabled BDI features
+@Agent(type="bdi")    // This annotation makes the java class and agent and enabled BDI features
 public class CleanerBDIAgent
 {
     //-------- fields holding agent data --------
@@ -58,7 +58,7 @@ public class CleanerBDIAgent
      *  The body is executed when the agent is started.
      *  @param bdifeature    Provides access to bdi specific methods
      */
-    @AgentBody    // This annotation informs the Jadex platform to call this method once the agent is started
+    @OnStart    // This annotation informs the Jadex platform to call this method once the agent is started
     private void    exampleBehavior(IBDIAgentFeature bdi)
     {
         // Open a window showing the agent's perceptions
@@ -103,7 +103,7 @@ automatic processing of goals and selection and execution of plans.
 ### Agent Setup
 
 You can notice another difference to the `SimpleCleanerAgent.java` in the setup code.
-As in the simple cleaner, we annotated a method with `@AgentBody` to have it executed after agent startup.
+As in the simple cleaner, we annotated a method with `@OnStart` to have it executed after agent startup.
 
 Unlike the simple cleaner, we stored the `actsense` object in a field instead of a local variable.
 The reason is that we will add more methods and inner classes later for goals and plans and want to access
@@ -228,9 +228,10 @@ this object as a goal, like we did in the  `exampleBehavior()` method.
 
 The result of the previous exercise is a cleaner agent that performs a single patrol round and then stops.
 Create a copy of the `CleanerBDIAgent.java` named `CleanerBDIAgentA1.java` to keep your code
-of the previous exercise.
+of the previous exercise. The continue editing the original `CleanerBDIAgent.java` for implementing the changes
+needed for this new exercise.
 
-Now we want to make the agent start over with a new patrol round whenever a patrol round is finished.
+We now want to make the agent start over with a new patrol round whenever a patrol round is finished.
 This is very easy in Jadex. Just change the `@Goal` annotation to `@Goal(recur=true)`.
 Execute the `Main` class and observe that the agent restarts to patrol after having completed a patrol round.
 
@@ -243,8 +244,8 @@ restarts after all available plans have been executed for the goal. As a result,
 agent the process is as follows:
 
 1. We create the goal and add it with `dispatchTopLevelGoal()`.
-2. The Jadex framework selects the `exampleBehavior()` as a suitable plan and executes the method.
-3. Our plan implementation in that method causes the agent to move to the specified locations on after another
+2. The Jadex framework selects the `performPatrolPlan()` as a suitable plan and executes the method.
+3. Our plan implementation in that method causes the agent to move to the specified locations one after another
     and finally the plan method returns.
 4. The Jadex framework notices that the plan is finished and considers the goal processing to be complete.
 5. In Exercise A1 the goal would now be dropped because processing is finished. Due to the `recur=true` flag,
@@ -285,6 +286,8 @@ should choose from for pursuing the `PerformPatrol` goal. We can just add more m
     // e.g. according to the figure
 ```
 
+Note that you can find the completed code in the [summary section](07%20Summary.md#exercise-a3-additional-patrol-plan-code).
+
 Add the methods above into your `CleanerBDIAgent.java`. Execute the agent by starting the `Main` class.
 Do you notice a difference?
 
@@ -294,7 +297,7 @@ Probably you haven't noticed any difference. The agent still only executes the f
 The reason is that the agent starts with the first plan and continues executing plans until it
 considers the goal to be achieved. As the first plan completes without errors (i.e. not throwing a Java exception)
 it is considered a success (cf. step 4 in the process described in Exercise A2) and the goal processing
-restarts with an empty slate (cf. step 2).
+restarts with a blank slate (cf. step 2).
 
 One option for telling the agent to look for other plans after a plan is completed is stating that not only *one*,
 but *all* available plans should be executed. This can be done with the `orsuccess` flag,
@@ -338,3 +341,14 @@ Execute the agent by starting the `Main` class and observe the behavior. What ha
 ```
 
 * What happens if you use the `posttoall` flag for the `PerformPatrol` goal and why (5)?
+
+Answers to these questions can be found in the [summary section](07%20Summary.md#exercise-a4-questions-about-means-end-reasoning-flags).
+
+Before continuing with the next exercises be sure to revert the goal annotation back to a useful value, e.g.:
+
+```java
+    @Goal(recur=true, orsuccess=false)
+```
+
+---
+[[Back: 01 Introduction](01%20Introduction.md) | [Next: 03 Beliefs and Goal Conditions](03%20Beliefs%20and%20Goal%20Conditions.md)]

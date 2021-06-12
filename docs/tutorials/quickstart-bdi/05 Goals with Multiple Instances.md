@@ -73,3 +73,15 @@ Created achieve cleanup goal for Waste(id=Waste_#3, location=Location(x=0.3, y=0
 You can place additional waste objects in the *Welcome to Cleaner World*
 window with the left mouse button and check, if the agent detects them,
 when they come in vision range.
+
+## To be continued...
+
+The text of the following exercises is not yet written.
+If you are interested in the steps to build a fully functional cleaner agent
+you can find the solutions of the planned upcoming exercises in the *jadex-applications-quickstart-<version>.jar*
+in your project:
+
+![](solutions-jar.png)
+
+---
+[[Back: 04 Plans with Subgoals](04%20Plans%20with%20Subgoals.md) | [Next: 06 Advanced Exercises](06%20Advanced%20Exercises.md)]

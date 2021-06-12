@@ -1,7 +1,5 @@
 # Summary
 
-${SorryNotYetAvailable}
-
 ## Solutions and Answers to Questions
 
 Here you can find solutions for code you had to write yourself and the answers to questions from different exercises.
@@ -164,15 +162,8 @@ Reusing the first patrol plan, you could just add the new goal to the plan trigg
 #### Alternative 2
 
 A simple alternative is a plan that does just one random move.
-To allow this plan being executed repeatedly, you can set `ExcludeMode.Never` on the goal.
 
 ```java
-    @Goal(excludemode=ExcludeMode.Never)
-    class QueryChargingStation
-    {
-        ...
-    }
-
     /**
      *  A plan to move randomly in the environment.
      */
@@ -184,3 +175,23 @@ To allow this plan being executed repeatedly, you can set `ExcludeMode.Never` on
         actsense.moveTo(Math.random(), Math.random());
     }
 ```
+
+If this plan does not immediately lead to the discovery of a charging station, the query goal fails.
+As a result, also the load battery plan fails, as the plan has the query goal as a subgoal, and
+an exception is printed to the console, indicating that no other plans for the query goal are found (*"No more candidates"*).
+
+This is not really a problem, because the top level `MaintainBatteryLoaded` goal has a `recur=true` setting,
+which causes the `loadBattery()` plan to be started over and over until a charging station is known.
+Still, if you want to get rid of the exception, you could tell the query goal to retry existing plans without failing in between.
+To allow, e.g. the `moveAround()` plan being executed repeatedly, you can set `ExcludeMode.Never` on the query goal like this:
+
+```java
+    @Goal(excludemode=ExcludeMode.Never)
+    class QueryChargingStation
+    {
+        ...
+    }
+```
+
+---
+[[Back: 06 Advanced Exercises](06%20Advanced%20Exercises.md) | [Up: Documentation Overview](../../index.md)]
