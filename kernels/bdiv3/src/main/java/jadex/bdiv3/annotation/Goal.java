@@ -5,8 +5,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
-
 /**
  *  Let a class be used to represent goals of a BDI agent.
  *  Can be annotated to inner classes of an agent or in a {@link Goals}

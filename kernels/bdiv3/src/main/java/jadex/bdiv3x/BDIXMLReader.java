@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import jadex.bdiv3.annotation.ExcludeMode;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
@@ -31,8 +32,6 @@ import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3.model.MParameterElement;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MPlanParameter;
-import jadex.bdiv3.model.MProcessableElement;
-import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.model.SBDIModel;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -130,7 +129,7 @@ public class BDIXMLReader extends ComponentXMLReader
 	{
 		public Object convertString(String val, Object context) throws Exception
 		{
-			return MProcessableElement.ExcludeMode.getExcludeMode(val);
+			return ExcludeMode.getExcludeMode(val);
 		}
 	};
 	

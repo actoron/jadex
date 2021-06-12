@@ -5,13 +5,13 @@ import java.util.Set;
 
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Deliberation;
+import jadex.bdiv3.annotation.ExcludeMode;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;

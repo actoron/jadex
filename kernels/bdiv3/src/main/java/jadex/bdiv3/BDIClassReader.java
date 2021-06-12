@@ -22,6 +22,7 @@ import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Deliberation;
+import jadex.bdiv3.annotation.ExcludeMode;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalContextCondition;
 import jadex.bdiv3.annotation.GoalCreationCondition;
@@ -61,7 +62,6 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameterElement;
 import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.model.SBDIModel;
@@ -704,7 +704,7 @@ public class BDIClassReader extends MicroClassReader
 			ret = bdimodel.getCapability().getService(m.toString());
 			if(ret==null)
 			{
-				ret = new MServiceCall(m.toString(), false, false, MProcessableElement.ExcludeMode.WhenTried);
+				ret = new MServiceCall(m.toString(), false, false, ExcludeMode.WhenTried);
 				bdimodel.getCapability().addservice(ret);
 			}
 		}
