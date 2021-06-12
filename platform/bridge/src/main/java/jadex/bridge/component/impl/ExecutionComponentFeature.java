@@ -810,7 +810,10 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			// Exe service gone -> component is platform during last steps of shutdown
 			else
 			{
-				Starter.scheduleRescueStep(getComponent().getId(), () -> { while(execute()); } );
+				if(!executing)
+				{
+					Starter.scheduleRescueStep(getComponent().getId(), () -> { while(execute()); } );					
+				}
 			}
 		}
 	}
