@@ -2,18 +2,10 @@ package jadex.bridge.service.component;
 
 import java.util.logging.Logger;
 
-import jadex.base.Starter;
-import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentStep;
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
-import jadex.commons.DebugException;
 import jadex.commons.ICommand;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 /**
  *  Schedule forward future executions (e.g. results) on component thread,
@@ -43,52 +35,6 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	@Override
 	public <T> void scheduleForward(final ICommand<T> command, final T args)
 	{
-		if(!access.getFeature(IExecutionFeature.class).isComponentThread())
-		{
-			Exception ex	= Future.DEBUG ? new DebugException() : null;
-			access.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-			{
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					if(Future.DEBUG)
-						DebugException.ADDITIONAL.set(ex);
-					command.execute(args);
-					return IFuture.DONE;
-				}
-			}).addResultListener(new IResultListener<Void>()
-			{
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-					// Todo: why rescue thread necessary? (e.g. DependentServicesAgent)
-					if(exception instanceof ComponentTerminatedException && ((ComponentTerminatedException)exception).getComponentIdentifier().equals(access.getId()))
-					{
-						Starter.scheduleRescueStep(access.getId(), new Runnable()
-						{
-							public void run()
-							{
-//								System.err.println(access.getId()+": scheduled on rescue thread: "+command);
-								command.execute(args);
-							}
-						});
-					}
-					else
-					{
-						System.err.println("Unexpected Exception: "+command);
-						exception.printStackTrace();
-					}
-				}
-				
-				@Override
-				public void resultAvailable(Void result)
-				{
-					// scheduled ok.
-				}
-			});
-		}
-		else
-		{
-			command.execute(args);
-		}
-	};
+		ComponentResultListener.scheduleForward(access, null, () -> command.execute(args));
+	}
 }
