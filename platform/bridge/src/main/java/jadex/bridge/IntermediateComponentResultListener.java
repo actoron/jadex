@@ -2,6 +2,7 @@ package jadex.bridge;
 
 import java.util.Collection;
 
+import jadex.base.Starter;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -83,17 +84,46 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
      */
     public void finished()
     {
-    	scheduleForward(() ->
-    	{
-			if(undone && listener instanceof IUndoneIntermediateResultListener)
+    	if(!component.getFeature(IExecutionFeature.class).isComponentThread())
+		{
+			try
 			{
-				((IUndoneIntermediateResultListener<E>)listener).finishedIfUndone();
+				component.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						if(undone && listener instanceof IUndoneIntermediateResultListener)
+						{
+							((IUndoneIntermediateResultListener<E>)listener).finishedIfUndone();
+						}
+						else
+						{
+							((IIntermediateResultListener<E>)listener).finished();
+						}
+						return IFuture.DONE;
+					}
+					
+					public String toString()
+					{
+						return "setFinished()_#"+this.hashCode();
+					}
+				});
 			}
-			else
+			catch(final Exception e)
 			{
-				((IIntermediateResultListener<E>)listener).finished();
-			}    		
-    	});
+				Starter.scheduleRescueStep(component.getId(), new Runnable()
+				{
+					public void run()
+					{
+						listener.exceptionOccurred(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			((IIntermediateResultListener<E>)listener).finished();
+		}
     }
     
     /**
@@ -109,10 +139,39 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
 	@Override
 	public void maxResultCountAvailable(int max) 
 	{
-		scheduleForward(() ->
+    	if(!component.getFeature(IExecutionFeature.class).isComponentThread())
 		{
-			((IIntermediateResultListener<E>)listener).maxResultCountAvailable(max);			
-		});
+			try
+			{
+				component.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						((IIntermediateResultListener<E>)listener).maxResultCountAvailable(max);
+						return IFuture.DONE;
+					}
+					
+					public String toString()
+					{
+						return "maxResultCountAvailable()_#"+this.hashCode();
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(component.getId(), new Runnable()
+				{
+					public void run()
+					{
+						listener.exceptionOccurred(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			((IIntermediateResultListener<E>)listener).maxResultCountAvailable(max);
+		}
 	}
 	
 	/**
