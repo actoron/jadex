@@ -810,8 +810,63 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			// Exe service gone -> component is platform during last steps of shutdown
 			else
 			{
-				Starter.scheduleRescueStep(getComponent().getId(), () -> { while(execute()); } );
+				switchToRescueThread();
 			}
+		}
+	}
+	
+	/** Should switch to rescue thread after next step? */
+	protected boolean	switchtorescue	= false;
+	
+	/** Running on rescue thread? */
+	protected boolean	isonrescue	= false;
+	
+	/** Is the current thread the rescue thread? */
+	protected Thread	rescuethread	= null;	
+	
+	/**
+	 *  Switch to rescue thread when execution service is gone.
+	 */
+	protected void	switchToRescueThread()
+	{
+		// robust handshake exe service vs rescue thread to avoid double executions vs hang
+		boolean	run	= false;
+		synchronized(this)
+		{
+			if(executing || isonrescue)
+			{
+				switchtorescue	= true;
+			}
+			else
+			{
+				run	= true;
+				isonrescue	= true;
+				switchtorescue	= false;
+			}
+		}
+		
+		if(run)
+		{
+//			System.err.println(getComponent() + ": starting rescue thread");
+//			Thread.dumpStack();
+			Starter.scheduleRescueStep(getComponent().getId(), () ->
+			{
+				// Hack to avoid double execution if execution service triggered in mean time
+				
+//				System.out.println(getComponent() + ": starting rescue thread 1");
+				try
+				{
+					rescuethread	= Thread.currentThread();
+					while(execute());
+				}
+				finally
+				{
+//					System.err.println(getComponent() + ": finished rescue thread");
+					isonrescue	= false;
+					if(switchtorescue)
+						switchToRescueThread();
+				}
+			} );
 		}
 	}
 	
@@ -1017,7 +1072,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					if(executing)
 					{
-						System.err.println(getComponent().getId()+": double execution");
+						System.err.println(getComponent().getId()+": double execution (unblock)");
 						if(debug)
 							new RuntimeException("executing: "+getComponent().getId()).initCause(stacktrace).printStackTrace();
 						else
@@ -1103,9 +1158,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 
 		synchronized(this)
 		{
+			// Abort execution service step when already on rescue thread
+			if(isonrescue && !(Thread.currentThread()==rescuethread))
+				return false;
+			
 			if(executing)
 			{
-				System.err.println(getComponent().getId()+": double execution");
+				System.err.println(getComponent().getId()+": double execution "+isonrescue);
 				if(debug)
 					new RuntimeException("executing: "+getComponent().getId()).initCause(stacktrace).printStackTrace();
 				else
@@ -1689,7 +1748,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //		if(endstepcnt!=-1 && getComponent().getComponentIdentifier().equals(getComponent().getComponentIdentifier().getRoot()))
 //			System.out.println("platform: "+steps.size());
 		
-		return ret;
+		// Stop executing again on exe service when switched to rescue thread in mean time.
+		return ret && (!isonrescue || Thread.currentThread()==rescuethread);
 		
 		} catch(Throwable t) {
 			if(executing)
@@ -1743,6 +1803,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	protected void resetExecutionState(ClassLoader cl)
 	{
+		// Switch to rescue thread?
+		boolean	run	= false;
+		synchronized(this)
+		{
+			run	= switchtorescue && !isonrescue;
+		}
+		
 		// Reset execution state.
 		IComponentIdentifier.LOCAL.set(null);
 		IInternalExecutionFeature.LOCAL.set(null);
@@ -1755,6 +1822,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		executing	= false;
 		stacktrace	= null;
 		ISuspendable.SUSPENDABLE.set(null);
+		
+		if(run)
+		{
+			switchToRescueThread();
+		}
 	}
 
 	/**
