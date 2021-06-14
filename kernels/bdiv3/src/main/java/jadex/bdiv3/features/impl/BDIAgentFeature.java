@@ -147,13 +147,20 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	public IFuture<Void> init()
 	{
 		// cannot do this in constructor because it needs access to this feature in expressions
-		
-		Object pojo = getComponent().getFeature(IPojoComponentFeature.class).getPojoAgent();
-		injectAgent(getInternalAccess(), pojo, bdimodel, null);
-		invokeInitCalls(pojo);
-		initCapabilities(pojo, bdimodel.getSubcapabilities() , 0);
-//		startBehavior();
-		return IFuture.DONE;
+		try
+		{
+			Object pojo = getComponent().getFeature(IPojoComponentFeature.class).getPojoAgent();
+			injectAgent(getInternalAccess(), pojo, bdimodel, null);
+			invokeInitCalls(pojo);
+			return initCapabilities(pojo, bdimodel.getSubcapabilities() , 0);
+//	//		startBehavior();
+//			return IFuture.DONE;
+		}
+		catch(Exception e)
+		{
+			// E.g. invocation target exception in init calls
+			return new Future<>(e);
+		}
 	}
 	
 	/**
@@ -1671,13 +1678,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //					System.out.println("Init: "+um);
 					um.invoke(pojo, initcall.getSecondEntity());
 				}
-				catch(InvocationTargetException e)
-				{
-					e.getTargetException().printStackTrace();
-				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+					SUtil.throwUnchecked(e);
 				}
 			}
 		}
