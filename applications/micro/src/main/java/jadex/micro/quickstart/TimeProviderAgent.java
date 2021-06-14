@@ -8,8 +8,10 @@ import java.util.Map;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
@@ -53,6 +55,7 @@ public class TimeProviderAgent implements ITimeService
      */
     public ISubscriptionIntermediateFuture<String> subscribe(DateFormat format)
     {
+        final IComponentIdentifier    client    = ServiceCall.getCurrentInvocation().getCaller();
         final SubscriptionIntermediateFuture<String> ret = new SubscriptionIntermediateFuture<String>();
         subscriptions.put(ret, format);
 
@@ -65,7 +68,7 @@ public class TimeProviderAgent implements ITimeService
              */
             public void terminated(Exception reason)
             {
-                System.out.println("removed subscriber due to: "+reason);
+                System.out.println("removed subscriber "+client+" due to: "+reason);
                 subscriptions.remove(ret);
             }
         });

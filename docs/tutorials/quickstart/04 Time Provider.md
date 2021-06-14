@@ -17,8 +17,10 @@ import java.util.Map;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
@@ -62,6 +64,7 @@ public class TimeProviderAgent implements ITimeService
      */
     public ISubscriptionIntermediateFuture<String> subscribe(DateFormat format)
     {
+        final IComponentIdentifier    client    = ServiceCall.getCurrentInvocation().getCaller();
         final SubscriptionIntermediateFuture<String> ret = new SubscriptionIntermediateFuture<String>();
         subscriptions.put(ret, format);
 
@@ -74,7 +77,7 @@ public class TimeProviderAgent implements ITimeService
              */
             public void terminated(Exception reason)
             {
-                System.out.println("removed subscriber due to: "+reason);
+                System.out.println("removed subscriber "+client+" due to: "+reason);
                 subscriptions.remove(ret);
             }
         });
@@ -146,7 +149,8 @@ The `subscriptions` field is a `java.util.Map` of the current subscriptions to t
 
 On each call, the `subscribe()` method creates a new subscription future object for the new subscriber and returns that object. The subcription future object is also added to the subscriptions list, so it can be notified about each new time message.
 
-Furthermore, a termination command is set on the subscription future. This command is executed when the subscription ends either due to a network error or when a client explicitly terminates the subscription. In the command, the time provider agent prints out a message and removes the subscription from the list.
+Furthermore, a termination command is set on the subscription future. This command is executed when the subscription ends either due to a network error or when a client explicitly terminates the subscription. In the command, the time provider agent prints out a message and removes the subscription from the list. In the printed messages, it uses the id of the client that is fetched at the top of the subscribe method with
+`ServiceCall.getCurrentInvocation().getCaller()`.
 
 ## The Agent Life Cycle
 
