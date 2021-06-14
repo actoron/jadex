@@ -139,13 +139,15 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 					stopped	= IFuture.DONE;
 				}
 				
-				if(advanceblockers!=null)
+				List<IFuture<?>>	blockers;
+				synchronized(this)
 				{
-					for(IFuture<?> fut: advanceblockers)
-					{
-						((Future<?>)fut).setExceptionIfUndone(new RuntimeException("Simulation service shutdowned"));
-					}
+					blockers	= advanceblockers!=null ? new ArrayList<>(advanceblockers) : Collections.emptyList();
 					advanceblockers.clear();
+				}
+				for(IFuture<?> fut: blockers)
+				{
+					((Future<?>)fut).setExceptionIfUndone(new RuntimeException("Simulation service shutdowned"));
 				}
 				
 				stopped.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
@@ -498,7 +500,10 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 			}
 		}, true);
 		
-		advanceblockers.add(toblocker);
+		synchronized(this)
+		{
+			advanceblockers.add(toblocker);
+		}
 		
 		// -------- For debugging when simulation hangs due to leftover adblocker.
 		if(SSimulation.DEBUG_BLOCKERS)
@@ -660,37 +665,43 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	 */
 	protected IFuture<Void> waitForBlockers()
 	{
-		IFuture<Void> ret = null;
-		if(advanceblockers.size() > 0)
+		FutureBarrier<Object> bar	= null;
+		synchronized(this)
+		{
+			if(advanceblockers.size() > 0)
+			{
+				bar = new FutureBarrier<>();
+				for(IFuture<?> blocker : advanceblockers)
+				{
+					@SuppressWarnings("unchecked")
+					IFuture<Object>	oblocker = (IFuture<Object>)blocker;
+					bar.addFuture(oblocker);
+				}
+				advanceblockers.clear();
+			}
+		}
+		
+		if(bar!=null)
 		{
 			Future<Void> futret = new Future<>();
-			ret = futret;
-			FutureBarrier<Object> bar = new FutureBarrier<>();
-			for(IFuture<?> blocker : advanceblockers)
-			{
-				@SuppressWarnings("unchecked")
-				IFuture<Object>	oblocker = (IFuture<Object>)blocker;
-				bar.addFuture(oblocker);
-			}
-			advanceblockers.clear();
-//			System.out.println("waitForBlockers start");
+			//			System.out.println("waitForBlockers start");
 			bar.waitForIgnoreFailures(null).addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{
-//					System.out.println("waitForBlockers end");
+	//					System.out.println("waitForBlockers end");
 					waitForBlockers().addResultListener(new DelegationResultListener<>(futret));
 				}
 				public void exceptionOccurred(Exception exception)
 				{
 				}
 			}));
+			return futret;
 		}
 		else
 		{
-			ret = IFuture.DONE;
+			return IFuture.DONE;
 		}
-		return ret;
 	}
 	
 	//-------- helper classes --------

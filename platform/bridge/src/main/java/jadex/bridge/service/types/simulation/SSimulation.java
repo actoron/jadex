@@ -4,6 +4,7 @@ import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
@@ -34,8 +35,9 @@ public class SSimulation
 			try
 			{
 				debugBlocker();
-				ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISimulationService.class))
-					.addAdvanceBlocker(adblock).get();
+				// Hack!!! raw access to avoid scheduling on terminated components (e.g. gui close after schutdown)
+				((IInternalRequiredServicesFeature)ia.getFeature(IRequiredServicesFeature.class)).getRawService(ISimulationService.class)
+					.addAdvanceBlocker(adblock);
 			}
 			catch(ThreadDeath td)
 			{
@@ -63,8 +65,9 @@ public class SSimulation
 			try
 			{
 				debugBlocker();
-				ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISimulationService.class))
-					.addAdvanceBlocker(adblock).get();
+				// Hack!!! raw access to avoid scheduling on terminated components (e.g. gui close after schutdown)
+				((IInternalRequiredServicesFeature)ia.getFeature(IRequiredServicesFeature.class)).getRawService(ISimulationService.class)
+					.addAdvanceBlocker(adblock);
 			}
 			catch(ThreadDeath td)
 			{
