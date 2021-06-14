@@ -430,9 +430,14 @@ public class PlatformAgent
 			//	System.out.println("hhhfhjsdf");
 			isSystemComponent(ci, PlatformAgent.class.getClassLoader());
 			AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
+			if(ai==null)
+			{
+				System.out.println("Failed to load component: "+ci);
+				continue;
+			}
 			EnumInfo ei = (EnumInfo)ai.getValue("autostart");
 			if(ei==null)
-				System.out.println("No autostart agent: "+ci);
+				System.out.println("No autostart component: "+ci);
 
 			String name = ai.getValue("name")==null || ((String)ai.getValue("name")).length()==0? null: (String)ai.getValue("name");
 			
