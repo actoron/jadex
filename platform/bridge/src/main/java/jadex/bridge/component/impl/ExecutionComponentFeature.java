@@ -463,62 +463,89 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		// todo: remember and cleanup timers in case of component removal.
 		
 		final Future<T> ret = new Future<T>();
-
-		if(delay>=0)
+		
+		try
 		{
-			// OK to fetch sync even from external access because everything thread safe.
-			//IClockService cs = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
-			IClockService cs = getClockService();
-			if(cs!=null)
+			if(delay>=0)
 			{
-				ITimedObject to	= new ITimedObject()
+				// OK to fetch sync even from external access because everything thread safe.
+				//IClockService cs = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+				IClockService cs = getClockService();
+				if(cs!=null)
 				{
-					public void timeEventOccurred(long currenttime)
+					ITimedObject to	= new ITimedObject()
 					{
-						//if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
-						//	System.out.println("before scheduleStep: "+getComponent().getId());
-	//					System.out.println("step: "+step);
-						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)
+						public void timeEventOccurred(long currenttime)
 						{
-							@Override
-							public void customResultAvailable(T result)
+							//if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
+							//	System.out.println("before scheduleStep: "+getComponent().getId());
+		//					System.out.println("step: "+step);
+							IFuture<T>	stepfut	= scheduleStep(step);
+							
+							// Immediate future fail due to component terminated before timer occurred.
+							if(stepfut.getException() instanceof ComponentTerminatedException
+								&& ((ComponentTerminatedException)stepfut.getException()).getComponentIdentifier().equals(component.getId()))
 							{
-								//if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
-								//	System.out.println("after scheduleStep: "+getComponent().getId());
-								super.customResultAvailable(result);
+								// TODO: handle or just ignore?
+								getComponent().getLogger().info("Timer after termination: "+component+", "+step);
 							}
-							@Override
-							public void exceptionOccurred(Exception exception)
+							else
 							{
-								//if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
-								//	System.out.println("after scheduleStep: "+getComponent().getId()+" "+exception);
-								super.exceptionOccurred(exception);
+								stepfut.addResultListener(createResultListener(new DelegationResultListener<T>(ret)
+								{
+									@Override
+									public void customResultAvailable(T result)
+									{
+										//if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
+										//	System.out.println("after scheduleStep: "+getComponent().getId());
+										super.customResultAvailable(result);
+									}
+									@Override
+									public void exceptionOccurred(Exception exception)
+									{
+										//if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
+										//	System.out.println("after scheduleStep: "+getComponent().getId()+" "+exception);
+										super.exceptionOccurred(exception);
+									}
+								}));
 							}
-						}));
-					}
-					
-					public String toString()
+						}
+						
+						public String toString()
+						{
+							return "waitForDelay["+step+"]("+getComponent().getId()+")";
+						}
+					};
+					if(realtime)
 					{
-						return "waitForDelay["+step+"]("+getComponent().getId()+")";
+						cs.createRealtimeTimer(delay, to);
 					}
-				};
-				if(realtime)
-				{
-					cs.createRealtimeTimer(delay, to);
+					else
+					{
+						cs.createTimer(delay, to);					
+					}
 				}
 				else
 				{
-					cs.createTimer(delay, to);					
+					ret.setException(new ServiceNotFoundException("Clock service not found."));
 				}
 			}
 			else
 			{
-				ret.setException(new ServiceNotFoundException("Clock service not found."));
+				getComponent().getLogger().warning("WaitFor will never complete: "+step);
 			}
 		}
-		else
+		catch(Exception e)
 		{
-			getComponent().getLogger().warning("WaitFor will never complete: "+step);
+			ret.setExceptionIfUndone(new RuntimeException(e)
+			{
+				@Override
+				public void printStackTrace()
+				{
+					Thread.dumpStack();
+					super.printStackTrace();
+				}
+			});
 		}
 		
 		return ret;

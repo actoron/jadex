@@ -787,6 +787,13 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 				}
     		}
 		}
+		
+		
+		@Override
+		public String toString()
+		{
+			return "NotiCommand(" + Future.this + ", " + result + ", " + exception +")";
+		}
 	};
     
     /**
