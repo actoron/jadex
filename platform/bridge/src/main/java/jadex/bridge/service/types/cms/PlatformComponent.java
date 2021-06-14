@@ -1943,8 +1943,11 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 							{
 								public void exceptionOccurred(Exception exception)
 								{
-									System.err.println("Unexpected Exception: "+command);
-									exception.printStackTrace();
+									if(!(exception instanceof ComponentTerminatedException))
+									{
+										System.err.println("Could not schedule back on component: "+command);
+										exception.printStackTrace();
+									}
 								}
 								
 								public void resultAvailable(Void result)
@@ -1987,8 +1990,11 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 							{
 								public void exceptionOccurred(Exception exception)
 								{
-									System.err.println("Unexpected Exception: "+command);
-									exception.printStackTrace();
+									if(!(exception instanceof ComponentTerminatedException))
+									{
+										System.err.println("Could not schedule back on component: "+command);
+										exception.printStackTrace();
+									}
 								}
 								
 								public void resultAvailable(Void result)

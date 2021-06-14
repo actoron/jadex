@@ -223,7 +223,15 @@ public class DebuggerMainPanel extends JSplitPane
 				run.setEnabled(false);
 				//System.out.println("step compo: "+DebuggerMainPanel.this.desc.getName()+" "+getStepInfo());
 				IFuture<Void> ret = DebuggerMainPanel.this.jcc.getPlatformAccess().getExternalAccess(DebuggerMainPanel.this.desc.getName()).stepComponent(getStepInfo());
-				ret.then(x -> {System.out.println("step ok"); update.run();}).catchEx(ex -> {System.out.println("step ex: "+ex); update.run();});
+				ret.then(x -> 
+				{
+					//System.out.println("step ok"); 
+					update.run();})
+				.catchEx(ex -> 
+				{
+					System.out.println("step ex: "+ex); 
+					update.run();
+				});
 			}
 		});
 		
