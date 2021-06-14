@@ -32,6 +32,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.ProxyFactory;
@@ -1572,6 +1573,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			
 			Class<?> rettype = method.getReturnType();
 			
+			int prio = IExecutionFeature.STEP_PRIORITY_NORMAL; 
 			// Hack, use step return type
 			if("scheduleStep".equals(method.getName()))
 			{
@@ -1581,6 +1583,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					if(args[i] instanceof IComponentStep<?>)
 					{
 						step = (IComponentStep<?>)args[i];
+						if(step instanceof IPriorityComponentStep)
+							prio = ((IPriorityComponentStep)step).getPriority();
 						break;
 					}
 				}
@@ -1633,8 +1637,6 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			}
 			else
 			{
-				int prio = IExecutionFeature.STEP_PRIORITY_NORMAL;
-				
 				// Allow getting arguments and results from dead components.
 				switch (method.getName())
 				{
@@ -1941,8 +1943,11 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 							{
 								public void exceptionOccurred(Exception exception)
 								{
-									System.err.println("Unexpected Exception: "+command);
-									exception.printStackTrace();
+									if(!(exception instanceof ComponentTerminatedException))
+									{
+										System.err.println("Could not schedule back on component: "+command);
+										exception.printStackTrace();
+									}
 								}
 								
 								public void resultAvailable(Void result)
@@ -1985,8 +1990,11 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 							{
 								public void exceptionOccurred(Exception exception)
 								{
-									System.err.println("Unexpected Exception: "+command);
-									exception.printStackTrace();
+									if(!(exception instanceof ComponentTerminatedException))
+									{
+										System.err.println("Could not schedule back on component: "+command);
+										exception.printStackTrace();
+									}
 								}
 								
 								public void resultAvailable(Void result)

@@ -917,8 +917,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			else
 			{
 //				this.dostep	= true;		
-				this.stepfuture = ret;
-				this.stepinfo = stepinfo;
+				this.stepfuture = ret; // stepfuture!=null signals that step mode is active
+				this.stepinfo = stepinfo; // stepinfo is name id of the step to perform (if not simply next)
+				//System.out.println("stepfuture set");
 			}
 		}
 		
@@ -967,9 +968,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		synchronized(this)
 		{
 			if(subcomponents==null)
-			{
 				subcomponents	= new HashSet<IInternalExecutionFeature>();
-			}
 			subcomponents.add(sub);
 		}
 	}
@@ -982,9 +981,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		synchronized(this)
 		{
 			if(subcomponents!=null)
-			{
 				subcomponents.remove(sub);
-			}
 		}
 	}
 	
@@ -1348,7 +1345,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					}
 				}		
 		
-//				if(getComponent().getComponentIdentifier().getName().indexOf("Hello")!=-1)
+//				if(getComponent().getId().getName().indexOf("Hello")!=-1)
 //					System.out.println("executing");
 				if(priostep)
 				{
@@ -1714,19 +1711,24 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			}				
 		}
 		
-		// In step mode, notify done step, if any.
-		Future<Void>	stepfut	= null;
-		synchronized(this)
+		if(!priostep)
 		{
-			if(stepfuture!=null && stepinfo==null)
+			// In step mode, notify done step, if any.
+			Future<Void> stepfut = null;
+			synchronized(this)
 			{
-				stepfut	= stepfuture;
-				stepfuture	= null;
+				
+				if(stepfuture!=null && stepinfo==null)
+				{
+					stepfut	= stepfuture;
+					stepfuture = null;
+					//System.out.println("stepfuture null");
+				}
 			}
-		}
-		if(stepfut!=null)
-		{
-			stepfut.setResult(null);
+			if(stepfut!=null)
+			{
+				stepfut.setResult(null);
+			}
 		}
 
 		resetExecutionState(cl);

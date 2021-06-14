@@ -96,7 +96,7 @@ public class PropertiesComponentFeature	extends	AbstractComponentFeature impleme
 						Class<?> clazz = unexp.getClazz()!=null? unexp.getClazz().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports()): null;
 						if(unexp.getValue()==null || unexp.getValue().length()==0 && clazz!=null)
 						{
-							tmp = clazz.newInstance();
+							tmp = clazz.getDeclaredConstructor().newInstance(); //clazz.newInstance();
 						}
 						else
 						{
