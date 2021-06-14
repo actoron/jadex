@@ -339,7 +339,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     		else if(isDone())
     		{
     			if(getException()!=null)
-    				throw SUtil.throwUnchecked(getException());
+    				throwException(getException());
     			else
     				throw new NoSuchElementException("No more intermediate results.");
     		}

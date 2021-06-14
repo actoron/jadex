@@ -397,7 +397,7 @@ public class Executor implements Runnable
 				Throwable	t	= throwables.remove(monitor);
 				if(t!=null)
 				{
-					SUtil.throwUnchecked(t);
+					Future.throwException(t);
 				}
 			}			
 		}
