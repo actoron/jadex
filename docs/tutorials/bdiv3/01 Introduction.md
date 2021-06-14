@@ -6,7 +6,7 @@ The Jadex BDI V3 kernel is a Belief-Desire-Intention reasoning engine for intell
 
 This tutorial is a good starting point for agent developers that want to learn programming Jadex BDI agents in small hands-on exercises.
 Each lesson of this tutorial covers one important concept and tries to illustrate why and especially how the concept can be used in Jadex.
-Nonetheless, the tutorial cannot illustrate all available concepts and the reader is encouraged to also have a look at the example source contained in the distribution or take a look into the [BDIV3 User Guide](../../guides/bdiv3/01%20Introduction.md)).
+Nonetheless, the tutorial cannot illustrate all available concepts and the reader is encouraged to also have a look at the example source contained in the distribution or take a look into the [BDIV3 User Guide](../../guides/bdiv3/01%20Introduction.md).
 
 Contents of this tutorial:
 

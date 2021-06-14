@@ -14,23 +14,16 @@ import java.util.logging.Level;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.annotation.OnEnd;
-import jadex.bridge.service.annotation.OnStart;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceShutdown;
-import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.*;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Boolean3;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.SUtil;
-import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
+import jadex.commons.future.*;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -40,9 +33,9 @@ import jadex.transformation.jsonserializer.JsonTraverser;
  *  Agent that provides the settings service.
  */
 @Service
-@Agent(autoprovide=Boolean3.TRUE,
-	autostart=Boolean3.TRUE)
-public class SettingsAgent	implements ISettingsService
+//@Agent(autoprovide=Boolean3.TRUE,
+//	autostart=Boolean3.TRUE)
+public class SettingsService implements ISettingsService
 {
 	// -------- constants --------
 
@@ -74,6 +67,9 @@ public class SettingsAgent	implements ISettingsService
 	/** Do not save settings?. */
 	@AgentArgument
 	protected boolean	readonly;
+
+	/** Initialization future for the service. */
+	protected Future<Void> initfut = new Future<Void>();
 	
 	//-------- Service methods --------
 	
@@ -81,10 +77,12 @@ public class SettingsAgent	implements ISettingsService
 	 *  Start the service.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
-	@ServiceStart
+	//@OnInit
 	//@OnStart
+	@ServiceStart
 	public IFuture<Void>	startService()
 	{
+		final Future<Void>	ret = initfut;
 		this.providers	= new LinkedHashMap<String, IPropertiesProvider>();
 		this.filename	= "properties.json";
 		settingsdir = new File(SUtil.getAppDir(), "settings_" + access.getId().getPlatformPrefix());
@@ -96,8 +94,6 @@ public class SettingsAgent	implements ISettingsService
 		else if (!settingsdir.exists() && !readonly)
 			settingsdir.mkdir();
 		//this.filename	= access.getComponentIdentifier().getPlatformPrefix() + SETTINGS_EXTENSION;
-		
-		final Future<Void>	ret	= new Future<Void>();
 		loadProperties().addResultListener(new DelegationResultListener<Void>(ret));
 		
 		return ret;
@@ -136,24 +132,28 @@ public class SettingsAgent	implements ISettingsService
 	public IFuture<Void>	registerPropertiesProvider(String id, IPropertiesProvider provider)
 	{
 		Future<Void>	ret	= new Future<Void>();
-		if(providers.containsKey(id))
-		{
-			ret.setException(new IllegalArgumentException("Id already contained: "+id));
-		}
-		else
-		{
-//			System.out.println("Added provider: "+id+", "+provider);
-			providers.put(id, provider);
-			Properties	sub	= props.getSubproperty(id);
-			if(sub!=null)
+
+		// We need to guard against calls by other platform services before we are initialized
+		initfut.then( res -> {
+			if(providers.containsKey(id))
 			{
-				provider.setProperties(sub).addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
+				ret.setException(new IllegalArgumentException("Id already contained: "+id));
 			}
 			else
 			{
-				ret.setResult(null);
+	//			System.out.println("Added provider: "+id+", "+provider);
+				providers.put(id, provider);
+				Properties	sub	= props.getSubproperty(id);
+				if(sub!=null)
+				{
+					provider.setProperties(sub).addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
+				}
+				else
+				{
+					ret.setResult(null);
+				}
 			}
-		}
+		});
 		return ret;
 	}
 	

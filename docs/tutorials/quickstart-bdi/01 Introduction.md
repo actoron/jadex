@@ -101,4 +101,8 @@ As a preliminary exercise in this tutorial, you could try to implement a cleaner
 * drops waste in a waste bin,
 * recharges at a charging station before the battery is empty.
 
+A simple an somewhat limited solution is shown in the [summary section](07%20Summary.md#exercise-zero-a-simple-java-cleaner-agent).
 In the following exercises we will use features of the Jadex BDI model to build a more sophisticated agent step by step.
+
+---
+[[Up: Documentation Overview](../../index.md) | [Next: 02 Goals and Plans](02%20Goals%20and%20Plans.md)]

@@ -8,7 +8,7 @@ The Jadex ADF Checker is an eclipse plugin that allows checking Jadex *agent def
 Requirements
 -------------------------
 
-The plugin should work with Eclipse 3.5 or later. It has been tested on Eclipse 3.6 (Helios), Eclipse 3.7 (Indigo) and Eclipse 4.2 (Juno).Â 
+The plugin should work with Eclipse 3.5 or later. It has been tested on Eclipse 3.6 (Helios), Eclipse 3.7 (Indigo) and Eclipse 4.2 (Juno). 
 
 The plugin requires that all Jadex libraries, which are used in the project, are available in the project's build path, e.g. as referenced libraries or as maven dependencies. The ADF checker uses whatever version of Jadex is in the build path for loading the ADFs. Therefore, you can choose the Jadex version that you want to use yourself. Due to some changes in the Jadex code base, not all file types are supported for all recent Jadex versions:
 
@@ -31,7 +31,7 @@ The plugin requires that all Jadex libraries, which are used in the project, are
 Installation
 -------------------------
 
-The plugin can be obtained from the [eclipse update site](http://www2.activecomponents.org/eclipse/update/) . In Eclipse, choose the menu *Help-&gt;Install New Software...*, enter the update site address at *Work with:Â * and select *Jadex Eclipse Plugins-&gt;Jadex ADF Checker*.
+The plugin can be obtained from the [eclipse update site](http://www2.activecomponents.org/eclipse/update/) . In Eclipse, choose the menu *Help-&gt;Install New Software...*, enter the update site address at *Work with: * and select *Jadex Eclipse Plugins-&gt;Jadex ADF Checker*.
 
 ![15 ADF Checker@install.png](install.png)
 *Figure 2: Installing the ADF Checker*

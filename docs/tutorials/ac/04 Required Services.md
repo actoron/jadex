@@ -16,7 +16,7 @@ Create a Java class called *ChatC1Agent.java* and use the following:
 
 - Add the *@Agent* annotation to state that this Java file is an agent
 - Add a *@Description* annotation with an illustrative example explanation such as @Description("This agent uses the clock service.")
-- Add a required service description that defines the name of the service as *clockservice*, its type as *IClockService* and its scope as *ServiceScope.PLATFORM*.Â 
+- Add a required service description that defines the name of the service as *clockservice*, its type as *IClockService* and its scope as *ServiceScope.PLATFORM*. 
 
 The resulting definition should look like the following:
 
@@ -35,22 +35,22 @@ public class ChatC1Agent
 ## Verify the Component Behavior
 
 To understand the code it is necessary to explain the underlying concepts of the component service container. Each active component (regardless of its type) contains a service container that basically fulfills three aspects.
-It allows for *fetching required services*, *searching services*, and *providing services*. Â 
-If you're using the JCC, you can [see the service container below your running component](../../tools/03%20Starter.md#running-components)).
+It allows for *fetching required services*, *searching services*, and *providing services*.
+If you're using the JCC, you can [see the service container below your running component](../../tools/03%20Starter.md#running-components).
 
 # Exercise C2 - Invoking a Predefined Service
 
-In this lecture we will use the clock service to print out the current platform time.Â 
+In this lecture we will use the clock service to print out the current platform time. 
 
 ## Defining the Component
 
 - Create a Java class called *ChatC2Agent.java* by copying the agent file from the last lecture.
 
 - Insert a field of type ```IRequiredServicesFeature``` and name it *requiredServicesFeature*. Add an ```@AgentFeature``` annotation above the field declaration. Jadex will notice the annotation and automatically inject the corresponding micro agent feature object to the agent.
- In this case, the injected feature provides access to the declared Required Services. Read more about Component Features [here](../../components/components.md#component-features)).
+ In this case, the injected feature provides access to the declared Required Services. Read more about Component Features [here](../../components/components.md#component-features).
 
 - Declare a public void method called *executeBody()* and add a ```@AgentBody``` annotation above the method.
-  This annotation is one of three [lifecycle annotations](../../components/components.md#component-lifecycle)) of a micro agents which will contain the functional agent code. It is called once after the agent is born.Â 
+  This annotation is one of three [lifecycle annotations](../../components/components.md#component-lifecycle) of a micro agents which will contain the functional agent code. It is called once after the agent is born. 
 
 - What is still missing is the usage of the declared required service. This will be done in the *executeBody()* method with the following code:
 
@@ -82,7 +82,7 @@ In this execise we will use another service of the platform and invoke a method 
 ## Defining the Component
 
 - Create a Java class called *ChatC3Agent.java* by copying the agent from the last lecture.
-- Change the required service specification to look for the *IComponentManagementService.class** and change the name to *cms*. The scope can be kept the same as this service is also made available by the platform component itself.Â 
+- Change the required service specification to look for the *IComponentManagementService.class** and change the name to *cms*. The scope can be kept the same as this service is also made available by the platform component itself. 
 - Adapt the ```getService()``` call to use the new service name cms and type ```IComponentManagementService```.
 - Change the parameter type of the ```resultAvailable``` method to ```IComponentManagementService```.
 - Invoke the `getComponentDescriptions()` method on the service to get an array of all components in the platform.
@@ -94,12 +94,12 @@ In this execise we will use another service of the platform and invoke a method 
 Start the platform and the agent and check if the component descriptions are printed out. The output should look similar to the console snapshot shown below. Please note that the component management service is one of the central services of the Jadex platform. It can e.g. be used to *create*, *kill*, *suspend* and resume components. Feel free to inspect the [IComponentManagementService interface](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/bridge/service/types/cms/IComponentManagementService.html) to learn more about theses functionalities.
 
 ![04 Required Services@console1.png](console1.png)
-*Â Console snaphsot*
+* Console snaphsot*
 
 Please note that, besides the interface type itself, the most important factor of searches and required service specifications is the search scope. It defines the area of the search and is per default set to *application*. This means that only components within the started application are considered within the search. Knowing this it becomes clear why we had to change the scope to *platform* in all lectures so far. Otherwise the search would have stopped at the application component and the platform services would not have been found. In the figure below a visual representation of search scopes is given.
 
 ![04 Required Services@scopes.png](scopes.png)
-*Â Component search scopes*
+* Component search scopes*
 
 # Exercise C4 - Searching services
 
@@ -110,7 +110,7 @@ In rare cases one might want to search for services directly. This can be done b
 An alternative that can be used if really fine-grained search control is necessary is using the *jadex.bridge.service.SServiceProvider* class, which provides many static methods for searching services.
 
 In this lecture we will search for the micro agent factory service of the platform. This is not directly possible using a required service definition, because the platform has several component factories with the same interface *IComponentFactory*. (As an alternative one could use a required service binding for all services of type *IComponentFactory* and select from those).
-So what we need is a possibility to further restrict the search results. This can be done using a *jadex.bridge.service.IResultSelector*. For component factories there is already a ready to use selector called *jadex.bridge.service.component.ComponentFactorySelector*.Â 
+So what we need is a possibility to further restrict the search results. This can be done using a *jadex.bridge.service.IResultSelector*. For component factories there is already a ready to use selector called *jadex.bridge.service.component.ComponentFactorySelector*. 
 
 ## Defining the Component
 
@@ -134,5 +134,5 @@ factory.addResultListener(new DefaultResultListener<IComponentFactory>()
 
 ## Verify the intended behavior
 
-After starting the component on the console the output should indicate that a factory was found that is capable to load micro agents. Depending on the platform configuration this could either be the *MultiFactory* or the *MicroAgentFactory*.Â 
+After starting the component on the console the output should indicate that a factory was found that is capable to load micro agents. Depending on the platform configuration this could either be the *MultiFactory* or the *MicroAgentFactory*. 
 <!-- TODO: sometimes throws exception !?-->

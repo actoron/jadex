@@ -30,34 +30,34 @@ The code snippet below shows a fictitious robot example, which creates robot age
 
 Percepts are meaningful events for components, i.e. a percept can be seen as some kind of environment event that is adressed towards a specific kind of component. This means that different kinds of components may receive completely different percepts for the same observed events. Hence, a percept is a concept that connects a component with the environment. For this reason percept types include several aspects in EnvSupport. On the one hand, the basic kinds of percepts can be defined (inner percept types tag). On the other hand percept generators and processors need to be specified. A percept generator is responsible for creating percepts (based on the available percept types) and thus attached to the environment. These percepts are then consumed by components using percepts processors, which may depend on the concrete component type. E.g. a bdi agent percept processor can directly store newly arriving percepts in fitting beliefs or beliefsets.
 
-A percept type is described using a *name* attribute for percept type identification. Using the *objecttype* attribute (or tags for multiple types) the underlying meaning of the percept can be defined. The *componenttype* attribute (or tags for multiple types) is useful for specifying the component types that can generally perceive such kind of percept. Property tags can be employed for parametrization as for most other elements.Â 
+A percept type is described using a *name* attribute for percept type identification. Using the *objecttype* attribute (or tags for multiple types) the underlying meaning of the percept can be defined. The *componenttype* attribute (or tags for multiple types) is useful for specifying the component types that can generally perceive such kind of percept. Property tags can be employed for parametrization as for most other elements. 
 
 ### Percept Generators
 
-A percept generator is defined using *name* and implementation *class* attributes. An implemeting class has to extend the *IPerceptGenerator* interface. Currently, with the *DefaultVisionGenerator* (package jadex.application.space.envsupport.environment.space2d) a quite powerful default implementation for a percept generator, capable of creating vision range dependent percepts, exists.Â 
+A percept generator is defined using *name* and implementation *class* attributes. An implemeting class has to extend the *IPerceptGenerator* interface. Currently, with the *DefaultVisionGenerator* (package jadex.application.space.envsupport.environment.space2d) a quite powerful default implementation for a percept generator, capable of creating vision range dependent percepts, exists. 
 
 ```xml
 <env:perceptgenerator name="visiongen" class="DefaultVisionGenerator">
-Â Â <env:property name="range">0.1</env:property>
-Â Â <env:property name="range\_property">"vision_range"</env:property>
-Â Â <env:property name="percepttypes">
-Â Â Â Â new Object[]
-Â Â Â Â {
-Â Â Â Â Â Â new String[]{"cleaner_moved", "moved"},
-Â Â Â Â Â Â new String[]{"waste_appeared", "appeared", "created"},
-Â Â Â Â Â Â new String[]{"waste_disappeared", "destroyed"},
-Â Â Â Â Â Â new String[]{"wastebin_appeared", "appeared", "created"},
-Â Â Â Â Â Â new String[]{"wastebin_disappeared", "destroyed"},
-Â Â Â Â Â Â new String[]{"chargingstation_appeared", "appeared", "created"},
-Â Â Â Â Â Â new String[]{"chargingstation_disappeared", "destroyed"}
-Â Â Â Â }
-Â Â </env:property>
+  <env:property name="range">0.1</env:property>
+  <env:property name="range\_property">"vision_range"</env:property>
+  <env:property name="percepttypes">
+    new Object[]
+    {
+      new String[]{"cleaner_moved", "moved"},
+      new String[]{"waste_appeared", "appeared", "created"},
+      new String[]{"waste_disappeared", "destroyed"},
+      new String[]{"wastebin_appeared", "appeared", "created"},
+      new String[]{"wastebin_disappeared", "destroyed"},
+      new String[]{"chargingstation_appeared", "appeared", "created"},
+      new String[]{"chargingstation_disappeared", "destroyed"}
+    }
+  </env:property>
 </env:perceptgenerator>
 ```
 
 *Default vision generator example from cleanerworld example*
 
-In the code snippet above an example for a vision generator specification is shown. The configuration of the default vision generator in done using the *range*, *range\_property* and *percepttypes* properties. The range determines the radius of the vision the avatar can perceive (all elements within the radius can be seen). In order to find out what range to use the following steps are performed: 1) try to get the range as property from the avatar using the range\_property (if not specified "range" ist tried) 2) if no range value could be obtained the default range is used by fetching the *range* property of the vision generator.Â 
+In the code snippet above an example for a vision generator specification is shown. The configuration of the default vision generator in done using the *range*, *range\_property* and *percepttypes* properties. The range determines the radius of the vision the avatar can perceive (all elements within the radius can be seen). In order to find out what range to use the following steps are performed: 1) try to get the range as property from the avatar using the range\_property (if not specified "range" ist tried) 2) if no range value could be obtained the default range is used by fetching the *range* property of the vision generator. 
 
 The percept types are defined using String arrays of the form of a perceptname and an arbitrary number of actionnames. In order to find the correct percept type for a specific event consisting of *componenttype*, *objecttype* and *actiontype* the percepttype defined in the space is fetched and it is checked if the componenttype and objecttype of the event fit to those of the percepttype. Thereafter, the actiontype of the event is compared with those declared in the vision processor. Please note the the default vision processor supports the following action types:
 
@@ -65,7 +65,7 @@ The percept types are defined using String arrays of the form of a perceptname a
 - **destroyed:** A space object has been destroyed.
 - **appeared:** A space object came into the vision range and was not seen before.
 - **disappeared:** A space object moved out the vision range and was seen before.
-- **moved:** A space object changed its position.Â 
+- **moved:** A space object changed its position. 
 
 ### Percept Processors
 
@@ -76,8 +76,8 @@ package jadex.application.space.envsupport.environment;
 
 public interface IPerceptProcessor extends IPropertyObject
 {
-Â Â public void processPercept(IEnvironmentSpace space, String type,
-Â Â Â Â Object percept, IComponentIdentifier component, ISpaceObject avatar);
+  public void processPercept(IEnvironmentSpace space, String type,
+    Object percept, IComponentIdentifier component, ISpaceObject avatar);
 }
 ```
 
@@ -85,18 +85,18 @@ For BDI agents a default implementation called *DefaultBDIVisionProcessor* exist
 
 ```xml
 <env:perceptprocessor componenttype="Cleaner" class="DefaultBDIVisionProcessor" >
-Â Â <env:property name="percepttypes">
-Â Â Â Â new Object[]
-Â Â Â Â {
-Â Â Â Â Â Â new String[]{"cleaner_moved", "remove_outdated", "wastes"},
-Â Â Â Â Â Â new String[]{"waste_appeared", "add", "wastes"},
-Â Â Â Â Â Â new String[]{"waste_disappeared", "remove", "wastes"},
-Â Â Â Â Â Â new String[]{"wastebin_appeared", "add", "wastebins"},
-Â Â Â Â Â Â new String[]{"wastebin_disappeared", "remove", "wastebins"},
-Â Â Â Â Â Â new String[]{"chargingstation_appeared", "add", "chargingstations"},
-Â Â Â Â Â Â new String[]{"chargingstation_disappeared", "remove", "chargingstations"}
-Â Â Â Â }
-Â Â </env:property>
+  <env:property name="percepttypes">
+    new Object[]
+    {
+      new String[]{"cleaner_moved", "remove_outdated", "wastes"},
+      new String[]{"waste_appeared", "add", "wastes"},
+      new String[]{"waste_disappeared", "remove", "wastes"},
+      new String[]{"wastebin_appeared", "add", "wastebins"},
+      new String[]{"wastebin_disappeared", "remove", "wastebins"},
+      new String[]{"chargingstation_appeared", "add", "chargingstations"},
+      new String[]{"chargingstation_disappeared", "remove", "chargingstations"}
+    }
+  </env:property>
 </env:perceptprocessor>
 ```
 

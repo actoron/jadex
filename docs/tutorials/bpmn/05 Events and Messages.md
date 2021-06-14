@@ -1,7 +1,7 @@
 Chapter 5 - Events and Messages
 ============================================
 
-This chapter deals with the dispatching and processing of events insinde processes. Events can be e.g. timing events, errors or custom internal events.Â 
+This chapter deals with the dispatching and processing of events insinde processes. Events can be e.g. timing events, errors or custom internal events. 
 
 BPMN distinguishes *start*, *intermediate* and *end* events. Intermediate events are further subdivided into *thrown* and *catched* events, i.e. events, which are produced or consumed, respectively. Start events are always considered to be catched (consumed), while end events are thrown (produced). The [BPMN Poster](http://www.bpmb.de/images/BPMN2_0_Poster_DE.pdf)  presents an overview of available event types.
 
@@ -14,7 +14,7 @@ The timer event represents some passing of time. As time is outside the control 
 
 ### Create the Time Event Process
 
-Create a process as shown in the figure below. This example represents a reminder process, e.g. when some order is late. First, an initial reminder is sent. If nothing happens after some delay, a second reminder is sent.Â 
+Create a process as shown in the figure below. This example represents a reminder process, e.g. when some order is late. First, an initial reminder is sent. If nothing happens after some delay, a second reminder is sent. 
 
 ![05 Events and Messages@1.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-1.png)
 

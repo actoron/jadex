@@ -60,7 +60,7 @@ In this exercise, we will create a user interface for the chat bot that can be a
 ## Defining a Chat Bot Component
 
 - Copy the contents of the *ChatBotF1Agent.java* to a new *ChatBotF2Agent.java* and change the service implementation class to *ChatServiceF2*.
-- Copy the contents of the *ChatServiceF1.java* to a new *ChatServiceF2.java* and change the occurrences of Â *ChatBotF1* accordingly.
+- Copy the contents of the *ChatServiceF1.java* to a new *ChatServiceF2.java* and change the occurrences of  *ChatBotF1* accordingly.
 - Add a *GuiClass* annotation to the agent class pointing to the user interface implementation as follows:
 
 ```java

@@ -8,7 +8,7 @@ An important property of agents is the ability to react timely to different kind
 
 *Figure 1: The Jadex events XML schema part*
 
-Two kinds of events are supported in Â Jadex: message events and internal events, as well as references to these types, as shown in Figure 1. Generally, all event types are parameter elements meaning that any number of parameter(set)s can be specified for a user-defined kind of event. A parameter itself can be used for passing values from the source to the consumer of the event. Unlike goals, events are single points in time and therefore only support "in" parameters, which denote the "source to consumer"-direction of value passing. In addition all kinds of events share the common attributes: "posttoall" and "randomselection". The "posttoall" flag determines if the event should be dispatched to a single receiver or to all applicable plans. Â The "randomselection" flag can be used to turn off the importance of the declaration order of plans for the plan selection process. Nevertheless, the priority of a plan is still respected.
+Two kinds of events are supported in  Jadex: message events and internal events, as well as references to these types, as shown in Figure 1. Generally, all event types are parameter elements meaning that any number of parameter(set)s can be specified for a user-defined kind of event. A parameter itself can be used for passing values from the source to the consumer of the event. Unlike goals, events are single points in time and therefore only support "in" parameters, which denote the "source to consumer"-direction of value passing. In addition all kinds of events share the common attributes: "posttoall" and "randomselection". The "posttoall" flag determines if the event should be dispatched to a single receiver or to all applicable plans.  The "randomselection" flag can be used to turn off the importance of the declaration order of plans for the plan selection process. Nevertheless, the priority of a plan is still respected.
 
 | Flags         | Default Value |
 |---------------|---------------|
@@ -21,33 +21,33 @@ At runtime, e.g., when accessed from plans, instances of the elements are repres
 
 ## Internal Events
 
-Internal events are the typical way in Jadex for explicit one-way communication of an interesting occurrence inside the agent. The usage of internal events is characterized Â by the fact that an information should be passed from a source to some consumers (similar to the object oriented observer pattern). Hence, if an internal event occurs within the system, e.g., because some plan dispatches one, it is distributed to all plans that have declared their interest in this kind of event by using a corresponding trigger or by waiting for this kind of internal event. The internal event can transport arbitrary information to the consumers if custom parameter(set)s are defined in the type for that purpose. A typical use case for resorting to internal events is, e.g., updating a GUI.
- Â 
+Internal events are the typical way in Jadex for explicit one-way communication of an interesting occurrence inside the agent. The usage of internal events is characterized  by the fact that an information should be passed from a source to some consumers (similar to the object oriented observer pattern). Hence, if an internal event occurs within the system, e.g., because some plan dispatches one, it is distributed to all plans that have declared their interest in this kind of event by using a corresponding trigger or by waiting for this kind of internal event. The internal event can transport arbitrary information to the consumers if custom parameter(set)s are defined in the type for that purpose. A typical use case for resorting to internal events is, e.g., updating a GUI.
+  
 
 ```xml
 ...
 <events>
-Â Â <internalevent name="gui-update">
-Â Â Â Â <parameter name="content" class="String"/>
-Â Â </internalevent>
+  <internalevent name="gui-update">
+    <parameter name="content" class="String"/>
+  </internalevent>
 </events>
 ...
 ```
 
-*Example of the declaration of an internal event*Â 
+*Example of the declaration of an internal event* 
 
 ```java
 ...
 public void body()
 {
-Â Â String update_info;
-Â Â ...
- Â //Â "gui_update" internal event type must be defined in the ADF
-Â Â IInternalEvent event = createInternalEvent("gui_update");
-Â Â // Setting the content parameter to the update info
-Â Â event.getParameter("content").setValue(update_info);
-Â Â dispatchInternalEvent(event);
-Â Â ...
+  String update_info;
+  ...
+  // "gui_update" internal event type must be defined in the ADF
+  IInternalEvent event = createInternalEvent("gui_update");
+  // Setting the content parameter to the update info
+  event.getParameter("content").setValue(update_info);
+  dispatchInternalEvent(event);
+  ...
 }
 ```
 
@@ -55,7 +55,7 @@ public void body()
 
 ## Message Events
 
-All message types an agent wants to send or receive need to be specified within the ADF. The message event (class *jadex.bdi.runtime.IMessageEvent* denotes the arrival or sending of a message. Â Note, that only incoming messages are handled by the event dispatching mechanism, while outgoing messages are just sent. The native underlying message object (which is platform dependent) can be retrieved using the *getMessage()* method. In addition, the message type, which may be FIPA or some other message format, can be retrieved using the *getMessageType()* method. The message type (subclass of *jadex.bridge.MessageType*) is meant to represent the way a message is composed, i.e. it defines which parameter and parametersets exists and (partially) what their meaning is. Hence, the message type can e.g. be used to determine which parameter(set) contains the receivers of the message. The message type is comparable to metainformation of a specific kind of message such as FIPA. It represents an extension point is Jadex and allows for introducing new message types without having to modify underlying message passing infrastructure. An agent developer normally can ignore the message type and use the default FIPA for all messages.Â Â 
+All message types an agent wants to send or receive need to be specified within the ADF. The message event (class *jadex.bdi.runtime.IMessageEvent* denotes the arrival or sending of a message.  Note, that only incoming messages are handled by the event dispatching mechanism, while outgoing messages are just sent. The native underlying message object (which is platform dependent) can be retrieved using the *getMessage()* method. In addition, the message type, which may be FIPA or some other message format, can be retrieved using the *getMessageType()* method. The message type (subclass of *jadex.bridge.MessageType*) is meant to represent the way a message is composed, i.e. it defines which parameter and parametersets exists and (partially) what their meaning is. Hence, the message type can e.g. be used to determine which parameter(set) contains the receivers of the message. The message type is comparable to metainformation of a specific kind of message such as FIPA. It represents an extension point is Jadex and allows for introducing new message types without having to modify underlying message passing infrastructure. An agent developer normally can ignore the message type and use the default FIPA for all messages.  
 
 The message passing mechanism is based on using *jadex.bridge.IComponentIdentifier*s for the unambiguous identification of agents. A component identifier hence contains an agents globally unique name which consists of a local part followed by the "@" character and the platforms name (schema: &lt;agentname>@&lt;platformname>, example: ams@lars). In addition to the name a component identifier can contain additional information. On the one hand arbitrary many transport addresses might be present. These addresses can be used to contact the agent from a remote platform and normally represent the address of platform wide transport mechanisms (schema: &lt;transportname>:*&lt;address>, example: [http://www.fipa.org/specs/fipa00023/SC00023J.html](http://www.fipa.org/specs/fipa00023/SC00023J.html).
 A component identifier of another agent can be obtained in two ways. If all details about the agent are known an agent identifier can directly be created using a local or global name by using the *IComponentManagementService*. Please note that it is not allowed to create a component identifier via a simple constructor call, because the concrete implementation may vary in different platform infrastrutures. The needed creation code is illustrated in the code snippet below. If the details of an agent are not known in advance, an agent may search for other agents using either the CMS listing all agents on a platform or the DF, which allows to search for agents providing a given service. Searching CMS and DF is explained in detail in [Predefined Capabilities](16%20Predefined%20Capabilities.md).
@@ -95,27 +95,27 @@ A message event type matches an incoming message if all fixed parameter values a
 
 ```xml
 <imports>
-Â Â <import>jadex.base.fipa.SFipa</import>
+  <import>jadex.base.fipa.SFipa</import>
 </imports>
 ...
 <events>
-Â Â <!--Â A query-ref message with content "ping"Â -->
-Â Â <messageevent name="query-ping" type="fipa" direction="receive">
-Â Â Â Â <parameter name="performative" class="String" direction="fixed">
-Â Â Â Â Â Â <value>SFipa.QUERY_REF</value>
-Â Â Â Â </parameter>
-Â Â Â Â <parameter name="content" class="String" direction="fixed">
-Â Â Â Â Â Â <value>"ping"</value>
-Â Â Â Â </parameter>
-Â Â </messageevent>
- Â Â Â 
-Â Â <!--Â An inform message where content contains the word "hello"Â -->
-Â Â <messageevent name="inform_hello" type="fipa" direction="receive">
-Â Â Â Â <parameter name="performative" class="String" direction="fixed">
-Â Â Â Â Â Â <value>SFipa.INFORM</value>
-Â Â Â Â </parameter>
-Â Â Â Â <match>((String)$content).indexOf("hello") != -1</match>
-Â Â </messageevent>
+  <!-- A query-ref message with content "ping" -->
+  <messageevent name="query-ping" type="fipa" direction="receive">
+    <parameter name="performative" class="String" direction="fixed">
+      <value>SFipa.QUERY_REF</value>
+    </parameter>
+    <parameter name="content" class="String" direction="fixed">
+      <value>"ping"</value>
+    </parameter>
+  </messageevent>
+    
+  <!-- An inform message where content contains the word "hello" -->
+  <messageevent name="inform_hello" type="fipa" direction="receive">
+    <parameter name="performative" class="String" direction="fixed">
+      <value>SFipa.INFORM</value>
+    </parameter>
+    <match>((String)$content).indexOf("hello") != -1</match>
+  </messageevent>
 </events>
 ```
 
@@ -136,24 +136,24 @@ In the first case, if more than one message event type has a match with the inco
 ## Sending Messages
 
 Messages to be sent also have to be declared in the ADF. The actual sending is usually done inside a plan, which instantiates the declared message event, fills in desired parameter values, and dispatches the message using one of the ```sendMessage...()``` methods. The super class of both plan types (*jadex.bdi.runtime.AbstractPlan*) provides several convenience methods to create message events. To send a message, a message event has to be created using the *createMessageEvent(Strint type)* method supplying the declared message event type name as parameter. The receivers of fipa messages are specified by agent identifiers (interface *jadex.bdige.IComponentIdentifier*). The message content can be supplied as String or as Object with *getParameter(SFipa.CONTENT).setValue(Object content)*. If the content is provided as Object it must be ensured that the agent can encode it into a transmissable representation as described in the following section about content languages.
-Â 
+ 
 To actually send the message event it is sufficient to call the *sendMessage(IMessageEvent me)* method with the prepared message event as parameter. It is also possible to send a message and directly wait for a reply with an optional timeout by using the `sendMessageAndWait(IMessageEvent me [, timeout])` method. This is described in the following XML:
 
 ```xml
 <imports>
-Â Â <import>jadex.base.fipa.SFipa</import>
+  <import>jadex.base.fipa.SFipa</import>
 </imports>
 ...
 <events>
-Â Â <!--Â A query-ref message with content "ping"Â -->
-Â Â <messageevent name="query-ping" type="fipa" direction="send">
-Â Â Â Â <parameter name="performative" class="String">
-Â Â Â Â Â Â <value>SFipa.QUERY-REF</value>
-Â Â Â Â </parameter>
-Â Â Â Â <parameter name="content" class="String">
-Â Â Â Â Â Â <value>"ping"</value>
-Â Â Â Â </parameter>
-Â Â </messageevent>
+  <!-- A query-ref message with content "ping" -->
+  <messageevent name="query-ping" type="fipa" direction="send">
+    <parameter name="performative" class="String">
+      <value>SFipa.QUERY-REF</value>
+    </parameter>
+    <parameter name="content" class="String">
+      <value>"ping"</value>
+    </parameter>
+  </messageevent>
 </events>
 ```
 
@@ -162,11 +162,11 @@ To actually send the message event it is sufficient to call the *sendMessage(IMe
 ```java
 public void body()
 {
-Â Â IMessageEvent me = createMessageEvent("query_ref");
-Â Â me.getParameterSet(SFipa.RECEIVERS).addValue(cid);
+  IMessageEvent me = createMessageEvent("query_ref");
+  me.getParameterSet(SFipa.RECEIVERS).addValue(cid);
   // Set/change content if necessary
- Â me.getParameter(SFipa.CONTENT).setValue("ping 2");Â 
-Â Â sendMessage(me);
+  me.getParameter(SFipa.CONTENT).setValue("ping 2"); 
+  sendMessage(me);
 }
 ```
 
@@ -182,17 +182,17 @@ Two simple examples for sending and receiving a Java object inside a message are
 The corresponding codec can handle arbitrary Java Beans (i.e. Java objects, which provide public getter and setter methods for their properties). For detailed information about JavaBean you should have a look at the [JavaBeans Specification](http://java.sun.com/products/javabeans/docs/spec.html) .
 
 ```xml
-<!--Â Message declaration in the ADF -->
+<!-- Message declaration in the ADF -->
 <messageevent name="inform_target" type="fipa" direction="send">
-Â Â <parameter name="performative" class="String" direction="fixed">
-Â Â Â Â <value>SFipa.INFORM</value>
-Â Â </parameter>
-Â Â <parameter name="language" class="String" direction="fixed">
-Â Â Â Â <value>SFipa.JADEX_XML</value>
-Â Â </parameter>
-Â Â <parameter name="ontology" class="String" direction="fixed">
-Â Â Â Â <value>MarsOntology.ONTOLOGY_NAME</value>
-Â Â </parameter>
+  <parameter name="performative" class="String" direction="fixed">
+    <value>SFipa.INFORM</value>
+  </parameter>
+  <parameter name="language" class="String" direction="fixed">
+    <value>SFipa.JADEX_XML</value>
+  </parameter>
+  <parameter name="ontology" class="String" direction="fixed">
+    <value>MarsOntology.ONTOLOGY_NAME</value>
+  </parameter>
 </messageevent>
 ```
 
@@ -201,14 +201,14 @@ The corresponding codec can handle arbitrary Java Beans (i.e. Java objects, whic
 ```java
 public void body()
 {
- Â //Â Message sending in the plan.
-Â Â IComponentIdentifier receiver = ...
-Â Â Target target = ...
-Â Â IMessageEvent me = createMessageEvent("inform_target");
-Â Â me.getParameterSet(SFipa.RECEIVERS).addValue(receiver);
+  // Message sending in the plan.
+  IComponentIdentifier receiver = ...
+  Target target = ...
+  IMessageEvent me = createMessageEvent("inform_target");
+  me.getParameterSet(SFipa.RECEIVERS).addValue(receiver);
   // The Java object is directly used as content.
-Â Â me.getParameter(SFipa.CONTENT).setValue(target);Â 
-Â Â sendMessage(me);
+  me.getParameter(SFipa.CONTENT).setValue(target); 
+  sendMessage(me);
 }
 ```
 
@@ -217,15 +217,15 @@ public void body()
 As the decoded object is already availble for matching an incoming message, on the receiver side, the match expression can be used to only match messages containing a *Target* object.
 
 ```xml
-<!--Â Message declaration in the ADFÂ -->
+<!-- Message declaration in the ADF -->
 <messageevent name="target_inform" type="fipa" direction="receive">
-Â Â <parameter name="performative" class="String" direction="fixed">
-Â Â Â Â <value>SFipa.INFORM</value>
-Â Â </parameter>
-Â Â <parameter name="ontology" class="String" direction="fixed">
-Â Â Â Â <value>MarsOntology.ONTOLOGY_NAME</value>
-Â Â </parameter>
-Â Â <match>$content instanceof Target</value>
+  <parameter name="performative" class="String" direction="fixed">
+    <value>SFipa.INFORM</value>
+  </parameter>
+  <parameter name="ontology" class="String" direction="fixed">
+    <value>MarsOntology.ONTOLOGY_NAME</value>
+  </parameter>
+  <match>$content instanceof Target</value>
 </messageevent>
 ```
 
@@ -234,10 +234,10 @@ As the decoded object is already availble for matching an incoming message, on t
 ```java
 public void body()
 {
- Â //Â Message receiving in the plan.
-Â Â IMessageEvent msg = (IMessageEvent)getReason();
-Â Â Target target = (Target)msg.getParameter(SFipa.CONTENT).getValue();
-Â Â ...
+  // Message receiving in the plan.
+  IMessageEvent msg = (IMessageEvent)getReason();
+  Target target = (Target)msg.getParameter(SFipa.CONTENT).getValue();
+  ...
 }
 ```
 
@@ -249,7 +249,7 @@ Other content languages are available depending on the underlying platform (e.g.
 
 ```xml
 <properties>
-Â Â <property name="contentcodec.my-codec"<new MyContentCodec()</property>
+  <property name="contentcodec.my-codec"<new MyContentCodec()</property>
 </properties>
 ```
 
@@ -266,23 +266,23 @@ In Jadex, the relation between messages is used to achieve two things: First, it
 Second, it allows to restrict message receival to a certain capability, namely the capability from which an earlier message was sent. This means, e.g., that if an agent defines two similar message events in two different capabilities (as is commonly the case, when the same capability is included twice in an agent), the message will automatically be routed to the correct capability where the corresponding conversation originated.
 
 In both cases, the mechanism is based on the usage of the *conversation_id* and/or *in_repy_to* and *reply_with* parameters. The developer has to make sure that, when sending an initial message a useful value has been set to one or more of these parameters. When replying to an initial message (by using *msg.createReply(...)*), the parameter values are set automatically, based on the values of the initial message (i.e. the conversation-id is retained while the reply-with is copied to the in-reply-to parameter). The setting of initial parameter values can directly be done in the message declaration as shown in following example. In the example, the method *createUniqueId()* is used to generate a unique id for the conversation, whenever an instance of the message is created. The plan can send the message using *dispatchMessageAndWait()* and directly receive the correponding reply message. When using a timout in *dispatchMessageAndWait()* and the message is not received before the timeout has elapsed, a *jadex.runtime.TimeoutException* is thrown (see also [Plans](08%20Plans.md)). For a reply message (e.g. the inform below) no special settings have to defined in the ADF.
- Â Â 
+   
 
 ```xml
 <events>
-Â Â <messageevent name="request" type="fipa" direction="send">
-Â Â Â Â <parameter name="performative" class="String">
-Â Â Â Â Â Â <value>SFipa.REQUEST</value>
-Â Â Â Â </parameter>
-Â Â Â Â <parameter name="conversation-id" class="String">
-Â Â Â Â Â Â <value>SFipa.createUniqueId($scope.getAgentName())</value>
-Â Â Â Â </parameter>
-Â Â </messageevent>
-Â Â <messageevent name="inform" type="fipa" direction="receive">
-Â Â Â Â <parameter name="performative" class="String" direction="fixed">
-Â Â Â Â Â Â <value>SFipa.INFORM</value>
-Â Â Â Â </parameter>
-Â Â </messageevent>
+  <messageevent name="request" type="fipa" direction="send">
+    <parameter name="performative" class="String">
+      <value>SFipa.REQUEST</value>
+    </parameter>
+    <parameter name="conversation-id" class="String">
+      <value>SFipa.createUniqueId($scope.getAgentName())</value>
+    </parameter>
+  </messageevent>
+  <messageevent name="inform" type="fipa" direction="receive">
+    <parameter name="performative" class="String" direction="fixed">
+      <value>SFipa.INFORM</value>
+    </parameter>
+  </messageevent>
 </events>
 ```
 
@@ -291,14 +291,14 @@ In both cases, the mechanism is based on the usage of the *conversation_id* and/
 ```java
 public void body()
 {
-Â Â IMessageEvent me = createMessageEvent("request");
-Â Â //Set other parameters as desiredÂ Â 
-Â Â ...
+  IMessageEvent me = createMessageEvent("request");
+  //Set other parameters as desired  
+  ...
 
 
-Â Â IMessageEvent reply = sendMessageAndWait(me);
-Â Â //Handle reply messageÂ Â 
-Â Â ...Â 
+  IMessageEvent reply = sendMessageAndWait(me);
+  //Handle reply message  
+  ... 
 }
 ```
 
@@ -309,16 +309,16 @@ Example for Replying to a Message:
 
 ```xml
 <events>
-Â Â <messageevent name="request" type="fipa" direction="receive">
-Â Â Â Â <parameter name="performative" class="String" direction="fixed">
-Â Â Â Â Â Â <value>SFipa.REQUEST</value>
-Â Â Â Â </parameter>
-Â Â </messageevent>
-Â Â <messageevent name="inform" type="fipa" direction="send">
-Â Â Â Â <parameter name="performative" class="String">
-Â Â Â Â Â Â <value>SFipa.INFORM</value>
-Â Â Â Â </parameter>
-Â Â </messageevent>
+  <messageevent name="request" type="fipa" direction="receive">
+    <parameter name="performative" class="String" direction="fixed">
+      <value>SFipa.REQUEST</value>
+    </parameter>
+  </messageevent>
+  <messageevent name="inform" type="fipa" direction="send">
+    <parameter name="performative" class="String">
+      <value>SFipa.INFORM</value>
+    </parameter>
+  </messageevent>
 <events>
 ```
 
@@ -327,15 +327,15 @@ Example for Replying to a Message:
 ```java
 public void body()
 {
- Â //Â Message receiving in the plan.
-Â Â IMessageEvent msg = (IMessageEvent)getInitialEvent();
-Â Â Object content = ...Â // Prepare content for reply
-Â Â IMessageEvent reply = msg.createReply("inform", content);
-Â Â sendMessage(reply); //Â Take care to send 'reply' and not 'msg'!
+  // Message receiving in the plan.
+  IMessageEvent msg = (IMessageEvent)getInitialEvent();
+  Object content = ... // Prepare content for reply
+  IMessageEvent reply = msg.createReply("inform", content);
+  sendMessage(reply); // Take care to send 'reply' and not 'msg'!
 }
 ```
 
 *Example code for creating and sending a reply message**
 
 The way of handling conversations described in this section is pretty different to programming agents based on abstract goals, as the programmer has to directly deal with all alternatives of the interaction flow. This process can be tedious and error-prone. Therefore, in Jadex a predefined capability is available, that already implements common use cases of interactions as specified in standardized FIPA interaction protocols (e.g. request, contract-net, auctions). The protocols capability allows to focus on the goals of the agents participating in a conversation. The protocols capability is described in detail in [Predefined Capabilities](16%20Predefined%20Capabilities.md). Even if you want to implement your own custom interaction protocol, you should have a look at the protocols capability, because it introduces helpful patterns that can be applied to other interactions as well.
-Â Â 
+  

@@ -12,6 +12,6 @@ This user guide provides a detailed description of the available functionalities
 - [Chapter 03 Asynchronous Programming](03%20Asynchronous%20Programming.md)  gives an introduction to asynchronous methods using futures.
 - [Chapter 04 Component Specification](04%20Component%20Specification.md)  illustrates how services can be found and invoked.
 - [Chapter 05 Services](05%20Services.md)  explains how service invocations work.
-- [Chapter 06 Web Service Integration](06%20Web%20Service%20Integration.md)  describes how web services can be offered and used.Â 
+- [Chapter 06 Web Service Integration](06%20Web%20Service%20Integration.md)  describes how web services can be offered and used. 
 - [Chapter 07 Platform Awareness](07%20Platform%20Awareness.md)  explains how platforms can automatically find each other.
 - [Chapter 08 Security](08%20Security.md)  introduces the main security concepts of Jadex.

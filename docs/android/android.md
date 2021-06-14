@@ -623,7 +623,6 @@ The simplest way to use the Jadex Gradle plugin is to include the jadex reposito
 ```groovy
 buildscript {
     repositories {
-        jcenter()
         mavenLocal()
         mavenCentral()
         maven

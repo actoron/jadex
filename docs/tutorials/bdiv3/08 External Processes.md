@@ -81,7 +81,7 @@ Runnable run = new Runnable()
 };
 ```
 
-- If the socket could be opened we start waiting in an endless loop in a blocking fashion for incoming calls. Whenever a request is received we schedule a step on the agent and dispatch a translation goal with the new client socket.Â 
+- If the socket could be opened we start waiting in an endless loop in a blocking fashion for incoming calls. Whenever a request is received we schedule a step on the agent and dispatch a translation goal with the new client socket. 
 
 ```java
 while(true)

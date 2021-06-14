@@ -1,6 +1,6 @@
 # 3D Visualization
 
-In this section the 3D visualization concepts are described. This section only focuses the **use** of existing 3D-objects in the Enviroment. The creation of new 3D Objects for Jadex 3D is a complex topic which willÂ later in a different chapter
+In this section the 3D visualization concepts are described. This section only focuses the **use** of existing 3D-objects in the Enviroment. The creation of new 3D Objects for Jadex 3D is a complex topic which will later in a different chapter
 
 ![](example.PNG)
 *Figure 1 A running 3D Example*
@@ -14,7 +14,7 @@ The coordinate system consists of:
   - This point is always at coordinate (0,0,0)
 - Three coordinate axes that are mutually perpendicular, and meet in the origin.
   - The X axis is "right/left"
-  - Â The Y axis is "up/down"
+  -  The Y axis is "up/down"
   - The Z axis is "towards you/away from you"
 
 ![](3dkoord.png)
@@ -25,46 +25,46 @@ Every point in 3D space is defined by its (x,y,z) coordinates. The data type for
 **Drawable3d declaration part of XML schema**
 ----------------------------------------------------------
 
-A **drawable3dÂ **represents the visual counterpart of a space object type. As can be seen in the schema part above it consists of property elements and arbitrary many geometrical meshes composing the look of the object (sphere, box, cylinder, dome, torus, object3d, arrow, text3d, sky, terrain, rndterrain and sound3d).
+A **drawable3d **represents the visual counterpart of a space object type. As can be seen in the schema part above it consists of property elements and arbitrary many geometrical meshes composing the look of the object (sphere, box, cylinder, dome, torus, object3d, arrow, text3d, sky, terrain, rndterrain and sound3d).
 
 ![](drawable3d_overview01.JPG)
 
 The primitve mesh-elements are sphere, box, cylinder, dome, torus and object. Complex mesh types are object3d (which loads a complex 3d mesh from a file) and terrain (generator for a 3d-terrain ground). Text3d, sky and sound3d can be considered as special types. We will describe all these types in detail later.
 The drawable3d itself is further specified by associating it to a specific objecttype.
-Additionally, the width, height and rotation can be set. Each geometrical mesh based shape contained in the drawable is of type **drawableelementÂ **and has the attributes described in the list below.Â 
+Additionally, the width, height and rotation can be set. Each geometrical mesh based shape contained in the drawable is of type **drawableelement **and has the attributes described in the list below. 
 
-For all Elements, the **Drawable3dÂ **and the Visual Objects inside have at least the three Attributes Position, Size and Rotation.
+For all Elements, the **Drawable3d **and the Visual Objects inside have at least the three Attributes Position, Size and Rotation.
 
 For instance, if you set the Size for the **Drawable3d** all Objects inside are influenced. If you set the Size for just one Visual Object only the Object is influenced relative to the size value of the **Drawable3d**.
 
-|NameÂ |Â Default ValueÂ |Â Description |Â Type|
+|Name | Default Value | Description | Type|
 |-----|---------------|-------------|-----|
-| **position** | Vector3Double(0,0,0) | An IVector3 or String for the 3d position of the object (relative to the drawable position). <br> *Use this or x, y, z instead (then you have to set all three)* |Â Vector3Int <br> Vector3Double |
-|Â x |Â 0 | The x value of the position | int / double |
-|Â y |Â 0 | The y value of the position |Â int / double |
-|Â z | 0 | The zvalue of the position  |Â int / double |
+| **position** | Vector3Double(0,0,0) | An IVector3 or String for the 3d position of the object (relative to the drawable position). <br> *Use this or x, y, z instead (then you have to set all three)* | Vector3Int <br> Vector3Double |
+| x | 0 | The x value of the position | int / double |
+| y | 0 | The y value of the position | int / double |
+| z | 0 | The zvalue of the position  | int / double |
 
-|NameÂ |Â Default ValueÂ |Â Description |Â Type|
+|Name | Default Value | Description | Type|
 |-----|---------------|-------------|-----|
-| **size**  |Â Vector3Double(1,1,1) | An IVector3 or String for the shape size (relative to the drawable size). <br> If it is a String it must be a property name of the drawable the value is bound to. <br> Use this or width, height, depth instead (then you have to set all three).|Â  String <br> Vector3Int <br>Vector3Double  |
-| width  | 1 | The height value of the size   |Â int / double |
-|Â height | 1 | The depth value of the size    |Â int / double |
-| depth  |Â 1 | The depth value of the sizeÂ    |Â int / double |
+| **size**  | Vector3Double(1,1,1) | An IVector3 or String for the shape size (relative to the drawable size). <br> If it is a String it must be a property name of the drawable the value is bound to. <br> Use this or width, height, depth instead (then you have to set all three).|  String <br> Vector3Int <br>Vector3Double  |
+| width  | 1 | The height value of the size   | int / double |
+| height | 1 | The depth value of the size    | int / double |
+| depth  | 1 | The depth value of the size    | int / double |
 
-|NameÂ |Â Default ValueÂ |Â Description |Â Type|
+|Name | Default Value | Description | Type|
 |-----|---------------|-------------|-----|
-| **rotation** |Â Vector3Double(0,0,0) |  An IVecor3 or String for the rotation according to x, y, z axis (relative to the drawable rotation) in radians. <br> *Use this or rotatex, rotatey, rotatez instead (then you have to set all three)*. | String<br>Vector3Double|
-|Â rotatex |Â 0 | The rotation value along the x axis |Â int / double |
-|Â rotatey |Â 0 | The rotation value along the y axis |Â int / double |
-|Â rotatez |Â 0 | The rotation value along the z axis |Â int / double |
+| **rotation** | Vector3Double(0,0,0) |  An IVecor3 or String for the rotation according to x, y, z axis (relative to the drawable rotation) in radians. <br> *Use this or rotatex, rotatey, rotatez instead (then you have to set all three)*. | String<br>Vector3Double|
+| rotatex | 0 | The rotation value along the x axis | int / double |
+| rotatey | 0 | The rotation value along the y axis | int / double |
+| rotatez | 0 | The rotation value along the z axis | int / double |
 
 Beside this very basic Attributes all the Visuals (not the Drawable3d itself) have these three attributes:
 
-|NameÂ |Â Default ValueÂ |Â Description |Â Type|
+|Name | Default Value | Description | Type|
 |-----|---------------|-------------|-----|
-|**shadowType** |"Off" Â |A String that indicates if this object should be rendered with shadows. Values are recieve, cast and off. If you choose recieve this object can recieve shadows from every object that cast a shadow. |String|
-|**color**|  "#FFFFFF"Â |Â The color of the visual object. Notation is in RGB, # following by the Red, Green and Blue Value in Hex (from 00 to FF). So pure Red is for example: "#FF0000" | String|
-|**texturepath**|Â ""Â |  If you want to use a texture instead of just a color for the primitive put the Path to it here. You can combine color and texturepath to juse a coloration for the texture. If you want the texture unchanged dont set a color value | String |
+|**shadowType** |"Off"  |A String that indicates if this object should be rendered with shadows. Values are recieve, cast and off. If you choose recieve this object can recieve shadows from every object that cast a shadow. |String|
+|**color**|  "#FFFFFF" | The color of the visual object. Notation is in RGB, # following by the Red, Green and Blue Value in Hex (from 00 to FF). So pure Red is for example: "#FF0000" | String|
+|**texturepath**| "" |  If you want to use a texture instead of just a color for the primitive put the Path to it here. You can combine color and texturepath to juse a coloration for the texture. If you want the texture unchanged dont set a color value | String |
 
 Moreover, some elements have certain special properties, which are not applicable to all Drawables. The easiest way to find out about the properties is to use eclipse's auto-complete to gain an overview. We will describe this special Attributes in detail for each visual Object if necessary in the list of predefined visuals below.
 
@@ -136,13 +136,13 @@ Example:
 
 Additional Values: **radius**
 
-|NameÂ |Â Default ValueÂ |Â Description |Â Type|
+|Name | Default Value | Description | Type|
 |-----|---------------|-------------|-----|
 | **radius** | 1 | The Radius of the Cylinder. Default is 1. You can change the apperance for the cylinder by changing the height and/or the radius. |  Double |
 
 As you can see from the example, you have to rotate a Cylinder 90 degree on the x oder z axis to get it in a "standing" position.
 
-You only need the **heightÂ **and the **radiusÂ **value to define a Cylinder.
+You only need the **height **and the **radius **value to define a Cylinder.
 
 Example:
 
@@ -162,11 +162,11 @@ Example:
 
 Additional Values: radius, planes, samples
 
- | Name    |Â default value  |Â Description                                                                                 | Type  |
+ | Name    | default value  | Description                                                                                 | Type  |
  |---------|----------------|---------------------------------------------------------------------------------------------|-------|
- |radius   |Â 1              |The Radius of the Dome.                                                                     |Double |
- |planes   |Â 1              |How rounded the Dome is at the sides.                                                       |Int    |
- |samples  |Â 4              |The samples. It means how round the Domes Ground is. So itÂ´s more like a pyramid or a dome. |Int    |
+ |radius   | 1              |The Radius of the Dome.                                                                     |Double |
+ |planes   | 1              |How rounded the Dome is at the sides.                                                       |Int    |
+ |samples  | 4              |The samples. It means how round the Domes Ground is. So it´s more like a pyramid or a dome. |Int    |
 
 Look at the Picture to understand the influence of planes and samples.
 
@@ -189,11 +189,11 @@ Example:
 
 Additional Values: outerRadius, innerRadius, circleSamples, radialSamples
 
- |Name           |Â default value  |Â Description                                                                                                    |Â Type|
+ |Name           | default value  | Description                                                                                                    | Type|
  |---------------|----------------|----------------------------------------------------------------------------------------------------------------|-------|
- |Â outerRadius   |1               |The outer Radius                                                                                                |Double |
- |Â innerRadius   |0.1             |The inner Radius of the Torus-Ring                                                                              |Double |
- |circleSamples  |40              |Â How many Samples used for rendering the circle from the outer Radius. If set to 4 it is something like a cube  |Int    |
+ | outerRadius   |1               |The outer Radius                                                                                                |Double |
+ | innerRadius   |0.1             |The inner Radius of the Torus-Ring                                                                              |Double |
+ |circleSamples  |40              | How many Samples used for rendering the circle from the outer Radius. If set to 4 it is something like a cube  |Int    |
  |radialSamples  |20              |The Samples for the Torus-Ring                                                                                  |Int    |
 
 Example:
@@ -216,7 +216,7 @@ Example:
 
 Additional Values: (none)
 
-The Arrows are always one pixel wide. So the only thing you can set is the Direction (width, height, depth) and the origin Point(x,y,z). Â               Â 
+The Arrows are always one pixel wide. So the only thing you can set is the Direction (width, height, depth) and the origin Point(x,y,z).                 
 
 Example:
 
@@ -344,12 +344,12 @@ Inside an object3d tag you can define Animations. For example if you just want t
 
 You can choose different parameters:
 
-| Name      |Â default value  |Â Description                                                  |Â Type    |
+| Name      | default value  | Description                                                  | Type    |
 | ----------|----------------|--------------------------------------------------------------|---------|
-| Â name     |null            |The Name has the be the Same from Step 1                      |String   |
-| Â channel  |null            |Some models can have several Animations on differnt Channels  |String   |
-| Â loop     |true            |If you set this in false the Animation is only played once    |Boolean  |
-| Â speed    |1.0             |The Playback speed of the Animation                           |Integer  |
+|  name     |null            |The Name has the be the Same from Step 1                      |String   |
+|  channel  |null            |Some models can have several Animations on differnt Channels  |String   |
+|  loop     |true            |If you set this in false the Animation is only played once    |Boolean  |
+|  speed    |1.0             |The Playback speed of the Animation                           |Integer  |
 
 If you want to create more complex animation-logics you have to define an animationscondition. The next example show you how to use that. Its uses Properties from the Enivorment which are used and influenced by your Java code.
 

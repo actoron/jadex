@@ -13,11 +13,11 @@ The Jadex Control Center (JCC) is the heart of most Swing based runtime tools. T
 
 Adding a tool plugin via popup menu on toolbar
 
-**Plugin**: The main plugin view in the middle of the JCC show the user interface of the currently selected plugin.Â 
+**Plugin**: The main plugin view in the middle of the JCC show the user interface of the currently selected plugin. 
 
 **Console**: The console can be used to display the Java System.out and System.err streams of the platform. Especially, when adminstrating remote platforms it can be used to make visible the print outs of the otherwise inaccessible streams.
 
-**Status line**: The status line is used by the plugins and the JCC itself to announce recent events to the user. The messages will be displayed for several seconds and vanish automatically. In additiona, on the right hand side of the status line current Â processing activities may be visualized.
+**Status line**: The status line is used by the plugins and the JCC itself to announce recent events to the user. The messages will be displayed for several seconds and vanish automatically. In additiona, on the right hand side of the status line current  processing activities may be visualized.
 
 Overview of Plugins
 --------------------------------
@@ -34,4 +34,4 @@ Overview of Plugins
 ![02 JCC Overview@new\_introspector.png](new_introspector.png): The **debugger** allows for executing components is step mode and inspecting their state.\
 ![02 JCC Overview@new\_conversation.png](new_conversation.png): The **conversation center** can be used to manually send messages to specific components.\
 ![02 JCC Overview@new\_comanalyzer.png](new_comanalyzer.png): The **communication analyzer** is helpful for tracking message based communication between components.\
-![02 JCC Overview@new\_dfbrowser.png](new_dfbrowser.png)Â (deprecated): The **directory facilitator GUI** can be used to inspect the state of the DF and manually add or remove subscriptions.
+![02 JCC Overview@new\_dfbrowser.png](new_dfbrowser.png) (deprecated): The **directory facilitator GUI** can be used to inspect the state of the DF and manually add or remove subscriptions.

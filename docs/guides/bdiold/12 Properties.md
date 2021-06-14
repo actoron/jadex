@@ -4,9 +4,9 @@ This chapter contains an overview about the usage of agent and capability proper
 
 ![](jadexpropertiesadf.png)
 
-*Propertybase xml specification*Â 
+*Propertybase xml specification* 
 
-Â 
+ 
 The table below gives an overview of all available properties. The scope denotes, if the property can only be specified for the agent as a whole, or can be adjusted to different values for individual capabilities.
 
   |Scope       |Property                   |Default    |Possible Values                    |
@@ -26,13 +26,13 @@ The "storedmessages.size" property can be used to restrict the number of monitor
 The "debugging" property influences the execution mode of the agent. When setting debugging to *true* the agent is halted after startup and set to single-step mode. You can then use the debugger tab of the introspector tool execute the agent step-by-step and observe its behavior.
 
 The logging properties can be used to adjust the logging behavior according to the [Java Logging API](http://java.sun.com/j2se/1.4/docs/guide/util/logging/overview.html) . The level influences the amount of logging information produced by the agent (logging information below the level will be completely ignored). Setting "useParentHandlers" to "true" will forward logging information to the parent handler, which by Java default causes logging output up to the INFO level to be displayed on the console. If you want to direct more detailed logging output to the console use the "addConsoleHandler" property, which creates a custom logging handler for console ouput with the specified logging level.
-More about logging settings can be found in [Jadex Active Components Tools](../../tools/01%20Introduction.md)).
+More about logging settings can be found in [Jadex Active Components Tools](../../tools/01%20Introduction.md).
 
-The "logging.level.exceptions" property can be used to specify the logging level for uncatched exceptions occurring in plan bodies. Using the default settings for logging (non-BDI specific) exceptions are printed out as SEVERE log messages to the console. You can adjust the level settings to suppress exception log messages from plans that you expect to throw exceptions.Â 
+The "logging.level.exceptions" property can be used to specify the logging level for uncatched exceptions occurring in plan bodies. Using the default settings for logging (non-BDI specific) exceptions are printed out as SEVERE log messages to the console. You can adjust the level settings to suppress exception log messages from plans that you expect to throw exceptions. 
 
 The following concrete subclasses of the abstract *jadex.bdi.runtime.BDIFailureException* may occur:
 
-- **jadex.bdi.runtime.GoalFailureException** A goal failure exception indicates that a goal could not successfully pursued. It is thrown by the reasoning engine when e.g. dispatchSubgoalAndWait() is called and the goal does not succeed.Â 
+- **jadex.bdi.runtime.GoalFailureException** A goal failure exception indicates that a goal could not successfully pursued. It is thrown by the reasoning engine when e.g. dispatchSubgoalAndWait() is called and the goal does not succeed. 
 - **jadex.runtime.PlanFailureException** Can be thrown from user code in plans for indicating that a normal plan failure has occurred. Also calling the fail() method will lead to throwing a plan failure exception.
 - **jadex.bdi.runtime.TimeoutException** Occurs, when any waitFor...() method is called with eexception of the basic waitFor(time) method, which will only block until the given time interval elpased.
 

@@ -108,7 +108,7 @@ We use a simple checklist process to demonstrate the custom task. The process in
 
 As we expect that the checklist items can be checked in any order, we do not impose ordering restrictions between the tasks, i.e. there are no flow connectors in the process. Also, because the process and the custom task implementation reside in the same package, we can simply write 'OKTask' instead of a fully qualified name like 'jadex.bpmn.tutorial.OKTask'. If you have problems ('Class OKTask not found in imports') remember to set the package property of the process accordingly.
 
-In the BPMN diagram, the tasks contain two parameters: 'message' and 'title'. These are the parameters that we used in the task implementation.Â 
+In the BPMN diagram, the tasks contain two parameters: 'message' and 'title'. These are the parameters that we used in the task implementation. 
 
 When the process is executed, the requesters for the tasks appear one after another. Because the JOptionPane blocks the thread when *showMessageDialog()* is called, the whole process waits until the requester is closed. Only then the process will activate the next task and open the next requester.
 

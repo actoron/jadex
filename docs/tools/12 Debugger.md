@@ -18,7 +18,7 @@ The BDI debugger offers four different views:
 - **BDI Viewer:** The BDI Viewer shows the beliefs, plans and goals of an agent in the corresponding section. By clicking at a belief or belief set its current value is displayed in the Facts area below. Furthermore, the goal and plan views show the goal and plan instances of the agent and their current state.
 - **Agent Inspector:** In the agent inspector the state of the agent can be inspected according to its internal composition. In this tree view more details can be seen about the agent's beliefs, plans, and goals, yet the view is also more diffucult to interpret as one has to navigate along the agent structure to get to the elements.
 - **Rule Engine:** The rule engine is also a rather internal view that shows which rules make up the behavior of the agent. In addition, the rule engine view contains a visual representation of the rules of the agent as [Rete](http://en.wikipedia.org/wiki/Rete_algorithm)  network.
-- **Breakpoints:** For a BDI agent in the breakpoints view all rules of the agent are listed, i.e. by selecting a rule the interpreter automatically stops just before a rule of the given type gets executed. Â One can use the Step, or Run buttons to continue processing.
+- **Breakpoints:** For a BDI agent in the breakpoints view all rules of the agent are listed, i.e. by selecting a rule the interpreter automatically stops just before a rule of the given type gets executed.  One can use the Step, or Run buttons to continue processing.
 
 BPMN Process Debugger
 ==================================
@@ -33,8 +33,8 @@ The BPMN process debugger comprises three views:
   - Exception: The exception instance if one has occurred during execution of the process thread.
   - Data: A map containing the specific variable values as name, value pairs.
   - Status: The current state of the thread. If it is ready the next step can be executed if it is waiting some conditional has to be met before execution can continue.
-- **History of steps:Â **In the history the executed steps and their association to the process thread that executed them are shown.
-- **Breakpoints:Â **In the breakpoint list of BPMN process all its activities, gateways and events are showns.**Â **By selecting such an element and executing the process the debugger will suspend execution until such an element is reached.
+- **History of steps: **In the history the executed steps and their association to the process thread that executed them are shown.
+- **Breakpoints: **In the breakpoint list of BPMN process all its activities, gateways and events are showns.** **By selecting such an element and executing the process the debugger will suspend execution until such an element is reached.
 
 Micro Agent Debugger
 =================================
@@ -47,7 +47,7 @@ Micro Agent Debugger
 public boolean isAtBreakpoint(String[] breakpoints)
 ```
 
-See *jadex.micro.testcases.semiautomatic.BeakpointAgentÂ *and *PojoBreakpointAgent* for example code.
+See *jadex.micro.testcases.semiautomatic.BeakpointAgent *and *PojoBreakpointAgent* for example code.
 
 **Note:** Currently, the XML component types 'component' and 'application' do not posses a dedicated debugger. Instead, if a component of such a type is selected for debugging an Object Inspector view will be shown. This view displays the object structure of the underlying component and can be used to get information about the current state of the object.
 

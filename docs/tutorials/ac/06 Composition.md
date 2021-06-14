@@ -14,8 +14,8 @@ In the first lecture of this chapter we will create a composite component that h
 - Add a *componenttypes* section and insert one *componenttype* definition inside.
 - The *componenttype* should be equipped with a *name* and a *filename* attribute.
 - The *name* is used as internal identifier within the component.xml to refer to the defined kind of agent. Here is should be set to *chatagent*.
-- The *filename* serves as file location and sould be set to *tutorial.ChatD5Agent.class*.Â 
-- Create a *configurations* section below the *componenttypes* section. In the configurations section place two *configuration* definitions. The first should be named *One chatter* the second *Ten chatters* using the *name* attribute of the *configuration* definition.Â 
+- The *filename* serves as file location and sould be set to *tutorial.ChatD5Agent.class*. 
+- Create a *configurations* section below the *componenttypes* section. In the configurations section place two *configuration* definitions. The first should be named *One chatter* the second *Ten chatters* using the *name* attribute of the *configuration* definition. 
 - In each of the *configuration* section add a *components* section and inside of it a *component* definition. The component should have the attribute *type* set to *chatagent* (or formerly defined logical agent type). In the component definition of the second configuration also introduced an attribute *number* and set it to *10* (all attributes must be set in quotation marks).
 
 ```xml
@@ -30,8 +30,8 @@ In the first lecture of this chapter we will create a composite component that h
 
 ## Verify the component behavior
 
-Select the new component model in the JCC and look at the configuration choice box at the right upper panel. Ensure that you can see both configuration names. Start the component once with each of the configurations selected and look inside the component in the component. You should see one and in the second case ten subcomponents inside of it. Â \
-Â 
+Select the new component model in the JCC and look at the configuration choice box at the right upper panel. Ensure that you can see both configuration names. Start the component once with each of the configurations selected and look inside the component in the component. You should see one and in the second case ten subcomponents inside of it.  \
+ 
 
 # Exercise E2 - Agent arguments
 
@@ -64,7 +64,7 @@ This lecture will show how services of components can be directly connected. In 
 - Create a new class called *RegistryServiceE3.java* that implements the interface *IRegistryServiceE3*
 - Add a class attribute called *entries* of type *Map* and initialize it to a *new HashMap*.
 - Add both methods of the interface.
-- In the *register* method use *put* to store the nickname Â as key and the component identifier in the map.
+- In the *register* method use *put* to store the nickname  as key and the component identifier in the map.
 - In the *getChatters* method simply return the entries by *new Future(entries)*.
 
 ## Defining the registry agent
@@ -80,7 +80,7 @@ This lecture will show how services of components can be directly connected. In 
 - Add a *@Arguments* annotation. Inside create a *@Argument* annotation and give it the *name* nickname, the *clazz* String and the *defaultvalue* "Willi". The backslash is used because Jadex expects a parseable Java expression and for a String the quotation marks necessary. The defaultvalue is used in case no other value is supplied during startup of the component (e.g. from the JCC or programmatically).
 - Also add a field *nickname* of type String in the agent class. Above this field add the *@AgentArgument* annotation. This automatically injects the argument value in the corresponding field.
 - Add a *@RequiredService* annotation with name *regservice* and type *IRegistryServiceE3.class*. Do not add a *@Binding* annotation inside. Instead we will assign the binding explicitly in the composite component.
-- Delete the content of the *executeBody* method. We will use it to fetch the registry service. On the registry service we will first call the register method with the component's identifier and some chooseable nickname. Thereafter, we will let the agent wait for 10 seconds and then use the registry service again to get all registered chat agents. This should look like the following:Â 
+- Delete the content of the *executeBody* method. We will use it to fetch the registry service. On the registry service we will first call the register method with the component's identifier and some chooseable nickname. Thereafter, we will let the agent wait for 10 seconds and then use the registry service again to get all registered chat agents. This should look like the following: 
 
 ```java
 
@@ -144,7 +144,7 @@ In the JCC start the chat application (ChatE3.component.xml) and check if it has
 
 # Exercise E4 - On demand component creation
 
-In this small lecture we will create the registry component on demand, i.e. when a chat component tries to access the registry service for the first time and no service provider could be found, it will create one on its own. This kind of behavior is not enabled per default and we need to turn it on by setting the *create* flag to true in the required service binding specification.Â 
+In this small lecture we will create the registry component on demand, i.e. when a chat component tries to access the registry service for the first time and no service provider could be found, it will create one on its own. This kind of behavior is not enabled per default and we need to turn it on by setting the *create* flag to true in the required service binding specification. 
 
 ## Defining the chat composite component
 

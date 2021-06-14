@@ -49,6 +49,9 @@ Also, we need to tell the `SensorActuator` object to keep this belief up to date
 We can do this in the `exampleBehavior()` method:
 
 ```java
+        // Print class of stations object to show that the LinkedHashSet has been wrapped.
+        System.out.println("Class of the belief set is: "+stations.getClass());
+
         // Tell the sensor to update the belief sets
         actsense.manageChargingstationsIn(stations);
 ```
@@ -56,20 +59,19 @@ We can do this in the `exampleBehavior()` method:
 To test the new belief set, we can change the battery loading plan as follows:
 
 ```java
-//        IChargingstation    chargingstation    = actsense.getChargingstations().iterator().next();    // old
+        // Move to first known charging station -> fails when no charging station known.
+//      IChargingstation    chargingstation    = actsense.getChargingstations().iterator().next();    // old
         IChargingstation    chargingstation    = stations.iterator().next();    // new
-
-        // Print class of stations object to show that the LinkedHashSet has been wrapped.
-        System.out.println("Class of the belief set is: "+stations.getClass());
 ```
 
 ### The `stations` Belief Set
 
-One important aspect of the Jadex framework is that fields and the referenced objects of field
-marked with `@Belief` are monitored for changes (cf. Exercise B1). The `LinkedHashSet` as well as
+One important aspect of the Jadex framework is that fields and the referenced objects of fields
+marked with `@Belief` are monitored for changes (cf. [Exercise B1](03%20Beliefs%20and%20Goal%20Conditions.md#exercise-b1-using-a-belief-to-control-a-declarative-goal)).
+The `LinkedHashSet` as well as
 other Java collection classes do not directly support monitoring their contents. For that reason,
 Jadex wraps the object into a collection that supports monitoring. Jadex can do this for lists (`java.util.List`),
-sets (`java.util.Set`) and maps (`java.util.Map`). We added a `println()` in the loading plan,
+sets (`java.util.Set`) and maps (`java.util.Map`). We added a `println()` in the agent,
 so you can see that the `stations` set is wrapped in an object of type `jadex.bdiv3.runtime.wrappers.SetWrapper`.
 
 Try changing the belief declaration as follows:
@@ -201,6 +203,8 @@ Implement a plan that handles the `QueryChargingStation` goal. Add a method name
 with a corresponding `@Plan` annotation and write code to move around in search for a charging station.
 You should be able to devise such a plan yourself. *Hint: you could just reuse one of the patrol plans...*
 
+In any case, solutions are provided in the [summary section](07%20Summary.md#exercise-c2-a-plan-for-finding-a-charging-station).
+
 ### Agent Behavior After Adding the Plan
 
 After adding the plan, the agent should exhibit the following behavior:
@@ -234,3 +238,6 @@ Starting loadBattery() plan
 Starting performPatrolPlan2()
 ...
 ```
+
+---
+[[Back: 03 Beliefs and Goal Conditions](03%20Beliefs%20and%20Goal%20Conditions.md) | [Next: 05 Goals with Multiple Instances](05%20Goals%20with%20Multiple%20Instances.md)]

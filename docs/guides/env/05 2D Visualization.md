@@ -6,7 +6,7 @@ In this section the visualization concepts between components and space objects 
 
 *Figure 1 Visualization xml schema part of the environment space type*
 
-The EnvSupport visualization is clearly decoupled from the domain and interaction aspects. It is defined using *perspectives*, whereby multiple perspectives can be specified for the same domain model. At runtime between these perspectives can be switched as needed. A perspective has an identifying *name* attribute and is composed of *property* elements as well as arbitrary many darwables and pre- and postlayers.Â 
+The EnvSupport visualization is clearly decoupled from the domain and interaction aspects. It is defined using *perspectives*, whereby multiple perspectives can be specified for the same domain model. At runtime between these perspectives can be switched as needed. A perspective has an identifying *name* attribute and is composed of *property* elements as well as arbitrary many darwables and pre- and postlayers. 
 
 ![](perspectives.png)
 
@@ -47,12 +47,12 @@ Moreover, some elements have certain special properties, which are not applicabl
 
 ```xml
 <env:drawable objecttype="prey" width="1.0" height="1.0">
-Â <env:texturedrectangle layer="1" width="0.9" height="0.9" imagepath="jadex/micro/examples/hunterprey/images/prey.png" />
-Â <env:rectangle layer="-1" width="3" height="3" color="#ff00007f" /> <!--Â redÂ -->
-Â <env:rectangle layer="-1" width="1" height="1" x="-2" y="0" color="#00ff007f" /> <!--Â green-->
-Â <env:rectangle layer="-1" width="1" height="1" x="2" y="0" color="#0000ff7f" /> <!--Â blueÂ -->
-Â <env:rectangle layer="-1" width="1" height="1" x="0" y="-2" color="#ffff007f" /> <!--Â yellowÂ -->
-Â <env:rectangle layer="-1" width="1" height="1" x="0" y="2" color="#00ffff7f" /> <!--Â turquoiseÂ -->
+ <env:texturedrectangle layer="1" width="0.9" height="0.9" imagepath="jadex/micro/examples/hunterprey/images/prey.png" />
+ <env:rectangle layer="-1" width="3" height="3" color="#ff00007f" /> <!-- red -->
+ <env:rectangle layer="-1" width="1" height="1" x="-2" y="0" color="#00ff007f" /> <!-- green-->
+ <env:rectangle layer="-1" width="1" height="1" x="2" y="0" color="#0000ff7f" /> <!-- blue -->
+ <env:rectangle layer="-1" width="1" height="1" x="0" y="-2" color="#ffff007f" /> <!-- yellow -->
+ <env:rectangle layer="-1" width="1" height="1" x="0" y="2" color="#00ffff7f" /> <!-- turquoise -->
 </env:drawable>
 ```
 
@@ -73,14 +73,14 @@ Prelayers can be used for displaying graphical background elements. These layers
 ### Example
 
 ```xml
-<!--Â Draw the backgroundÂ -->
+<!-- Draw the background -->
 <env:prelayers>
-Â <env:tiledlayer width="0.4" height="0.4" imagepath="jadex/micro/examples/hunterprey/images/background.png" />
+ <env:tiledlayer width="0.4" height="0.4" imagepath="jadex/micro/examples/hunterprey/images/background.png" />
 </env:prelayers>
- Â Â Â Â 
-<!--Â draw a black grid upon everythingÂ -->
+     
+<!-- draw a black grid upon everything -->
 <env:postlayers>
-Â <env:gridlayer width="1.0" height="1.0" color="black" />
+ <env:gridlayer width="1.0" height="1.0" color="black" />
 </env:postlayers>
 ```
 

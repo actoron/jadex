@@ -8,7 +8,7 @@ This quickstart tutorial assumes that you are familiar with Java and your favour
 
 For your Java project please make sure **not** to include the `jadex-application-xyz` jars as they already contain the quickstart tutorial classes. If you include these, Java might ignore your own classes and only use the ones from the jar. If you set up your project using the gradle-based [Jadex example project](../../getting-started/getting-started.md#importing-the-jadex-example-project), the appropriate jars will be automatically included and excluded as needed.
 
-If you need additional guidance for the project setup, please have a look at the [getting started guide](../../getting-started/getting-started.md#ide-setup)).
+If you need additional guidance for the project setup, please have a look at the [getting started guide](../../getting-started/getting-started.md#ide-setup).
 
 ## The Time Service Interface
 
@@ -46,37 +46,27 @@ public interface ITimeService
      */
     public ISubscriptionIntermediateFuture<String> subscribe(DateFormat format);
 }
-
 ```
 
 ### The Name and Package of the Interface
 
 In Jadex, the fully qualified name of a service interface is used for service discovery. Therefore when you implement a time user component to search for your `ITimeService`, Jadex will discover all components worldwide that offer a service of type `jadex.micro.quickstart.ITimeService`. If you make sure to use the interface and package name as shown, you might be able to find other people's time provider components.
 
-<!--
-TODO:
-
-* link to web-registry
-* explanation of discovery mechanisms (local/global registry vs. awareness)
-* web page listing available time providers (jadex.js)
-
--->
-
 ### The `getLocation()` Method
 
-Service methods are potentially remote calls. Therefore service methods should use [future types](../../futures/futures.md)) as return values. Futures avoid that the caller is blocked during the service processing and add further support e.g. for dealing with timeouts.
+Service methods are potentially remote calls. Therefore service methods should use [future types](../../futures/futures.md) as return values. Futures avoid that the caller is blocked during the service processing and add further support e.g. for dealing with timeouts.
 
 The result of the `getLocation()` method is not directly a `String` object, but an object of type `jadex.commons.future.IFuture<String>`, that is, a placeholder or promise for the location string that might or might not be available yet.
 
 ### The `subscribe()` Method
 
-A method with an basic `IFuture` return type captures a simple request-reply interaction. Jadex provides different future types for realizing more complex interaction schemes. The `subscribe()` method signature captures such a complex interaction between time provider and time user. It accepts a `DateFormat` object as input and uses the [subscription intermediate future](../../futures/futures.md#subscription-futures)) as a return type, which denotes a subscription semantics for the interaction as shown in the diagram below.
+A method with a basic `IFuture` return type captures a simple request-reply interaction. Jadex provides different future types for realizing more complex interaction schemes. The `subscribe()` method signature captures such a complex interaction between time provider and time user. It accepts a `DateFormat` object as input and uses the [subscription intermediate future](../../futures/futures.md#subscription-futures) as a return type, which denotes a subscription semantics for the interaction as shown in the diagram below.
 
 ![Interaction diagram of a subscription future](subscription.png "Interaction diagram of a subscription future")
 
-The interactions starts by the user calling the `subscribe()` method on the service of the provider. While the interaction is active, the time provider may post time values in arbitrary intervals. These time values are transmitted as intermediate results of the future and immediately become available to the time user. At any point in time, either of both sides may decide to end the interaction. The time provider may do this by setting the future to finished to indicate that no more results will be published. The time user on the other hand may decide that it no longer wants to receive time values from the time provider and thus may call the `cancel()` method on the future.
+The interactions starts by the user calling the `subscribe()` method on the service of the provider. While the interaction is active, the time provider may post time values in arbitrary intervals. These time values are transmitted as intermediate results of the future and immediately become available to the time user. At any point in time, either of both sides may decide to end the interaction. The time provider may do this by setting the future to finished to indicate that no more results will be published. The time user on the other hand may decide that it no longer wants to receive time values from the time provider and thus may call the `terminate()` method on the future.
 
-As you can see, using subscription futures allows capturing a complex interaction semantics in a single method signature. Using generics, the shown method signature further demands that the intermediate results must be of type `String.
+As you can see, using subscription futures allow capturing a complex interaction semantics in a single method signature. Using generics, the shown method signature further demands that the intermediate results must be of type `String`.
 
 ## Security Issues
 

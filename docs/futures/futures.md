@@ -122,7 +122,7 @@ Other Future types also provide support for functional interfaces - just look fo
 ### Asynchronous Map Function
 
 With intermediate futures, you can receive many results from one call (see [future types](#future-types)).
-To loop over all results and ['map'](https://en.wikipedia.org/wiki/Map_(higher-order_function)) them with a given asynchronous function, you can use ```mapAsync()```.
+To loop over all results and ['map'](https://en.wikipedia.org/wiki/Map_%28higher-order_function%29) them with a given asynchronous function, you can use ```mapAsync()```.
 The result will be another intermediate future, where the results will be mapped by the given function:
 
 ```java

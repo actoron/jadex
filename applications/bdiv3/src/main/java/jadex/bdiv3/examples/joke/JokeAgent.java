@@ -17,6 +17,7 @@ import javax.swing.SwingUtilities;
 
 import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.ExcludeMode;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
@@ -24,7 +25,6 @@ import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanPrecondition;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.runtime.impl.GoalDroppedException;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bridge.service.annotation.OnInit;

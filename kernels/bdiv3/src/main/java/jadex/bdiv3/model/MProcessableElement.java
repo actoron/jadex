@@ -1,73 +1,12 @@
 package jadex.bdiv3.model;
 
-import java.util.HashMap;
-import java.util.Map;
+import jadex.bdiv3.annotation.ExcludeMode;
 
 /**
  *  Base class for all elements that can be processed with means-end reasoning.
  */
 public class MProcessableElement extends MParameterElement
 {
-	public static Map<String, ExcludeMode> modes = new HashMap<String, ExcludeMode>();
-	
-	/** The exclude mode determines when and if a plan is removed from the applicable plans list (APL). */
-	public enum ExcludeMode
-	{
-		/** The plan is never removed. */
-		Never("never"),
-
-		/** The plan is removed after it has been executed once, regardless of success or failure or abortion. */
-		WhenTried("when_tried"),
-		
-		/** The plan is removed after it has been executed once, but only when it exited with an exception. */
-		WhenFailed("when_failed"),
-		
-		/** The plan is removed after it has been executed once, but only when it exited without an exception. */
-		WhenSucceeded("when_succeeded");
-		
-		protected String str;
-		
-		/**
-		 *  Create a new direction
-		 */
-		ExcludeMode(String str)
-		{
-			this.str = str;
-			modes.put(str, this);
-		} 
-		
-		/**
-		 *  Get the string representation.
-		 *  @return The string representation.
-		 */
-		public String getString()
-		{
-			return str;
-		}
-		
-		/**
-		 *  Convert from string to enum.
-		 */
-		public static ExcludeMode getExcludeMode(String name)
-		{
-			return modes.get(name);
-		}
-	}
-	
-//	/** Never exclude plan candidates from apl. */
-//	public static final String EXCLUDE_NEVER = "never";
-//
-//	/** Exclude tried plan candidates from apl. */ 
-//	public static final String EXCLUDE_WHEN_TRIED = "when_tried";
-//	
-//	/** Exclude failed plan candidates from apl. */
-//	public static final String EXCLUDE_WHEN_FAILED = "when_failed";
-//
-//	/** Exclude succeeded plan candidates from apl. */
-//	public static final String EXCLUDE_WHEN_SUCCEEDED = "when_succeeded";
-
-	// default values for xml reader
-	
 	/** Post to all flag. */
 	protected boolean posttoall = false;
 	

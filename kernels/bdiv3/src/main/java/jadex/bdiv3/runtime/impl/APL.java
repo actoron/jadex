@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.bdiv3.annotation.ExcludeMode;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
@@ -24,7 +25,6 @@ import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameterElement;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MProcessableElement;
-import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.IGoal;
@@ -804,7 +804,7 @@ public class APL
 			((CandidateInfoMPlan)cand).removePlan();
 
 		// Do nothing if APL exclude is never
-		if(MProcessableElement.ExcludeMode.Never.equals(exclude))
+		if(ExcludeMode.Never.equals(exclude))
 			return;
 		
 		if(isToExclude(rplan, exclude))

@@ -28,35 +28,35 @@ A process instance is defined very similar to an object. In the same way the *ty
 *Figure 4 Observer schema definition*
 
 An observer represents the user interface part of the simulation environment. It is configured using mandatory attributes for the *name*, *dataview* and *perspective*. Please note that the dataview and perspective attributes only represent the default settings of the observer window. The user can change these at runtime as she likes. Additionally, the *killonexit* flag can be used to determine, if the application should be killed when the gui is closed. The observer offers an extension mechanism that allows the user interface being modified by adding new plugins. A plugin is represented with its own button on the top left of the observer. When activated the plugin can display its own view on the control area (lower left). A plugin is defined using *name* and *class* attributes. Plugin classes have to implement the *jadex.application.space.envsupport.observer.gui.plugin.IObserverCenterPlugin*.\
-The interface is shown below and basically has methods for start and shutdown as well as fetching information such as name, icon and the view to display.Â 
+The interface is shown below and basically has methods for start and shutdown as well as fetching information such as name, icon and the view to display. 
 
 ```java
 package jadex.application.space.envsupport.observer.gui.plugin;
 
 public interface IObserverCenterPlugin
 {
-Â Â public void start(ObserverCenter main);
- Â 
-Â Â public void shutdown();
- Â 
-Â Â public String getName();
+  public void start(ObserverCenter main);
+  
+  public void shutdown();
+  
+  public String getName();
 
-Â  public String getIconPath();
+  public String getIconPath();
 
-Â Â public Component getView();
+  public Component getView();
 
-Â Â public void refresh();
+  public void refresh();
 }
 ```
 
-The evaluation of environment data is done by specifying data providers and data consumers. A data provider can be used to define which data should be collected and a data consumer then can operate on this collected data in order to process it in different ways.Â 
+The evaluation of environment data is done by specifying data providers and data consumers. A data provider can be used to define which data should be collected and a data consumer then can operate on this collected data in order to process it in different ways. 
 
 1.1 Data Providers
 
 ![](dataproviders.png)
 *Figure 5 Data provider schema part*
 
-A data provider is similar to a database query, which is executed once every step the spaceexecutor performs. This means a data provider does not store a history of entries but only provides the data that has been collected at the current point in time. In order to use a data provider from data consumers it is necessary to equip it with a specific *name* attribute. The query itself is specified using arbitrary many *source* and *data* elements.Â 
+A data provider is similar to a database query, which is executed once every step the spaceexecutor performs. This means a data provider does not store a history of entries but only provides the data that has been collected at the current point in time. In order to use a data provider from data consumers it is necessary to equip it with a specific *name* attribute. The query itself is specified using arbitrary many *source* and *data* elements. 
 
 A named *source* element determines which space objects are of general interest for the query (corresponds to the 'from' part of an SQL query). It requires to state, which space objects of an underlying *objecttype* should be considered. As possibly not all objects of a given type should be included an *includecondition* can be employed to explicitly state what dynamic property an object has to posses in order to be considerd. If not the object itself is of primary interest for the query but only one of its properties this can be expressed using an expression inside the tag. Using the *aggregate* flag it is possible to determine if the source data is interpreted as multiple elements (for each included object) or as one element (list of objects). The result data is calculated via a join over all sources, i.e. the cartesian product of all source elements (similar to the 'select' of an SQL query). An aggregated source provides always only one element to the join.
 
@@ -67,14 +67,14 @@ Finally, the concrete data model is specified using columns similar to a relatio
 ![](dataconsumers.png)
 *Figure 6 Data consumers schema part*
 
-Data consumers can be used to process data in various ways. As data consumers may be very different, the configuration is kept very general. A data consumer is specified using the *name* and *class* attributes. The class has to extend the interface *jadex.application.space.envsupport.evaluation.ITableDataConsumer*, which is shown below.Â 
+Data consumers can be used to process data in various ways. As data consumers may be very different, the configuration is kept very general. A data consumer is specified using the *name* and *class* attributes. The class has to extend the interface *jadex.application.space.envsupport.evaluation.ITableDataConsumer*, which is shown below. 
 
 ```java
 package jadex.application.space.envsupport.evaluation;
 
 public interface ITableDataConsumer extends IPropertyObject
 {
-Â Â public void consumeData(long time, double tick);
+  public void consumeData(long time, double tick);
 }
 ```
 

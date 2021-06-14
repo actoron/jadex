@@ -40,7 +40,7 @@ The first block of methods allows for fetching, adding and removing provided ser
 Required Services
 ------------------------------
 
-The second block of methods shows how required services can be used. There is amethod to fetch a single service *getService()* and another one for fetching multiple services (those that have been defined with *multiple=true*) *getServices()*. Both methods come in two variants. The first variant only requires the *name* as argument. The second variant includes a *rebind* flag that allows for initiating a fresh binding by searching again the services according to the required service definition. This is only required if the service definition is static, i.e. *dynamic=false* which is the default.Â 
+The second block of methods shows how required services can be used. There is amethod to fetch a single service *getService()* and another one for fetching multiple services (those that have been defined with *multiple=true*) *getServices()*. Both methods come in two variants. The first variant only requires the *name* as argument. The second variant includes a *rebind* flag that allows for initiating a fresh binding by searching again the services according to the required service definition. This is only required if the service definition is static, i.e. *dynamic=false* which is the default. 
 
 Service Search
 ---------------------------
@@ -76,7 +76,7 @@ In the figure above the four different cases of reference settings are illustrat
 
 - When an object is immutable per definition (example an invoice that will never change in future), it should be declared as local reference to avoid unnecessary copying.
 - In most cases remote references should be avoidable. The most common use case is a remote listener object that automatically notifies the listeners on the caller side. In the Jadex programming model such listeners in many cases can be replaced by using subscription futures as return values (subscription futures do not save intermediate results).
-- **The caller of a service call needs not to be passed explcitly as parameter value.** Instead at the beginning of the service method (i.e. before other services have been invoked or component steps have been performed), ***ServiceCall.getInstance().getCaller()*****Â **can be used to retrieve the component id of the caller component.
+- **The caller of a service call needs not to be passed explcitly as parameter value.** Instead at the beginning of the service method (i.e. before other services have been invoked or component steps have been performed), ***ServiceCall.getInstance().getCaller()***** **can be used to retrieve the component id of the caller component.
 
 Concurrency
 ------------------------
@@ -96,7 +96,7 @@ Contract Oriented Programming
 [Programming by contract](http://en.wikipedia.org/wiki/Design_by_contract)  is a well-known approach that focusses on the relationships between suppliers and clients. In the active components approach contracts between service providers and service consumers can be defined and automatically monitored. The basic idea is to allow **pre-** and **postconditions** to be stated for service interfaces. These conditions can be expressed in terms of different kinds of annotations attached to method parameters and/or the return value and are automatically checked by the Jadex infrastructure, i.e. the conditions need not be manually evaluated at the beginning or end of a service call. Jadex simply uses specific condition interceptors before and after a service call to ensure that conditions hold. If that is not the case a runtime exception is raised and returned to the caller. Currently, the following types of conditions are supported:
 
 - **@CheckNotNull:** As the name suggests, this annotation ensures that the corresponding parameter or result value is different from null.
-- **@CheckIndex:** Precondition for checking if the argument is a valid index. This annotation needs a further value that states in which parameter the collection is given, to which the index should be checked against. The annotation works for all kinds of elements that can be somehow iterated over (e.g. arrays or collections)Â 
+- **@CheckIndex:** Precondition for checking if the argument is a valid index. This annotation needs a further value that states in which parameter the collection is given, to which the index should be checked against. The annotation works for all kinds of elements that can be somehow iterated over (e.g. arrays or collections) 
 - **@CheckState:** Allows a Java expression to be evaluated. Reserved variables are \$arg for the current argument and \$arg0 - \$argn for other arguments. In case of a post condition the result is available via \$res and intermediate results via \$res\[0\], \$res\[-1\], etc.
 
 An example application (from package jadex.micro.testcases.prepostconditions) further illustrates how conditions can be specified:
@@ -121,7 +121,7 @@ The example interface definition shows how the different conditions can be used:
 
 - The first method *doSomething()* takes three parameters (a, x, y) and expects that a never nulls, x is between 0 and 100 and y is greater 0. Furthermore, the result value of the method must never be null.
 - The second method *getName()* works with an index (idx) and a collection (names). The precondition ensures that the index is valid according to the referenced collection (the 1 argument in @CheckIndex(1)), i.e. idx&gt;=0 and idx&lt;size of the collection.
-- The third method getIncreasingValue() shows how postconditions can be used with intermediate results. In the example it is safeguarded that the method delivers only monotonically increasing values (\$res\[-1\] &lt; \$res).Â 
+- The third method getIncreasingValue() shows how postconditions can be used with intermediate results. In the example it is safeguarded that the method delivers only monotonically increasing values (\$res\[-1\] &lt; \$res). 
 
 Streams
 --------------------
@@ -132,7 +132,7 @@ Streams are a convenient and versatile programming concept in Java. Basically, t
 
 *Overview of important stream interfaces and classes*
 
-The base interface for all types of Jadex streams is ***IConnection***, which mainly provides methods to get general information about the stream (such as the connection id, the initiator and participant component ids). From this interface ***IInputConnection*** and ***IOutputConnectionÂ ***are derived. These coarsely correspond to the Java *InputStream* and *OutputStream* and offer functionalities to read and write data. Finally, the concrete classes ***ServiceInputConnection*** and ***ServiceOutputConnection*** implement those interfaces and additionally add one important method to get a corresponding output for input connection and vice versa. The idea is that a service connection can be created within a service implementation of a component. The original service connection can then be used to e.g. write or read data and the derived opposite connection can be passed as parameter value in a method call or can be passed back as return value. In this way two services can communicate via streams. In Jadex streaming support is based on two different APIs, a low and a high level one as described next.
+The base interface for all types of Jadex streams is ***IConnection***, which mainly provides methods to get general information about the stream (such as the connection id, the initiator and participant component ids). From this interface ***IInputConnection*** and ***IOutputConnection ***are derived. These coarsely correspond to the Java *InputStream* and *OutputStream* and offer functionalities to read and write data. Finally, the concrete classes ***ServiceInputConnection*** and ***ServiceOutputConnection*** implement those interfaces and additionally add one important method to get a corresponding output for input connection and vice versa. The idea is that a service connection can be created within a service implementation of a component. The original service connection can then be used to e.g. write or read data and the derived opposite connection can be passed as parameter value in a method call or can be passed back as return value. In this way two services can communicate via streams. In Jadex streaming support is based on two different APIs, a low and a high level one as described next.
 
 ### Low-Level Streaming API
 
@@ -157,7 +157,7 @@ The component that receives the stream is notified about the new stream arrival.
 
 **Micro Agent**
 
-In case of a micro agent notification is done via a simple callback method. In case a pojo agent is used, the method that is annotated with ***@AgentStreamArrived*** is called with the*Â IConnection* as method parameter as shown below.
+In case of a micro agent notification is done via a simple callback method. In case a pojo agent is used, the method that is annotated with ***@AgentStreamArrived*** is called with the* IConnection* as method parameter as shown below.
 
 ```java
 
@@ -206,11 +206,11 @@ XML component types do not possess behavior specifications so that they do not p
 
 ### High-Level Streaming API
 
-The high-level streaming API deals with streams as parameters and return values of service calls. This enables to pass a stream directly to another component, so that one side can write and the other one read data.Â 
+The high-level streaming API deals with streams as parameters and return values of service calls. This enables to pass a stream directly to another component, so that one side can write and the other one read data. 
 
 In general the high-level streaming API allows to:
 
-- Pass ***IInputConnectionÂ ***and***Â IOutputConnection*** as parameters of services
+- Pass ***IInputConnection ***and*** IOutputConnection*** as parameters of services
 - Pass ***IInputConnection*** and ***IOutputConnection*** as return value of services
 - Offers ***ServiceInputConnection*** and ***ServiceOutputConnection*** to create pipes between services\
     (using getInputConnection(), getOutputConnection())

@@ -1,19 +1,19 @@
 # Using Services
 
 So far we have explored how BDI can be used to define the internal behaviour of an agent.
-In this part we move on towards multi-agent scenarios and show how a BDI agents can be designed to interact with each other. The typical way for realizing interactions with active components is using [services](../../services/services.md)).
+In this part we move on towards multi-agent scenarios and show how a BDI agents can be designed to interact with each other. The typical way for realizing interactions with active components is using [services](../../services/services.md).
 
 A service is defined by an interface that determines the available methods and a service implementation that can be either a separate class of just part of the agent itself.
-For further details please have a look at the  [services section](../../services/services.md)).
+For further details please have a look at the  [services section](../../services/services.md).
 
 # F1 - Creating a Service
 
 In the first exercise we will equip the translation agent with a corresponding service.
 We will additionally create a user agent that opens a small user interface.
 The user interface allows for entering English words that will be translated on request.
-Internally, the user agent searches for a translation service and delegates the request to it.Â 
+Internally, the user agent searches for a translation service and delegates the request to it. 
 
-- First create a new Java interface called *ITranslationService*. Add a method called *translateEnglishGerman* to it. The method should take a String parameter called *eword* and return a [futurized](../../futures/futures.md) String (```IFuture<String>```)):
+- First create a new Java interface called *ITranslationService*. Add a method called *translateEnglishGerman* to it. The method should take a String parameter called *eword* and return a [futurized](../../futures/futures.md) String (```IFuture<String>```):
 
 ```java
 public interface ITranslationService
@@ -36,7 +36,7 @@ public class TranslationBDI implements ITranslationService
 }
 ```
 
-- Add a *wordtable* field to the agent. As in previous lectures declare it with the type ```Map<String, String>```.Â Â 
+- Add a *wordtable* field to the agent. As in previous lectures declare it with the type ```Map<String, String>```.  
 - Add an agent init method using the ```@AgentCreated``` annotation. Initialize the wordtable and add some word pairs to it.
 - Implement the interface method by just looking up the word in the map and returning it via a new future:
 
@@ -78,7 +78,7 @@ public class UserBDI
     }
 ```
 
-Inside of the body method first a thread switch to the Swing thread is performed (using ```SwingUtilities.invokeLater```). Within the runnable that is executed by Swing first a JFrame is created. Two textfields and one button are added. The rest of the code is in charge of displaying the gui at the center of the screen.Â 
+Inside of the body method first a thread switch to the Swing thread is performed (using ```SwingUtilities.invokeLater```). Within the runnable that is executed by Swing first a JFrame is created. Two textfields and one button are added. The rest of the code is in charge of displaying the gui at the center of the screen. 
 
 <x-hint title="Swing Thread">
 It is a general Swing requirement that all gui related actions should always be performed only on the Swing thread. Otherwise you might encounter strange behavior due to race conditions.
@@ -118,11 +118,11 @@ bt.addActionListener(new ActionListener()
 });
 ```
 
-For more information about service invocation, visit the [Services](../../services/services.md#using-services)) chapter.
+For more information about service invocation, visit the [Services](../../services/services.md#using-services) chapter.
 
 ** Starting and testing the agents **
 
-Start both agents. The user interface should appear after the user agent has been started. Enter a word and press the Translate button. You should see the translated word appearing immediately in the text field below.Â 
+Start both agents. The user interface should appear after the user agent has been started. Enter a word and press the Translate button. You should see the translated word appearing immediately in the text field below. 
 
 # F2 - Mapping a Service to Plans
 
@@ -279,7 +279,7 @@ protected IExecutionFeature execFeature;
 protected IBDIAgentFeature bdiFeature;
 ```
 
-- Now we need to change the user agent to use a translation goal and that it has delegation capabilities. The idea is to allow for defining a plan that is represented by a required service. Such a mapping is defined using the ```@ServicePlan``` annotation. It refers to the name of a previously defined required service (*transser*).Â 
+- Now we need to change the user agent to use a translation goal and that it has delegation capabilities. The idea is to allow for defining a plan that is represented by a required service. Such a mapping is defined using the ```@ServicePlan``` annotation. It refers to the name of a previously defined required service (*transser*). 
 
 ```java
 @RequiredServices(@RequiredService(name="transser", type=ITranslationService.class,
@@ -343,7 +343,7 @@ public class TranslationBDI
 ```
 
 - Keep the field definitions and the agent init method.
-- Delete both plans and instead add a new simple method plan that reacts on the translation goal. It just looks up the word and return the translation.Â 
+- Delete both plans and instead add a new simple method plan that reacts on the translation goal. It just looks up the word and return the translation. 
 
 ```java
 @Plan(trigger=@Trigger(goals=TranslationGoal.class))

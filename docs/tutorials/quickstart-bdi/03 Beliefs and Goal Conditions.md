@@ -117,7 +117,7 @@ So why did we need the `@Belief` annotation? Lets find out: remove just the anno
 Uh, oh. Not good. Scrolling down the output finally reveals the following source of error:
 
 ```txt
-Found condition without triggering events (will never trigger): maintain_boolean jadex.quickstart.cleanerworld.single.CleanerBDIAgentB1$MaintainBatteryLoaded.isBatteryLoaded()
+Found condition without triggering events (will never trigger): maintain_boolean quickstart.cleanerworld.CleanerBDIAgent$MaintainBatteryLoaded.isBatteryLoaded()
 ```
 
 What does that mean? The Jadex framework does not check every goal condition for every step of every agent all the time
@@ -204,3 +204,6 @@ but now it isn't stopped at 20% but only at 90%.
 
 Execute the program to observe that the agent now exhibits a somewhat useful periodic sequence of
 patrol/recharge behaviors.
+
+---
+[[Back: 02 Goals and Plans](02%20Goals%20and%20Plans.md) | [Next: 04 Plans with Subgoals](04%20Plans%20with%20Subgoals.md)]

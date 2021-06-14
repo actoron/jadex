@@ -9,7 +9,7 @@ The chat tool is a typical messenger style JCC plugin that can be used to exchan
 Messaging
 ----------------------
 
-The messaging view contains a **chat user list** in the upper left area, a **chat settings panel** on the lower left, a **chat message area** on the right and a**Â send message area** at the bottom of the window.
+The messaging view contains a **chat user list** in the upper left area, a **chat settings panel** on the lower left, a **chat message area** on the right and a** send message area** at the bottom of the window.
 
 ### Chat Users
 
@@ -19,12 +19,12 @@ The chat user list contains a list of the chat users currently online. Each user
 
 The chat settings panel allow to customize the chat behavior. Currently the following options are available:
 
-- **Nickname:Â **Can be used to change the user's nickname.
-- **Image:Â **Can be used to change**Â **user's image.
-- **Sound files:Â **Important chat events are underlayed with characteristic sounds that can be changed here. First, the event type should be selected using the choice box. The availble event types are **new msg** (message), **new user**, **msg failed**, **new file**, **file abort**, and **file complete**. Using the '...' button one can bring up a file chooser to select a new sound file. To test the new sound the play button ![08 Chat@arrowright.png](arrowright.png)Â can be used.
-- **Sound enabled:Â **Enable or disable to turn on or off all notification sounds.
-- **Users auto refresh:Â **Enable or disable to turn on or off the auto refresh of the chat user list.
-- **Reset sounds:Â **Pressing the reset button will reload the default sounds settings.
+- **Nickname: **Can be used to change the user's nickname.
+- **Image: **Can be used to change** **user's image.
+- **Sound files: **Important chat events are underlayed with characteristic sounds that can be changed here. First, the event type should be selected using the choice box. The availble event types are **new msg** (message), **new user**, **msg failed**, **new file**, **file abort**, and **file complete**. Using the '...' button one can bring up a file chooser to select a new sound file. To test the new sound the play button ![08 Chat@arrowright.png](arrowright.png) can be used.
+- **Sound enabled: **Enable or disable to turn on or off all notification sounds.
+- **Users auto refresh: **Enable or disable to turn on or off the auto refresh of the chat user list.
+- **Reset sounds: **Pressing the reset button will reload the default sounds settings.
 - **Reset receivers:** Pressing the reset button will set the chat receivers to 'all'. An alternative to change the receivers to all consists in deselecting one or more selected users by holding down ctrl and clicking the corresponding users in the chat user list.
 
 ### Send Message Area

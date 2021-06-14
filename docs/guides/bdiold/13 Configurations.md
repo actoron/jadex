@@ -2,7 +2,7 @@
 
 Configurations represent both the initial and/or end states of an agent type. Initial instance elements can be declared that are created when the agent (resp. the capability) is started. This means that initial elements such as goals or plans are created immediately when an agent is born. On the conatrary, end elements can be used to declare instance elements such as goals or plans that will be created when an agent is going to be terminated. After an agent has been urged to terminate (e.g. by calling *killAgent()* from within a plan or by an CMS *cms_destroy_component* goal), all normal goals and plans will be aborted (except plans that perform their cleanup code, i.e. execute one of the *passed()*, *failed()* or *aborted()* methods) and the declared end elements will be created and executed.
 
-Instance and end elements always have to refer to some original element via the "ref" attribute. &lt;!~~Â Additionally, an optional instance name can be provided via the "name" attribute. This can be useful if the element should be accessible later on via this name.~~> Besides the reference also bindings can be used in combination with initial/end elements. If (at least one) binding parameter is declared instance elements will be created for all possible bindings.
+Instance and end elements always have to refer to some original element via the "ref" attribute. &lt;!~~ Additionally, an optional instance name can be provided via the "name" attribute. This can be useful if the element should be accessible later on via this name.~~> Besides the reference also bindings can be used in combination with initial/end elements. If (at least one) binding parameter is declared instance elements will be created for all possible bindings.
 
 It is possible to declare any number of configurations for a single agent or capability. When starting an agent or including a capability you can choose among the available configurations In the XML portion for specifying configurations is depicted. Each configuration must have a name for identification purposes. The default configuration can be set up by using the *default* attribute of the &lt;configurations> base tag. If no explicit default configuration is specified, the first one declared in the ADF is used.
 
@@ -25,23 +25,23 @@ In the figure below an example is shown how the initial state can be used to dec
 
 ```xml
 <agent ...>
-Â Â ...
-Â Â <capabilities>
-Â Â Â Â <capability name="mycap" file="SomeCapability"/>
-Â Â </capabilities>
-Â Â ...
-Â Â <configurations default="two">
-Â Â Â Â <configuration name="one">
-Â Â Â Â Â Â <capabilities>
-Â Â Â Â Â Â Â Â <initialcapability ref="mycap" configuration="a"/>
-Â Â Â Â Â Â </capabilities>
-Â Â Â Â </configuration>
-Â Â Â Â <configuration name="two">
-Â Â Â Â Â Â <capabilities>
-Â Â Â Â Â Â Â Â <initialcapability ref="mycap" configuration="b"/>
-Â Â Â Â Â Â </capabilities>
-Â Â Â Â </configuration>
-Â Â </configurations>
+  ...
+  <capabilities>
+    <capability name="mycap" file="SomeCapability"/>
+  </capabilities>
+  ...
+  <configurations default="two">
+    <configuration name="one">
+      <capabilities>
+        <initialcapability ref="mycap" configuration="a"/>
+      </capabilities>
+    </configuration>
+    <configuration name="two">
+      <capabilities>
+        <initialcapability ref="mycap" configuration="b"/>
+      </capabilities>
+    </configuration>
+  </configurations>
 </agent>
 ```
 
@@ -59,26 +59,26 @@ The example below shows how a configuration can be used to change belief facts. 
 
 ```xml
 <agent ...>
-Â Â ...
-Â Â <beliefs>
-Â Â Â Â <belief name="name" class="String">
-Â Â Â Â Â Â <fact>"Jim"</fact>
-Â Â Â Â </belief>
-Â Â Â Â <beliefset name="names" class="String"/>
-Â Â </beliefs>
-Â Â ...
-Â Â <configurations>
-Â Â Â Â <configuration name="one">
-Â Â Â Â Â Â <beliefs>
-Â Â Â Â Â Â Â Â <initialbelief ref="name">
-Â Â Â Â Â Â Â Â Â Â <fact>"John"</fact>
-Â Â Â Â Â Â Â Â </initialbelief>
-Â Â Â Â Â Â Â Â <initialbelief set ref="names">
-Â Â Â Â Â Â Â Â Â Â <facts>DB.queryNames()</facts>
-Â Â Â Â Â Â Â Â </initialbelief set>
-Â Â Â Â Â Â </beliefs>
-Â Â Â Â </configuration>
-Â Â </configurations>
+  ...
+  <beliefs>
+    <belief name="name" class="String">
+      <fact>"Jim"</fact>
+    </belief>
+    <beliefset name="names" class="String"/>
+  </beliefs>
+  ...
+  <configurations>
+    <configuration name="one">
+      <beliefs>
+        <initialbelief ref="name">
+          <fact>"John"</fact>
+        </initialbelief>
+        <initialbelief set ref="names">
+          <facts>DB.queryNames()</facts>
+        </initialbelief set>
+      </beliefs>
+    </configuration>
+  </configurations>
 </agent>
 ```
 
@@ -86,7 +86,7 @@ The example below shows how a configuration can be used to change belief facts. 
 
 1.1 Goals
 
-In the &lt;goals> section Â initial and end goals can be specified. Initial goals will be instantiated when an agent is born whereas end goals are created when an agent is beginning the termination phase. This means that a new goal instance is created for each declared initial resp. end goal at the mentioned points in time. The specification of an &lt;initialgoal> and an &lt;endgoal> requires the connection to the underlying goal template which is used for instantiation. For this purpose the *ref* attribute is used. Optionally, further parameter(set) values can be declared by using the corresponding &lt;parameter> and &lt;parameterset> tags.
+In the &lt;goals> section  initial and end goals can be specified. Initial goals will be instantiated when an agent is born whereas end goals are created when an agent is beginning the termination phase. This means that a new goal instance is created for each declared initial resp. end goal at the mentioned points in time. The specification of an &lt;initialgoal> and an &lt;endgoal> requires the connection to the underlying goal template which is used for instantiation. For this purpose the *ref* attribute is used. Optionally, further parameter(set) values can be declared by using the corresponding &lt;parameter> and &lt;parameterset> tags.
 
 ![](jadexconfigurationsgoalsadf.png)
 
@@ -96,29 +96,29 @@ In the example below is depicted how an initial and end goal can be created. Bot
 
 ```xml
 <agent ...>
-Â Â ...
-Â Â <goals>
-Â Â Â Â <performgoal name="play_song">
-Â Â Â Â Â Â <parameter name="song" class="URL"/>
-Â Â Â Â </performgoal>
-Â Â </goals>
-Â Â ...
-Â Â <configurations>
-Â Â Â Â <configuration name="one">
-Â Â Â Â Â Â <goals>
-Â Â Â Â Â Â Â Â <initialgoal name="welcome" ref="play_song">
-Â Â Â Â Â Â Â Â Â Â <parameter ref="song">
-Â Â Â Â Â Â Â Â Â Â Â Â <value>new URL("http://someserver/welcome.mp3")</value>
-Â Â Â Â Â Â Â Â Â Â </parameter>
-Â Â Â Â Â Â Â Â </initialgoal>
-Â Â Â Â Â Â Â Â <endgoal name="goodbye" ref="play_song">
-Â Â Â Â Â Â Â Â Â Â <parameter ref="song">
-Â Â Â Â Â Â Â Â Â Â Â Â <value>new URL("http://someserver/goodbye.mp3")</value>
-Â Â Â Â Â Â Â Â Â Â </parameter>
-Â Â Â Â Â Â Â Â </endgoal>
-Â Â Â Â Â Â </goals>
-Â Â Â Â </configuration>
-Â Â </configurations>
+  ...
+  <goals>
+    <performgoal name="play_song">
+      <parameter name="song" class="URL"/>
+    </performgoal>
+  </goals>
+  ...
+  <configurations>
+    <configuration name="one">
+      <goals>
+        <initialgoal name="welcome" ref="play_song">
+          <parameter ref="song">
+            <value>new URL("http://someserver/welcome.mp3")</value>
+          </parameter>
+        </initialgoal>
+        <endgoal name="goodbye" ref="play_song">
+          <parameter ref="song">
+            <value>new URL("http://someserver/goodbye.mp3")</value>
+          </parameter>
+        </endgoal>
+      </goals>
+    </configuration>
+  </configurations>
 </agent>
 ```
 
@@ -135,26 +135,26 @@ In the example is depicted how an initial and end plan can be used. In this case
 
 ```xml
 <agent ...>
-Â Â ...
-Â Â <plans>
-Â Â Â Â <plan name="print_plan">
-Â Â Â Â Â Â <parameter name="text" class="String"/>
-Â Â Â Â Â Â <body class="PrintOnConsolePlan" />
-Â Â Â Â </plan>
-Â Â </plans>
-Â Â ...
-Â Â <configurations>
-Â Â Â Â <configuration name="one">
-Â Â Â Â Â Â <plans>
-Â Â Â Â Â Â Â Â <initialplan ref="print_hello">
-Â Â Â Â Â Â Â Â Â Â <parameter name="text">"Hello World!"</parameter>
-Â Â Â Â Â Â Â Â </initialplan>
-Â Â Â Â Â Â Â Â <endplan ref="print_goodbye">
-Â Â Â Â Â Â Â Â Â Â <paramter name="text">"Goodbye World!"</parameter>
-Â Â Â Â Â Â Â Â </endplan>
-Â Â Â Â Â Â </plans>
-Â Â Â Â </configuration>
-Â Â </configurations>
+  ...
+  <plans>
+    <plan name="print_plan">
+      <parameter name="text" class="String"/>
+      <body class="PrintOnConsolePlan" />
+    </plan>
+  </plans>
+  ...
+  <configurations>
+    <configuration name="one">
+      <plans>
+        <initialplan ref="print_hello">
+          <parameter name="text">"Hello World!"</parameter>
+        </initialplan>
+        <endplan ref="print_goodbye">
+          <paramter name="text">"Goodbye World!"</parameter>
+        </endplan>
+      </plans>
+    </configuration>
+  </configurations>
 </agent>
 ```
 
@@ -164,7 +164,7 @@ In the example is depicted how an initial and end plan can be used. In this case
 
 Finally, in the &lt;events> section initial and end events can be specified. This means that a new event instance is created for each declared initial event after startup of the agent. Additionally, new event instances are created for all declared end events whenever the agent is shutdowned. It is possible to define initial/end internal and initial/end message events (goal events are not necessary as initial goals can be declared). The specification of an &lt;initialinternalevent> resp. an &lt;endinternalevent> or an &lt;initialmessageevent> resp. an &lt;endmessageevent> requires the connection to the underlying event template which is used for instantiation. For this purpose the *ref* attribute is used. Optionally, further parameter(set) values can be declared by using the &lt;parameter> and &lt;parameterset> tags.
 
-Â Â 
+  
 
 ![](jadexconfigurationseventsadf.png)
 
@@ -174,34 +174,34 @@ In the example below it is shown how an initial and end message event can be cre
 
 ```xml
 <events>
-Â Â <messageevent name="inform_state" type="fipa" direction="send">
-Â Â Â Â <parameter name="performative" class="String" direction="fixed">
-Â Â Â Â Â Â <value>SFipa.INFORM</value>
-Â Â Â Â </parameter>
-Â Â </messageevent>
+  <messageevent name="inform_state" type="fipa" direction="send">
+    <parameter name="performative" class="String" direction="fixed">
+      <value>SFipa.INFORM</value>
+    </parameter>
+  </messageevent>
 </events>
 ...
 <configurations>
-Â Â <configuration name="one">
-Â Â Â Â <events>
-Â Â Â Â Â Â <initialmessageevent ref="inform_state">
-Â Â Â Â Â Â Â Â <parameter ref="content">
-Â Â Â Â Â Â Â Â Â Â <value>$scope.getAgentName()+" is born."</value>
-Â Â Â Â Â Â Â Â </parameter>
-Â Â Â Â Â Â Â Â <parameterset ref="receivers">
-Â Â Â Â Â Â Â Â Â Â <value>$scope.getEventbase().createComponentIdentifier("Uncle")</value>
-Â Â Â Â Â Â Â Â </parameterset>
-Â Â Â Â Â Â </initialmessageevent>
-Â Â Â Â Â Â <endmessageevent ref="inform_state">
-Â Â Â Â Â Â Â Â <parameter ref="content">
-Â Â Â Â Â Â Â Â Â Â <value>$scope.getAgentName()+" is terminating."</value>
-Â Â Â Â Â Â Â Â </parameter>
-Â Â Â Â Â Â Â Â <parameterset ref="receivers">
-Â Â Â Â Â Â Â Â Â Â <value>$scope.getEventbase().createComponentIdentifier("Uncle")</value>
-Â Â Â Â Â Â Â Â </parameterset>
-Â Â Â Â Â Â </endmessageevent>
-Â Â Â Â </events>
-Â Â </configuration>
+  <configuration name="one">
+    <events>
+      <initialmessageevent ref="inform_state">
+        <parameter ref="content">
+          <value>$scope.getAgentName()+" is born."</value>
+        </parameter>
+        <parameterset ref="receivers">
+          <value>$scope.getEventbase().createComponentIdentifier("Uncle")</value>
+        </parameterset>
+      </initialmessageevent>
+      <endmessageevent ref="inform_state">
+        <parameter ref="content">
+          <value>$scope.getAgentName()+" is terminating."</value>
+        </parameter>
+        <parameterset ref="receivers">
+          <value>$scope.getEventbase().createComponentIdentifier("Uncle")</value>
+        </parameterset>
+      </endmessageevent>
+    </events>
+  </configuration>
 </configurations>
 ```
 

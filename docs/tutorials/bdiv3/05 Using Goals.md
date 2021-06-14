@@ -16,12 +16,12 @@ When this limit is exceeded, the agent has to act and normalize the state.
 
 The fourth kind of goal is the **perform goal**, which is directly related to some kind of action one wants the agent to perform. An example for a perform goal is an agent that as to patrol at some kind of frontier.
 
-The different kinds of goals need not to be specified explicitly. Instead, it is sufficient to just use the type of conditions that are required to produce the desired behaviour.Â 
+The different kinds of goals need not to be specified explicitly. Instead, it is sufficient to just use the type of conditions that are required to produce the desired behaviour. 
 
 Concretely, a goal can be implemented in the following ways:
 
 - **Inner Class**: If a goal is private to an agent it is often elegant and helpful to use an inner class to represent the goal type. The inner class has natural access to the fields and beliefs of the agent which makes programming less complex. In some cases it is also required to use a static inner class. In this case the aforementioned advantage is not existent, but you could pass the agent as explicit argument in the constructor to gain access to the agent aspects.
-- **Class**: A goal can also be represented as a normal Java class. In this case there is no direct connection to the agent available and one has to pass whatever is need via the constructor call or other methods.Â Â 
+- **Class**: A goal can also be represented as a normal Java class. In this case there is no direct connection to the agent available and one has to pass whatever is need via the constructor call or other methods.  
 
 # D1 - Using a Top-Level Goal
 
@@ -29,7 +29,7 @@ The first thing we will try out in this exercise is dispatching a top-level goal
 The difference between a top-level and a subgoal can be understood as its part in the BDI goal-plan hierarchy.
 For each goal different plans can be tried out, which in turn may produce subgoals to fulfill parts of their work.
 These subgoals again may have other subgoals leading to the already mentioned goal-plan tree.
-In this sense a top-level goal is just a goal that has no parent, i.e. which is on the top level of the hierarchy.Â Â Â 
+In this sense a top-level goal is just a goal that has no parent, i.e. which is on the top level of the hierarchy.   
 
 - We create a new *TranslationBDI* agent Java file and add the ```@Agent``` annotation to the class itself.
 - Furthermore we need two fields, *bdiFeature* for the BDI API and another one for the *wordtable*.
@@ -187,7 +187,7 @@ A goal is different from a plan because it describes an objective without exactl
 This means that different plans can be tried out to finally reach a given objective.
 Besides the specification of plans that can in principle help achieving a goal, the means-end reasoning process can be adjusted in many ways use the various BDI flags.
 
-One of the fundamental flags is the *retry* setting which defines if another plan can be tried out when the first one fails or does not achieve the goal completely. In this exercise we will try out the retry behaviour by using two plans from which the first will fail.Â 
+One of the fundamental flags is the *retry* setting which defines if another plan can be tried out when the first one fails or does not achieve the goal completely. In this exercise we will try out the retry behaviour by using two plans from which the first will fail. 
 
 - Create a *TranslationBDI* file by copying from the last exercise.
 - Modify the existing plan to throw a ```PlanFailureException``` after having printed out a text message, e.g. "Plan A".
@@ -354,7 +354,7 @@ In this example we will use a **maintain goal** to restrict the number of word p
 
 - We start by creating a *TranslationBDI* Java file by copying it from the last exercise.
 - We delete the Translate goal, the Plan and the agent body and instead create a new *MaintainStorageGoal* as inner class.
-  In the goal annotation we set the exclude mode to never ```(excludemode=ExcludeMode.Never)```. This allows a plan to be executed again and again without being excluded.Â 
+  In the goal annotation we set the exclude mode to never ```(excludemode=ExcludeMode.Never)```. This allows a plan to be executed again and again without being excluded. 
 - Furthermore, we add two methods (without parameters and boolean return value), one called *maintain* and the other one *target*.
   To the first we add the ```@GoalMaintainCondition(beliefs="wordtable")``` and to the second ```@GoalTargetCondition(beliefs="wordtable")``` annotation. This leads to a reevaluation of the conditions whenever the dictionary *wordtable* changes.
 

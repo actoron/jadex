@@ -8,10 +8,10 @@ Of course, this mechanism suffers from the fact that in Java no multi-inheritanc
 
 Hence, in case you want to reuse different functionalities, these can be encapsulated in so called **BDI capabilities**.
 A BDI capability represents a module that may contain beliefs, goals and plans like a normal agent.
-Capabilities realize a hierarchical (de)composition concept meaning that it is possible to include any number of subcapabilities that may again represent composite entities.Â 
+Capabilities realize a hierarchical (de)composition concept meaning that it is possible to include any number of subcapabilities that may again represent composite entities. 
 
 In Jadex BDIV3 a capability is typically represented as a **class**:
-An instance of a capability class is declared and instantiated as normal field in the agent with corresponding meta information in terms of an annotation.Â 
+An instance of a capability class is declared and instantiated as normal field in the agent with corresponding meta information in terms of an annotation. 
 
 # E1 - Creating a Capability
 
@@ -27,7 +27,7 @@ public class TranslationCapability
 }
 ```
 
-- Add a belief named *wordtable* of type Map&lt;String, String&gt; Â and initialize it.
+- Add a belief named *wordtable* of type Map&lt;String, String&gt;  and initialize it.
 - Add a constructor to *TranslationCapability*, which adds some word pairs to the word table.
 
 For the actual goal we will use an inner class called *Translate*:

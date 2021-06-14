@@ -3,10 +3,10 @@
 ${SorryOutdated}
 
 The documentation of the predefined capabilities is not yet finished.
-Please also take a look at the [BDIV3 Tutorial](../../tutorials/bdiv3/06%20Using%20Capabilities.md))
+Please also take a look at the [BDIV3 Tutorial](../../tutorials/bdiv3/06%20Using%20Capabilities.md)
 and at the [legacy documentation of Jadex 0.96](https://download.actoron.com/docs/releases/jadex-0.96x/userguide/predef_cap.html).
 
-Jadex uses capabilities for the modularization of agents (see [Chapter 5. Capabilities](05%20Capabilities.md)), whereby capabilities contain ready to use functionalities. The Jadex distribution contains several ready-to-use predefined capabilities for different purposes. Besides the basic management capabilties for using the CMS (component management service, see [CMSCapability](#the-component-management-service-cms-capability) below and the Directory Facilitator (see [DFCapability](../../tools/A3%20Directory%20Facilitator.md)) also a Protocols Capability is available for the efficient usage of some predefined FIPA interaction protocols. The interface of a capability mainly consists of a set of exported goals which is similar to an object-oriented method-based interface description. This chapter aims at depicting their usage by offering the application programmer an overview and explanation of their functionalities and additionally a selection of short code snippets that can directly be used in your applications.Â 
+Jadex uses capabilities for the modularization of agents (see [Chapter 5. Capabilities](05%20Capabilities.md)), whereby capabilities contain ready to use functionalities. The Jadex distribution contains several ready-to-use predefined capabilities for different purposes. Besides the basic management capabilties for using the CMS (component management service, see [CMSCapability](#the-component-management-service-cms-capability) below and the Directory Facilitator (see [DFCapability](../../tools/A3%20Directory%20Facilitator.md)) also a Protocols Capability is available for the efficient usage of some predefined FIPA interaction protocols. The interface of a capability mainly consists of a set of exported goals which is similar to an object-oriented method-based interface description. This chapter aims at depicting their usage by offering the application programmer an overview and explanation of their functionalities and additionally a selection of short code snippets that can directly be used in your applications. 
 
 The test capability for writing agent-based unit test is explained in the *Jadex Tool Guide*, which also illustrates the usage of the corresponding Test Center user interface.
 
@@ -22,8 +22,7 @@ capability can be used for:
 - [Suspending Components](#suspending-components)
 - [Resuming Components](#resuming-components)
 - [Searching Components](#searching-for-components)
-- [Shutting Down the Platform](#shutting-down-the-platform)
-    Â Â 
+      
 
 ### Creating Components
 
@@ -48,15 +47,15 @@ yet done in order to use other goals of the CMS-capability) and set a reference 
 ```xml
 ...
 <capabilities>
-Â Â <capability name="cmscap" file="jadex.bdi.planlib.cms.CMS" />
-Â Â ...
+  <capability name="cmscap" file="jadex.bdi.planlib.cms.CMS" />
+  ...
 </capabilities>
 ...
 <goals>
-Â Â <achievegoalref name="cms_create_component">
-Â Â Â Â <concrete ref="cmscap.cms_create_component" />
-Â Â </achievegoalref>
-Â Â ...
+  <achievegoalref name="cms_create_component">
+    <concrete ref="cmscap.cms_create_component" />
+  </achievegoalref>
+  ...
 </goals>
 ...
 ```
@@ -68,13 +67,13 @@ Now you can use this goal to create a component in your plan:
 ```java
 public void body()
 {
-Â Â ...
-Â Â IGoal cc = createGoal("cms_create_component");
-Â Â cc.getParameter("type").setValue("mypackage.MyComponent");
-Â Â dispatchSubgoalAndWait(cc);
-Â Â IComponentIdentifier createdcomponent =
-Â Â Â Â (IComponentIdentifier)cc.getParameter("componentidentifier").getValue();
-Â Â ...
+  ...
+  IGoal cc = createGoal("cms_create_component");
+  cc.getParameter("type").setValue("mypackage.MyComponent");
+  dispatchSubgoalAndWait(cc);
+  IComponentIdentifier createdcomponent =
+    (IComponentIdentifier)cc.getParameter("componentidentifier").getValue();
+  ...
 }
 ```
 
@@ -87,18 +86,18 @@ The same goal is used for remote creation of a component:
 ```java
 public void body()
 {
-Â Â IComponentManagementService cms = IComponentManagementService)getScope()
-Â Â Â Â .getServiceContainer().getService(IComponentManagementService.class);
-Â Â IComponentIdentifier remote_cms_id = cms.createComponentIdentifier("cms@remoteplatform",
-Â Â Â Â false, new String[]{"niomtp://134.100.11.232:5678"});
+  IComponentManagementService cms = IComponentManagementService)getScope()
+    .getServiceContainer().getService(IComponentManagementService.class);
+  IComponentIdentifier remote_cms_id = cms.createComponentIdentifier("cms@remoteplatform",
+    false, new String[]{"niomtp://134.100.11.232:5678"});
 
-Â Â IGoal cc = createGoal("cms_create_component");
-Â Â cc.getParameter("type").setValue("mypackage.MyComponent");
-Â Â cc.getParameter("cms").setValue(remote_cms_id);
-Â Â dispatchSubgoalAndWait(cc);
-Â Â IComponentIdentifier createdcomponent =
-Â Â Â Â (IComponentIdentifier)cc.getParameter("componentidentifier").getValue();
-Â Â ...
+  IGoal cc = createGoal("cms_create_component");
+  cc.getParameter("type").setValue("mypackage.MyComponent");
+  cc.getParameter("cms").setValue(remote_cms_id);
+  dispatchSubgoalAndWait(cc);
+  IComponentIdentifier createdcomponent =
+    (IComponentIdentifier)cc.getParameter("componentidentifier").getValue();
+  ...
 }
 ```
 
@@ -121,7 +120,7 @@ and wait. After the goal has succeeded, you can fetch the *IComponentIdentifier*
 
 The CMS capability offers the goal *cms_destroy_component* to give the application programmer the possibility to destroy
 components, both on a local as well as on remote platforms.
-Â Â Â Â 
+    
 
 The goal has the following parameters:
 
@@ -138,15 +137,15 @@ not yet done in order to use other goals of the CMS-capability) and set a refere
 ```xml
 ...
 <capabilities>
-Â Â <capability name="cmscap" file="jadex.bdi.planlib.cms.CMS" />
-Â Â ...
+  <capability name="cmscap" file="jadex.bdi.planlib.cms.CMS" />
+  ...
 </capabilities>
 ...
 <goals>
-Â Â <achievegoalref name="cms_destroy_component">
-Â Â Â Â Â <concrete ref="cmscap.cms_destroy_component" />
-Â Â </achievegoalref>
-Â Â ...
+  <achievegoalref name="cms_destroy_component">
+     <concrete ref="cmscap.cms_destroy_component" />
+  </achievegoalref>
+  ...
 </goals>
 ...
 ```
@@ -158,11 +157,11 @@ Thus you can destroy a component in your plan:
 ```java
 public void body()
 {
-Â Â IGoal dc = createGoal("cms_destroy_component");
-Â Â dc.getParameter("componentidentifier").setValue(createdcomponent);
- Â *Â dc.getParameter("cms").setValue(cms);Â Â * Set cms in case of remote platform
-Â Â dispatchSubgoalAndWait(dc);
-Â Â ...
+  IGoal dc = createGoal("cms_destroy_component");
+  dc.getParameter("componentidentifier").setValue(createdcomponent);
+  * dc.getParameter("cms").setValue(cms);  * Set cms in case of remote platform
+  dispatchSubgoalAndWait(dc);
+  ...
 }
 ```
 
@@ -173,7 +172,7 @@ new goal using the *createGoal()*-method with the parameter
 "cms_destroy_component". Then you set its componentidentifier-parameter to the desired value, dispatch the
 subgoal and wait for success. The same goal is used to destroy a remote component. In this case you only
 have to additionally supply the remote CMS component identifier.
-Â Â 
+  
 
 ### Suspending Components
 
@@ -181,7 +180,7 @@ The CMS offers the goals "cms_suspend_component" and "cms_resume_component" in o
 the execution of a component and later resume it. When a component gets suspended the platform will not process
 any actions of this component. Nevertheless, the component is able to receive messages from other components and will
 process them when its execution is resumed.
-Â Â Â Â 
+    
 
 The "cms_suspend_component"-goal has the following parameters:
 
@@ -199,15 +198,15 @@ not yet done in order to use other goals of the CMS-capability) and set a refere
 ```xml
 ...
 <capabilities>
-Â Â <capability name="cmscap" file="jadex.bdi.planlib.cms.CMS" />
-Â Â ...
+  <capability name="cmscap" file="jadex.bdi.planlib.cms.CMS" />
+  ...
 </capabilities>
 ...
 <goals>
-Â Â <achievegoalref name="cms_suspend_component">
-Â Â Â Â <concrete ref="cmscap.cms_suspend_component" />
-Â Â </achievegoalref>
-Â Â ...
+  <achievegoalref name="cms_suspend_component">
+    <concrete ref="cmscap.cms_suspend_component" />
+  </achievegoalref>
+  ...
 </goals>
 ...
 ```
@@ -219,13 +218,13 @@ Thus you can suspend a component in your plan:
 ```java
 public void body()
 {
-Â Â IComponentIdentifier component; Â *Â The component to suspend
-Â Â ...
-Â Â IGoal sc = createGoal("cms_suspend_component");
-Â Â sc.getParameter("componentidentifier").setValue(component);
-Â Â * sc.getParameter("cms").setValue(cms); Â *Â Set cms in case of remote platform
-Â Â dispatchSubgoalAndWait(sc);
-Â Â ...
+  IComponentIdentifier component;  * The component to suspend
+  ...
+  IGoal sc = createGoal("cms_suspend_component");
+  sc.getParameter("componentidentifier").setValue(component);
+  * sc.getParameter("cms").setValue(cms);  * Set cms in case of remote platform
+  dispatchSubgoalAndWait(sc);
+  ...
 }
 ```
 
@@ -250,41 +249,41 @@ If you want to resume a suspended component you can use the goal "cms_resume_com
 
 *Parameters for cms_resume_component* ( ** denotes optional parameters)
 
-Â Â 
+  
 To use the "cms_resume_component"-goal, you must first of all include the CMS-capability in your ADF (if
 not yet done in order to use other goals of the CMS-capability) and set a reference to the goal as described below:
 
 ```xml
 ...
 <capabilities>
-Â Â <capability name="cmscap" file="jadex.bdi.planlib.cms.CMS" />
-Â Â ...
+  <capability name="cmscap" file="jadex.bdi.planlib.cms.CMS" />
+  ...
 </capabilities>
 ...
 <goals>
-Â Â <achievegoalref name="cms_resume_component">
-Â Â Â Â <concrete ref="cmscap.cms_resume_component" />
-Â Â </achievegoalref>
-Â Â ...
+  <achievegoalref name="cms_resume_component">
+    <concrete ref="cmscap.cms_resume_component" />
+  </achievegoalref>
+  ...
 </goals>
 ...
 ```
 
 *Including the CMS capability and the cms_resume_component-goal*
-Â Â Â 
+   
 
 Thus you can resume a component in your plan:
 
 ```java
 public void body()
 {
-Â Â ComponentIdentifier component; Â *Â The component to resume
-Â Â ...
-Â Â IGoal rc = createGoal("cms_resume_component");
-Â Â rc.getParameter("componentidentifier").setValue(component);
-Â Â * rc.getParameter("cms").setValue(cms); Â *Â Set cms in case of remote platform
-Â Â dispatchSubgoalAndWait(rc);
-Â Â ...
+  ComponentIdentifier component;  * The component to resume
+  ...
+  IGoal rc = createGoal("cms_resume_component");
+  rc.getParameter("componentidentifier").setValue(component);
+  * rc.getParameter("cms").setValue(cms);  * Set cms in case of remote platform
+  dispatchSubgoalAndWait(rc);
+  ...
 }
 ```
 
@@ -296,7 +295,7 @@ new goal using the *createGoal()*-method with the paramter
 subgoal and wait for success. As result the goal returns a possibly modified CMS component description of
 the resumed component. The same goal is used to resume a remote component. In this case you only
 have to additionally supply the remote CMS component identifier.
- Â Â 
+   
 
 ### Searching for Components
 
@@ -321,15 +320,15 @@ not yet done in order to use other goals of the CMS-capability) and set a refere
 ```xml
 ...
 <capabilities>
-Â Â <capability name="cmscap" file="jadex.bdi.planlib.cms.CMS" />
-Â Â ...
+  <capability name="cmscap" file="jadex.bdi.planlib.cms.CMS" />
+  ...
 </capabilities>
 ...
 <goals>
-Â Â <achievegoalref name="cms_search_components">
-Â Â Â Â <concrete ref="cmscap.cms_search_components" />
-Â Â </achievegoalref>
-Â Â ...
+  <achievegoalref name="cms_search_components">
+    <concrete ref="cmscap.cms_search_components" />
+  </achievegoalref>
+  ...
 </goals>
 ...
 ```
@@ -341,14 +340,14 @@ To search for components in your plan use the goal in the following manner:
 ```java
 public void body()
 {
-Â Â CMSComponentDescription desc = new CMSComponentDescription(new ComponentIdentifier("a1", true));
-Â Â IGoal search = createGoal("cms_search_components");
-Â Â search.getParameter("description").setValue(desc);
- Â *Â search.getParameter("cms").setValue(cms);Â Â * Set cms in case of remote platform
-Â Â dispatchSubgoalAndWait(search);
-Â Â CMSComponentDescription[] result = (CMSComponentDescription[])
-Â Â search.getParameterSet("result").getValues();
-Â Â ...
+  CMSComponentDescription desc = new CMSComponentDescription(new ComponentIdentifier("a1", true));
+  IGoal search = createGoal("cms_search_components");
+  search.getParameter("description").setValue(desc);
+  * search.getParameter("cms").setValue(cms);  * Set cms in case of remote platform
+  dispatchSubgoalAndWait(search);
+  CMSComponentDescription[] result = (CMSComponentDescription[])
+  search.getParameterSet("result").getValues();
+  ...
 }
 ```
 
@@ -372,16 +371,16 @@ The same goal is used to search for remote components:
 ```java
 public void body()
 {
-Â Â ...
-Â Â IComponentIdentifier cms = ...
-Â Â CMSComponentDescription desc = new CMSComponentDescription(new ComponentIdentifier("my_component@myplatform"));
-Â Â IGoal search = createGoal("cms_search_components");
-Â Â search.getParameter("description").setValue(desc);
-Â Â search.getParameter("cms").setValue(cms);
-Â Â dispatchSubgoalAndWait(search);
-Â Â CMSComponentDescription[] result = (CMSComponentDescription[])
-Â Â Â Â search.getParameterSet("result").getValues();
-Â Â ...
+  ...
+  IComponentIdentifier cms = ...
+  CMSComponentDescription desc = new CMSComponentDescription(new ComponentIdentifier("my_component@myplatform"));
+  IGoal search = createGoal("cms_search_components");
+  search.getParameter("description").setValue(desc);
+  search.getParameter("cms").setValue(cms);
+  dispatchSubgoalAndWait(search);
+  CMSComponentDescription[] result = (CMSComponentDescription[])
+    search.getParameterSet("result").getValues();
+  ...
 }
 ```
 

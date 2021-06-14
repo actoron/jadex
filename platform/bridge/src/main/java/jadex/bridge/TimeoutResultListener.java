@@ -203,47 +203,54 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				IClockService clock	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class));
-				
-				synchronized(TimeoutResultListener.this)
+				try
 				{
-					// Do not create new timer if already notified
-					if(timeout>0 && !notified)
+					IClockService clock	= ia.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IClockService.class));
+					
+					synchronized(TimeoutResultListener.this)
 					{
-						cancel();
-						if(realtime)
+						// Do not create new timer if already notified
+						if(timeout>0 && !notified)
 						{
-							timer = clock.createRealtimeTimer(timeout, new ITimedObject()
+							cancel();
+							if(realtime)
 							{
-								public void timeEventOccurred(long currenttime)
+								timer = clock.createRealtimeTimer(timeout, new ITimedObject()
 								{
-									createTimerTask(ex).run();
-								}
-
-								public String toString()
-								{
-									return super.toString()+": "+message;
-								}
-							});
-						}
-						else
-						{
-							timer = clock.createTimer(timeout, new ITimedObject()
+									public void timeEventOccurred(long currenttime)
+									{
+										createTimerTask(ex).run();
+									}
+	
+									public String toString()
+									{
+										return super.toString()+": "+message;
+									}
+								});
+							}
+							else
 							{
-								public void timeEventOccurred(long currenttime)
+								timer = clock.createTimer(timeout, new ITimedObject()
 								{
-									createTimerTask(ex).run();
-								}
-								
-								public String toString()
-								{
-									return super.toString()+": "+message;
-								}
-							});
+									public void timeEventOccurred(long currenttime)
+									{
+										createTimerTask(ex).run();
+									}
+									
+									public String toString()
+									{
+										return super.toString()+": "+message;
+									}
+								});
+							}
 						}
 					}
+					return IFuture.DONE;
 				}
-				return IFuture.DONE;
+				catch(Exception e)
+				{
+					return new Future<Void>(e);
+				}
 			}
 		}).addResultListener(new ExceptionResultListener<Void>()
 		{

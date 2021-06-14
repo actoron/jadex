@@ -1,5 +1,7 @@
 package jadex.bdiv3.model;
 
+import jadex.bdiv3.annotation.ExcludeMode;
+
 /**
  *  Model element for a service call.
  */

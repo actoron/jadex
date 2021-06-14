@@ -11,18 +11,18 @@ The external access object for BDI agents implements the *IBDIExternalAccess* an
 ```java
 public void body()
 {
-Â Â ...
-Â Â JButton button = new JButton("Click Me");
-Â Â button.addActionListener(new ActionListener()
-Â Â {
-Â Â Â Â public void actionPerformed(ActionEvent e)
-Â Â Â Â {
- Â Â Â Â Â //Â This code is executed on the AWT thread (not on the plan thread!)
-Â Â Â Â Â Â IBeliefbase bb = getExternalAccess().getBeliefbase();
-Â Â Â Â Â Â bb.getBelief("button_pressed").setFact(new Boolean(true));
-Â Â Â Â }
-Â Â });
-Â Â ...
+  ...
+  JButton button = new JButton("Click Me");
+  button.addActionListener(new ActionListener()
+  {
+    public void actionPerformed(ActionEvent e)
+    {
+      // This code is executed on the AWT thread (not on the plan thread!)
+      IBeliefbase bb = getExternalAccess().getBeliefbase();
+      bb.getBelief("button_pressed").setFact(new Boolean(true));
+    }
+  });
+  ...
 }
 ```
 
@@ -38,24 +38,24 @@ The invocation of listener methods can happen either on the agent thread or on a
 
 The addition and removal of listeners can be done either on the instance elements themselves (e.g. a goal) or on the bases (e.g. the goalbase). In case the listener shall be added on an instance element it is only necessary to pass the listener object itself as parameter of the call (e.g. *addBeliefListener(IBeliefListener listener)*). In case a type-based listener shall be used e.g. for getting informed about new goal instances in addition to the parameters aforementioned also the type needs to be declared (e.g. *addGoalListener(String type, IGoalListener listener)*).
 
-Â Â 
+  
 
 In the listener example below it is shown how a belief listener can be directly added to a "name" belief via the external access interface. It is used to update the value of a textfeld whenever the belief value changes.
- Â 
+  
 
 ```java
 IExternalAccess agent = ...
 agent.getBeliefbase().getBelief("name").addBeliefListener(new IBeliefListener()
 {
-Â Â public void beliefChanged(AgentEvent ae)
-Â Â {
-Â Â Â Â textfield.setText("Name: ["+ae.getValue()+"]");
-Â Â }
+  public void beliefChanged(AgentEvent ae)
+  {
+    textfield.setText("Name: ["+ae.getValue()+"]");
+  }
 });
 ```
 
 *Agent listener example*
- Â Â Â 
+    
 
 | Listener               | Element                  | Listener Methods                          |
 |------------------------|--------------------------|-------------------------------------------|
@@ -69,4 +69,4 @@ agent.getBeliefbase().getBelief("name").addBeliefListener(new IBeliefListener()
 | IPlanListener          | IPlan IPlanbase          | planAdded() planFinished()                |
 
 *Available listeners*
-Â Â Â Â Â 
+     

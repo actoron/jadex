@@ -44,16 +44,16 @@ The concrete actions an agent may carry out to reach its goals are described in 
 
 The complete definition of an agent is captured in a so called *agent definition file* (ADF). The ADF is an XML file, which contains all relevant properties of an agent (e.g. the beliefs, goals and plans). In addition to the XML tags for the agent elements, the developer can use expressions in a Java-like syntax for specifying belief values and goal parameters. The ADF is a kind of a class description for agents: From the ADF agents get instantiated like Objects get instantiated from their class. For example, the different player agents from BlackJack (src/jadex/bdi/examples/blackjack) share Player.agent.xml as their definition file.
 
-Â 
+ 
 For each element ADF in the all important properties can be defined as attributes or subtags. For example, plans are declared by specifying how to instantiate them from their Java class (body tag), and a trigger (e.g. event) can be stated, that determines under which conditions a plan gets executed. Moreover, in the ADF, the initial state of an agent (how the agent should look like, when it is born) is determined in a so called configuration, which defines the initial beliefs, initial goals, and initial plans.
 
 # Execution Model of a Jadex Agent
 
- Â 
+  
 This sections shows the operation of the reasoning component, given the Jadex BDI concepts. Since version 0.93 Jadex does not employ the classical BDI-interpreter cycle as described in the literature [Rao and Georgeff 95](https://www.aaai.org/Library/ICMAS/1995/icmas95-042.php) but uses a new execution scheme (described more extensive in [Pokahr and Braubach 09](https://vsis-www.informatik.uni-hamburg.de/vsis/publications/lookpub/334)). In Jadex V2 the interpreter is a rule based system operating on a set of predefined BDI rules. The basic mode of operation is simple: The agent selects an activation (a triggering rule) from the agenda and executes the corresponding action. The BDI interpreter is depicted in the following figure.
 
 ![Jadex BDI interpreter architecture](interpreter.png "Jadex BDI interpreter architecture")
 
-The working memory of a BDI agent consists of two parts: the agent model and the agent runtime state. The agent model represents the type definition of a BDI agent and determine which beliefs, plans and goals (besides other elements) an agent possesses. In the runtime state concrete instances of these model elements are contained, e.g. belief values, specific goals and plans. The conceptual foundation of how an agent model and instance should look like is defined in the BDI agent metamodel.Â 
+The working memory of a BDI agent consists of two parts: the agent model and the agent runtime state. The agent model represents the type definition of a BDI agent and determine which beliefs, plans and goals (besides other elements) an agent possesses. In the runtime state concrete instances of these model elements are contained, e.g. belief values, specific goals and plans. The conceptual foundation of how an agent model and instance should look like is defined in the BDI agent metamodel. 
 
 Advantages of the new rule based approach are that the new mechanism offers a much higher degree of extensibility and flexibility as new functionalities such as emotions or team behaviour can be added as new set of rules without having to change the interpreter itself. One concrete effect already contained in this version is the support for goal deliberation via the "Easy Deliberation" strategy, which allows users to define which goals inhibit others to ensure that the active set of currently pursued goals by the agent is always consistent.

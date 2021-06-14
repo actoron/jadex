@@ -11,7 +11,7 @@ Note that this tutorial is not a replacement for the existing eclipse documentat
 - *(Standard setup: A1-A3)* Download the latest Jadex distribution .zip from [https://www.activecomponents.org/index.html#/download](https://www.activecomponents.org/index.html#/download)  and unpack it to a place of your choice.
 - *(Alternative setup: A4)* Download the jadex-example-project.zip from [https://www.activecomponents.org/index.html#/download](https://www.activecomponents.org/index.html#/download)  and unpack it to a place of your choice.
 
-Before starting with the exercises, you need to decide if you'd like to use the standard setup as described in exercises A1-A3 or the alternative setup with the Maven build tool as described in exercise A4. For inexperienced users, it is recommended to follow the standard setup, were most steps are performed manually and are thus explained in the exercises.Â 
+Before starting with the exercises, you need to decide if you'd like to use the standard setup as described in exercises A1-A3 or the alternative setup with the Maven build tool as described in exercise A4. For inexperienced users, it is recommended to follow the standard setup, were most steps are performed manually and are thus explained in the exercises. 
 
 ## Exercise A1 - Eclipse Environment Setup
 
@@ -22,7 +22,7 @@ Start eclipse. Start the 'New Java Project' wizard, disable the 'Use default loc
 ![02 Installation@eclipseprojectcreate.png](eclipseprojectcreate.png)
 *Create Java project in eclipse*
 
-Click 'Finish' - the project will be created. Your project should now look like the picture below.Â 
+Click 'Finish' - the project will be created. Your project should now look like the picture below. 
 
 ![02 Installation@eclipseprojectfinal.png](eclipseprojectfinal.png)
 *Final Jadex eclipse project layout*

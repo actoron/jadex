@@ -1,5 +1,6 @@
 package jadex.bdiv3.model;
 
+import jadex.bdiv3.annotation.ExcludeMode;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 

@@ -41,7 +41,7 @@ Add a parameter 'address' of type string. Leave the other tasks empty for now (i
 
 ### Using Local Parameter Values
 
-Data flow between tasks is modelled using data edges. A data edge is a connection between the out parameter of a task with an in parameter of another task. Data edges allow for transferring parameter values between arbitrary tasks of the same level, i.e. one cannot draw a data edge to a task inside a subprocess - instead one has to first connect the subtask itself per data edge and afterwards route it to the corresponding task.Â 
+Data flow between tasks is modelled using data edges. A data edge is a connection between the out parameter of a task with an in parameter of another task. Data edges allow for transferring parameter values between arbitrary tasks of the same level, i.e. one cannot draw a data edge to a task inside a subprocess - instead one has to first connect the subtask itself per data edge and afterwards route it to the corresponding task. 
 
 In the example we want to access the address the user entered in both subsequent tasks. To enable this we need to draw two data edges that connect the 'address' out parameter with in parameters of the other tasks. Make both tasks to PrintTasks and fetch the corresponding 'text' parameter. Then draw two edges connecting the 'address' parameter with the 'text' parameter for each task. In order to print not only the address itself, we want to modify the parameter value when transferred to the 'text' parameter by using a 'Value Mapping'. This can be found as property of the data edges. Set the first mapping to '"Shipping to: "+address' and the mapping of the second task to '"Arrived at: "+address' as indicated below.
 
