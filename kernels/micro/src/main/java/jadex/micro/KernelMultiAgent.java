@@ -907,11 +907,37 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	 *  define kernel-specific settings to configure tools.
 	 *  @param type	The component type. 
 	 *  @return The properties or null, if the component type is not supported by this factory.
-	 */
+	 * /
 	public Map<String, Object> getProperties(String type)
 	{
 //		return Collections.EMPTY_MAP;
 		return props;
+	}*/
+	
+	/**
+	 * Get a default icon for a component type.
+	 */
+	public Map<String, Object> getProperties(String type)
+	{
+//		System.out.println("multi factory icon: "+type+" "+iconcache.containsKey(type));
+		
+		Map<String, Object> ret = new HashMap<>(props);
+		
+		for(IComponentFactory fac : getFactories())
+		{
+			if(!((IService)fac).getServiceId().equals(sid))
+			{
+				Map<String, Object> props = fac.getProperties(type);
+			
+				if(props != null)
+				{
+					ret.putAll(props);
+					break;
+				}
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**

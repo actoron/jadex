@@ -58,13 +58,13 @@ public class DebuggerMainPanel extends JSplitPane
 	protected IComponentDescription	desc;
 	
 	/** The step button. */
-	protected JButton	step;
+	protected JButton step;
 
 	/** The step button. */
-	protected JButton	run;
+	protected JButton run;
 
 	/** The pause buuton. */
-	protected JButton	pause;
+	protected JButton pause;
 	
 	/** The tabs. */
 	protected List<IDebuggerPanel> debuggerpanels;
@@ -127,21 +127,21 @@ public class DebuggerMainPanel extends JSplitPane
 						{
 							public void customResultAvailable(Object result)
 							{
-								final String	panels	= (String)result;
+								final String panels	= (String)result;
 								if(panels!=null)
 								{
 									AbstractJCCPlugin.getClassLoader(desc.getName(), jcc).addResultListener(new SwingDefaultResultListener<ClassLoader>(DebuggerMainPanel.this)
 									{
 										public void customResultAvailable(ClassLoader cl)
 										{
-		//											final ClassLoader	cl	= (ClassLoader)result;
+		//									final ClassLoader	cl	= (ClassLoader)result;
 											StringTokenizer	stok	= new StringTokenizer(panels, ", \t\n\r\f");
 											while(stok.hasMoreTokens())
 											{
 												String classname	= stok.nextToken();
 												try
 												{
-		//													System.out.println("loading panel: "+classname+" "+cl);
+		//											System.out.println("loading panel: "+classname+" "+cl);
 													Class<?> clazz	= SReflect.classForName(classname, cl);
 													IDebuggerPanel	panel	= (IDebuggerPanel)clazz.newInstance();
 													panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
@@ -195,21 +195,35 @@ public class DebuggerMainPanel extends JSplitPane
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				Runnable update = new Runnable()
+				{	
+					public void run() 
+					{
+						DebuggerMainPanel.this.jcc.getPlatformAccess().scheduleStep(x ->
+						{
+							DebuggerMainPanel.this.jcc.getPlatformAccess().getDescription(DebuggerMainPanel.this.desc.getName())
+							.addResultListener(new IResultListener<IComponentDescription>()
+							{
+								public void resultAvailable(IComponentDescription result)
+								{
+									updatePanel(result);
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									error();
+								}
+							});
+							return IFuture.DONE;
+						});
+					}
+				};
+				
 				step.setEnabled(false);
 				run.setEnabled(false);
-				DebuggerMainPanel.this.jcc.getPlatformAccess().getDescription(DebuggerMainPanel.this.desc.getName())
-					.addResultListener(new IResultListener<IComponentDescription>()
-				{
-					public void resultAvailable(IComponentDescription result)
-					{
-						updatePanel(result);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						error();
-					}
-				});
+				//System.out.println("step compo: "+DebuggerMainPanel.this.desc.getName()+" "+getStepInfo());
+				IFuture<Void> ret = DebuggerMainPanel.this.jcc.getPlatformAccess().getExternalAccess(DebuggerMainPanel.this.desc.getName()).stepComponent(getStepInfo());
+				ret.then(x -> {System.out.println("step ok"); update.run();}).catchEx(ex -> {System.out.println("step ex: "+ex); update.run();});
 			}
 		});
 		
@@ -338,8 +352,6 @@ public class DebuggerMainPanel extends JSplitPane
 
 	protected void updatePanel(final IComponentDescription desc)
 	{
-		if(desc==null)
-			System.out.println("asfhsfhakfhk");
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
