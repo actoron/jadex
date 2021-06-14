@@ -83,14 +83,14 @@ the `hasNext...` or `getNext...` future methods will eventually throw a `jadex.c
 Juni 14, 2021 2:14:22 PM TimeUserAgent@WinnieThePooh_dc3 jadex.bridge.component.impl.ExecutionComponentFeature execute
 SEVERE: Component step failed: jadex.micro.quickstart.TimeUserAgent.addTimeService[ITimeService_#19@TimeProviderAgent@WinnieThePooh_oxw]
 jadex.commons.TimeoutException: 30000: Use PlatformConfiguration.getExtendedPlatformConfiguration().setDebugFutures(true) for timeout cause.
-	at jadex.bridge.component.impl.ExecutionComponentFeature$11.resultAvailable(ExecutionComponentFeature.java:1048)
-	at jadex.bridge.component.impl.ExecutionComponentFeature$11.resultAvailable(ExecutionComponentFeature.java:1)
-	at jadex.commons.future.Future$1.execute(Future.java:786)
-	at jadex.commons.future.Future$1.execute(Future.java:1)
-	at jadex.commons.future.Future.executeNotification(Future.java:696)
-	at jadex.commons.future.Future.doStartScheduledNotifications(Future.java:667)
-	at jadex.commons.future.Future.startScheduledNotifications(Future.java:620)
-	...
+    at jadex.bridge.component.impl.ExecutionComponentFeature$11.resultAvailable(ExecutionComponentFeature.java:1048)
+    at jadex.bridge.component.impl.ExecutionComponentFeature$11.resultAvailable(ExecutionComponentFeature.java:1)
+    at jadex.commons.future.Future$1.execute(Future.java:786)
+    at jadex.commons.future.Future$1.execute(Future.java:1)
+    at jadex.commons.future.Future.executeNotification(Future.java:696)
+    at jadex.commons.future.Future.doStartScheduledNotifications(Future.java:667)
+    at jadex.commons.future.Future.startScheduledNotifications(Future.java:620)
+    ...
 ```
 
 You can see that the stack trace includes the method, where the exception occurred `jadex.micro.quickstart.TimeUserAgent.addTimeService` as well as the time provider that failed `ITimeService_#19@TimeProviderAgent@WinnieThePooh_oxw`.
