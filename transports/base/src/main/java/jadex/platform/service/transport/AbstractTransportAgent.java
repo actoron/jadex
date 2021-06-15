@@ -57,7 +57,6 @@ import jadex.bridge.service.types.transport.PlatformData;
 import jadex.commons.Boolean3;
 import jadex.commons.ICommand;
 import jadex.commons.MethodInfo;
-import jadex.commons.MultiException;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
@@ -657,7 +656,7 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 			tas.resolveAddresses(remotepf, impl.getProtocolName()).addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Void>(ret)
 			{
 				int	todo;
-				MultiException	ex;
+//				MultiException	ex;
 				
 				public void customResultAvailable(List<TransportAddress> result)
 				{
@@ -734,16 +733,18 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 								{
 									if(--todo==0)
 									{
-										ret.setException(ex!=null ? ex.addCause(exception) : exception);
+										// Only propagate last exception. Alternative: jadex.commons.MultiException: caused by: Connection refused: no further information, Connection refused: no further information, ...
+										ret.setException(exception);
+//										ret.setException(ex!=null ? ex.addCause(exception) : exception);
 									}
-									else
-									{
-										if(ex==null)
-										{
-											ex	= new MultiException();
-										}
-										ex.addCause(exception);
-									}
+//									else
+//									{
+//										if(ex==null)
+//										{
+//											ex	= new MultiException();
+//										}
+//										ex.addCause(exception);
+//									}
 								}
 							});
 						}

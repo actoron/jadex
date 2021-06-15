@@ -244,8 +244,8 @@ public class TcpTransport	implements ITransport<SocketChannel>
 				public void run()
 				{
 					SelectionKey	sk	= sc.keyFor(selector);
-					assert sk!=null;
-					closeConnection(sk, null, true);
+					if(sk!=null)	// Maybe already closed
+						closeConnection(sk, null, true);
 				}
 			});
 		}

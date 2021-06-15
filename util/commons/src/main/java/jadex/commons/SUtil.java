@@ -513,24 +513,41 @@ public class SUtil
 	 * @param a2 The second array.
 	 * @return The joined array.
 	 */
-	public static Object joinArrays(Object a1, Object a2)
+	public static Object joinArrays(Object... arrays)
 	{
-		if(a1==null)
+		int	length	= 0;
+		Object	first	= null;
+		boolean	multi	= false;
+		for(Object a: arrays)
 		{
-			return a2;
+			if(a!=null)
+			{
+				if(first!=null)
+					multi	= true;
+				else
+					first	= a;
+				length	+= Array.getLength(a);
+			}
 		}
-		else if(a2==null)
+
+		if(multi)
 		{
-			return a1;
+			Object res = Array.newInstance(first.getClass().getComponentType(), length);
+			int	pos	= 0;
+			for(Object a: arrays)
+			{
+				if(a!=null)
+				{
+					length	= Array.getLength(a);
+					System.arraycopy(a, 0, res, pos, length);
+					pos	+= length;
+				}
+			}
+			return res;
 		}
 		else
 		{
-			int l1 = Array.getLength(a1);
-			int l2 = Array.getLength(a2);
-			Object res = Array.newInstance(a1.getClass().getComponentType(), l1+ l2);
-			System.arraycopy(a1, 0, res, 0, l1);
-			System.arraycopy(a2, 0, res, l1, l2);
-			return res;
+			return first;
 		}
 	}
 	

@@ -739,15 +739,20 @@ public class Starter
 				});
 				
 				// Manually bootstrap platform execution until execution service is available
+				boolean	inited	= false;
+				boolean	execute	= true;
 				IProvidedServicesFeature	prov	= component.getInternalAccess().getFeature(IProvidedServicesFeature.class);
-				while(prov.getProvidedService(IExecutionService.class)==null
-					|| !((IService)prov.getProvidedService(IExecutionService.class)).isValid().get().booleanValue())
+				while(execute && !inited)
 				{
-					if(!exe.execute())
-					{
-						// execution stopped before init complete!?
-						throw new IllegalStateException("Boostrapping failed: "+component.getInternalAccess());
-					}
+					execute	= exe.execute();
+					inited	= prov.getProvidedService(IExecutionService.class)!=null
+						&& ((IService)prov.getProvidedService(IExecutionService.class)).isValid().get().booleanValue();
+				}
+				
+				if(!inited)
+				{
+					// execution stopped before init complete!?
+					throw new IllegalStateException("Boostrapping failed: "+component.getInternalAccess());
 				}
 				
 				// Rare case when createPlatform called from non-component future listener notification

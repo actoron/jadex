@@ -279,20 +279,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     	{
 	    	if(exception!=null)
 	    	{
-	    		if(exception instanceof RuntimeException)
-	    		{
-	    			throw (RuntimeException)exception;
-	    		}
-	    		else if(exception instanceof ErrorException)
-	    		{
-	    			// Special case to allow errors being set as exception result and thrown as errors.
-	    			throw ((ErrorException)exception).getError();
-	    		}
-	    		else
-	    		{
-	    			// Nest exception to have both calling and manually set exception stack trace.
-	    			throw new RuntimeException(exception.getMessage(), exception);
-	    		}
+	    		throw throwException(exception);
 	    	}
 	    	else if(isDone())
 	    	{
@@ -304,6 +291,37 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	    	}
     	}
     }
+	
+	/**
+	 *  Throw an exception but include the current stack trace. 
+	 */
+	public static RuntimeException	throwException(Throwable t)
+	{
+		if(t instanceof RuntimeException
+			|| t instanceof Error)
+		{
+			// Combine exception and current stack trace with filler in between.
+			StackTraceElement[]	stack0	= t.getStackTrace();
+			StackTraceElement[]	stack1	= new RuntimeException().fillInStackTrace().getStackTrace();
+			t.setStackTrace((StackTraceElement[])SUtil.joinArrays(stack1,
+				new StackTraceElement[]{new StackTraceElement("End of future stack trace", "\n", "Original exception: "+t.toString(), -1)}, stack0));
+			
+			if(t instanceof RuntimeException)
+				throw (RuntimeException)t;
+			else
+				throw (Error)t;
+		}
+		else if(t instanceof ErrorException)
+		{
+			// Special case to allow errors being set as exception result and thrown as errors.
+			throw throwException(((ErrorException)t).getError());
+		}
+		else
+		{
+			// Nest exception to have both calling and manually set exception stack trace.
+			throw new RuntimeException(t.getMessage(), t);
+		}		
+	}
 	
 	/**
 	 *  Set the exception (internal implementation for normal and if-undone).
@@ -786,6 +804,13 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 					listener.resultAvailable(result);
 				}
     		}
+		}
+		
+		
+		@Override
+		public String toString()
+		{
+			return "NotiCommand(" + Future.this + ", " + result + ", " + exception +")";
 		}
 	};
     

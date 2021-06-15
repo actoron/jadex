@@ -76,6 +76,51 @@ The `@OnService(requiredservice=...)` annotation to the `addTimeService()` metho
 
 In the `addTimeService()`, the agent subscribes to each found time service and receives the client side of the subscription future as described in the [last section](02%20Time%20Service%20Interface.md#the-subscribe-method). In the while loop, `hasNextIntermediateResult()` blocks until the next time notification becomes available and can be fetched by `getNextIntermediateResult()`.
 
+The subscription is managed by Jadex and includes a timeout handling. So when one of the time providers is stopped or when the network is down,
+the `hasNext...` or `getNext...` future methods will eventually throw a `jadex.commons.TimeoutException`. If you do not use try/catch in your agent, the exception will be catched internally and printed to the console, e.g.:
+
+```txt
+Juni 14, 2021 2:14:22 PM TimeUserAgent@WinnieThePooh_dc3 jadex.bridge.component.impl.ExecutionComponentFeature execute
+SEVERE: Component step failed: jadex.micro.quickstart.TimeUserAgent.addTimeService[ITimeService_#19@TimeProviderAgent@WinnieThePooh_oxw]
+jadex.commons.TimeoutException: 30000: Use PlatformConfiguration.getExtendedPlatformConfiguration().setDebugFutures(true) for timeout cause.
+    at jadex.bridge.component.impl.ExecutionComponentFeature$11.resultAvailable(ExecutionComponentFeature.java:1048)
+    at jadex.bridge.component.impl.ExecutionComponentFeature$11.resultAvailable(ExecutionComponentFeature.java:1)
+    at jadex.commons.future.Future$1.execute(Future.java:786)
+    at jadex.commons.future.Future$1.execute(Future.java:1)
+    at jadex.commons.future.Future.executeNotification(Future.java:696)
+    at jadex.commons.future.Future.doStartScheduledNotifications(Future.java:667)
+    at jadex.commons.future.Future.startScheduledNotifications(Future.java:620)
+    ...
+```
+
+You can see that the stack trace includes the method, where the exception occurred `jadex.micro.quickstart.TimeUserAgent.addTimeService` as well as the time provider that failed `ITimeService_#19@TimeProviderAgent@WinnieThePooh_oxw`.
+
+For a more complex application, you could consider implementing custom code that explicitly handles timeout exceptions but in many cases the default handling (stopping the subscription and logging the exception) might suffice. To catch the exception and just print an info could
+e.g. look like so:
+
+```java
+    @OnService(requiredservice = @RequiredService(scope = ServiceScope.GLOBAL))
+    public void    addTimeService(ITimeService timeservice)
+    {
+        try
+        {
+            String location = timeservice.getLocation().get();
+            DateFormat format = DateFormat.getDateTimeInstance();
+            ISubscriptionIntermediateFuture<String> subscription = timeservice.subscribe(format);
+            while(subscription.hasNextIntermediateResult())
+            {
+                String time = subscription.getNextIntermediateResult();
+                String platform = ((IService)timeservice).getServiceId().getProviderId().getPlatformName();
+                System.out.println("New time received from "+platform+" in "+location+": "+time);
+            }
+        }
+        catch(TimeoutException e)
+        {
+            System.out.println("Provider disconnected: "+timeservice);
+        }
+    }
+```
+
 [//]: # (*todo: describe IService and service identifier?*)
 
 [//]: # (*todo: describe main method details?*)

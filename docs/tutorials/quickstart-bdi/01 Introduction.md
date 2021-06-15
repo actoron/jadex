@@ -83,7 +83,7 @@ Try placing/removing waste around the moving cleaner to understand the differenc
 world view and the cleaners local (incomplete and possibly incorrect) knowledge.
 
 More details about the sensor/actuator object can be found in the
-[Javadoc](https://www.activecomponents.org/forward.html?type=javadoc&path=index.html?jadex/quickstart/cleanerworld/environment/SensorActuator.html).
+[Javadoc](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/quickstart/cleanerworld/environment/SensorActuator.html).
 
 The simple cleaner is just a starting point that does not perceive anything and just moves randomly:
 

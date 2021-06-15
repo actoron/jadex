@@ -766,7 +766,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		else if(isDone())
     		{
     			if(getException()!=null)
-    				throw SUtil.throwUnchecked(getException());
+    				throwException(getException());
     			else
     				throw new NoSuchElementException("No more intermediate results.");
     		}

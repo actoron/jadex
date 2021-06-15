@@ -55,7 +55,7 @@ Download the **jadex-example-project.zip** from [Downloads](https://www.activeco
 To use Jadex in a new or existing Gradle project, add the following code to your build script's dependency section (set `jadex_version` to the desired version):
 
 ```groovy
-def jadex_version = "4.0.171"
+def jadex_version = "4.0.241"
 
 dependencies {
     // [...] other dependencies
@@ -68,7 +68,7 @@ A minimal complete `build.gradle` could look like this:
 ```groovy
 apply plugin: 'java'
 
-def jadex_version = "4.0.238"
+def jadex_version = "4.0.241"
 
 repositories {
     mavenCentral()
@@ -98,7 +98,7 @@ To use Jadex in a new or existing Maven project, add the following code to your 
 
 ```xml
 <properties>
-    <jadexversion>4.0.171</jadexversion>
+    <jadexversion>4.0.241</jadexversion>
 </properties>
 
 <dependency>
@@ -216,7 +216,7 @@ As shown in the example above, you can combine these two steps by adding your ag
 Jadex comes with many small and large example applications in the [example application directories](../../applications). To start these examples in you Gradle project, you need to add the dependency and afterwards refresh the Gradle project in eclipse, e.g.:
 
 ```Groovy
-    implementation 'org.activecomponents.jadex:jadex-applications-micro:4.0.238'
+    implementation 'org.activecomponents.jadex:jadex-applications-micro:4.0.241'
 ```
 
 ![Refreshing the Gradle project](gradle_refresh.png "Refreshing the Gradle project")
