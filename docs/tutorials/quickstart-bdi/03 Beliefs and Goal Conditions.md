@@ -135,7 +135,7 @@ The field holds a reference to an object of type `ICleaner`. The reference (`sel
 but an attribute of the referenced cleaner object. This change is published as a *bean property change*.
 If you are interested in more details, e.g. for augmenting your own belief objects with property change support
 you can have a look at a simple example from the official
-[Javadoc](https://docs.oracle.com/javase/8/docs/api/index.html?java/beans/PropertyChangeSupport.html).
+[Javadoc](https://docs.oracle.com/javase/8/docs/api/java/beans/PropertyChangeSupport.html).
 
 ## Exercise B2: Using Deliberation Settings for Managing Conflicting Goals
 
