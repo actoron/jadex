@@ -56,8 +56,11 @@ public class SensorActuator
 	/** The known charging stations. */
 	private Set<IChargingstation>	chargingstations;
 	
-	/** The known waste boins. */
+	/** The known waste bins. */
 	private Set<IWastebin>	wastebins;
+	
+	/** Future allowing to wait for recharging. */
+	private Future<Void>	recharging;
 	
 	//-------- constructors --------
 	
@@ -248,6 +251,18 @@ public class SensorActuator
 		{
 			throw new IllegalStateException("Cannot move to multiple targets simultaneously. Target exists: "+target);
 		}
+		
+		// When out of battery -> block until battery is recharged a bit.
+		if(self.getChargestate()<=0)
+		{
+			if(recharging==null)
+			{
+				recharging	= new Future<Void>();
+			}
+			agent.getLogger().warning("moveTo() called with empty battery -> blocking until recharged.");
+			recharging.get();
+		}
+		
 		this.target	= new Location(x, y);
 		
 		// Signal variable to check when location is reached.
@@ -287,7 +302,7 @@ public class SensorActuator
 								if(chargestate<0)
 								{
 									self.setChargestate(0);
-									throw new IllegalStateException("Out of battery!");
+									return new Future<>(new IllegalStateException("Run of battery during moveTo() -> target location not reached!"));
 								}
 								self.setChargestate(chargestate);
 								
@@ -347,8 +362,8 @@ public class SensorActuator
 		}
 		catch(Throwable t)
 		{
-			if(t instanceof Exception)
-				t.printStackTrace();
+//			if(t instanceof Exception)
+//				t.printStackTrace();
 			// Move interrupted -> set exception to abort move steps.
 			reached.setExceptionIfUndone(t instanceof Exception ? (Exception)t : new ErrorException((Error)t));
 			SUtil.throwUnchecked(t);
@@ -414,6 +429,14 @@ public class SensorActuator
 								inc	= inc * 10/3.0 * (1-self.getChargestate());
 							}
 							self.setChargestate(self.getChargestate()+inc);
+							
+							// Restart blocked moveTo()s, if any.
+							Future<Void>	rec	= recharging;
+							recharging	= null;
+							if(rec!=null)
+							{
+								rec.setResult(null);
+							}
 							
 							// Post new own state to environment
 							Environment.getInstance().updateCleaner(self);

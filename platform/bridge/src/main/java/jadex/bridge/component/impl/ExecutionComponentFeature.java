@@ -1412,6 +1412,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			
 			IFuture<?>	stepfut	= null;
 			Throwable ex = null;
+			boolean	hardex	= false;
 			try
 			{
 				boolean valid = true;
@@ -1485,13 +1486,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			catch(Throwable t)
 			{
 				ex = t;
-				
-				if(!(t instanceof ThreadDeath) && !(t instanceof StepAborted))
-				{
-					StringWriter sw	= new StringWriter();
-					t.printStackTrace(new PrintWriter(sw));
-					getComponent().getLogger().warning("Component step threw hard exception: "+step.getStep()+"\n"+sw);
-				}
+				hardex	= true;
 			}
 			
 			if(ex!=null)
@@ -1514,14 +1509,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				step.getFuture().setExceptionIfUndone(ex instanceof Exception? (Exception)ex: new RuntimeException(ex));
 
 				// If no listener, print failed step to console for developer.
-				// Hard step failure with uncatched exception is shown also when no debug.
-				if(!step.getFuture().hasResultListener() &&
+				if(!step.getFuture().isNotified() &&
 					(!(ex instanceof ComponentTerminatedException)
 					|| !((ComponentTerminatedException)ex).getComponentIdentifier().equals(component.getId()))
 					&& !(ex instanceof StepInvalidException) && !(ex instanceof StepAbortedException))
 				{
-					final Throwable fex = ex;
-					// No wait for delayed listener addition for hard failures to print errors immediately.
+//					final Throwable fex = ex;
+//					// No wait for delayed listener addition for hard failures to print errors immediately.
 //					waitForDelay(3000, true)
 //						.addResultListener(new IResultListener<Void>()
 //					{
@@ -1530,9 +1524,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //							if(!step.getSecondEntity().hasResultListener())
 //							{
 								// Todo: fail fast vs robust components.
-								StringWriter	sw	= new StringWriter();
-								fex.printStackTrace(new PrintWriter(sw));
-								getComponent().getLogger().severe("Component step failed: "+step.getStep()+"\n"+sw);
+								getComponent().getLogger().severe("Component step failed: "+step.getStep()+"\n"+SUtil.getExceptionStacktrace(ex));
 								
 								if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getStep()))
 								{
@@ -1547,6 +1539,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //							exception.printStackTrace();
 //						}
 //					});
+				}
+				// Hard step failure with uncatched exception is shown also when no debug.
+				else if(hardex)
+				{
+					getComponent().getLogger().warning("Component step threw hard exception: "+step.getStep()+"\n"+SUtil.getExceptionStacktrace(ex));
 				}
 			}
 			
@@ -1578,7 +1575,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						});
 					}
 		
-					if(DEBUG && !step.getFuture().hasResultListener())
+					if(DEBUG && !step.getFuture().isNotified())
 					{
 						// Wait for delayed listener addition.
 						waitForDelay(3000, true)
@@ -1586,7 +1583,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						{
 							public void resultAvailable(Void result)
 							{
-								if(!step.getFuture().hasResultListener())
+								if(!step.getFuture().isNotified())
 								{
 									((Future<Object>)step.getFuture()).addResultListener(new IResultListener<Object>()
 									{

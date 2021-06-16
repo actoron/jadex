@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import javax.swing.JPanel;
 
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
@@ -67,95 +68,101 @@ class SensorPanel extends JPanel
 	 */
 	protected void	paintComponent(Graphics g)
 	{
-		GuiData	data	= fetchGuiData();
-		
-		// Paint background (dependent on daytime).
-		Rectangle	bounds	= getBounds();
-		g.setColor(data.daytime ? Color.lightGray : Color.darkGray);
-		g.fillRect(0, 0, bounds.width, bounds.height);
-
-		// Paint the known cleaners.
-		for(ICleaner cleaner: data.cleaners)
+		try
 		{
+			GuiData	data	= fetchGuiData();
+			
+			// Paint background (dependent on daytime).
+			Rectangle	bounds	= getBounds();
+			g.setColor(data.daytime ? Color.lightGray : Color.darkGray);
+			g.fillRect(0, 0, bounds.width, bounds.height);
+
+			// Paint the known cleaners.
+			for(ICleaner cleaner: data.cleaners)
+			{
+				// Paint agent.
+				Point	p	= onScreenLocation(cleaner.getLocation(), bounds);
+				int w	= (int)(cleaner.getVisionRange()*bounds.width);
+				int h	= (int)(cleaner.getVisionRange()*bounds.height);
+				int colorcode	= Math.abs(cleaner.getAgentIdentifier().getParent().getLocalName().hashCode()%8);
+				g.setColor(new Color((colorcode&1)!=0?255:100, (colorcode&2)!=0?255:100, (colorcode&4)!=0?255:100, 192));	// Vision range
+				g.fillOval(p.x-w, p.y-h, w*2, h*2);
+				g.setColor(new Color(50, 50, 50, 180));
+				g.fillOval(p.x-3, p.y-3, 7, 7);
+				g.drawString(cleaner.getAgentIdentifier().getLocalName(),
+					p.x+5, p.y-5);
+				g.drawString("battery: " + (int)(cleaner.getChargestate()*100.0) + "%",
+					p.x+5, p.y+5);
+				g.drawString("waste: " + (cleaner.getCarriedWaste()!=null ? "yes" : "no"),
+					p.x+5, p.y+15);
+			}
+
 			// Paint agent.
-			Point	p	= onScreenLocation(cleaner.getLocation(), bounds);
-			int w	= (int)(cleaner.getVisionRange()*bounds.width);
-			int h	= (int)(cleaner.getVisionRange()*bounds.height);
-			int colorcode	= Math.abs(cleaner.getAgentIdentifier().getParent().getLocalName().hashCode()%8);
+			Point	p	= onScreenLocation(data.self.getLocation(), bounds);
+			int w	= (int)(data.self.getVisionRange()*bounds.width);
+			int h	= (int)(data.self.getVisionRange()*bounds.height);
+			int colorcode	= Math.abs(ComponentIdentifier.getPlatformPrefix(data.self.getAgentIdentifier().getParent().getLocalName()).hashCode()%8);
 			g.setColor(new Color((colorcode&1)!=0?255:100, (colorcode&2)!=0?255:100, (colorcode&4)!=0?255:100, 192));	// Vision range
 			g.fillOval(p.x-w, p.y-h, w*2, h*2);
-			g.setColor(new Color(50, 50, 50, 180));
+			g.setColor(Color.black);	// Agent
 			g.fillOval(p.x-3, p.y-3, 7, 7);
-			g.drawString(cleaner.getAgentIdentifier().getLocalName(),
+			g.drawString(data.self.getAgentIdentifier().getLocalName(),
 				p.x+5, p.y-5);
-			g.drawString("battery: " + (int)(cleaner.getChargestate()*100.0) + "%",
+			g.drawString("battery: " + (int)(data.self.getChargestate()*100.0) + "%",
 				p.x+5, p.y+5);
-			g.drawString("waste: " + (cleaner.getCarriedWaste()!=null ? "yes" : "no"),
+			g.drawString("waste: " + (data.self.getCarriedWaste()!=null ? "yes" : "no"),
 				p.x+5, p.y+15);
+			
+//			// Paint pheromones.
+//			for(IPheromone pheromone: data.pheromones)
+//			{
+//				colorcode	= Math.abs(pheromone.getType().hashCode()%8);
+//				g.setColor(new Color((colorcode&1)!=0?192:0, (colorcode&2)!=0?192:0, (colorcode&4)!=0?192:0, (int)(192*pheromone.getStrength())));
+//				p	= onScreenLocation(pheromone.getLocation(), bounds);
+//				int size	= (int)(pheromone.getStrength()*7);
+//				g.fillOval(p.x-size, p.y-size, size*2+1, size*2+1);
+//			}
+
+			// Paint charge stations.
+			for(IChargingstation station: data.stations)
+			{
+				g.setColor(Color.blue);
+				p	= onScreenLocation(station.getLocation(), bounds);
+				g.drawRect(p.x-10, p.y-10, 20, 20);
+				g.setColor(data.daytime ? Color.black : Color.white);
+				g.drawString(station.getId(), p.x+14, p.y+5);
+			}
+
+			// Paint waste bins.
+			for(IWastebin bin: data.wastebins)
+			{
+				g.setColor(Color.red);
+				p = onScreenLocation(bin.getLocation(), bounds);
+				g.drawOval(p.x-10, p.y-10, 20, 20);
+				g.setColor(data.daytime ? Color.black : Color.white);
+				g.drawString(bin.getId()+" ("+bin.getWastes().length+"/"+bin.getCapacity()+")", p.x+14, p.y+5);
+			}
+
+			// Paint waste.
+			for(IWaste waste: data.wastes)
+			{
+				g.setColor(Color.red);
+				p	= onScreenLocation(waste.getLocation(), bounds);
+				g.fillOval(p.x-3, p.y-3, 7, 7);
+			}
+
+			// Paint movement target.
+			if(data.target!=null)
+			{
+				g.setColor(Color.black);
+				p = onScreenLocation(data.target, bounds);
+				g.drawOval(p.x-5, p.y-5, 10, 10);
+				g.drawLine(p.x-7, p.y, p.x+7, p.y);
+				g.drawLine(p.x, p.y-7, p.x, p.y+7);
+			}
 		}
-
-		// Paint agent.
-		Point	p	= onScreenLocation(data.self.getLocation(), bounds);
-		int w	= (int)(data.self.getVisionRange()*bounds.width);
-		int h	= (int)(data.self.getVisionRange()*bounds.height);
-		int colorcode	= Math.abs(ComponentIdentifier.getPlatformPrefix(data.self.getAgentIdentifier().getParent().getLocalName()).hashCode()%8);
-		g.setColor(new Color((colorcode&1)!=0?255:100, (colorcode&2)!=0?255:100, (colorcode&4)!=0?255:100, 192));	// Vision range
-		g.fillOval(p.x-w, p.y-h, w*2, h*2);
-		g.setColor(Color.black);	// Agent
-		g.fillOval(p.x-3, p.y-3, 7, 7);
-		g.drawString(data.self.getAgentIdentifier().getLocalName(),
-			p.x+5, p.y-5);
-		g.drawString("battery: " + (int)(data.self.getChargestate()*100.0) + "%",
-			p.x+5, p.y+5);
-		g.drawString("waste: " + (data.self.getCarriedWaste()!=null ? "yes" : "no"),
-			p.x+5, p.y+15);
-		
-//		// Paint pheromones.
-//		for(IPheromone pheromone: data.pheromones)
-//		{
-//			colorcode	= Math.abs(pheromone.getType().hashCode()%8);
-//			g.setColor(new Color((colorcode&1)!=0?192:0, (colorcode&2)!=0?192:0, (colorcode&4)!=0?192:0, (int)(192*pheromone.getStrength())));
-//			p	= onScreenLocation(pheromone.getLocation(), bounds);
-//			int size	= (int)(pheromone.getStrength()*7);
-//			g.fillOval(p.x-size, p.y-size, size*2+1, size*2+1);
-//		}
-
-		// Paint charge stations.
-		for(IChargingstation station: data.stations)
-		{
-			g.setColor(Color.blue);
-			p	= onScreenLocation(station.getLocation(), bounds);
-			g.drawRect(p.x-10, p.y-10, 20, 20);
-			g.setColor(data.daytime ? Color.black : Color.white);
-			g.drawString(station.getId(), p.x+14, p.y+5);
-		}
-
-		// Paint waste bins.
-		for(IWastebin bin: data.wastebins)
-		{
-			g.setColor(Color.red);
-			p = onScreenLocation(bin.getLocation(), bounds);
-			g.drawOval(p.x-10, p.y-10, 20, 20);
-			g.setColor(data.daytime ? Color.black : Color.white);
-			g.drawString(bin.getId()+" ("+bin.getWastes().length+"/"+bin.getCapacity()+")", p.x+14, p.y+5);
-		}
-
-		// Paint waste.
-		for(IWaste waste: data.wastes)
-		{
-			g.setColor(Color.red);
-			p	= onScreenLocation(waste.getLocation(), bounds);
-			g.fillOval(p.x-3, p.y-3, 7, 7);
-		}
-
-		// Paint movement target.
-		if(data.target!=null)
-		{
-			g.setColor(Color.black);
-			p = onScreenLocation(data.target, bounds);
-			g.drawOval(p.x-5, p.y-5, 10, 10);
-			g.drawLine(p.x-7, p.y, p.x+7, p.y);
-			g.drawLine(p.x, p.y-7, p.x, p.y+7);
+		catch(ComponentTerminatedException e)
+		{	
 		}
 	}
 	

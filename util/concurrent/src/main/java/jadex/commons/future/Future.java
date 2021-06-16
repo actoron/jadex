@@ -464,6 +464,16 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     	return true;
     }
     
+    protected boolean	notified	= false;
+    
+    /**
+     *  Was the result/exception (scheduled to be) notified to some listener/blocked caller?
+     */
+    public boolean	isNotified()
+    {
+    	return notified;
+    }
+    
 	/**
 	 *  Resume after result or exception has been set.
 	 */
@@ -490,10 +500,12 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		    			callers.put(caller, CALLER_RESUMED);
 					}
 		    	}
+				notified	= true;
 			}
 
     	   	// cast to filter for notifying all listeners
     		scheduled	= scheduleNotification((IFilter<IResultListener<E>>)null, getNotificationCommand());
+			notified	= notified || scheduled;
     		
     		// avoid memory leaks
 			listeners	= null;

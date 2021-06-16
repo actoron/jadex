@@ -53,7 +53,7 @@ public class Main
 
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentA0.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentA1.class");
-//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentA2.class");
+		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentA2.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentA3.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentA4.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentB1.class");
@@ -62,7 +62,7 @@ public class Main
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentC0.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentC1.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentC2.class");
-		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentD1.class");
+//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentD1.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentD2.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentD3a.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgent.class");
