@@ -51,7 +51,7 @@ public class QuizMasterAgent implements IQuizService
 	
 	/** The delay between questions. */
 	@AgentArgument
-	protected long delay = 5000;
+	protected long delay = 15000;
 	
 	/** The current question no. */
 	protected int questioncnt = 0;
