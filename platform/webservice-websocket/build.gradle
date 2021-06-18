@@ -10,7 +10,7 @@ buildscript {
 plugins {
 	id "maven-publish" // PublishToMavenLocal
 	id "java"
-	id "maven"
+//	id "maven"
 	id "eclipse"
 	id "eclipse-wtp"
 //	id "com.moowork.node" version "0.13"

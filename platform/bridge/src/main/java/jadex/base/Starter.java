@@ -3,16 +3,7 @@ package jadex.base;
 import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.logging.Logger;
 
 import jadex.bridge.ComponentIdentifier;
@@ -235,7 +226,7 @@ public class Starter
 	 *  @throws Exception
 	 */
 	public static void main(String[] args)
-	{		
+	{
 //		try
 //		{
 //			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

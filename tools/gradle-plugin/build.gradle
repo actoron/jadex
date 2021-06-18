@@ -58,7 +58,7 @@ task createClasspathManifest {
 
 // Add the classpath file to the test runtime classpath
 dependencies {
-    testRuntime files(createClasspathManifest)
+    testImplementation files(createClasspathManifest)
 }
 
 

@@ -227,6 +227,7 @@ def addSourcesJarTask(Project p) {
         def sourcesJar = p.tasks.create('sourcesJar', Jar) {
         	archiveBaseName = getArtifactName(p)
             classifier = 'sources'
+			duplicatesStrategy = DuplicatesStrategy.EXCLUDE;
             from p.sourceSets.main.allSource
 			outputs.cacheIf { true }
         }
