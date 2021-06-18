@@ -18,6 +18,8 @@ import jadex.bridge.service.ServiceScope;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -26,7 +28,10 @@ import jadex.micro.annotation.RequiredServices;
  *  The quiz client agent.
  */
 @Agent
-@RequiredServices({@RequiredService(name="quizservice", type=IQuizService.class, scope = ServiceScope.PLATFORM)})
+@Arguments(
+	@Argument(name="scope", clazz=ServiceScope.class, defaultvalue="jadex.bridge.service.ServiceScope.PLATFORM"))
+@RequiredServices({@RequiredService(name="quizservice", type=IQuizService.class,
+	scope=ServiceScope.EXPRESSION, scopeexpression="$args.scope")})
 public class QuizClientAgent
 {
 	@Agent

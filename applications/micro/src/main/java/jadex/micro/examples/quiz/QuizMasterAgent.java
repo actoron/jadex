@@ -8,8 +8,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnStart;
-import jadex.commons.Boolean3;
+import jadex.bridge.service.annotation.Security;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -17,11 +18,22 @@ import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Imports;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 
 /**
  *  The quiz master agent.
  */
-@Agent(autoprovide = Boolean3.TRUE)
+@Agent
+@Imports("jadex.bridge.service.annotation.Security")
+@Arguments(
+	@Argument(name="scope", clazz=ServiceScope.class))
+@ProvidedServices(@ProvidedService(name="quiz", type=IQuizService.class,
+	scope=ServiceScope.EXPRESSION, scopeexpression="$args.scope",
+	security=@Security(roles="%{$args.scope.isGlobal() ? Security.UNRESTRICTED : Security.TRUSTED}")))
 public class QuizMasterAgent implements IQuizService
 {
 	/** The agent. */
