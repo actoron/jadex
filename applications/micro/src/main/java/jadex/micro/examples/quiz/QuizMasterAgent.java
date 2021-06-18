@@ -59,11 +59,7 @@ public class QuizMasterAgent implements IQuizService
 	@OnStart
 	public void start()
 	{
-		this.quiz = new Quiz();
-		quiz.addQuestion(new Question("Question 1?", Arrays.asList(new String[]{"A1", "B", "C", "D"}), 0));
-		quiz.addQuestion(new Question("Question 2?", Arrays.asList(new String[]{"A", "B2", "C", "D"}), 1));
-		quiz.addQuestion(new Question("Question 3?", Arrays.asList(new String[]{"A", "B", "C3", "D"}), 2));
-		quiz.addQuestion(new Question("Question 4?", Arrays.asList(new String[]{"A", "B", "C", "D4"}), 3));
+		this.quiz = createQuiz();
 		
 		agent.scheduleStep(s ->
 		{
@@ -95,6 +91,19 @@ public class QuizMasterAgent implements IQuizService
 		{
 			subscription.addIntermediateResult(new QuestionEvent(question, questioncnt));
 		}
+	}
+	
+	/**
+	 *  Create a quiz.
+	 */
+	protected Quiz createQuiz()
+	{
+		Quiz quiz = new Quiz();
+		quiz.addQuestion(new Question("Which software pattern can be used to exchange algorithms?", Arrays.asList(new String[]{"Visitor", "Observer", "Memento", "Strategy"}), 3));
+		quiz.addQuestion(new Question("What does the L in SOLID stands for?", Arrays.asList(new String[]{"Lavrow", "Liskov", "Low", "Lightweight"}), 1));
+		quiz.addQuestion(new Question("In the SOA triangle there are the entities service provider, user and ...?", Arrays.asList(new String[]{"ESB", "Bus", "Registry", "Mesh"}), 2));
+		quiz.addQuestion(new Question("An agent often is reactive and ...?", Arrays.asList(new String[]{"emotional", "fast", "proactive", "scalable"}), 2));
+		return quiz;
 	}
 	
 	/**
@@ -139,8 +148,10 @@ public class QuizMasterAgent implements IQuizService
 			res = new QuizResults();
 			results.put(caller, res);
 		}
+		System.out.println("answer: "+answer+" "+questioncnt+" "+(quiz.getQuestion(questioncnt).getSolution()==answer));
+		//System.out.println("antwort: "+(quiz.getQuestion(questioncnt).getSolution()==answer)+" "+answer);
 		res.addResult(questioncnt, quiz.getQuestion(questioncnt).getSolution()==answer);
-		System.out.println("res: "+res.size()+" "+quiz.getNumberOfQuestions());
+		//System.out.println("res: "+res.size()+" "+quiz.getNumberOfQuestions());
 		if(res.size()==quiz.getNumberOfQuestions())
 		{
 			SubscriptionIntermediateFuture<QuizEvent> s = subscriptions.get(caller);
