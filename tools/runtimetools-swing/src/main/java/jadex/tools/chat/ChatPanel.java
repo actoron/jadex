@@ -1171,13 +1171,20 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				
 				getService().getUsers().then(col ->
 				{
-					for(IChatService chat: col)
+					getServiceAccess().then(c -> 
 					{
-						IComponentIdentifier cid = ((IService)chat).getServiceId().getProviderId();
-						updateChatUser(cid, chat);
-					}
+						c.scheduleStep(a ->
+						{
+							for(IChatService chat: col)
+							{
+								IComponentIdentifier cid = ((IService)chat).getServiceId().getProviderId();
+								updateChatUser(cid, chat);
+							}
+							return IFuture.DONE;
+						});
+					});
 				});
-				
+						
 				subscription = getService().subscribeToEvents();
 				subscription.addResultListener(new SwingIntermediateDefaultResultListener<ChatEvent>()
 				{

@@ -4,18 +4,23 @@ export class BaseElement extends LitElement
 {
 	static app_singleton;
 	
-	static apppromise = new Promise((resolve,reject) => {
+	static apppromise = new Promise((resolve,reject) => 
+	{
 		// axios.get('/webcomponents/app.js') is better but does not work with path rewrite in proxy
-		axios.get('../webcomponents/app.js').then(function(resp) {
+		axios.get('../webcomponents/app.js').then(function(resp) 
+		{
 			let appfun = new Function("return " + resp.data + "\n//# sourceURL=app.js\n");
-			try {
+			try 
+			{
 				BaseElement.app_singleton = appfun();
 				resolve();
 			}
-			catch (err) {
+			catch (err) 
+			{
 				reject(err);
 			}
-		}).catch(err => {
+		}).catch(err => 
+		{
 			reject(err);
 		});
 	});
@@ -81,15 +86,16 @@ export class BaseElement extends LitElement
 				self.app = BaseElement.app_singleton;
 				
 				// must load sync to ensure that style.css rules are defined and gain precedence		
-				self.loadStyle("/libs/bootstrap_4.5.0/bootstrap.min.css")
+				//self.loadStyle("/libs/bootstrap_4.5.0/bootstrap.min.css")
+				self.loadStyle("/libs/bootstrap_5.0.1/css/bootstrap.min.css")
 				.then(()=>
 				{
 					//console.log("loaded bootstrap css")
-					self.loadScript("libs/jquery_3.4.1/jquery.js")
-					.then(()=>
-					{
+					//self.loadScript("libs/jquery_3.4.1/jquery.js")
+					//.then(()=>
+					//{
 						//console.log("loaded jquery")
-						self.loadScript("/libs/bootstrap_4.5.0/bootstrap.bundle.min.js")
+						self.loadScript("/libs/bootstrap_5.0.1/js/bootstrap.bundle.min.js")
 						.then(()=>
 						{
 							//console.log("loaded bootstrap")
@@ -103,8 +109,8 @@ export class BaseElement extends LitElement
 							.catch((err)=>rejec(err));
 						})
 						.catch((err)=>rejec(err));
-					})
-					.catch((err)=>rejec(err));
+					//})
+					//.catch((err)=>rejec(err));
 				})
 				.catch((err)=>rejec(err));
 			})
@@ -160,7 +166,7 @@ export class BaseElement extends LitElement
 	loadStyle(url)
 	{
 		
-		console.log("###########LOADING STY " + url);
+		//console.log("###########LOADING STY " + url);
 		var self = this;
 		var ret = null;
 		

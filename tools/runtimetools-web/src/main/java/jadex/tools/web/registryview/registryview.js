@@ -103,13 +103,12 @@ class RegistryViewElement extends CidElement
 		self.subscribe();
 	}
 	
-	/*connectedCallback()
+	connectedCallback()
 	{
 		super.connectedCallback();
 		this.concom = true;	
-	
-		this.subscribe();
-	}*/
+		//this.subscribe();
+	}
 	
 	subscribe()
 	{
@@ -233,11 +232,11 @@ class RegistryViewElement extends CidElement
 			self.getSubscription(x).connected = true;
 			self.updateX(x, response.data, equals, add);
 		},
-		function(response)
+		function(err)
 		{
 			//console.log("Could not reach platform.");
 			//console.log("Err: "+JSON.stringify(err));
-			self.getSubscription(x).connected = true;
+			self.getSubscription(x).connected = false;
 			self.getSubscription(x).elements = [];
 			self.requestUpdate();
 			
