@@ -59,7 +59,7 @@ table.actwtable {
 	border-bottom-left-radius: 6px;
 }
 
-.btn{
+.jadexbtn{
 	/*
 	background-color: #1f79a0;
 	border-color: #73b4d0;
@@ -77,9 +77,9 @@ table.actwtable {
 	border: 0px;
 	
 	color: #fff;
-	margin-top:5px;
+	/*margin-top:5px;
 	display: block;
-	width:100%;
+	width:100%;*/
 }
 
 .w100 {
@@ -88,6 +88,30 @@ table.actwtable {
 
 .h100 {
 	height: 100%;
+}
+
+h1 {
+  font-size: 1.6em; /* x px/16=y em */
+}
+
+h2 {
+  font-size: 1.5em;
+}
+
+h3 {
+  font-size: 1.4em;
+}
+
+h4 {
+  font-size: 1.3em;
+}
+
+h5 {
+  font-size: 1.2em; 
+}
+
+h6 {
+  font-size: 1.1em; 
 }
 
 .flexcontainerrow {

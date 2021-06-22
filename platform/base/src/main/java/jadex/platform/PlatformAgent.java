@@ -485,8 +485,8 @@ public class PlatformAgent
 				CreationInfo info = new CreationInfo();
 				info.setName(name);
 				info.setFilename(ci.getClassName()+".class");
-				
 				infos.add(info);
+				//System.out.println("added agent to start: "+info.getFilename());
 			}
 		}
 		
