@@ -18,13 +18,13 @@ class ChatElement extends CidElement
 	postInit()
 	{
 		var self = this;
-		this.subscribe();
+		this.subscribe(10000);
 		
 		this.searchUsers().then(users =>
 		{
 			for(var user of users)
 			{
-				var cid = user.serviceIdentifier.providerId;
+				var cid = user.serviceIdentifier.providerId.name;
 				self.updateChatUser(cid);
 			}
 			
@@ -46,10 +46,11 @@ class ChatElement extends CidElement
 		this.terminateSubscription();
 	}
 
-	subscribe()
+	subscribe(interval)
 	{
 		var self = this;
-		var interval = 10000;
+		if(interval==null)
+			interval = 10000;
 		self.terminate = jadex.getIntermediate(this.getMethodPrefix()+'&methodname=subscribeToEvents&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		function(response)
 		{
@@ -61,12 +62,12 @@ class ChatElement extends CidElement
 			if("message"===ce.type)
 			{
 				//console.log("message: "+ce.value);
-				self.addMessage(ce.componentIdentifier, ce.value, ce.nick, ce.privateMessage, false);
+				self.addMessage(ce.componentIdentifier.name, ce.value, ce.nick, ce.privateMessage, false);
 			}
 			else if("statechange"===ce.type)
 			{
 				console.log("state change: "+ce);
-				self.setUserState(ce.componentIdentifier, "dead"!==ce.value, "typing"===ce.value, "away"===ce.value, ce.nick, ce.image);
+				self.setUserState(ce.componentIdentifier.name, "dead"!==ce.value, "typing"===ce.value, "away"===ce.value, ce.nick, ce.image);
 			}
 			else if("file"===ce.type)
 			{
@@ -103,13 +104,13 @@ class ChatElement extends CidElement
 							
 				if(event.type===0)
 				{
-					var cid = event.service.serviceIdentifier.providerId;
+					var cid = event.service.serviceIdentifier.providerId.name;
 					console.log("user added event: "+id);
-					self.updateChatUser(event);
+					self.updateChatUser(cid);
 				}
 				else if(event.type===1)
 				{
-					var cid = event.service.providerId;
+					var cid = event.service.providerId.name;
 					console.log("user removed: "+cid);
 					self.setUserState(cid, false, false, false, ce.nick, ce.image);
 				}
@@ -211,7 +212,7 @@ class ChatElement extends CidElement
 		
 		self.setUserState(cid, true);
 		
-		var cu = self.users[cid.name];
+		var cu = self.users[cid];
 		
 		if(cu==null || cu.nickUnknown)
 		{
@@ -222,20 +223,20 @@ class ChatElement extends CidElement
 			}).catch(ex => console.log("ex: "+ex));
 		}
 		
-		/*if(cu==null || cu.image===null)
+		if(cu==null || cu.image===null)
 		{
 			self.getImage(cid).then(img =>
 			{
 				console.log("image is: "+img);
 				self.setUserState(cid, true, null, null, null, img);
 			}).catch(ex => console.log("ex: "+ex));
-		}*/
+		}
 		
-		/*self.getStatus(cid).then(status =>
+		self.getStatus(cid).then(status =>
 		{
 			console.log("getstatus: "+status);
-			self.setUserState(cid, true, "typing"===statuc, "away"===status);
-		}).catch(ex => console.log("ex: "+ex));*/
+			self.setUserState(cid, true, "typing"===status, "away"===status);
+		}).catch(ex => console.log("ex: "+ex));
 	}
 	
 	setUserState(cid, online, typing, away, nickname, image)
@@ -243,7 +244,6 @@ class ChatElement extends CidElement
 		console.log("setUserState: "+cid+" "+online);
 		if(cid==null)
 			throw new Exception("cid must not null");
-		cid = cid.name;
 		
 		var isnew = false;
 		var isdead = false;
@@ -309,13 +309,13 @@ class ChatElement extends CidElement
 	{
 		var self = this;
 		var url = this.getMethodPrefix()+'&methodname=getNickName'+
-			'&args_0='+cid+"&argtypes_0=jadex.bridge.IComponentIdentifier"+
+			'&args_0='+cid+"&argtypes_0=jadex.bridge.IComponentIdentifier";
 		//url = encodeURIComponent(url);
-		console.log("sendmsg: "+url);
+		console.log("getNickName: "+url);
 		
 		return new Promise(function(resolve, reject) 
 		{
-			axios.get(url, this.transform).then(function(resp)
+			axios.get(url, self.transform).then(function(resp)
 			{
 				console.log("getNickname called: "+resp.data);
 				resolve(resp.data);
@@ -327,15 +327,33 @@ class ChatElement extends CidElement
 	{
 		var self = this;
 		var url = this.getMethodPrefix()+'&methodname=getImage'+
-			'&args_0='+cid+"&argtypes_0=jadex.bridge.IComponentIdentifier"+
+			'&args_0='+cid+"&argtypes_0=jadex.bridge.IComponentIdentifier";
 		//url = encodeURIComponent(url);
-		console.log("sendmsg: "+url);
+		console.log("getImage: "+url);
 		
 		return new Promise(function(resolve, reject) 
 		{
-			axios.get(url, this.transform).then(function(resp)
+			axios.get(url, self.transform).then(function(resp)
 			{
 				console.log("getNickname called: "+resp.data);
+				resolve(resp.data);
+			}).catch(ex => reject(ex));
+		});
+	}
+	
+	getStatus(cid)
+	{
+		var self = this;
+		var url = this.getMethodPrefix()+'&methodname=getStatus'+
+			'&args_0='+cid+"&argtypes_0=jadex.bridge.IComponentIdentifier";
+		//url = encodeURIComponent(url);
+		console.log("getStatus: "+url);
+		
+		return new Promise(function(resolve, reject) 
+		{
+			axios.get(url, self.transform).then(function(resp)
+			{
+				console.log("getStatus called: "+resp.data);
 				resolve(resp.data);
 			}).catch(ex => reject(ex));
 		});
@@ -357,6 +375,8 @@ class ChatElement extends CidElement
 				${this.getUsers().map((user) => html`
 				<tr @click="${e => console.log(e)}">
 					<!--<td>${user.image}</td>-->
+					<td>${user.typing}</td>
+					<td>${user.away}</td>
 					<td>${user.nick}</td>
 					<td>[${user.cid}]</td>
 			    </tr>
@@ -382,7 +402,7 @@ class ChatElement extends CidElement
 		    css`
 	    	.grid-container {
 				display: grid;
-				grid-template-columns: 3fr 1fr; 
+				grid-template-columns: 3fr 2fr; 
 				grid-template-rows: 1fr minmax(min-content, max-content);
 				grid-gap: 10px;
 				height: calc(60vh);

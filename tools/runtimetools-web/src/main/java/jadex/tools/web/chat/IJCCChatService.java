@@ -31,4 +31,11 @@ public interface IJCCChatService extends IJCCPluginService, IChatGuiService
 	 *  @return The image.
 	 */
 	public IFuture<byte[]> getImage(IComponentIdentifier cid);
+	
+	/**
+	 *  Get the status of a user.
+	 *  @param cid The owner.
+	 *  @return The status.
+	 */
+	public IFuture<String> getStatus(IComponentIdentifier cid);
 }

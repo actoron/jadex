@@ -266,4 +266,19 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 		return ret;
 	}
 	
+	/**
+	 *  Get the status of a user.
+	 *  @param cid The owner.
+	 *  @return The status.
+	 */
+	public IFuture<String> getStatus(IComponentIdentifier cid)
+	{
+		Future<String> ret = new Future<String>();
+		agent.searchService(new ServiceQuery<IChatService>(IChatService.class).setOwner(cid)).then(ser ->
+		{
+			ser.getStatus().delegate(ret);
+		}).catchEx(ret);
+		return ret;
+	}
+	
 }
