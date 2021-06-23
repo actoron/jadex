@@ -124,7 +124,7 @@ publishCentral:
 publishActoron:
   stage: deployandpublish
   script: 
-    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -P repos=actoron --max-workers=32 $GRADLE_EXTRA
+    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -P repos=actoron --max-workers=16 $GRADLE_EXTRA
   rules:
     - if: $HEISENTEST!="true" && ($PUBLISHACTORON=="true" || $PUBLISHACTORON!="false" && $CI_COMMIT_REF_SLUG=~$PUBLISHACTORON_BRANCHES)
       when: on_success
