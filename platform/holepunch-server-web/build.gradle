@@ -11,9 +11,9 @@ repositories
 
 dependencies
 {
-	compile project(':platform:holepunch-server')
+	api project(':platform:holepunch-server')
 	
-	compile 'javax.servlet:servlet-api:2.4'
+	api 'javax.servlet:servlet-api:2.4'
 }
 
 /*task copyIncludes(type: Copy) {

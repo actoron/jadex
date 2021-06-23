@@ -47,6 +47,6 @@ jar
 	manifest 
 	{
 		attributes('Main-Class': 'jadex.base.Starter',
-			'Class-Path': configurations.compile.collect { it.getName() }.join(' '))
+			'Class-Path': configurations.runtimeClasspath.collect { it.getName() }.join(' '))
 	}
 }
