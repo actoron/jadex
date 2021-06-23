@@ -179,7 +179,11 @@ def createSignTask(origtask, classi, exten) {
     def signtask = project.tasks.create('sign' + origtask.name.capitalize(), Sign) {
     	outputs.cacheIf { true }
    		dependsOn origtask
+   		//doLast {
+		//	println "signtask: " + origtask+", "+classi+", "+exten
+   		//}
     }
+        
     signtask.sign(classi, origtask.outputs.files.singleFile)
     
     // Change name of signature file to not include version number -> allows caching across version as long as jar contents haven't changed
@@ -220,12 +224,13 @@ publishing {
     		{ 
     			// Sign archives and pom in separate tasks as archive signing can be cached while pom signing cannot, when jadex version changes.
     			createSignTask(generatePomFileForMavenJavaPublication, null, 'pom')
+    			createSignTask(generateMetadataFileForMavenJavaPublication, null, 'module')
     		}
-    		
-    		// Disable generation of module.json
-    		tasks.matching { it.name == "generateMetadataFileFor${name.capitalize()}Publication" }.all {
-    			onlyIf { false }
-    		}
+    		    		
+//    		// Disable generation of module.json
+//   		tasks.matching { it.name == "generateMetadataFileFor${name.capitalize()}Publication" }.all {
+//    			onlyIf { false }
+//    		}
     		
         	if(gradle.ext.webprojects.contains(project.getPath()))
             {

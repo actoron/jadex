@@ -122,6 +122,7 @@ buildscript
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.21.2"
 		classpath 'org.eclipse.jgit:org.eclipse.jgit:5.10.0.202012080955-r' // git capabilities
 		classpath 'de.marcphilipp.gradle:nexus-publish-plugin:0.4.0'
+		classpath 'org.owasp:dependency-check-gradle:6.2.2'
     }
     
     apply from: "$rootDir/src/main/buildutils/util.gradle"
@@ -159,6 +160,17 @@ allprojects
 			url 'https://oss.sonatype.org/content/groups/public/'
 		}
     }
+    
+   	// Auto check dependencies for vulnerabilities (CVEs)
+	// run all with `gradlew dependencyCheckAggregate`
+	// run on subproject with, e.g., `gradlew :tools:runtimetools-web:dependencyCheckAnalyze`
+	apply plugin: 'org.owasp.dependencycheck'
+	// https://github.com/dependency-check/dependency-check-gradle/issues/73
+	dependencyCheck {
+ 		analyzers {
+    		bundleAuditEnabled = false
+  		}
+	}
     
     buildscript 
 	{
@@ -221,7 +233,7 @@ subprojects
 {
     def mainSrcDir  = 'src/main/java'
     def testSrcDir  = 'src/test/java'
-    def junit       = 'junit:junit:4.11'
+    def junit       = 'junit:junit:4.13.2'
 
 	apply plugin: 'eclipse' // hack to allow starting web projects in eclipse with correct dependencies
 	apply plugin: 'eclipse-wtp' // hack to allow starting web projects in eclipse with correct dependencies
@@ -253,7 +265,7 @@ subprojects
        matcher {
          id = 'org.eclipse.ui.ide.multiFilter'
          // to find out which arguments to use, configure the desired
-         // filter with Eclipse's UI and copy the arguments string over
+         // filter with Eclipse's UI and copy the arguments string from .project
          arguments = '1.0-name-matches-false-false-build'
        }
      }

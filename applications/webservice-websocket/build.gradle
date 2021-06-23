@@ -1,6 +1,6 @@
 apply plugin: 'maven-publish' // PublishToMavenLocal
 apply plugin: 'java' 
-apply plugin: 'maven'
+//apply plugin: 'maven'
 apply plugin: 'war'
 apply plugin: "eclipse"
 apply plugin: 'eclipse-wtp'
@@ -22,6 +22,7 @@ war
 	from('src/main/java') {
 		//archiveName project.name.substring(0, project.name.length()-4)+".war"
 		archiveName project.name+".war"
+		duplicatesStrategy DuplicatesStrategy.EXCLUDE
 		//archiveName "actoron-webapi-web.war"
 		include '**/*.html'
 		include '**/*.properties'

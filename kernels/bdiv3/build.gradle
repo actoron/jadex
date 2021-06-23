@@ -17,14 +17,3 @@ dependencies
 //	api 'org.ow2.asm:asm-all:6.0_ALPHA'
 }
 
-task mappings {
-	doLast {
-		conf2ScopeMappings.mappings.each {
-			Conf2ScopeMapping mapping = it.getValue()
-			//println "${it.getKey()} -> $mapping.scope"
-			mapping.configuration.allDependencies.each {
-				println it
-			}
-		}
-	}
-}

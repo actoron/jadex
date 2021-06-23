@@ -16,6 +16,7 @@ dependencies
 	api 'org.apache.xmlgraphics:batik-codec:1.8'
 	api 'org.apache.xmlgraphics:xmlgraphics-commons:2.1'
 	api 'org.ow2.asm:asm-all:5.0.3'
+	api 'xml-apis:xml-apis:1.4.01'
 }
 
 jar 
@@ -28,7 +29,7 @@ jar
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
 	// http://stackoverflow.com/questions/10986244/building-a-uberjar-with-gradle
-	from(configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }) {
+	from(configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude "META-INF/*.SF"
         exclude "META-INF/*.DSA"
         exclude "META-INF/*.RSA"

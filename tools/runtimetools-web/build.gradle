@@ -7,11 +7,8 @@ dependencies
 	testImplementation project(':transports:intravm')
 	testImplementation project(':platform:webservice-jetty')
 	
-	// bootstrap also pulls jquery, but with open version interval, so pin version here for compatibility with index.html, grrr
-	implementation 'org.webjars.bower:jquery:3.5.1'
-	implementation 'org.webjars.bower:bootstrap:3.4.1'
+	implementation 'org.webjars.bowergithub.twbs:bootstrap:3.4.1'
 	
-	implementation 'org.webjars.bower:angular:1.5.1'
-	implementation 'org.webjars.bower:angular-route:1.5.1'
-	
+	implementation 'org.webjars.bowergithub.angular:bower-angular:1.5.11'
+	implementation 'org.webjars.bower:angular-route:1.5.11'
 }
