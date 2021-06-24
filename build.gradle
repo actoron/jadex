@@ -658,7 +658,7 @@ task copyJavadocSources(type: Copy) {
 task publicJavadoc(type: Javadoc, dependsOn: [copyJavadocSources]) {
 	def sourcedir = getDistsDir(project).getCanonicalPath() + '/javadocworkdir'
 	//classpath = configurations.runtimeClasspath
-	println (gradle.ext.maindistartifacts.collect {project(it).sourceSets.main.compileClasspath})
+	//println 'classpath: ' + (gradle.ext.maindistartifacts.collect {project(it).sourceSets.main.compileClasspath})
 	classpath = files(gradle.ext.maindistartifacts.collect {project(it).sourceSets.main.compileClasspath})
 	source(sourcedir)
 	destinationDir = new File(getDistsDir(project).getCanonicalPath() + '/docs/jadex-' + jadex_build_version + '-javadoc')
