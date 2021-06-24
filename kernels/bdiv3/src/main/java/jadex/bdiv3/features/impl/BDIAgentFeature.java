@@ -3,7 +3,6 @@ package jadex.bdiv3.features.impl;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -331,7 +330,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	protected static Object setFieldValue(Object obj, String fieldname, Object val) throws IllegalAccessException
 	{
-		Tuple2<Field, Object> res = findFieldWithOuterClass(obj, fieldname);
+		Tuple2<Field, Object> res = findFieldWithOuterClass(obj, fieldname, false);
 		Field f = res.getFirstEntity();
 		if(f==null)
 			throw new RuntimeException("Field not found: "+fieldname);
@@ -350,13 +349,13 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 * @param fieldname
 	 * @return
 	 */
-	protected static Tuple2<Field, Object> findFieldWithOuterClass(Object obj, String fieldname)
+	protected static Tuple2<Field, Object> findFieldWithOuterClass(Object obj, String fieldname, boolean nonnull)
 	{
 		Field f = null;
 		Object tmp = obj;
 		while(f==null && tmp!=null)
 		{
-			f = findFieldWithSuperclass(tmp.getClass(), fieldname);
+			f = findFieldWithSuperclass(tmp.getClass(), fieldname, obj, nonnull);
 			
 			// If field not found try searching outer class
 			if(f==null)
@@ -389,7 +388,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				}
 			}
 		}
-		return new Tuple2<Field, Object>(f, tmp);
+		return f!=null ? new Tuple2<Field, Object>(f, tmp) : null;
 	}
 	
 	/**
@@ -398,7 +397,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 * @param fieldname
 	 * @return
 	 */
-	protected static Field findFieldWithSuperclass(Class<?> cl, String fieldname)
+	protected static Field findFieldWithSuperclass(Class<?> cl, String fieldname, Object obj, boolean nonnull)
 	{
 		Field ret = null;
 		while(ret==null && !Object.class.equals(cl))
@@ -406,11 +405,17 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			try
 			{
 				ret = cl.getDeclaredField(fieldname);
+				if(nonnull && ret!=null)
+				{
+					ret.setAccessible(true);
+					if(ret.get(obj)==null)
+						ret	= null;
+				}
 			}
 			catch(Exception e)
 			{
-				cl = cl.getSuperclass();
 			}
+			cl = cl.getSuperclass();
 		}
 		return ret;
 	}
@@ -421,25 +426,13 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public static void writeField(Object val, String fieldname, Object obj, IInternalAccess agent)
 	{
-//		System.out.println("write: "+val+" "+fieldname+" "+obj+" "+agent);
+		if((""+obj).indexOf("Inner")!=-1)
+			System.out.println("write: "+val+" "+fieldname+" "+obj+" "+agent);
 		
 		// This is the case in inner classes
 		if(agent==null)
 		{
-			try
-			{
-				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, IBDIClassGenerator.AGENT_FIELD_NAME);
-//				System.out.println("res: "+res);
-				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
-			}
-			catch(RuntimeException e)
-			{
-				throw e;
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException(e);
-			}
+			agent = findAgent(obj, true);
 		}
 		
 		String belname	= getBeliefName(obj, fieldname);
@@ -491,6 +484,33 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				SUtil.throwUnchecked(e);
 			}
 		}
+	}
+
+	protected static IInternalAccess findAgent(Object obj, boolean nonnull)
+	{
+		IInternalAccess	agent	= null;
+		try
+		{
+			Tuple2<Field, Object> res = findFieldWithOuterClass(obj, IBDIClassGenerator.AGENT_FIELD_NAME, true);
+			if(res!=null)
+			{
+				res.getFirstEntity().setAccessible(true);
+				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
+			}
+			else if(nonnull)
+			{
+				throw new NullPointerException();
+			}
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		return agent;
 	}
 	
 	/** Saved init writes. */
@@ -653,20 +673,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		}
 		else
 		{
-			try
-			{
-				Tuple2<Field, Object> res = findFieldWithOuterClass(agentobj, IBDIClassGenerator.AGENT_FIELD_NAME);
-//					System.out.println("res: "+res);
-				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
-			}
-			catch(RuntimeException e)
-			{
-				throw e;
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException(e);
-			}
+			agent = findAgent(agentobj, true);
 		}
 		
 //		final BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
@@ -1018,10 +1025,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 			try
 			{
-				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, IBDIClassGenerator.AGENT_FIELD_NAME);
-//				System.out.println("res: "+res);
-				res.getFirstEntity().setAccessible(true);
-				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
+				agent = findAgent(obj, false);
 				if(agent==null) 
 				{
 					// this should only happen if class is static or external
@@ -1145,20 +1149,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		}
 		else
 		{
-			try
-			{
-				Tuple2<Field, Object> res = findFieldWithOuterClass(agentobj, IBDIClassGenerator.AGENT_FIELD_NAME);
-//					System.out.println("res: "+res);
-				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
-			}
-			catch(RuntimeException e)
-			{
-				throw e;
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException(e);
-			}
+			agent = findAgent(agentobj, true);
 		}
 		
 //		final BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
