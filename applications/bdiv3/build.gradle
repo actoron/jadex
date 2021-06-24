@@ -21,11 +21,11 @@ else
 			buildName = "testJava$version"
 			startParameter.projectProperties << ["v3java": version]
 		}
-		test.dependsOn t
+		//test.dependsOn t
 	}
 	
 	// Skip default test (redundant)
-	test.enabled false
+	//test.enabled false
 }
 
 dependencies
