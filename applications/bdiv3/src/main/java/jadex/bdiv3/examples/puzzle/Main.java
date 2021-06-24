@@ -18,7 +18,7 @@ public class Main
 	 */
 	public static void main(String[] args) 
 	{
-		IExternalAccess platform = Starter.createPlatform(PlatformConfigurationHandler.getDefaultNoGui()).get();
+		IExternalAccess platform = Starter.createPlatform(PlatformConfigurationHandler.getDefault()).get();
 		CreationInfo ci = new CreationInfo().setFilename("jadex/bdiv3/examples/puzzle/SokratesAgent.class");
 		platform.createComponent(ci).get();
 	}

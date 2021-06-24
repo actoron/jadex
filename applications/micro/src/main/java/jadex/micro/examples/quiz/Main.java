@@ -16,7 +16,7 @@ public class Main
 	 */
 	public static void main(String[] args)
 	{
-		IExternalAccess platform = Starter.createPlatform(PlatformConfigurationHandler.getDefault()).get();
+		IExternalAccess platform = Starter.createPlatform(PlatformConfigurationHandler.getDefaultNoGui()).get();
 		platform.createComponent(new CreationInfo()
 			.setFilenameClass(QuizMasterAgent.class)
 			.addArgument("scope", ServiceScope.GLOBAL)).get();
