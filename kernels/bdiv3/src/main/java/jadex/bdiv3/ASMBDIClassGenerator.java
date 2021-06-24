@@ -33,7 +33,6 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.ASMifier;
-import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import jadex.bdiv3.exceptions.JadexBDIGenerationException;
@@ -114,7 +113,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			
 			final String iclname = clname.replace(".", "/");
 			
-			ClassVisitor cv = new ClassVisitor(Opcodes.ASM5, cn)
+			ClassVisitor cv = new ClassVisitor(Opcodes.ASM9, cn)
 			{
 				boolean isagentorcapa = false;
 				boolean isgoal = false;
@@ -181,7 +180,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			    		public AnnotationVisitor visitAnnotation(String name, String desc)
 			    		{
 //			    			System.out.println("visit: "+name+" "+desc);
-			    			return !desc.equals("Ljadex/bdiv3/annotation/Goal;")? super.visitAnnotation(name, desc) : new AnnotationVisitor(Opcodes.ASM4, super.visitAnnotation(name, desc))
+			    			return !desc.equals("Ljadex/bdiv3/annotation/Goal;")? super.visitAnnotation(name, desc) : new AnnotationVisitor(Opcodes.ASM9, super.visitAnnotation(name, desc))
 							{
 			    				public void visit(String name, Object value)
 			    				{
@@ -246,7 +245,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 								{
 									// possibly transform basic value
 									if(SReflect.isBasicType(SReflect.findClass0(Type.getType(desc).getClassName(), null, cl)))
-										visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "("+desc+")Ljava/lang/Object;");
+										visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "("+desc+")Ljava/lang/Object;", false);
 									
 									visitInsn(Opcodes.SWAP);
 									
@@ -272,7 +271,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 									visitVarInsn(Opcodes.ALOAD, 0);
 									visitInsn(Opcodes.SWAP);
 									
-									visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/bdiv3/features/impl/BDIAgentFeature", "writeField", "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljadex/bridge/IInternalAccess;)V");
+									visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/bdiv3/features/impl/BDIAgentFeature", "writeField", "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljadex/bridge/IInternalAccess;)V", false);
 									enh = true;
 								}
 								else if(isgoal)
@@ -282,7 +281,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 									{
 										// possibly transform basic value
 										if(SReflect.isBasicType(SReflect.findClass0(Type.getType(desc).getClassName(), null, cl)))
-											visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "("+desc+")Ljava/lang/Object;");
+											visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "("+desc+")Ljava/lang/Object;", false);
 										
 										visitInsn(Opcodes.SWAP);
 										
@@ -297,7 +296,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 										visitVarInsn(Opcodes.ALOAD, 0);
 										visitInsn(Opcodes.SWAP);
 										
-										visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/bdiv3/features/impl/BDIAgentFeature", "writeParameterField", "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljadex/bridge/IInternalAccess;)V");
+										visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/bdiv3/features/impl/BDIAgentFeature", "writeParameterField", "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljadex/bridge/IInternalAccess;)V", false);
 										enh = true;
 									}
 								}
@@ -1309,7 +1308,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //		
 ////		final ASMifier asm = new ASMifier();
 //		
-//		ClassVisitor cv = new ClassVisitor(Opcodes.ASM4, tcv)
+//		ClassVisitor cv = new ClassVisitor(Opcodes.ASM9, tcv)
 //		{
 ////			public void visit(int version, int access, String name,
 ////				String signature, String superName, String[] interfaces)

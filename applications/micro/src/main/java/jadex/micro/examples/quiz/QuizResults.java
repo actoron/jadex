@@ -44,6 +44,15 @@ public class QuizResults
 	 */
 	public void addResult(int no, boolean correct)
 	{
+		// replace old result
+		for(Result result: results)
+		{
+			if(result.getNo()==no)
+			{
+				results.remove(result);
+				break;
+			}
+		}
 		results.add(new Result(no, correct));
 	}
 	

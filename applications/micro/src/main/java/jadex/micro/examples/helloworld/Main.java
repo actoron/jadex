@@ -20,6 +20,6 @@ public class Main
 	{
 		IExternalAccess platform = Starter.createPlatform(PlatformConfigurationHandler.getDefaultNoGui()).get();
 		CreationInfo ci = new CreationInfo().setFilenameClass(PojoHelloWorldAgent.class);
-		platform.createComponent(ci).get();
+		IExternalAccess agent = platform.createComponent(ci).get();
 	}
 }

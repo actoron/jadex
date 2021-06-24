@@ -2,6 +2,8 @@ package jadex.micro.examples.quiz;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Enumeration;
 
 import javax.swing.AbstractButton;
@@ -15,6 +17,7 @@ import javax.swing.SwingUtilities;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.micro.annotation.Agent;
@@ -85,6 +88,12 @@ public class QuizClientAgent
 		}
 	}
 	
+	@OnEnd
+	public void end()
+	{
+		gui.dispose();
+	}
+	
 	/**
 	 *  The quiz gui.
 	 */
@@ -141,6 +150,14 @@ public class QuizClientAgent
 				f.pack();
 				f.setVisible(true);
 				f.setLocation(SGUI.calculateMiddlePosition(f));
+				
+				f.addWindowListener(new WindowAdapter()
+				{
+					public void windowClosing(WindowEvent e)
+					{
+						agent.killComponent();
+					}
+				});
 			});
 		}
 		
@@ -182,6 +199,14 @@ public class QuizClientAgent
 			{
 				conl.setText(quizser!=null? "Connected with "+quizser: "");
 			});
+		}
+		
+		/**
+		 *  Close the gui.
+		 */
+		public void dispose()
+		{
+			f.dispose();
 		}
 	}
 }
