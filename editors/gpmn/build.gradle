@@ -22,7 +22,7 @@ jar
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
 	// http://stackoverflow.com/questions/10986244/building-a-uberjar-with-gradle
-	from(configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }) {
+	from(configurations.compileClasspath.files.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude "META-INF/*.SF"
         exclude "META-INF/*.DSA"
         exclude "META-INF/*.RSA"
