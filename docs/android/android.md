@@ -214,13 +214,8 @@ repositories {
     mavenCentral()
     maven
     {
-        name 'jadexsnapshots'
-        url 'https://nexus.actoron.com/content/repositories/oss-nightlies/'
-    }
-    maven
-    {
         name 'jadexreleases'
-        url 'https://nexus.actoron.com/content/repositories/oss/'
+        url 'https://nexus.actoron.com/content/repositories/jadex/'
     }
 }
 
@@ -627,13 +622,8 @@ buildscript {
         mavenCentral()
         maven
         {
-            name 'jadexsnapshots'
-            url 'https://nexus.actoron.com/content/repositories/oss-nightlies/'
-        }
-        maven
-        {
             name 'jadexreleases'
-            url 'https://nexus.actoron.com/content/repositories/oss/'
+            url 'https://nexus.actoron.com/content/repositories/jadex/'
         }
     }
 

@@ -87,7 +87,7 @@ repositories {
     maven
     {
         name 'jadexsnapshots'
-        url 'https://nexus.actoron.com/content/repositories/oss-nightlies/'
+        url 'https://nexus.actoron.com/content/repositories/jadex/'
     }
 }
 ```
@@ -108,13 +108,13 @@ To use Jadex in a new or existing Maven project, add the following code to your 
 </dependency>
 ```
 
-If you want to use our nightly builds, you need to add our repository:
+If you want to use some build that is not released to maven central, you need to add our repository:
 
 ```xml
 <repositories>
     <repository>
         <id>jadex-oss-nightlies</id>
-        <url>https://nexus.actoron.com/content/repositories/oss-nightlies</url>
+        <url>https://nexus.actoron.com/content/repositories/jadex</url>
     </repository>
 </repositories>
 ```

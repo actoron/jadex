@@ -182,7 +182,7 @@ allprojects
 	    	// For jme3
 	        maven
 			{
-				url "https://nexus.actoron.com/content/repositories/oss-nightlies/"
+				url "https://nexus.actoron.com/content/repositories/jadex/"
 			}
 			
 			maven
