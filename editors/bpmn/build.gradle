@@ -19,20 +19,18 @@ dependencies
 	api 'xml-apis:xml-apis:1.4.01'
 }
 
-jar 
+jar
 {
-	manifest 
-	{
-		attributes('Main-Class': 'jadex.bpmn.editor.BpmnEditor')
-	}
-	
+	manifest
+			{
+				attributes('Main-Class': 'jadex.bpmn.editor.BpmnEditor')
+			}
+
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-	// http://stackoverflow.com/questions/10986244/building-a-uberjar-with-gradle
-	from(configurations.compileClasspath.files.collect { it.isDirectory() ? it : zipTree(it) }) {
-        exclude "META-INF/*.SF"
-        exclude "META-INF/*.DSA"
-        exclude "META-INF/*.RSA"
-    }
-}
+	dependsOn(configurations.runtimeClasspath)
 
+	from({
+		configurations.runtimeClasspath.collect { zipTree(it) }
+	})
+}
