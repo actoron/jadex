@@ -49,7 +49,7 @@ Now we have to add a dependency to Jadex in the 'pom.xml'. If you want to use th
 <repositories>
   <repository>
     <id>jadex-nightlies</id>
-    <url>https://nexus.actoron.com/content/repositories/oss-nightlies/</url>
+    <url>https://nexus.actoron.com/content/repositories/jadex/</url>
   </repository>
 </repositories>
 

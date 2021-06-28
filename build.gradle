@@ -178,12 +178,6 @@ allprojects
 	    {
 			mavenLocal()
 	    	mavenCentral()
-
-	    	// For jme3
-	        maven
-			{
-				url "https://nexus.actoron.com/content/repositories/oss-nightlies/"
-			}
 			
 			maven
 			{
