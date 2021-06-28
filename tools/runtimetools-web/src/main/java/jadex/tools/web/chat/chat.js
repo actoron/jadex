@@ -11,14 +11,45 @@ class ChatElement extends CidElement
 		this.app.lang.listeners.add(this);
 		this.connected = false;
 		this.terminate = null;
-		this.concom = false;
 		this.users = {};
+		this.userimage = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/chat/images/user.png';
+		this.overlay_away = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/chat/images/overlay_away.png';
+		this.overlay_typing = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/chat/images/overlay_typing.png';
+		this.overlay_sending = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/chat/images/overlay_sending.png';
+		
+		var res1 ="jadex/tools/web/chat/libs/emojibutton/emojibutton.js";
+		var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+		return this.loadScript(ures1);
 	}
 	
 	postInit()
 	{
 		var self = this;
 		this.subscribe(10000);
+		
+		const picker = new EmojiButton();
+		const trigger = this.shadowRoot.getElementById("emoji");
+		picker.on('emoji', selection => {
+  			trigger.innerHTML = selection;
+			this.shadowRoot.getElementById("msg").value += selection;
+		});
+		trigger.addEventListener('click', () => picker.togglePicker(trigger));
+		
+		this.shadowRoot.getElementById('msg').addEventListener('keyup', function onEvent(e) 
+		{
+			if(e.keyCode === 13)
+			{
+				self.sendMessage();
+		    }
+		});
+		
+		var sheet = new CSSStyleSheet();
+		sheet.insertRule('.away { background-image: url('+this.overlay_away+") }", 0);
+		sheet.insertRule('.typing { background-image: url('+this.overlay_typing+") }", 0);
+		sheet.insertRule('.sending { background-image: url('+this.overlay_sending+") }", 0);
+		sheet.insertRule('.imageanon { background-image: url('+this.userimage+") }", 0);
+		sheet.insertRule('.imageuser { background-image: url($("data:image/png;base64,"+user.image.__base64)}', 0);
+		self.shadowRoot.adoptedStyleSheets = self.shadowRoot.adoptedStyleSheets.concat(sheet);
 		
 		this.searchUsers().then(users =>
 		{
@@ -61,7 +92,7 @@ class ChatElement extends CidElement
 			
 			if("message"===ce.type)
 			{
-				//console.log("message: "+ce.value);
+				console.log("message: "+ce.value);
 				self.addMessage(ce.componentIdentifier.name, ce.value, ce.nick, ce.privateMessage, false);
 			}
 			else if("statechange"===ce.type)
@@ -160,6 +191,7 @@ class ChatElement extends CidElement
 	{
 		var self = this;
 		var msg = this.shadowRoot.getElementById("msg").value;
+		this.shadowRoot.getElementById("msg").value = "";
 		var url = this.getMethodPrefix()+'&methodname=message'+
 			'&args_0='+msg+"&argtypes_0=java.lang.String"+
 			'&args_1='+'null'+"&argtypes_0=jadex.bridge.IComponentIdentifier[]"+
@@ -214,7 +246,7 @@ class ChatElement extends CidElement
 		
 		var cu = self.users[cid];
 		
-		if(cu==null || cu.nickUnknown)
+		if(cu==null || cu.nick==null)
 		{
 			self.getNickName(cid).then(nick =>
 			{
@@ -223,7 +255,7 @@ class ChatElement extends CidElement
 			}).catch(ex => console.log("ex: "+ex));
 		}
 		
-		if(cu==null || cu.image===null)
+		if(cu==null || cu.image==null)
 		{
 			self.getImage(cid).then(img =>
 			{
@@ -336,7 +368,7 @@ class ChatElement extends CidElement
 			axios.get(url, self.transform).then(function(resp)
 			{
 				console.log("getNickname called: "+resp.data);
-				resolve(resp.data);
+				resolve(resp.data!=null && resp.data.length==0? null: resp.data);
 			}).catch(ex => reject(ex));
 		});
 	}
@@ -374,11 +406,13 @@ class ChatElement extends CidElement
 				<table>
 				${this.getUsers().map((user) => html`
 				<tr @click="${e => console.log(e)}">
-					<!--<td>${user.image}</td>-->
-					<td>${user.typing}</td>
-					<td>${user.away}</td>
-					<td>${user.nick}</td>
-					<td>[${user.cid}]</td>
+					<td>
+						<div class="grid-container2">
+							<img class="grid-item-21" id="user" src="${user.image!=null? 'data:image/png;base64,'+user.image.__base64: this.userimage}"/>
+							<img class="grid-item-21" id="overlay" src="${user.away? this.overlay_away: user.typing? this.overlay_typing: user.sending? this.overlay_sending: ''}"/>
+						</div>
+					</td>
+					<td>${user.nick} [${user.cid}]</td>
 			    </tr>
 				`)}
 				</table>
@@ -386,7 +420,7 @@ class ChatElement extends CidElement
 			<div class="grid-item grid-item-3 grid-container-inner">
 				<p id="to">To: All</p>
 				<input id="msg" type="text"></input>
-				<button class="jadexbtn" type="button">Smiley</button>
+				<button id="emoji" class="jadexbtn" type="button">&#128512;</button>
 				<button class="jadexbtn" type="button" @click="${e => this.sendMessage(e)}">Send</button>
 			</div>
 		</div>
@@ -421,6 +455,24 @@ class ChatElement extends CidElement
 			#to {
 				vertical-align: middle;
 				margin: auto;
+			}
+			#user {
+				position: relative;
+			}
+			#overlay {
+				position: relative;
+				z-index: 1;
+			}
+			.grid-container2 {
+				display: grid;
+				grid-template-columns: 1fr; 
+			}
+			.grid-item-21 {
+				grid-area: 1 / 1 / 2 / 2;
+			}
+			.aligncenter {
+				display: flex;
+				align-items: center;
 			}
 		    `);
 		return ret;

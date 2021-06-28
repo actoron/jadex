@@ -263,6 +263,7 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 		{
 			ser.getImage().delegate(ret);
 		}).catchEx(ret);
+		
 		return ret;
 	}
 	
