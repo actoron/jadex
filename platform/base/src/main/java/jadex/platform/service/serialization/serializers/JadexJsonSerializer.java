@@ -179,7 +179,10 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 	public String convertObject(Object val, Class<?> type, ClassLoader cl, Object context)
 	{
 		// does not use type currently?!
-		return JsonTraverser.objectToString(val, cl, true, true, null, null, writeprocs, context);
+		String ret = JsonTraverser.objectToString(val, cl, true, true, null, null, writeprocs, context);
+		//if((""+val).indexOf("ChatEvent")!=-1)
+		//System.out.println("json: "+ret);
+		return ret;
 	}
 	
 	/**

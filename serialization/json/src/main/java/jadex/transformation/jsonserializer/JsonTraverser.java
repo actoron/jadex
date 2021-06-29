@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -328,6 +329,7 @@ public class JsonTraverser extends Traverser
 			traverser.traverse(val, null, conversionprocessors, processors!=null? processors: writeprocs, Traverser.MODE.PREPROCESS, classloader, wr);
 			byte[] ret = enc==null? wr.getString().getBytes(SUtil.UTF8): wr.getString().getBytes(enc);
 			bos.close();
+			//System.out.println("json: "+Arrays.toString(ret));
 			return ret;
 		}
 		catch(RuntimeException e)
