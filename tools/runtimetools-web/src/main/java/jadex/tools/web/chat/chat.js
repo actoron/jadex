@@ -32,11 +32,11 @@ class ChatElement extends CidElement
 			//rootElement: this.shadowRoot,
 			//position: "auto",
 			autoHide: false,
-			emojisPerRow: 7,
+			//emojisPerRow: 7,
 			//showCategoryButtons: false,
 			showPreview: false,
 			//emojiSize: '16px',
-     		style: 'twemoji', //native
+     		//style: 'twemoji', //native
 		});
 		const trigger = this.shadowRoot.getElementById("emoji");
 		picker.on('emoji', selection => {
