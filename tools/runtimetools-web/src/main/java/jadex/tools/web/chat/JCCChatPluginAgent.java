@@ -143,6 +143,7 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	 */
 	public IIntermediateFuture<IChatService> message(String text, IComponentIdentifier[] receivers, boolean self)
 	{
+		System.out.println("message: "+text);
 		return getChatService().message(text, receivers, self);
 	}
 	

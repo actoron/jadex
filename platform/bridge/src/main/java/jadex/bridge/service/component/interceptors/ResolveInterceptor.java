@@ -198,8 +198,10 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 						{
 							try
 							{
+								// convert and check if the converted type fits to the argtype
 								Object val = convertFromJsonString((String)as[i], null);
-								as[i] = val;
+								if(i>=argtypes.length || val!=null && argtypes[i].equals(new ClassInfo(val.getClass()))) //SReflect.isSupertype(argtypes[i], val.getClass()))
+									as[i] = val;
 							}
 							catch(Exception e)
 							{
