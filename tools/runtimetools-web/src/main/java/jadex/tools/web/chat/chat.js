@@ -27,7 +27,17 @@ class ChatElement extends CidElement
 		var self = this;
 		this.subscribe(10000);
 		
-		const picker = new EmojiButton();
+		const picker = new EmojiButton(
+		{
+			//rootElement: this.shadowRoot,
+			//position: "auto",
+			autoHide: false,
+			emojisPerRow: 7,
+			//showCategoryButtons: false,
+			showPreview: false,
+			//emojiSize: '16px',
+     		style: 'twemoji', //native
+		});
 		const trigger = this.shadowRoot.getElementById("emoji");
 		picker.on('emoji', selection => {
   			trigger.innerHTML = selection;
@@ -216,6 +226,7 @@ class ChatElement extends CidElement
 		var text = "<div style='color:"+col+"'>["+time+", "+nick+"]: "+text+"</div>";
 		var elem = this.shadowRoot.getElementById("messages");
 		elem.innerHTML+=text;
+		elem.scrollTop = elem.scrollHeight; // scroll to newest text
 		//notifyChatEvent(sendfailure ? NOTIFICATION_MSG_FAILED : NOTIFICATION_NEW_MSG, cid, text, false);
 		//setUserState(cid, Boolean.TRUE, null, null, null, null);
 	}
@@ -400,9 +411,9 @@ class ChatElement extends CidElement
 	{
 		return html`
 		<div id="panel" class="grid-container">
-			<div id="messages" class="grid-item grid-item-1">
+			<div id="messages" class="yscrollable">
 			</div>
-			<div id="users" class="grid-item grid-item-2">
+			<div id="users" class="yscrollable">
 				<table>
 				${this.getUsers().map((user) => html`
 				<tr @click="${e => console.log(e)}">
@@ -440,6 +451,9 @@ class ChatElement extends CidElement
 				grid-template-rows: 1fr minmax(min-content, max-content);
 				grid-gap: 10px;
 				height: calc(60vh);
+			}
+			.yscrollable {
+				overflow-y: auto;
 			}
 			.grid-item {
 				/*background-color: red;*/
