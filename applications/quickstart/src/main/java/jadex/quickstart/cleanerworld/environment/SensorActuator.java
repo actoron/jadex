@@ -35,8 +35,8 @@ public class SensorActuator
 {
 	//-------- attributes --------
 	
-	/** The agent. */
-	private IInternalAccess agent;
+	/** The agent. Must be public due to Java Reflection Restrictions */
+	public IInternalAccess agent;
 	
 	/** The cleaner. */
 	private Cleaner	self;

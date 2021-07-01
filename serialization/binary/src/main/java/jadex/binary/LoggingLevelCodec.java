@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.logging.Level;
 
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -59,7 +60,7 @@ public class LoggingLevelCodec extends AbstractCodec
 			{
 				// Let's hope the Level subclass has this constructor...
 				Constructor c = clazz.getDeclaredConstructor(new Class[] { String.class, int.class });
-				c.setAccessible(true);
+				VmHacks.get().setAccessible(c, true);
 				ret = (Level) c.newInstance(new Object[] {name, val} );
 			}
 			catch (Exception e)

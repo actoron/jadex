@@ -14,6 +14,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -60,7 +61,7 @@ public class TracingInterceptor extends ComponentThreadInterceptor
 		try
 		{
 			Field f = GlobalTracer.class.getDeclaredField("tracer");
-			f.setAccessible(true);
+			VmHacks.get().setAccessible(f, true);
 			MockTracer mt = (MockTracer)f.get(t);
 			System.out.println("spans:"+mt.finishedSpans());
 		}

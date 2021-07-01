@@ -45,6 +45,7 @@ import jadex.bridge.service.component.interceptors.MethodCallListenerInterceptor
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.component.interceptors.PrePostConditionInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -722,7 +723,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 								{
 									try
 									{
-										fields[i].setAccessible(true);
+										VmHacks.get().setAccessible(fields[i], true);
 										fields[i].set(service, mgmntservice.getServiceId());
 									}
 									catch(Exception e)
@@ -742,7 +743,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 							Object val	= ia.getParameterGuesser().guessParameter(fields[i].getType(), false);
 							try
 							{
-								fields[i].setAccessible(true);
+								VmHacks.get().setAccessible(fields[i], true);
 								fields[i].set(service, val);
 							}
 							catch(Exception e)

@@ -39,6 +39,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.Properties;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -485,7 +486,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 //			final IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
 //			System.out.println(SUtil.arrayToString(clazz.getConstructors()));
 			Constructor<?> con = clazz.getDeclaredConstructor(new Class[0]);
-			con.setAccessible(true);
+			VmHacks.get().setAccessible(con, true);
 			final IComponentViewerPanel panel = (IComponentViewerPanel)con.newInstance(new Object[0]);
 			panel.init(getJCC(), exta).addResultListener(new SwingDefaultResultListener<Void>(comptree)
 			{

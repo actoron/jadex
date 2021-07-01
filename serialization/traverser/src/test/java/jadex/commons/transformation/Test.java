@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import jadex.bridge.ClassInfo;
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.ErrorException;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -1127,7 +1128,7 @@ public abstract class Test extends TestCase
 				try
 				{
 					Field	field	= SReflect.getField(obj.getClass(), "val$name");
-					field.setAccessible(true);
+					VmHacks.get().setAccessible(field, true);
 					othername	= (String)field.get(obj);
 				}
 				catch(Exception e)
@@ -1167,7 +1168,7 @@ public abstract class Test extends TestCase
 				try
 				{
 					Field	field	= SReflect.getField(obj.getClass(), "val$name");
-					field.setAccessible(true);
+					VmHacks.get().setAccessible(field, true);
 					othername	= (String)field.get(obj);
 				}
 				catch(Exception e)
@@ -1177,7 +1178,7 @@ public abstract class Test extends TestCase
 				try
 				{
 					Field	field	= SReflect.getField(obj.getClass(), "val$booli");
-					field.setAccessible(true);
+					VmHacks.get().setAccessible(field, true);
 					otherbooli	= (Boolean)field.get(obj);
 				}
 				catch(Exception e)

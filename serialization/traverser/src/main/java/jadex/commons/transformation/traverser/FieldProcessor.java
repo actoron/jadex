@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -78,7 +79,7 @@ class FieldProcessor implements ITraverseProcessor
 			{
 				if(!Modifier.isStatic(fields[i].getModifiers())) 
 				{
-					fields[i].setAccessible(true);
+					VmHacks.get().setAccessible(fields[i], true);
 					Object val = null;
 					try
 					{

@@ -26,6 +26,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
@@ -973,7 +974,7 @@ public class JavaReader
 							{
 								// Try private constructor for error exception (hack???)
 								Constructor<?> con = cl.getDeclaredConstructor(new Class<?>[0]);
-								con.setAccessible(true);
+								VmHacks.get().setAccessible(con, true);
 								ret = con.newInstance(new Object[0]);
 							}
 						}

@@ -18,6 +18,7 @@ import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3x.runtime.CapabilityWrapper;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
@@ -300,7 +301,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 								Method dm = mi.getMethod(agent.getClassLoader());
 								try
 								{
-									dm.setAccessible(true);
+									VmHacks.get().setAccessible(dm, true);
 									ret = ((Boolean)dm.invoke(goal.getPojoElement(), new Object[]{other.getPojoElement()})).booleanValue();
 								}
 								catch(Exception e)

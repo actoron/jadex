@@ -26,6 +26,7 @@ import jadex.bdiv3x.runtime.IParameter;
 import jadex.bdiv3x.runtime.IParameterSet;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -142,7 +143,7 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 					{
 						if(f.isAnnotationPresent(GoalAPI.class))
 						{
-							f.setAccessible(true);
+							VmHacks.get().setAccessible(f, true);
 							f.set(goal.getPojoElement(), goal);
 						}
 						else if(f.isAnnotationPresent(GoalParent.class))
@@ -162,12 +163,12 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 									
 								if(SReflect.isSupertype(f.getType(), pa.getClass()))
 								{
-									f.setAccessible(true);
+									VmHacks.get().setAccessible(f, true);
 									f.set(goal.getPojoElement(), pa);
 								}
 								else if(pojopa!=null && SReflect.isSupertype(f.getType(), pojopa.getClass()))
 								{
-									f.setAccessible(true);
+									VmHacks.get().setAccessible(f, true);
 									f.set(goal.getPojoElement(), pojopa);
 								}
 							}

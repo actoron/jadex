@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -91,7 +92,7 @@ public class JsonLoggingLevelProcessor extends AbstractJsonProcessor
 				// Let's hope the Level subclass has this constructor...
 				Class<?> clazz = SReflect.getClass(type);
 				Constructor<?> c = clazz.getDeclaredConstructor(new Class[]{String.class, int.class});
-				c.setAccessible(true);
+				VmHacks.get().setAccessible(c, true);
 				ret = (Level) c.newInstance(new Object[] {name, val} );
 			}
 			catch (Exception e)

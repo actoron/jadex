@@ -52,7 +52,6 @@ class SensorPanel extends JPanel
 		try
 		{
 			Field	fagent	= sensor.getClass().getDeclaredField("agent");
-			fagent.setAccessible(true);
 			agent	= (IInternalAccess)fagent.get(sensor);
 		}
 		catch(Exception e)

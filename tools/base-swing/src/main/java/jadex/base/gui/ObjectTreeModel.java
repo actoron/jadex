@@ -27,6 +27,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SUtil;
 import jadex.commons.gui.SGUI;
 
@@ -779,10 +780,10 @@ public class ObjectTreeModel implements TreeModel
 					for (Class clazz = nodeObject.getClass(); clazz != null; clazz = clazz.getSuperclass())
 					{
 						Field[] f = clazz.getDeclaredFields();
-						AccessibleObject.setAccessible(f, true);
-	
+						
 						for (int i = 0; i < f.length; i++)
 						{
+							VmHacks.get().setAccessible(f[i], true);
 							// get only nonstatic fields
 							if(!Modifier.isStatic(f[i].getModifiers()))
 							{

@@ -3,6 +3,7 @@ package jadex.webservice.grizzlytest;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import jadex.bytecode.vmhacks.VmHacks;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpHandlerChain;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -20,9 +21,9 @@ public class GrizzlyTest
 		Class< ? > clazz = HttpHandlerChain.class;
 		Field f = clazz.getDeclaredField("LOCAL_HOST");
 		Field mf = Field.class.getDeclaredField("modifiers");
-		mf.setAccessible(true);
+		VmHacks.get().setAccessible(mf, true);
 		mf.setInt(f, f.getModifiers() & ~Modifier.FINAL);
-		f.setAccessible(true);
+		VmHacks.get().setAccessible(f, true);
 
 		f.set(null, "hugo");
 		server.getServerConfiguration().addHttpHandler(new HttpHandler()

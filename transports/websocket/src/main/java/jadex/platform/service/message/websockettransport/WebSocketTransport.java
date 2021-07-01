@@ -11,6 +11,7 @@ import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.platform.service.transport.ITransport;
@@ -72,7 +73,7 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 			try
 			{
 				Field f = NanoHTTPD.class.getField("myServerSocket");
-				f.setAccessible(true);
+				VmHacks.get().setAccessible(f, true);
 				ServerSocket s = (ServerSocket) f.get(server);
 				if (s != null)
 					s.close();

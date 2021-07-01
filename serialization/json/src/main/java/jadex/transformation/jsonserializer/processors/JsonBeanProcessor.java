@@ -9,6 +9,7 @@ import java.util.Map;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.BasicTypeConverter;
@@ -253,7 +254,7 @@ public class JsonBeanProcessor extends AbstractJsonProcessor
 
 		try
 		{
-			c.setAccessible(true);
+			VmHacks.get().setAccessible(c, true);
 			Class<?>[] paramtypes = c.getParameterTypes();
 			Object[] paramvalues = new Object[paramtypes.length];
 			for(int i=0; i<paramtypes.length; i++)

@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
@@ -76,10 +77,10 @@ public class MultiCollectionCodec extends AbstractCodec
 		try
 		{
 			Field field = SReflect.getField(clazz, "map");
-			field.setAccessible(true);
+			VmHacks.get().setAccessible(field, true);
 			field.set(object, map);
 			field = SReflect.getField(clazz, "type");
-			field.setAccessible(true);
+			VmHacks.get().setAccessible(field, true);
 			field.set(object, type);
 		}
 		catch (Exception e)
@@ -99,12 +100,12 @@ public class MultiCollectionCodec extends AbstractCodec
 		try
 		{
 			Field mapfield = MultiCollection.class.getDeclaredField("map");
-			mapfield.setAccessible(true);
+			VmHacks.get().setAccessible(mapfield, true);
 			Map map = (Map) mapfield.get(mc);
 			traverser.doTraverse(map, map.getClass(), preprocessors, processors, mode, targetcl, ec);
 			
 			Field typefield = MultiCollection.class.getDeclaredField("type");
-			typefield.setAccessible(true);
+			VmHacks.get().setAccessible(typefield, true);
 			Class type = (Class) typefield.get(mc);
 			ec.writeClass(type);
 		}

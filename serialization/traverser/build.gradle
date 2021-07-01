@@ -3,8 +3,7 @@ description 'The traverser allows for realizing object transformations like clon
 dependencies 
 {
 	api project(':util:commons')
-
-	testImplementation project(':serialization:testbase')
+	api project(':util:bytecode')
 }
 
 // testjar is needed for jadex-android-xmlpull tests

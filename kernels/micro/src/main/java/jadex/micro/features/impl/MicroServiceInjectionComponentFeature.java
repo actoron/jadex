@@ -31,6 +31,7 @@ import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.component.UnresolvedServiceInvocationHandler;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -227,7 +228,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 								{
 									try
 									{
-										f.setAccessible(true);
+										VmHacks.get().setAccessible(f, true);
 										f.set(target, sfut);
 										lis2.resultAvailable(null);
 									}
@@ -263,7 +264,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 									
 										try
 										{
-											f.setAccessible(true);
+											VmHacks.get().setAccessible(f, true);
 											f.set(target, proxy);
 											lis2.resultAvailable(null);
 										}
@@ -405,7 +406,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 		{
 			try
 			{
-				f.setAccessible(true);
+				VmHacks.get().setAccessible(f, true);
 				f.set(target, result);
 			}
 			catch(Throwable t)
@@ -429,7 +430,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 						{
 							try
 							{
-								f.setAccessible(true);
+								VmHacks.get().setAccessible(f, true);
 								f.set(target, result);
 							}
 							catch(Exception e)
@@ -459,7 +460,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 					coll = new ArrayList<Object>();
 					try
 					{
-						f.setAccessible(true);
+						VmHacks.get().setAccessible(f, true);
 						f.set(target, coll);
 					}
 					catch(Exception e)
@@ -485,7 +486,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 					coll = new HashSet<Object>();
 					try
 					{
-						f.setAccessible(true);
+						VmHacks.get().setAccessible(f, true);
 						f.set(target, coll);
 					}
 					catch(Exception e)
@@ -535,7 +536,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 				{
 					try
 					{
-						m.setAccessible(true);
+						VmHacks.get().setAccessible(m, true);
 						m.invoke(target, args);
 					}
 					catch(Throwable t)
@@ -666,7 +667,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 							{
 								try
 								{
-									f.setAccessible(true);
+									VmHacks.get().setAccessible(f, true);
 									f.set(target, sfut);
 									lis2.resultAvailable(null);
 								}
@@ -684,7 +685,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 								{
 									try
 									{
-										f.setAccessible(true);
+										VmHacks.get().setAccessible(f, true);
 										f.set(target, sfut.get());
 										lis2.resultAvailable(null);
 									}
@@ -705,7 +706,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 								
 									try
 									{
-										f.setAccessible(true);
+										VmHacks.get().setAccessible(f, true);
 										f.set(target, proxy);
 										lis2.resultAvailable(null);
 									}
@@ -728,7 +729,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 										{
 											try
 											{
-												f.setAccessible(true);
+												VmHacks.get().setAccessible(f, true);
 												f.set(component, result);
 												lis2.resultAvailable(null);
 											}

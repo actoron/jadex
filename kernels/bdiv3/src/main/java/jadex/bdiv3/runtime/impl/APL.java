@@ -36,6 +36,7 @@ import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -124,7 +125,7 @@ public class APL
 					Method m = mi.getMethod(ia.getClassLoader());
 					try
 					{
-						m.setAccessible(true);
+						VmHacks.get().setAccessible(m, true);
 						List<Object> cands = (List<Object>)m.invoke(pojo, new Object[0]);
 						candidates = new ArrayList<ICandidateInfo>();
 						if(cands!=null)
@@ -573,7 +574,7 @@ public class APL
 				
 				try
 				{
-					m.setAccessible(true);
+					VmHacks.get().setAccessible(m, true);
 					
 					Object[] params = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), element.getModelElement(), null, null, element, ia);
 					if(params==null)
@@ -651,7 +652,7 @@ public class APL
 				Method m = mi.getMethod(ia.getClassLoader());
 				try
 				{
-					m.setAccessible(true);
+					VmHacks.get().setAccessible(m, true);
 					Collection<Object> col = new ArrayList<Object>();
 					col.add(getCandidates());
 					cand = (ICandidateInfo)m.invoke(element.getPojoElement(), BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), melem, null, null, element, col, ia));

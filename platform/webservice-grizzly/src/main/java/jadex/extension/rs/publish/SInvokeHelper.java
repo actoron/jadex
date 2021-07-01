@@ -14,6 +14,7 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
+import jadex.bytecode.vmhacks.VmHacks;
 import org.glassfish.grizzly.CompletionHandler;
 import org.glassfish.grizzly.ReadHandler;
 import org.glassfish.grizzly.http.io.NIOReader;
@@ -385,7 +386,7 @@ public class SInvokeHelper
 										{
 											Request r = (Request)greq;
 											Field f = r.getClass().getDeclaredField("usingInputStream");
-											f.setAccessible(true);
+											VmHacks.get().setAccessible(f, true);
 											f.set(r, Boolean.FALSE);
 	//										System.out.println("params: "+r.getParameterNames());
 										}
@@ -466,7 +467,7 @@ public class SInvokeHelper
 	protected static Object getFieldValue(String name, Object object) throws Exception
 	{
 		Field f = object.getClass().getDeclaredField(name);
-		f.setAccessible(true);
+		VmHacks.get().setAccessible(f, true);
 		return f.get(object);
 	}
 	
@@ -481,7 +482,7 @@ public class SInvokeHelper
 			{
 				Request r = (Request)req;
 				Field f = r.getClass().getDeclaredField("usingInputStream");
-				f.setAccessible(true);
+				VmHacks.get().setAccessible(f, true);
 				f.set(r, Boolean.FALSE);
 				System.out.println("params: "+r.getParameterNames());
 			}

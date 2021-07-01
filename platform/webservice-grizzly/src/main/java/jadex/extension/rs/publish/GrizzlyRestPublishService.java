@@ -9,6 +9,7 @@ import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jadex.bytecode.vmhacks.VmHacks;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -129,12 +130,12 @@ public class GrizzlyRestPublishService extends AbstractRestPublishService
     						{
     							req.setServletPath(data.wrapperPath.toString());
     							Method m = req.getClass().getDeclaredMethod("setPathInfo", new Class[]{String.class});
-    							m.setAccessible(true);
+								VmHacks.get().setAccessible(m, true);
     							m.invoke(req, new Object[]{pi});
     						}
     						
     					    Method m = req.getClass().getDeclaredMethod("setContextPath", new Class[]{String.class});
-    					    m.setAccessible(true);
+							VmHacks.get().setAccessible(m, true);
     					    m.invoke(req, new Object[]{data.contextPath.toString()});
     				            
 //        				        request.setNote(SERVLET_REQUEST_NOTE, servletRequest);

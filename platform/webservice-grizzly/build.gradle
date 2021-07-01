@@ -5,6 +5,7 @@ description 'Provides webservice support via Grizzly.'
 dependencies 
 {
 	api project(':platform:webservice')
+	api project(':util:bytecode');
 
 	api 'org.glassfish.grizzly:grizzly-http-servlet:2.3.22'
 	api 'org.glassfish.jersey.media:jersey-media-multipart:2.11'

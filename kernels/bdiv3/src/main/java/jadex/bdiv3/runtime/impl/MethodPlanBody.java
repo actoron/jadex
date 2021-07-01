@@ -7,6 +7,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.MElement;
 import jadex.bridge.IInternalAccess;
+import jadex.bytecode.vmhacks.VmHacks;
 
 /**
  *  Implementation of a method as a plan body.
@@ -45,7 +46,7 @@ public class MethodPlanBody extends AbstractPlanBody
 	{
 		try
 		{
-			body.setAccessible(true);
+			VmHacks.get().setAccessible(body, true);
 			return body.invoke(agent, params);
 		}
 		catch(Exception e)

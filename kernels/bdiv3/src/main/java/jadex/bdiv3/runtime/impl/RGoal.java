@@ -37,6 +37,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -975,7 +976,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				try
 				{
 					Field f = (Field)pac;
-					f.setAccessible(true);
+					VmHacks.get().setAccessible(f, true);
 					ret = f.get(pojo);
 				}
 				catch(Exception e)
@@ -988,7 +989,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				try
 				{
 					Method m = (Method)pac;
-					m.setAccessible(true);
+					VmHacks.get().setAccessible(m, true);
 					ret = m.invoke(pojo, new Object[0]);
 				}
 				catch(Exception e)
@@ -1187,7 +1188,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			try
 			{
 				Field f = (Field)wa;
-				f.setAccessible(true);
+				VmHacks.get().setAccessible(f, true);
 				f.set(getPojoElement(), result);
 			}
 			catch(Exception e)
@@ -1200,7 +1201,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			try
 			{
 				Method m = (Method)wa;
-				m.setAccessible(true);
+				VmHacks.get().setAccessible(m, true);
 				List<Object> res = new ArrayList<Object>();
 				res.add(result);
 				Object[] params = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), 
@@ -1233,7 +1234,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				Method m = mi.getMethod(getAgent().getClassLoader());
 				try
 				{
-					m.setAccessible(true);
+					VmHacks.get().setAccessible(m, true);
 					Object[] params = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), getModelElement(), null, null, this, getAgent());
 					Object res = m.invoke(pojo, params);
 					if(res instanceof IFuture)

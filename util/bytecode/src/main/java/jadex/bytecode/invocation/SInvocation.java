@@ -877,7 +877,7 @@ public class SInvocation
 		{
 			return false;
 		}
-		cicm.setAccessible(true);
+		VmHacks.get().setAccessible(cicm, true);
 		boolean acc = false;
 		try
 		{

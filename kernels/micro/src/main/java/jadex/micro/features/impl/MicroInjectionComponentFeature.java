@@ -14,6 +14,7 @@ import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.FieldInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -83,7 +84,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 			for(int i=0; i<fields.length; i++)
 			{
 				Field f = fields[i].getField(component.getClassLoader());
-				f.setAccessible(true);
+				VmHacks.get().setAccessible(f, true);
 				f.set(target, component);
 			}
 	
@@ -143,7 +144,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 				Class<?> iface = component.getClassLoader().loadClass(fields[i].getTypeName());
 				Object feat = component.getFeature(iface);
 				Field f = fields[i].getField(component.getClassLoader());
-				f.setAccessible(true);
+				VmHacks.get().setAccessible(f, true);
 				f.set(target, feat);
 			}
 			
@@ -162,7 +163,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 					{
 						try
 						{
-							f.setAccessible(true);
+							VmHacks.get().setAccessible(f, true);
 							f.set(target, exta);
 							lis.resultAvailable(null);
 						}
@@ -182,7 +183,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 								{
 									try
 									{
-										f.setAccessible(true);
+										VmHacks.get().setAccessible(f, true);
 										f.set(target, pagent);
 										lis.resultAvailable(null);
 									}
@@ -247,7 +248,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 					fetcher.setValue("$value", val);
 					val = SJavaParser.evaluateExpression(convert, component.getModel().getAllImports(), fetcher, component.getClassLoader());
 				}
-				field.setAccessible(true);
+				VmHacks.get().setAccessible(field, true);
 //				if(field.getName().equals("address"))
 //					System.out.println("setVal: "+getComponent().getId()+" "+val+" "+field.getName());
 				//field.set(agent, val);

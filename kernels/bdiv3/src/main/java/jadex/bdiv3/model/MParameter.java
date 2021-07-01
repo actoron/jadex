@@ -14,6 +14,7 @@ import jadex.bdiv3x.runtime.CapabilityWrapper;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -222,7 +223,7 @@ public class MParameter extends MElement
 			try
 			{
 				Field f = ftarget.getField(cl);
-				f.setAccessible(true);
+				VmHacks.get().setAccessible(f, true);
 				ret = f.get(object);
 			}
 			catch(Exception e)
@@ -274,7 +275,7 @@ public class MParameter extends MElement
 			try
 			{
 				Field f = ftarget.getField(cl);
-				f.setAccessible(true);
+				VmHacks.get().setAccessible(f, true);
 				f.set(object, value);
 			}
 			catch(Exception e)
