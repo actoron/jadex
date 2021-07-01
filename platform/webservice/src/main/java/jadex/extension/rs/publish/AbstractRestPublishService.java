@@ -8,6 +8,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -221,7 +222,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				
 				byte[] data = jsonser.encode(val, component.getClassLoader(), null, conv);
 				//byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, false, false, null, null, null);
-				return new String(data);
+				return new String(data, StandardCharsets.UTF_8);
 			}
 		};
 		converters.add(MediaType.APPLICATION_JSON, jsonc);
@@ -233,7 +234,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			{
 				byte[] data = jsonser.encode(val, component.getClassLoader(), null, null);
 				//byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, true, true, null, null, null);
-				return new String(data);
+				String ret = new String(data, StandardCharsets.UTF_8);
+				System.out.println("rest json: "+ret);
+				return ret;
 			}
 		};
 		converters.add(STransformation.MediaType.APPLICATION_JSON_JADEX, jjsonc);
@@ -246,7 +249,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				// System.out.println("write response in xml");
 
 				byte[] data = JavaWriter.objectToByteArray(val, component.getClassLoader());
-				return new String(data);
+				return new String(data, StandardCharsets.UTF_8);
 			}
 		};
 		converters.add(MediaType.APPLICATION_XML, xmlc);
@@ -1390,7 +1393,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		{
 			try
 			{
-				ret = binser.decode(val.getBytes(), component.getClassLoader(), null, null, null);
+				ret = binser.decode(val.getBytes(StandardCharsets.UTF_8), component.getClassLoader(), null, null, null);
 				//ret = JavaReader.objectFromByteArray(val.getBytes(), component.getClassLoader(), null);
 				done = true;
 			}
@@ -1441,16 +1444,16 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	}
 
 	/**
-	*
-	*/
+	 *
+	 */
 	protected void writeResponse(Object result, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin, Integer max)
 	{
 		writeResponse(result, Response.Status.OK.getStatusCode(), callid, mi, request, response, fin, max);
 	}
 
 	/**
-	*
-	*/
+	 *
+	 */
 	protected void writeResponse(Object result, int status, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin, Integer max)
 	{
 		// System.out.println("writeResponse: "+result+", "+status+", "+callid);
@@ -1576,7 +1579,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 */
 	protected void writeResponseContent(Object result, HttpServletRequest request, HttpServletResponse response, List<String> sr)
 	{
-		//if(result!=null && result.getClass().isArray())
+		//if(result!=null && result.getClass().toString().indexOf("ChatEvent")!=-1)
 		//	System.out.println("jju");
 		
 		//if(result instanceof Exception)
@@ -1595,7 +1598,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			}
 			else
 			{
-				PrintWriter out = response.getWriter();
 				if(result != null)
 				{
 					String ret = null;
@@ -1621,11 +1623,16 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					{
 						// If no charset is specified, default to UTF-8 instead
 						// of HTTP default which is ISO-8859-1.
-						if(mt.startsWith("text") && !mt.contains("charset"))
+						//if(mt.startsWith("text") && !mt.contains("charset"))
+						if(!mt.contains("charset"))
 							mt = mt + "; charset=utf-8";
 	
 						if(response.getHeader("Content-Type") == null)
 							response.setHeader("Content-Type", mt);
+
+						// Important: writer access must be deferred to happen after setting charset! Will be ignored otherwise
+						// https://stackoverflow.com/questions/51014481/setting-default-character-encoding-and-content-type-in-embedded-jetty
+						PrintWriter out = response.getWriter();
 						out.write(ret);
 						// System.out.println("Response content: "+ret);
 					}
@@ -1635,7 +1642,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 							response.setHeader("Content-Type", MediaType.TEXT_PLAIN + "; charset=utf-8");
 						if(!(result instanceof String) && !(result instanceof Response))
 							System.out.println("cannot convert result, writing as string: " + result);
-	
+
+						// Important: writer access must be deferred to happen after setting charset!
+						PrintWriter out = response.getWriter();
 						out.write(result instanceof Response ? "" + ((Response)result).getEntity() : result.toString());
 					}
 	

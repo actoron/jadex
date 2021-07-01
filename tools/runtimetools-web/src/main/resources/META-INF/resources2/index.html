@@ -137,10 +137,11 @@
 						    }
 						    return value;
 						}*/
+						console.log("received data: "+data);
 						try
 						{
 							var ret = JSON.parse(data);//, daterev);
-							//console.log("json: "+ret);
+							console.log("json: "+ret);
 							return ret;
 						}
 						catch(ex)
@@ -167,7 +168,7 @@
 					var erfunc = function(err)
 					{
 						//if(axios.isCancel(err))
-			             //   console.log('request canceled', err.message);
+			            //   console.log('request canceled', err.message);
 						
 						if(terminated)
 						{

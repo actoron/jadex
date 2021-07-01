@@ -1,39 +1,20 @@
 package jadex.tools.web.chat;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
-import jadex.base.SRemoteGui;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
 import jadex.bridge.service.types.chat.TransferInfo;
-import jadex.bridge.service.types.cms.CMSStatusEvent;
-import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.factory.SComponentFactory;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Boolean3;
-import jadex.commons.ICommand;
-import jadex.commons.MethodInfo;
 import jadex.commons.future.Future;
-import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.tools.web.jcc.JCCPluginAgent;
@@ -263,6 +244,7 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 		{
 			ser.getImage().delegate(ret);
 		}).catchEx(ret);
+		
 		return ret;
 	}
 	

@@ -21,8 +21,8 @@ repositories {
 	// Some default repositories for open source Java artifacts
 	mavenCentral()
 	
-	// Optional repository for using nightly versions of Jadex.
+	// Optional repository for using versions of Jadex not released to Maven Central.
 	maven {
-		url "https://nexus.actoron.com/content/repositories/oss-nightlies"
+		url "https://nexus.actoron.com/content/repositories/jadex/"
 	}
 }

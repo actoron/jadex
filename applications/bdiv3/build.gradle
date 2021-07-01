@@ -1,32 +1,23 @@
 description 'The Jadex BDI V3 applications package contains several example applications, benchmarks and testcases using BDI V3 agents.'
 
-// Test a specific java version, if set. 
-if(Boolean.TRUE.equals(project.hasProperty('v3java')))
-{
-	def	version	= project.getProperty('v3java');
-	sourceCompatibility = "1.$version"
-	project.buildDir	= new File(project.buildDir, "buildJava$version")
+// Test ASM with different versions -> add extra compile/test tasks for each desired java version
+['8', '11'].each { version ->
+	def compileJavaX	= task "compileJava$version"(type: JavaCompile) {
+		sourceCompatibility = version
+		targetCompatibility = version
+		source sourceSets.main.java + sourceSets.test.java
+		classpath = sourceSets.main.compileClasspath
+		destinationDirectory = new File(project.buildDir, "classesJava$version")
+	}
+	def testJavaX	= task "testJava$version"(type: Test) {
+		classpath = sourceSets.test.compileClasspath + project.files(compileJavaX.destinationDirectory)
+		maxParallelForks = test.maxParallelForks
+	}
+	test.dependsOn testJavaX
 }
 
-// If java version is unset -> test ASM with different versions
-else
-{
-	// Add extra test task for each desired java version
-	['8', '11'].each { version ->
-		// Create tasks as extra gradle builds to allow for different build output dirs
-		// https://stackoverflow.com/questions/26459067/how-to-run-gradle-script-from-gradle
-		// https://discuss.gradle.org/t/replacement-for-task-execute/27545
-		def t	= task "testJava$version"(type: GradleBuild) {
-			tasks = ["test"]
-			buildName = "testJava$version"
-			startParameter.projectProperties << ["v3java": version]
-		}
-		//test.dependsOn t
-	}
-	
-	// Skip default test (redundant)
-	//test.enabled false
-}
+// Skip default test (redundant)
+test.enabled false
 
 dependencies
 {
