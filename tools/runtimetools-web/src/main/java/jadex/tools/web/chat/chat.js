@@ -98,7 +98,9 @@ class ChatElement extends CidElement
 		var self = this;
 		if(interval==null)
 			interval = 10000;
-		self.terminate = jadex.getIntermediate(this.getMethodPrefix()+'&methodname=subscribeToEvents&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
+		self.terminate = jadex.getIntermediate(this.getMethodPrefix()
+			+'&args_0='+self.cid+"&argtypes_0=jadex.bridge.IComponentIdentifier"
+			+'&methodname=subscribeToEvents&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		function(response)
 		{
 			self.connected = true;
@@ -213,12 +215,13 @@ class ChatElement extends CidElement
 		this.shadowRoot.getElementById("msg").value = "";
 		var url = this.getMethodPrefix()+'&methodname=message'+
 			'&args_0='+msg+"&argtypes_0=java.lang.String"+
-			'&args_1='+'null'+"&argtypes_0=jadex.bridge.IComponentIdentifier[]"+
-			'&args_2='+'false'+"&argtypes_0=boolean";
+			'&args_1='+'null'+"&argtypes_1=jadex.bridge.IComponentIdentifier[]"+
+			'&args_2='+'false'+"&argtypes_2=boolean"+
+			'&args_3='+self.cid+"&argtypes_3=jadex.bridge.IComponentIdentifier";
 		//url = encodeURIComponent(url);
 		
-		console.log("sendmsg: "+msg);
-		console.log("sendmsg: "+url);
+		//console.log("sendmsg: "+msg);
+		//console.log("sendmsg: "+url);
 		
 		axios.get(url, this.transform).then(function(resp)
 		{
@@ -243,7 +246,8 @@ class ChatElement extends CidElement
 	searchUsers()
 	{
 		var self = this;
-		var url = this.getMethodPrefix()+'&methodname=getUsers';
+		var url = this.getMethodPrefix()+'&methodname=getUsers'+
+		'&args_0='+self.cid+"&argtypes_0=jadex.bridge.IComponentIdentifier";
 		//url = encodeURIComponent(url);
 		
 		console.log("getUsers: "+url);

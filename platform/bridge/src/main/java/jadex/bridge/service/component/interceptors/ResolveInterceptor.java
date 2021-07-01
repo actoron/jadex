@@ -649,96 +649,99 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		}
 
 		Object ret = value;
-
-		Class<?> valuewrapped = SReflect.getWrappedType(value.getClass());
-
-		if(!SReflect.isSupertype(targetclass, valuewrapped))
+		
+		if(ret!=null)
 		{
-//			System.out.println("type problem: "+targetType+" "+actualValueWrapped+" "+sim.getParameterValues()[i]);
-			
-			if(value instanceof String)
+			Class<?> valuewrapped = SReflect.getWrappedType(value.getClass());
+	
+			if(!SReflect.isSupertype(targetclass, valuewrapped))
 			{
-				if(isSupportedBasicType(targetclass))
+	//			System.out.println("type problem: "+targetType+" "+actualValueWrapped+" "+sim.getParameterValues()[i]);
+				
+				if(value instanceof String)
 				{
-					Object cval = convertFromString((String)value, targetclass);
-					ret = cval;
+					if(isSupportedBasicType(targetclass))
+					{
+						Object cval = convertFromString((String)value, targetclass);
+						ret = cval;
+					}
+					// base 64 case (problem could be normal string?!)
+					else if(SReflect.isSupertype(byte[].class, targetclass))
+					{
+						ret = Base64.decode(((String) value).toCharArray());
+					}
 				}
-				// base 64 case (problem could be normal string?!)
-				else if(SReflect.isSupertype(byte[].class, targetclass))
+				// Javascript only has float (no integer etc.)
+				else if(SReflect.isSupertype(Number.class, targetclass) && SReflect.isSupertype(Number.class, valuewrapped))
 				{
-					ret = Base64.decode(((String) value).toCharArray());
+					if(Integer.class.equals(targetclasswrapped))
+					{
+						ret = ((Number)value).intValue();
+					}
+					else if(Long.class.equals(targetclasswrapped))
+					{
+						ret = ((Number)value).longValue();
+					}
+					else if(Double.class.equals(targetclasswrapped))
+					{
+						ret = ((Number)value).doubleValue();
+					}
+					else if(Float.class.equals(targetclasswrapped))
+					{
+						ret = ((Number)value).floatValue();
+					}
+					else if(Short.class.equals(targetclasswrapped))
+					{
+						ret = ((Number)value).shortValue();
+					}
+					else if(Byte.class.equals(targetclasswrapped))
+					{
+						ret = ((Number)value).byteValue();
+					}
 				}
-			}
-			// Javascript only has float (no integer etc.)
-			else if(SReflect.isSupertype(Number.class, targetclass) && SReflect.isSupertype(Number.class, valuewrapped))
-			{
-				if(Integer.class.equals(targetclasswrapped))
+				else if(valuewrapped.isArray())
 				{
-					ret = ((Number)value).intValue();
-				}
-				else if(Long.class.equals(targetclasswrapped))
-				{
-					ret = ((Number)value).longValue();
-				}
-				else if(Double.class.equals(targetclasswrapped))
-				{
-					ret = ((Number)value).doubleValue();
-				}
-				else if(Float.class.equals(targetclasswrapped))
-				{
-					ret = ((Number)value).floatValue();
-				}
-				else if(Short.class.equals(targetclasswrapped))
-				{
-					ret = ((Number)value).shortValue();
-				}
-				else if(Byte.class.equals(targetclasswrapped))
-				{
-					ret = ((Number)value).byteValue();
-				}
-			}
-			else if(valuewrapped.isArray())
-			{
-				Type itype;
-				if(SReflect.isSupertype(List.class, targetclass))
-				{
-					ret = new ArrayList<Object>();
-					itype = SReflect.getInnerGenericType(targettype);
-				}
-				else if(SReflect.isSupertype(Set.class, targetclass))
-				{
-					ret = new HashSet<Object>();
-					itype = SReflect.getInnerGenericType(targettype);
-				}
-				else if(targetclass.isArray())
-				{
-					ret = Array.newInstance(targetclass.getComponentType(), Array.getLength(value));
-					itype = targetclass.getComponentType();
+					Type itype;
+					if(SReflect.isSupertype(List.class, targetclass))
+					{
+						ret = new ArrayList<Object>();
+						itype = SReflect.getInnerGenericType(targettype);
+					}
+					else if(SReflect.isSupertype(Set.class, targetclass))
+					{
+						ret = new HashSet<Object>();
+						itype = SReflect.getInnerGenericType(targettype);
+					}
+					else if(targetclass.isArray())
+					{
+						ret = Array.newInstance(targetclass.getComponentType(), Array.getLength(value));
+						itype = targetclass.getComponentType();
+					}
+					else
+					{
+						throw new RuntimeException("Parameter conversion not possible: "+value+" "+targettype);
+					}
+						
+					if(Array.getLength(value)>0)
+					{
+						for(int i=0; i<Array.getLength(value); i++)
+						{
+							Object v = convertParameter(Array.get(value, i), itype);
+							if(ret instanceof Collection)
+							{
+								((Collection)ret).add(v);
+							}
+							else
+							{
+								Array.set(ret, i, v);
+							}
+						}
+					}
 				}
 				else
 				{
 					throw new RuntimeException("Parameter conversion not possible: "+value+" "+targettype);
 				}
-					
-				if(Array.getLength(value)>0)
-				{
-					for(int i=0; i<Array.getLength(value); i++)
-					{
-						Object v = convertParameter(Array.get(value, i), itype);
-						if(ret instanceof Collection)
-						{
-							((Collection)ret).add(v);
-						}
-						else
-						{
-							Array.set(ret, i, v);
-						}
-					}
-				}
-			}
-			else
-			{
-				throw new RuntimeException("Parameter conversion not possible: "+value+" "+targettype);
 			}
 		}
 		

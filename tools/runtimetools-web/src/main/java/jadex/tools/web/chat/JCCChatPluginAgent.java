@@ -8,12 +8,13 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
-import jadex.bridge.service.types.chat.TransferInfo;
 import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -26,19 +27,6 @@ import jadex.tools.web.jcc.JCCPluginAgent;
 @Agent(autostart=Boolean3.TRUE)
 public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatService
 {
-	/*@OnService(name="chatguiservice")
-	public void setService(IChatGuiService service)
-	{
-	}*/
-	
-	/**
-	 *  Get the chat gui service.
-	 */
-	protected IChatGuiService getChatService()
-	{
-		return agent.getLocalService(new ServiceQuery<IChatGuiService>(IChatGuiService.class).setExcludeOwner(true).setScope(ServiceScope.PLATFORM));
-	}
-	
 	/**
 	 *  Get the plugin name.
 	 *  @return The plugin name.
@@ -78,33 +66,17 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	/**
 	 *  Set the user name.
 	 */
-	public IFuture<Void> setNickName(String nick)
+	public IFuture<Void> setNickName(String nick, IComponentIdentifier cid)
 	{
-		return  getChatService().setNickName(nick);
-	}
-	
-	/**
-	 *  Get the user name.
-	 */
-	public IFuture<String> getNickName()
-	{
-		return getChatService().getNickName();
+		return getChatGuiService(cid).thenCompose(s -> s.setNickName(nick));
 	}
 	
 	/**
 	 *  Set the avatar image.
 	 */
-	public IFuture<Void> setImage(byte[] image)
+	public IFuture<Void> setImage(byte[] image, IComponentIdentifier cid)
 	{
-		return getChatService().setImage(image);
-	}
-	
-	/**
-	 *  Get the avatar image.
-	 */
-	public IFuture<byte[]> getImage()
-	{
-		return getChatService().getImage();
+		return getChatGuiService(cid).thenCompose(s -> s.setImage(image));
 	}
 	
 	// download directory
@@ -117,9 +89,9 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	 */
 	// Not necessary due to SFuture.getNoTimeoutFuture
 //	@Timeout(Timeout.NONE)
-	public ISubscriptionIntermediateFuture<ChatEvent> subscribeToEvents()
+	public ISubscriptionIntermediateFuture<ChatEvent> subscribeToEvents(IComponentIdentifier cid)
 	{
-		return getChatService().subscribeToEvents();
+		return (ISubscriptionIntermediateFuture<ChatEvent>)getChatGuiService(cid).thenCompose(s -> s.subscribeToEvents(), SubscriptionIntermediateDelegationFuture.class);
 	}
 	
 	//-------- chatting --------
@@ -128,9 +100,9 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	 *  Get available chat users.
 	 *  @return The currently available remote services.
 	 */
-	public IFuture<Collection<IChatService>> getUsers()
+	public IFuture<Collection<IChatService>> getUsers(IComponentIdentifier cid)
 	{
-		return getChatService().getUsers();
+		return getChatGuiService(cid).thenCompose(s -> s.getUsers());
 	}
 	
 	/**
@@ -141,10 +113,10 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	 *  @param self Flag if message should also be sent to service itself.
 	 *  @return The remote services, to which the message was successfully posted.
 	 */
-	public IIntermediateFuture<IChatService> message(String text, IComponentIdentifier[] receivers, boolean self)
+	public IIntermediateFuture<IChatService> message(String text, IComponentIdentifier[] receivers, boolean self, IComponentIdentifier cid)
 	{
 		System.out.println("message: "+text);
-		return getChatService().message(text, receivers, self);
+		return (IIntermediateFuture<IChatService>)getChatGuiService(cid).thenCompose(s -> s.message(text, receivers, self), IntermediateFuture.class);
 	}
 	
 	/**
@@ -153,68 +125,14 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	 *  @param image The new avatar image or null for no change.
 	 *  @param receivers The receivers.
 	 */
-	public IIntermediateFuture<IChatService> status(String status, byte[] image, IComponentIdentifier[] receivers)
+	public IIntermediateFuture<IChatService> status(String status, byte[] image, IComponentIdentifier[] receivers, IComponentIdentifier cid)
 	{
-		return getChatService().status(status, image, receivers);
+		return (IIntermediateFuture<IChatService>)getChatGuiService(cid).thenCompose(s -> s.status(status, image, receivers), IntermediateFuture.class);
 	}
 
 	//-------- file handling --------
 	
-	/**
-	 *  Get a snapshot of the currently managed file transfers.
-	 */
-	public IIntermediateFuture<TransferInfo> getFileTransfers()
-	{
-		return getChatService().getFileTransfers();
-	}
-	
-	/**
-	 *  Send a local file to the target component.
-	 *  @param filename	The file name.
-	 *  @param cid	The id of a remote chat component.
-	 */
-	public IFuture<Void> sendFile(String filename, IComponentIdentifier cid)
-	{
-		return getChatService().sendFile(filename, cid);
-	}
-
-	/**
-	 *  Send a file to the target component via bytes.
-	 *  @param filepath	The file path, local to the chat component.
-	 *  @param cid	The id of a remote chat component.
-	 */
-	public IFuture<Void> sendFile(final String fname, final byte[] data, final IComponentIdentifier cid)
-	{
-		return getChatService().sendFile(fname, data, cid);
-	}
-	
-	/**
-	 *  Accept a waiting file transfer.
-	 *  @param id	The transfer id. 
-	 *  @param filename	The location of the file (possibly changed by user). 
-	 */
-	public IFuture<Void> acceptFile(String id, String filename)
-	{
-		return getChatService().acceptFile(id, filename);
-	}
-	
-	/**
-	 *  Reject a waiting file transfer.
-	 *  @param id The transfer id. 
-	 */
-	public IFuture<Void> rejectFile(String id)
-	{
-		return getChatService().rejectFile(id);
-	}
-	
-	/**
-	 *  Cancel an ongoing file transfer.
-	 *  @param id The transfer id. 
-	 */
-	public IFuture<Void> cancelTransfer(String id)
-	{
-		return getChatService().cancelTransfer(id);
-	}
+	// todo
 	
 	// specific chat service methods for other chat services
 	
@@ -225,12 +143,7 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	 */
 	public IFuture<String> getNickName(IComponentIdentifier cid)
 	{
-		Future<String> ret = new Future<String>();
-		agent.searchService(new ServiceQuery<IChatService>(IChatService.class).setOwner(cid)).then(ser ->
-		{
-			ser.getNickName().delegate(ret);
-		}).catchEx(ret);
-		return ret;
+		return getChatService(cid).thenCompose(s -> s.getNickName());
 	}
 	
 	/**
@@ -240,13 +153,7 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	 */
 	public IFuture<byte[]> getImage(IComponentIdentifier cid)
 	{
-		Future<byte[]> ret = new Future<byte[]>();
-		agent.searchService(new ServiceQuery<IChatService>(IChatService.class).setOwner(cid)).then(ser ->
-		{
-			ser.getImage().delegate(ret);
-		}).catchEx(ret);
-		
-		return ret;
+		return getChatService(cid).thenCompose(s -> s.getImage());
 	}
 	
 	/**
@@ -256,12 +163,44 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	 */
 	public IFuture<String> getStatus(IComponentIdentifier cid)
 	{
-		Future<String> ret = new Future<String>();
-		agent.searchService(new ServiceQuery<IChatService>(IChatService.class).setOwner(cid)).then(ser ->
-		{
-			ser.getStatus().delegate(ret);
-		}).catchEx(ret);
-		return ret;
+		return getChatService(cid).thenCompose(s -> s.getStatus());
 	}
 	
+	/**
+	 *  Get the chat gui service of the own platform or of cid platform.
+	 *  @param cid The platform id.
+	 *  @return The service
+	 */
+	protected IFuture<IChatGuiService> getChatGuiService(IComponentIdentifier cid)
+	{
+		if(cid==null)
+			Thread.dumpStack();
+		if(cid==null || cid.hasSameRoot(cid))
+		{
+			return agent.searchService(new ServiceQuery<IChatGuiService>(IChatGuiService.class).setScope(ServiceScope.PLATFORM));
+		}
+		else
+		{
+			return agent.searchService(new ServiceQuery<IChatGuiService>(IChatGuiService.class).setPlatform(cid).setScope(ServiceScope.NETWORK));
+		}
+	}
+	
+	/**
+	 *  Get the chat service of the own platform or of cid platform.
+	 *  @param cid The platform id.
+	 *  @return The service
+	 */
+	protected IFuture<IChatService> getChatService(IComponentIdentifier cid)
+	{
+		if(cid==null)
+			Thread.dumpStack();
+		if(cid==null || cid.hasSameRoot(cid))
+		{
+			return agent.searchService(new ServiceQuery<IChatService>(IChatService.class).setScope(ServiceScope.PLATFORM));
+		}
+		else
+		{
+			return agent.searchService(new ServiceQuery<IChatService>(IChatService.class).setPlatform(cid).setScope(ServiceScope.NETWORK));
+		}
+	}
 }
