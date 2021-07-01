@@ -18,6 +18,7 @@ import java.security.ProtectionDomain;
 import java.security.Provider;
 import java.security.Security;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -57,6 +58,9 @@ public class VmHacks
 	
 	/** Globally disable all VM Hacks. */
 	public static boolean DISABLE = false;
+	
+	/** Globally disable setAccessible VM Hacks. */
+	public static boolean DISABLE_SETACCESSIBLE = false;
 	
 	/** Disable all instrumentation-based Hacks. */
 	public static boolean DISABLE_INSTRUMENTATION = true;
@@ -231,12 +235,35 @@ public class VmHacks
 		 */
 		public void setAccessible(AccessibleObject accobj, boolean flag)
 		{
+			if (DISABLE_SETACCESSIBLE)
+			{
+				accobj.setAccessible(flag);
+				return;
+			}
+			
+			boolean nativesuccess = false;
 			if (hasNative() && nativehelper.canSetAccessible())
 			{
-				nativehelper.setAccessible(setaccessibleoverride.getName(), accobj, flag);
+				try
+				{
+					nativehelper.setAccessible("override", accobj, flag);
+					nativesuccess = true;
+				}
+				catch (Throwable t1)
+				{
+					try
+					{
+						nativehelper.setAccessible("flag", accobj, flag);
+						nativesuccess = true;
+					}
+					catch (Throwable t)
+					{
+					}
+				}
 				
 			}
-			else if (putboolean != null && setaccessibleoverrideoffset != null)
+			
+			if (!nativesuccess && putboolean != null && setaccessibleoverrideoffset != null)
 			{
 				putboolean.invoke(null, accobj, setaccessibleoverrideoffset, flag);
 			}
@@ -486,10 +513,12 @@ public class VmHacks
 				// setAccessible override flag
 				try
 				{
+					System.out.println("AAAAA " + Arrays.toString(AccessibleObject.class.getDeclaredFields()));
 					setaccessibleoverride = AccessibleObject.class.getDeclaredField("override");
 				}
 				catch (Exception e)
 				{
+					e.printStackTrace();
 					try
 					{
 						// Sometimes called flag?
