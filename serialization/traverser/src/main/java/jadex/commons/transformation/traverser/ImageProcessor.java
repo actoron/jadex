@@ -171,10 +171,14 @@ public class ImageProcessor implements ITraverseProcessor
 //			width = image.getWidth(null);
 //			height = image.getHeight(null);
 //		}
-		ColorModel model = ColorModel.getRGBdefault();
-		WritableRaster raster = model.createCompatibleWritableRaster(width, height);
-		BufferedImage bufferedImage = new BufferedImage(model, raster,
-			model.isAlphaPremultiplied(), null);
+		
+		// Deleted nonsense... should include alpha channel color space!
+		//ColorModel model = ColorModel.getRGBdefault();
+		//WritableRaster raster = model.createCompatibleWritableRaster(width, height);
+		//BufferedImage bufferedImage = new BufferedImage(model, raster,
+		//	model.isAlphaPremultiplied(), null);
+		
+		BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 		Graphics g = bufferedImage.getGraphics();
 		try
 		{
