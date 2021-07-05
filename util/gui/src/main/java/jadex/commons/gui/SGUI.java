@@ -966,9 +966,9 @@ public class SGUI
 	public static final BufferedImage scaleImage(Image src, int w, int h, int type)
 	{
 		Image img = src.getScaledInstance(w, h, type);
-		BufferedImage ret = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+		BufferedImage ret = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 		Graphics g = ret.createGraphics();
-		g.drawImage(img, 0, 0, new Color(0,0,0), null);
+		g.drawImage(img, 0, 0, new Color(0, 0, 0, 0), null);
 		g.dispose();
 		return ret;
 	}
