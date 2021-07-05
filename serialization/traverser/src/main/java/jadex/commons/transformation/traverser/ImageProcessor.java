@@ -1,8 +1,6 @@
 package jadex.commons.transformation.traverser;
 
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.RenderedImage;
@@ -179,7 +177,8 @@ public class ImageProcessor implements ITraverseProcessor
 		//	model.isAlphaPremultiplied(), null);
 		
 		BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
-		Graphics g = bufferedImage.getGraphics();
+		Graphics2D g = (Graphics2D) bufferedImage.getGraphics();
+		g.setComposite(AlphaComposite.Src);
 		try
 		{
 			g.drawImage(image, 0, 0, width, height, null);
