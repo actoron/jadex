@@ -5,6 +5,7 @@ import javax.swing.Icon;
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.chat.IChatGuiService;
+import jadex.bridge.service.types.chat.IChatService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

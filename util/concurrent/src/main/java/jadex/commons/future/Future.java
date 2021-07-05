@@ -1393,7 +1393,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		{
 			try
 			{
-				ret = (Future<T>)futuretype.newInstance();
+				ret = (Future<T>)futuretype.getDeclaredConstructor().newInstance();
 			}
 			catch(Exception e)
 			{

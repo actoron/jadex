@@ -25,7 +25,6 @@ class ChatElement extends CidElement
 	postInit()
 	{
 		var self = this;
-		this.subscribe(10000);
 		
 		const picker = new EmojiButton(
 		{
@@ -61,6 +60,13 @@ class ChatElement extends CidElement
 		sheet.insertRule('.imageuser { background-image: url($("data:image/png;base64,"+user.image.__base64)}', 0);
 		self.shadowRoot.adoptedStyleSheets = self.shadowRoot.adoptedStyleSheets.concat(sheet);
 		
+		self.subscribe(10000);
+		self.updateUserList();
+	}
+	
+	updateUserList()
+	{
+		this.users = {};
 		this.searchUsers().then(users =>
 		{
 			for(var user of users)
@@ -92,10 +98,13 @@ class ChatElement extends CidElement
 		var self = this;
 		if(interval==null)
 			interval = 10000;
-		self.terminate = jadex.getIntermediate(this.getMethodPrefix()+'&methodname=subscribeToEvents&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
+		self.terminate = jadex.getIntermediate(this.getMethodPrefix()
+			+'&args_0='+self.cid+"&argtypes_0=jadex.bridge.IComponentIdentifier"
+			+'&methodname=subscribeToEvents&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		function(response)
 		{
 			self.connected = true;
+						
 			console.log("subscribed: "+response.data);
 			//self.updateMe(response.data);
 			var ce = response.data;
@@ -174,6 +183,8 @@ class ChatElement extends CidElement
 				{
 					console.log("Retrying platform connection...");
 					self.subscribe();
+					// hack, should not be in subscribe
+					self.updateUserList();
 				}
 				else
 				{
@@ -204,12 +215,13 @@ class ChatElement extends CidElement
 		this.shadowRoot.getElementById("msg").value = "";
 		var url = this.getMethodPrefix()+'&methodname=message'+
 			'&args_0='+msg+"&argtypes_0=java.lang.String"+
-			'&args_1='+'null'+"&argtypes_0=jadex.bridge.IComponentIdentifier[]"+
-			'&args_2='+'false'+"&argtypes_0=boolean";
+			'&args_1='+'null'+"&argtypes_1=jadex.bridge.IComponentIdentifier[]"+
+			'&args_2='+'false'+"&argtypes_2=boolean"+
+			'&args_3='+self.cid+"&argtypes_3=jadex.bridge.IComponentIdentifier";
 		//url = encodeURIComponent(url);
 		
-		console.log("sendmsg: "+msg);
-		console.log("sendmsg: "+url);
+		//console.log("sendmsg: "+msg);
+		//console.log("sendmsg: "+url);
 		
 		axios.get(url, this.transform).then(function(resp)
 		{
@@ -234,7 +246,8 @@ class ChatElement extends CidElement
 	searchUsers()
 	{
 		var self = this;
-		var url = this.getMethodPrefix()+'&methodname=getUsers';
+		var url = this.getMethodPrefix()+'&methodname=getUsers'+
+		'&args_0='+self.cid+"&argtypes_0=jadex.bridge.IComponentIdentifier";
 		//url = encodeURIComponent(url);
 		
 		console.log("getUsers: "+url);
@@ -251,6 +264,8 @@ class ChatElement extends CidElement
 	
 	updateChatUser(cid)
 	{
+		console.log("user: "+cid);
+		
 		var self = this;
 		
 		self.setUserState(cid, true);

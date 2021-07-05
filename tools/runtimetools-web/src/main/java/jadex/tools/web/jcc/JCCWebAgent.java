@@ -422,6 +422,13 @@ public class JCCWebAgent implements IJCCWebService
 			.addResultListener(new ExceptionDelegationResultListener<Boolean, Object>(ret)
 		{
 			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("ex: "+exception);
+				super.exceptionOccurred(exception);
+			}
+				
+			@Override
 			public void customResultAvailable(Boolean unres) throws Exception
 			{
 				// if method is restricted -> check if logged in
