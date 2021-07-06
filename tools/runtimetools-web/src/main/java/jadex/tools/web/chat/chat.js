@@ -393,12 +393,15 @@ class ChatElement extends CidElement
 		//url = encodeURIComponent(url);
 		console.log("getImage: "+url);
 		
+		// getImage() delivers the result as raw byte[]
+		// should it use base64 str?!
 		return new Promise(function(resolve, reject) 
 		{
-			axios.get(url, self.transform).then(function(resp)
+			axios.get(url, {responseType: 'arraybuffer'}).then(function(resp)
 			{
 				//console.log("getImage called: "+resp.data);
-				resolve(resp.data!=null && resp.data.length==0? null: resp.data);
+				var imgstr = btoa(String.fromCharCode.apply(null, new Uint8Array(resp.data)));
+				resolve(resp.data!=null && resp.data.length==0? null: imgstr);
 			}).catch(ex => reject(ex));
 		});
 	}
