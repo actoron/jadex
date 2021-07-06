@@ -12,6 +12,7 @@ class ChatElement extends CidElement
 		this.connected = false;
 		this.terminate = null;
 		this.users = {};
+		this.selectedusers = [];
 		this.userimage = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/chat/images/user.png';
 		this.overlay_away = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/chat/images/overlay_away.png';
 		this.overlay_typing = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/chat/images/overlay_typing.png';
@@ -66,6 +67,7 @@ class ChatElement extends CidElement
 	
 	updateUserList()
 	{
+		var self = this;
 		this.users = {};
 		this.searchUsers().then(users =>
 		{
@@ -117,7 +119,7 @@ class ChatElement extends CidElement
 			else if("statechange"===ce.type)
 			{
 				console.log("state change: "+ce);
-				self.setUserState(ce.componentIdentifier.name, "dead"!==ce.value, "typing"===ce.value, "away"===ce.value, ce.nick, ce.image);
+				self.setUserState(ce.componentIdentifier.name, "dead"!==ce.value, "typing"===ce.value, "away"===ce.value, ce.nick, ce.image?.__base64);
 			}
 			else if("file"===ce.type)
 			{
@@ -162,7 +164,7 @@ class ChatElement extends CidElement
 				{
 					var cid = event.service.providerId.name;
 					console.log("user removed: "+cid);
-					self.setUserState(cid, false, false, false, ce.nick, ce.image);
+					self.setUserState(cid, false, false, false, ce.nick, ce.image?.__base64);
 				}
 			}
 			
@@ -285,7 +287,7 @@ class ChatElement extends CidElement
 		{
 			self.getImage(cid).then(img =>
 			{
-				console.log("image is: "+img);
+				//console.log("image is: "+img);
 				self.setUserState(cid, true, null, null, null, img);
 			}).catch(ex => console.log("ex: "+ex));
 		}
@@ -347,6 +349,8 @@ class ChatElement extends CidElement
 				}
 			}
 		}
+		
+		this.requestUpdate();
 	}
 	
 	setOnline(online, cu)
@@ -393,7 +397,7 @@ class ChatElement extends CidElement
 		{
 			axios.get(url, self.transform).then(function(resp)
 			{
-				console.log("getNickname called: "+resp.data);
+				//console.log("getImage called: "+resp.data);
 				resolve(resp.data!=null && resp.data.length==0? null: resp.data);
 			}).catch(ex => reject(ex));
 		});
@@ -422,6 +426,122 @@ class ChatElement extends CidElement
 		return Object.values(this.users);
 	}
 	
+	setTo(user)
+	{
+		var elem = this.shadowRoot.getElementById("to");
+		if(user==null)
+		{
+			this.selectedusers = [];
+			elem.textContent = "To: All";
+		}
+		else
+		{
+			var contains = false;
+			for(var i=0; i<this.selectedusers.length; i++)
+			{
+				if(this.selectedusers[i].cid===user.cid)
+				{
+					contains = true;
+					this.selectedusers.splice(i, 1);
+					break;
+				}
+			}
+			if(!contains)
+				this.selectedusers.push(user);
+			
+			var text = "To: ";
+			for(var i=0; i<this.selectedusers.length; i++)
+			{
+				text += this.selectedusers[i].nick;
+				if(i+1<this.selectedusers.length)
+					text += ", ";
+			}
+			elem.textContent = text;
+			
+			for(var u of this.selectedusers)
+			{
+				console.log("seluser: "+u.cid);
+			}
+		}
+	}
+	
+	/*tell(text)
+	{
+		var sendusers = {};
+		//var id = ++reqcnt;
+		
+		int[] sels = usertable.getSelectedRows();
+		
+		IComponentIdentifier[] recs = new IComponentIdentifier[sels.length];
+		if(sels.length>0)
+		{
+			for(int i=0; i<sels.length; i++)
+			{
+				ChatUser cu = (ChatUser)usertable.getModel().getValueAt(sels[i], 0);
+				cu.addMessage(id);
+				sendusers.add(cu);
+				recs[i] = cu.getComponentIdentifier();
+			}
+		}
+		else
+		{
+			for(ChatUser cu: usermodel.getUsers())
+			{
+				cu.addMessage(id);
+				sendusers.add(cu);				
+			}
+		}
+		
+		usertable.repaint();
+
+		getService().message(text, recs, true).addResultListener(new SwingIntermediateDefaultResultListener<IChatService>()
+		{
+			public void customIntermediateResultAvailable(final IChatService chat)
+			{
+				ChatUser cu = usermodel.getUser(((IService)chat).getServiceId().getProviderId());
+				if(cu!=null)
+				{
+					sendusers.remove(cu);
+					cu.removeMessage(id);
+					usertable.repaint();
+				}
+			}
+			
+			public void customFinished()
+			{
+				ret.setResult(null);
+				printFailures();
+			}
+			
+			public void customExceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+				printFailures();
+			}
+			
+			protected void	printFailures()
+			{
+				if(!sendusers.isEmpty())
+				{
+					StringBuffer	nick	= new StringBuffer();
+					nick.append("failed to deliver message to");
+					for(ChatUser cu: sendusers)
+					{
+						nick.append(" ");
+						nick.append(cu.getNick());
+						nick.append(",");
+						cu.removeMessage(id);
+					}
+					usertable.repaint();
+					addMessage(((IService)getService()).getServiceId().getProviderId(),
+						text, nick.substring(0, nick.length()-1), false, true); // Strip last comma.
+				}
+			}
+		});
+		
+		return ret;
+	}*/
+	
 	asyncRender() 
 	{
 		return html`
@@ -431,20 +551,20 @@ class ChatElement extends CidElement
 			<div id="users" class="yscrollable">
 				<table>
 				${this.getUsers().map((user) => html`
-				<tr @click="${e => console.log(e)}">
+				<tr @click="${e => this.setTo(user)}">
 					<td>
 						<div class="grid-container2">
-							<img class="grid-item-21" id="user" src="${user.image!=null? 'data:image/png;base64,'+user.image.__base64: this.userimage}"/>
+							<img class="grid-item-21" id="user" src="${user.image!=null? 'data:image/png;base64,'+user.image: this.userimage}"/>
 							<img class="grid-item-21" id="overlay" src="${user.away? this.overlay_away: user.typing? this.overlay_typing: user.sending? this.overlay_sending: ''}"/>
 						</div>
 					</td>
-					<td>${user.nick} [${user.cid}]</td>
+					<td @click="${e => e.target.contentEditable=e.target.contentEditable===true?false:true}">${user.nick} [${user.cid}]</td>
 			    </tr>
 				`)}
 				</table>
 			</div>
 			<div class="grid-item grid-item-3 grid-container-inner">
-				<p id="to">To: All</p>
+				<p id="to" @click="${e => this.setTo(null)}">To: All</p>
 				<input id="msg" type="text"></input>
 				<button id="emoji" class="jadexbtn" type="button">&#128512;</button>
 				<button class="jadexbtn" type="button" @click="${e => this.sendMessage(e)}">Send</button>
@@ -484,6 +604,9 @@ class ChatElement extends CidElement
 			#to {
 				vertical-align: middle;
 				margin: auto;
+			}
+			#users {
+				background: transparent;
 			}
 			#user {
 				position: relative;
