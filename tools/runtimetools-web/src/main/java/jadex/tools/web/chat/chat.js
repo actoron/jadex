@@ -48,9 +48,7 @@ class ChatElement extends CidElement
 		this.shadowRoot.getElementById('msg').addEventListener('keyup', function onEvent(e) 
 		{
 			if(e.keyCode === 13)
-			{
 				self.sendMessage();
-		    }
 		});
 		
 		var sheet = new CSSStyleSheet();
@@ -107,7 +105,7 @@ class ChatElement extends CidElement
 		{
 			self.connected = true;
 						
-			console.log("subscribed: "+response.data);
+			//console.log("subscribed: "+response.data);
 			//self.updateMe(response.data);
 			var ce = response.data;
 			
@@ -170,6 +168,7 @@ class ChatElement extends CidElement
 			
 			// Update view after each event
 			self.requestUpdate();
+			console.log("users: "+self.users);
 		},
 		function(err)
 		{
@@ -278,7 +277,7 @@ class ChatElement extends CidElement
 		{
 			self.getNickName(cid).then(nick =>
 			{
-				console.log("nick is: "+nick);
+				console.log("nick is: "+nick+" for: "+cid);
 				self.setUserState(cid, true, null, null, nick, null);
 			}).catch(ex => console.log("ex: "+ex));
 		}
@@ -294,7 +293,7 @@ class ChatElement extends CidElement
 		
 		self.getStatus(cid).then(status =>
 		{
-			console.log("getstatus: "+status);
+			console.log("getstatus: "+status+" for: "+cid);
 			self.setUserState(cid, true, "typing"===status, "away"===status);
 		}).catch(ex => console.log("ex: "+ex));
 	}
@@ -380,6 +379,25 @@ class ChatElement extends CidElement
 			axios.get(url, self.transform).then(function(resp)
 			{
 				console.log("getNickname called: "+resp.data);
+				resolve(resp.data);
+			}).catch(ex => reject(ex));
+		});
+	}
+	
+	setNickName(nick, cid)
+	{
+		var self = this;
+		var url = this.getMethodPrefix()+'&methodname=setNickName'
+			+'&args_0='+nick+"&argtypes_0=java.lang.String"
+			+'&args_1='+cid+"&argtypes_1=jadex.bridge.IComponentIdentifier";
+		//url = encodeURIComponent(url);
+		console.log("setNickName: "+url);
+		
+		return new Promise(function(resolve, reject) 
+		{
+			axios.get(url, self.transform).then(function(resp)
+			{
+				console.log("setNickname called: "+nick);
 				resolve(resp.data);
 			}).catch(ex => reject(ex));
 		});
@@ -561,7 +579,9 @@ class ChatElement extends CidElement
 							<img class="grid-item-21" id="overlay" src="${user.away? this.overlay_away: user.typing? this.overlay_typing: user.sending? this.overlay_sending: ''}"/>
 						</div>
 					</td>
-					<td @click="${e => e.target.contentEditable=e.target.contentEditable===true?false:true}">${user.nick} [${user.cid}]</td>
+					<td @click="${e => e.target.contentEditable=true}" 
+						@blur="${e => {e.target.contentEditable=false; console.log("enter"+e.keyCode+e.target.textContent); this.setNickName(e.target.textContent, user.cid);}}">${user.nick}</td>
+					<td>[${user.cid}]</td>
 			    </tr>
 				`)}
 				</table>
