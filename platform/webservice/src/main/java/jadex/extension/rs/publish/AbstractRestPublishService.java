@@ -1579,8 +1579,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 */
 	protected void writeResponseContent(Object result, HttpServletRequest request, HttpServletResponse response, List<String> sr)
 	{
-		//if(result!=null && result.getClass().toString().indexOf("ChatEvent")!=-1)
-		//	System.out.println("jju");
+		//if(result!=null)// && result.getClass().toString().toLowerCase().indexOf("byte")!=-1)
+		//	System.out.println("jju: "+result.getClass());
 		
 		//if(result instanceof Exception)
 		//	System.out.println("result is exception: "+result);

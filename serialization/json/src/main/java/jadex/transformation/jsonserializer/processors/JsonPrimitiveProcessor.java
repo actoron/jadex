@@ -39,6 +39,7 @@ public class JsonPrimitiveProcessor implements ITraverseProcessor
 	 */
 	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
+
 		Object ret = null;
 		Class<?> clazz = SReflect.getClass(type);
 		
@@ -60,6 +61,10 @@ public class JsonPrimitiveProcessor implements ITraverseProcessor
 			else if(Long.class.equals(clazz) || long.class.equals(clazz))
 			{
 				ret = val.asLong();
+			}
+			else if(String.class.equals(clazz))
+			{
+				ret = val.toString();
 			}
 			else 
 			{
