@@ -5,7 +5,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
@@ -107,7 +107,7 @@ public class SCloner
 				{
 					if(!Modifier.isPublic(c.getModifiers()) || !Modifier.isPublic(clazz.getModifiers()))
 					{
-						VmHacks.get().setAccessible(c, true);
+						SAccess.setAccessible(c, true);
 					}
 					bean = c.newInstance();
 				}
@@ -119,7 +119,7 @@ public class SCloner
 			else
 			{
 				c = clazz.getDeclaredConstructors()[0];
-				VmHacks.get().setAccessible(c, true);
+				SAccess.setAccessible(c, true);
 				Class<?>[] paramtypes = c.getParameterTypes();
 				Object[] paramvalues = new Object[paramtypes.length];
 				for(int i=0; i<paramtypes.length; i++)

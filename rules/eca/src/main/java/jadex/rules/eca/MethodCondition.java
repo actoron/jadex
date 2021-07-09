@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.IMethodParameterGuesser;
 import jadex.commons.SimpleMethodParameterGuesser;
 import jadex.commons.SimpleParameterGuesser;
@@ -110,7 +110,7 @@ public class MethodCondition implements ICondition
 	 */
 	protected Object invokeMethod(IEvent event)	throws Exception
 	{
-		VmHacks.get().setAccessible(method, true);
+		SAccess.setAccessible(method, true);
 		Object[] params = null;
 		List<Object> vals = new ArrayList<Object>();
 		vals.add(event);

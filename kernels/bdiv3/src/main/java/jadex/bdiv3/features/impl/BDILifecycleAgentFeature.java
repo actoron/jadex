@@ -70,7 +70,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.ICommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -189,7 +189,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		final Future<Boolean> ret = new Future<Boolean>();
 		try
 		{
-			VmHacks.get().setAccessible(m, true);
+			SAccess.setAccessible(m, true);
 			
 			Object[] vals = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(),
 				modelelement, event!=null ? new ChangeEvent(event) : null, rplan, null, component);
@@ -1059,7 +1059,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										
 										if(ok)
 										{
-											VmHacks.get().setAccessible(c, true);
+											SAccess.setAccessible(c, true);
 											pojogoal = c.newInstance(pvals);
 										}
 									}
@@ -1097,7 +1097,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							{
 								protected Object invokeMethod(IEvent event) throws Exception
 								{
-									VmHacks.get().setAccessible(m, true);
+									SAccess.setAccessible(m, true);
 									Object[] pvals = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(),
 										mgoal, new ChangeEvent(event), null, null, component);
 									return pvals!=null? m.invoke(null, pvals): null;

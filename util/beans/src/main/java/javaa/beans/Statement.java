@@ -214,7 +214,7 @@ public class Statement {
 
 						public Object run() {
 							try {
-                                VmHacks.get().setAccessible(method, true);
+                                SAccess.setAccessible(method, true);
 								return (method.invoke(iterator, new Object[0]));
 							} catch (Exception e) {
 								// ignore
@@ -228,7 +228,7 @@ public class Statement {
             } else {
                 Method method = findMethod(theTarget.getClass(), theMethodName,
                         theArguments, false);
-                VmHacks.get().setAccessible(method, true);
+                SAccess.setAccessible(method, true);
                 result = method.invoke(theTarget, theArguments);
             }
         } catch (InvocationTargetException ite) {

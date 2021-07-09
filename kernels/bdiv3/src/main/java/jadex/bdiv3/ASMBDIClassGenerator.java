@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.bytecode.vmhacks.VmHacks;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -41,7 +42,7 @@ import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MGoal;
 import jadex.bridge.IInternalAccess;
 import jadex.bytecode.SASM;
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.micro.MicroClassReader.DummyClassLoader;

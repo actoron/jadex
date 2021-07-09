@@ -31,6 +31,7 @@ import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
+import jadex.commons.SAccess;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -44,8 +45,10 @@ import jadex.bytecode.IByteCodeClassLoader;
 import jadex.bytecode.SASM;
 import jadex.bytecode.invocation.IMethodInvoker;
 import jadex.bytecode.invocation.SInvocation;
+import jadex.nativetools.NativeHelper;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import sun.misc.Unsafe;
 
 /**
  *  Class providing various means of getting around VM restrictions.
@@ -62,7 +65,10 @@ public class VmHacks
 	/** Globally disable setAccessible VM Hacks. */
 	public static boolean DISABLE_SETACCESSIBLE = false;
 	
-	/** Disable all instrumentation-based Hacks. */
+	/** Globally disable native functionality. */
+	public static boolean DISABLE_NATIVE = false;
+	
+	/** Disable all instrumentation-based functionality. */
 	public static boolean DISABLE_INSTRUMENTATION = true;
 	
 	/** Set to true to see debug infos during startup. */
@@ -107,7 +113,7 @@ public class VmHacks
 		private boolean asm = false;
 		
 		/** The native support if available. */
-		private INativeHelper nativehelper = null;
+		private NativeHelper nativehelper = null;
 		
 		/** sun.misc.Unsafe if available. */
 		private Class<?> unsafeclass;
@@ -119,6 +125,9 @@ public class VmHacks
 		
 		/** The defineClass method. */
 		private IMethodInvoker defineclass;
+		
+		/** The putBoolean method. */
+		private IMethodInvoker getboolean;
 		
 		/** The putBoolean method. */
 		private IMethodInvoker putboolean;
@@ -179,6 +188,15 @@ public class VmHacks
 		}
 		
 		/**
+		 *  Returns functionality unlocked through native interface.
+		 *  @return The native helper, may return null if unavailable.
+		 */
+		public NativeHelper getNativeHelper()
+		{
+			return nativehelper;
+		}
+		
+		/**
 		 *  Checks if instrumentation is available.
 		 *  
 		 *  @return True, if instrumentation is available.
@@ -228,66 +246,6 @@ public class VmHacks
 		}
 		
 		/**
-		 *  Sets reflective object accessible without checks if native support is available.
-		 *  
-		 *  @param accobj The accessible object.
-		 *  @param flag The flag value.
-		 */
-		public void setAccessible(AccessibleObject accobj, boolean flag)
-		{
-			if (DISABLE_SETACCESSIBLE)
-			{
-				accobj.setAccessible(flag);
-				return;
-			}
-			
-			boolean nativesuccess = false;
-			if (hasNative() && nativehelper.canSetAccessible())
-			{
-				try
-				{
-					nativehelper.setAccessible("override", accobj, flag);
-					nativesuccess = true;
-				}
-				catch (Throwable t1)
-				{
-					try
-					{
-						nativehelper.setAccessible("flag", accobj, flag);
-						nativesuccess = true;
-					}
-					catch (Throwable t)
-					{
-					}
-				}
-				
-			}
-			
-			if (!nativesuccess && putboolean != null && setaccessibleoverrideoffset != null)
-			{
-				putboolean.invoke(null, accobj, setaccessibleoverrideoffset, flag);
-			}
-			else if (setaccessibleoverride != null)
-			{
-				try
-				{
-					if (!setaccessibleoverride.isAccessible())
-						setaccessibleoverride.setAccessible(true);
-				
-					setaccessibleoverride.set(accobj, true);
-				}
-				catch (Exception e)
-				{
-					accobj.setAccessible(flag);
-				}
-			}
-			else
-			{
-				accobj.setAccessible(flag);
-			}
-		}
-		
-		/**
 	     *  Access to sun.misc.Unsafe or equivalent.
 	     */
 		public Class<?> defineClass(String name, byte[] b, int off, int len, ClassLoader loader, ProtectionDomain pd)
@@ -306,7 +264,7 @@ public class VmHacks
 				try
 				{
 					Method dc = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class, ProtectionDomain.class);
-					setAccessible(dc, true);
+					SAccess.setAccessible(dc, true);
 					ret = (Class<?>) dc.invoke(loader, name, b, off, len, pd == null ? loader.getClass().getProtectionDomain() : pd);
 				}
 				catch (Exception e)
@@ -491,7 +449,8 @@ public class VmHacks
 			
 			try
 			{
-				nativehelper = new NativeHelper();
+				if (!DISABLE_NATIVE)
+					nativehelper = new NativeHelper();
 			}
 			catch (Throwable t)
 			{
@@ -513,12 +472,10 @@ public class VmHacks
 				// setAccessible override flag
 				try
 				{
-					System.out.println("AAAAA " + Arrays.toString(AccessibleObject.class.getDeclaredFields()));
 					setaccessibleoverride = AccessibleObject.class.getDeclaredField("override");
 				}
 				catch (Exception e)
 				{
-					e.printStackTrace();
 					try
 					{
 						// Sometimes called flag?
@@ -537,12 +494,43 @@ public class VmHacks
 			if (unsafeinstance != null)
 			{
 				defineclass = getSunUnsafeMethod("defineClass", String.class, byte[].class, int.class, int.class, ClassLoader.class, ProtectionDomain.class);
+				getboolean = getSunUnsafeMethod("getBoolean", Object.class, long.class);
 				putboolean = getSunUnsafeMethod("putBoolean", Object.class, long.class, boolean.class);
 				objectFieldOffset = getSunUnsafeMethod("objectFieldOffset", Field.class);
 			}
 			
 			if (setaccessibleoverride != null && objectFieldOffset != null)
+			{
 				setaccessibleoverrideoffset = (Long) objectFieldOffset.invoke(unsafeinstance, setaccessibleoverride);
+			}
+			else if (unsafeinstance != null && setaccessibleoverrideoffset == null)
+			{
+				try
+				{
+					Method testmethod = Unsafe.class.getDeclaredMethod("init");
+					
+					// Scan for the override offset
+					boolean[] before = new boolean[200];
+					
+					for (int i = 0; i < before.length; ++i)
+						before[i] = (Boolean) getboolean.invoke(unsafeinstance, testmethod, (long) i);
+					
+					testmethod.setAccessible(true);
+					
+					for (int i = 0; i < before.length; ++i)
+					{
+						boolean current = (Boolean) getboolean.invoke(unsafeinstance, testmethod, (long) i);
+						if (current && !before[i])
+						{
+							setaccessibleoverrideoffset = (long) i;
+							break;
+						}
+					}
+				}
+				catch (Exception e)
+				{
+				}
+			}
 			
 			startInstrumentationAgent();
 		}

@@ -29,7 +29,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.SUtil;
 import jadex.commons.gui.SGUI;
 import jadex.rules.state.IOAVState;
@@ -1580,7 +1580,7 @@ public class OAVTreeModel implements TreeModel
 	
 						for (int i = 0; i < f.length; i++)
 						{
-							VmHacks.get().setAccessible(f[i], true);
+							SAccess.setAccessible(f[i], true);
 							// get only nonstatic fields
 							if(!Modifier.isStatic(f[i].getModifiers()))
 							{

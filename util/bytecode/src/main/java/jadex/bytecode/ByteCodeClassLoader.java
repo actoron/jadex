@@ -3,6 +3,7 @@ package jadex.bytecode;
 import java.security.ProtectionDomain;
 
 import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 
 /**
  *  ClassLoader for generated classes.

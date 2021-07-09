@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.glassfish.grizzly.http.server.HttpHandler;
@@ -709,7 +709,7 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 			try
 			{
 				Method setcontextpath = Request.class.getDeclaredMethod("setContextPath", new Class<?>[] { String.class });
-				VmHacks.get().setAccessible(setcontextpath, true);
+				SAccess.setAccessible(setcontextpath, true);
 				setcontextpath.invoke(request, subhandlertuple.getFirstEntity());
 			}
 			catch (Exception e)

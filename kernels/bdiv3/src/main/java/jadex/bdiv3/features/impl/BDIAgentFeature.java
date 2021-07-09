@@ -70,7 +70,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.FieldInfo;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
@@ -222,7 +222,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 			Field f	= clazz.getDeclaredField("__initargs");
 //				System.out.println(f+", "+SUtil.arrayToString(args));
-			VmHacks.get().setAccessible(f, true);
+			SAccess.setAccessible(f, true);
 			List<Tuple2<Class<?>[], Object[]>> initcalls	= (List<Tuple2<Class<?>[], Object[]>>)f.get(obj);
 			if(initcalls==null)
 			{
@@ -246,7 +246,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		try
 		{
 			Field f	= clazz.getDeclaredField("__initargs");
-			VmHacks.get().setAccessible(f, true);
+			SAccess.setAccessible(f, true);
 			List<Tuple2<Class<?>[], Object[]>> initcalls	= (List<Tuple2<Class<?>[], Object[]>>)f.get(obj);
 			f.set(obj, null);
 			return initcalls;
@@ -337,7 +337,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			throw new RuntimeException("Field not found: "+fieldname);
 		
 		Object tmp = res.getSecondEntity();
-		VmHacks.get().setAccessible(f, true);
+		SAccess.setAccessible(f, true);
 		Object oldval = f.get(tmp);
 		f.set(tmp, val);
 	
@@ -373,7 +373,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					{
 						if(fi.getName().startsWith("this$"))
 						{
-							VmHacks.get().setAccessible(fi, true);
+							SAccess.setAccessible(fi, true);
 							tmp = fi.get(tmp);
 							found = true;
 							break;
@@ -408,7 +408,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				ret = cl.getDeclaredField(fieldname);
 				if(nonnull && ret!=null)
 				{
-					VmHacks.get().setAccessible(ret, true);
+					SAccess.setAccessible(ret, true);
 					if(ret.get(obj)==null)
 						ret	= null;
 				}
@@ -495,7 +495,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			Tuple2<Field, Object> res = findFieldWithOuterClass(obj, IBDIClassGenerator.AGENT_FIELD_NAME, true);
 			if(res!=null)
 			{
-				VmHacks.get().setAccessible(res.getFirstEntity(), true);
+				SAccess.setAccessible(res.getFirstEntity(), true);
 				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
 			}
 			else if(nonnull)
@@ -997,7 +997,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		try
 		{
 			Field	gnf	= obj.getClass().getField(IBDIClassGenerator.GLOBALNAME_FIELD_NAME);
-			VmHacks.get().setAccessible(gnf, true);
+			SAccess.setAccessible(gnf, true);
 			gn	= (String)gnf.get(obj);
 		}
 		catch(Exception e)
@@ -1276,12 +1276,12 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				Field f = fields[i].getField(getComponent().getClassLoader());
 				if(SReflect.isSupertype(f.getType(), ICapability.class))
 				{
-					VmHacks.get().setAccessible(f, true);
+					SAccess.setAccessible(f, true);
 					f.set(agent, new CapabilityPojoWrapper(pa, agent, globalname));						
 				}
 				else
 				{
-					VmHacks.get().setAccessible(f, true);
+					SAccess.setAccessible(f, true);
 					f.set(agent, pa);
 				}
 			}
@@ -1299,11 +1299,11 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			try
 			{
 				Field field = agcl.getDeclaredField(IBDIClassGenerator.AGENT_FIELD_NAME);
-				VmHacks.get().setAccessible(field, true);
+				SAccess.setAccessible(field, true);
 				field.set(agent, pa);
 				
 				field = agcl.getDeclaredField(IBDIClassGenerator.GLOBALNAME_FIELD_NAME);
-				VmHacks.get().setAccessible(field, true);
+				SAccess.setAccessible(field, true);
 				field.set(agent, globalname);
 				agcl = agcl.getSuperclass();
 
@@ -1356,7 +1356,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					try
 					{
 						Field	f	= cl.getDeclaredField(name);
-						VmHacks.get().setAccessible(f, true);
+						SAccess.setAccessible(f, true);
 						ret	= f.get(ret);
 						found = true;
 						break;
@@ -1596,7 +1596,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				while(finfo!=null)
 				{
 					Field	f	= finfo.getField(getComponent().getClassLoader());
-					VmHacks.get().setAccessible(f, true);
+					SAccess.setAccessible(f, true);
 					capa	= f.get(capa);
 					globalname	= globalname==null ? f.getName() : globalname+MElement.CAPABILITY_SEPARATOR+f.getName();
 					finfo	= finfo.getInner();

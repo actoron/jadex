@@ -3,10 +3,10 @@ description 'Jadex bytecode tools contains helper stuff for asm bytecode generat
 dependencies
 {
 	api project(':util:commons')
+	api project(':util:nativetools')
 	// api 'com.google.android.tools:dx:1.7'
 	api 'org.ow2.asm:asm:9.1'
 	api 'org.ow2.asm:asm-tree:9.1'
 	api 'org.ow2.asm:asm-util:9.1'
-	api 'net.java.dev.jna:jna:4.5.1'
 }
 

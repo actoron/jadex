@@ -63,7 +63,7 @@ import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.annotation.Value;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.Boolean3;
 import jadex.commons.FieldInfo;
 import jadex.commons.IValueFetcher;
@@ -2284,7 +2284,7 @@ public class MicroClassReader
 				try
 				{
 					Method gbcl = orig.getClass().getDeclaredMethod("getBaseClassLoader", (Class<?>[]) null);
-					VmHacks.get().setAccessible(gbcl, true);
+					SAccess.setAccessible(gbcl, true);
 					bcl = (ClassLoader)gbcl.invoke(orig, (Object[]) null);
 				}
 				catch (Exception e1)

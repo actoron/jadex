@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -341,7 +341,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 					{	
 						if(!Modifier.isPublic(method.getModifiers()) || !Modifier.isPublic(object.getClass().getModifiers()))
 						{
-							VmHacks.get().setAccessible(method, true);
+							SAccess.setAccessible(method, true);
 						}
 						value = method.invoke(object, new Object[0]);
 					}
@@ -356,7 +356,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 					{
 						if(!Modifier.isPublic(field.getModifiers()) || !Modifier.isPublic(object.getClass().getModifiers()))
 						{
-							VmHacks.get().setAccessible(field, true);
+							SAccess.setAccessible(field, true);
 						}
 						value = field.get(object);
 					}

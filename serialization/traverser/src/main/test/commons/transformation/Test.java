@@ -1109,7 +1109,7 @@ public abstract class Test extends TestCase
 				try
 				{
 					Field	field	= SReflect.getField(obj.getClass(), "val$name");
-					VmHacks.get().setAccessible(field, true);
+					SAccess.setAccessible(field, true);
 					othername	= (String)field.get(obj);
 				}
 				catch(Exception e)
@@ -1149,7 +1149,7 @@ public abstract class Test extends TestCase
 				try
 				{
 					Field	field	= SReflect.getField(obj.getClass(), "val$name");
-					VmHacks.get().setAccessible(field, true);
+					SAccess.setAccessible(field, true);
 					othername	= (String)field.get(obj);
 				}
 				catch(Exception e)
@@ -1159,7 +1159,7 @@ public abstract class Test extends TestCase
 				try
 				{
 					Field	field	= SReflect.getField(obj.getClass(), "val$booli");
-					VmHacks.get().setAccessible(field, true);
+					SAccess.setAccessible(field, true);
 					otherbooli	= (Boolean)field.get(obj);
 				}
 				catch(Exception e)

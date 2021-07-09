@@ -29,7 +29,7 @@ import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.FieldInfo;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.MethodInfo;
@@ -226,7 +226,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 						Field field = inj.getFirstEntity().getField(getComponent().getClassLoader());
 						String convback = inj.getThirdEntity();
 						
-						VmHacks.get().setAccessible(field, true);
+						SAccess.setAccessible(field, true);
 						Object val = field.get(agent);
 						
 						if(convback!=null)
@@ -384,13 +384,13 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 			if(call.getCallbackMethod()!=null)
 			{
 				Method m = call.getCallbackMethod().getMethod(getComponent().getClassLoader());
-				VmHacks.get().setAccessible(m, true);
+				SAccess.setAccessible(m, true);
 				m.invoke(getPojoAgent(), new Object[]{result});
 			}
 			else
 			{
 				Field f = call.getCallbackField().getField(getComponent().getClassLoader());
-				VmHacks.get().setAccessible(f, true);
+				SAccess.setAccessible(f, true);
 				Class<?> ft = f.getType();
 				if(SReflect.isSupertype(ft, result.getClass()))
 				{
@@ -441,7 +441,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 				try
 				{
 					// It is now allowed to use protected/private agent created, body, terminate methods
-					VmHacks.get().setAccessible(method, true);
+					SAccess.setAccessible(method, true);
 					Object res = method.invoke(pojo, iargs);
 					if(res instanceof IFuture)
 					{

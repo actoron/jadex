@@ -20,7 +20,7 @@ import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IPojoComponentFeature;
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 import jadex.rules.eca.ChangeInfo;
@@ -117,7 +117,7 @@ public class ClassPlanBody extends AbstractPlanBody
 						{
 							try
 							{
-								VmHacks.get().setAccessible(c, true);
+								SAccess.setAccessible(c, true);
 								plan = c.newInstance(params);
 								break;
 							}
@@ -176,7 +176,7 @@ public class ClassPlanBody extends AbstractPlanBody
 				{
 					if(f.isAnnotationPresent(PlanAPI.class))
 					{
-						VmHacks.get().setAccessible(f, true);
+						SAccess.setAccessible(f, true);
 						f.set(plan, getRPlan());
 					}
 					else if(f.isAnnotationPresent(PlanCapability.class))
@@ -197,17 +197,17 @@ public class ClassPlanBody extends AbstractPlanBody
 						
 						if(f.getType().isAssignableFrom(IInternalAccess.class))
 						{
-							VmHacks.get().setAccessible(f, true);
+							SAccess.setAccessible(f, true);
 							f.set(plan, new CapabilityPojoWrapper(ia, pojocapa, capaname).getAgent());
 						}
 						else if(f.getType().isAssignableFrom(ICapability.class))
 						{
-							VmHacks.get().setAccessible(f, true);
+							SAccess.setAccessible(f, true);
 							f.set(plan, new CapabilityPojoWrapper(ia, pojocapa, capaname));
 						}
 						else if(pojocapa!=null && f.getType().isAssignableFrom(pojocapa.getClass()))
 						{
-							VmHacks.get().setAccessible(f, true);
+							SAccess.setAccessible(f, true);
 							f.set(plan, pojocapa);
 						}
 						else
@@ -223,19 +223,19 @@ public class ClassPlanBody extends AbstractPlanBody
 							Object reason = ((RProcessableElement)r).getPojoElement();
 							if(reason!=null)
 							{
-								VmHacks.get().setAccessible(f, true);
+								SAccess.setAccessible(f, true);
 								f.set(plan, reason);
 							}
 							else 
 							{
-								VmHacks.get().setAccessible(f, true);
+								SAccess.setAccessible(f, true);
 								f.set(plan, r);
 							}
 						}
 						else if(r instanceof ChangeEvent)
 						{
 							Class<?> ft = f.getType();
-							VmHacks.get().setAccessible(f, true);
+							SAccess.setAccessible(f, true);
 							if(ft.equals(ChangeEvent.class))
 							{
 								f.set(plan, r);
@@ -285,7 +285,7 @@ public class ClassPlanBody extends AbstractPlanBody
 		try
 		{
 			getBody();
-			VmHacks.get().setAccessible(bodymethod, true);
+			SAccess.setAccessible(bodymethod, true);
 			return bodymethod.invoke(plan, params);
 		}
 		catch(Throwable t)
@@ -312,7 +312,7 @@ public class ClassPlanBody extends AbstractPlanBody
 		{
 			try
 			{
-				VmHacks.get().setAccessible(passedmethod, true);
+				SAccess.setAccessible(passedmethod, true);
 				ret = passedmethod.invoke(plan, params);			
 			}
 			catch(Throwable t)
@@ -345,7 +345,7 @@ public class ClassPlanBody extends AbstractPlanBody
 		{
 			try
 			{
-				VmHacks.get().setAccessible(failedmethod, true);
+				SAccess.setAccessible(failedmethod, true);
 				ret = failedmethod.invoke(plan, params);			
 			}
 			catch(Throwable t)
@@ -378,7 +378,7 @@ public class ClassPlanBody extends AbstractPlanBody
 		{
 			try
 			{
-				VmHacks.get().setAccessible(abortedmethod, true);
+				SAccess.setAccessible(abortedmethod, true);
 				ret = abortedmethod.invoke(plan, params);			
 			}
 			catch(Throwable t)

@@ -39,7 +39,7 @@ import javax.media.opengl.glu.GLU;
 import com.sun.opengl.impl.GLDrawableHelper;
 import com.sun.opengl.util.j2d.TextRenderer;
 
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.SUtil;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Double;
@@ -367,10 +367,10 @@ public class ViewportJOGL extends AbstractViewport
 		try
 		{
 			Field helperField = GLCanvas.class.getDeclaredField("drawableHelper");
-			VmHacks.get().setAccessible(helperField, true);
+			SAccess.setAccessible(helperField, true);
 			
 			Field tlField = GLDrawableHelper.class.getDeclaredField("perThreadInitAction");
-			VmHacks.get().setAccessible(tlField, true);
+			SAccess.setAccessible(tlField, true);
 			
 			ThreadLocal tl = (ThreadLocal) tlField.get(helperField.get(canvas_));
 			tl.remove();

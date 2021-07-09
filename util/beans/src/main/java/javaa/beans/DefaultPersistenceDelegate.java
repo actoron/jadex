@@ -184,7 +184,7 @@ public class DefaultPersistenceDelegate extends PersistenceDelegate {
         final Field f = c.getDeclaredField(fieldName);
         AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {
-                VmHacks.get().setAccessible(f, true);
+                SAccess.setAccessible(f, true);
                 return null;
             }
         });

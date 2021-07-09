@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoWSD;
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.SUtil;
 import jadex.platform.service.transport.ITransportHandler;
 
@@ -48,7 +48,7 @@ public class WebSocketServer extends NanoWSD
 				try
 				{
 					Field f = ClientHandler.class.getDeclaredField("acceptSocket");
-					VmHacks.get().setAccessible(f, true);
+					SAccess.setAccessible(f, true);
 					Socket socket = (Socket) f.get(code);
 					sockets.add(socket);
 				}
@@ -66,7 +66,7 @@ public class WebSocketServer extends NanoWSD
 				try
 				{
 					Field f = ClientHandler.class.getDeclaredField("acceptSocket");
-					VmHacks.get().setAccessible(f, true);
+					SAccess.setAccessible(f, true);
 					Socket socket = (Socket) f.get(clientHandler);
 					sockets.remove(socket);
 				}

@@ -211,9 +211,9 @@ public class SSecurity
 //					if (holdercl != null)
 //					{
 //						Field prngfield = holdercl.getDeclaredField("numberGenerator");
-//						VmHacks.get().setAccessible(prngfield, true);
+//						SAccess.setAccessible(prngfield, true);
 //						Field modifiersfield = Field.class.getDeclaredField("modifiers");
-//						VmHacks.get().setAccessible(modifiersfield, true);
+//						SAccess.setAccessible(modifiersfield, true);
 //						modifiersfield.setInt(prngfield, prngfield.getModifiers() & ~Modifier.FINAL);
 //						prngfield.set(null, SECURE_RANDOM);
 //					}

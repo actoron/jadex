@@ -3,7 +3,7 @@ package jadex.binary;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
@@ -66,7 +66,7 @@ public class TupleCodec extends AbstractCodec
 		try
 		{
 			Field fentities = SReflect.getField(object.getClass(), "entities");
-			VmHacks.get().setAccessible(fentities, true);
+			SAccess.setAccessible(fentities, true);
 			fentities.set(object, entities);
 		}
 		catch(Exception e)

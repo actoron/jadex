@@ -9,7 +9,7 @@ import java.util.Map;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
@@ -103,10 +103,10 @@ public class JsonMultiCollectionProcessor extends AbstractJsonProcessor
 		try
 		{
 			Field field = SReflect.getField(clazz, "map");
-			VmHacks.get().setAccessible(field, true);
+			SAccess.setAccessible(field, true);
 			field.set(ret, map);
 			field = SReflect.getField(clazz, "type");
-			VmHacks.get().setAccessible(field, true);
+			SAccess.setAccessible(field, true);
 			field.set(ret, ctype);
 		}
 		catch (Exception e)
@@ -135,13 +135,13 @@ public class JsonMultiCollectionProcessor extends AbstractJsonProcessor
 			wr.write("{");
 			
 			Field typefield = MultiCollection.class.getDeclaredField("type");
-			VmHacks.get().setAccessible(typefield, true);
+			SAccess.setAccessible(typefield, true);
 			Class<?> ctype = (Class<?>)typefield.get(mc);
 			wr.writeNameValue("type", ctype);
 			
 			wr.write(",\"map\":");
 			Field mapfield = MultiCollection.class.getDeclaredField("map");
-			VmHacks.get().setAccessible(mapfield, true);
+			SAccess.setAccessible(mapfield, true);
 			Map<?,?> map = (Map<?,?>)mapfield.get(mc);
 			traverser.doTraverse(map, map.getClass(), conversionprocessors, processors, mode, targetcl, wr);
 			

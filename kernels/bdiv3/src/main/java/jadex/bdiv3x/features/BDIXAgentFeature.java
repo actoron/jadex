@@ -71,7 +71,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
@@ -265,7 +265,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		{
 			Field f	= clazz.getDeclaredField("__initargs");
 //				System.out.println(f+", "+SUtil.arrayToString(args));
-			VmHacks.get().setAccessible(f, true);
+			SAccess.setAccessible(f, true);
 			List<Tuple2<Class<?>[], Object[]>> initcalls	= (List<Tuple2<Class<?>[], Object[]>>)f.get(obj);
 			if(initcalls==null)
 			{
@@ -336,7 +336,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		try
 		{
 			Field	gnf	= obj.getClass().getField(IBDIClassGenerator.GLOBALNAME_FIELD_NAME);
-			VmHacks.get().setAccessible(gnf, true);
+			SAccess.setAccessible(gnf, true);
 			gn	= (String)gnf.get(obj);
 		}
 		catch(Exception e)

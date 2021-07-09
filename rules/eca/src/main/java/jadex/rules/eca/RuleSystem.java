@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
 import jadex.commons.beans.PropertyChangeEvent;
@@ -777,7 +777,7 @@ class FetchFieldCommand implements IResultCommand<IEvent, Object>
 		try
 		{
 			Field f = object.getClass().getDeclaredField(name);
-			VmHacks.get().setAccessible(f, true);
+			SAccess.setAccessible(f, true);
 			Object content = f.get(object);
 			return new Event(new EventType(name), content);
 		}

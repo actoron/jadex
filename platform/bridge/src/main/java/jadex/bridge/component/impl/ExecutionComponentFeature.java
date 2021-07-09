@@ -56,7 +56,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.DebugException;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
@@ -1968,7 +1968,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			String valtext = null;
 			try 
 			{
-				VmHacks.get().setAccessible(fields[i], true);
+				SAccess.setAccessible(fields[i], true);
 				Object val = fields[i].get(step.getStep());
 				valtext = val == null ? "null" : val.toString();
 			} 

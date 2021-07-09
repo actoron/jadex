@@ -3,7 +3,7 @@ package jadex.platform.service.security.auth;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.agreement.jpake.JPAKEParticipant;
 import org.bouncycastle.crypto.agreement.jpake.JPAKEPrimeOrderGroups;
@@ -26,7 +26,7 @@ public class JadexJPakeParticipant extends JPAKEParticipant
 		try
 		{
 			pwfield = JPAKEParticipant.class.getDeclaredField("password");
-			VmHacks.get().setAccessible(pwfield, true);
+			SAccess.setAccessible(pwfield, true);
 		}
 		catch (Exception e)
 		{

@@ -1,6 +1,8 @@
-package jadex.bytecode.vmhacks;
+package jadex.nativetools;
 
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +23,7 @@ import jadex.commons.SUtil;
  *
  */
 @SuppressWarnings("unused")
-public final class NativeHelper implements INativeHelper
+public final class NativeHelper
 {
 	// ------ JNI ------
 	
@@ -34,8 +36,14 @@ public final class NativeHelper implements INativeHelper
 	/** JNI function DefineClass(). */
 	private static final int JNI_DEFINECLASS_OFFSET = 5 * Pointer.SIZE;
 	
+	/** JNI function FindClass(). */
+	private static final int JNI_FINDCLASS_OFFSET = 6 * Pointer.SIZE;
+	
 	/** JNI function FromReflectedMethod(). */
 	private static final int JNI_FROMREFLECTEDMETHOD_OFFSET = 7 * Pointer.SIZE;
+	
+	/** JNI function ToReflectedField(). */
+	private static final int JNI_TOREFLECTEDFIELD_OFFSET = 12 * Pointer.SIZE;
 	
 	/** JNI function CallObjectMethod(). */
 	private static final int JNI_CALLOBJECTMETHOD_OFFSET = 34 * Pointer.SIZE;
@@ -55,7 +63,7 @@ public final class NativeHelper implements INativeHelper
 	// ------ JavaVM ------
 	
 	/** JavaVM function GetEnv(). */
-	private static final int JAVAVM_GETENV_OFFSET = 6 * Pointer.SIZE;
+	private final int JAVAVM_GETENV_OFFSET = 6 * Pointer.SIZE;
 	
 	/** Pointer to the JavaVM. */
 	private Pointer javavm;
@@ -63,17 +71,18 @@ public final class NativeHelper implements INativeHelper
 	/** Pointer to the JNI function table. */
 	private Pointer jnifunctiontable;
 	
-	/** Field ID of AccessibleObject override field, if found. */
-	private Pointer overridefieldid;
-	
 	/** Invocation options of JNI environment. */
-	private Map<String, Object> envoptions = new HashMap<String, Object>();
+	private Map<String, Object> envoptions;
+	
+	/** Field ID of AccessibleObject override field, if found. */
+    private Pointer overridefieldid;
 	
 	/**
 	 *  Create helper.
 	 */
-	protected NativeHelper()
+	public NativeHelper()
 	{
+		envoptions = new HashMap<String, Object>();
 		envoptions.put(Library.OPTION_ALLOW_OBJECTS, Boolean.TRUE);
 		
 		javavm = getJavaVm();
@@ -92,21 +101,6 @@ public final class NativeHelper implements INativeHelper
 		jnifunctiontable = env.getPointer(0);
 		
 		invokeJni(JNI_GETVERSION_OFFSET, int.class);
-		
-		try
-		{
-			overridefieldid = invokeJni(JNI_GETFIELDID_OFFSET, Pointer.class, AccessibleObject.class, "override", "Z");
-		}
-		catch (Throwable e)
-		{
-			try
-			{
-				overridefieldid = invokeJni(JNI_GETFIELDID_OFFSET, Pointer.class, AccessibleObject.class, "flag", "Z");
-			}
-			catch (Throwable e1)
-			{
-			}
-		}
 	}
 	
 	/**
@@ -115,18 +109,28 @@ public final class NativeHelper implements INativeHelper
 	 *  @param accobj The accessible object.
 	 *  @param flag The flag value.
 	 */
-	public void setAccessible(String flagname, AccessibleObject accobj, boolean flag)
+	public void setAccessible(AccessibleObject accobj, boolean flag)
 	{
+		if (overridefieldid == null)
+		{
+			try
+			{
+					overridefieldid = invokeJni(JNI_GETFIELDID_OFFSET, Pointer.class, AccessibleObject.class, "override", "Z");
+			}
+			catch (Throwable e)
+			{
+					try
+					{
+							overridefieldid = invokeJni(JNI_GETFIELDID_OFFSET, Pointer.class, AccessibleObject.class, "flag", "Z");
+					}
+					catch (Throwable e1)
+					{
+						// Throw original exception, most likely candidate...
+						throw new RuntimeException(e);
+					}
+			}
+		}
 		invokeJni(JNI_SETBOOLEANFIELD_OFFSET, void.class, accobj, overridefieldid, flag);
-	}
-	
-	/**
-	 *  Tests if the setAccessible() method can be used.
-	 *  @return True, if method can be used.
-	 */
-	public boolean canSetAccessible()
-	{
-		return overridefieldid != null;
 	}
 	
 	/**
@@ -136,6 +140,34 @@ public final class NativeHelper implements INativeHelper
 	{
 		name = name!=null ? name.replace('.', '/') : null;
 		Class<?> ret = (Class<?>) invokeJni(JNI_DEFINECLASS_OFFSET, Object.class, name, loader, b, b.length);
+		return ret;
+	}
+	
+	/**
+	 *  Find a class in system classloader.
+	 *  @param name Fully-qualified name of class.
+	 *  @return The class.
+	 */
+	public Class<?> findClass(String name)
+	{
+		name = name!=null ? name.replace('.', '/') : null;
+		Class<?> ret = (Class<?>) invokeJni(JNI_FINDCLASS_OFFSET, Object.class, name);
+		return ret;
+	}
+	
+	/**
+	 *  Returns the field of a class, overriding security checks.
+	 *
+	 *  @param clazz The class.
+	 *  @param fieldname The field name.
+	 *  @param type The field type in VM notation.
+	 *  @param isstatic If the field is static or not.
+	 *  @return The field.
+	 */
+	public Field getField(Class<?> clazz, String fieldname, String type, boolean isstatic)
+	{
+		Pointer fieldid = invokeJni(JNI_GETFIELDID_OFFSET, Pointer.class, clazz, fieldname, type);
+		Field ret = (Field) invokeJni(JNI_TOREFLECTEDFIELD_OFFSET, Object.class, clazz, fieldid, isstatic);
 		return ret;
 	}
 	
@@ -347,14 +379,20 @@ public final class NativeHelper implements INativeHelper
 //	private native final int JNI_GetCreatedJavaVMs(PointerByReference vmref, int len, IntByReference num);
 	
 	/** Test main */
-	public static void main(String[] args) throws Exception
+	public static final void main(String[] args) throws Exception
 	{
-		final NativeHelper n = new NativeHelper();
+		NativeHelper n = new NativeHelper();
 //		System.out.println(n.getVm());
 		System.out.println(n.geteUid());
 		System.out.println(n.getUidGid("nobody")[0] + " " + n.getUidGid("nobody")[1]);
 		n.tryChangeUser(null);
 		System.out.println(n.geteUid());
-		SUtil.sleep(30000);
+		try
+		{
+			Thread.sleep(30000);
+		}
+		catch (Exception e)
+		{
+		}
 	}
 }

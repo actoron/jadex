@@ -14,7 +14,7 @@ import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -62,12 +62,12 @@ public class PojoTaskWrapper implements ITask
 				Field f = fi.getField(ia.getClassLoader());
 				if(SReflect.isSupertype(f.getType(), IInternalAccess.class))
 				{
-					VmHacks.get().setAccessible(f, true);
+					SAccess.setAccessible(f, true);
 					f.set(pojotask, ia);						
 				}
 				else if(SReflect.isSupertype(f.getType(), IExternalAccess.class))
 				{
-					VmHacks.get().setAccessible(f, true);
+					SAccess.setAccessible(f, true);
 					f.set(pojotask, ia.getExternalAccess());
 				}
 			}
@@ -86,7 +86,7 @@ public class PojoTaskWrapper implements ITask
 				try
 				{
 					Field f = fi.getField(ia.getClassLoader());
-					VmHacks.get().setAccessible(f, true);
+					SAccess.setAccessible(f, true);
 					f.set(pojotask, thread.getParameterValue(name));
 				}
 				catch(Exception e)
@@ -103,7 +103,7 @@ public class PojoTaskWrapper implements ITask
 			try
 			{
 				Field f = fi.getField(ia.getClassLoader());
-				VmHacks.get().setAccessible(f, true);
+				SAccess.setAccessible(f, true);
 				f.set(pojotask, thread.getParameterValue(name));
 			}
 			catch(Exception e)
@@ -133,7 +133,7 @@ public class PojoTaskWrapper implements ITask
 		Method bodymethod = bodymi.getMethod(process.getClassLoader());
 		try
 		{
-			VmHacks.get().setAccessible(bodymethod, true);
+			SAccess.setAccessible(bodymethod, true);
 			
 			Set<Object> vals = new LinkedHashSet<Object>();
 			vals.add(context);
@@ -195,7 +195,7 @@ public class PojoTaskWrapper implements ITask
 			Set<Object> vals = new LinkedHashSet<Object>();
 			vals.add(process);
 			
-			VmHacks.get().setAccessible(cancelmethod, true);
+			SAccess.setAccessible(cancelmethod, true);
 			Object re = cancelmethod.invoke(pojotask, guessParameters(cancelmethod.getParameterTypes(), vals));
 			
 			if(re instanceof Future)
@@ -279,7 +279,7 @@ public class PojoTaskWrapper implements ITask
 					{
 						FieldInfo fi = resinjections.get(name);
 						Field f = fi.getField(process.getClassLoader());
-						VmHacks.get().setAccessible(f, true);
+						SAccess.setAccessible(f, true);
 						Object val = f.get(pojotask);
 						context.setParameterValue(name, val);
 					}

@@ -26,6 +26,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import jadex.bytecode.IByteCodeClassLoader;
 import jadex.bytecode.SASM;
+import jadex.commons.SAccess;
 import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -877,7 +878,7 @@ public class SInvocation
 		{
 			return false;
 		}
-		VmHacks.get().setAccessible(cicm, true);
+		SAccess.setAccessible(cicm, true);
 		boolean acc = false;
 		try
 		{
@@ -984,7 +985,7 @@ public class SInvocation
 		public FallBackInvoker(Method method)
 		{
 //			System.err.println("WARNING FALLBACK MODE ENABLED");
-			VmHacks.get().setAccessible(method, true);
+			SAccess.setAccessible(method, true);
 			this.method = method;
 		}
 		

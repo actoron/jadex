@@ -7,7 +7,7 @@ import java.util.List;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
@@ -89,7 +89,7 @@ public class JsonTupleProcessor extends AbstractJsonProcessor
 		try
 		{
 			Field fentities = SReflect.getField(ret.getClass(), "entities");
-			VmHacks.get().setAccessible(fentities, true);
+			SAccess.setAccessible(fentities, true);
 			fentities.set(ret, entities);
 		}
 		catch(Exception e)

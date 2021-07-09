@@ -49,6 +49,7 @@ import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.settings.IPlatformSettings;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;

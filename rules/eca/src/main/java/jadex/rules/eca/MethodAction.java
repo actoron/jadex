@@ -2,7 +2,7 @@ package jadex.rules.eca;
 
 import java.lang.reflect.Method;
 
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -33,7 +33,7 @@ public class MethodAction<T> implements IAction<T>
 	{
 		try
 		{
-			VmHacks.get().setAccessible(method, true);
+			SAccess.setAccessible(method, true);
 			Object result = method.invoke(object, new Object[]{event, rule, context, condresult});
 			if(result instanceof IFuture)
 			{

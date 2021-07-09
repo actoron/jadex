@@ -7,7 +7,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
+import jadex.commons.SAccess;
 import jadex.commons.SUtil;
 
 /**
@@ -148,7 +149,7 @@ public class BeanProperty
 		try
 		{
 			if (!getter.isAccessible())
-				VmHacks.get().setAccessible(getter, true);
+				SAccess.setAccessible(getter, true);
 		}
 		catch (Exception e)
 		{
@@ -181,7 +182,7 @@ public class BeanProperty
 		try
 		{
 			if (!setter.isAccessible())
-				VmHacks.get().setAccessible(setter, true);
+				SAccess.setAccessible(setter, true);
 		}
 		catch (Exception e)
 		{
@@ -253,7 +254,7 @@ public class BeanProperty
 		try
 		{
 			if (!field.isAccessible())
-				VmHacks.get().setAccessible(field, true);
+				SAccess.setAccessible(field, true);
 		}
 		catch (Exception e)
 		{
@@ -352,7 +353,7 @@ public class BeanProperty
 			{
 //				Field field = getField();
 				if(!field.isAccessible())
-					VmHacks.get().setAccessible(field, true);
+					SAccess.setAccessible(field, true);
 				ret = field.get(object);
 			}
 			catch (Exception e)
@@ -412,7 +413,7 @@ public class BeanProperty
 			{
 //				Field field = getField();
 				if (!field.isAccessible())
-					VmHacks.get().setAccessible(field, true);
+					SAccess.setAccessible(field, true);
 				field.set(object, value);
 			}
 			catch (Exception e)

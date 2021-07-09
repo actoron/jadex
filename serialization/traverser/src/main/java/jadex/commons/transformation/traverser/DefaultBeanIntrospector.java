@@ -10,7 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.SAccess;
+import jadex.commons.SAccess;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
@@ -211,7 +212,7 @@ public class DefaultBeanIntrospector implements IBeanIntrospector
 				try
 				{
 					refcon = clazz.getDeclaredConstructor();
-					VmHacks.get().setAccessible(refcon, true);
+					SAccess.setAccessible(refcon, true);
 				}
 				catch (Exception e)
 				{
