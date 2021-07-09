@@ -9,11 +9,11 @@ import java.lang.reflect.Method;
 
 public class SAccess
 {
-    /** Globally disable setAccessible using approach "Unsafe". */
-    public static boolean DISABLE_UNSAFE_SETACCESSIBLE = false;
+    /** Enable setAccessible using approach "Unsafe". */
+    public static boolean ENABLE_UNSAFE_SETACCESSIBLE = true;
     
     /** Globally disable setAccessible using approach "Native Access". */
-    public static boolean DISABLE_NATIVE_SETACCESSIBLE = false;
+    public static boolean ENABLE_NATIVE_SETACCESSIBLE = true;
     
     /** Flag if class was inited. */
     private volatile static boolean inited = false;
@@ -83,10 +83,10 @@ public class SAccess
             {
                 if (!inited)
                 {
-                    if (!DISABLE_UNSAFE_SETACCESSIBLE)
+                    if (ENABLE_UNSAFE_SETACCESSIBLE)
                         initUnsafe();
                     
-                    if (!DISABLE_NATIVE_SETACCESSIBLE)
+                    if (ENABLE_NATIVE_SETACCESSIBLE)
                         initNative();
                     
                     inited = true;
