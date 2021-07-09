@@ -2,6 +2,6 @@ description 'Jadex natigee tools contains helpers for accessing native and OS fu
 
 dependencies
 {
-	implementation 'net.java.dev.jna:jna:4.5.1'
+	implementation 'net.java.dev.jna:jna:5.8.0'
 }
 

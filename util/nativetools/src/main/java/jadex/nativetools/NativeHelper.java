@@ -16,8 +16,6 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 
-import jadex.commons.SUtil;
-
 /**
  *  Helper class using JNA to provide native features.
  *
@@ -31,39 +29,39 @@ public final class NativeHelper
 	private static final int JNI_VERSION_1_6 = 0x00010006;
 	
 	/** JNI function GetVersion(). */
-	private static final int JNI_GETVERSION_OFFSET = 4 * Pointer.SIZE;
+	private static final int JNI_GETVERSION_OFFSET = 4 * Native.POINTER_SIZE;
 	
 	/** JNI function DefineClass(). */
-	private static final int JNI_DEFINECLASS_OFFSET = 5 * Pointer.SIZE;
+	private static final int JNI_DEFINECLASS_OFFSET = 5 * Native.POINTER_SIZE;
 	
 	/** JNI function FindClass(). */
-	private static final int JNI_FINDCLASS_OFFSET = 6 * Pointer.SIZE;
+	private static final int JNI_FINDCLASS_OFFSET = 6 * Native.POINTER_SIZE;
 	
 	/** JNI function FromReflectedMethod(). */
-	private static final int JNI_FROMREFLECTEDMETHOD_OFFSET = 7 * Pointer.SIZE;
+	private static final int JNI_FROMREFLECTEDMETHOD_OFFSET = 7 * Native.POINTER_SIZE;
 	
 	/** JNI function ToReflectedField(). */
-	private static final int JNI_TOREFLECTEDFIELD_OFFSET = 12 * Pointer.SIZE;
+	private static final int JNI_TOREFLECTEDFIELD_OFFSET = 12 * Native.POINTER_SIZE;
 	
 	/** JNI function CallObjectMethod(). */
-	private static final int JNI_CALLOBJECTMETHOD_OFFSET = 34 * Pointer.SIZE;
+	private static final int JNI_CALLOBJECTMETHOD_OFFSET = 34 * Native.POINTER_SIZE;
 	
 	/** JNI function CallLongMethod(). */
-	private static final int JNI_CALLLONGMETHOD_OFFSET = 52 * Pointer.SIZE;
+	private static final int JNI_CALLLONGMETHOD_OFFSET = 52 * Native.POINTER_SIZE;
 	
 	/** JNI function GetFieldID(). */
-	private static final int JNI_GETFIELDID_OFFSET = 94 * Pointer.SIZE;
+	private static final int JNI_GETFIELDID_OFFSET = 94 * Native.POINTER_SIZE;
 	
 	/** JNI function SetBooleanField(). */
-	private static final int JNI_SETBOOLEANFIELD_OFFSET = 105 * Pointer.SIZE;
+	private static final int JNI_SETBOOLEANFIELD_OFFSET = 105 * Native.POINTER_SIZE;
 	
 	/** JNI function GetJavaVM(). */
-	private static final int JNI_GETJAVAVM_OFFSET = 219 * Pointer.SIZE;
+	private static final int JNI_GETJAVAVM_OFFSET = 219 * Native.POINTER_SIZE;
 	
 	// ------ JavaVM ------
 	
 	/** JavaVM function GetEnv(). */
-	private final int JAVAVM_GETENV_OFFSET = 6 * Pointer.SIZE;
+	private final int JAVAVM_GETENV_OFFSET = 6 * Native.POINTER_SIZE;
 	
 	/** Pointer to the JavaVM. */
 	private Pointer javavm;
@@ -340,7 +338,7 @@ public final class NativeHelper
 		if (structp != null)
 		{
 			ret = new int[2];
-			long off = 2*Pointer.SIZE;
+			long off = 2*Native.POINTER_SIZE;
 			ret[0] = structp.getInt(off);
 			off += 4;
 			ret[1] = structp.getInt(off);
