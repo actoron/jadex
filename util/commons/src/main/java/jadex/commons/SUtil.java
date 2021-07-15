@@ -5543,6 +5543,103 @@ public class SUtil
 	}
 	
 	/**
+	 *  Guess the mime type by the file name.
+	 *  @param name The file content in bytes.
+	 *  @return The mime type.
+	 */
+	public static String guessContentTypeByBytes(byte[] data)
+	{
+		String ret = null;
+		if(data!=null)
+		{
+			byte[] header = new byte[11];
+			System.arraycopy(data, 0, header, 0, Math.min(data.length, header.length));
+			int c1 = header[0] & 0xff;
+			int c2 = header[1] & 0xff;
+			int c3 = header[2] & 0xff;
+			int c4 = header[3] & 0xff;
+			int c5 = header[4] & 0xff;
+			int c6 = header[5] & 0xff;
+			int c7 = header[6] & 0xff;
+			int c8 = header[7] & 0xff;
+			int c9 = header[8] & 0xff;
+			int c10 = header[9] & 0xff;
+			int c11 = header[10] & 0xff;
+	
+			if(c1 == 0xCA && c2 == 0xFE && c3 == 0xBA && c4 == 0xBE)
+				ret = "application/java-vm";
+			else if(c1 == 0xD0 && c2 == 0xCF && c3 == 0x11 && c4 == 0xE0 && c5 == 0xA1 && c6 == 0xB1 && c7 == 0x1A && c8 == 0xE1)
+				ret = "application/msword";
+			else if(c1 == 0x25 && c2 == 0x50 && c3 == 0x44 && c4 == 0x46 && c5 == 0x2d && c6 == 0x31 && c7 == 0x2e)
+				ret = "application/pdf";
+			else if(c1 == 0x38 && c2 == 0x42 && c3 == 0x50 && c4 == 0x53 && c5 == 0x00 && c6 == 0x01)
+				ret = "image/photoshop";
+			else if(c1 == 0x25 && c2 == 0x21 && c3 == 0x50 && c4 == 0x53)
+				ret = "application/postscript";
+			else if(c1 == 0xff && c2 == 0xfb && c3 == 0x30)
+				ret = "audio/mp3";
+			else if(c1 == 0x49 && c2 == 0x44 && c3 == 0x33)
+				ret = "audio/mp3";
+			else if(c1 == 0xAC && c2 == 0xED)
+				ret = "application/x-java-serialized-object";
+			else if(c1 == '<')
+			{
+				if(c2 == '!' ||
+					((c2 == 'h' && (c3 == 't' && c4 == 'm' && c5 == 'l' || c3 == 'e' && c4 == 'a' && c5 == 'd') || (c2 == 'b' && c3 == 'o' && c4 == 'd' && c5 == 'y'))) ||
+					((c2 == 'H' && (c3 == 'T' && c4 == 'M' && c5 == 'L' || c3 == 'E' && c4 == 'A' && c5 == 'D') || (c2 == 'B' && c3 == 'O' && c4 == 'D' && c5 == 'Y'))))
+					ret ="text/html";
+				else if(c2 == '?' && c3 == 'x' && c4 == 'm' && c5 == 'l' && c6 == ' ')
+					ret = "application/xml";
+			}
+			else if(c1 == 0xfe && c2 == 0xff)
+			{
+				if(c3 == 0 && c4 == '<' && c5 == 0 && c6 == '?' && c7 == 0 && c8 == 'x')
+					ret = "application/xml";
+			}
+			else if(c1 == 0xff && c2 == 0xfe)
+			{
+				if(c3 == '<' && c4 == 0 && c5 == '?' && c6 == 0 && c7 == 'x' && c8 == 0)
+					ret = "application/xml";
+			}
+			else if(c1 == 'B' && c2 == 'M')
+				ret = "image/bmp";
+			else if(c1 == 0x49 && c2 == 0x49 && c3 == 0x2a && c4 == 0x00)
+				ret = "image/tiff";
+			else if(c1 == 0x4D && c2 == 0x4D && c3 == 0x00 && c4 == 0x2a)
+				ret = "image/tiff";
+			else if(c1 == 'G' && c2 == 'I' && c3 == 'F' && c4 == '8')
+				ret = "image/gif";
+			else if(c1 == '#' && c2 == 'd' && c3 == 'e' && c4 == 'f')
+				ret = "image/x-bitmap";
+			else if(c1 == '!' && c2 == ' ' && c3 == 'X' && c4 == 'P' && c5 == 'M' && c6 == '2')
+				ret = "image/x-pixmap";
+			else if(c1 == 137 && c2 == 80 && c3 == 78 && c4 == 71 && c5 == 13 && c6 == 10 && c7 == 26 && c8 == 10)
+				ret = "image/png";
+			else if(c1 == 0xFF && c2 == 0xD8 && c3 == 0xFF)
+			{
+				if(c4 == 0xE0)
+					ret = "image/jpeg";
+				else if((c4 == 0xE1) && (c7 == 'E' && c8 == 'x' && c9 == 'i' && c10 == 'f' && c11 == 0))
+					ret = "image/jpeg";
+				else if(c4 == 0xEE)
+					ret = "image/jpg";
+			}
+			else if((c1 == 0x41 && c2 == 0x43) && (c7 == 0x00 && c8 == 0x00 && c9 == 0x00 && c10 == 0x00 && c11 == 0x00))
+				ret = "application/acad";
+			else if(c1 == 0x2E && c2 == 0x73 && c3 == 0x6E && c4 == 0x64)
+				ret = "audio/basic"; 
+			else if(c1 == 0x64 && c2 == 0x6E && c3 == 0x73 && c4 == 0x2E)
+				ret = "audio/basic";
+			else if(c1 == 'R' && c2 == 'I' && c3 == 'F' && c4 == 'F')
+				ret = "audio/x-wav";
+			else if(c1 == 'P' && c2 == 'K')
+				ret = "application/zip";
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Test if a string contains a digit.
 	 *  @param s The string.
 	 *  @return True, if the string contains a digit.

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.QueryParam;
+
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -21,6 +23,8 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.FutureReturnType;
+import jadex.bridge.service.annotation.ParameterInfo;
+import jadex.bridge.service.annotation.Value;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
@@ -30,6 +34,7 @@ import jadex.commons.Boolean3;
 import jadex.commons.IResultCommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
@@ -37,6 +42,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.extension.rs.invoke.annotation.ParameterMapper;
+import jadex.extension.rs.publish.mapper.IParameterMapper2;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.OnService;
@@ -353,7 +360,9 @@ public class JCCWebAgent implements IJCCWebService
 	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, 
 		final String methodname, final Object[] args, final ClassInfo[] argtypes, @FutureReturnType final ClassInfo rettype)
 	{
-		//System.out.println("INVOKE: " + methodname + " " + servicetype);
+		//if(methodname!=null && methodname.indexOf("setIm")!=-1)
+		//	System.out.println("INVOKE: " + methodname + " " + servicetype);
+		
 		// todo: the return type could not be available on this platform :-(
 		Class<?> rtype = rettype!=null? rettype.getType(agent.getClassLoader(), agent.getModel().getAllImports()): null;
 		final Future<Object> ret = (Future<Object>)SFuture.getNoTimeoutFuture(rtype, agent);
@@ -499,4 +508,61 @@ public class JCCWebAgent implements IJCCWebService
 		IWebPublishService wps = agent.getLocalService(IWebPublishService.class);
 		wps.login(platformpass);
 	}*/
+	
+	/**
+	 * 
+	 */
+	public static class InvokeServiceMethodMapper implements IParameterMapper2
+	{
+		/**
+		 *  Convert parameters.
+		 *  @param values The values map to convert.
+		 *  @param pinfos The parameter infos (i.e. annotation meta info). 
+		 *  				List<Tuple2<String, String>>: says "kind of param" name, path form, query, no and name of parameter 
+		 *  				Map<String, Class<?>>: says for this named param use this type (from method param)
+		 *  @param context The context (could be the http servlet request or a custom container request).
+		 *  @return The converted parameters.
+		 */
+		public Object[] convertParameters(Map<String, Object> values, Tuple2<List<Tuple2<String, String>>, Map<String, Class<?>>> pinfos, Object request) throws Exception
+		{
+			List<Object> args = new ArrayList<Object>();
+			for(int i=0; ; i++)
+			{
+				if(values.containsKey("args_"+i))
+				{
+					args.add(values.get("args_"+i));
+				}
+				else
+				{
+					break;
+				}
+			}
+			if(args.size()>0)
+				values.put("args", args);
+			List<Object> argtypes = new ArrayList<Object>();
+			for(int i=0; ; i++)
+			{
+				if(values.containsKey("argtypes_"+i))
+				{
+					argtypes.add(values.get("argtypes_"+i));
+				}
+				else
+				{
+					break;
+				}
+			}
+			if(argtypes.size()>0)
+				values.put("argtypes", argtypes);
+			
+			Object[] ret = new Object[6];
+			ret[0] = values.get("cid");
+			ret[1] = values.get("servicetype");
+			ret[2] = values.get("methodname");
+			ret[3] = values.get("args");
+			ret[4] = values.get("argtypes");
+			ret[5] = values.get("returntype");
+			
+			return ret;
+		}
+	}
 }	
