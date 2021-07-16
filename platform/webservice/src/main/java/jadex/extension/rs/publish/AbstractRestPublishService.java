@@ -103,6 +103,7 @@ import jadex.extension.rs.publish.clone.CloneResponseProcessor;
 import jadex.extension.rs.publish.json.JsonResponseProcessor;
 import jadex.extension.rs.publish.mapper.DefaultParameterMapper;
 import jadex.extension.rs.publish.mapper.IParameterMapper;
+import jadex.extension.rs.publish.mapper.IParameterMapper2;
 import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
 import jadex.platform.service.serialization.SerializationServices;
@@ -548,8 +549,11 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					methodname = methodname.substring(1);
 				if(methodname != null && methodname.endsWith("()"))
 					methodname = methodname.substring(0, methodname.length() - 2);
-	
 				final String fmn = methodname;
+
+				if(methodname!=null && request.toString().indexOf("setIm")!=-1)
+					System.out.println("INVOKE: " + methodname);
+				
 				Collection<MappingInfo> mis = pm.getElementsForPath(methodname);
 				List<Map<String, String>> bindings = mis.stream().map(x -> pm.getBindingsForPath(fmn)).collect(Collectors.toList());
 				
@@ -962,9 +966,19 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			{
 				for(Part part : request.getParts())
 				{
+					//System.out.println("content-type: "+part.getContentType());
 					byte[] data = SUtil.readStream(part.getInputStream());
-					// inparamsmap.add(part.getName(), new String(data));
-					addEntry(inparamsmap, part.getName(), new String(data));
+					String mime = SUtil.guessContentTypeByBytes(data);
+					if(mime!=null && (mime.indexOf("application")!=-1 || mime.indexOf("image")!=-1 || mime.indexOf("audio")!=-1))
+					{
+						// add as raw byte[] if mimetype is binary 
+						addEntry(inparamsmap, part.getName(), data);
+					}
+					else
+					{
+						// add as text if other mimetype
+						addEntry(inparamsmap, part.getName(), new String(data, StandardCharsets.UTF_8));
+					}
 				}
 			}
 					
@@ -1002,7 +1016,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			Method method = mi.getMethod();
 			
 			// target method types
-			Class<?>[] types = mi.getMethod().getParameterTypes();
+			Class<?>[] types = method.getParameterTypes();
 			
 			// acceptable media types for input
 			String mts = request.getHeader("Content-Type");
@@ -1063,145 +1077,108 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			
 			if(bytes!=null && bytes.length>0)
 			{
-				String str = new String(bytes, SUtil.UTF8);
-				
-				if(ct!=null && ct.trim().startsWith("application/x-www-form-urlencoded"))
+				String mime = SUtil.guessContentTypeByBytes(bytes);
+				if(mime!=null && (mime.indexOf("application")!=-1 || mime.indexOf("image")!=-1 || mime.indexOf("audio")!=-1))
 				{
-//					System.out.println(str);
-					Map<String, Object> vals = splitQueryString(str);
-					inparamsmap.putAll(vals);
-				}
-				else if(ct!=null && (ct.trim().startsWith("application/json") || ct.trim().startsWith("test/plain")))
-				{
-					// if only one target argument
-					if(types.length == 1)
-					{
-						// if is json object
-						if(str.trim().startsWith("{"))
-						{
-							// Map as first argument
-							Object arg0 = convertJsonValue(str, types[0], component.getClassLoader(), true);
-							inparamsmap.put("0", arg0);
-						}
-						else if(str.trim().startsWith("\""))
-						{
-							// try to directly convert to target type
-							Object arg0 = JsonTraverser.objectFromString(str, component.getClassLoader(), null, types[0], null);
-							inparamsmap.put("0", arg0);
-						}
-					}
-					// multiple arguments
-					else
-					{
-						// Array of objects as arguments
-						JsonValue args = Json.parse(str);
-						
-						if(args instanceof JsonArray)
-						{
-							JsonArray array = (JsonArray)args;
-							for(int i = 0; i < array.size(); i++)
-							{
-								inparamsmap.put(""+i, convertJsonValue(array.get(i).toString(), types[i], component.getClassLoader(), false));
-							}
-						}
-						else if(args instanceof JsonObject)
-						{
-							JsonObject jobj = (JsonObject)args;
-							if(hasformparam)
-							{
-								Map<String, Class<?>> typesmap = pinfos.getSecondEntity();
-								// put all contained objects in the params map
-								int[] i = new int[1];
-								final Map<String, Object> finparamsmap = inparamsmap;
-								jobj.forEach((com.eclipsesource.json.JsonObject.Member x)->
-								{
-									i[0]++;
-									Class<?> type = typesmap.get(x.getName());
-									if(type!=null)
-									{
-										Object val = convertJsonValue(x.getValue().toString(), type, component.getClassLoader(), false);
-										finparamsmap.put(x.getName(), val);
-									}
-									else
-									{
-										System.out.println("Ignoring argument with no type: "+x.getName());
-										//throw new RuntimeException("Unable to determine argument type: "+x.getName());
-									}
-								});
-							}
-							else
-							{
-//								if(type==null && i[0]<types.length)
-//									type = types[i[0]];
-//								else
-							}
-						}
-					}
+					// add as raw byte[] if mimetype is binary 
+					// add under what name?!
+					addEntry(inparamsmap, "body", bytes);
 				}
 				else
 				{
-					throw new RuntimeException("Content type not supported for body: "+ct);
+					
+					String str = new String(bytes, SUtil.UTF8);
+					
+					if(ct!=null && ct.trim().startsWith("application/x-www-form-urlencoded"))
+					{
+	//					System.out.println(str);
+						Map<String, Object> vals = splitQueryString(str);
+						inparamsmap.putAll(vals);
+					}
+					else if(ct!=null && (ct.trim().startsWith("application/json") || ct.trim().startsWith("test/plain")))
+					{
+						// if only one target argument
+						if(types.length == 1)
+						{
+							// if is json object
+							if(str.trim().startsWith("{"))
+							{
+								// Map as first argument
+								Object arg0 = convertJsonValue(str, types[0], component.getClassLoader(), true);
+								inparamsmap.put("0", arg0);
+							}
+							else if(str.trim().startsWith("\""))
+							{
+								// try to directly convert to target type
+								Object arg0 = JsonTraverser.objectFromString(str, component.getClassLoader(), null, types[0], null);
+								inparamsmap.put("0", arg0);
+							}
+						}
+						// multiple arguments
+						else
+						{
+							// Array of objects as arguments
+							JsonValue args = Json.parse(str);
+							
+							if(args instanceof JsonArray)
+							{
+								JsonArray array = (JsonArray)args;
+								for(int i = 0; i < array.size(); i++)
+								{
+									inparamsmap.put(""+i, convertJsonValue(array.get(i).toString(), types[i], component.getClassLoader(), false));
+								}
+							}
+							else if(args instanceof JsonObject)
+							{
+								JsonObject jobj = (JsonObject)args;
+								if(hasformparam)
+								{
+									Map<String, Class<?>> typesmap = pinfos.getSecondEntity();
+									// put all contained objects in the params map
+									int[] i = new int[1];
+									final Map<String, Object> finparamsmap = inparamsmap;
+									jobj.forEach((com.eclipsesource.json.JsonObject.Member x)->
+									{
+										i[0]++;
+										Class<?> type = typesmap.get(x.getName());
+										if(type!=null)
+										{
+											Object val = convertJsonValue(x.getValue().toString(), type, component.getClassLoader(), false);
+											finparamsmap.put(x.getName(), val);
+										}
+										else
+										{
+											System.out.println("Ignoring argument with no type: "+x.getName());
+											//throw new RuntimeException("Unable to determine argument type: "+x.getName());
+										}
+									});
+								}
+								else
+								{
+	//								if(type==null && i[0]<types.length)
+	//									type = types[i[0]];
+	//								else
+								}
+							}
+						}
+					}
+					else
+					{
+						throw new RuntimeException("Content type not supported for body: "+ct);
+					}
 				}
 			}
+			
+			// From here the parameter array 'inparams' is built using
+			// a) the map with possibly named input values 'inparamsmap'
+			// b) the parameter annotations describing where each parameter comes from 'pinfos'
 			
 			// if(sr.size()>0)
 			// System.out.println("found acceptable in types: "+sr);
 			// if(sr.size()==0)
 			// System.out.println("found no acceptable in types.");
 
-			// The order of in parameters is corrected with respect to the
-			// target parameter order
-			Object[] inparams = new Object[method.getParameterTypes().length];
 			
-			// Iterate over given method parameter annotations in order
-			//for(Tuple2<String, String> pinfo: pinfos.getFirstEntity())
-			List<Integer> todo = new ArrayList<>();
-			for(int i=0; i<pinfos.getFirstEntity().size(); i++)
-			{
-				Tuple2<String, String> pinfo = pinfos.getFirstEntity().get(i);
-				
-				if("name".equals(pinfo.getFirstEntity()))
-				{
-					inparams[i] = inparamsmap.remove(pinfo.getSecondEntity());
-				}
-				else if("path".equals(pinfo.getFirstEntity()))
-				{
-					inparams[i] = inparamsmap.remove(pinfo.getSecondEntity());
-					//binding.get(pinfo.getSecondEntity());
-				}
-				else if("query".equals(pinfo.getFirstEntity()))
-				{
-					// query params are in normal parameter map
-					inparams[i] = inparamsmap.remove(pinfo.getSecondEntity());
-				}
-				else if("form".equals(pinfo.getFirstEntity()))
-				{
-					// query params are in normal parameter map
-					inparams[i] = inparamsmap.remove(pinfo.getSecondEntity());
-				}
-				else
-				{
-					todo.add(i);
-				}
-			}
-			
-			Iterator<String> innames = inparamsmap.keySet().iterator();
-			for(int i: todo)
-			{
-				Tuple2<String, String> pinfo = pinfos.getFirstEntity().get(i);
-				String inname = innames.hasNext()? innames.next(): null;
-				
-				if("no".equals(pinfo.getFirstEntity()) && inname!=null && inparamsmap.get(inname)!=null)
-				{
-					inparams[i] = inparamsmap.get(inname);
-				}
-			}
-			
-			for(int i = 0; i < inparams.length; i++)
-			{
-				if(inparams[i] instanceof String)
-					inparams[i] = convertParameter(sr, (String)inparams[i], types[i]);
-			}
 
 			if(method.isAnnotationPresent(ParametersMapper.class))
 			{
@@ -1213,7 +1190,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					Object mapper;
 					if(!Object.class.equals(pclazz))
 					{
-						mapper = pclazz.newInstance();
+						mapper = pclazz.getDeclaredConstructor().newInstance();
 					}
 					else
 					{
@@ -1221,13 +1198,32 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					}
 					if(mapper instanceof IValueMapper)
 						mapper = new DefaultParameterMapper((IValueMapper)mapper);
-
-					targetparams = ((IParameterMapper)mapper).convertParameters(inparams, request);
+					
+					if(mapper instanceof IParameterMapper)
+					{
+						// The order of in parameters is corrected with respect to the
+						// target parameter order
+						Object[] inparams = generateInParameters(inparamsmap, pinfos, types);
+						for(int i = 0; i < inparams.length; i++)
+						{
+							if(inparams[i] instanceof String)
+								inparams[i] = convertParameter(sr, (String)inparams[i], types[i]);
+						}
+						targetparams = ((IParameterMapper)mapper).convertParameters(inparams, request);
+					}
+					else if(mapper instanceof IParameterMapper2)
+					{
+						targetparams = ((IParameterMapper2)mapper).convertParameters(inparamsmap, pinfos, request);
+					}
+					else
+					{
+						throw new RuntimeException("Mapper does not implement IParameterMapper/2");
+					}
 				}
 				else
 				{
 					// System.out.println("automapping detected");
-					Class< ? >[] ts = method.getParameterTypes();
+					Class<?>[] ts = method.getParameterTypes();
 					targetparams = new Object[ts.length];
 					if(ts.length == 1 && inparamsmap != null)
 					{
@@ -1239,69 +1235,82 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					}
 				}
 			}
-			// natural auto map if there are in parameters
-			else
+			
+			// Natural auto map if there are in parameters
+			// Mappers can return null to not handle the mapping and let default mapping being applied
+			if(targetparams==null)
 			{
-				Class<?>[] ts = method.getParameterTypes();
-				targetparams = new Object[ts.length];
+				targetparams = new Object[types.length];
 
+				Object[] inparams = generateInParameters(inparamsmap, pinfos, types);
+				for(int i = 0; i < inparams.length; i++)
+				{
+					if(inparams[i] instanceof String)
+						inparams[i] = convertParameter(sr, (String)inparams[i], types[i]);
+				}
+				
 				for(int i = 0; i < targetparams.length && i < inparams.length; i++)
 				{
-					Object p = inparams[i];
+					targetparams[i] = inparams[i];
+				}
+			}
+			
+			// Type check parameters and convert
+			for(int i = 0; i < targetparams.length; i++)
+			{
+				Object p = targetparams[i];
 
-					if(p != null)
+				if(p != null)
+				{
+					Object v = convertParameter(p, types[i]);
+
+					if(v != null)
 					{
-						Object v = convertParameter(p, ts[i]);
-
-						if(v != null)
+						targetparams[i] = v;
+					}
+					else if(p != null && types[i].isArray())
+					{
+						// fill in collection
+						if(p instanceof Collection)
 						{
-							targetparams[i] = v;
+							Collection<Object> col = (Collection<Object>)p;
+							Object ar = Array.newInstance(types[i].getComponentType(), col.size());
+							targetparams[i] = ar;
+							Iterator<Object> it = col.iterator();
+							for(int j = 0; j < col.size(); j++)
+							{
+								v = convertParameter(it.next(), types[i].getComponentType());
+								if(v != null)
+									Array.set(ar, j, v);
+							}
 						}
-						else if(p != null && ts[i].isArray())
+						// varargs support -> convert matching single value
+						// to singleton array
+						else if(SReflect.isSupertype(types[i].getComponentType(), p.getClass()))
 						{
-							// fill in collection
-							if(p instanceof Collection)
-							{
-								Collection<Object> col = (Collection<Object>)p;
-								Object ar = Array.newInstance(ts[i].getComponentType(), col.size());
-								targetparams[i] = ar;
-								Iterator<Object> it = col.iterator();
-								for(int j = 0; j < col.size(); j++)
-								{
-									v = convertParameter(it.next(), ts[i].getComponentType());
-									if(v != null)
-										Array.set(ar, j, v);
-								}
-							}
-							// varargs support -> convert matching single value
-							// to singleton array
-							else if(SReflect.isSupertype(ts[i].getComponentType(), p.getClass()))
-							{
-								targetparams[i] = Array.newInstance(ts[i].getComponentType(), 1);
-								Array.set(targetparams[i], 0, p);
-							}
+							targetparams[i] = Array.newInstance(types[i].getComponentType(), 1);
+							Array.set(targetparams[i], 0, p);
 						}
 					}
 				}
-
-				// Add default values for basic types
-				for(int i = 0; i < targetparams.length; i++)
+			}
+			
+			// Add default values for basic types
+			for(int i = 0; i < targetparams.length; i++)
+			{
+				if(targetparams[i] == null)
 				{
-					if(targetparams[i] == null)
+					if(types[i].equals(boolean.class))
 					{
-						if(ts[i].equals(boolean.class))
-						{
-							targetparams[i] = Boolean.FALSE;
-						}
-						else if(ts[i].equals(char.class))
-						{
-							targetparams[i] = Character.valueOf((char)0);
-						}
-						else if(SReflect.getWrappedType(ts[i]) != ts[i]) // Number
-																			// type
-						{
-							targetparams[i] = Integer.valueOf(0);
-						}
+						targetparams[i] = Boolean.FALSE;
+					}
+					else if(types[i].equals(char.class))
+					{
+						targetparams[i] = Character.valueOf((char)0);
+					}
+					else if(SReflect.getWrappedType(types[i]) != types[i]) // Number type
+					{
+						targetparams[i] = Integer.valueOf(0);
 					}
 				}
 			}
@@ -1312,6 +1321,68 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		{
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/**
+	 *  Generate in parameters that are correct wrt order and number of targetparameter (must convert types possibly).
+	 */
+	public static Object[] generateInParameters(Map<String, Object> inparamsmap, Tuple2<List<Tuple2<String, String>>, Map<String, Class<?>>> pinfos, Class<?>[] types)
+	{
+		// The order of in parameters is corrected with respect to the
+		// target parameter order
+		Object[] inparams = new Object[types.length];
+		
+		// Iterate over given method parameter annotations in order
+		//for(Tuple2<String, String> pinfo: pinfos.getFirstEntity())
+		List<Integer> todo = new ArrayList<>();
+		for(int i=0; i<pinfos.getFirstEntity().size(); i++)
+		{
+			Tuple2<String, String> pinfo = pinfos.getFirstEntity().get(i);
+			
+			if("name".equals(pinfo.getFirstEntity()))
+			{
+				inparams[i] = inparamsmap.remove(pinfo.getSecondEntity());
+			}
+			else if("path".equals(pinfo.getFirstEntity()))
+			{
+				inparams[i] = inparamsmap.remove(pinfo.getSecondEntity());
+				//binding.get(pinfo.getSecondEntity());
+			}
+			else if("query".equals(pinfo.getFirstEntity()))
+			{
+				// query params are in normal parameter map
+				inparams[i] = inparamsmap.remove(pinfo.getSecondEntity());
+			}
+			else if("form".equals(pinfo.getFirstEntity()))
+			{
+				// query params are in normal parameter map
+				inparams[i] = inparamsmap.remove(pinfo.getSecondEntity());
+			}
+			else
+			{
+				todo.add(i);
+			}
+		}
+		
+		Iterator<String> innames = inparamsmap.keySet().iterator();
+		for(int i: todo)
+		{
+			Tuple2<String, String> pinfo = pinfos.getFirstEntity().get(i);
+			String inname = innames.hasNext()? innames.next(): null;
+			
+			if("no".equals(pinfo.getFirstEntity()) && inname!=null && inparamsmap.get(inname)!=null)
+			{
+				inparams[i] = inparamsmap.get(inname);
+			}
+		}
+		
+		/*for(int i = 0; i < inparams.length; i++)
+		{
+			if(inparams[i] instanceof String)
+				inparams[i] = convertParameter(sr, (String)inparams[i], types[i]);
+		}*/
+		
+		return inparams;
 	}
 
 	/**
@@ -2874,7 +2945,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	}
 
 	/**
-	 * 
+	 *  Get metainfo about parameters from the target method via annotations.
 	 */
 	public Tuple2<List<Tuple2<String, String>>, Map<String, Class<?>>> getParameterInfos(Method method)
 	{
@@ -2886,6 +2957,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		
 		for(int i=0; i<anns.length; i++)
 		{
+			boolean done = false;
 			for(Annotation ann: anns[i])
 			{
 				if(ann instanceof PathParam)
@@ -2894,13 +2966,17 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					String name = pp.value();
 					ret.add(new Tuple2<String, String>("path", name));
 					targettypes.put(name, types[i]);
-	            }
+					done = true;
+					break;
+				}
 				else if(ann instanceof QueryParam)
 				{
 					QueryParam qp = (QueryParam)ann;
 					String name = qp.value();
 					ret.add(new Tuple2<String, String>("query", name));
 					targettypes.put(name, types[i]);
+					done = true;
+					break;
 				}
 				else if(ann instanceof FormParam)
 				{
@@ -2908,22 +2984,26 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					String name = qp.value();
 					ret.add(new Tuple2<String, String>("form", name));
 					targettypes.put(name, types[i]);
+					done = true;
+					break;
 				}
 				else if(ann instanceof ParameterInfo)
 				{
-					QueryParam qp = (QueryParam)ann;
+					ParameterInfo qp = (ParameterInfo)ann;
 					String name = qp.value();
 					ret.add(new Tuple2<String, String>("name", name));
 					targettypes.put(name, types[i]);
+					done = true;
+					break;
 				}
-				else
+				/*else
 				{
 					String name = ""+i;
 					ret.add(new Tuple2<String, String>("no", name));
 					targettypes.put(name, types[i]);
-				}
+				}*/
 	        }
-			if(anns[i].length==0)
+			if(!done) //if(anns[i].length==0)
 			{
 				String name = ""+i;
 				ret.add(new Tuple2<String, String>("no", name));

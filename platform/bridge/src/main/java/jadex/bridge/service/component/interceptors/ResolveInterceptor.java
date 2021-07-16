@@ -5,6 +5,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -668,7 +669,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 					// base 64 case (problem could be normal string?!)
 					else if(SReflect.isSupertype(byte[].class, targetclass))
 					{
-						ret = Base64.decode(((String) value).toCharArray());
+						ret = Base64.decode(((String)value).toCharArray());
 					}
 				}
 				// Javascript only has float (no integer etc.)

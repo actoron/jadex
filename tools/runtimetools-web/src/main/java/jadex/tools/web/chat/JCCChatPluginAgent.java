@@ -3,6 +3,7 @@ package jadex.tools.web.chat;
 import java.util.Collection;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.chat.ChatEvent;
@@ -115,7 +116,7 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	 */
 	public IIntermediateFuture<IChatService> message(String text, IComponentIdentifier[] receivers, boolean self, IComponentIdentifier cid)
 	{
-		System.out.println("message: "+text);
+		//System.out.println("message: "+text);
 		return (IIntermediateFuture<IChatService>)getChatGuiService(cid).thenCompose(s -> s.message(text, receivers, self), IntermediateFuture.class);
 	}
 	
@@ -144,6 +145,12 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	public IFuture<String> getNickName(IComponentIdentifier cid)
 	{
 		return getChatService(cid).thenCompose(s -> s.getNickName());
+		/*Future<String> ret = new Future<>();
+		getChatService(cid).then(s -> 
+		{
+			s.getNickName().then(n -> {System.out.println("getNick in webjcc: "+n+" "+cid+" "+((IService)s).getServiceId().getProviderId()); ret.setResult(n);});
+		});
+		return ret;*/
 	}
 	
 	/**
@@ -175,13 +182,14 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	{
 		if(cid==null)
 			Thread.dumpStack();
-		if(cid==null || cid.hasSameRoot(cid))
+		if(cid==null || cid.hasSameRoot(getAgent().getId()))
 		{
-			return agent.searchService(new ServiceQuery<IChatGuiService>(IChatGuiService.class).setScope(ServiceScope.PLATFORM));
+			return getAgent().searchService(new ServiceQuery<IChatGuiService>(IChatGuiService.class).setScope(ServiceScope.PLATFORM));
 		}
 		else
 		{
-			return agent.searchService(new ServiceQuery<IChatGuiService>(IChatGuiService.class).setPlatform(cid).setScope(ServiceScope.NETWORK));
+			// IChatGuiService is only visible locally
+			return getAgent().searchService(new ServiceQuery<IChatGuiService>(IChatGuiService.class).setProvider(cid));
 		}
 	}
 	
@@ -194,13 +202,13 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	{
 		if(cid==null)
 			Thread.dumpStack();
-		if(cid==null || cid.hasSameRoot(cid))
+		if(cid==null || cid.hasSameRoot(getAgent().getId()))
 		{
-			return agent.searchService(new ServiceQuery<IChatService>(IChatService.class).setScope(ServiceScope.PLATFORM));
+			return getAgent().searchService(new ServiceQuery<IChatService>(IChatService.class).setScope(ServiceScope.PLATFORM));
 		}
 		else
 		{
-			return agent.searchService(new ServiceQuery<IChatService>(IChatService.class).setPlatform(cid).setScope(ServiceScope.NETWORK));
+			return getAgent().searchService(new ServiceQuery<IChatService>(IChatService.class).setProvider(cid));
 		}
 	}
 }

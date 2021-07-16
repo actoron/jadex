@@ -155,20 +155,20 @@ class ChatElement extends CidElement
 				if(event.type===0)
 				{
 					var cid = event.service.serviceIdentifier.providerId.name;
-					console.log("user added event: "+id);
+					//console.log("user added event: "+cid);
 					self.updateChatUser(cid);
 				}
 				else if(event.type===1)
 				{
 					var cid = event.service.providerId.name;
-					console.log("user removed: "+cid);
+					//console.log("user removed: "+cid);
 					self.setUserState(cid, false, false, false, ce.nick, ce.image?.__base64);
 				}
 			}
 			
 			// Update view after each event
 			self.requestUpdate();
-			console.log("users: "+self.users);
+			//console.log("users: "+self.users);
 		},
 		function(err)
 		{
@@ -286,7 +286,7 @@ class ChatElement extends CidElement
 		{
 			self.getImage(cid).then(img =>
 			{
-				//console.log("image is: "+img);
+				//console.log("image is: "+cu.cid+" "+img);
 				self.setUserState(cid, true, null, null, null, img);
 			}).catch(ex => console.log("ex: "+ex));
 		}
@@ -300,7 +300,7 @@ class ChatElement extends CidElement
 	
 	setUserState(cid, online, typing, away, nickname, image)
 	{
-		console.log("setUserState: "+cid+" "+online);
+		console.log("setUserState: "+cid+" "+online+" "+nickname);
 		if(cid==null)
 			throw new Exception("cid must not null");
 		
@@ -321,7 +321,7 @@ class ChatElement extends CidElement
 					
 			if(isdead)
 			{
-				this.users.remove(cid);
+				delete this.users[cid];
 			}
 			else
 			{
@@ -335,10 +335,12 @@ class ChatElement extends CidElement
 				}
 				if(nickname!=null)
 				{
+					//console.log("setting user nick: "+cid+" "+nickname);
 					cu.nick = nickname;
 				}
 				if(image!=null)
 				{
+					//console.log("setting user image: "+cid+" "+image);
 					cu.image = image;
 				}
 				if(isnew)
@@ -397,7 +399,7 @@ class ChatElement extends CidElement
 		{
 			axios.get(url, self.transform).then(function(resp)
 			{
-				console.log("setNickname called: "+nick);
+				//console.log("setNickname called: "+nick);
 				resolve(resp.data);
 			}).catch(ex => reject(ex));
 		});
@@ -419,6 +421,8 @@ class ChatElement extends CidElement
 			{
 				//console.log("getImage called: "+resp.data);
 				var imgstr = btoa(String.fromCharCode.apply(null, new Uint8Array(resp.data)));
+				if(imgstr!=null && imgstr.length==0)
+					imgstr = null;
 				resolve(resp.data!=null && resp.data.length==0? null: imgstr);
 			}).catch(ex => reject(ex));
 		});
@@ -484,6 +488,72 @@ class ChatElement extends CidElement
 				console.log("seluser: "+u.cid);
 			}
 		}
+	}
+	
+	resizeImage(file, max)
+	{
+		return new Promise(function(resolve, reject) 
+		{
+			if(!file.type.match(/image.*/)) 
+			{
+				reject("file is not an image: "+file.type);
+			}
+			else
+			{
+	        	console.log('An image has been selected');
+				if(max==null)
+					max = 50;
+		        // Load the image
+		        var reader = new FileReader();
+		        reader.onload = function(revent) 
+				{
+		        	var image = new Image();
+		            image.onload = function(ievent) 
+					{
+		                var canvas = document.createElement('canvas');
+		                var width = image.width;
+		                var height = image.height;
+
+						var fac = Math.max(width, height)/max;
+						if(fac>1)
+						{
+							width /= fac;
+							height /= fac; 
+						}
+		                canvas.width = width;
+		                canvas.height = height;
+		                canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+		                //var img = canvas.toDataURL(file.type);
+						canvas.toBlob(resolve, file.type);//, QUALITY);
+					}
+		            image.src = revent.target.result;
+		        }
+		        reader.readAsDataURL(file);
+			}
+		});
+	}
+	
+	uploadImage(e)
+	{
+		var ii = this.shadowRoot.getElementById("imageinput");
+		this.resizeImage(ii.files[0], 50).then(img =>
+		{
+			var fd = new FormData();
+			//fd.append('args_0', ii.files[0]);
+			fd.append('args_0', img);
+			fd.append('args_1', this.cid);
+			fd.append('argtypes_0', "byte[]");
+			fd.append('argtypes_1', "jadex.bridge.IComponentIdentifier");
+			
+			var url = this.getMethodPrefix()+'&methodname=setImage';
+			
+			//axios.post(url, {args_0: fd, args_1: this.cid}).then(function(resp)
+			axios.post(url, fd).then(function(resp)
+			{
+				console.log("setImage called: "+resp.data);
+				//self.createInfoMessage("Sent message "+resp.data); 
+			});
+		});
 	}
 	
 	/*tell(text)
@@ -563,6 +633,18 @@ class ChatElement extends CidElement
 		return ret;
 	}*/
 	
+	getPlatformName(cid)
+	{
+		var rootname = cid;
+		var idx;
+		if((idx = rootname.indexOf('@')) != -1)
+			rootname = rootname.substring(idx + 1);
+		if((idx = rootname.lastIndexOf(':')) != -1)
+			rootname = rootname.substring(idx + 1);
+		//console.log("platform name is: "+rootname+" "+cid);
+		return rootname;
+	}
+	
 	asyncRender() 
 	{
 		return html`
@@ -572,15 +654,16 @@ class ChatElement extends CidElement
 			<div id="users" class="yscrollable">
 				<table>
 				${this.getUsers().map((user) => html`
-				<tr @click="${e => this.setTo(user)}">
+				<tr>
 					<td>
-						<div class="grid-container2">
+						<div class="grid-container2" @click="${e => {if(this.getPlatformName(user.cid)===this.cid) this.shadowRoot.getElementById('imageinput').click(); }}">
 							<img class="grid-item-21" id="user" src="${user.image!=null? 'data:image/png;base64,'+user.image: this.userimage}"/>
 							<img class="grid-item-21" id="overlay" src="${user.away? this.overlay_away: user.typing? this.overlay_typing: user.sending? this.overlay_sending: ''}"/>
 						</div>
+						<input type="file" id="imageinput" style="display: none;" @change="${e => this.uploadImage(e)}" />
 					</td>
-					<td @click="${e => e.target.contentEditable=true}" 
-						@blur="${e => {e.target.contentEditable=false; console.log("enter"+e.keyCode+e.target.textContent); this.setNickName(e.target.textContent, user.cid);}}">${user.nick}</td>
+					<td @click="${e => {if(this.getPlatformName(user.cid)===this.cid) e.target.contentEditable=true;}}" 
+						@blur="${e => {e.target.contentEditable=false; this.setNickName(e.target.textContent, user.cid);}}">${user.nick}</td>
 					<td>[${user.cid}]</td>
 			    </tr>
 				`)}

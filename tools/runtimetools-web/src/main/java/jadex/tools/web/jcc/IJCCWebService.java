@@ -9,11 +9,16 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.FutureReturnType;
+import jadex.bridge.service.annotation.ParameterInfo;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.Value;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.extension.rs.invoke.annotation.ParameterMapper;
+import jadex.extension.rs.publish.annotation.ParametersMapper;
+import jadex.tools.web.jcc.JCCWebAgent.InvokeServiceMethodMapper;
 
 /**
  *  Interface for the web platform that is used as front controller for
@@ -58,8 +63,9 @@ public interface IJCCWebService
 	/**
 	 *  Invoke a Jadex service on the managed platform.
 	 */
-	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, 
-		String methodname, Object[] args, ClassInfo[] argtypes, @QueryParam("returntype") @FutureReturnType ClassInfo rettype);
+	@ParametersMapper(@Value(clazz=InvokeServiceMethodMapper.class))
+	public IFuture<Object> invokeServiceMethod(@ParameterInfo("cid") IComponentIdentifier cid, @ParameterInfo("servicetype") ClassInfo servicetype, 
+		@ParameterInfo("methodname") String methodname, @ParameterInfo("args") Object[] args, @ParameterInfo("argtypes") ClassInfo[] argtypes, @QueryParam("returntype") @FutureReturnType ClassInfo rettype);
 	
 	/**
 	 *  Check if a platform is available.

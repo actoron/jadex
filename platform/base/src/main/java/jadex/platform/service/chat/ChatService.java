@@ -470,6 +470,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	public IFuture<String> getNickName()
 	{
+		//System.out.println("getNickname: "+nick+" "+agent.getId());
 		return new Future<String>(nick);
 	}
 	

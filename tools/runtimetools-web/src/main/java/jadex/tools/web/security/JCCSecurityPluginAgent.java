@@ -81,7 +81,7 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	 */
 	protected IFuture<ISecurityService> getSecurityService(IComponentIdentifier cid)
 	{
-		if(cid==null || cid.hasSameRoot(cid))
+		if(cid==null || cid.hasSameRoot(getAgent().getId()))
 		{
 			return agent.getService(ISecurityService.class);
 		}
