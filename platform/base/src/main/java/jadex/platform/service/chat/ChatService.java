@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -41,6 +43,7 @@ import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
 import jadex.bridge.service.types.chat.TransferInfo;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
+import jadex.bridge.service.types.settings.IPlatformSettings;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Base64;
 import jadex.commons.IPropertiesProvider;
@@ -75,6 +78,9 @@ import jadex.commons.future.TerminationCommand;
 public class ChatService implements IChatService, IChatGuiService
 {
 	//-------- attributes --------
+	
+	/** Properties id for the settings service. */
+	public static final String PROPERTIES_ID = "chatservice";
 	
 	/** The agent. */
 	@ServiceComponent
@@ -129,7 +135,7 @@ public class ChatService implements IChatService, IChatGuiService
 			{
 				public void resultAvailable(ISettingsService settings)
 				{
-					if(!(agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave") instanceof Boolean)
+					/*if(!(agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave") instanceof Boolean)
 						|| !((Boolean)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave")).booleanValue())
 					{
 						settings.registerPropertiesProvider(getSubname(), pp)
@@ -148,9 +154,9 @@ public class ChatService implements IChatService, IChatGuiService
 						});
 					}
 					else
-					{
+					{*/
 						proceed();
-					}
+					//}
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -208,6 +214,8 @@ public class ChatService implements IChatService, IChatGuiService
 							publishEvent(ChatEvent.TYPE_USER, nick, agent.getId(), event, false, null);
 						}
 					}).catchEx(ex -> ex.printStackTrace());
+					
+					restoreSettings();
 					
 					ret.setResult(null);
 				}
@@ -276,7 +284,7 @@ public class ChatService implements IChatService, IChatGuiService
 				public void resultAvailable(ISettingsService settings)
 				{
 					// Settings can null during shutdown
-					if(settings!=null &&
+					/*if(settings!=null &&
 						(!(agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave") instanceof Boolean)
 						|| !((Boolean)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave")).booleanValue()))
 					{
@@ -290,9 +298,9 @@ public class ChatService implements IChatService, IChatGuiService
 						});
 					}
 					else
-					{
+					{*/
 						proceed();
-					}
+					//}
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -332,6 +340,46 @@ public class ChatService implements IChatService, IChatGuiService
 			
 			return ret;
 		}
+	}
+	
+	/**
+	 *  Loads the settings.
+	 */
+	protected void restoreSettings()
+	{
+		IPlatformSettings set = Starter.getPlatformSettings(agent.getId());
+		if(set != null)
+		{
+			try
+			{
+				Map<String, Object> props = (Map<String, Object>)set.loadState(PROPERTIES_ID);
+				String nick = (String)props.get("nick");
+				if(nick!=null)
+					this.nick = nick;
+				byte[] img = (byte[])props.get("image");
+				if(img!=null)
+					this.image = img;
+				status(null, null, new IComponentIdentifier[0]);
+			}
+			catch (Exception e)
+			{
+			}
+		}
+	}
+	
+	/**
+	 *  Saves the current settings.
+	 */
+	protected void saveSettings()
+	{
+		IPlatformSettings set = Starter.getPlatformSettings(agent.getId());
+		
+		Map<String, Object> settings = new HashMap<String, Object>();
+		
+		settings.put("nick", nick);
+		settings.put("image", image);
+		
+		set.saveState(PROPERTIES_ID, settings);
 	}
 
 	/**
@@ -462,6 +510,9 @@ public class ChatService implements IChatService, IChatGuiService
 		this.nick	= nick;
 		// Publish new nickname
 		status(null, null, new IComponentIdentifier[0]);
+		
+		saveSettings();
+		
 		return IFuture.DONE;
 	}
 	
@@ -482,6 +533,9 @@ public class ChatService implements IChatService, IChatGuiService
 		this.image = image;
 		// Publish new image
 		status(null, image, new IComponentIdentifier[0]);
+		
+		saveSettings();
+		
 		return IFuture.DONE;
 	}
 	

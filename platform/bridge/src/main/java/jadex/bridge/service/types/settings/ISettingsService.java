@@ -9,8 +9,12 @@ import jadex.commons.future.IFuture;
 /**
  *  This service allows storing and retrieving settings
  *  for specific components or services.
+ *  
+ *  use: Starter.getPlatformSettings() and IPlatformSettings.loadState/saveState
+ *  
  */
 @Service(system=true)
+@Deprecated
 public interface ISettingsService
 {
 	/**
