@@ -6,7 +6,8 @@ sourceSets.main.resources.srcDirs = ['src/main/java'];
 
 dependencies
 {
-	def jetty_version = "9.3.9.v20160517"
+	//def jetty_version = "9.3.9.v20160517"
+	def jetty_version = "11.0.6"
 
 	api project(':platform:webservice-websocket')
 	api project(':applications:webservice-websocket')
