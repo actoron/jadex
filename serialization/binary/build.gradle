@@ -8,5 +8,6 @@ dependencies
 	// Correct(?) way: (project dependency correctly interpreted by eclipse import as well as gradle build)
 	// currently broken in newer gradles :( >= 6.7 https://github.com/eclipse/buildship/issues/1035
 	// This now works in 7+
-	testImplementation project(':serialization:traverser').sourceSets.test.output
+	//testImplementation project(':serialization:traverser').sourceSets.test.output
+	testImplementation(testFixtures(project(':serialization:traverser')))
 }

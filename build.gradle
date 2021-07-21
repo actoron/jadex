@@ -272,6 +272,7 @@ subprojects
 
 
 		apply plugin: 'java-library'
+		apply plugin: 'java-test-fixtures'
 		if (isWebApplicationProject(project)) {
 			apply plugin: 'war'
 			artifacts {
