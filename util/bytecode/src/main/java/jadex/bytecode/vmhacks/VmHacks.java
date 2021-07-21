@@ -46,9 +46,7 @@ import jadex.bytecode.SASM;
 import jadex.bytecode.invocation.IMethodInvoker;
 import jadex.bytecode.invocation.SInvocation;
 import jadex.nativetools.NativeHelper;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import sun.misc.Unsafe;
 
 /**
  *  Class providing various means of getting around VM restrictions.
