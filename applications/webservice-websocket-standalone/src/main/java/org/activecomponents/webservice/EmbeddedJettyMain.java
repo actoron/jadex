@@ -8,8 +8,9 @@ import javax.websocket.server.ServerContainer;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
 
 
 /**
@@ -26,6 +27,9 @@ public class EmbeddedJettyMain
 		WebSocketInitListener init;
 		server.addConnector(connector);
 
+		//ServletContextHandler context = new ServletContextHandler();
+		//context.setContextPath("/");
+		
 		WebAppContext webapp = new WebAppContext();
 		webapp.setContextPath("/");
 		ClassLoader classLoader = EmbeddedJettyMain.class.getClassLoader();
@@ -93,7 +97,8 @@ public class EmbeddedJettyMain
 		try
 		{
 			// Initialize javax.websocket layer
-			ServerContainer wscontainer = WebSocketServerContainerInitializer.configureContext(webapp);
+			//ServerContainer wscontainer = JettyWebSocketServletContainerInitializer.configureContext(webapp);
+			JettyWebSocketServletContainerInitializer.configure(webapp, null);
 
 			server.start();
 			server.join();

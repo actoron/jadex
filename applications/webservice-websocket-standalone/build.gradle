@@ -17,13 +17,12 @@ dependencies
 	api 'org.eclipse.jetty:jetty-webapp:' + jetty_version
 	api 'org.eclipse.jetty:jetty-rewrite:' + jetty_version
 
-	api 'org.eclipse.jetty.websocket:websocket-server:' + jetty_version
-	api 'org.eclipse.jetty.websocket:websocket-api:' + jetty_version
-	api 'org.eclipse.jetty.websocket:websocket-client:' + jetty_version
+	api 'org.eclipse.jetty.websocket:websocket-jetty-server:' + jetty_version
+	api 'org.eclipse.jetty.websocket:websocket-jetty-api:' + jetty_version
+	api 'org.eclipse.jetty.websocket:websocket-jetty-client:' + jetty_version
 
-	api 'org.eclipse.jetty.websocket:javax-websocket-server-impl:' + jetty_version
+	api 'org.eclipse.jetty.websocket:websocket-jakarta-server:' + jetty_version
 }
-
 //war
 //{
 //	from('src/main/java') {
