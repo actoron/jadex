@@ -7,11 +7,12 @@ dependencies
 	api project(':platform:webservice')
 	api project(':util:bytecode');
 
-	api 'org.glassfish.grizzly:grizzly-http-servlet:2.3.22'
-	api 'org.glassfish.jersey.media:jersey-media-multipart:2.11'
-	api 'org.glassfish.grizzly:grizzly-http-server-multipart:2.3.16'
-	api 'org.glassfish.grizzly:grizzly-http-server:2.3.16'
-	api 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:2.11'
-	api 'org.glassfish.jersey.core:jersey-client:2.11'
-	api 'org.glassfish.jersey.media:jersey-media-moxy:2.11'
+	api 'org.glassfish.grizzly:grizzly-http-servlet:3.0.0'
+	api 'org.glassfish.jersey.media:jersey-media-multipart:3.0.2'
+	api 'org.glassfish.grizzly:grizzly-http-server-multipart:3.0.0'
+	api 'org.glassfish.grizzly:grizzly-http-server:3.0.0'
+	api 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.0.2'
+	api 'org.glassfish.jersey.core:jersey-client:3.0.2'
+	api 'org.glassfish.jersey.media:jersey-media-moxy:3.0.2'
+	api 'org.glassfish.hk2:hk2-api:3.0.2'
 }

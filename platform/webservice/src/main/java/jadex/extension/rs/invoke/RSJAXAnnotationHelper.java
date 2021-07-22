@@ -13,8 +13,8 @@ public class RSJAXAnnotationHelper
 	
 	private static Class<?>[] JAX_ANNOTATIONTYPES = new Class[] 
 	{
-		javax.ws.rs.GET.class, javax.ws.rs.POST.class, javax.ws.rs.PUT.class, 
-		javax.ws.rs.DELETE.class, javax.ws.rs.HEAD.class, javax.ws.rs.OPTIONS.class
+		jakarta.ws.rs.GET.class, jakarta.ws.rs.POST.class, jakarta.ws.rs.PUT.class, 
+		jakarta.ws.rs.DELETE.class, jakarta.ws.rs.HEAD.class, jakarta.ws.rs.OPTIONS.class
 	}; 
 	
 //	private Map<Class<?>,Annotation> jaxToJadexMap = new HashMap<Class<?>, Annotation>();

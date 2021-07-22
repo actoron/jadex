@@ -3,7 +3,7 @@ package jadex.webservice.examples.rs.hello;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import jadex.extension.rs.invoke.RestResponse;
 import jadex.extension.rs.publish.mapper.IValueMapper;

@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.QueryParam;
-
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -23,8 +21,6 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.FutureReturnType;
-import jadex.bridge.service.annotation.ParameterInfo;
-import jadex.bridge.service.annotation.Value;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
@@ -42,7 +38,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.extension.rs.invoke.annotation.ParameterMapper;
 import jadex.extension.rs.publish.mapper.IParameterMapper2;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;

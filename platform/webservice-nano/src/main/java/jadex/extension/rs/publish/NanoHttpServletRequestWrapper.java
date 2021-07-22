@@ -27,32 +27,32 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.AsyncEvent;
-import javax.servlet.AsyncListener;
-import javax.servlet.DispatcherType;
-import javax.servlet.Filter;
-import javax.servlet.FilterRegistration;
-import javax.servlet.FilterRegistration.Dynamic;
-import javax.servlet.ReadListener;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletRegistration;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.SessionCookieConfig;
-import javax.servlet.SessionTrackingMode;
-import javax.servlet.descriptor.JspConfigDescriptor;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionContext;
-import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.Part;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.AsyncEvent;
+import jakarta.servlet.AsyncListener;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterRegistration;
+import jakarta.servlet.FilterRegistration.Dynamic;
+import jakarta.servlet.ReadListener;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.SessionCookieConfig;
+import jakarta.servlet.SessionTrackingMode;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSessionContext;
+import jakarta.servlet.http.HttpUpgradeHandler;
+import jakarta.servlet.http.Part;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.CookieHandler;
@@ -1281,19 +1281,19 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 		}
 		
 		@Override
-		public javax.servlet.ServletRegistration.Dynamic addServlet(String servletName, Class< ? extends Servlet> servletClass)
+		public jakarta.servlet.ServletRegistration.Dynamic addServlet(String servletName, Class< ? extends Servlet> servletClass)
 		{
 			throw new UnsupportedOperationException();
 		}
 		
 		@Override
-		public javax.servlet.ServletRegistration.Dynamic addServlet(String servletName, Servlet servlet)
+		public jakarta.servlet.ServletRegistration.Dynamic addServlet(String servletName, Servlet servlet)
 		{
 			throw new UnsupportedOperationException();
 		}
 		
 		@Override
-		public javax.servlet.ServletRegistration.Dynamic addServlet(String servletName, String className)
+		public jakarta.servlet.ServletRegistration.Dynamic addServlet(String servletName, String className)
 		{
 			throw new UnsupportedOperationException();
 		}
@@ -1332,6 +1332,47 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 		public Dynamic addFilter(String filterName, String className)
 		{
 			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public int getSessionTimeout()
+		{
+			return 20;
+		}
+		
+		@Override
+		public String getResponseCharacterEncoding()
+		{
+			return "UTF-8";
+		}
+		
+		@Override
+		public String getRequestCharacterEncoding()
+		{
+			return "UTF-8";
+		}
+		
+		@Override
+		public jakarta.servlet.ServletRegistration.Dynamic addJspFile(
+				String servletName, String jspFile)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public void setRequestCharacterEncoding(String encoding)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public void setSessionTimeout(int sessionTimeout)
+		{
+		}
+		
+		@Override
+		public void setResponseCharacterEncoding(String encoding)
+		{
 		}
 	}
 	

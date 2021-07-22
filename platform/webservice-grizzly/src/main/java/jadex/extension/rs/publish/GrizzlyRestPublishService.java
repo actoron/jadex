@@ -5,9 +5,9 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.MultipartConfigElement;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.MultipartConfigElement;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import jadex.commons.SAccess;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;

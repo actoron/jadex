@@ -3,8 +3,6 @@ package jadex.tools.web.jcc;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.ws.rs.QueryParam;
-
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceIdentifier;
@@ -16,9 +14,9 @@ import jadex.bridge.service.annotation.Value;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.extension.rs.invoke.annotation.ParameterMapper;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.tools.web.jcc.JCCWebAgent.InvokeServiceMethodMapper;
+import jakarta.ws.rs.QueryParam;
 
 /**
  *  Interface for the web platform that is used as front controller for

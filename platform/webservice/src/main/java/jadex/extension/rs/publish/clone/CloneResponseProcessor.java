@@ -3,7 +3,7 @@ package jadex.extension.rs.publish.clone;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.SCloner;

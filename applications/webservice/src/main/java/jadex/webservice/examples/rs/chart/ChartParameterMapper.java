@@ -1,7 +1,7 @@
 package jadex.webservice.examples.rs.chart;
 
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import jadex.extension.rs.publish.mapper.IValueMapper;
 

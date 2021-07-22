@@ -5,11 +5,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.MultipartConfigElement;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
@@ -17,16 +12,12 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.server.session.DefaultSessionCache;
-import org.eclipse.jetty.server.session.NullSessionDataStore;
-import org.eclipse.jetty.server.session.SessionCache;
-import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.websocket.server.WebSocketHandler;
-import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
-import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
-import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
-import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
+import org.eclipse.jetty.websocket.core.server.WebSocketUpgradeHandler;
+import org.eclipse.jetty.websocket.server.JettyServerUpgradeRequest;
+import org.eclipse.jetty.websocket.server.JettyServerUpgradeResponse;
+import org.eclipse.jetty.websocket.server.JettyWebSocketCreator;
+import org.eclipse.jetty.websocket.server.JettyWebSocketServletFactory;
 
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -39,6 +30,10 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jakarta.servlet.MultipartConfigElement;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  *  Publish service without Jersey directly using Jetty container.
@@ -218,16 +213,17 @@ public class JettyRestPublishService extends AbstractRestPublishService
                 ServletContextHandler ch = new ServletContextHandler(ServletContextHandler.SESSIONS);
                 ch.setContextPath("/wswebapi");
                 ch.setAllowNullPathInfo(true); // disable redirect from /ws to /ws/
-                final WebSocketCreator wsc = new WebSocketCreator() 
+                final JettyWebSocketCreator wsc = new JettyWebSocketCreator() 
                 {
-                	public Object createWebSocket(ServletUpgradeRequest request, ServletUpgradeResponse response) 
+                	public Object createWebSocket(JettyServerUpgradeRequest request, JettyServerUpgradeResponse response) 
                 	{
                 		return new JettyWebsocketServer(component);
                 	}
                 };
-                Handler wsh = new WebSocketHandler() 
+                Handler wsh = new WebSocketUpgradeHandler() 
                 {
-                	public void configure(WebSocketServletFactory factory) 
+                	//public void configure(WebSocketServletFactory factory) 
+                	public void configure(JettyWebSocketServletFactory factory) 
                 	{
                 		factory.setCreator(wsc);
                 		//factory.register(RestWebSocket.class);

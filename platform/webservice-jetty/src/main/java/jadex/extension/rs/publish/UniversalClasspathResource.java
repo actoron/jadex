@@ -3,6 +3,7 @@ package jadex.extension.rs.publish;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.util.jar.JarFile;
@@ -60,6 +61,18 @@ public class UniversalClasspathResource extends Resource
 				url = getClass().getClassLoader().getResource("index.html");
 		}
 		return url;
+	}
+	
+	public URI getURI()
+	{
+		try
+		{
+			return getURL().toURI();
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 
 	public boolean isContainedIn(Resource r) throws java.net.MalformedURLException
