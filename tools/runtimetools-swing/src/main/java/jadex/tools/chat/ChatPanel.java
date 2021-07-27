@@ -1488,7 +1488,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		
 		usertable.repaint();
 
-		getService().message(text, recs, true).addResultListener(new SwingIntermediateDefaultResultListener<IChatService>()
+		getService().postMessage(text, recs, true).addResultListener(new SwingIntermediateDefaultResultListener<IChatService>()
 		{
 			public void customIntermediateResultAvailable(final IChatService chat)
 			{
@@ -1546,7 +1546,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			: away ? IChatService.STATE_AWAY : IChatService.STATE_IDLE;
 		
 		// Empty cid array for backwards compatibility.
-		getService().status(status, null, new IComponentIdentifier[0]).addResultListener(new IntermediateDefaultResultListener<IChatService>()
+		getService().postStatus(status, null, new IComponentIdentifier[0]).addResultListener(new IntermediateDefaultResultListener<IChatService>()
 		{
 			public void intermediateResultAvailable(final IChatService chat)
 			{

@@ -134,7 +134,7 @@ class PlatformElement extends CidElement
 
 		let self = this;
 		
-		console.log('?????????? Loading plugin ' + name + ' value is ' + this.plugins[name].unrestricted + ' i am loggedin ' + this.app.login.isLoggedIn());
+		//console.log('Loading plugin ' + name + ' value is ' + this.plugins[name].unrestricted + ' i am loggedin ' + this.app.login.isLoggedIn());
 		if(!this.plugins[name].unrestricted && !this.app.login.isLoggedIn())
 		{
 			let html = "<jadex-restricted></jadex-restricted>";
@@ -199,7 +199,7 @@ class PlatformElement extends CidElement
 				if(!component.startsWith('<'))
 				{
 					let funname = name + "pluginFragment";
-					console.log("Dynamically starting " + funname);
+					//console.log("Dynamically starting " + funname);
 					let componentfunc = new Function(component + "\n//# sourceURL=" + funname + "\n");
 					componentfunc();
 					resolve(component);
@@ -224,7 +224,7 @@ class PlatformElement extends CidElement
 		{
 			axios.get('webjcc/getPluginInfos?cid='+self.cid, self.transform).then(function(resp)
 			{
-				console.log("received: "+resp);	
+				//console.log("received: "+resp);	
 				
 				var pis = resp.data;
 				//console.log(map);
@@ -241,7 +241,7 @@ class PlatformElement extends CidElement
 						if(cnt==pis.length)
 						{
 							self.showPlugin2(self.getPlugins()[0].name);
-							console.log("loadPlugs show: "+self.getPlugins()[0].name);
+							//console.log("loadPlugs show: "+self.getPlugins()[0].name);
 						}
 					}
 				}

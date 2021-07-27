@@ -57,6 +57,13 @@ public interface IChatService
 	public IFuture<Void> message(String nick, String text, boolean privatemessage);
 	
 	/**
+	 *  Post an image.
+	 *  @param nick The sender's nick name.
+	 *  @param image The image.
+	 */
+	public IFuture<Void> image(String nick, byte[] image, boolean privatemessage);
+	
+	/**
 	 *  Post a status or nick name, or image change.
 	 *  @param nick The (possibly changed) nick name.
 	 *  @param status The new status or null for no change.

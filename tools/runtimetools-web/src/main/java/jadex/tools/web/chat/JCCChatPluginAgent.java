@@ -114,10 +114,23 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	 *  @param self Flag if message should also be sent to service itself.
 	 *  @return The remote services, to which the message was successfully posted.
 	 */
-	public IIntermediateFuture<IChatService> message(String text, IComponentIdentifier[] receivers, boolean self, IComponentIdentifier cid)
+	public IIntermediateFuture<IChatService> postMessage(String text, IComponentIdentifier[] receivers, boolean self, IComponentIdentifier cid)
 	{
 		//System.out.println("message: "+text);
-		return (IIntermediateFuture<IChatService>)getChatGuiService(cid).thenCompose(s -> s.message(text, receivers, self), IntermediateFuture.class);
+		return (IIntermediateFuture<IChatService>)getChatGuiService(cid).thenCompose(s -> s.postMessage(text, receivers, self), IntermediateFuture.class);
+	}
+	
+	/**
+	 *  Post an image.
+	 *  @param text The text message.
+	 *  @param receivers The receivers the message should be sent to.
+	 *  @param self Flag if message should also be sent to service itself.
+	 *  @return The remote services, to which the message was successfully posted.
+	 */
+	public IIntermediateFuture<IChatService> postImage(byte[] image, IComponentIdentifier[] receivers, boolean self, IComponentIdentifier cid)
+	{
+		//System.out.println("image: "+text);
+		return (IIntermediateFuture<IChatService>)getChatGuiService(cid).thenCompose(s -> s.postImage(image, receivers, self), IntermediateFuture.class);
 	}
 	
 	/**
@@ -126,9 +139,9 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	 *  @param image The new avatar image or null for no change.
 	 *  @param receivers The receivers.
 	 */
-	public IIntermediateFuture<IChatService> status(String status, byte[] image, IComponentIdentifier[] receivers, IComponentIdentifier cid)
+	public IIntermediateFuture<IChatService> postStatus(String status, byte[] image, IComponentIdentifier[] receivers, IComponentIdentifier cid)
 	{
-		return (IIntermediateFuture<IChatService>)getChatGuiService(cid).thenCompose(s -> s.status(status, image, receivers), IntermediateFuture.class);
+		return (IIntermediateFuture<IChatService>)getChatGuiService(cid).thenCompose(s -> s.postStatus(status, image, receivers), IntermediateFuture.class);
 	}
 
 	//-------- file handling --------

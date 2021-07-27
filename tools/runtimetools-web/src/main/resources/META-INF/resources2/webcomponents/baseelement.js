@@ -42,7 +42,7 @@ export class BaseElement extends LitElement
 		//console.log(typeof self.prototype.init);
 		self.preInit().then(() =>
 		{
-			console.log('checking for init function.... ' + typeof self.init + " " + self.constructor.name);
+			//console.log('checking for init function.... ' + typeof self.init + " " + self.constructor.name);
 			let initprom;
 			//if(name === 'cid' && newval!=null && typeof this.init === 'function')
 			if(typeof self.init === 'function')
@@ -102,7 +102,7 @@ export class BaseElement extends LitElement
 							self.loadStyle("/css/style.css")
 							.then(()=>{
 								
-								console.log("loaded all, requesting update...");
+								//console.log("loaded all, requesting update...");
 								resolv();
 								
 							})

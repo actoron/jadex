@@ -16,6 +16,9 @@ public class ChatEvent
 	/** Event type for a received message (value is message text). */
 	public static final String TYPE_MESSAGE = "message";
 	
+	/** Event type for a received image. */
+	public static final String TYPE_IMAGE = "image";
+	
 	/** Event type for a received file (value is file info, nick only available for initial file events). */
 	public static final String TYPE_FILE = "file";
 	

@@ -359,7 +359,7 @@ public class ChatService implements IChatService, IChatGuiService
 				byte[] img = (byte[])props.get("image");
 				if(img!=null)
 					this.image = img;
-				status(null, null, new IComponentIdentifier[0]);
+				postStatus(null, null, new IComponentIdentifier[0]);
 			}
 			catch (Exception e)
 			{
@@ -407,6 +407,17 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 //		System.out.println("Timeout: "+ServiceCall.getInstance().getTimeout()+", "+ServiceCall.getInstance().isRealtime());
 		boolean	published = publishEvent(ChatEvent.TYPE_MESSAGE, nick, ServiceCall.getCurrentInvocation().getCaller(), text, privatemessage, null);
+		return published ? IFuture.DONE : new Future<Void>(new RuntimeException("No GUI, message was discarded."));
+	}
+	
+	/**
+	 *  Post a message
+	 *  @param text The text message.
+	 */
+	public IFuture<Void> image(String nick, byte[] image, boolean privatemessage)
+	{
+//		System.out.println("Timeout: "+ServiceCall.getInstance().getTimeout()+", "+ServiceCall.getInstance().isRealtime());
+		boolean	published = publishEvent(ChatEvent.TYPE_IMAGE, nick, ServiceCall.getCurrentInvocation().getCaller(), image, privatemessage, null);
 		return published ? IFuture.DONE : new Future<Void>(new RuntimeException("No GUI, message was discarded."));
 	}
 
@@ -509,7 +520,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		this.nick	= nick;
 		// Publish new nickname
-		status(null, null, new IComponentIdentifier[0]);
+		postStatus(null, null, new IComponentIdentifier[0]);
 		
 		saveSettings();
 		
@@ -532,7 +543,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		this.image = image;
 		// Publish new image
-		status(null, image, new IComponentIdentifier[0]);
+		postStatus(null, image, new IComponentIdentifier[0]);
 		
 		saveSettings();
 		
@@ -570,7 +581,7 @@ public class ChatService implements IChatService, IChatGuiService
 		if(subscribers.size()==1)
 		{
 			// Set own status to idle after first gui connected
-			status(STATE_IDLE, null, (IComponentIdentifier[])null);
+			postStatus(STATE_IDLE, null, (IComponentIdentifier[])null);
 		}
 		
 		return ret;		
@@ -599,7 +610,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 *  @param text The text message.
 	 *  @return The remote services, to which the message was successfully posted.
 	 */
-	public IIntermediateFuture<IChatService> message(final String text, final IComponentIdentifier[] receivers, boolean self)
+	public IIntermediateFuture<IChatService> postThing(final Object thing, final IComponentIdentifier[] receivers, boolean self)
 	{
 		final IntermediateFuture<IChatService>	ret = (IntermediateFuture<IChatService>)SFuture.getNoTimeoutFuture(IntermediateFuture.class, agent);
 //		final IntermediateFuture<IChatService>	ret	= new IntermediateFuture<IChatService>();
@@ -637,7 +648,7 @@ public class ChatService implements IChatService, IChatGuiService
 			
 			for(int i=0; i<receivers.length; i++)
 			{
-				sendTo(text, receivers[i], true).addResultListener(new IResultListener<IChatService>()
+				sendTo(thing, receivers[i], true).addResultListener(new IResultListener<IChatService>()
 				{
 					public void resultAvailable(IChatService result)
 					{
@@ -654,7 +665,7 @@ public class ChatService implements IChatService, IChatGuiService
 			
 			if(self && !foundself)
 			{
-				sendTo(text, agent.getId(), true).addResultListener(new IResultListener<IChatService>()
+				sendTo(thing, agent.getId(), true).addResultListener(new IResultListener<IChatService>()
 				{
 					public void resultAvailable(IChatService result)
 					{
@@ -675,22 +686,46 @@ public class ChatService implements IChatService, IChatGuiService
 			cnt[0] = chatservices.size();
 			for(IChatService chat: chatservices)
 			{
-				chat.message(nick, text, false).addResultListener(new IResultListener<Void>()
+				if(thing instanceof String)
 				{
-					public void resultAvailable(Void result)
+					String text = (String)thing;
+					chat.message(nick, text, false).addResultListener(new IResultListener<Void>()
 					{
-						ret.addIntermediateResultIfUndone(chat);	// Might be called after concurrent exception in service search!
+						public void resultAvailable(Void result)
+						{
+							ret.addIntermediateResultIfUndone(chat);	// Might be called after concurrent exception in service search!
+							
+							if(--cnt[0]==0)
+								ret.setFinished();
+						}
 						
-						if(--cnt[0]==0)
-							ret.setFinished();
-					}
-					
-					public void exceptionOccurred(Exception exception)
+						public void exceptionOccurred(Exception exception)
+						{
+							if(--cnt[0]==0)
+								ret.setFinished();
+						}
+					});
+				}
+				else
+				{
+					byte[] image = (byte[])thing;
+					chat.image(nick, image, false).addResultListener(new IResultListener<Void>()
 					{
-						if(--cnt[0]==0)
-							ret.setFinished();
-					}
-				});
+						public void resultAvailable(Void result)
+						{
+							ret.addIntermediateResultIfUndone(chat);	// Might be called after concurrent exception in service search!
+							
+							if(--cnt[0]==0)
+								ret.setFinished();
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							if(--cnt[0]==0)
+								ret.setFinished();
+						}
+					});
+				}
 			}
 		}
 		
@@ -698,9 +733,32 @@ public class ChatService implements IChatService, IChatGuiService
 	}
 	
 	/**
+	 *  Post a message.
+	 *  Searches for available chat services and posts the message to all.
+	 *  @param text The text message.
+	 *  @return The remote services, to which the message was successfully posted.
+	 */
+	public IIntermediateFuture<IChatService> postMessage(final String text, final IComponentIdentifier[] receivers, boolean self)
+	{
+		return postThing(text, receivers, self);
+	}
+	
+	/**
+	 *  Post an image.
+	 *  @param image The image.
+	 *  @param receivers The receivers the message should be sent to.
+	 *  @param self Flag if message should also be sent to service itself.
+	 *  @return The remote services, to which the message was successfully posted.
+	 */
+	public IIntermediateFuture<IChatService> postImage(byte[] image, IComponentIdentifier[] receivers, boolean self)
+	{
+		return postThing(image, receivers, self);
+	}
+	
+	/**
 	 *  Helper method for sending message to cid.
 	 */
-	protected IFuture<IChatService> sendTo(final String text, IComponentIdentifier rec, final boolean privatemessage)
+	protected IFuture<IChatService> sendTo(final Object thing, IComponentIdentifier rec, final boolean privatemessage)
 	{
 		final Future<IChatService> ret = new Future<IChatService>();
 		
@@ -710,13 +768,28 @@ public class ChatService implements IChatService, IChatGuiService
 			public void customResultAvailable(final IChatService chat)
 			{
 //				ret.setResult(chat);
-				chat.message(nick, text, privatemessage).addResultListener(new ExceptionDelegationResultListener<Void, IChatService>(ret)
+				if(thing instanceof String)
 				{
-					public void customResultAvailable(Void result)
+					String text = (String)thing;
+					chat.message(nick, text, privatemessage).addResultListener(new ExceptionDelegationResultListener<Void, IChatService>(ret)
 					{
-						ret.setResult(chat);
-					}
-				});
+						public void customResultAvailable(Void result)
+						{
+							ret.setResult(chat);
+						}
+					});
+				}
+				else
+				{
+					byte[] image = (byte[])thing;
+					chat.image(nick, image, privatemessage).addResultListener(new ExceptionDelegationResultListener<Void, IChatService>(ret)
+					{
+						public void customResultAvailable(Void result)
+						{
+							ret.setResult(chat);
+						}
+					});
+				}
 			}
 			
 			@Override
@@ -735,7 +808,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 *  @param status The new status or null for no change.
 	 *  @param image The new avatar image or null for no change.
 	 */
-	public IIntermediateFuture<IChatService> status(final String status, final byte[] image, IComponentIdentifier[] receivers)
+	public IIntermediateFuture<IChatService> postStatus(final String status, final byte[] image, IComponentIdentifier[] receivers)
 	{
 		final IntermediateFuture<IChatService> ret = new IntermediateFuture<IChatService>();
 		if(status!=null)

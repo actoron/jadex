@@ -61,7 +61,7 @@ public class EchoChatAgent
 	@OnInit
 	public void	start()
 	{
-		chat.status(IChatService.STATE_IDLE, null, new IComponentIdentifier[0]);	// Change state from away to idle.
+		chat.postStatus(IChatService.STATE_IDLE, null, new IComponentIdentifier[0]);	// Change state from away to idle.
 		
 		chat.setNickName("Echo").get();
 
@@ -85,7 +85,7 @@ public class EchoChatAgent
 					s=s.trim();
 					if(s.length()>0)
 					{
-						chat.message(s, new IComponentIdentifier[]{event.getComponentIdentifier()}, true);
+						chat.postMessage(s, new IComponentIdentifier[]{event.getComponentIdentifier()}, true);
 					}
 				}
 			}

@@ -48,7 +48,7 @@ class ChatElement extends CidElement
 		this.shadowRoot.getElementById('msg').addEventListener('keyup', function onEvent(e) 
 		{
 			if(e.keyCode === 13)
-				self.sendMessage();
+				self.postMessage();
 		});
 		
 		var sheet = new CSSStyleSheet();
@@ -113,6 +113,12 @@ class ChatElement extends CidElement
 			{
 				console.log("message: "+ce.value);
 				self.addMessage(ce.componentIdentifier.name, ce.value, ce.nick, ce.privateMessage, false);
+			}
+			else if("image"===ce.type)
+			{
+				console.log("image: "+ce);
+				var url = 'data:image/png;base64,'+ce.value.__base64;
+				self.addMessage(ce.componentIdentifier.name, "<img src='"+url+"'></img>", ce.nick, ce.privateMessage, false);
 			}
 			else if("statechange"===ce.type)
 			{
@@ -209,12 +215,12 @@ class ChatElement extends CidElement
 		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype=jadex.tools.web.chat.IJCCChatService';
 	}
 	
-	sendMessage(e)
+	postMessage(e)
 	{
 		var self = this;
 		var msg = this.shadowRoot.getElementById("msg").value;
 		this.shadowRoot.getElementById("msg").value = "";
-		var url = this.getMethodPrefix()+'&methodname=message'+
+		var url = this.getMethodPrefix()+'&methodname=postMessage'+
 			'&args_0='+msg+"&argtypes_0=java.lang.String"+
 			'&args_1='+'null'+"&argtypes_1=jadex.bridge.IComponentIdentifier[]"+
 			'&args_2='+'false'+"&argtypes_2=boolean"+
@@ -257,7 +263,7 @@ class ChatElement extends CidElement
 		{
 			axios.get(url, self.transform).then(function(resp)
 			{
-				console.log("getUsers called: "+resp.data);
+				//console.log("getUsers called: "+resp.data);
 				resolve(resp.data);
 			}).catch(ex => reject(ex));
 		});
@@ -533,9 +539,11 @@ class ChatElement extends CidElement
 		});
 	}
 	
+	// Upload avatar image
 	uploadImage(e)
 	{
-		var ii = this.shadowRoot.getElementById("imageinput");
+		//var ii = this.shadowRoot.getElementById("imageinput");
+		var ii = e.target;
 		this.resizeImage(ii.files[0], 50).then(img =>
 		{
 			var fd = new FormData();
@@ -551,6 +559,41 @@ class ChatElement extends CidElement
 			axios.post(url, fd).then(function(resp)
 			{
 				console.log("setImage called: "+resp.data);
+				//self.createInfoMessage("Sent message "+resp.data); 
+			});
+		});
+	}
+	
+	// Upload chat image
+	uploadChatImage(e)
+	{
+		var self = this;
+		//var ii = this.shadowRoot.getElementById("imageinput");
+		var ii = e.target;
+		this.resizeImage(ii.files[0], 500).then(img =>
+		{
+			/* Preview code
+			var uc = window.URL || window.webkitURL;
+  	 		var url = uc.createObjectURL(img);
+			self.addMessage(ce.componentIdentifier.name, "<img src='"+url+"'></img>", ce.nick, ce.privateMessage, false);
+			*/
+			
+			var fd = new FormData();
+			fd.append('args_0', img);
+			fd.append('args_1', null);
+			fd.append('args_2', false);
+			fd.append('args_3', this.cid);
+			fd.append('argtypes_0', "byte[]");
+			fd.append('argtypes_1', "jadex.bridge.IComponentIdentifier[]");
+			fd.append('argtypes_2', "boolean");
+			fd.append('argtypes_3', "jadex.bridge.IComponentIdentifier");
+			
+			var url = this.getMethodPrefix()+'&methodname=postImage';
+			
+			//axios.post(url, {args_0: fd, args_1: this.cid}).then(function(resp)
+			axios.post(url, fd).then(function(resp)
+			{
+				console.log("postImage called: "+resp.data);
 				//self.createInfoMessage("Sent message "+resp.data); 
 			});
 		});
@@ -673,7 +716,9 @@ class ChatElement extends CidElement
 				<p id="to" @click="${e => this.setTo(null)}">To: All</p>
 				<input id="msg" type="text"></input>
 				<button id="emoji" class="jadexbtn" type="button">&#128512;</button>
-				<button class="jadexbtn" type="button" @click="${e => this.sendMessage(e)}">Send</button>
+				<input type="file" id="imageinput2" style="display: none;" @change="${e => this.uploadChatImage(e)}" />
+				<button id="file" class="jadexbtn" type="button" @click="${e => this.shadowRoot.getElementById('imageinput2').click()}">&#128206;</button>
+				<button class="jadexbtn" type="button" @click="${e => this.postMessage(e)}">Send</button>
 			</div>
 		</div>
 		`;
@@ -704,7 +749,7 @@ class ChatElement extends CidElement
 			}
 			.grid-container-inner {
 				display: grid;
-				grid-template-columns: minmax(min-content, max-content) auto minmax(min-content, max-content) minmax(min-content, max-content); 
+				grid-template-columns: minmax(min-content, max-content) auto minmax(min-content, max-content) minmax(min-content, max-content) minmax(min-content, max-content); 
 				grid-gap: 10px;
 			}
 			#to {

@@ -71,7 +71,7 @@ public class ElizaAgent
 		
 		chat.setNickName("Eliza").get();
 		// Status get() comes back when all receivers have acknowledge their receipt of the info :-(
-		chat.status(IChatService.STATE_IDLE, null, new IComponentIdentifier[0]);	// Change state from away to idle. 
+		chat.postStatus(IChatService.STATE_IDLE, null, new IComponentIdentifier[0]);	// Change state from away to idle. 
 		try
 		{
 			chat.setImage(new LazyResource(ElizaAgent.class, "images/eliza.png").getData()).get();
@@ -107,7 +107,7 @@ public class ElizaAgent
 						writeToLog(s, event.getComponentIdentifier());
 						while(!eliza.msg.isEmpty())
 						{
-							chat.message((String)eliza.msg.elementAt(0), new IComponentIdentifier[]{event.getComponentIdentifier()}, true);
+							chat.postMessage((String)eliza.msg.elementAt(0), new IComponentIdentifier[]{event.getComponentIdentifier()}, true);
 							writeToLog("> "+eliza.msg.elementAt(0), event.getComponentIdentifier());
 							eliza.msg.removeElementAt(0);
 						}
@@ -115,7 +115,7 @@ public class ElizaAgent
 					else if(s.toLowerCase().indexOf("eliza")!=-1)
 					{
 						writeToLog(s, event.getComponentIdentifier());
-						chat.message("Hi! I'm the famous Eliza program. Please tell me your problem in private.", new IComponentIdentifier[]{event.getComponentIdentifier()}, true);
+						chat.postMessage("Hi! I'm the famous Eliza program. Please tell me your problem in private.", new IComponentIdentifier[]{event.getComponentIdentifier()}, true);
 						writeToLog("> "+"Hi! I'm the famous Eliza program. Please tell me your problem in private.", event.getComponentIdentifier());
 					}
 				}

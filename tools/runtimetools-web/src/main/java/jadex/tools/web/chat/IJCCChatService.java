@@ -78,13 +78,22 @@ public interface IJCCChatService extends IJCCPluginService //,IChatGuiService
 	
 	/**
 	 *  Post a message.
-	 *  Searches for available chat services and posts the message to all.
 	 *  @param text The text message.
 	 *  @param receivers The receivers the message should be sent to.
 	 *  @param self Flag if message should also be sent to service itself.
 	 *  @return The remote services, to which the message was successfully posted.
 	 */
-	public IIntermediateFuture<IChatService> message(String text, IComponentIdentifier[] receivers, boolean self, IComponentIdentifier cid);
+	public IIntermediateFuture<IChatService> postMessage(String text, IComponentIdentifier[] receivers, boolean self, IComponentIdentifier cid);
+	
+	/**
+	 *  Post an image.
+	 *  @param text The text message.
+	 *  @param receivers The receivers the message should be sent to.
+	 *  @param self Flag if message should also be sent to service itself.
+	 *  @return The remote services, to which the message was successfully posted.
+	 */
+	public IIntermediateFuture<IChatService> postImage(byte[] image, IComponentIdentifier[] receivers, boolean self, IComponentIdentifier cid);
+
 	
 	/**
 	 *  Post a status change.
@@ -92,7 +101,7 @@ public interface IJCCChatService extends IJCCPluginService //,IChatGuiService
 	 *  @param image The new avatar image or null for no change.
 	 *  @param receivers The receivers.
 	 */
-	public IIntermediateFuture<IChatService> status(String status, byte[] image, IComponentIdentifier[] receivers, IComponentIdentifier cid);
+	public IIntermediateFuture<IChatService> postStatus(String status, byte[] image, IComponentIdentifier[] receivers, IComponentIdentifier cid);
 
 	//-------- file handling --------
 	

@@ -342,7 +342,7 @@ public class UpdateAgent implements IUpdateService
 			public void customResultAvailable(IChatGuiService chatser)
 			{
 				// Only wait 2 secs for sending status before continuing.
-				chatser.message(agent.getId().getName()+": "+text, null, true)
+				chatser.postMessage(agent.getId().getName()+": "+text, null, true)
 					.addResultListener(new TimeoutResultListener<Collection<IChatService>>(2000, agent.getExternalAccess(),
 					new IResultListener<Collection<IChatService>>()
 				{

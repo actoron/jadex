@@ -13,16 +13,16 @@ export class CidElement extends BaseElement
 		let self = this;
 		let preinitprom = super.preInit();
 		preinitprom.then(() => {
-			console.log("Resolving prinitnprom");
+			//console.log("Resolving prinitnprom");
 		});
 		let cidprom = new Promise((resolv, rejec) => 
 		{
-			console.log("Resolving CIDPROM " + self.constructor.name + " " + typeof resolv + " " + typeof rejec);
+			//console.log("Resolving CIDPROM " + self.constructor.name + " " + typeof resolv + " " + typeof rejec);
 			self.cidresolve = resolv;
 		});
 		let ret = Promise.all([cidprom,preinitprom]);
 		ret.then(() => {
-			console.log("ALL RESOVLED");
+			//console.log("ALL RESOVLED");
 		});
 		return ret;
 	}
