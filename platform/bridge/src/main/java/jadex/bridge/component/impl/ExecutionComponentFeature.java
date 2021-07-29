@@ -1511,21 +1511,25 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			
 			if(ex!=null)
 			{
+				// "Soft" cleanup using endagenda
 				if(ex instanceof StepAborted)
 				{
 					// Todo: plan for other uses of step aborted= -> step terminated exception in addition to step aborted error?
 					ex	= new ComponentTerminatedException(component.getId());
 					System.err.println(component.getId()+": step after termination: "+step);
 				}
+				
+				// Hard thread cleanup after endagenda is done
 				else if(ex instanceof ThreadDeath)
 				{
-					System.err.println("Thread death on component: "+component);
-					ex.printStackTrace();
+					getComponent().getLogger().info("Cleaning up blocked thread of terminated component: "+component
+						+ (Future.DEBUG ? "\n"+SUtil.getExceptionStacktrace(ex)	: ", "+ex));
 					
 					// Hard cleanup during kill.
 					resetExecutionState(cl);
 					throw (ThreadDeath)ex;
 				}
+				
 				step.getFuture().setExceptionIfUndone(ex instanceof Exception? (Exception)ex: new RuntimeException(ex));
 
 				// If no listener, print failed step to console for developer.
