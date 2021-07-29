@@ -7,7 +7,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
@@ -19,8 +18,19 @@ public interface IExternalExecutionFeature extends IExternalComponentFeature
 	/**
 	 *  Execute a component step.
 	 *  @param step The component step.
+	 *  @return the future result of the step execution.
 	 */
 	public <T> IFuture<T> scheduleStep(IComponentStep<T> step);
+	
+	/**
+	 *  Schedule a component step but don't wait for its execution.
+	 *  Scheduling a decoupled step is useful to indicate that exceptions in the
+	 *  step are not handled by the caller, e.g., to have them printed to the console instead of discarded.
+	 *  
+	 *  @param step The component step.
+	 *  @return A future indicating that the step has been scheduled (but maybe not yet executed).
+	 */
+	public IFuture<Void> scheduleDecoupledStep(IComponentStep<?> step);
 	
 	/**
 	 *  Execute a component step.

@@ -284,6 +284,25 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		return getComponent().getDescription();
 	}
 	
+	/**
+	 *  Schedule a component step but don't wait for its execution.
+	 *  Scheduling a decoupled step is useful to indicate that exceptions in the
+	 *  step are not handled by the caller, e.g., to have them printed to the console instead of discarded.
+	 *  @param step The component step.
+	 *  @return A future indicating that the step has been scheduled (but maybe not yet executed).
+	 */
+	public IFuture<Void> scheduleDecoupledStep(IComponentStep<?> step)
+	{
+		IFuture<?>	fut	= scheduleStep(step);
+		if(fut.getException()!=null)
+		{
+			return new Future<>(fut.getException());
+		}
+		else
+		{
+			return IFuture.DONE;
+		}
+	}
 	
 	/**
 	 *  Execute a component step.
