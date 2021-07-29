@@ -730,15 +730,15 @@ class ChatElement extends CidElement
 				${this.getUsers().map((user) => html`
 				<tr>
 					<td>
-						<div class="grid-container2" @click="${e => {if(this.getPlatformName(user.cid)===this.cid) this.shadowRoot.getElementById('imageinput').click(); }}">
+						<div class="grid-container2" @click="${e => {this.getPlatformName(user.cid)===this.cid? this.shadowRoot.getElementById('imageinput').click(): this.setTo(user);}}">
 							<img class="grid-item-21" id="user" src="${user.image!=null? 'data:image/png;base64,'+user.image: this.userimage}"/>
 							<img class="grid-item-21" id="overlay" src="${user.away? this.overlay_away: user.typing? this.overlay_typing: user.sending? this.overlay_sending: ''}"/>
 						</div>
 						<input type="file" id="imageinput" style="display: none;" @change="${e => this.uploadImage(e)}" />
 					</td>
-					<td @click="${e => {if(this.getPlatformName(user.cid)===this.cid) e.target.contentEditable=true;}}" 
+					<td @click="${e => {this.getPlatformName(user.cid)===this.cid? e.target.contentEditable=true: this.setTo(user);}}" 
 						@blur="${e => {e.target.contentEditable=false; this.setNickName(e.target.textContent, user.cid);}}">${user.nick}</td>
-					<td>[${user.cid}]</td>
+					<td @click="${e => {if(this.getPlatformName(user.cid)!==this.cid) this.setTo(user);}}">[${user.cid}]</td>
 			    </tr>
 				`)}
 				</table>
