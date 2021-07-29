@@ -57,7 +57,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //				if(sic.getMethod().getName().indexOf("getAllKnownNetworks")!=-1)
 //					System.out.println("decouplingret: "+sic.getArguments());
 				
-				final Object	res	= sic.getResult();
+				final Object res = sic.getResult();
 				
 				if(res instanceof IFuture)
 				{

@@ -118,7 +118,8 @@ public class ServiceCallPlan
 							public void resultAvailable(Object result)
 							{
 //								System.out.println("ires: "+mycnt);
-								mapper.handleServiceResult(reason, m, result, rplan);
+								ex = invokeMapper(reason, m, result, rplan);
+								//mapper.handleServiceResult(reason, m, result, rplan);
 								opencalls--;
 								proceed();
 							}
@@ -127,7 +128,8 @@ public class ServiceCallPlan
 							{
 //								System.out.println("iex: "+mycnt);
 								ex = exception;
-								mapper.handleServiceResult(reason, m, exception, rplan);
+								ex = invokeMapper(reason, m, exception, rplan);
+								//mapper.handleServiceResult(reason, m, exception, rplan);
 								opencalls--;
 								proceed();
 							}
@@ -137,7 +139,8 @@ public class ServiceCallPlan
 					}
 					else
 					{
-						mapper.handleServiceResult(reason, m, res, rplan);
+						ex = invokeMapper(reason, m, res, rplan);
+						//mapper.handleServiceResult(reason, m, res, rplan);
 						opencalls--;
 						proceed();
 					}
@@ -145,6 +148,7 @@ public class ServiceCallPlan
 				catch(Exception e)
 				{
 //					System.out.println("oex: "+mycnt);
+					ex = e;
 					opencalls--;
 					proceed();
 				}
@@ -195,4 +199,22 @@ public class ServiceCallPlan
 		
 		return ret;
 	}
+	
+	/**
+	 *  Invoke the handleResult of the mapper.
+	 */
+	public Exception invokeMapper(Object obj, Method m, Object result, RPlan plan)
+	{
+		Exception ret = null;
+		try
+		{
+			mapper.handleServiceResult(reason, m, result, rplan);
+		}
+		catch(Exception e)
+		{
+			ret = e;
+		}
+		return ret;
+	}
+	
 }
