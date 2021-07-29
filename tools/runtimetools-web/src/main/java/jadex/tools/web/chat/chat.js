@@ -17,6 +17,7 @@ class ChatElement extends CidElement
 		this.overlay_away = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/chat/images/overlay_away.png';
 		this.overlay_typing = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/chat/images/overlay_typing.png';
 		this.overlay_sending = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/chat/images/overlay_sending.png';
+		this.previewimages = [];
 		
 		var res1 ="jadex/tools/web/chat/libs/emojibutton/emojibutton.js";
 		var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
@@ -564,38 +565,68 @@ class ChatElement extends CidElement
 		});
 	}
 	
-	// Upload chat image
-	uploadChatImage(e)
+	addPreviewImage(e)
 	{
 		var self = this;
 		//var ii = this.shadowRoot.getElementById("imageinput");
 		var ii = e.target;
+				
 		this.resizeImage(ii.files[0], 500).then(img =>
 		{
-			/* Preview code
+			///* Preview code
 			var uc = window.URL || window.webkitURL;
   	 		var url = uc.createObjectURL(img);
-			self.addMessage(ce.componentIdentifier.name, "<img src='"+url+"'></img>", ce.nick, ce.privateMessage, false);
-			*/
-			
-			var fd = new FormData();
-			fd.append('args_0', img);
-			fd.append('args_1', null);
-			fd.append('args_2', false);
-			fd.append('args_3', this.cid);
-			fd.append('argtypes_0', "byte[]");
-			fd.append('argtypes_1', "jadex.bridge.IComponentIdentifier[]");
-			fd.append('argtypes_2', "boolean");
-			fd.append('argtypes_3', "jadex.bridge.IComponentIdentifier");
-			
-			var url = this.getMethodPrefix()+'&methodname=postImage';
-			
-			//axios.post(url, {args_0: fd, args_1: this.cid}).then(function(resp)
-			axios.post(url, fd).then(function(resp)
+			//self.addMessage(ce.componentIdentifier.name, "<img src='"+url+"'></img>", ce.nick, ce.privateMessage, false);
+			ii.files[0].url = url;
+			ii.files[0].image = img;
+			this.previewimages.push(ii.files[0]);
+			this.requestUpdate();
+		});
+	}
+	
+	removePreviewImage(image)
+	{
+		var ret = false;
+		for(var i=0; i<this.previewimages.length; i++)
+		{
+			if(image===this.previewimages[i])
 			{
-				console.log("postImage called: "+resp.data);
-				//self.createInfoMessage("Sent message "+resp.data); 
-			});
+				this.previewimages.splice(i, 1);
+				ret = true;
+				break;
+			}
+		}
+		return ret;
+	}
+	
+	postPreviewImages()
+	{
+		for(var file of this.previewimages)
+		{
+			this.postImage(file.image);
+		}
+		this.previewimages.length = 0; // clear the array
+	}
+	
+	postImage(img)
+	{
+		var fd = new FormData();
+		fd.append('args_0', img);
+		fd.append('args_1', null);
+		fd.append('args_2', false);
+		fd.append('args_3', this.cid);
+		fd.append('argtypes_0', "byte[]");
+		fd.append('argtypes_1', "jadex.bridge.IComponentIdentifier[]");
+		fd.append('argtypes_2', "boolean");
+		fd.append('argtypes_3', "jadex.bridge.IComponentIdentifier");
+		
+		var url = this.getMethodPrefix()+'&methodname=postImage';
+		
+		//axios.post(url, {args_0: fd, args_1: this.cid}).then(function(resp)
+		axios.post(url, fd).then(function(resp)
+		{
+			console.log("postImage called: "+resp.data);
+			//self.createInfoMessage("Sent message "+resp.data); 
 		});
 	}
 	
@@ -716,9 +747,21 @@ class ChatElement extends CidElement
 				<p id="to" @click="${e => this.setTo(null)}">To: All</p>
 				<input id="msg" type="text"></input>
 				<button id="emoji" class="jadexbtn" type="button">&#128512;</button>
-				<input type="file" id="imageinput2" style="display: none;" @change="${e => this.uploadChatImage(e)}" />
+				<input type="file" id="imageinput2" style="display: none;" @change="${e => this.addPreviewImage(e)}" />
 				<button id="file" class="jadexbtn" type="button" @click="${e => this.shadowRoot.getElementById('imageinput2').click()}">&#128206;</button>
-				<button class="jadexbtn" type="button" @click="${e => this.postMessage(e)}">Send</button>
+				<button class="jadexbtn" type="button" @click="${e => {this.postMessage(e); this.postPreviewImages();}}">Send</button>
+				<div id="imagepreview" class="previews-element previews-container ${this.previewimages.length>0? '': 'hidden'}">
+				${this.previewimages.map((image) => html`
+					<div class="preview-element">
+						<img class="h100px" src="${image.url}"/>
+						<div class="preview-textbox">
+							<div class="bold">${image.name}</div> 
+							<div>${Math.ceil(image.size/1024)+" KB"}</div>
+						</div>
+						<div class="close relative" @click="${e => {this.removePreviewImage(image); this.requestUpdate();}}"></div>
+					</div>
+				`)}
+				</div>
 			</div>
 		</div>
 		`;
@@ -771,11 +814,44 @@ class ChatElement extends CidElement
 				grid-template-columns: 1fr; 
 			}
 			.grid-item-21 {
-				grid-area: 1 / 1 / 2 / 2;
+				grid-area: 1 / 1 / 1 / 2;
+			}
+			.previews-element {
+				grid-area: 2 / 1 / 2 / 6;
+			}
+			.previews-container {
+				display: flex;
+				flex-shrink: 0;
+				flex-wrap: wrap;
+				margin: 1px 0 5px;
+				overflow-x: auto;
+				overflow-y: hidden;
+				white-space: nowrap;
+			}
+			.preview-textbox {
+				display: flex;
+  				align-content: center;
+				justify-content: center;
+  				flex-direction: column;
+				margin-left: 5px;
+			}
+			.preview-element {
+				display: flex;
+				flex-shrink: 0;
+				flex-wrap: nowrap;
+				margin: 0 10px 10px 0; 
+				border: 1px black dotted;
+				padding: 2px;
 			}
 			.aligncenter {
 				display: flex;
 				align-items: center;
+			}
+			.w100px {
+				width: 100px;
+			}
+			.h100px {
+				height: 100px;
 			}
 		    `);
 		return ret;

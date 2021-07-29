@@ -1214,7 +1214,7 @@ class ComponentTree extends BaseElement
 				</div>
 			</div>	
 			<div id="details" class="dragable ${this.info!=null? 'visible': 'hidden'}">
-				<div class="close" @click="${e => {this.info=null; this.requestUpdate();}}"></div>
+				<div class="close absolute" @click="${e => {this.info=null; this.requestUpdate();}}"></div>
 				<div>
 					<h4>${this.info!=null? this.info.heading: ""}</h4>
 				</div>
