@@ -301,7 +301,7 @@ subprojects
 
         sourceSets.test.resources.srcDirs    testSrcDir
 		sourceSets.test.resources.includes   ["**/*"]
-		sourceSets.test.resources.includes   ["**/*.java"]
+		sourceSets.test.resources.excludes   ["**/*.java"]
 
         dependencies
         {
