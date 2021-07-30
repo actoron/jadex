@@ -367,6 +367,7 @@ public class Traverser
 //				IStringObjectConverter conv = BasicTypeConverter.CONVERTERS.getStringConverter(targetclazz);
 
 				if(converter==null)
+				{
 					converter = new IStringConverter()
 					{
 						@Override
@@ -386,7 +387,7 @@ public class Traverser
 						{
 							try
 							{
-								return BasicTypeConverter.getBasicStringConverter(type).convertString(val, context);
+								return BasicTypeConverter.getBasicStringConverter(type)!=null? BasicTypeConverter.getBasicStringConverter(type).convertString(val, context): val;
 							}
 							catch(Exception e)
 							{
@@ -398,9 +399,10 @@ public class Traverser
 						@Override
 						public String convertObject(Object val, Class<?> type, ClassLoader cl, Object context)
 						{
-							return BasicTypeConverter.getBasicObjectConverter(type).convertObject(val, context);
+							return BasicTypeConverter.getBasicObjectConverter(type)!=null? BasicTypeConverter.getBasicObjectConverter(type).convertObject(val, context): ""+val;
 						}
 					};
+				}
 				
 				if(converter!=null)
 				{
