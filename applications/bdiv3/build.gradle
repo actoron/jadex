@@ -2,6 +2,7 @@ description 'The Jadex BDI V3 applications package contains several example appl
 
 // Test ASM with different versions -> add extra compile/test tasks for each desired java version
 ['8', '11'].each { version ->
+	// Compile main and test classes into combined custom output dir
 	def compileJavaX	= task "compileJava$version"(type: JavaCompile) {
 		sourceCompatibility = version
 		targetCompatibility = version
@@ -9,9 +10,11 @@ description 'The Jadex BDI V3 applications package contains several example appl
 		classpath = sourceSets.main.compileClasspath
 		destinationDirectory = new File(project.buildDir, "classesJava$version")
 	}
+	// Run tests with custom classes dir
 	def testJavaX	= task "testJava$version"(type: Test) {
-		classpath = sourceSets.test.compileClasspath + project.files(compileJavaX.destinationDirectory)
+		classpath = sourceSets.test.compileClasspath + project.files(compileJavaX.destinationDirectory) + project.files(processResources.destinationDir) + project.files(processTestResources.destinationDir)
 		maxParallelForks = test.maxParallelForks
+		dependsOn compileJavaX, processResources, processTestResources
 	}
 	test.dependsOn testJavaX
 }
