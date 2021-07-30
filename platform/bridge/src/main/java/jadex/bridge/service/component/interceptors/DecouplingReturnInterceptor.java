@@ -80,66 +80,57 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							}
 							else
 							{
-								try
+								final Exception ex	= Future.DEBUG ? new DebugException() : null;									
+								caller.getFeature(IExecutionFeature.class).scheduleDecoupledStep(new IComponentStep<Void>()
+//								caller.getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()	// immediate was required for return of monitoring event component disposed. disabled waiting for last monitoring event instead. 
 								{
-									final Exception ex	= Future.DEBUG ? new DebugException() : null;									
-									caller.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-//									caller.getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()	// immediate was required for return of monitoring event component disposed. disabled waiting for last monitoring event instead. 
+									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										public IFuture<Void> execute(IInternalAccess ia)
+										if(ex!=null)
 										{
-											if(ex!=null)
+											try
 											{
-												try
-												{
-													DebugException.ADDITIONAL.set(ex);
-													com.execute(args);
-													return IFuture.DONE;
-												}
-												finally
-												{
-													DebugException.ADDITIONAL.set(null);									
-												}
-											}
-											else
-											{
+												DebugException.ADDITIONAL.set(ex);
 												com.execute(args);
 												return IFuture.DONE;
 											}
-										}
-									}).addResultListener(new IResultListener<Void>()
-									{
-										public void resultAvailable(Void result) {}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-											if(exception instanceof ComponentTerminatedException)
+											finally
 											{
-												// pass exception back to future as receiver is already dead.
-												if(res instanceof ITerminableFuture<?>)
-												{
-													((ITerminableFuture<?>)res).terminate(exception);
-												}
-												else
-												{
-													getLogger().warning("Future receiver already dead: "+exception+", "+com+", "+res);
-												}
+												DebugException.ADDITIONAL.set(null);									
+											}
+										}
+										else
+										{
+											com.execute(args);
+											return IFuture.DONE;
+										}
+									}
+								}).addResultListener(new IResultListener<Void>()
+								{
+									public void resultAvailable(Void result) {}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										if(exception instanceof ComponentTerminatedException)
+										{
+											// pass exception back to future as receiver is already dead.
+											if(res instanceof ITerminableFuture<?>)
+											{
+												((ITerminableFuture<?>)res).terminate(exception);
 											}
 											else
 											{
-												// shouldn't happen?
-												System.err.println("Unexpected Exception"+", "+com);
-												exception.printStackTrace();
+												getLogger().warning("Future receiver already dead: "+exception+", "+com+", "+res);
 											}
 										}
-									});
-								}
-								catch(Exception e)
-								{
-									// shouldn't happen?
-									System.err.println("Unexpected Exception");
-									e.printStackTrace();
-								}
+										else
+										{
+											// shouldn't happen?
+											System.err.println("Unexpected Exception"+", "+com);
+											exception.printStackTrace();
+										}
+									}
+								});
 							}
 						}
 					};

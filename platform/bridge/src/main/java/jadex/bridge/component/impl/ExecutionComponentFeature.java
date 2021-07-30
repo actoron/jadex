@@ -284,6 +284,25 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		return getComponent().getDescription();
 	}
 	
+	/**
+	 *  Schedule a component step but don't wait for its execution.
+	 *  Scheduling a decoupled step is useful to indicate that exceptions in the
+	 *  step are not handled by the caller, e.g., to have them printed to the console instead of discarded.
+	 *  @param step The component step.
+	 *  @return A future indicating that the step has been scheduled (but maybe not yet executed).
+	 */
+	public IFuture<Void> scheduleDecoupledStep(IComponentStep<?> step)
+	{
+		IFuture<?>	fut	= scheduleStep(step);
+		if(fut.getException()!=null)
+		{
+			return new Future<>(fut.getException());
+		}
+		else
+		{
+			return IFuture.DONE;
+		}
+	}
 	
 	/**
 	 *  Execute a component step.
@@ -1492,21 +1511,25 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			
 			if(ex!=null)
 			{
+				// "Soft" cleanup using endagenda
 				if(ex instanceof StepAborted)
 				{
 					// Todo: plan for other uses of step aborted= -> step terminated exception in addition to step aborted error?
 					ex	= new ComponentTerminatedException(component.getId());
 					System.err.println(component.getId()+": step after termination: "+step);
 				}
+				
+				// Hard thread cleanup after endagenda is done
 				else if(ex instanceof ThreadDeath)
 				{
-					System.err.println("Thread death on component: "+component);
-					ex.printStackTrace();
+					getComponent().getLogger().info("Cleaning up blocked thread of terminated component: "+component
+						+ (Future.DEBUG ? "\n"+SUtil.getExceptionStacktrace(ex)	: ", "+ex));
 					
 					// Hard cleanup during kill.
 					resetExecutionState(cl);
 					throw (ThreadDeath)ex;
 				}
+				
 				step.getFuture().setExceptionIfUndone(ex instanceof Exception? (Exception)ex: new RuntimeException(ex));
 
 				// If no listener, print failed step to console for developer.
