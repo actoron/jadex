@@ -296,12 +296,7 @@ subprojects
         compileJava.options.encoding = 'UTF-8'
         // include all resources that are placed inside src dirs
         sourceSets.main.resources.srcDirs    mainSrcDir
-		sourceSets.main.resources.includes   ["**/*"]
-		sourceSets.main.resources.excludes   ["**/*.java"]
-
         sourceSets.test.resources.srcDirs    testSrcDir
-		sourceSets.test.resources.includes   ["**/*"]
-		sourceSets.test.resources.excludes   ["**/*.java"]
 
         dependencies
         {
