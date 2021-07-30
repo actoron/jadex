@@ -15,6 +15,7 @@ import com.sun.jna.NativeLibrary;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
+import com.sun.tools.attach.VirtualMachine;
 
 /**
  *  Helper class using JNA to provide native features.
@@ -245,11 +246,19 @@ public final class NativeHelper
 		boolean ret = false;
 		try
 		{
+			/*long pid = ProcessHandle.current().pid();
+			VirtualMachine vm = VirtualMachine.attach(Long.toString(pid));
+			vm.loadAgent(jarfile);
+			vm.detach();*/
+			
+			/*System.loadLibrary("instrument");
 			Function fun = NativeLibrary.getInstance("instrument").getFunction("Agent_OnAttach");
-			ret = fun.invokeInt(new Object[] { javavm, jarfile, Pointer.NULL }) == 0;
+			//ret = fun.invokeInt(new Object[] { javavm, jarfile, Pointer.NULL }) == 0;
+			ret = fun.invokeInt(new Object[] { getJavaVm(), jarfile, Pointer.NULL }) == 0;*/
 		}
 		catch (Throwable e)
 		{
+			e.printStackTrace();
 		}
 		return ret;
 	}
