@@ -5,6 +5,7 @@ import java.util.List;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.BeanIntrospectorFactory;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -45,10 +46,10 @@ public class SimpleDateFormatCodec extends BeanCodec
 	 */
 	@Override
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors,
-			List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl,
+			List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, Traverser traverser, ClassLoader targetcl,
 			IEncodingContext ec)
 	{
-		super.encode(object, clazz, preprocessors, processors, mode, traverser, targetcl, ec);
+		super.encode(object, clazz, preprocessors, processors, converter, mode, traverser, targetcl, ec);
 		ec.writeString(((SimpleDateFormat)object).toPattern());
 		return object;
 	}

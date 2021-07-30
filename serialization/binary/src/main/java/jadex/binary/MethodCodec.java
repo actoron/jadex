@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -56,13 +57,13 @@ public class MethodCodec
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		Method method = (Method) object;
 		ec.writeClass(method.getDeclaringClass());
 		ec.writeString(method.getName());
 		Class<?>[] params = method.getParameterTypes();
-		traverser.doTraverse(params, params.getClass(), preprocessors, processors, null, null, ec);
+		traverser.doTraverse(params, params.getClass(), preprocessors, processors, converter, mode, null, ec);
 		
 		return object;
 	}

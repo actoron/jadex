@@ -8,6 +8,7 @@ import java.util.Map;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.BeanIntrospectorFactory;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
@@ -49,7 +50,7 @@ public class BeanProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 //		System.out.println("fp: "+object);
 		Class<?> clazz = SReflect.getClass(type);
@@ -61,7 +62,7 @@ public class BeanProcessor implements ITraverseProcessor
 //			System.out.println("cloned: "+object.getClass());
 //			ret = object.getClass().newInstance();
 			
-			traverseProperties(object, conversionprocessors, processors, mode, traverser, targetcl, ret, context);
+			traverseProperties(object, conversionprocessors, processors, converter, mode, traverser, targetcl, ret, context);
 		}
 		catch(Exception e)
 		{
@@ -74,7 +75,7 @@ public class BeanProcessor implements ITraverseProcessor
 	/**
 	 *  Clone all properties of an object.
 	 */
-	protected void traverseProperties(Object object, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, Object ret, Object context)
+	protected void traverseProperties(Object object, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, Traverser traverser, ClassLoader targetcl, Object ret, Object context)
 	{
 		Class clazz = object.getClass();
 			
@@ -95,7 +96,7 @@ public class BeanProcessor implements ITraverseProcessor
 						Object val = prop.getPropertyValue(object);//getGetter().invoke(object, new Object[0]);
 						if(val!=null) 
 						{
-							Object newval = traverser.doTraverse(val, prop.getType(), conversionprocessors, processors, mode, targetcl, context);
+							Object newval = traverser.doTraverse(val, prop.getType(), conversionprocessors, processors, converter, mode, targetcl, context);
 							if(newval != Traverser.IGNORE_RESULT && (object!=ret || val!=newval))
 								prop.setPropertyValue(ret, newval);
 	//							prop.getSetter().invoke(ret, new Object[]{newval});

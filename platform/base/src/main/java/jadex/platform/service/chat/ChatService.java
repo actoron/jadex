@@ -663,6 +663,7 @@ public class ChatService implements IChatService, IChatGuiService
 				});
 			}
 			
+			// Send only extra when not included in recs
 			if(self && !foundself)
 			{
 				sendTo(thing, agent.getId(), true).addResultListener(new IResultListener<IChatService>()

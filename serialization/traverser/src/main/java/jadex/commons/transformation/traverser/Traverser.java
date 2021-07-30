@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.transformation.BasicTypeConverter;
+import jadex.commons.transformation.IStringConverter;
 
 /**
  *  The traverser allows to traverse an object graph deeply.
@@ -152,7 +155,7 @@ public class Traverser
 	 */
 	public static Object traverseObject(Object object, Class<?> clazz, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, Object context)
 	{
-		return traverseObject(object, clazz, conversionprocessors, processors, mode, null, context);
+		return traverseObject(object, clazz, conversionprocessors, processors, null, mode, null, context);
 	}
 	
 	/**
@@ -163,7 +166,7 @@ public class Traverser
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The traversed (or modified) object.
 	 */
-	public static Object traverseObject(Object object, Class<?> clazz, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors,  MODE mode, ClassLoader targetcl, Object context)
+	public static Object traverseObject(Object object, Class<?> clazz, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors,  IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 //		if(clone && object!=null && object.getClass().getName().indexOf("Not")!=-1)
 //			System.out.println("Cloning: "+object);
@@ -177,7 +180,7 @@ public class Traverser
 		try
 		{
 			// Must be identity hash map because otherwise empty collections will equal
-			ret = getInstance().traverse(object, clazz, conversionprocessors, processors, mode, targetcl, context);
+			ret = getInstance().traverse(object, clazz, conversionprocessors, processors, converter, mode, targetcl, context);
 		}
 		catch(RuntimeException e)
 		{
@@ -198,12 +201,12 @@ public class Traverser
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object traverse(Object object, Type clazz, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object traverse(Object object, Type clazz, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{	
 		if(processors == null)
 			processors = getDefaultProcessors();
 		
-		Object obj = doTraverse(object, clazz, conversionprocessors, processors, mode, targetcl, context);
+		Object obj = doTraverse(object, clazz, conversionprocessors, processors, converter, mode, targetcl, context);
 		if(obj == IGNORE_RESULT)
 			obj = null;
 		
@@ -220,7 +223,7 @@ public class Traverser
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object doTraverse(Object object, Type type, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object doTraverse(Object object, Type type, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 		if(mode == null)
 			throw new IllegalArgumentException("MODE IS NULL");
@@ -237,7 +240,7 @@ public class Traverser
 					if (preprocessor.isApplicable(object, type, targetcl, context))
 					{
 						usedconvproc = preprocessor;
-						object = preprocessor.process(object, type, this, conversionprocessors, processors, mode, targetcl, context);
+						object = preprocessor.process(object, type, this, conversionprocessors, processors, converter, mode, targetcl, context);
 						break;
 					}
 				}
@@ -274,7 +277,7 @@ public class Traverser
 	//					if(object.getClass().getName().indexOf("awt")!=-1)
 	//						System.out.println("traverse: "+object+" "+proc.getClass());
 						usedproc = proc;
-						processed = proc.process(processed, clazz, this, conversionprocessors, processors, mode, targetcl, context);
+						processed = proc.process(processed, clazz, this, conversionprocessors, processors, converter, mode, targetcl, context);
 						ret	= processed;
 						break;
 						//processorcache.put(clazz, proc);
@@ -295,7 +298,7 @@ public class Traverser
 					if (postprocessor.isApplicable(ret, ret!=null?ret.getClass():clazz, targetcl, context))
 					{
 						usedconvproc = postprocessor;
-						ret = postprocessor.process(ret,  ret!=null?ret.getClass():clazz, this, conversionprocessors, processors, mode, targetcl, context);
+						ret = postprocessor.process(ret,  ret!=null?ret.getClass():clazz, this, conversionprocessors, processors, converter, mode, targetcl, context);
 						break;
 					}
 				}
@@ -345,6 +348,94 @@ public class Traverser
 	 */
 	public void finalizeProcessing(Object inputobject, Object outputobject, ITraverseProcessor convproc, ITraverseProcessor proc, Object context)
 	{
+	}
+	
+	/**
+	 *  Convert a basic type.
+	 *  @param value The value.
+	 *  @param targetclazz The target class.
+	 *  @return The converted value.
+	 */
+	public static Object convertBasicType(IStringConverter converter, Object value, Class<?> targetclazz, ClassLoader cl, Object context)
+	{
+		if(value!=null && !SReflect.isSupertype(targetclazz, value.getClass()))
+		{
+			// Autoconvert basic from string
+			if(value instanceof String)
+			{
+//				IStringObjectConverter conv = BasicTypeConverter.getBasicStringConverter(targetclazz);
+//				IStringObjectConverter conv = BasicTypeConverter.CONVERTERS.getStringConverter(targetclazz);
+
+				if(converter==null)
+					converter = new IStringConverter()
+					{
+						@Override
+						public boolean isSupportedType(Class<?> clazz)
+						{
+							return BasicTypeConverter.isBuiltInType(clazz);
+						}
+						
+						@Override
+						public String getType()
+						{
+							return "plain";
+						}
+						
+						@Override
+						public Object convertString(String val, Class<?> type, ClassLoader cl, Object context) 
+						{
+							try
+							{
+								return BasicTypeConverter.getBasicStringConverter(type).convertString(val, context);
+							}
+							catch(Exception e)
+							{
+								SUtil.throwUnchecked(e);
+							}
+							return null;
+						}
+						
+						@Override
+						public String convertObject(Object val, Class<?> type, ClassLoader cl, Object context)
+						{
+							return BasicTypeConverter.getBasicObjectConverter(type).convertObject(val, context);
+						}
+					};
+				
+				if(converter!=null)
+				{
+					try
+					{
+						value = converter.convertString((String)value, targetclazz, cl, context);
+						//value = conv.convertString((String)value, null);
+					}
+					catch(Exception e)
+					{
+						SUtil.rethrowAsUnchecked(e);
+					}
+				}
+			}
+			// Autoconvert basic to string
+			else if(String.class.equals(targetclazz))
+			{
+//				IObjectStringConverter conv = BasicTypeConverter.getBasicObjectConverter(value.getClass());
+				
+				if(converter!=null)
+				{
+					try
+					{
+						//value = conv.convertObject(value, null);
+						value = converter.convertObject(value, targetclazz, cl, context);
+					}
+					catch(Exception e)
+					{
+						SUtil.rethrowAsUnchecked(e);
+					}
+				}
+			}
+		}
+		
+		return value;
 	}
 	
 	/**

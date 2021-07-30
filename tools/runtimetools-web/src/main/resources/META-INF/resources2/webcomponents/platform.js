@@ -32,9 +32,9 @@ class PlatformElement extends CidElement
 		
 		console.log("platform");
 		this.plugin = null;
-		console.log("setting plugins to {}");
+		//console.log("setting plugins to {}");
 		this.plugins = {};
-		console.log("set plugins to {}");
+		//console.log("set plugins to {}");
 		this.no = 0;
 		
 		var self = this;

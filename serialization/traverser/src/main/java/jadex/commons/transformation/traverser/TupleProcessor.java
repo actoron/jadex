@@ -6,6 +6,7 @@ import java.util.List;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
@@ -33,7 +34,7 @@ public class TupleProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Object ret = object;
 		if(SCloner.isCloneContext(context))
@@ -48,7 +49,7 @@ public class TupleProcessor implements ITraverseProcessor
 			
 			for(int i=0; i<vals.length; i++) 
 			{
-				Object newval = traverser.doTraverse(vals[i], null, conversionprocessors, processors, mode, targetcl, context);
+				Object newval = traverser.doTraverse(vals[i], null, conversionprocessors, processors, converter, mode, targetcl, context);
 				if (newval != Traverser.IGNORE_RESULT)
 				{
 					dest[i] = newval;

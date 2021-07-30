@@ -112,25 +112,25 @@ class ChatElement extends CidElement
 			
 			if("message"===ce.type)
 			{
-				console.log("message: "+ce.value);
+				//console.log("message: "+ce.value);
 				self.addMessage(ce.componentIdentifier.name, ce.value, ce.nick, ce.privateMessage, false);
 			}
 			else if("image"===ce.type)
 			{
-				console.log("image: "+ce);
+				//console.log("image: "+ce);
 				var url = 'data:image/png;base64,'+ce.value.__base64;
 				self.addMessage(ce.componentIdentifier.name, "<img src='"+url+"'></img>", ce.nick, ce.privateMessage, false);
 			}
 			else if("statechange"===ce.type)
 			{
-				console.log("state change: "+ce);
+				//console.log("state change: "+ce);
 				self.setUserState(ce.componentIdentifier.name, "dead"!==ce.value, "typing"===ce.value, "away"===ce.value, ce.nick, ce.image?.__base64);
 			}
 			else if("file"===ce.type)
 			{
 				var ti = ce.value;
 				
-				console.log("transfer: "+ti);
+				//console.log("transfer: "+ti);
 				
 				//self.updateTransfer(ti);
 							
@@ -216,27 +216,46 @@ class ChatElement extends CidElement
 		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype=jadex.tools.web.chat.IJCCChatService';
 	}
 	
+	getSelectedUserCids()
+	{
+		var recs = null;
+		if(this.selectedusers.length>0)
+		{
+			recs = [];
+			for(var i=0; i<this.selectedusers.length; i++)
+			{
+				recs.push(this.selectedusers[i].cid);
+			}
+		}
+		return recs;
+	}
+	
 	postMessage(e)
 	{
 		var self = this;
 		var msg = this.shadowRoot.getElementById("msg").value;
-		this.shadowRoot.getElementById("msg").value = "";
-		var url = this.getMethodPrefix()+'&methodname=postMessage'+
-			'&args_0='+msg+"&argtypes_0=java.lang.String"+
-			'&args_1='+'null'+"&argtypes_1=jadex.bridge.IComponentIdentifier[]"+
-			'&args_2='+'false'+"&argtypes_2=boolean"+
-			'&args_3='+self.cid+"&argtypes_3=jadex.bridge.IComponentIdentifier";
-		//url = encodeURIComponent(url);
 		
-		//console.log("sendmsg: "+msg);
-		//console.log("sendmsg: "+url);
-		
-		axios.get(url, this.transform).then(function(resp)
+		if(msg.length>0)
 		{
-			// todo: show running components?!
-			console.log("message called: "+resp.data);
-			//self.createInfoMessage("Sent message "+resp.data); 
-		});
+			this.shadowRoot.getElementById("msg").value = "";
+			var recs = this.getSelectedUserCids();
+			var url = this.getMethodPrefix()+'&methodname=postMessage'+
+				'&args_0='+msg+"&argtypes_0=java.lang.String"+
+				'&args_1='+(recs!=null? JSON.stringify(recs): 'null')+"&argtypes_1=jadex.bridge.IComponentIdentifier[]"+
+				'&args_2='+'true'+"&argtypes_2=boolean"+
+				'&args_3='+self.cid+"&argtypes_3=jadex.bridge.IComponentIdentifier";
+			//url = encodeURIComponent(url);
+			
+			//console.log("sendmsg: "+msg);
+			//console.log("sendmsg: "+url);
+			
+			axios.get(url, this.transform).then(function(resp)
+			{
+				// todo: show running components?!
+				console.log("message called: "+resp.data);
+				//self.createInfoMessage("Sent message "+resp.data); 
+			});
+		}
 	}
 	
 	addMessage(cid, text, nick, privatemessage, sendfailure)
@@ -258,7 +277,7 @@ class ChatElement extends CidElement
 		'&args_0='+self.cid+"&argtypes_0=jadex.bridge.IComponentIdentifier";
 		//url = encodeURIComponent(url);
 		
-		console.log("getUsers: "+url);
+		//console.log("getUsers: "+url);
 
 		return new Promise(function(resolve, reject) 
 		{
@@ -272,7 +291,7 @@ class ChatElement extends CidElement
 	
 	updateChatUser(cid)
 	{
-		console.log("user: "+cid);
+		//console.log("user: "+cid);
 		
 		var self = this;
 		
@@ -284,7 +303,7 @@ class ChatElement extends CidElement
 		{
 			self.getNickName(cid).then(nick =>
 			{
-				console.log("nick is: "+nick+" for: "+cid);
+				//console.log("nick is: "+nick+" for: "+cid);
 				self.setUserState(cid, true, null, null, nick, null);
 			}).catch(ex => console.log("ex: "+ex));
 		}
@@ -300,14 +319,14 @@ class ChatElement extends CidElement
 		
 		self.getStatus(cid).then(status =>
 		{
-			console.log("getstatus: "+status+" for: "+cid);
+			//console.log("getstatus: "+status+" for: "+cid);
 			self.setUserState(cid, true, "typing"===status, "away"===status);
 		}).catch(ex => console.log("ex: "+ex));
 	}
 	
 	setUserState(cid, online, typing, away, nickname, image)
 	{
-		console.log("setUserState: "+cid+" "+online+" "+nickname);
+		//console.log("setUserState: "+cid+" "+online+" "+nickname);
 		if(cid==null)
 			throw new Exception("cid must not null");
 		
@@ -316,7 +335,7 @@ class ChatElement extends CidElement
 		var cu = this.users[cid];
 		if(cu==null && online)
 		{
-			console.log("create User "+cid+", "+online);
+			//console.log("create User "+cid+", "+online);
 			cu = {'cid': cid};
 			this.users[cid] = cu;
 			isnew	= true;
@@ -352,7 +371,7 @@ class ChatElement extends CidElement
 				}
 				if(isnew)
 				{
-					console.log("new user: "+cid);
+					//console.log("new user: "+cid);
 					//notifyChatEvent(NOTIFICATION_NEW_USER, cid, null, false);
 				}
 			}
@@ -381,13 +400,13 @@ class ChatElement extends CidElement
 		var url = this.getMethodPrefix()+'&methodname=getNickName'+
 			'&args_0='+cid+"&argtypes_0=jadex.bridge.IComponentIdentifier";
 		//url = encodeURIComponent(url);
-		console.log("getNickName: "+url);
+		//console.log("getNickName: "+url);
 		
 		return new Promise(function(resolve, reject) 
 		{
 			axios.get(url, self.transform).then(function(resp)
 			{
-				console.log("getNickname called: "+resp.data);
+				//console.log("getNickname called: "+resp.data);
 				resolve(resp.data);
 			}).catch(ex => reject(ex));
 		});
@@ -418,7 +437,7 @@ class ChatElement extends CidElement
 		var url = this.getMethodPrefix()+'&methodname=getImage'+
 			'&args_0='+cid+"&argtypes_0=jadex.bridge.IComponentIdentifier";
 		//url = encodeURIComponent(url);
-		console.log("getImage: "+url);
+		//console.log("getImage: "+url);
 		
 		// getImage() delivers the result as raw byte[]
 		// should it use base64 str?!
@@ -441,13 +460,13 @@ class ChatElement extends CidElement
 		var url = this.getMethodPrefix()+'&methodname=getStatus'+
 			'&args_0='+cid+"&argtypes_0=jadex.bridge.IComponentIdentifier";
 		//url = encodeURIComponent(url);
-		console.log("getStatus: "+url);
+		//console.log("getStatus: "+url);
 		
 		return new Promise(function(resolve, reject) 
 		{
 			axios.get(url, self.transform).then(function(resp)
 			{
-				console.log("getStatus called: "+resp.data);
+				//console.log("getStatus called: "+resp.data);
 				resolve(resp.data);
 			}).catch(ex => reject(ex));
 		});
@@ -490,10 +509,10 @@ class ChatElement extends CidElement
 			}
 			elem.textContent = text;
 			
-			for(var u of this.selectedusers)
+			/*for(var u of this.selectedusers)
 			{
 				console.log("seluser: "+u.cid);
-			}
+			}*/
 		}
 	}
 	
@@ -507,7 +526,7 @@ class ChatElement extends CidElement
 			}
 			else
 			{
-	        	console.log('An image has been selected');
+	        	//console.log('An image has been selected');
 				if(max==null)
 					max = 50;
 		        // Load the image
@@ -610,10 +629,12 @@ class ChatElement extends CidElement
 	
 	postImage(img)
 	{
+		var recs = this.getSelectedUserCids();
+		
 		var fd = new FormData();
 		fd.append('args_0', img);
-		fd.append('args_1', null);
-		fd.append('args_2', false);
+		fd.append('args_1', recs!=null? JSON.stringify(recs): 'null');
+		fd.append('args_2', true);
 		fd.append('args_3', this.cid);
 		fd.append('argtypes_0', "byte[]");
 		fd.append('argtypes_1', "jadex.bridge.IComponentIdentifier[]");
@@ -625,7 +646,7 @@ class ChatElement extends CidElement
 		//axios.post(url, {args_0: fd, args_1: this.cid}).then(function(resp)
 		axios.post(url, fd).then(function(resp)
 		{
-			console.log("postImage called: "+resp.data);
+			//console.log("postImage called: "+resp.data);
 			//self.createInfoMessage("Sent message "+resp.data); 
 		});
 	}

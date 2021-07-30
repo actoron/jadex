@@ -11,6 +11,7 @@ import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -41,7 +42,7 @@ public class JsonResourceIdentifierProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
 //		wr.addObject(traversed, object);
@@ -73,7 +74,7 @@ public class JsonResourceIdentifierProcessor implements ITraverseProcessor
 					wr.write(", ");
 				wr.writeString("componentIdentifier");
 				wr.write(":");
-				traverser.traverse(cid, IComponentIdentifier.class, conversionprocessors, processors, mode, targetcl, context);
+				traverser.traverse(cid, IComponentIdentifier.class, conversionprocessors, processors, converter, mode, targetcl, context);
 				first = false;
 			}
 			
@@ -84,7 +85,7 @@ public class JsonResourceIdentifierProcessor implements ITraverseProcessor
 					wr.write(", ");
 				wr.writeString("uri");
 				wr.write(":");
-				traverser.traverse(uri, URI.class, conversionprocessors, processors, mode, targetcl, context);
+				traverser.traverse(uri, URI.class, conversionprocessors, processors, converter, mode, targetcl, context);
 			}
 			
 			wr.write("}");
@@ -114,7 +115,7 @@ public class JsonResourceIdentifierProcessor implements ITraverseProcessor
 					wr.write(", ");
 				wr.writeString("repositoryInfo");
 				wr.write(":");
-				traverser.traverse(rif, IComponentIdentifier.class, conversionprocessors, processors, mode, targetcl, context);
+				traverser.traverse(rif, IComponentIdentifier.class, conversionprocessors, processors, converter, mode, targetcl, context);
 				first = false;
 			}
 			

@@ -8,6 +8,7 @@ import java.util.List;
 import jadex.commons.SAccess;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
@@ -41,7 +42,7 @@ class FieldProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 //		System.out.println("fp: "+object);
 		Class<?> clazz = SReflect.getClass(type);
@@ -53,7 +54,7 @@ class FieldProcessor implements ITraverseProcessor
 //			System.out.println("cloned: "+object.getClass());
 //			ret = object.getClass().newInstance();
 			
-			traverseFields(object, conversionprocessors, processors, mode, traverser, targetcl, ret, context);
+			traverseFields(object, conversionprocessors, processors, converter, mode, traverser, targetcl, ret, context);
 		}
 		catch(Exception e)
 		{
@@ -66,7 +67,7 @@ class FieldProcessor implements ITraverseProcessor
 	/**
 	 *  Clone all fields of an object.
 	 */
-	protected void traverseFields(Object object, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode,Traverser traverser, ClassLoader targetcl, Object ret, Object context)
+	protected void traverseFields(Object object, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, Traverser traverser, ClassLoader targetcl, Object ret, Object context)
 	{
 		Class clazz = object.getClass();
 			
@@ -86,7 +87,7 @@ class FieldProcessor implements ITraverseProcessor
 						val = fields[i].get(object);
 						if(val!=null) 
 						{
-							Object newval = traverser.doTraverse(val, fields[i].getType(), conversionprocessors, processors, mode, targetcl, context);
+							Object newval = traverser.doTraverse(val, fields[i].getType(), conversionprocessors, processors, converter, mode, targetcl, context);
 							if(SCloner.isCloneContext(context) || val!=newval)
 								fields[i].set(ret, newval);
 						}

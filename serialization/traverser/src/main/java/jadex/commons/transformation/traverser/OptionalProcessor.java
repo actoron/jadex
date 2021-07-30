@@ -6,6 +6,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 
 /**
  *  Allows processing java.util.Optional.
@@ -70,29 +71,41 @@ public class OptionalProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, Traverser.MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, Traverser.MODE mode, ClassLoader targetcl, Object context)
 	{
 		init();
 		Object result = null;
-		if (SCloner.isCloneContext(context)) {
-			try {
+		if(SCloner.isCloneContext(context)) 
+		{
+			try 
+			{
 				Boolean isPresent = (Boolean) isPresentMethod.invoke(object);
-				if (isPresent) {
+				if(isPresent) 
+				{
 					Object subobject = getMethod.invoke(object);
-					Object newval = traverser.doTraverse(subobject, null, conversionprocessors, processors, mode, targetcl, context);
-					if(newval != Traverser.IGNORE_RESULT) {
+					Object newval = traverser.doTraverse(subobject, null, conversionprocessors, processors, converter, mode, targetcl, context);
+					if(newval != Traverser.IGNORE_RESULT) 
+					{
 						result = ofMethod.invoke(optionalClass, newval);
-					} else {
+					}
+					else 
+					{
 						// fallback to not cloning?
 						result = ofMethod.invoke(optionalClass, subobject);
 					}
-				} else {
+				} 
+				else 
+				{
 					result = emptyMethod.invoke(optionalClass);
 				}
-			} catch (Exception e) {
+			} 
+			catch (Exception e) 
+			{
 				throw new RuntimeException(e);
 			}
-		} else {
+		} 
+		else 
+		{
 			result = object;
 		}
 		return result;

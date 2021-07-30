@@ -9,6 +9,7 @@ import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.BeanIntrospectorFactory;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -96,7 +97,7 @@ public class JsonOptionalProcessor extends AbstractJsonProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, Traverser.MODE mode, ClassLoader targetcl, JsonReadContext context)
+	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, Traverser.MODE mode, ClassLoader targetcl, JsonReadContext context)
 	{
 		init();
 		Object ret = null;
@@ -110,7 +111,7 @@ public class JsonOptionalProcessor extends AbstractJsonProcessor
 				Object subObject;
 				if(subJson != null) 
 				{
-					subObject = traverser.traverse(subJson, Object.class, conversionprocessors, processors, mode, targetcl, context);
+					subObject = traverser.traverse(subJson, Object.class, conversionprocessors, processors, converter, mode, targetcl, context);
 					ret =	ofMethod.invoke(optionalClass, subObject);
 				} 
 				else 
@@ -142,7 +143,7 @@ public class JsonOptionalProcessor extends AbstractJsonProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, Traverser.MODE mode, ClassLoader targetcl, JsonWriteContext wr)
+	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, Traverser.MODE mode, ClassLoader targetcl, JsonWriteContext wr)
 	{
 		init();
 		wr.addObject(object);
@@ -156,22 +157,26 @@ public class JsonOptionalProcessor extends AbstractJsonProcessor
 			first = false;
 		}
 
-		try {
+		try 
+		{
 			Boolean isPresent = (Boolean) isPresentMethod.invoke(object);
 			if (!first)
 				wr.write(",");
 			wr.write("\"isPresent\":");
-			traverser.doTraverse(isPresent, Boolean.class, conversionprocessors, processors, mode, targetcl, wr);
+			traverser.doTraverse(isPresent, Boolean.class, conversionprocessors, processors, converter, mode, targetcl, wr);
 
 			Object subobject = null;
-			if (isPresent) {
-				if (!first)
+			if(isPresent) 
+			{
+				if(!first)
 					wr.write(",");
 				wr.write("\"subobject\":");
 				subobject = getMethod.invoke(object);
-				traverser.doTraverse(subobject, subobject.getClass(), conversionprocessors, processors, mode, targetcl, wr);
+				traverser.doTraverse(subobject, subobject.getClass(), conversionprocessors, processors, converter, mode, targetcl, wr);
 			}
-		} catch (Exception e) {
+		} 
+		catch (Exception e) 
+		{
 			throw new RuntimeException(e);
 		}
 

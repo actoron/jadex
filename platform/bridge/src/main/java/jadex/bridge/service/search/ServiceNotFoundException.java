@@ -11,6 +11,13 @@ public class ServiceNotFoundException extends RuntimeException
 	/**
 	 *  Create a new service not found exception.
 	 */
+	public ServiceNotFoundException()
+	{
+	}
+	
+	/**
+	 *  Create a new service not found exception.
+	 */
 	public ServiceNotFoundException(ServiceQuery<?> query)
 	{
 		this(""+query);
@@ -37,9 +44,18 @@ public class ServiceNotFoundException extends RuntimeException
 		return query;
 	}
 	
+	/**
+	 *  Set the query.
+	 *  @param query The query.
+	 */
+	public void setQuery(ServiceQuery<?> query)
+	{
+		this.query = query;
+	}
+
 	public void printStackTrace()
 	{
-		Thread.dumpStack();
+		//Thread.dumpStack();
 		super.printStackTrace();
 	}
 }

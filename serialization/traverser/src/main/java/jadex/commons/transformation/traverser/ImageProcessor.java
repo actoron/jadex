@@ -20,6 +20,7 @@ import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageOutputStream;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 //import sun.awt.image.ImageRepresentation;
 //import sun.awt.image.ToolkitImage;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -48,7 +49,7 @@ public class ImageProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Object ret = object;
 		if(SCloner.isCloneContext(context))

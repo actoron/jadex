@@ -9,6 +9,7 @@ import java.util.Set;
 import jadex.commons.SReflect;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
@@ -43,7 +44,7 @@ public class MapProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		Map ret = (Map)getReturnObject(object, clazz, context);
@@ -56,7 +57,7 @@ public class MapProcessor implements ITraverseProcessor
 			ILRUEntryCleaner cleaner = ((LRU) object).getCleaner();
 			if (cleaner != null)
 			{
-				((LRU) ret).setCleaner((ILRUEntryCleaner) traverser.doTraverse(cleaner, cleaner.getClass(), conversionprocessors, processors, mode, targetcl, context));
+				((LRU) ret).setCleaner((ILRUEntryCleaner) traverser.doTraverse(cleaner, cleaner.getClass(), conversionprocessors, processors, converter, mode, targetcl, context));
 			}
 		}
 		
@@ -68,8 +69,8 @@ public class MapProcessor implements ITraverseProcessor
 			Class<?> valclazz = val!=null? val.getClass(): null;
 			Object key = keys[i];
 			Class<?> keyclazz = key != null? key.getClass() : null;
-			Object newkey = traverser.doTraverse(key, keyclazz, conversionprocessors, processors, mode, targetcl, context);
-			Object newval = traverser.doTraverse(val, valclazz, conversionprocessors, processors, mode, targetcl, context);
+			Object newkey = traverser.doTraverse(key, keyclazz, conversionprocessors, processors, converter, mode, targetcl, context);
+			Object newval = traverser.doTraverse(val, valclazz, conversionprocessors, processors, converter, mode, targetcl, context);
 			
 			if (newkey != Traverser.IGNORE_RESULT && newval != Traverser.IGNORE_RESULT)
 			{

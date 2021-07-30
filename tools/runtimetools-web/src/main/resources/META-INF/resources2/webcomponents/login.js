@@ -28,7 +28,7 @@ export class LoginElement extends BaseElement
 	postInit()
 	{
 		let pass = localStorage.getItem("platformpassword")
-		console.log("session store pass " + pass);
+		//console.log("session store pass " + pass);
 		if(pass)
 			this.login(pass);
 	}

@@ -12,6 +12,7 @@ import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -57,7 +58,7 @@ public class JsonMapProcessor extends AbstractJsonProcessor
 	 *  @return The processed object.
 	 */
 	@SuppressWarnings("unchecked")
-	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonReadContext context)
+	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonReadContext context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		@SuppressWarnings("rawtypes")
@@ -87,7 +88,7 @@ public class JsonMapProcessor extends AbstractJsonProcessor
 					continue;
 				Object val = obj.get(name);
 				Class<?> valclazz = getValueClass(val, context);
-				Object newval = traverser.doTraverse(val, valclazz, conversionprocessors, processors, mode, targetcl, context);
+				Object newval = traverser.doTraverse(val, valclazz, conversionprocessors, processors, converter, mode, targetcl, context);
 //				Object newval = traverser.doTraverse(val, null, traversed, preprocessors, processors, postprocessors, clone, targetcl, context);
 //				Class<?> valclazz = val!=null? val.getClass(): null;
 //				Object newval = traverser.doTraverse(val, valclazz, traversed, preprocessors, processors, postprocessors, clone, targetcl, context);
@@ -101,8 +102,8 @@ public class JsonMapProcessor extends AbstractJsonProcessor
 		else
 		{
 //			rc.setIgnoreNext(true);
-			Object keys = traverser.doTraverse(obj.get("__keys"), null, conversionprocessors, processors, mode, targetcl, context);
-			Object vals = traverser.doTraverse(obj.get("__values"), null, conversionprocessors, processors, mode, targetcl, context);
+			Object keys = traverser.doTraverse(obj.get("__keys"), null, conversionprocessors, processors, converter, mode, targetcl, context);
+			Object vals = traverser.doTraverse(obj.get("__values"), null, conversionprocessors, processors, converter, mode, targetcl, context);
 //			Object keys = traverser.doTraverse(obj.get("__keys"), null, traversed, preprocessors, processors, postprocessors, clone, targetcl, context);
 //			rc.setIgnoreNext(true);
 //			Object vals = traverser.doTraverse(obj.get("__values"), null, traversed, preprocessors, processors, postprocessors, clone, targetcl, context);
@@ -128,7 +129,7 @@ public class JsonMapProcessor extends AbstractJsonProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonWriteContext wr)
+	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonWriteContext wr)
 	{
 		wr.addObject(wr.getCurrentInputObject());
 		
@@ -186,7 +187,7 @@ public class JsonMapProcessor extends AbstractJsonProcessor
 					if(i>0)
 						wr.write(",");
 					wr.write("\"").write(key.toString()).write("\":");
-					traverser.doTraverse(val, valclazz, conversionprocessors, processors, mode, targetcl, wr);
+					traverser.doTraverse(val, valclazz, conversionprocessors, processors, converter, mode, targetcl, wr);
 				}
 			}
 			else
@@ -200,7 +201,7 @@ public class JsonMapProcessor extends AbstractJsonProcessor
 						wr.write(",");
 					Object key = keys[i];
 					Class<?> keyclazz = key != null? key.getClass() : null;
-					traverser.doTraverse(key, keyclazz, conversionprocessors, processors, mode, targetcl, wr);
+					traverser.doTraverse(key, keyclazz, conversionprocessors, processors, converter, mode, targetcl, wr);
 				}
 				wr.write("]");
 				
@@ -213,7 +214,7 @@ public class JsonMapProcessor extends AbstractJsonProcessor
 						wr.write(",");
 					Object val = map.get(keys[i]);
 					Class<?> valclazz = val!=null? val.getClass(): null;
-					traverser.doTraverse(val, valclazz, conversionprocessors, processors, mode, targetcl, wr);
+					traverser.doTraverse(val, valclazz, conversionprocessors, processors, converter, mode, targetcl, wr);
 				}
 				wr.write("]");
 			}

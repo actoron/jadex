@@ -8,6 +8,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -51,13 +52,13 @@ public class JsonBigIntegerProcessor extends AbstractJsonProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonReadContext context)
+	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonReadContext context)
 	{
 		JsonObject obj = (JsonObject)object;
 		
 		JsonValue val = obj.get("value");
 		
-		byte[] vals = (byte[])traverser.traverse(val, byte[].class, conversionprocessors, processors, mode, targetcl, context);
+		byte[] vals = (byte[])traverser.traverse(val, byte[].class, conversionprocessors, processors, converter, mode, targetcl, context);
 		BigInteger ret = new BigInteger(vals);
 		
 		JsonValue idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
@@ -73,7 +74,7 @@ public class JsonBigIntegerProcessor extends AbstractJsonProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonWriteContext wr)
+	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonWriteContext wr)
 	{
 		wr.addObject(wr.getCurrentInputObject());
 	
@@ -82,7 +83,7 @@ public class JsonBigIntegerProcessor extends AbstractJsonProcessor
 		wr.write("{");
 		
 		wr.write("\"value\":");
-		traverser.doTraverse(bi.toByteArray(), byte[].class, conversionprocessors, processors, mode, targetcl, wr);
+		traverser.doTraverse(bi.toByteArray(), byte[].class, conversionprocessors, processors, converter, mode, targetcl, wr);
 
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());

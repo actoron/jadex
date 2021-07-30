@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -161,7 +162,7 @@ public class ArrayCodec extends AbstractCodec
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		Class<?> compclazz = clazz.getComponentType();
 		
@@ -190,7 +191,7 @@ public class ArrayCodec extends AbstractCodec
 					if (ignoreclass)
 						ec.setIgnoreNextClassWrite(true);
 					
-					traverser.doTraverse(val, val.getClass(), preprocessors, processors, mode, targetcl, ec);
+					traverser.doTraverse(val, val.getClass(), preprocessors, processors, converter, mode, targetcl, ec);
 				}
 			}
 		}

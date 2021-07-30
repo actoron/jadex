@@ -10,6 +10,7 @@ import java.util.Map;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.BeanIntrospectorFactory;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
@@ -143,7 +144,7 @@ public class BeanCodec extends AbstractCodec
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		if (!ec.getNonInnerClassCache().contains(clazz))
 		{
@@ -179,7 +180,7 @@ public class BeanCodec extends AbstractCodec
 			ec.writeBoolean(false);
 		}
 		
-		writeBeanProperties(object, clazz, preprocessors, processors, traverser, mode, ec, intro);
+		writeBeanProperties(object, clazz, preprocessors, processors, traverser, converter, mode, ec, intro);
 		
 		return object;
 	}
@@ -187,7 +188,7 @@ public class BeanCodec extends AbstractCodec
 	/**
 	 * 
 	 */
-	public static void writeBeanProperties(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, Traverser traverser, MODE mode, IEncodingContext ec, IBeanIntrospector intro)
+	public static void writeBeanProperties(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, Traverser traverser, IStringConverter converter, MODE mode, IEncodingContext ec, IBeanIntrospector intro)
 	{
 		Map<String, BeanProperty> props = intro.getBeanProperties(clazz, true, false);
 		
@@ -228,7 +229,7 @@ public class BeanCodec extends AbstractCodec
 		{
 			ec.writeString(names.get(i));
 			Object val = values.get(i);
-			traverser.doTraverse(val, clazzes.get(i), preprocessors, processors, mode, ec.getClassLoader(), ec);
+			traverser.doTraverse(val, clazzes.get(i), preprocessors, processors, converter, mode, ec.getClassLoader(), ec);
 		}
 	}
 	

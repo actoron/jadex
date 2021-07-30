@@ -8,6 +8,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -52,7 +53,7 @@ public class JsonSimpleDateFormatProcessor extends JsonBeanProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonReadContext context)
+	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonReadContext context)
 	{
 		Class<?>	clazz	= JsonPrimitiveObjectProcessor.getClazz(object, targetcl);
 		SimpleDateFormat ret = (SimpleDateFormat)getReturnObject(object, clazz, targetcl);
@@ -65,7 +66,7 @@ public class JsonSimpleDateFormatProcessor extends JsonBeanProcessor
 			((JsonReadContext)context).addKnownObject(ret, idx.asInt());
 		
 		// Include bean properties of superclass DateFormat
-		readProperties(object, clazz, conversionprocessors, processors, mode, traverser, targetcl, ret, context, intro);
+		readProperties(object, clazz, conversionprocessors, processors, converter, mode, traverser, targetcl, ret, context, intro);
 		
 		return ret;
 	}
@@ -75,7 +76,7 @@ public class JsonSimpleDateFormatProcessor extends JsonBeanProcessor
 	 */
 	@Override
 	protected void writeProperties(Object object, List<ITraverseProcessor> conversionprocessors,
-			List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, JsonWriteContext wr,
+			List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, Traverser traverser, ClassLoader targetcl, JsonWriteContext wr,
 			IBeanIntrospector intro, boolean first)
 	{
 		Class<?> clazz = object.getClass();
@@ -90,10 +91,10 @@ public class JsonSimpleDateFormatProcessor extends JsonBeanProcessor
 				wr.writeString("pattern");
 				wr.write(":");
 				
-				traverser.doTraverse(val, String.class, conversionprocessors, processors, mode, targetcl, wr);
+				traverser.doTraverse(val, String.class, conversionprocessors, processors, converter, mode, targetcl, wr);
 			}
 		}
 
-		super.writeProperties(object, conversionprocessors, processors, mode, traverser, targetcl, wr, intro, first);
+		super.writeProperties(object, conversionprocessors, processors, converter, mode, traverser, targetcl, wr, intro, first);
 	}
 }

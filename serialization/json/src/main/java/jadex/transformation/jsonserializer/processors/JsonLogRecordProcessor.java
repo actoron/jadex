@@ -10,6 +10,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -53,11 +54,11 @@ public class JsonLogRecordProcessor extends AbstractJsonProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonReadContext context)
+	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonReadContext context)
 	{
 		JsonObject obj = (JsonObject)object;
 		
-		Level level = (Level)traverser.doTraverse(obj.get("level"), Level.class, conversionprocessors, processors, mode, targetcl, context);
+		Level level = (Level)traverser.doTraverse(obj.get("level"), Level.class, conversionprocessors, processors, converter, mode, targetcl, context);
 
 		String msg = obj.getString("msg", null);
 		long millis = obj.getLong("millis", 0);
@@ -82,7 +83,7 @@ public class JsonLogRecordProcessor extends AbstractJsonProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonWriteContext wr)
+	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonWriteContext wr)
 	{
 		wr.addObject(wr.getCurrentInputObject());
 
@@ -91,7 +92,7 @@ public class JsonLogRecordProcessor extends AbstractJsonProcessor
 		wr.write("{");
 		wr.write("\"level\":");
 		Level level = rec.getLevel();
-		traverser.doTraverse(level, level.getClass(), conversionprocessors, processors, mode, targetcl, wr);
+		traverser.doTraverse(level, level.getClass(), conversionprocessors, processors, converter, mode, targetcl, wr);
 		wr.write(",");
 		wr.writeNameString("msg", rec.getMessage());
 		wr.write(",");

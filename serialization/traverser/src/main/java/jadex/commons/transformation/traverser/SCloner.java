@@ -74,7 +74,7 @@ public class SCloner
 //		}
 		
 		traverser = traverser != null? traverser:Traverser.getInstance();
-		return traverser.traverse(object, null, null, processors == null? Traverser.getDefaultProcessors():processors, Traverser.MODE.PLAIN, targetcl, new CloneContext());
+		return traverser.traverse(object, null, null, processors == null? Traverser.getDefaultProcessors():processors, null, Traverser.MODE.PLAIN, targetcl, new CloneContext());
 	}
 	
 	/**

@@ -8,6 +8,7 @@ import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -45,7 +46,7 @@ public class JsonPrimitiveObjectProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Object ret = null;
 		

@@ -47,7 +47,7 @@ export class BaseElement extends LitElement
 			//if(name === 'cid' && newval!=null && typeof this.init === 'function')
 			if(typeof self.init === 'function')
 		    {
-		    	console.log('init found, calling...');
+		    	//console.log('init found, calling...');
 		    	initprom = self.init();
 		    }
 			let callpostinit = function() {

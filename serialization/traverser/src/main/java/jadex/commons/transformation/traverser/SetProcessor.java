@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
@@ -33,7 +34,7 @@ public class SetProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		Set ret = (Set)getReturnObject(object, clazz, context);
@@ -44,7 +45,7 @@ public class SetProcessor implements ITraverseProcessor
 		for(int i=0; i<vals.length; i++)
 		{
 			Class valclazz = vals[i]!=null? vals[i].getClass(): null;
-			Object newval = traverser.doTraverse(vals[i], valclazz, conversionprocessors, processors, mode, targetcl, context);
+			Object newval = traverser.doTraverse(vals[i], valclazz, conversionprocessors, processors, converter, mode, targetcl, context);
 			
 			if (newval != Traverser.IGNORE_RESULT)
 			{

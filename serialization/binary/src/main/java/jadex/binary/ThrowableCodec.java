@@ -5,6 +5,7 @@ import java.util.List;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.BeanIntrospectorFactory;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -148,7 +149,7 @@ public class ThrowableCodec extends AbstractCodec
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		Throwable t = (Throwable)object;
 		
@@ -156,9 +157,9 @@ public class ThrowableCodec extends AbstractCodec
 //		traverser.doTraverse(t.getMessage(), String.class, preprocessors, processors, mode, ec.getClassLoader(), ec);
 	
 		Object val = t.getCause();
-		traverser.doTraverse(val, val!=null? val.getClass(): Throwable.class, preprocessors, processors, mode, targetcl, ec);
+		traverser.doTraverse(val, val!=null? val.getClass(): Throwable.class, preprocessors, processors, converter, mode, targetcl, ec);
 
-		BeanCodec.writeBeanProperties(object, clazz, preprocessors, processors, traverser, mode, ec, intro);
+		BeanCodec.writeBeanProperties(object, clazz, preprocessors, processors, traverser, converter, mode, ec, intro);
 		
 		return object;
 	}

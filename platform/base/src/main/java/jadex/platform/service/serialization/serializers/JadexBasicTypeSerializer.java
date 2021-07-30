@@ -28,7 +28,7 @@ import jadex.transformation.jsonserializer.processors.JsonReadContext;
 import jadex.transformation.jsonserializer.processors.JsonWriteContext;
 
 /**
- * 
+ *  Serializer impl for converting basic types including Jadex specific ones like ComponentIdentifier etc.
  */
 public class JadexBasicTypeSerializer implements ISerializer, IStringConverter
 {

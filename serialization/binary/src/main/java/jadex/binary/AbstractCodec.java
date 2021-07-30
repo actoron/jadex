@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -18,7 +19,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *  @param object The object.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter,MODE mode, ClassLoader targetcl, Object context)
 	{
 		IEncodingContext ec = (IEncodingContext) context;
 		
@@ -37,7 +38,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 		
 		ec.startObjectFrame(isFixedFrame());
 		
-		object = encode(object, clazz, conversionprocessors, processors, mode, traverser, targetcl, ec);
+		object = encode(object, clazz, conversionprocessors, processors, converter, mode, traverser, targetcl, ec);
 		
 		ec.stopObjectFrame();
 		
@@ -106,7 +107,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	/**
 	 *  Encode the object.
 	 */
-	public abstract Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec);
+	public abstract Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec);
 	
 	/**
 	 *  Decodes an object.

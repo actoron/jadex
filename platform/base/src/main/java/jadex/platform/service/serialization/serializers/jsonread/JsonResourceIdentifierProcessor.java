@@ -1,23 +1,18 @@
 package jadex.platform.service.serialization.serializers.jsonread;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
-import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.ServiceIdentifier;
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -47,7 +42,7 @@ public class JsonResourceIdentifierProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 		JsonObject obj = (JsonObject)object;
 		
@@ -63,9 +58,9 @@ public class JsonResourceIdentifierProcessor implements ITraverseProcessor
 			if(li.get("hostIdentifier")!=null)
 				hi = li.get("hostIdentifier").asString();
 			if(li.get("componentIdentifier")!=null)
-				cid = (IComponentIdentifier)traverser.traverse(li.get("componentIdentifier"), IComponentIdentifier.class, conversionprocessors,  processors, mode, targetcl, context);
+				cid = (IComponentIdentifier)traverser.traverse(li.get("componentIdentifier"), IComponentIdentifier.class, conversionprocessors, processors, converter, mode, targetcl, context);
 			if(li.get("uri")!=null)
-				uri = (URI)traverser.traverse(li.get("uri"), URI.class, conversionprocessors, processors, mode, targetcl, context);
+				uri = (URI)traverser.traverse(li.get("uri"), URI.class, conversionprocessors, processors, converter, mode, targetcl, context);
 			
 			lid = new LocalResourceIdentifier(cid, uri, hi);
 		}
@@ -78,7 +73,7 @@ public class JsonResourceIdentifierProcessor implements ITraverseProcessor
 			if(gi.get("resourceId")!=null)
 				id = gi.get("resourceId").asString();
 			if(gi.get("repositoryInfo")!=null)
-				uri = (URI)traverser.traverse(li.get("repositoryInfo"), URI.class, conversionprocessors, processors, mode, targetcl, context);
+				uri = (URI)traverser.traverse(li.get("repositoryInfo"), URI.class, conversionprocessors, processors, converter, mode, targetcl, context);
 			if(gi.get("versionInfo")!=null)
 				versioninfo = gi.get("versionInfo").asString();
 			gid = new GlobalResourceIdentifier(id, uri, versioninfo);

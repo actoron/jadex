@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
@@ -32,7 +33,7 @@ public class ListProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		List ret = (List)getReturnObject(object, clazz, context);
@@ -43,7 +44,7 @@ public class ListProcessor implements ITraverseProcessor
 		{
 			Object val = list.get(i);
 			Class valclazz = val!=null? val.getClass(): null;
-			Object newval = traverser.doTraverse(val, valclazz, conversionprocessors, processors, mode, targetcl, context);
+			Object newval = traverser.doTraverse(val, valclazz, conversionprocessors, processors, converter, mode, targetcl, context);
 			
 			if (newval != Traverser.IGNORE_RESULT)
 			{

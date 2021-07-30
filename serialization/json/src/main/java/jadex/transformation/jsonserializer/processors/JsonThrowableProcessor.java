@@ -8,6 +8,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -51,7 +52,7 @@ public class JsonThrowableProcessor extends JsonBeanProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonReadContext context)
+	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonReadContext context)
 	{
 		Object ret = null;
 		Class<?> clazz = SReflect.getClass(type);
@@ -62,7 +63,7 @@ public class JsonThrowableProcessor extends JsonBeanProcessor
 		Throwable cause = null;
 		JsonValue cau = obj.get("cause");
 		if(cau!=null)
-			cause = (Throwable)traverser.traverse(cau, Throwable.class, conversionprocessors, processors, mode, targetcl, context);
+			cause = (Throwable)traverser.traverse(cau, Throwable.class, conversionprocessors, processors, converter, mode, targetcl, context);
 //			cause = (Throwable)traverser.traverse(cau, Throwable.class, preprocessors, processors, postprocessors, targetcl, context);
 		
 //		Class<?> cl = JsonPrimitiveObjectProcessor.getClazz(object, targetcl);
@@ -158,7 +159,7 @@ public class JsonThrowableProcessor extends JsonBeanProcessor
 			if(idx!=null)
 				((JsonReadContext)context).addKnownObject(ret, idx.asInt());
 			
-			JsonBeanProcessor.readProperties(object, clazz, conversionprocessors, processors, mode, traverser, targetcl, ret, context, intro);
+			JsonBeanProcessor.readProperties(object, clazz, conversionprocessors, processors, converter, mode, traverser, targetcl, ret, context, intro);
 //			JsonBeanProcessor.traverseProperties(object, clazz, traversed, processors, postprocessors, traverser, clone, targetcl, ret, context, intro);
 		}
 		
@@ -172,7 +173,7 @@ public class JsonThrowableProcessor extends JsonBeanProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonWriteContext context)
+	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonWriteContext context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
 		wr.addObject(wr.getCurrentInputObject());
@@ -193,7 +194,7 @@ public class JsonThrowableProcessor extends JsonBeanProcessor
 			if(!first)
 				wr.write(",");
 			wr.write("\"msg\":");
-			traverser.doTraverse(t.getMessage(), String.class, conversionprocessors, processors, mode, targetcl, context);
+			traverser.doTraverse(t.getMessage(), String.class, conversionprocessors, processors, converter, mode, targetcl, context);
 			first = false;
 		}
 		if(t.getCause()!=null)
@@ -202,11 +203,11 @@ public class JsonThrowableProcessor extends JsonBeanProcessor
 				wr.write(",");
 			wr.write("\"cause\":");
 			Object val = t.getCause();
-			traverser.doTraverse(val, val!=null? val.getClass(): Throwable.class, conversionprocessors, processors, mode, targetcl, context);
+			traverser.doTraverse(val, val!=null? val.getClass(): Throwable.class, conversionprocessors, processors, converter, mode, targetcl, context);
 			first = false;
 		}
 		
-		writeProperties(object, conversionprocessors, processors, mode, traverser, targetcl, context, intro, first);
+		writeProperties(object, conversionprocessors, processors, converter, mode, traverser, targetcl, context, intro, first);
 		
 		wr.write("}");
 		

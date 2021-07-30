@@ -109,12 +109,13 @@
 				//console.log("login change happened")
 				this.loggedin = loggedin;
 				
-				app.login.listeners.forEach( elem => {
-					console.log("Updating " + elem)
+				app.login.listeners.forEach( elem => 
+				{
+					//console.log("Updating " + elem)
 					elem.requestUpdate();
 				});
 			}
-			console.log("loggedin is: "+this.loggedin);
+			//console.log("loggedin is: "+this.loggedin);
 		},
 		isLoggedIn: function()
 		{
