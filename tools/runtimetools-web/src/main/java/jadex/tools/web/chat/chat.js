@@ -527,34 +527,50 @@ class ChatElement extends CidElement
 			else
 			{
 	        	//console.log('An image has been selected');
-				if(max==null)
-					max = 50;
+				//if(max==null)
+				//	max = 50;
 		        // Load the image
-		        var reader = new FileReader();
-		        reader.onload = function(revent) 
+				if(max!=null)
 				{
-		        	var image = new Image();
-		            image.onload = function(ievent) 
+		        	var reader = new FileReader();
+		        	reader.onload = function(revent) 
 					{
-		                var canvas = document.createElement('canvas');
-		                var width = image.width;
-		                var height = image.height;
-
-						var fac = Math.max(width, height)/max;
-						if(fac>1)
+			        	var image = new Image();
+			            image.onload = function(ievent) 
 						{
-							width /= fac;
-							height /= fac; 
+			                var canvas = document.createElement('canvas');
+			                var width = image.width;
+			                var height = image.height;
+	
+							var fac = Math.max(width, height)/max;
+							if(fac>1)
+							{
+								width /= fac;
+								height /= fac; 
+							}
+			                canvas.width = width;
+			                canvas.height = height;
+			                canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+			                //var img = canvas.toDataURL(file.type);
+							canvas.toBlob(resolve, file.type);//, QUALITY);
 						}
-		                canvas.width = width;
-		                canvas.height = height;
-		                canvas.getContext('2d').drawImage(image, 0, 0, width, height);
-		                //var img = canvas.toDataURL(file.type);
-						canvas.toBlob(resolve, file.type);//, QUALITY);
+			            image.src = revent.target.result;
 					}
-		            image.src = revent.target.result;
+					reader.readAsDataURL(file);
+				}
+				else
+				{
+					var reader = new FileReader();
+		        	reader.onload = function(revent) 
+					{
+						if(revent.target.readyState == FileReader.DONE) 
+						{
+							var blob = new Blob([new Uint8Array(revent.target.result)], {type: file.type});
+							resolve(blob);
+						}
+					}
+					reader.readAsArrayBuffer(file);
 		        }
-		        reader.readAsDataURL(file);
 			}
 		});
 	}
@@ -590,9 +606,8 @@ class ChatElement extends CidElement
 		//var ii = this.shadowRoot.getElementById("imageinput");
 		var ii = e.target;
 				
-		this.resizeImage(ii.files[0], 500).then(img =>
+		this.resizeImage(ii.files[0]).then(img =>
 		{
-			///* Preview code
 			var uc = window.URL || window.webkitURL;
   	 		var url = uc.createObjectURL(img);
 			//self.addMessage(ce.componentIdentifier.name, "<img src='"+url+"'></img>", ce.nick, ce.privateMessage, false);

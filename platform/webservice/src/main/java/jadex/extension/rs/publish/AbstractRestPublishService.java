@@ -550,8 +550,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					methodname = methodname.substring(0, methodname.length() - 2);
 				final String fmn = methodname;
 
-				if(methodname!=null && request.toString().indexOf("setIm")!=-1)
-					System.out.println("INVOKE: " + methodname);
+				//if(methodname!=null && request.toString().indexOf("setIm")!=-1)
+				//	System.out.println("INVOKE: " + methodname);
 				
 				Collection<MappingInfo> mis = pm.getElementsForPath(methodname);
 				List<Map<String, String>> bindings = mis.stream().map(x -> pm.getBindingsForPath(fmn)).collect(Collectors.toList());

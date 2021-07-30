@@ -187,11 +187,11 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 				Object[] as = (Object[])args.get(2);
 				//ClassInfo rettype = (ClassInfo)args.get(3);
 				
-				if(methodname.indexOf("postIm")!=-1)
-					System.out.println("herere");
+				//if(methodname.indexOf("postIm")!=-1)
+				//	System.out.println("herere");
 				
-				if(methodname.indexOf("postMes")!=-1)
-					System.out.println("herere");
+				//if(methodname.indexOf("postMes")!=-1)
+				//	System.out.println("herere");
 				
 				// todo: always try decoding strings with json?
 				if(as!=null)
