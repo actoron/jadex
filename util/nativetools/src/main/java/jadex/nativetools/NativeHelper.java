@@ -15,7 +15,6 @@ import com.sun.jna.NativeLibrary;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
-import com.sun.tools.attach.VirtualMachine;
 
 /**
  *  Helper class using JNA to provide native features.
