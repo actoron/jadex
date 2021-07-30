@@ -297,10 +297,11 @@ subprojects
         // include all resources that are placed inside src dirs
         sourceSets.main.resources.srcDirs    mainSrcDir
 		sourceSets.main.resources.includes   ["**/*"]
-        //sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
+		sourceSets.main.resources.excludes   ["**/*.java"]
+
         sourceSets.test.resources.srcDirs    testSrcDir
 		sourceSets.test.resources.includes   ["**/*"]
-        //sourceSets.test.output.resourcesDir = sourceSets.test.output.classesDir
+		sourceSets.test.resources.includes   ["**/*.java"]
 
         dependencies
         {
