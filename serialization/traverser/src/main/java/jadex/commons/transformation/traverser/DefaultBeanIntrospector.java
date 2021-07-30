@@ -214,13 +214,13 @@ public class DefaultBeanIntrospector implements IBeanIntrospector
 					refcon = clazz.getDeclaredConstructor();
 					SAccess.setAccessible(refcon, true);
 				}
-				catch (Exception e)
+				catch(Exception e)
 				{
-					e.printStackTrace();
+					//e.printStackTrace();
 				}
 				
 				MethodHandle beanconstructor = null;
-				if (refcon != null)
+				if(refcon != null)
 					beanconstructor = MethodHandles.lookup().unreflectConstructor(refcon).asType(MethodType.genericMethodType(0));
 				
 				ret = new BeanClassInfo(beanconstructor, beanprops);
