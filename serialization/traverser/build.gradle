@@ -7,8 +7,9 @@ dependencies
 }
 
 // testjar is needed for jadex-android-xmlpull tests
-task testJar(type:Jar, dependsOn: testClasses) {
+// Disabled because no more android, is this still working? then remove..
+/*task testJar(type:Jar, dependsOn: testClasses) {
 	classifier = 'test'
 	from sourceSets.test.output
-}
+}*/
 

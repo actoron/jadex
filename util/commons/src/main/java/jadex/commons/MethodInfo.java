@@ -23,7 +23,7 @@ public class MethodInfo
 	// cached values
 	
 	/** Cached return type. */
-	protected ClassInfo returntype;
+	private ClassInfo returntype;
 	
 	/** Cached class. */
 	protected String classname;

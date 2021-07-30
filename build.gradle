@@ -301,6 +301,7 @@ subprojects
         dependencies
         {
             testImplementation junit
+			testFixturesImplementation junit
         }
 
         processResources {
