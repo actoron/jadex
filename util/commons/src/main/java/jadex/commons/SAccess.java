@@ -9,11 +9,14 @@ import java.lang.reflect.Method;
 
 public class SAccess
 {
-    /** Enable setAccessible using approach "Unsafe". */
+    /** Enable approach "Unsafe". */
     public static boolean ENABLE_UNSAFE_SETACCESSIBLE = true;
     
-    /** Globally disable setAccessible using approach "Native Access". */
+    /** Enable approach "Native Access". */
     public static boolean ENABLE_NATIVE_SETACCESSIBLE = true;
+    
+    /** Enable approach "Instrumentation". */
+    public static boolean ENABLE_INSTRUMENTATION_SETACCESSIBLE = true;
     
     /** Flag if class was inited. */
     private volatile static boolean inited = false;
@@ -40,9 +43,26 @@ public class SAccess
     /** NativeHelper.setAccessible() Method if available **/
     private static MethodHandle nativesetaccessible;
     
+    // ========== Access handle unlocked by any method. =========
+    
+    /** Access to the setAccessible0 internal method, if available. */
+    private static volatile MethodHandle setaccessible;
+    
     public static final void setAccessible(AccessibleObject acc, boolean flag)
     {
         checkInit();
+        
+        if (setaccessible != null)
+        {
+            try
+            {
+                setaccessible.invoke(acc, flag);
+                return;
+            }
+            catch (Throwable t)
+            {
+            }
+        }
         
         if (setaccessibleoverrideoffset != null)
         {
@@ -53,7 +73,6 @@ public class SAccess
             }
             catch (Throwable t)
             {
-                t.printStackTrace();
             }
         }
         
@@ -65,7 +84,6 @@ public class SAccess
             }
             catch (Throwable t)
             {
-                t.printStackTrace();
             }
         }
         
@@ -88,6 +106,9 @@ public class SAccess
                     
                     if (ENABLE_NATIVE_SETACCESSIBLE)
                         initNative();
+                    
+                    if (ENABLE_INSTRUMENTATION_SETACCESSIBLE)
+                        initInstrumentation();
                     
                     inited = true;
                 }
@@ -197,6 +218,14 @@ public class SAccess
                             if (!before && after)
                             {
                                 setaccessibleoverrideoffset = (long) i;
+                                
+                                if (setaccessible == null)
+                                {
+                                    Method sa = AccessibleObject.class.getDeclaredMethod("setAccessible0", boolean.class);
+                                    putboolean.invoke(unsafe, sa, setaccessibleoverrideoffset, true);
+                                    setaccessible = MethodHandles.lookup().unreflect(sa);
+                                }
+                                
                                 break;
                             }
                         }
@@ -243,10 +272,37 @@ public class SAccess
                 {
                     Method method = nativehelperclass.getDeclaredMethod("setAccessible", AccessibleObject.class, boolean.class);
                     nativesetaccessible = MethodHandles.lookup().unreflect(method);
+    
+                    if (setaccessible == null)
+                    {
+                        Method sa = AccessibleObject.class.getDeclaredMethod("setAccessible0", boolean.class);
+                        nativesetaccessible.invoke(sa, true);
+                        setaccessible = MethodHandles.lookup().unreflect(sa);
+                    }
                 }
-                catch (Exception e)
+                catch (Throwable t)
                 {
                 }
+            }
+        }
+    }
+    
+    /**
+     *  Initialize instrumentation-based approach.
+     */
+    private static final void initInstrumentation()
+    {
+        if (setaccessible == null)
+        {
+            try
+            {
+                Class<?> instaccessclass = Class.forName("jadex.bytecode.access.InstAccess");
+                Method method = instaccessclass.getDeclaredMethod("getAccessHandle");
+                MethodHandle getaccesshandle = MethodHandles.lookup().unreflect(method);
+                setaccessible = (MethodHandle) getaccesshandle.invoke();
+            }
+            catch (Throwable t)
+            {
             }
         }
     }

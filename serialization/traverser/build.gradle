@@ -1,14 +1,18 @@
 description 'The traverser allows for realizing object transformations like cloning.'
 
+apply plugin: 'java-test-fixtures'
+
 dependencies 
 {
 	api project(':util:commons')
 	api project(':util:bytecode')
+	testFixturesImplementation 'junit:junit:4.13.2'
 }
 
 // testjar is needed for jadex-android-xmlpull tests
-task testJar(type:Jar, dependsOn: testClasses) {
+// Disabled because no more android, is this still working? then remove..
+/*task testJar(type:Jar, dependsOn: testClasses) {
 	classifier = 'test'
 	from sourceSets.test.output
-}
+}*/
 
