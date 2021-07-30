@@ -60,6 +60,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.ImmutableProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -1778,7 +1779,7 @@ public class RemoteReferenceModule
 					return object instanceof IBrokenProxy;
 				}
 				
-				public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+				public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 				{
 					return getProxyReference(object, null, targetcl);
 				}
@@ -1793,7 +1794,7 @@ public class RemoteReferenceModule
 						&& object.getClass().isAnnotationPresent(Service.class);
 				}
 				
-				public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+				public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 				{
 					return BasicServiceInvocationHandler.getPojoServiceProxy(object);
 				}
@@ -1818,7 +1819,7 @@ public class RemoteReferenceModule
 					return ret;
 				}
 				
-				public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+				public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 				{
 					ServiceInputConnectionProxy sicp = (ServiceInputConnectionProxy)object;
 					
@@ -1854,7 +1855,7 @@ public class RemoteReferenceModule
 					return ret;
 				}
 				
-				public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+				public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 				{
 					ServiceOutputConnectionProxy socp = (ServiceOutputConnectionProxy)object;
 					

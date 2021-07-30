@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -101,7 +102,7 @@ public class CollectionCodec extends AbstractCodec
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		ec.writeVarInt(((Collection) object).size());
 		
@@ -115,7 +116,7 @@ public class CollectionCodec extends AbstractCodec
 				if (val != null)
 				{
 					Class valclazz = val.getClass();
-					traverser.doTraverse(val, valclazz, preprocessors, processors, mode, targetcl, ec);
+					traverser.doTraverse(val, valclazz, preprocessors, processors, converter, mode, targetcl, ec);
 				}
 				else
 				{

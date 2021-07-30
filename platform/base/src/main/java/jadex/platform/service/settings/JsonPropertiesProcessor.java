@@ -9,6 +9,7 @@ import com.eclipsesource.json.JsonValue;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -38,7 +39,7 @@ public class JsonPropertiesProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Object ret = object;
 		if (object instanceof Properties)
@@ -65,14 +66,14 @@ public class JsonPropertiesProcessor implements ITraverseProcessor
 				tw.write(",");
 				wr.writeString("properties");
 				wr.write(":");
-				traverser.doTraverse(props.getProperties(), null, conversionprocessors, processors, mode, targetcl, context);
+				traverser.doTraverse(props.getProperties(), null, conversionprocessors, processors, converter, mode, targetcl, context);
 			}
 			if (props.getSubproperties() != null)
 			{
 				tw.write(",");
 				wr.writeString("subproperties");
 				wr.write(":");
-				traverser.doTraverse(props.getSubproperties(), null, conversionprocessors, processors, mode, targetcl, context);
+				traverser.doTraverse(props.getSubproperties(), null, conversionprocessors, processors, converter, mode, targetcl, context);
 			}
 			wr.write("}");
 		}
@@ -86,10 +87,10 @@ public class JsonPropertiesProcessor implements ITraverseProcessor
 			Properties props = new Properties(name, proptype, id);
 			
 			if(obj.get("properties")!=null)
-				 props.setProperties((Property[]) traverser.doTraverse(obj.get("properties"), Property[].class, conversionprocessors, processors, mode, targetcl, context));
+				 props.setProperties((Property[]) traverser.doTraverse(obj.get("properties"), Property[].class, conversionprocessors, processors, converter, mode, targetcl, context));
 			
 			if(obj.get("subproperties")!=null)
-				 props.setSubproperties((Properties[]) traverser.doTraverse(obj.get("subproperties"), Properties[].class, conversionprocessors, processors, mode, targetcl, context));
+				 props.setSubproperties((Properties[]) traverser.doTraverse(obj.get("subproperties"), Properties[].class, conversionprocessors, processors, converter, mode, targetcl, context));
 			
 			ret = props;
 			

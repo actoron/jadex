@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
@@ -38,7 +39,7 @@ public class ArrayProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		Object ret = getReturnObject(object, clazz, targetcl, context);
@@ -50,7 +51,7 @@ public class ArrayProcessor implements ITraverseProcessor
 		for(int i=0; i<length; i++) 
 		{
 			Object val = Array.get(object, i);
-			Object newval = traverser.doTraverse(val, ctype, conversionprocessors, processors, mode, targetcl, context);
+			Object newval = traverser.doTraverse(val, ctype, conversionprocessors, processors, converter, mode, targetcl, context);
 			if(newval != Traverser.IGNORE_RESULT && (SCloner.isCloneContext(context) || newval!=val))
 				Array.set(ret, i, newval);
 		}

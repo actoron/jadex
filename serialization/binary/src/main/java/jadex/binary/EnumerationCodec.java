@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Vector;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -57,7 +58,7 @@ public class EnumerationCodec extends AbstractCodec
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		Enumeration en = (Enumeration)object;
 		
@@ -79,7 +80,7 @@ public class EnumerationCodec extends AbstractCodec
 			{
 				ec.writeVarInt(count);
 				Class valclazz = val.getClass();
-				traverser.doTraverse(val, valclazz, preprocessors, processors, null, null, ec);
+				traverser.doTraverse(val, valclazz, preprocessors, processors, converter, null, null, ec);
 			}
 			++count;
 		}

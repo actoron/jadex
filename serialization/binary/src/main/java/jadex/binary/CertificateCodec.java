@@ -6,6 +6,7 @@ import java.security.cert.CertificateFactory;
 import java.util.List;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -71,13 +72,13 @@ public class CertificateCodec extends AbstractCodec
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		try
 		{
 			ec.writeString(((Certificate)object).getType());
 			byte[] encimg = ((Certificate)object).getEncoded();
-			traverser.doTraverse(encimg, encimg.getClass(), preprocessors, processors, mode, targetcl, ec);
+			traverser.doTraverse(encimg, encimg.getClass(), preprocessors, processors, converter, mode, targetcl, ec);
 			return object;
 		}
 		catch(RuntimeException e)

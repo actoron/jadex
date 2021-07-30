@@ -2,7 +2,7 @@ import * as litelement from "./lit/lit-element.js"
 import * as baseelement from "../webcomponents/baseelement.js"
 import * as cidelement from "../webcomponents/cidelement.js"
 
-console.log("Executing modloader " + Object.keys(litelement));
+//console.log("Executing modloader " + Object.keys(litelement));
 
 window.modLoad = (function () {
 	let resolvemap = {};

@@ -8,6 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -38,7 +39,7 @@ public class JsonServiceIdentifierProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
 		wr.addObject(object);
@@ -50,17 +51,17 @@ public class JsonServiceIdentifierProcessor implements ITraverseProcessor
 		wr.writeNameString("scope", sid.getScope().name()).write(", ");
 		wr.writeNameString("type", sid.getServiceType().getTypeName()).write(", ");
 		wr.write("\"providerId\":");
-		traverser.traverse(sid.getProviderId(), IComponentIdentifier.class, conversionprocessors, processors, mode, targetcl, context);
+		traverser.traverse(sid.getProviderId(), IComponentIdentifier.class, conversionprocessors, processors, converter, mode, targetcl, context);
 		wr.write(", ");
 		wr.write("\"networkNames\":");
-		traverser.traverse(sid.getNetworkNames(), Set.class, conversionprocessors, processors, mode, targetcl, context);
+		traverser.traverse(sid.getNetworkNames(), Set.class, conversionprocessors, processors, converter, mode, targetcl, context);
 		wr.write(", ");
 		wr.write("\"tags\":");
-		traverser.traverse(sid.getTags(), Set.class, conversionprocessors, processors, mode, targetcl, context);
+		traverser.traverse(sid.getTags(), Set.class, conversionprocessors, processors, converter, mode, targetcl, context);
 		wr.write(", ");
 		wr.writeNameValue("unrestricted", sid.isUnrestricted()).write(", ");
 		wr.write("\"resourceIdentifier\":");
-		traverser.traverse(sid.getResourceIdentifier(), IResourceIdentifier.class, conversionprocessors, processors, mode, targetcl, context);
+		traverser.traverse(sid.getResourceIdentifier(), IResourceIdentifier.class, conversionprocessors, processors, converter, mode, targetcl, context);
 
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(IServiceIdentifier.class);

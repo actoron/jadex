@@ -12,6 +12,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -41,12 +42,12 @@ public class JsonServiceIdentifierProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 		JsonObject obj = (JsonObject)object;
 		
-		IComponentIdentifier pid = (IComponentIdentifier)traverser.traverse(obj.get("providerId"), IComponentIdentifier.class, conversionprocessors, processors, mode, targetcl, context);
-		IResourceIdentifier rid = (IResourceIdentifier)traverser.traverse(obj.get("resourceIdentifier"), IResourceIdentifier.class, conversionprocessors, processors, mode, targetcl, context);
+		IComponentIdentifier pid = (IComponentIdentifier)traverser.traverse(obj.get("providerId"), IComponentIdentifier.class, conversionprocessors, processors, converter, mode, targetcl, context);
+		IResourceIdentifier rid = (IResourceIdentifier)traverser.traverse(obj.get("resourceIdentifier"), IResourceIdentifier.class, conversionprocessors, processors, converter, mode, targetcl, context);
 		
 		// todo: supertypes, networknames, unrestricted???
 //		public ServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, ClassInfo[] supertypes, String servicename, IResourceIdentifier rid, String scope, Set<String> networknames, boolean unrestricted)

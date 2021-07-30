@@ -15,6 +15,7 @@ import jadex.binary.IEncodingContext;
 import jadex.binary.SBinarySerializer;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.BeanIntrospectorFactory;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -84,7 +85,7 @@ public class BinaryResponseProcessor extends AbstractCodec
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		Response r = (Response)object;
 		
@@ -92,9 +93,9 @@ public class BinaryResponseProcessor extends AbstractCodec
 		ec.writeString(""+r.getEntity());
 		
 		MultivaluedMap<String, Object> hs = r.getHeaders();
-		traverser.doTraverse(hs, Map.class, preprocessors, processors, mode, targetcl, ec);
+		traverser.doTraverse(hs, Map.class, preprocessors, processors, converter, mode, targetcl, ec);
 
-		BeanCodec.writeBeanProperties(object, clazz, preprocessors, processors, traverser, mode, ec, intro);
+		BeanCodec.writeBeanProperties(object, clazz, preprocessors, processors, traverser, converter, mode, ec, intro);
 		
 		return object;
 	}

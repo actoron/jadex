@@ -355,7 +355,7 @@ public class SerializationServices implements ISerializationServices
 				return ProxyReference.class.equals(type);
 			}
 			
-			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 			{
 				try
 				{
@@ -378,7 +378,7 @@ public class SerializationServices implements ISerializationServices
 				return ServiceInputConnectionProxy.class.equals(type);
 			}
 			
-			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 			{
 				try
 				{
@@ -403,7 +403,7 @@ public class SerializationServices implements ISerializationServices
 				return ServiceOutputConnectionProxy.class.equals(type);
 			}
 			
-			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 			{
 				try
 				{
@@ -429,7 +429,7 @@ public class SerializationServices implements ISerializationServices
 				return SpanContextInfo.class.equals(type);
 			}
 			
-			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 			{
 				try
 				{
@@ -500,7 +500,7 @@ public class SerializationServices implements ISerializationServices
 				return object!=null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class);
 			}
 			
-			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 			{
 				try
 				{
@@ -528,7 +528,7 @@ public class SerializationServices implements ISerializationServices
 				return rrm.isRemoteReference(object);
 			}
 			
-			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 			{
 				try
 				{
@@ -551,7 +551,7 @@ public class SerializationServices implements ISerializationServices
 		// output connection as result of call
 		procs.add(new ITraverseProcessor()
 		{
-			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 			{
 				try
 				{
@@ -581,7 +581,7 @@ public class SerializationServices implements ISerializationServices
 		// input connection proxy as result of call
 		procs.add(new ITraverseProcessor()
 		{
-			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 			{
 				try
 				{
@@ -616,7 +616,7 @@ public class SerializationServices implements ISerializationServices
 				return object instanceof Span;
 			}
 			
-			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 			{
 				try
 				{

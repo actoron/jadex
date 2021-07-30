@@ -12,6 +12,7 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -55,7 +56,7 @@ public class JsonTupleProcessor extends AbstractJsonProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonReadContext context)
+	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonReadContext context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		JsonObject obj = (JsonObject)object;
@@ -84,7 +85,7 @@ public class JsonTupleProcessor extends AbstractJsonProcessor
 		if(idx!=null)
 			((JsonReadContext)context).addKnownObject(ret, idx.asInt());
 		
-		Object[] entities = (Object[])traverser.doTraverse(obj.get("values"), Object[].class, conversionprocessors, processors, mode, targetcl, context);
+		Object[] entities = (Object[])traverser.doTraverse(obj.get("values"), Object[].class, conversionprocessors, processors, converter, mode, targetcl, context);
 //		Object[] entities = (Object[])traverser.doTraverse(obj.get("values"), Object[].class, traversed, preprocessors, processors, postprocessors, clone, targetcl, context);
 		try
 		{
@@ -106,14 +107,14 @@ public class JsonTupleProcessor extends AbstractJsonProcessor
 	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
 	 *  @return The processed object.
 	 */
-	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonWriteContext wr)
+	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonWriteContext wr)
 	{
 		wr.addObject(wr.getCurrentInputObject());
 
 		Object[] entities = ((Tuple)object).getEntities();
 		wr.write("{");
 		wr.write("\"values\":");
-		traverser.doTraverse(entities, entities.getClass(), conversionprocessors, processors, mode, targetcl, wr);
+		traverser.doTraverse(entities, entities.getClass(), conversionprocessors, processors, converter, mode, targetcl, wr);
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());
 		if(wr.isWriteId())

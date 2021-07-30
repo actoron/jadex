@@ -8,6 +8,7 @@ import java.util.Set;
 
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
@@ -42,7 +43,7 @@ public class MultiCollectionProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		MultiCollection<Object, Object> ret = (MultiCollection<Object, Object>)getReturnObject(object, clazz, context);
@@ -55,14 +56,14 @@ public class MultiCollectionProcessor implements ITraverseProcessor
 		{
 			Object key = keys[i];
 			Class<?> keyclazz = key != null? key.getClass() : null;
-			Object newkey = traverser.doTraverse(key, keyclazz, conversionprocessors, processors, mode, targetcl, context);
+			Object newkey = traverser.doTraverse(key, keyclazz, conversionprocessors, processors, converter, mode, targetcl, context);
 			if (newkey != Traverser.IGNORE_RESULT)
 			{
 				Collection<Object> vals = map.get(key);
 				for(Object val : vals)
 				{
 					Class<?> valclazz = val!=null? val.getClass(): null;
-					Object newval = traverser.doTraverse(val, valclazz, conversionprocessors, processors, mode, targetcl, context);
+					Object newval = traverser.doTraverse(val, valclazz, conversionprocessors, processors, converter, mode, targetcl, context);
 					
 					if(newval != Traverser.IGNORE_RESULT && (SCloner.isCloneContext(context) || newval!=val))
 						ret.add(newkey, newval);

@@ -12,6 +12,7 @@ import com.eclipsesource.json.JsonValue;
 import jadex.commons.SAccess;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -55,7 +56,7 @@ public class JsonMultiCollectionProcessor extends AbstractJsonProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonReadContext context)
+	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonReadContext context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		
@@ -94,7 +95,7 @@ public class JsonMultiCollectionProcessor extends AbstractJsonProcessor
 		Map<?, ?> map = null;
 		JsonValue m = obj.get("map");
 		if(m!=null)
-			map = (Map<?,?>)traverser.traverse(m, Map.class, conversionprocessors, processors, mode, targetcl, context);
+			map = (Map<?,?>)traverser.traverse(m, Map.class, conversionprocessors, processors, converter, mode, targetcl, context);
 //			map = (Map<?,?>)traverser.traverse(m, Map.class, preprocessors, processors, postprocessors, targetcl, context);
 		
 		if(ctype == null)
@@ -124,7 +125,7 @@ public class JsonMultiCollectionProcessor extends AbstractJsonProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonWriteContext wr)
+	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonWriteContext wr)
 	{
 		try
 		{
@@ -143,7 +144,7 @@ public class JsonMultiCollectionProcessor extends AbstractJsonProcessor
 			Field mapfield = MultiCollection.class.getDeclaredField("map");
 			SAccess.setAccessible(mapfield, true);
 			Map<?,?> map = (Map<?,?>)mapfield.get(mc);
-			traverser.doTraverse(map, map.getClass(), conversionprocessors, processors, mode, targetcl, wr);
+			traverser.doTraverse(map, map.getClass(), conversionprocessors, processors, converter, mode, targetcl, wr);
 			
 			if(wr.isWriteClass())
 				wr.write(",").writeClass(object.getClass());

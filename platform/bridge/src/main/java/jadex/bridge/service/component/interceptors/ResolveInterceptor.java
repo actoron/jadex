@@ -187,7 +187,10 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 				Object[] as = (Object[])args.get(2);
 				//ClassInfo rettype = (ClassInfo)args.get(3);
 				
-				//if(methodname.indexOf("getNF")!=-1)
+				//if(methodname.indexOf("postIm")!=-1)
+				//	System.out.println("herere");
+				
+				//if(methodname.indexOf("postMes")!=-1)
 				//	System.out.println("herere");
 				
 				// todo: always try decoding strings with json?
@@ -201,6 +204,8 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 							{
 								// convert and check if the converted type fits to the argtype
 								Object val = convertFromJsonString((String)as[i], null);
+								// Checks expected type with read Json type
+								// Problem could be e.g. a json number that is just a string paremeter
 								if(i>=argtypes.length || val!=null && argtypes[i].equals(new ClassInfo(val.getClass()))) //SReflect.isSupertype(argtypes[i], val.getClass()))
 									as[i] = val;
 							}

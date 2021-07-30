@@ -3,6 +3,7 @@ package jadex.transformation.jsonserializer.processors;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -37,7 +38,7 @@ public abstract class AbstractJsonProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected abstract Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonReadContext context);
+	protected abstract Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonReadContext context);
 	
 	/**
 	 *  Write an object.
@@ -46,7 +47,7 @@ public abstract class AbstractJsonProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected abstract Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonWriteContext context);
+	protected abstract Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonWriteContext context);
 	
 	/**
 	 *  Test if the processor is applicable.
@@ -70,11 +71,11 @@ public abstract class AbstractJsonProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public final Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public final Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 		if (context instanceof JsonReadContext)
-			return readObject(object, type, traverser, conversionprocessors, processors, mode, targetcl, (JsonReadContext) context);
+			return readObject(object, type, traverser, conversionprocessors, processors, converter, mode, targetcl, (JsonReadContext) context);
 		else
-			return writeObject(object, type, traverser, conversionprocessors, processors, mode, targetcl, (JsonWriteContext) context);
+			return writeObject(object, type, traverser, conversionprocessors, processors, converter, mode, targetcl, (JsonWriteContext) context);
 	}
 }

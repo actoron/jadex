@@ -15,6 +15,7 @@ import jadex.commons.SUtil;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.BeanIntrospectorFactory;
 import jadex.commons.transformation.IObjectStringConverter;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
@@ -63,7 +64,7 @@ public class JsonBeanProcessor extends AbstractJsonProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonReadContext context)
+	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonReadContext context)
 	{
 		Object ret = null;
 		Class<?> clazz = SReflect.getClass(type);
@@ -77,7 +78,7 @@ public class JsonBeanProcessor extends AbstractJsonProcessor
 		
 		try
 		{
-			readProperties(object, clazz, conversionprocessors, processors, mode, traverser, targetcl, ret, context, intro);
+			readProperties(object, clazz, conversionprocessors, processors, converter, mode, traverser, targetcl, ret, context, intro);
 		}
 		catch(Exception e)
 		{
@@ -94,7 +95,7 @@ public class JsonBeanProcessor extends AbstractJsonProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonWriteContext wr)
+	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonWriteContext wr)
 	{
 //		System.out.println("fp: "+object);
 		wr.addObject(wr.getCurrentInputObject());
@@ -121,7 +122,7 @@ public class JsonBeanProcessor extends AbstractJsonProcessor
 //			System.out.println("cloned: "+object.getClass());
 //			ret = object.getClass().newInstance();
 			
-			writeProperties(object, conversionprocessors, processors, mode, traverser, targetcl, wr, intro, !wr.isWriteClass() && !wr.isWriteId());
+			writeProperties(object, conversionprocessors, processors, converter, mode, traverser, targetcl, wr, intro, !wr.isWriteClass() && !wr.isWriteId());
 		}
 		catch(Exception e)
 		{
@@ -136,7 +137,7 @@ public class JsonBeanProcessor extends AbstractJsonProcessor
 	/**
 	 *  Clone all properties of an object.
 	 */
-	protected static void readProperties(Object object, Type type, List<ITraverseProcessor> postprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, Object ret, JsonReadContext context, IBeanIntrospector intro)
+	protected static void readProperties(Object object, Type type, List<ITraverseProcessor> postprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, Traverser traverser, ClassLoader targetcl, Object ret, JsonReadContext context, IBeanIntrospector intro)
 	{
 		// Get all declared fields (public, protected and private)
 		
@@ -163,7 +164,7 @@ public class JsonBeanProcessor extends AbstractJsonProcessor
 //						System.out.println("VAL " + ((JsonObject) val).toString());
 //						System.out.println("CL " + ((JsonObject) val).getString(JsonTraverser.CLASSNAME_MARKER, null));
 //						System.out.println("SOT: " +sot);
-						Object newval = traverser.doTraverse(val, sot, postprocessors, processors, mode, targetcl, context);
+						Object newval = traverser.doTraverse(val, sot, postprocessors, processors, converter, mode, targetcl, context);
 //						Object newval = traverser.doTraverse(val, sot, rsionprocessors, postprocessors, mode, targetcl, context)
 //						Object newval = traverser.doTraverse(val, sot, cloned, null, processors, postprocessors, clone, targetcl, context);
 
@@ -172,7 +173,8 @@ public class JsonBeanProcessor extends AbstractJsonProcessor
 //							if ("result".equals(prop.getName()))
 //								System.out.println("PROP SET CALLED");
 							
-							prop.setPropertyValue(ret, convertBasicType(newval, prop.getType()));
+							prop.setPropertyValue(ret, traverser.convertBasicType(converter, newval, prop.getType(), targetcl, context));
+							//prop.setPropertyValue(ret, convertBasicType(newval, prop.getType()));
 						}
 					}
 				}
@@ -187,7 +189,7 @@ public class JsonBeanProcessor extends AbstractJsonProcessor
 	/**
 	 *  Clone all properties of an object.
 	 */
-	protected void writeProperties(Object object, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, 
+	protected void writeProperties(Object object, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, Traverser traverser, 
 		ClassLoader targetcl, JsonWriteContext wr, IBeanIntrospector intro, boolean first)
 	{
 		Class<?> clazz = object.getClass();
@@ -219,7 +221,7 @@ public class JsonBeanProcessor extends AbstractJsonProcessor
 							wr.writeString(name);
 							wr.write(":");
 							
-							traverser.doTraverse(val, prop.getType(), conversionprocessors, processors, mode, targetcl, wr);
+							traverser.doTraverse(val, prop.getType(), conversionprocessors, processors, converter, mode, targetcl, wr);
 						}
 					}
 				}
@@ -275,53 +277,5 @@ public class JsonBeanProcessor extends AbstractJsonProcessor
 			throw new RuntimeException(e);
 		}
 		return ret;
-	}
-	
-	/**
-	 * 
-	 * @param value
-	 * @param targetclazz
-	 * @return
-	 */
-	public static Object convertBasicType(Object value, Class<?> targetclazz)
-	{
-		if(value!=null && !SReflect.isSupertype(targetclazz, value.getClass()))
-		{
-			// Autoconvert basic from string
-			if(value instanceof String)
-			{
-//				IStringObjectConverter conv = BasicTypeConverter.getBasicStringConverter(targetclazz);
-				IStringObjectConverter conv = BasicTypeConverter.CONVERTERS.getStringConverter(targetclazz);
-				if(conv!=null)
-				{
-					try
-					{
-						value = conv.convertString((String)value, null);
-					}
-					catch(Exception e)
-					{
-						SUtil.rethrowAsUnchecked(e);
-					}
-				}
-			}
-			// Autoconvert basic to string
-			else if(String.class.equals(targetclazz))
-			{
-				IObjectStringConverter conv = BasicTypeConverter.getBasicObjectConverter(value.getClass());
-				if(conv!=null)
-				{
-					try
-					{
-						value = conv.convertObject(value, null);
-					}
-					catch(Exception e)
-					{
-						SUtil.rethrowAsUnchecked(e);
-					}
-				}
-			}
-		}
-		
-		return value;
 	}
 }

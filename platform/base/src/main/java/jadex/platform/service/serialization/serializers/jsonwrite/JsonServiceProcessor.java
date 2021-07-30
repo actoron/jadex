@@ -9,6 +9,7 @@ import java.util.Set;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -39,7 +40,7 @@ public class JsonServiceProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
 		wr.addObject(object);
@@ -67,12 +68,12 @@ public class JsonServiceProcessor implements ITraverseProcessor
 //		wr.writeNameString("serviceIdentifier", service.getId().toString()).write(", ");
 		
 		wr.write("\"serviceIdentifier\":");
-		traverser.traverse(service.getServiceId(), IServiceIdentifier.class, conversionprocessors, processors, mode, targetcl, context);
+		traverser.traverse(service.getServiceId(), IServiceIdentifier.class, conversionprocessors, processors, converter, mode, targetcl, context);
 		
 		// add method names for proxy gen
 		wr.write(",");
 		wr.write("\"methodNames\":");
-		traverser.traverse(ms, Set.class, conversionprocessors, processors, mode, targetcl, context);
+		traverser.traverse(ms, Set.class, conversionprocessors, processors, converter, mode, targetcl, context);
 
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(IService.class);

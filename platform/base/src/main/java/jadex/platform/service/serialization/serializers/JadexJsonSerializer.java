@@ -57,6 +57,9 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 	/** The read processors. */
 	public List<ITraverseProcessor> readprocs;
 	
+	/** The basic string converter. */
+	protected IStringConverter converter;
+	
 	/**
 	 *  Create a new serializer.
 	 */
@@ -76,6 +79,8 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 		readprocs.add(new jadex.platform.service.serialization.serializers.jsonread.JsonServiceIdentifierProcessor());
 		readprocs.add(new jadex.platform.service.serialization.serializers.jsonread.JsonServiceProcessor());
 		readprocs.addAll(JsonTraverser.readprocs);
+		
+		converter = new JadexBasicTypeSerializer();
 	}
 	
 	//-------- methods --------
@@ -108,7 +113,7 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 			writeid = conv.get("writeid") instanceof Boolean? (Boolean)conv.get("writeid"): true;
 		}
 		
-		byte[] ret = JsonTraverser.objectToByteArray(val, classloader, null, writeclass, writeid, null, preprocs!=null?Arrays.asList(preprocs):null, writeprocs, usercontext);
+		byte[] ret = JsonTraverser.objectToByteArray(val, classloader, null, writeclass, writeid, null, preprocs!=null?Arrays.asList(preprocs):null, writeprocs, usercontext, converter);
 		
 		if(DEBUG)
 			System.out.println("encode message: "+(new String(ret, SUtil.UTF8)));
@@ -124,7 +129,7 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 	{
 		if(DEBUG)
 			System.out.println("decode message: "+(new String((byte[])bytes, SUtil.UTF8)));
-		return JsonTraverser.objectFromByteArray(bytes, classloader, rep, null, null, readprocs, postprocs!=null?Arrays.asList(postprocs):null, usercontext);
+		return JsonTraverser.objectFromByteArray(bytes, classloader, rep, null, null, readprocs, postprocs!=null?Arrays.asList(postprocs):null, usercontext, converter);
 	}
 	
 	/**
@@ -166,7 +171,13 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 	 */
 	public Object convertString(String val, Class<?> type, ClassLoader cl, Object context)
 	{
-		return JsonTraverser.objectFromString(val, cl, null, type, readprocs, null, context);
+		return JsonTraverser.objectFromString(val, cl, null, type, readprocs, null, context, converter);
+	}
+	
+	private static JadexBasicTypeSerializer bts = new JadexBasicTypeSerializer();
+	public Object convertBasicType(String val, Class<?> targettype, ClassLoader cl, Object context)
+	{
+		return bts.convertString(val, targettype, cl, context);
 	}
 	
 	/**
@@ -179,7 +190,7 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 	public String convertObject(Object val, Class<?> type, ClassLoader cl, Object context)
 	{
 		// does not use type currently?!
-		String ret = JsonTraverser.objectToString(val, cl, true, true, null, null, writeprocs, context);
+		String ret = JsonTraverser.objectToString(val, cl, true, true, null, null, writeprocs, context, converter);
 		//if((""+val).indexOf("ChatEvent")!=-1)
 		//System.out.println("json: "+ret);
 		return ret;
@@ -201,7 +212,7 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 			return object instanceof byte[];
 		}
 		
-		public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+		public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 		{
 			JsonWriteContext wr = (JsonWriteContext)context;
 			wr.addObject(wr.getCurrentInputObject());
@@ -241,7 +252,7 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 			return ret;*/
 		}
 
-		public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+		public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 		{
 			JsonObject obj = (JsonObject)object;
 			

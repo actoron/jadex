@@ -161,7 +161,7 @@ public class SBinarySerializer
 		
 		Traverser traverser = new BinaryWriteTraverser();
 		//Traverser.traverseObject(val, ENCODER_HANDLERS, false, context);
-		traverser.traverse(val, null, preprocessors, encoderhandlers, Traverser.MODE.PREPROCESS, classloader, context);
+		traverser.traverse(val, null, preprocessors, encoderhandlers, null, Traverser.MODE.PREPROCESS, classloader, context);
 //		traverser.traverse(val, null, new IdentityHashMap<Object, Object>(), preprocessors, encoderhandlers, null, false, null, context);
 		return context.getWrittenBytes();
 	}
@@ -198,7 +198,7 @@ public class SBinarySerializer
 		
 		Traverser traverser = new BinaryWriteTraverser();
 		//Traverser.traverseObject(val, ENCODER_HANDLERS, false, context);
-		traverser.traverse(val, null, preprocessors, encoderhandlers, Traverser.MODE.PREPROCESS, classloader, context);
+		traverser.traverse(val, null, preprocessors, encoderhandlers, null, Traverser.MODE.PREPROCESS, classloader, context);
 //		traverser.traverse(val, null, new IdentityHashMap<Object, Object>(), preprocessors, encoderhandlers, null, false, null, context);
 		
 		return ((FramingEncodingContext) context).toByteArray();
@@ -215,7 +215,7 @@ public class SBinarySerializer
 	 */
 	public static long writeObjectToDataOutput(DataOutput dato, Object val, ClassLoader classloader)
 	{
-		return writeObjectToDataOutput(dato, val, null, null, classloader, null, null);
+		return writeObjectToDataOutput(dato, val, null, null, classloader, null);
 	}
 	
 	/**
@@ -280,7 +280,7 @@ public class SBinarySerializer
 //			}
 //		};
 		//Traverser.traverseObject(val, ENCODER_HANDLERS, false, context);
-		traverser.traverse(val, null, preprocessors, encoderhandlers, Traverser.MODE.PREPROCESS, classloader, context);
+		traverser.traverse(val, null, preprocessors, encoderhandlers, null, Traverser.MODE.PREPROCESS, classloader, context);
 		
 		return context.getWrittenBytes();
 	}
@@ -505,7 +505,7 @@ public class SBinarySerializer
 				
 				if (pp.isApplicable(context.getLastObject(), clazz, context.getClassloader(), context))
 				{
-					context.setLastObject(pp.process(context.getLastObject(), clazz, null, context.getPostProcessors(), null, Traverser.MODE.POSTPROCESS, context.getClassloader(), context));
+					context.setLastObject(pp.process(context.getLastObject(), clazz, null, context.getPostProcessors(), null, null, Traverser.MODE.POSTPROCESS, context.getClassloader(), context));
 					break;
 				}
 			}

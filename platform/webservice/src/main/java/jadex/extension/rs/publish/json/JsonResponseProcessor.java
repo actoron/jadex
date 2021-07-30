@@ -13,6 +13,7 @@ import com.eclipsesource.json.JsonValue;
 
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -59,7 +60,7 @@ public class JsonResponseProcessor extends AbstractJsonProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonReadContext context)
+	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonReadContext context)
 	{
 		JsonObject obj = (JsonObject)object;
 		Class<?> clazz = SReflect.getClass(type);
@@ -67,7 +68,7 @@ public class JsonResponseProcessor extends AbstractJsonProcessor
 		int status = obj.getInt("status", 0);
 		String entity = obj.getString("entity", null);
 		JsonValue hs = obj.get("headers");
-		Map<String, Object> headers = (Map)traverser.traverse(hs, Map.class, conversionprocessors, processors, mode, targetcl, context);
+		Map<String, Object> headers = (Map)traverser.traverse(hs, Map.class, conversionprocessors, processors, converter, mode, targetcl, context);
 		
 		ResponseBuilder rb = Response.status(status).entity(entity);
 		for(Map.Entry<String, Object> entry: headers.entrySet())
@@ -96,7 +97,7 @@ public class JsonResponseProcessor extends AbstractJsonProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonWriteContext context)
+	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, JsonWriteContext context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
 		wr.addObject(object);
@@ -116,7 +117,7 @@ public class JsonResponseProcessor extends AbstractJsonProcessor
 		//wr.writeNameString("statusinfo", r.getStatusInfo()).write(", ");
 		wr.writeNameString("entity", ""+r.getEntity()).write(", ");
 		wr.write("\"headers\":");
-		traverser.traverse(r.getHeaders(), Map.class, conversionprocessors, processors, mode, targetcl, context);
+		traverser.traverse(r.getHeaders(), Map.class, conversionprocessors, processors, converter, mode, targetcl, context);
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(IServiceIdentifier.class);
 		wr.write("}");

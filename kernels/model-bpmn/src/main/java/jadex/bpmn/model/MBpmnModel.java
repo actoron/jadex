@@ -25,6 +25,7 @@ import jadex.commons.IdGenerator;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BiHashMap;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.SCloner;
 import jadex.commons.transformation.traverser.TraversedObjectsContext;
@@ -1733,10 +1734,10 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		final IdGenerator idgen = new IdGenerator();
 		Traverser trav = new Traverser()
 		{
-			public Object doTraverse(Object object, Type type, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			public Object doTraverse(Object object, Type type, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter,  MODE mode, ClassLoader targetcl, Object context)
 			{
 				boolean istraversed = ((TraversedObjectsContext) context).get(object) != null;
-				Object ret = super.doTraverse(object, type, conversionprocessors, processors, mode, targetcl, context);
+				Object ret = super.doTraverse(object, type, conversionprocessors, processors, converter, mode, targetcl, context);
 				if (!istraversed && object != ret && ret instanceof MIdElement)
 				{
 					String oldid = ((MIdElement) ret).getId();
@@ -1749,7 +1750,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		List<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>();
 		procs.add(new ITraverseProcessor()
 		{
-			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 			{
 				return Traverser.IGNORE_RESULT;
 			}
@@ -1771,7 +1772,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		});
 		procs.add(new ITraverseProcessor()
 		{
-			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, IStringConverter converter, MODE mode, ClassLoader targetcl, Object context)
 			{
 				return object;
 			}
