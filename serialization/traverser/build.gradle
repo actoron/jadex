@@ -1,9 +1,12 @@
 description 'The traverser allows for realizing object transformations like cloning.'
 
+apply plugin: 'java-test-fixtures'
+
 dependencies 
 {
 	api project(':util:commons')
 	api project(':util:bytecode')
+	testFixturesImplementation 'junit:junit:4.13.2'
 }
 
 // testjar is needed for jadex-android-xmlpull tests

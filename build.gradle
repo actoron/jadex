@@ -272,7 +272,6 @@ subprojects
 
 
 		apply plugin: 'java-library'
-		apply plugin: 'java-test-fixtures'
 		if (isWebApplicationProject(project)) {
 			apply plugin: 'war'
 			artifacts {
@@ -301,7 +300,6 @@ subprojects
         dependencies
         {
             testImplementation junit
-			testFixturesImplementation junit
         }
 
         processResources {
