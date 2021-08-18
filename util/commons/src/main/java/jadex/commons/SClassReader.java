@@ -959,6 +959,12 @@ public class SClassReader
 		{
 			return (accessflags & 0x00000800) != 0;
 		}
+
+		@Override
+		public String toString()
+		{
+			return "MethodInfo [methodname=" + methodname + ", methoddesc="+ methoddesc + "]";
+		}
     }
     
     /**

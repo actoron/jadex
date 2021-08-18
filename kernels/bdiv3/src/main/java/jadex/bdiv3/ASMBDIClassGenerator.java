@@ -416,7 +416,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 				//System.out.println("toClass: "+clname+" "+found);
 				Class<?> loadedclass = toClass(clname, data, found, null);
-				if (loadedclass != null && !isEnhanced(loadedclass))
+				if(loadedclass != null && !IBDIClassGenerator.isEnhanced(loadedclass))
 					loadedclass = toClass(clname, data, found, null, true);
 				if(loadedclass != null) 
 				{
@@ -563,8 +563,6 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		
 		mn.instructions = nl;
 	}
-	
-	
 	
 	/**
 	 * 

@@ -134,7 +134,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		// todo: should not use getFeature() in constructor :-( move to init?!
 		
 		Object pojo = getComponent().getFeature(IPojoComponentFeature.class).getPojoAgent();
-		ASMBDIClassGenerator.checkEnhanced(pojo.getClass());
+		IBDIClassGenerator.checkEnhanced(pojo.getClass());
 		this.bdimodel = (BDIModel)getComponent().getModel().getRawModel();
 		this.capa = new RCapability(bdimodel.getCapability(), component);
 		this.rulesystem = new RuleSystem(pojo, component.getLogger(), true);
@@ -220,7 +220,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	{
 		try
 		{
-			Field f	= clazz.getDeclaredField("__initargs");
+			Field f	= clazz.getDeclaredField(IBDIClassGenerator.INITARGS_FIELD_NAME);
 //				System.out.println(f+", "+SUtil.arrayToString(args));
 			SAccess.setAccessible(f, true);
 			List<Tuple2<Class<?>[], Object[]>> initcalls	= (List<Tuple2<Class<?>[], Object[]>>)f.get(obj);
@@ -245,9 +245,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	{
 		try
 		{
-			Field f	= clazz.getDeclaredField("__initargs");
+			Field f	= SReflect.getField(clazz, IBDIClassGenerator.INITARGS_FIELD_NAME);
+			//Field f	= clazz.getDeclaredField(IBDIClassGenerator.INITARGS_FIELD_NAME);
 			SAccess.setAccessible(f, true);
-			List<Tuple2<Class<?>[], Object[]>> initcalls	= (List<Tuple2<Class<?>[], Object[]>>)f.get(obj);
+			List<Tuple2<Class<?>[], Object[]>> initcalls = (List<Tuple2<Class<?>[], Object[]>>)f.get(obj);
 			f.set(obj, null);
 			return initcalls;
 		}
@@ -356,7 +357,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		Object tmp = obj;
 		while(f==null && tmp!=null)
 		{
-			f = findFieldWithSuperclass(tmp.getClass(), fieldname, obj, nonnull);
+			//f = findFieldWithSuperclass(tmp.getClass(), fieldname, obj, nonnull);
+			f = findFieldWithSuperclass(tmp.getClass(), fieldname, tmp, nonnull);
 			
 			// If field not found try searching outer class
 			if(f==null)
@@ -400,6 +402,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	protected static Field findFieldWithSuperclass(Class<?> cl, String fieldname, Object obj, boolean nonnull)
 	{
+		//final Class<?> fcl = cl;
+		//System.out.println("findField"+fcl);
+		
 		Field ret = null;
 		while(ret==null && !Object.class.equals(cl))
 		{
@@ -432,9 +437,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		
 		// This is the case in inner classes
 		if(agent==null)
-		{
 			agent = findAgent(obj, true);
-		}
 		
 		String belname	= getBeliefName(obj, fieldname);
 
@@ -1311,7 +1314,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			catch(Exception e)
 			{
 				pa.getLogger().warning("Hidden agent injection failed: "+e);
-				break;
+				agcl = agcl.getSuperclass();
+				//break; // with pure BDI agents it can be the superclass BDIAgent
 			}
 		}
 		// Add hidden agent field also to contained inner classes (goals, plans)
@@ -1660,8 +1664,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		for(int i=inits.size()-1; i>=0; i--)
 		{
 			Class<?>	clazz	= inits.get(i);
-			List<Tuple2<Class<?>[], Object[]>>	initcalls	= getInitCalls(pojo, clazz);
-			for(Tuple2<Class<?>[], Object[]> initcall: initcalls)
+			List<Tuple2<Class<?>[], Object[]>>	initcalls = getInitCalls(pojo, clazz);
+			
+			for(Tuple2<Class<?>[], Object[]> initcall: SUtil.notNull(initcalls))
 			{					
 				try
 				{

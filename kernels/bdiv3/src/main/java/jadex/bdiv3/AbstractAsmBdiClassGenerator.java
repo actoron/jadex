@@ -1,9 +1,6 @@
 package jadex.bdiv3;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,10 +34,6 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.commons.MethodInfo;
-import jadex.commons.SClassReader;
-import jadex.commons.SClassReader.ClassFileInfo;
-import jadex.commons.SClassReader.ClassInfo;
-import jadex.commons.SClassReader.FieldInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
@@ -63,7 +56,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	 */
 	public static class MethodBeliefs
 	{
-		protected MethodNode methodNode;
+		protected MethodNode methodnode;
 		protected Set<String> beliefs;
 
 		/**
@@ -73,7 +66,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		 */
 		public MethodBeliefs(MethodNode methodNode, Set<String> beliefs)
 		{
-			this.methodNode = methodNode;
+			this.methodnode = methodNode;
 			this.beliefs = beliefs;
 		}
 
@@ -83,7 +76,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		 */
 		public MethodNode getMethodNode()
 		{
-			return methodNode;
+			return methodnode;
 		}
 		
 		/**
@@ -92,7 +85,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		 */
 		public void setMethodNode(MethodNode methodNode)
 		{
-			this.methodNode = methodNode;
+			this.methodnode = methodNode;
 		}
 		
 		/**
@@ -324,7 +317,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 				}
 			}
 
-			FieldNode initArgsField = nodehelper.createField(OpcodeHelper.ACC_PROTECTED, "__initargs", "Ljava/util/List;", new String[]{"Ljava/util/List<Ljadex/commons/Tuple3<Ljava/lang/Class<*>;[Ljava/lang/Class<*>;[Ljava/lang/Object;>;>;"}, null);
+			FieldNode initArgsField = nodehelper.createField(OpcodeHelper.ACC_PROTECTED, IBDIClassGenerator.INITARGS_FIELD_NAME, "Ljava/util/List;", new String[]{"Ljava/util/List<Ljadex/commons/Tuple3<Ljava/lang/Class<*>;[Ljava/lang/Class<*>;[Ljava/lang/Object;>;>;"}, null);
 			cn.fields.add(initArgsField);		
 			
 			for(MethodNode mn : mths)
@@ -334,8 +327,8 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 					int line = nodehelper.getLineNumberOfMethod(mn);
 					if(line != -1) 
 					{
-						MethodNode lineNumberMethod = nodehelper.createReturnConstantMethod("__getLineNumber"+mn.name, line);
-						cn.methods.add(lineNumberMethod);
+						MethodNode linenum = nodehelper.createReturnConstantMethod("__getLineNumber"+mn.name, line);
+						cn.methods.add(linenum);
 					}
 				}
 				
@@ -384,8 +377,8 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 						int line = nodehelper.getLineNumberOfMethod(mn);
 						if(line != -1) 
 						{
-							MethodNode lineNumberMethod = nodehelper.createReturnConstantMethod("__getLineNumber", line);
-							cn.methods.add(lineNumberMethod);
+							MethodNode linenum = nodehelper.createReturnConstantMethod("__getLineNumber", line);
+							cn.methods.add(linenum);
 						}
 					}
 					break;
@@ -723,7 +716,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	 * Returns whether a class is already enhanced.
 	 * @param clazz
 	 * @return true, if already enhanced, else false.
-	 */
+	 * /
 	public static boolean isEnhanced(Class<?> clazz)
 	{
 		boolean isEnhanced = false;
@@ -737,13 +730,13 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		{
 		}
 		return isEnhanced;
-	}
+	}*/
 	
 	/**
 	 * Returns whether a class is already enhanced.
 	 * @param clazz The clazz info.
 	 * @return true, if already enhanced, else false.
-	 */
+	 * /
 	public static boolean isEnhanced(ClassFileInfo clazzfileinfo)
 	{
 		boolean ret = false;
@@ -770,12 +763,12 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 			}
 		}
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Check if a bdi agent class was enhanced.
 	 *  @throws RuntimeException if was not enhanced.
-	 */
+	 * /
 	public static void checkEnhanced(Class<?> clazz)
 	{
 		// check if agentclass is bytecode enhanced
@@ -787,6 +780,6 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		{
 			throw new RuntimeException("BDI agent class was not bytecode enhanced: " + clazz.getName() + " This may happen if the class is accessed directly in application code before loadModel() was called.");
 		}
-	}
+	}*/
 
 }

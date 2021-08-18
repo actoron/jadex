@@ -85,6 +85,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
+import jadex.commons.SClassReader;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -218,6 +219,8 @@ public class BDIClassReader extends MicroClassReader
 		
 //		try
 //		{
+		
+		final Class<?> fcma = cma;
 		
 		Map<String, IBDIModel>	capas	= new LinkedHashMap<String, IBDIModel>();
 		
@@ -552,7 +555,11 @@ public class BDIClassReader extends MicroClassReader
 		{
 			try 
 			{
-				gen.generateBDIClass(agcl.getName(), bdimodel, cl);
+				
+				if(!IBDIClassGenerator.isEnhanced(agcl))
+					gen.generateBDIClass(agcl.getName(), bdimodel, cl);
+				else
+					System.out.println("already enhanced: "+agcl);
 			} 
 			catch (JadexBDIGenerationException e) 
 			{
@@ -564,7 +571,19 @@ public class BDIClassReader extends MicroClassReader
 		// Sort the plans according to their declaration order in the source file
 		// Must be done after class enhancement to contain the "__getLineNumber()" method
 		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
-		bdimodel.getCapability().sortPlans(classloader);
+		
+		// HacK?!
+		// todo: how to handle order of inner plan classes?
+		// possible solution would be using asm to generate a line number map for the plans :-(
+		SClassReader.ClassInfo ci = SClassReader.getClassInfo(fcma.getName(), cl, true, true);
+		//System.out.println("methods of "+fcma+" "+ci.getMethodInfos());
+		Map<String, Integer> order = new HashMap<>();
+		int cnt = 0;
+		for(SClassReader.MethodInfo mi: SUtil.notNull(ci.getMethodInfos()))
+		{
+			order.put(mi.getMethodName(), cnt++);
+		}
+		bdimodel.getCapability().sortPlans(order, classloader);
 		
 //		System.out.println("genclazz: "+genclazz);
 		

@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.SClassReader;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 
@@ -311,16 +312,31 @@ public class MCapability extends MElement
 	 *  Sorts plans according to their line numbers in the source
 	 *  to guarantee their natural declaration order.
 	 */
-	public void sortPlans(final ClassLoader cl)
+	public void sortPlans(final Map<String, Integer> order, final ClassLoader cl)
 	{
 		if(plans!=null)
-		{
+		{			
 			Collections.sort(plans, new Comparator<MPlan>()
 			{
 				public int compare(MPlan p1, MPlan p2)
 				{
 					int ln1 = p1.getBody().getLineNumber(cl);
 					int ln2 = p2.getBody().getLineNumber(cl);
+					
+					if(ln1==-1)
+					{
+						if(order.containsKey(p1.getName()))
+							ln1 = order.get(p1.getName());
+						else
+							System.out.println("found no plan order for: "+p1.getName());
+					}
+					if(ln2==-1)
+					{
+						if(order.containsKey(p2.getName()))
+							ln2 = order.get(p2.getName());
+						else
+							System.out.println("found no plan order for: "+p2.getName());
+					}
 					return ln1-ln2;
 				}
 			});

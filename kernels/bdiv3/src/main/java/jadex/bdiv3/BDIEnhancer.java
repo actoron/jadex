@@ -77,8 +77,7 @@ public class BDIEnhancer
 			public boolean filter(ClassFileInfo ci)
 			{
 				AnnotationInfo ai = ci.getClassInfo().getAnnotation(Agent.class.getName());
-				if(ai != null && 
-					(BDIAgentFactory.TYPE.equals(ai.getValue("type")) || ci.getFilename().indexOf("BDI")!=-1))
+				if(ai != null && (BDIAgentFactory.TYPE.equals(ai.getValue("type")) || ci.getFilename().indexOf("BDI")!=-1))
 				{
 					cis.add(ci);
 				}
@@ -97,7 +96,7 @@ public class BDIEnhancer
 		
 		for(ClassFileInfo ci : cis)
 		{
-			if(AbstractAsmBdiClassGenerator.isEnhanced(ci))
+			if(IBDIClassGenerator.isEnhanced(ci))
 			{
 				System.out.println("Already enhanced: "+ci.getFilename());
 			}

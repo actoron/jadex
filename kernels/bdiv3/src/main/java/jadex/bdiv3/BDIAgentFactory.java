@@ -108,6 +108,10 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	/** The model type identifier for use in the @Agent annotation. */
 	public static final String	TYPE = "bdi";
 	
+	/** The model type identifier for use in the @Agent annotation. */
+	//public static final String	TYPE_PURE = "bdi_pure";
+
+	
 	/** The model type identifier for a capability. */
 	public static final String	CAPA_TYPE = "capability";
 	

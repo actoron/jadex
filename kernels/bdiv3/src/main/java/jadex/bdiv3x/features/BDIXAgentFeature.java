@@ -263,13 +263,13 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 	{
 		try
 		{
-			Field f	= clazz.getDeclaredField("__initargs");
+			Field f	= clazz.getDeclaredField(IBDIClassGenerator.INITARGS_FIELD_NAME);
 //				System.out.println(f+", "+SUtil.arrayToString(args));
 			SAccess.setAccessible(f, true);
-			List<Tuple2<Class<?>[], Object[]>> initcalls	= (List<Tuple2<Class<?>[], Object[]>>)f.get(obj);
+			List<Tuple2<Class<?>[], Object[]>> initcalls = (List<Tuple2<Class<?>[], Object[]>>)f.get(obj);
 			if(initcalls==null)
 			{
-				initcalls	= new ArrayList<Tuple2<Class<?>[], Object[]>>();
+				initcalls = new ArrayList<Tuple2<Class<?>[], Object[]>>();
 				f.set(obj, initcalls);
 			}
 			initcalls.add(new Tuple2<Class<?>[], Object[]>(argtypes, args));
