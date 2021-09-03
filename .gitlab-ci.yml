@@ -78,7 +78,7 @@ test:
     # X libs not included in oppenjdk container, grrr...
     - apt-get update -qq && apt-get install -y -qq libxrender1 libxtst6
     - export DISPLAY=xvfb:1
-    - ./gradlew -Pdist=publishdists -Production --continue :applications:micro:test :platform:base:test test testReport $GRADLE_EXTRA
+    - ./gradlew -Pdist=publishdists -Production --continue :applications:bdiv3:test test testReport $GRADLE_EXTRA
   artifacts:
     when: always
     expire_in: 1 week
@@ -117,6 +117,7 @@ publishCentral:
   stage: deployandpublish
   script: 
     - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -P repos=central --max-workers=32 $GRADLE_EXTRA
+    - ./gradlew -P repos=central closeRepository $GRADLE_EXTRA
   rules:
     - if: $HEISENTEST!="true" && ($PUBLISHCENTRAL=="true" || $PUBLISHCENTRAL!="false" && $CI_COMMIT_REF_SLUG=~$PUBLISHCENTRAL_BRANCHES)
       when: on_success
@@ -170,14 +171,14 @@ deploySchemadocs:
 #    variables:
 #      - $UPLOAD == "true"
 
-# has some 401 error :-(  
-#releaseStagingRepo:
-#  stage: success
-#  script:
-#    -  ./gradlew closeAndReleaseRepository
-#  only:
-#    variables:
-#      - $UPLOAD == "true"
+releaseStagingRepo:
+  stage: success
+  script:
+    -  ./gradlew -Prepos=central releaseRepository
+  when: manual 
+  only:
+    variables:
+      - $UPLOAD == "true"
     
 tag:
   stage: success
