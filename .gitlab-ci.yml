@@ -175,11 +175,12 @@ releaseStagingRepo:
   stage: success
   script:
     -  ./gradlew -Prepos=central releaseRepository
-  when: manual 
-  only:
-    variables:
-      - $UPLOAD == "true"
-    
+  rules:
+    - when: manual 
+  #only:
+  #  variables:
+  #    - $UPLOAD == "true"
+
 tag:
   stage: success
   script:
