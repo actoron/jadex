@@ -29,6 +29,7 @@ if(project.hasProperty('repos'))
 			        stagingProfileId = "5bcba2b9075ec8" //when not defined will be got from server using "packageGroup"
 			        username = repoaccess.user
 			        password = repoaccess.password
+			        delayBetweenRetriesInMillis = 15000	// * default retries 20 -> 300 sec (5 min) total
 			    }	   
 			}
 			
