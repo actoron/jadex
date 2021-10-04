@@ -86,7 +86,9 @@ class ComponentTree extends BaseElement
 						{
 							return new Promise(function(r, e)
 							{
-								axios.get(self.getMethodPrefix()+'&methodname=getChildComponentDescriptions&arg0='+cid, self.transform).then(function(resp)
+								var url = self.getMethodPrefix()+'&methodname=getChildComponentDescriptions&args_0=null&args_1='+cid;
+								//console.log("fetching: "+url);
+								axios.get(url, self.transform).then(function(resp)
 								{
 									//console.log("descs are: "+resp.data);
 									var components = resp.data;

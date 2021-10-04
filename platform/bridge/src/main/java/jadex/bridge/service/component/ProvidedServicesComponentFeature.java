@@ -168,7 +168,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			if(ServiceScope.EXPRESSION.equals(scope))
 			{
 				scope = (ServiceScope)SJavaParser.getParsedValue(info.getScopeExpression(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
-				info	= new ProvidedServiceInfo(info.getName(), info.getType(), info.getImplementation(), scope, info.getScopeExpression(), info.getSecurity(), info.getPublish(), info.getProperties(), info.isSystemService());
+				info = new ProvidedServiceInfo(info.getName(), info.getType(), info.getImplementation(), scope, info.getScopeExpression(), info.getSecurity(), info.getPublish(), info.getProperties(), info.isSystemService());
 //				System.out.println("expression scope '"
 //					+ (info.getScopeExpression()!=null ? info.getScopeExpression().getValue() : "")
 //					+ "': "+scope);
@@ -194,7 +194,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			}
 			else
 			{
-				final ProvidedServiceInfo	finfo	= info;
+				final ProvidedServiceInfo finfo = info;
 				createServiceImplementation(info, getComponent().getFetcher())
 					.then(ser ->
 				{
@@ -238,7 +238,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 					}
 					fut.setResult(null);
 					
-				}).catchEx(e -> fut.setResult(null));
+				}).catchEx(e -> {e.printStackTrace(); fut.setResult(null);});
 			}
 		}
 		
@@ -411,7 +411,16 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			}
 			else
 			{
-				ret.setException(new RuntimeException("Could not load service implementation class: "+impl.getClazz()));
+				try
+				{
+					Class<?> c = Class.forName("jadex.extension.rs.publish.JettyRestPublishService", false, component.getClassLoader());
+					System.out.println("foundd: "+c);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+				ret.setException(new RuntimeException("Could not load service implementation class: "+impl.getClazz()+" "+component.getClassLoader()));
 			}
 		}
 		else

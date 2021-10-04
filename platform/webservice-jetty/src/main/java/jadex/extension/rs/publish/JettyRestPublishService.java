@@ -23,6 +23,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.publish.IPublishService;
@@ -37,23 +38,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  *  Publish service without Jersey directly using Jetty container.
- *  
- *  note: Jetty releases are Java 1.8 only.
  */
 @Service
 public class JettyRestPublishService extends AbstractRestPublishService
 {
-	// Jetty requires 1.8
-//	static
-//	{
-//		String ver = System.getProperty("java.version");
-//		
-//		if(Float.parseFloat(ver.substring(0,3)) < 1.8f)
-//		{
-//			System.out.println("WARNING: Jetty requires Java 1.8");
-//		}
-//	}
-	
 	// Hack constant for enabling multi-part :-(
 	private static final MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement(System.getProperty("java.io.tmpdir"));
 
@@ -66,12 +54,12 @@ public class JettyRestPublishService extends AbstractRestPublishService
     /** Infos for unpublishing. */
     protected Map<IServiceIdentifier, Tuple2<Server, ContextHandler>> unpublishinfos = new HashMap<IServiceIdentifier, Tuple2<Server,ContextHandler>>();
     
-//    @ServiceStart
-//    public void start()
-//    {
-//    	super.init();
-//    	System.out.println("Jetty started");
-//    }
+    @OnStart
+    public void start()
+    {
+    	super.init();
+    	System.out.println("Jetty started");
+    }
     
     //@ServiceShutdown
     @OnEnd

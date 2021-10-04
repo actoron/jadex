@@ -355,7 +355,8 @@ subprojects
 		addSchemaTasks(project)
 	}
 
-    sourceCompatibility = 1.8
+    sourceCompatibility = 1.11
+    targetCompatibility = 1.11
     
 	tasks.withType(Test) {
 		// Add current time as test input so tests are always run (i.e. outputs not uptodate and not taken from cache by gradle)
