@@ -541,10 +541,10 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	
 					int del = c.indexOf("=");
 					String name = c.substring(0, del).trim();
-					id = c.substring(del+1, c.length()).trim();
 					
 					if(HEADER_NANO_SESSIONID.equals(name))
 					{
+						id = c.substring(del+1, c.length()).trim();
 						session = NanoHttpSession.sessions.get(id);
 						if(session==null || !session.isValid())
 						{
