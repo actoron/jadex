@@ -339,8 +339,8 @@ def createRezipTask(task, file) {
 	}
 	// Rezip after task completed
 	task.finalizedBy task.project.tasks.create([name: newname.replace('/', '_'), type: Zip]) {
-		destinationDir file.parentFile
-		archiveName file.name
+		destinationDirectory	= file.parentFile
+		archiveFileName	= file.name
 		from(rebuilddir) { includes = ['*/**'] }
 //		doLast { println 'Rezipped generated ' + file.getCanonicalPath() }
 	}

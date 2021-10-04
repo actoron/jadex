@@ -9,10 +9,6 @@ dependencies
 	testFixturesImplementation 'junit:junit:4.13.2'
 }
 
-// testjar is needed for jadex-android-xmlpull tests
-// Disabled because no more android, is this still working? then remove..
-/*task testJar(type:Jar, dependsOn: testClasses) {
-	classifier = 'test'
-	from sourceSets.test.output
-}*/
-
+// disable publishing for test fixtures jar. cf. https://docs.gradle.org/current/userguide/java_testing.html#publishing_test_fixtures
+components.java.withVariantsFromConfiguration(configurations.testFixturesApiElements) { skip() }
+components.java.withVariantsFromConfiguration(configurations.testFixturesRuntimeElements) { skip() }
