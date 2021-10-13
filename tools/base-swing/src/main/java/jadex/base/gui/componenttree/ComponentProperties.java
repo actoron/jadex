@@ -34,7 +34,7 @@ public class ComponentProperties extends PropertiesPanel
 		createTextField("Creator");
 		createTextField("Resource Identifier");
 		createTextField("(global / local)");
-		createTextField("Ownership");
+		//createTextField("Ownership");
 		createTextField("State");
 		createTextField("Processing state");
 		createTextField("System component");
@@ -57,7 +57,7 @@ public class ComponentProperties extends PropertiesPanel
 		getTextField("Type").setText(desc.getType());
 		getTextField("Model name").setText(desc.getModelName());
 		getTextField("Creator").setText(desc.getCreator()!=null? desc.getCreator().getName(): "n/a");
-		getTextField("Ownership").setText(desc.getOwnership());
+		//getTextField("Ownership").setText(desc.getOwnership());
 		getTextField("State").setText(desc.getState());
 		String gid = desc.getResourceIdentifier().getGlobalIdentifier()!=null? desc.getResourceIdentifier().getGlobalIdentifier().getResourceId(): "n/a";
 		ILocalResourceIdentifier lid = desc.getResourceIdentifier().getLocalIdentifier();

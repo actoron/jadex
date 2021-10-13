@@ -24,19 +24,20 @@ class ComponentTree extends BaseElement
 		this.treedata["#"] = {};
 		this.treeid = "componenttree";
 		this.info = null;
+		//this.commands = [];
 
 		// fixed types
-		var cloud = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/cloud.png';
-		var applications = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/applications.png';
-		var platform = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/platform.png';
-		var system = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/system.png';
-		var services = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/services.png';
-		var provided = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/provided.png';
-		var required = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/required.png';
-		var required_mult = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/required_multiple.png';
-		var nonfunc = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/nonfunc.png';
-		var nfprop = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/nfprop.png';
-		var nfprop_dynamic = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/nfprop_dynamic.png';
+		var cloud = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/cloud.png';
+		var applications = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/applications.png';
+		var platform = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/platform.png';
+		var system = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/system.png';
+		var services = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/services.png';
+		var provided = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/provided.png';
+		var required = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/required.png';
+		var required_mult = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/required_multiple.png';
+		var nonfunc = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/nonfunc.png';
+		var nfprop = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/nfprop.png';
+		var nfprop_dynamic = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/nfprop_dynamic.png';
 		
 		this.types =
 		{
@@ -196,7 +197,7 @@ class ComponentTree extends BaseElement
 												var val = res[node.original.propname];
 												var txt = node.original.propname+": "+val;
 												
-												console.log("refresh nfnode: "+node+" "+val);
+												//console.log("refresh nfnode: "+node+" "+val);
 												
 												// store new data also in node info
 												self.treedata[node.id].info.val = res[node.original.propname];
@@ -495,7 +496,7 @@ class ComponentTree extends BaseElement
                                 	//	node.original.refreshcmd(node);
                                 	//}
                                 },
-                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/refresh.png'
+                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/refresh.png'
 		        			};
 			        	}
 
@@ -507,23 +508,54 @@ class ComponentTree extends BaseElement
 			        		menu.Kill = 
 		        			{
                                 'label': "Kill",
-                                'action': function() 
+                                'action': function(obj) 
                                 {
+									//console.log(obj);
                                 	//console.log("kill me: "+node.id);
                                 	self.killComponent(node.id);
                                 },
-                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/kill.png'
+                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/kill.png'
 		        			};
+
+							if(self.commands!=null)
+							{
+								for(const command of self.commands) 
+								{ 
+									const cmd = Object.assign({}, command);
+									cmd.node = node;
+									menu[command.label] = cmd;
+								}
+							}
 						}
+						
+						menu.Details = 
+	        			{
+                            'label': "Details",
+                            'action': function(obj) 
+                            {
+								//console.log(obj);
+                            	//console.log("kill me: "+node.id);
+                            	//self.killComponent(node.id);
+								self.refreshDetails(node);
+                            },
+                            'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/details.png'
+	        			};
 
 			        	return menu;
 					}
 			    }
 			})});
 			
-			self.getTree(self.treeid).on("select_node.jstree", function(evt, data)
+			/*self.getTree(self.treeid).on("select_node.jstree", function(evt, data)
 			{
 				self.refreshDetails(data.node);
+			});*/
+			
+			self.getTree(self.treeid).bind("dblclick.jstree", function (event) 
+			{
+				console.log("double");
+				var node = self.getTree(self.treeid).jstree("get_selected", true)[0];
+				self.refreshDetails(node);
 			});
 			
 			/*self.getTree(self.treeid).bind("dblclick.jstree", function (event) 
@@ -724,8 +756,8 @@ class ComponentTree extends BaseElement
 		
 		return new Promise(function(resolve, reject) 
 		{
-			var res1 ="jadex/tools/web/starter/libs/jstree_3.3.7.css";
-			var res2 = "jadex/tools/web/starter/libs/jstree_3.3.7.js";
+			var res1 ="jadex/tools/web/commons/libs/jstree_3.3.7.css";
+			var res2 = "jadex/tools/web/commons/libs/jstree_3.3.7.js";
 			var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
 			var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 	
@@ -1095,6 +1127,12 @@ class ComponentTree extends BaseElement
 		this.treedata[data.id] = data;
 		if(cids.indexOf(data.id)==-1)
 			cids.push(data.id);
+	}
+	
+	setCommands(commands)
+	{
+		console.log("commands set to: "+commands);
+		this.commands = commands;
 	}
 	
 	// methods for making dragable an element

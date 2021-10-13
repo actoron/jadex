@@ -374,8 +374,8 @@ public class JCCWebAgent implements IJCCWebService
 	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, 
 		final String methodname, final Object[] args, final ClassInfo[] argtypes, @FutureReturnType final ClassInfo rettype)
 	{
-		if(methodname!=null && methodname.indexOf("getChild")!=-1)
-			System.out.println("INVOKE: " + methodname + " " + servicetype);
+		//if(methodname!=null && methodname.indexOf("getChild")!=-1)
+		//	System.out.println("INVOKE: " + methodname + " " + servicetype);
 		
 		// todo: the return type could not be available on this platform :-(
 		Class<?> rtype = rettype!=null? rettype.getType(agent.getClassLoader(), agent.getModel().getAllImports()): null;

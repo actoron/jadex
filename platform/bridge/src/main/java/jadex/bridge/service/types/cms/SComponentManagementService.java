@@ -777,9 +777,9 @@ public class SComponentManagementService
 				{
 					CMSComponentDescription	test = (CMSComponentDescription)it.next().getAccess().getInternalAccess().getDescription();
 					if(adesc==null ||
-						(adesc.getOwnership()==null || adesc.getOwnership().equals(test.getOwnership()))
+						//(adesc.getOwnership()==null || adesc.getOwnership().equals(test.getOwnership()))
 	//						&& (adesc.getName().getParent()==null || adesc.getName().getParent().equals(test.getParent()))
-						&& (adesc.getType()==null || adesc.getType().equals(test.getType()))
+							(adesc.getType()==null || adesc.getType().equals(test.getType()))
 						&& (adesc.getState()==null || adesc.getState().equals(test.getState()))
 	//						&& (adesc.getProcessingState()==null || adesc.getProcessingState().equals(test.getProcessingState()))
 						&& (adesc.getModelName()==null || adesc.getModelName().equals(test.getModelName())))					

@@ -386,6 +386,7 @@ public class MicroAgentViewPanel extends JPanel
 	//					}
 						if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION) && event.getType().endsWith("step"))//MicroAgentInterpreter.TYPE_STEP))
 						{
+							//System.out.println("add step: "+event.getProperty("id"));
 							steps.addElement(event);
 							if(laststep==null && steps.size()==1)
 								sl.setSelectedIndex(0);
@@ -398,6 +399,7 @@ public class MicroAgentViewPanel extends JPanel
 								IMonitoringEvent tmp = (IMonitoringEvent)steps.get(i);
 								if(event.getProperty("id").equals(tmp.getProperty("id")))
 								{
+									//System.out.println("remove step: "+event.getProperty("id"));
 									steps.removeElementAt(i);
 									if(laststep!=null && laststep.getProperty("id").equals(tmp.getProperty("id")))
 										laststep = null;

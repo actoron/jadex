@@ -64,8 +64,8 @@ public interface IComponentDescription
 	/**
 	 *  Get the ownership string of the component.
 	 *  @return The ownership string.
-	 */
-	public String getOwnership();
+	 * /
+	public String getOwnership();*/
 
 	/**
 	 *  Get the component type.
