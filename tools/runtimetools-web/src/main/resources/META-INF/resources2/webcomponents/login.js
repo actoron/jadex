@@ -88,20 +88,6 @@ export class LoginElement extends BaseElement
 			});
 		});
 	}
-	
-	asyncRender() 
-	{
-    	return html`
-			<div class="${this.app.login.isLoggedIn()? 'hidden': ''}">
-				<div class="flexcontainerrow">
-					<input class="flexcellgrow mt-1 mb-1" id="pass" name="platformpass" type="text" placeholder="${this.app.lang.t('Platform password')}"></input>
-					<button class="btn btn-primary mt-1 mb-1 ml-1" @click="${e => {this.login(this.shadowRoot.getElementById('pass').value)}}">Login</button>
-				</div>
-				<input class"mt-1 mb-1 ml-1 flow-right" id="rememberpassword" type="checkbox" >${this.app.lang.t("Remember password")}</input>
-			</div>
-			<button class="btn btn-primary mt-1 mb-1 ml-1 flow-right ${this.app.login.isLoggedIn()? '': 'hidden'}" @click="${e => {this.logout()}}">Logout</button>
-    	`;
- 	}
 
 	login(pass)
 	{
@@ -177,6 +163,20 @@ export class LoginElement extends BaseElement
 			});
 		});
 	}
+	
+	asyncRender() 
+	{
+    	return html`
+			<div class="${this.app.login.isLoggedIn()? 'hidden': ''}">
+				<div class="flexcontainerrow">
+					<input class="flexcellgrow m-1" id="pass" name="platformpass" type="text" placeholder="${this.app.lang.t('Platform password')}"></input>
+					<button class="jadexbtn m-1" @click="${e => {this.login(this.shadowRoot.getElementById('pass').value)}}">Login</button>
+				</div>
+				<input class="m-1 flow-right" id="rememberpassword" type="checkbox" >${this.app.lang.t("Remember password")}</input>
+			</div>
+			<button class="jadexbtn m-1 flow-right ${this.app.login.isLoggedIn()? '': 'hidden'}" @click="${e => {this.logout()}}">Logout</button>
+    	`;
+ 	}
 }
 
 if(customElements.get('jadex-login') === undefined)

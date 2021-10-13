@@ -22,9 +22,9 @@ dependencies
 jar
 {
 	manifest
-			{
-				attributes('Main-Class': 'jadex.bpmn.editor.BpmnEditor')
-			}
+	{
+		attributes('Main-Class': 'jadex.bpmn.editor.BpmnEditor')
+	}
 
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 

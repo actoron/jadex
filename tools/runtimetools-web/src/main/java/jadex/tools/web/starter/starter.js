@@ -17,8 +17,8 @@ class StarterElement extends CidElement
 		
 		var self = this;
 		
-		var res1 = "jadex/tools/web/starter/modeltree.js";
-		var res2 = "jadex/tools/web/starter/componenttree.js";
+		var res1 = "jadex/tools/web/commons/modeltree.js";
+		var res2 = "jadex/tools/web/commons/componenttree.js";
 		var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
 		var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 

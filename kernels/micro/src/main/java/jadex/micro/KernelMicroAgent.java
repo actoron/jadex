@@ -20,7 +20,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Imports("jadex.commons.*")
 @ProvidedServices({@ProvidedService(type=IComponentFactory.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(
-	expression="new MicroAgentFactory($component, SUtil.createHashMap(new String[]{\"debugger.panels\"},new Object[]{\"jadex.tools.debugger.micro.MicroDebuggerPanel\"}))"))
+	expression="new MicroAgentFactory($component, SUtil.createHashMap(new String[]{\"debugger.panels\", \"debugger.panel_web\"},new Object[]{\"jadex.tools.debugger.micro.MicroDebuggerPanel\",\"jadex/tools/web/debugger/microdebugger.js\"}))"))
 })
 @Agent(name="kernel_micro",
 	autostart=Boolean3.FALSE)

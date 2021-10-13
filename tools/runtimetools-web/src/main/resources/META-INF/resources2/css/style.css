@@ -59,7 +59,7 @@ table.actwtable {
 	border-bottom-left-radius: 6px;
 }
 
-.jadexbtn{
+.jadexbtn {
 	/*
 	background-color: #1f79a0;
 	border-color: #73b4d0;
@@ -80,6 +80,13 @@ table.actwtable {
 	/*margin-top:5px;
 	display: block;
 	width:100%;*/
+}
+
+.jadexbtn:disabled,
+.jadexbtn.disabled {
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
 }
 
 .w100 {
