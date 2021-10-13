@@ -1,5 +1,7 @@
 package jadex.tools.web.jcc;
 
+import java.awt.*;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
+import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Boolean3;
 import jadex.commons.IResultCommand;
 import jadex.commons.MethodInfo;
@@ -104,6 +107,22 @@ public class JCCWebAgent implements IJCCWebService
 		wps.publishService(sid, new PublishInfo("[http://localhost:"+port+"/]webjcc", IPublishService.PUBLISH_RS, null)).get();
 		
 		wps.publishResources("[http://localhost:"+port+"/]", "META-INF/resources2").get();
+		
+		try
+		{
+			String pfname = agent.getId().getRoot().toString();
+			String url = "http://localhost:"+port+"/launch.html?pf=" + pfname;
+			if (loginsecurity)
+			{
+				ISecurityService secserv = agent.getLocalService(ISecurityService.class);
+				String pw = secserv.getPlatformSecret(null).get();
+				url += "&pw=" + pw;
+			}
+			Desktop.getDesktop().browse(new URI(url));
+		}
+		catch (Exception e)
+		{
+		}
 	}
 	
 	/**

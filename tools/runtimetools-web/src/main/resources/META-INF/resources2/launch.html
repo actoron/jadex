@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Launching Jadex...</title>
+    <script>
+      let query = window.location.search;
+      query = query.replace('?','');
+      let args = query.split('&');
+      let pw;
+      let pf;
+      for (let i = 0; i < args.length; ++i)
+      {
+          if (args[i].startsWith('pw='))
+              pw = args[i].substr(3);
+          if (args[i].startsWith('pf='))
+              pf = args[i].substr(3);
+      }
+
+      console.log(pf + " " + pw);
+      if (typeof pw === 'string' || pw instanceof String)
+          localStorage.setItem("platformpassword", pw);
+      window.location.href = '/#/platform/' + pf;
+    </script>
+</head>
+<body>
+</body>
+</html>
