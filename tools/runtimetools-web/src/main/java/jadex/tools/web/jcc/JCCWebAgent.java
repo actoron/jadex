@@ -112,12 +112,9 @@ public class JCCWebAgent implements IJCCWebService
 		{
 			String pfname = agent.getId().getRoot().toString();
 			String url = "http://localhost:"+port+"/launch.html?pf=" + pfname;
-			if (loginsecurity)
-			{
-				ISecurityService secserv = agent.getLocalService(ISecurityService.class);
-				String pw = secserv.getPlatformSecret(null).get();
-				url += "&pw=" + pw;
-			}
+			ISecurityService secserv = agent.getLocalService(ISecurityService.class);
+			String pw = secserv.getPlatformSecret(null).get();
+			url += "&pw=" + pw;
 			Desktop.getDesktop().browse(new URI(url));
 		}
 		catch (Exception e)
