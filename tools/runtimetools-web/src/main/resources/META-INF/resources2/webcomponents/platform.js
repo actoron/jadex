@@ -20,10 +20,10 @@ class PlatformElement extends CidElement
 		return ret;
 	}
 	
-	/*constructor() 
+	/*constructor()
 	{
 		super();
-		
+
 	}*/
 	
 	init()
@@ -64,20 +64,35 @@ class PlatformElement extends CidElement
 	
 	postInit()
 	{
+		let self = this;
 		this.loadPluginInfos().then(function()
     	{
     		self.loaded = true;
-    		if(self.plugin != null)
-    			self.showPlugin2({ "name" : self.plugin });
-    		else if(self.plugins.length > 0)
-    			self.showPlugin2(self.getPlugins()[0].name);
-			resolve();
+
+			self.plugin = self.getUrlHashParam(3);
+
+			let lastplugin = localStorage.getItem("lastplugin")
+    		if (self.plugin != null) {
+				localStorage.setItem("lastplugin", self.plugin);
+			}
+    		if (lastplugin != null) {
+				history.pushState(null, "", "/#/platform/"+self.cid+"/"+lastplugin);
+				self.plugin = lastplugin;
+			}
+    		else if(self.plugin == null || self.plugins.length > 0) {
+				let name = self.getPlugins()[0].name
+				history.pushState(null, "", "/#/platform/"+self.cid+"/"+name);
+				self.plugin = name;
+			}
+			//self.showPlugin2({ "name" : self.plugin });
+			self.showPlugin2(self.plugin);
+			//resolve();
     	}).catch(function(err) 
 		{
-			self.createErrorMessage("Could not load plugins", err);
+			//self.createErrorMessage("Could not load plugins", err);
 			console.log("err: "+err);
 			//throw err;
-			reject(err);
+			//reject(err);
 		});
 	}
 	
@@ -165,6 +180,7 @@ class PlatformElement extends CidElement
 				}).catch(function(err)
 				{
 					console.log(err);
+					fail();
 				});
 			}
 			else
@@ -181,6 +197,17 @@ class PlatformElement extends CidElement
 			}
 		}
 		return ret;
+	}
+
+	/**
+	 *  Changes URL and selects new plugin (GUI operation).
+	 *  @param name Name of selected plugin.
+	 */
+	selectPlugin(name)
+	{
+		history.pushState(null, "", "/#/platform/"+this.cid+"/"+name);
+		localStorage.setItem("lastplugin", name);
+		this.showPlugin2(name);
 	}
 	
 	loadPlugin(name)
@@ -222,6 +249,7 @@ class PlatformElement extends CidElement
 		var self = this;
 		return new Promise(function(resolve, reject) 
 		{
+			let presolve = resolve;
 			axios.get('webjcc/getPluginInfos?cid='+self.cid, self.transform).then(function(resp)
 			{
 				//console.log("received: "+resp);	
@@ -240,15 +268,17 @@ class PlatformElement extends CidElement
 						cnt++;
 						if(cnt==pis.length)
 						{
-							self.showPlugin2(self.getPlugins()[0].name);
+							//self.showPlugin2(self.getPlugins()[0].name);
+							presolve();
 							//console.log("loadPlugs show: "+self.getPlugins()[0].name);
 						}
 					}
 				}
+
 				
 			}).catch(function(err) 
 			{
-				//console.log("err: "+err);	
+				console.log("errpluginInfos: "+err);
 				reject(err);
 			});
 		});
@@ -338,7 +368,7 @@ class PlatformElement extends CidElement
 	
 	requestUpdate()
 	{
-		if(this.plugin!=null && !this.app.login.isLoggedIn() && !this.plugins[this.plugin].unrestricted)
+		if(this.plugin!=null && this.plugins!=null && !this.app.login.isLoggedIn() && !this.plugins[this.plugin].unrestricted)
 			this.showPlugin2(this.getPlugins()[0].name);
 		
 		return super.requestUpdate();
@@ -373,8 +403,8 @@ class PlatformElement extends CidElement
 			<div class="container-fluid m-0 p-0" id="plugincont">
 				${this.getPlugins().map((p, index) => html`
 					${!p.unrestricted && !this.app.login.isLoggedIn()? "": p.icon!=null? 
-						html`<img id="${'plugin'+index}" class="${self.plugin===p.name? "overlay": ""}" src="data:image/png;base64,${p.icon.__base64}" alt="Red dot" @click="${(e) => {self.showPlugin2(p.name)}}" data-toggle="tooltip" data-placement="top" title="${p.name}"/>`:
-						html`<span @click="${(e) => {self.showPlugin2(p.name)}}">${p.name}</span>`
+						html`<img id="${'plugin'+index}" class="${self.plugin===p.name? "overlay": ""}" src="data:image/png;base64,${p.icon.__base64}" alt="Red dot" @click="${(e) => {self.selectPlugin(p.name)}}" data-toggle="tooltip" data-placement="top" title="${p.name}"/>`:
+						html`<span @click="${(e) => {self.selectPlugin(p.name)}}">${p.name}</span>`
 					}
 				`)}
 			</div>

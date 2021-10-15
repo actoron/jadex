@@ -42,6 +42,26 @@ export class CidElement extends BaseElement
 			}
 	    }
 	}
+
+	/**
+	 *  Extracts the specified element in the URL-hash (anchor).
+	 *  0 is always "#"
+	 *  1 is usually "platform"
+	 *
+	 * @param index Index of the element.
+	 * @returns URL-hash element or {null} if out of bounds.
+	 */
+	getUrlHashParam(index)
+	{
+		let hashstr = window.location.hash;
+		let elems = hashstr.split('/');
+
+		let ret = null;
+		if ( elems.length > index)
+			ret = elems[index];
+
+		return ret;
+	}
 	
 	static get properties() 
 	{
