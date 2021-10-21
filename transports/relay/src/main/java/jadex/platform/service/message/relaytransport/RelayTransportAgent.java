@@ -353,11 +353,13 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 //			ServiceCall.getOrCreateNextInvocation().setTimeout(routingdelay);
 			getRoutingService(getRtComponent(route.getFirstEntity())).forwardMessage(header, body).then(priority -> 
 			{
-				ret.setResult(PRIORITY);
+				// Future is returned and can be terminated before this
+				ret.setResultIfUndone(PRIORITY);
 			}).	catchEx(ex ->
 			{
 				routecache.remove(fwdest);
-				ret.setException(ex);
+				// Future is returned and can be terminated before this
+				ret.setExceptionIfUndone(ex);
 			});
 			return ret;
 		}
@@ -366,7 +368,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		discoverRoute(fwdest, new LinkedHashSet<IComponentIdentifier>()).done(ex -> {
 			if (notsent[0])
 			{
-				ret.setException(new IllegalStateException("No route to receiver " + fwdest + " found."));
+				// Future is returned and can be terminated before this
+				ret.setExceptionIfUndone(new IllegalStateException("No route to receiver " + fwdest + " found."));
 			}
 		}).next(hops -> {
 			if (notsent[0])
@@ -376,11 +379,13 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				ServiceCall.getOrCreateNextInvocation().setTimeout(routingdelay);
 				getRoutingService(getRtComponent(froute.getFirstEntity())).forwardMessage(header, body).then(prio -> 
 				{
+					// Future is returned and can be terminated before this
 					ret.setResultIfUndone(PRIORITY);
 				}).	catchEx(ex ->
 				{
 					routecache.remove(fwdest);
-					ret.setException(ex);
+					// Future is returned and can be terminated before this
+					ret.setExceptionIfUndone(ex);
 				});
 			}
 		});
