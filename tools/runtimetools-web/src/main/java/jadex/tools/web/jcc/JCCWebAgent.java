@@ -86,6 +86,9 @@ public class JCCWebAgent implements IJCCWebService
 	@AgentArgument
 	protected boolean footer = false;
 	
+	@AgentArgument
+	protected boolean openbrowser = true;
+	
 	/**
 	 *  Wait for the IWebPublishService and then publish the resources.
 	 *  @param pubser The publish service.
@@ -108,17 +111,20 @@ public class JCCWebAgent implements IJCCWebService
 		
 		wps.publishResources("[http://localhost:"+port+"/]", "META-INF/resources2").get();
 		
-		try
+		if (openbrowser)
 		{
-			String pfname = agent.getId().getRoot().toString();
-			String url = "http://localhost:"+port+"/launch.html?pf=" + pfname;
-			ISecurityService secserv = agent.getLocalService(ISecurityService.class);
-			String pw = secserv.getPlatformSecret(null).get();
-			url += "&pw=" + pw;
-			Desktop.getDesktop().browse(new URI(url));
-		}
-		catch (Exception e)
-		{
+			try
+			{
+				String pfname = agent.getId().getRoot().toString();
+				String url = "http://localhost:" + port + "/launch.html?pf=" + pfname;
+				ISecurityService secserv = agent.getLocalService(ISecurityService.class);
+				String pw = secserv.getPlatformSecret(null).get();
+				url += "&pw=" + pw;
+				Desktop.getDesktop().browse(new URI(url));
+			}
+			catch (Exception e)
+			{
+			}
 		}
 	}
 	
