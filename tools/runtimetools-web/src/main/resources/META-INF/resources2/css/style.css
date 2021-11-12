@@ -391,3 +391,7 @@ z-index: 1;
 .absolute {
 	position: absolute;
 }
+
+.back-lightgray {
+	background-color: #F9F9F9;
+}

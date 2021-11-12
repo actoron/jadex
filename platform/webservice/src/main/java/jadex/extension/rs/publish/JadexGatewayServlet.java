@@ -269,6 +269,11 @@ public class JadexGatewayServlet extends HttpServlet
 				{
 					return complete[0];
 				}
+				
+				public AsyncContext getAsyncContext() 
+				{
+					return ctx;
+				}
 			});
 			
 			handler.handleRequest(request, response, null).addResultListener(new IResultListener<Void>()

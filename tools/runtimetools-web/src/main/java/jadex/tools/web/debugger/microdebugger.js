@@ -43,6 +43,7 @@ class MicroAgentDebuggerElement extends CidElement
 			interval = 5000;
 
 		var self = this;
+		console.log("sub at: "+this.cid);
 		self.sub.terminate = jadex.getIntermediate(this.getMethodPrefix()+'&methodname=subscribeToComponent&args_0='+this.cid+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		response =>
 		{
@@ -67,7 +68,6 @@ class MicroAgentDebuggerElement extends CidElement
 		{
 			console.log("Err: "+err);
 			self.sub.connected = false;
-			self.sub.elements = [];
 			self.requestUpdate();
 			
 			setTimeout(function()
@@ -93,6 +93,7 @@ class MicroAgentDebuggerElement extends CidElement
 			console.log("terminate sub");
 			tc();
 		}
+		this.sub.connected = false;
 	}
 	
 	updateEvent(event)
@@ -251,9 +252,6 @@ class MicroAgentDebuggerElement extends CidElement
 			.selected {
 				background-color: #beebff;
 			}
-			.back {
-				background-color: #F9F9F9;
-			}
 		    `);
 		return ret;
 	}
@@ -261,9 +259,8 @@ class MicroAgentDebuggerElement extends CidElement
 	asyncRender() 
 	{
 		return html`
-			<h3>${this.app.lang.t('Micro Agent Debugger')}</h3>
 			<div id="panel" class="grid-container">
-				<div id="steps" class="back inner">
+				<div id="steps" class="back-lightgray inner">
 					<h4 class="margin">${this.app.lang.t('Steps')}</h4>
 					<div class="yscrollable h100">
 						<table class="margin">
@@ -275,7 +272,7 @@ class MicroAgentDebuggerElement extends CidElement
 						</table>
 					</div>
 				</div>
-				<div id="history" class="back inner">
+				<div id="history" class="back-lightgray inner">
 					<h4 class="margin">${this.app.lang.t('History')}</h4>
 					<div class="yscrollable h100">
 						<table class="margin">
@@ -291,7 +288,7 @@ class MicroAgentDebuggerElement extends CidElement
 						<label for="his">History</label>
 					</div>
 				</div>
-				<div id="details" class="back inner">
+				<div id="details" class="back-lightgray inner">
 					<h4 class="margin">${this.app.lang.t('Step Details')}</h4>
 					<div class="yscrollable h100">
 						<table class="margin">

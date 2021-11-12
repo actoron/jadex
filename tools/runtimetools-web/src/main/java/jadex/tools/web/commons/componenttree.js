@@ -1131,7 +1131,7 @@ class ComponentTree extends BaseElement
 	
 	setCommands(commands)
 	{
-		console.log("commands set to: "+commands);
+		//console.log("commands set to: "+commands);
 		this.commands = commands;
 	}
 	

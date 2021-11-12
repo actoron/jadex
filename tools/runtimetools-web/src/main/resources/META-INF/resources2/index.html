@@ -113,7 +113,8 @@
 				if (a == null || b == null) return false;
 				if (a.length != b.length) return false;
 			
-				for (var i = 0; i < a.length; ++i) {
+				for (var i = 0; i < a.length; ++i) 
+				{
 			    	if (a[i] !== b[i]) return false;
 			  	}
 			  	return true;
@@ -124,6 +125,32 @@
 			
 			var jadex = 
 			{
+				source: null,
+				conversations: {},
+
+				init: function()
+				{
+					this.source = new EventSource('webjcc');
+					this.source.addEventListener('open', function(e) 
+					{
+						console.log('con established');
+					}, false);
+					this.source.onmessage = function(event) 
+					{
+						console.log("message received: "+event);
+					};
+					/*this.source.addEventListener('message', function (e) 
+					{
+						console.log("message received: "+e.data);
+						
+					}, false);*/
+					this.source.addEventListener('error', function(e) 
+					{
+					    if(e.readyState === EventSource.CLOSED) 
+					    	console.log('connection closed');
+					}, false);
+				},
+										
 				transform: 
 				{
 					// Currently this impl is the same as internal axios 
@@ -190,6 +217,7 @@
 						var fini = resp.headers["x-jadex-callidfin"];
 						var callid = resp.headers["x-jadex-callid"];
 						var max = resp.headers["x-jadex-max"];
+						var sse = resp.headers["x-jadex-sse"];
 						
 						if(resp.status!=202)	// ignore updatetimer commands
 						{
@@ -209,12 +237,24 @@
 						{
 							//console.log("call finished: "+fini);
 						}
+						else if(sse!=null)
+						{
+							console.log("call via sse: "+path+" "+callid);
+							if(this.conversations[callid]==null)
+							{
+								console.log("saved conversation: "+callid);
+								this.conversations[callid] = [func, errfunc];
+							}
+						}
 						else
 						{
+							console.log("long poll call: "+path+" "+callid);
 							if(callid!=null)
 							{
 								//console.log("long-poll request sent: "+path);
-								axios.get(path, {cancelToken: call.token, headers: {'x-jadex-callid': callid, 'cache-control': 'no-store'}}, this.transform).then(func).catch(erfunc); 
+								
+								var headers = {'x-jadex-callid': callid, 'cache-control': 'no-cache, no-store', "x-jadex-sse": true};
+								axios.get(path, {cancelToken: call.token, headers: headers}, this.transform).then(func).catch(erfunc); 
 							}
 						}
 						
@@ -225,7 +265,8 @@
 					{
 						//console.log("initial request sent: "+path);
 						call = axios.CancelToken.source();
-						axios.get(path, {cancelToken: call.token, headers: {'cache-control': 'no-cache'}}, this.transform)
+						
+						axios.get(path, {cancelToken: call.token, headers: {'cache-control': 'no-cache, no-store', "x-jadex-sse": true}}, this.transform)
 							.then(function(resp) 
 							{
 								var callid = func(resp); 
@@ -255,7 +296,7 @@
 								var r = reason==null? 'true': reason;
 								
 								//console.log("terminating request sent: "+path);
-								axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': r, headers: {'x-jadex-callid': callid, 'cache-control': 'no-cache'}}}, this.transform)
+								axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': r, headers: {'x-jadex-callid': callid, 'cache-control': 'no-cache, no-store', "x-jadex-sse": true}}}, this.transform)
 									.then(resolve).catch(reject); 
 							})
 							.catch(function(err)
@@ -303,6 +344,7 @@
 				    });
 				}*/
 			};
+			jadex.init();
 				
 			var loader = 
 			{

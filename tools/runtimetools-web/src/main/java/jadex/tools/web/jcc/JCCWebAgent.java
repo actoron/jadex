@@ -371,6 +371,9 @@ public class JCCWebAgent implements IJCCWebService
 	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, 
 		final String methodname, final Object[] args, final ClassInfo[] argtypes, @FutureReturnType final ClassInfo rettype)
 	{
+		if(cid==null)
+			return new Future<Object>(new RuntimeException("Cid must not be null"));
+		
 		//if(methodname!=null && methodname.indexOf("getChild")!=-1)
 		//	System.out.println("INVOKE: " + methodname + " " + servicetype);
 		

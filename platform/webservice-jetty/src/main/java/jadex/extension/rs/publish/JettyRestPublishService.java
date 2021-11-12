@@ -10,8 +10,13 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.server.session.DefaultSessionCache;
+import org.eclipse.jetty.server.session.NullSessionDataStore;
+import org.eclipse.jetty.server.session.SessionCache;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.core.server.WebSocketUpgradeHandler;
 import org.eclipse.jetty.websocket.server.JettyServerUpgradeRequest;
@@ -226,10 +231,12 @@ public class JettyRestPublishService extends AbstractRestPublishService
                 context.setContextPath("/");
                 context.setResourceBase(System.getProperty("java.io.tmpdir"));
                 //server.setHandler(context);
+               
                 SessionHandler sessions = context.getSessionHandler();
                 SessionCache cache = new DefaultSessionCache(sessions);
                 cache.setSessionDataStore(new NullSessionDataStore());
                 sessions.setSessionCache(cache);
+                collhandler.addHandler(new DefaultHandler());
                 collhandler.addHandler(context);*/
                 
                 server.setHandler(collhandler);

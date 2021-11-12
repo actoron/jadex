@@ -1,5 +1,7 @@
 package jadex.extension.rs.publish;
 
+import jakarta.servlet.AsyncContext;
+
 /**
  * 
  */
@@ -12,4 +14,9 @@ public interface IAsyncContextInfo
 	 *  Test if context is complete.
 	 */
 	public boolean isComplete();
+	
+	/**
+	 *  Get the context itself.
+	 */
+	public AsyncContext getAsyncContext();
 }

@@ -143,7 +143,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	public static final String HEADER_JADEX_LOGIN = "x-jadex-login";
 	public static final String HEADER_JADEX_LOGOUT = "x-jadex-logout";
 	public static final String HEADER_JADEX_ISLOGGEDIN = "x-jadex-isloggedin";
-
+	
 	/** Finished result marker. */
 	public static final String FINISHED	= "__finished__";
 
@@ -154,18 +154,15 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	@ServiceComponent
 	protected IInternalAccess component;
 
-	/**
-	 * The internal request info containing also results per call (coming from
-	 * the called Jadex service).
-	 */
+	/** The internal request info containing also results per call (coming from the called Jadex service). */
 	protected Map<String, RequestInfo> requestinfos;
 
 	/**
-	 * The requests per call (coming from the rest client). Signals sn ongoing
+	 * The requests per call (coming from the rest client). Signals an ongoing
 	 * conversation as long as callid is contained (results are not immediately
 	 * available).
 	 */
-	protected Map<String, Collection<AsyncContext>> requestspercall;
+	protected Map<String, Collection<IAsyncContextInfo>> requestspercall;
 
 	/** The media type converters. */
 	protected MultiCollection<String, IObjectStringConverter> converters;
@@ -227,6 +224,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		};
 		converters.add(MediaType.APPLICATION_JSON, jsonc);
 		converters.add("*/*", jsonc);
+		converters.add(MediaType.SERVER_SENT_EVENTS, jsonc);
 
 		IObjectStringConverter jjsonc = new IObjectStringConverter()
 		{
@@ -235,7 +233,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				byte[] data = jsonser.encode(val, component.getClassLoader(), null, null);
 				//byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, true, true, null, null, null);
 				String ret = new String(data, StandardCharsets.UTF_8);
-				System.out.println("rest json: "+ret);
+				//System.out.println("rest json: "+ret);
 				return ret;
 			}
 		};
@@ -293,23 +291,36 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		// a) passive lease time set: does not check all sets when sth. changes in multicoll
 		// b) active lease time set: does not work when multicol.remove(key) is used. The set does not know that it was removed
 		
-		requestspercall = new LeaseTimeMap(to, true, new ICommand<Tuple2<Entry<String, Collection<AsyncContext>>, Long>>()
+		requestspercall = new LeaseTimeMap(to, true, new ICommand<Tuple2<Entry<String, Collection<IAsyncContextInfo>>, Long>>()
 		{
-			public void execute(Tuple2<Entry<String, Collection<AsyncContext>>, Long> tup)
+			public void execute(Tuple2<Entry<String, Collection<IAsyncContextInfo>>, Long> tup)
 			{
 				//System.out.println("rqcs: "+requestspercall.size()+" "+requestspercall);
-				System.out.println("cleaner remove: "+tup.getFirstEntity().hashCode());
+				//System.out.println("cleaner remove: "+tup.getFirstEntity().hashCode());
 				// Client timeout (nearly) occurred for the request
 				
 				String callid = tup.getFirstEntity().getKey();
-				Collection<AsyncContext> ctxs = tup.getFirstEntity().getValue();
+				Collection<IAsyncContextInfo> ctxs = tup.getFirstEntity().getValue();
 				if(ctxs!=null)
 				{
-					for(AsyncContext ctx: ctxs)
+					for(IAsyncContextInfo ctx: ctxs)
 					{
 						//System.out.println("sending timeout to client " + ctx.getRequest());
-						writeResponse(null, Response.Status.REQUEST_TIMEOUT.getStatusCode(), callid, null, (HttpServletRequest)ctx.getRequest(),
-							(HttpServletResponse)ctx.getResponse(), false, null);
+						//writeResponse(null, Response.Status.REQUEST_TIMEOUT.getStatusCode(), callid, null, (HttpServletRequest)ctx.getRequest(),
+						//	(HttpServletResponse)ctx.getResponse(), false, null);
+						//((HttpServletRequest)ctx.getRequest()).getAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO).is
+						
+						// Only send timeout when context is still valid (not complete)
+						if(!ctx.isComplete())
+						{
+							System.out.println("cleaner remove: "+tup.getFirstEntity().hashCode());
+							writeResponse(new ResponseInfo().setStatus(Response.Status.REQUEST_TIMEOUT.getStatusCode())
+								.setCallid(callid).setRequest((HttpServletRequest)ctx.getAsyncContext().getRequest()).setResponse((HttpServletResponse)ctx.getAsyncContext().getResponse()).setFinished(false));
+						}
+						/*else
+						{
+							System.out.println("time outed ctx is already complete");
+						}*/
 					}
 				}
 				// ctx.complete();
@@ -374,9 +385,10 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 * @param response The response.
 	 */
 	public void handleRequest(IService service, PathManager<MappingInfo> pm, final HttpServletRequest request, final HttpServletResponse response, Object[] others)
-		throws IOException, ServletException// String target, Request
-											// baseRequest,
+		throws IOException, ServletException
 	{
+		ResponseInfo ri = new ResponseInfo().setRequest(request).setResponse(response);
+		
 		if(!component.getFeature(IExecutionFeature.class).isComponentThread())
 		{
 			component.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
@@ -398,49 +410,12 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			return;
 		}
 
-		//System.out.println("handleRequest: "+request.getRequestURI());
-
-		// In case the call comes from an internally started server async is not already set
-		// In case the call comes from an external web server it has to set the async in oder
-		// to let the call wait for async processing
-		if(request.getAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO) == null)
-		{
-			final AsyncContext rctx = request.startAsync();
-			final boolean[] complete = new boolean[1];
-			AsyncListener alis = new AsyncListener()
-			{
-				public void onTimeout(AsyncEvent arg0) throws IOException
-				{
-				}
-
-				public void onStartAsync(AsyncEvent arg0) throws IOException
-				{
-				}
-
-				public void onError(AsyncEvent arg0) throws IOException
-				{
-				}
-
-				public void onComplete(AsyncEvent arg0) throws IOException
-				{
-					complete[0] = true;
-				}
-			};
-			rctx.addListener(alis);
-
-			// Must be async because Jadex runs on other thread
-			// tomcat async bug? http://jira.icesoft.org/browse/PUSH-116
-			request.setAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO, new IAsyncContextInfo()
-			{
-				public boolean isComplete()
-				{
-					return complete[0];
-				}
-			});
-		}
+		System.out.println("handleRequest: "+request.getRequestURI());
+		getAsyncContextInfo(request); // ensure async request processing
 
 		// System.out.println("handler is: "+uri.getPath());
 		String callid = request.getHeader(HEADER_JADEX_CALLID);
+		ri.setCallid(callid);
 		
 		// check if it is a login request
 		String platformsecret = request.getHeader(HEADER_JADEX_LOGIN);
@@ -451,28 +426,35 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			login(request, platformsecret).then((Boolean ok) ->
 			{
 				if(ok)
-					writeResponse(Boolean.TRUE, Response.Status.OK.getStatusCode(), callid, null, request, response, true, null);
+					//writeResponse(Boolean.TRUE, Response.Status.OK.getStatusCode(), callid, null, request, response, true, null);
+					writeResponse(ri.setResult(Boolean.TRUE).setStatus(Response.Status.OK.getStatusCode()).setFinished(true));
 				else
-					writeResponse(Boolean.FALSE, Response.Status.UNAUTHORIZED.getStatusCode(), callid, null, request, response, true, null);
+					//writeResponse(Boolean.FALSE, Response.Status.UNAUTHORIZED.getStatusCode(), callid, null, request, response, true, null);
+					writeResponse(ri.setResult(Boolean.FALSE).setStatus(Response.Status.UNAUTHORIZED.getStatusCode()).setFinished(true));
 			}).catchEx((Exception e) ->
 			{
-				writeResponse(new SecurityException("Login failed"), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true, null);
+				//writeResponse(new SecurityException("Login failed"), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true, null);
+				writeResponse(ri.setResult(new SecurityException("Login failed")).setStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).setFinished(true));
 			});
 		}
 		else if(logout!=null)
 		{
 			logout(request).then((Boolean ok) ->
 			{
-				writeResponse(ok, Response.Status.OK.getStatusCode(), callid, null, request, response, true, null);
+				//writeResponse(ok, Response.Status.OK.getStatusCode(), callid, null, request, response, true, null);
+				writeResponse(ri.setResult(ok).setStatus(Response.Status.OK.getStatusCode()).setFinished(true));
+
 			}).catchEx((Exception e) ->
 			{
-				writeResponse(new SecurityException("Logout failed"), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), callid, null, request, response, true, null);
+				//writeResponse(new SecurityException("Logout failed"), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), callid, null, request, response, true, null);
+				writeResponse(ri.setResult(new SecurityException("Logout failed")).setStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).setFinished(true));
 			});
 		}
 		else if(isloggedin!=null)
 		{
 			boolean ret = isLoggedIn(request);
-			writeResponse(ret, Response.Status.OK.getStatusCode(), callid, null, request, response, true, null);
+			//writeResponse(ret, Response.Status.OK.getStatusCode(), callid, null, request, response, true, null);
+			writeResponse(ri.setResult(ret).setStatus(Response.Status.OK.getStatusCode()).setFinished(true));
 		}
 		else
 		{
@@ -495,7 +477,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					//writeResponse(FINISHED, callid, rinfo.getMappingInfo(), request, response, false);
 					
 					// save context to answer request after future is set
-					AsyncContext ctx = getAsyncContext(request);
+					IAsyncContextInfo ctx = getAsyncContextInfo(request);
 					saveRequestContext(callid, ctx);
 					if(!"true".equals(terminate))
 						((ITerminableFuture)rinfo.getFuture()).terminate(new RuntimeException(terminate)); 
@@ -509,20 +491,22 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					// Normal result (or FINISHED as handled in writeResponse())
 					Object result = rinfo.getNextResult();
 					result = FINISHED.equals(result) ? result : mapResult(rinfo.getMappingInfo().getMethod(), result);
-					writeResponse(result, callid, rinfo.getMappingInfo(), request, response, false, null);
+					//writeResponse(result, callid, rinfo.getMappingInfo(), request, response, false, null);
+					writeResponse(ri.setResult(result).setMappingInfo(rinfo.getMappingInfo()).setFinished(false));
 				}
 	
 				// Exception in mean time?
 				else if(rinfo.getException() != null)
 				{
 					Object result = mapResult(rinfo.getMappingInfo().getMethod(), rinfo.getException());
-					writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), callid, rinfo.getMappingInfo(), request, response, true, null);
+					//writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), callid, rinfo.getMappingInfo(), request, response, true, null);
+					writeResponse(ri.setResult(result).setStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).setMappingInfo(rinfo.getMappingInfo()).setFinished(true));
 				}
 	
 				// No result yet -> store current request context until next result available
 				else
 				{
-					AsyncContext ctx = getAsyncContext(request);
+					IAsyncContextInfo ctx = getAsyncContextInfo(request);
 					saveRequestContext(callid, ctx);
 				}
 				
@@ -532,7 +516,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			{
 				// System.out.println("callid not found: "+callid);
 	
-				writeResponse(null, Response.Status.NOT_FOUND.getStatusCode(), callid, null, request, response, true, null);
+				//writeResponse(null, Response.Status.NOT_FOUND.getStatusCode(), callid, null, request, response, true, null);
+				writeResponse(ri.setStatus(Response.Status.NOT_FOUND.getStatusCode()).setFinished(true));
 	
 				// if(request.isAsyncStarted())
 				// request.getAsyncContext().complete();
@@ -580,7 +565,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						{
 							if(loginsec && !unres && !isLoggedIn(request))
 							{
-								writeResponse(new SecurityException("Access not allowed as not logged in"), Response.Status.UNAUTHORIZED.getStatusCode(), null, mi, request, response, true, null);
+								//writeResponse(new SecurityException("Access not allowed as not logged in"), Response.Status.UNAUTHORIZED.getStatusCode(), null, mi, request, response, true, null);
+								writeResponse(ri.setResult(new SecurityException("Access not allowed as not logged in")).setStatus(Response.Status.UNAUTHORIZED.getStatusCode()).setMappingInfo(mi).setFinished(true));
 							}
 							else
 							{
@@ -590,7 +576,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 								
 								if(ret instanceof IIntermediateFuture)
 								{
-									AsyncContext ctx = getAsyncContext(request);
+									IAsyncContextInfo ctx = getAsyncContextInfo(request);
 									saveRequestContext(fcallid, ctx);
 									
 									final RequestInfo rinfo = new RequestInfo(mi, (IFuture)ret);
@@ -652,16 +638,23 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		
 											if(rinfo.isTerminated())
 											{
-												// nop -> ignore late results (i.e. when
-												// terminated due to browser offline).
-												// System.out.println("ignoring late
-												// result: "+result);
+												// nop -> ignore late results (i.e. when terminated due to browser offline).
+												// System.out.println("ignoring late result: "+result);
+											}
+											
+											// SSE
+											else if(request.getSession(false)!=null && request.getSession(true).getAttribute("sse")!=null)
+											{
+												System.out.println("sse result");
+												AsyncContext ctx = (AsyncContext)request.getSession().getAttribute("sse");
+												writeResponse(new ResponseInfo(result).setStatus(202).setCallid(fcallid).setMappingInfo(mi).setKeepOpen(true)
+													.setRequest((HttpServletRequest)ctx.getRequest()).setResponse((HttpServletResponse)ctx.getResponse()).setFinished(false));
 											}
 		
 											// Browser waiting for result -> send immediately
 											else if(requestspercall.containsKey(fcallid) && requestspercall.get(fcallid).size() > 0)
 											{
-												Collection<AsyncContext> cls = requestspercall.get(fcallid);
+												Collection<IAsyncContextInfo> cls = requestspercall.get(fcallid);
 												
 												// System.out.println("direct answer to browser request, removed context:"+callid+" "+ctx);
 												if(command != null)
@@ -669,9 +662,15 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 													// Timer update (or other command???)
 													// HTTP 102 -> processing (not recognized by angular?)
 													// HTTP 202 -> accepted
-													AsyncContext ctx = cls.iterator().next();
+													IAsyncContextInfo ctx = cls.iterator().next();
 													cls.remove(ctx);
-													writeResponse(null, 202, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false, null);
+													
+													if(!ctx.isComplete())
+													{
+														//writeResponse(null, 202, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false, null);
+														writeResponse(new ResponseInfo().setStatus(202).setCallid(fcallid).setMappingInfo(mi)
+															.setRequest((HttpServletRequest)ctx.getAsyncContext().getRequest()).setResponse((HttpServletResponse)ctx.getAsyncContext().getResponse()).setFinished(false));
+													}
 												}
 												else if(exception != null)
 												{
@@ -689,18 +688,24 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 													AsyncContext[] acs = cls.toArray(new AsyncContext[cls.size()]);
 													for(AsyncContext ac: acs)
 													{
-														writeResponse(result, rescode, fcallid, mi, (HttpServletRequest)ac.getRequest(),
-															(HttpServletResponse)ac.getResponse(), true, null);
+														//writeResponse(result, rescode, fcallid, mi, (HttpServletRequest)ac.getRequest(),
+														//	(HttpServletResponse)ac.getResponse(), true, null);
+														writeResponse(new ResponseInfo(result).setStatus(rescode).setCallid(fcallid).setMappingInfo(mi)
+															.setRequest((HttpServletRequest)ac.getRequest()).setResponse((HttpServletResponse)ac.getResponse()).setFinished(true));
+
 														cls.remove(ac);
 													}
 												}
 												else
 												{
-													AsyncContext ctx = cls.iterator().next();
+													IAsyncContextInfo ctx = cls.iterator().next();
 													cls.remove(ctx);
 													// Normal result (or FINISHED as handled in writeResponse())
 													result = FINISHED.equals(result) ? result : mapResult(method, result);
-													writeResponse(result, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false, max);
+													//writeResponse(result, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false, max);
+													// status?
+													writeResponse(new ResponseInfo(result).setStatus(202).setCallid(fcallid).setMappingInfo(mi)
+														.setRequest((HttpServletRequest)ctx.getAsyncContext().getRequest()).setResponse((HttpServletResponse)ctx.getAsyncContext().getResponse()).setFinished(true));
 												}
 												// ctx.complete();
 											}
@@ -713,11 +718,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 												// yet finished.
 												if(!FINISHED.equals(result) && exception == null)
 												{
-													// System.out.println("checking
-													// "+result);
+													// System.out.println("checking "+result);
 													// if timeout -> cancel future.
-													// TODO: which timeout? (client vs
-													// server).
+													// TODO: which timeout? (client vs server).
 													if(System.currentTimeMillis() - rinfo.getTimestamp() > Starter.getDefaultTimeout(component.getId()))
 													{
 														// System.out.println("terminating due to timeout: "+exception);
@@ -763,7 +766,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 								}
 								else if(ret instanceof IFuture)
 								{
-									final AsyncContext ctx = getAsyncContext(request);
+									final IAsyncContextInfo ctx = getAsyncContextInfo(request);
 									saveRequestContext(fcallid, ctx); // Only for having access to the request via callid from Jadex processing, e.g. for performing security checks with session
 			
 									// todo: use timeout listener
@@ -779,14 +782,16 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 											// "+SUtil.arrayToString(method.getParameterTypes())+"
 											// on "+service+" "+Arrays.toString(params));
 											ret = mapResult(method, ret);
-											writeResponse(ret, fcallid, mi, request, response, true, null);
+											//writeResponse(ret, fcallid, mi, request, response, true, null);
+											writeResponse(ri.setResult(ret).setCallid(fcallid).setMappingInfo(mi).setFinished(true));
 											// ctx.complete();
 										}
 			
 										public void exceptionOccurred(Exception exception)
 										{
 											Object result = mapResult(method, exception);
-											writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), fcallid, mi, request, response, true, null);
+											//writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), fcallid, mi, request, response, true, null);
+											writeResponse(ri.setResult(result).setStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).setCallid(fcallid).setMappingInfo(mi).setFinished(true));
 											// ctx.complete();
 										}
 									}));
@@ -802,33 +807,66 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 									// map the result by user defined mappers
 									Object res = mapResult(method, ret);
 									// convert content and write result to servlet response
-									writeResponse(res, fcallid, mi, request, response, true, null);
+									//writeResponse(res, fcallid, mi, request, response, true, null);
+									
+									// status?
+									writeResponse(ri.setResult(res).setStatus(202).setCallid(fcallid).setMappingInfo(mi).setFinished(true));
 								}
 							}
 						}
 						catch(Exception e)
 						{
 							// System.out.println("call exception: "+e);
-							writeResponse(e, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true, null);
+							//writeResponse(e, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true, null);
+							writeResponse(ri.setResult(e).setStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).setFinished(true));
 						}
 					});
 				}
 				else
 				{
+					response.setCharacterEncoding("utf-8");
 					PrintWriter out = response.getWriter();
 	
-					response.setContentType("text/html; charset=utf-8");
-					response.setStatus(HttpServletResponse.SC_OK);
-	
-					String info = getServiceInfo(service, getServletUrl(request), pm);
-					out.write(info);
-	
-					complete(request, response);
+					// setup SSE if requested via header
+					if(MediaType.SERVER_SENT_EVENTS.equals(request.getHeader("Accept")))
+					{
+						request.getSession(true).setAttribute("sse", request.getAsyncContext()); 
+						
+						response.setContentType(MediaType.SERVER_SENT_EVENTS+"; charset=utf-8");
+						response.setContentType(MediaType.SERVER_SENT_EVENTS);
+					    response.setCharacterEncoding("UTF-8");
+					    response.setStatus(HttpServletResponse.SC_OK);
+					    out.write("sse connection established");
+					    out.flush();
+					    System.out.println("sse connection saved: "+request.getAsyncContext());
+					}
+					else
+					{
+						response.setContentType(MediaType.TEXT_HTML+"; charset=utf-8");
+						String info = getServiceInfo(service, getServletUrl(request), pm);
+						out.write(info);
+						// Set to ok and send back response
+						response.setStatus(HttpServletResponse.SC_OK);
+						complete(request, response);
+					}
 				}
 			}
 		}
 		// System.out.println("handleRequest exit");
 	}
+	
+	/**
+	 *  Get the IP address of the client of a 
+	 *  @param request The http request.
+	 *  @return The ip. 
+	 * /
+	protected String getClientIP(HttpServletRequest request)
+	{
+		String addr = request.getHeader("X-FORWARDED-FOR");
+        if (addr == null || "".equals(addr))
+            addr = request.getRemoteAddr();
+        return addr;
+	}*/
 
 	/**
 	 * Publish a service.
@@ -900,10 +938,10 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	public IFuture<Boolean> isLoggedIn(String callid)
 	{
 		boolean ret = false;
-		Collection<AsyncContext> ctxs = requestspercall.get(callid);
-		AsyncContext ctx = ctxs!=null && ctxs.size()>0? ctxs.iterator().next(): null;
+		Collection<IAsyncContextInfo> ctxs = requestspercall.get(callid);
+		IAsyncContextInfo ctx = ctxs!=null && ctxs.size()>0? ctxs.iterator().next(): null;
 		if(ctx!=null)
-			ret = isLoggedIn(((HttpServletRequest)ctx.getRequest()));
+			ret = isLoggedIn(((HttpServletRequest)ctx.getAsyncContext().getRequest()));
 		return new Future<>(ret? Boolean.TRUE: Boolean.FALSE);
 	}
 	
@@ -931,10 +969,64 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 	/**
 	 * Get the async
-	 */
+	 * /
 	protected AsyncContext getAsyncContext(HttpServletRequest request)
 	{
 		return request.isAsyncStarted()? request.getAsyncContext(): request.startAsync();
+	}*/
+	
+	/**
+	 * Get the async
+	 */
+	protected IAsyncContextInfo getAsyncContextInfo(HttpServletRequest request)
+	{
+		IAsyncContextInfo ret = (IAsyncContextInfo)request.getAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO);
+		
+		// In case the call comes from an internally started server async is not already set
+		// In case the call comes from an external web server it has to set the async in order
+		// to let the call wait for async processing
+		if(ret == null)
+		{
+			final AsyncContext rctx = request.startAsync();
+			final boolean[] complete = new boolean[1];
+			AsyncListener alis = new AsyncListener()
+			{
+				public void onTimeout(AsyncEvent arg0) throws IOException
+				{
+				}
+
+				public void onStartAsync(AsyncEvent arg0) throws IOException
+				{
+				}
+
+				public void onError(AsyncEvent arg0) throws IOException
+				{
+				}
+
+				public void onComplete(AsyncEvent arg0) throws IOException
+				{
+					complete[0] = true;
+				}
+			};
+			rctx.addListener(alis);
+
+			// Must be async because Jadex runs on other thread
+			// tomcat async bug? http://jira.icesoft.org/browse/PUSH-116
+			request.setAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO, new IAsyncContextInfo()
+			{
+				public boolean isComplete()
+				{
+					return complete[0];
+				}
+				
+				public AsyncContext getAsyncContext() 
+				{
+					return rctx;
+				}
+			});
+		}
+		
+		return ret;
 	}
 
 	/**
@@ -1176,8 +1268,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			// System.out.println("found acceptable in types: "+sr);
 			// if(sr.size()==0)
 			// System.out.println("found no acceptable in types.");
-
-			
 
 			if(method.isAnnotationPresent(ParametersMapper.class))
 			{
@@ -1514,46 +1604,49 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	}
 
 	/**
-	 *
-	 */
+	 *  Write the response (header and content).
+	 * /
 	protected void writeResponse(Object result, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin, Integer max)
 	{
 		writeResponse(result, Response.Status.OK.getStatusCode(), callid, mi, request, response, fin, max);
-	}
+	}*/
 
 	/**
-	 *
+	 *  Write the response (header and content).
 	 */
-	protected void writeResponse(Object result, int status, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin, Integer max)
+	protected void writeResponse(ResponseInfo ri)
+//	protected void writeResponse(Object result, int status, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin, Integer max)
 	{
 		// System.out.println("writeResponse: "+result+", "+status+", "+callid);
 		// Only write response on first exception
-		if(isComplete(request, response))
+		if(isComplete(ri.getRequest(), ri.getResponse()))
 			return;
 
-		if(FINISHED.equals(result))
+		if(FINISHED.equals(ri.getResult()))
 		{
-			writeResponse(null, status, callid, mi, request, response, true, max);
-			fin = true;
+			ri.setFinished(true);
+			writeResponse(ri);
+			//fin = true;
 		}
 		else
 		{
-			List<String> sr = writeResponseHeader(result, status, callid, mi, request, response, fin, max);
-			writeResponseContent(result, request, response, sr);
+			List<String> sr = writeResponseHeader(ri);
+			//writeResponseContent(result, request, response, sr);
+			writeResponseContent(ri.setResultTypes(sr));
 		}
 		
-		if(fin && callid!=null)
+		if(ri.isFinished() && ri.getCallid()!=null)
 		{
 			//System.out.println("rqcs: "+requestspercall.size()+" "+requestspercall);
-			Collection<AsyncContext> ctxs = requestspercall.get(callid);
+			Collection<IAsyncContextInfo> ctxs = requestspercall.get(ri.getCallid());
 			/*System.out.println("remove callid: "+callid);
 			if(ctxs!=null)
 			{
 				for(AsyncContext ctx: ctxs)
 					System.out.println("remove: "+ctx.hashCode());
 			}*/
-			requestspercall.remove(callid);
-			requestinfos.remove(callid);
+			requestspercall.remove(ri.getCallid());
+			requestinfos.remove(ri.getCallid());
 			//System.out.println("rqcs: "+requestspercall.size()+" "+requestspercall);
 		}
 	}
@@ -1561,23 +1654,24 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	/**
 	 *
 	 */
-	protected List<String> writeResponseHeader(Object ret, int status, String callid, MappingInfo mi, 
-		HttpServletRequest request, HttpServletResponse response, boolean fin, Integer max)
+	//protected List<String> writeResponseHeader(Object ret, int status, String callid, MappingInfo mi, 
+	//	HttpServletRequest request, HttpServletResponse response, boolean fin, Integer max)
+	protected List<String> writeResponseHeader(ResponseInfo ri)
 	{
 		List<String> sr = null;
 
-		if(ret instanceof Response)
+		if(ri.getResult() instanceof Response)
 		{
-			Response resp = (Response)ret;
+			Response resp = (Response)ri.getResult();
 
-			response.setStatus(resp.getStatus());
+			ri.getResponse().setStatus(resp.getStatus());
 
 			for(String name : resp.getStringHeaders().keySet())
 			{
-				response.addHeader(name, resp.getHeaderString(name));
+				ri.getResponse().addHeader(name, resp.getHeaderString(name));
 			}
 
-			ret = resp.getEntity();
+			ri.setResult(resp.getEntity());
 			if(resp.getMediaType() != null)
 			{
 				sr = new ArrayList<String>();
@@ -1586,13 +1680,13 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		}
 		else
 		{
-			if(status > 0)
-				response.setStatus(status);
+			if(ri.getStatus() > 0)
+				ri.getResponse().setStatus(ri.getStatus());
 
 			// acceptable media types for response (HTTP is case insensitive!)
-			String mts = request.getHeader("accept");
+			String mts = ri.getRequest().getHeader("accept");
 			List<String> cl = parseMimetypes(mts);
-			sr = mi == null ? null : mi.getProducedMediaTypes();
+			sr = ri.getMappingInfo() == null ? null : ri.getMappingInfo().getProducedMediaTypes();
 			if(sr == null || sr.size() == 0)
 			{
 				sr = cl;
@@ -1608,37 +1702,35 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			 * System.out.println("acceptable return types: "+sr+" ("+cl+")"); }
 			 */
 
-			if(callid != null)
+			if(ri.getCallid() != null)
 			{
-				if(fin)
+				if(ri.isFinished())
 				{
-					response.addHeader(HEADER_JADEX_CALLFINISHED, callid);
+					ri.getResponse().addHeader(HEADER_JADEX_CALLFINISHED, ri.getCallid());
 				}
 				else
 				{
-					response.addHeader(HEADER_JADEX_CALLID, callid);
+					ri.getResponse().addHeader(HEADER_JADEX_CALLID, ri.getCallid());
 				}
 				
-				if(max!=null)
-					response.addHeader(HEADER_JADEX_MAX, ""+max);
+				if(ri.getMax()!=null)
+					ri.getResponse().addHeader(HEADER_JADEX_MAX, ""+ri.getMax());
 			}
 
 			// todo: add option for CORS
-			response.addHeader("Access-Control-Allow-Origin", "*");
+			ri.getResponse().addHeader("Access-Control-Allow-Origin", "*");
 			// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
-			response.addHeader("Access-Control-Allow-Credentials", "true ");
-			response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
-			response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
+			ri.getResponse().addHeader("Access-Control-Allow-Credentials", "true ");
+			ri.getResponse().addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+			ri.getResponse().addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
 		
 			// add header for non-caching
-			response.addHeader("Cache-Control", "no-cache, no-store");
-			response.addHeader("Expires", "-1");
+			ri.getResponse().addHeader("Cache-Control", "no-cache, no-store");
+			ri.getResponse().addHeader("Expires", "-1");
 			
 			// Add Jadex version header, if enabled
 			if(Boolean.TRUE.equals(Starter.getPlatformArgument(component.getId(), "showversion")))
-			{
-				response.addHeader(HEADER_JADEX_VERSION, VersionInfo.getInstance().toString());				
-			}
+				ri.getResponse().addHeader(HEADER_JADEX_VERSION, VersionInfo.getInstance().toString());				
 		}
 
 		return sr;
@@ -1647,7 +1739,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	/**
 	 * Write the response content.
 	 */
-	protected void writeResponseContent(Object result, HttpServletRequest request, HttpServletResponse response, List<String> sr)
+	//protected void writeResponseContent(Object result, HttpServletRequest request, HttpServletResponse response, List<String> sr)
+	protected void writeResponseContent(ResponseInfo ri)
 	{
 		//if(result!=null)// && result.getClass().toString().toLowerCase().indexOf("byte")!=-1)
 		//	System.out.println("jju: "+result.getClass());
@@ -1655,34 +1748,53 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		//if(result instanceof Exception)
 		//	System.out.println("result is exception: "+result);
 		
+		// Set response content type to stream when requested so
+		//if(ri.getResultTypes()!=null && ri.getResultTypes().size()>0)
+		//{
+			//Optional<String> f = ri.getResultTypes().stream().filter(rt -> rt.indexOf("text/event-stream")!=-1).findFirst();
+			//if(f.isPresent())
+		//}
+		
+		boolean sse = false;
+		
+		// Set content type to sse when request was sse 
+		if(ri.getRequest().getHeader("Accept").equals(MediaType.SERVER_SENT_EVENTS)
+			|| ri.getResultTypes().contains(MediaType.SERVER_SENT_EVENTS))
+		{
+			sse = true;
+			ri.getResponse().setHeader("Content-Type", MediaType.SERVER_SENT_EVENTS);
+			System.out.println("setting response type to stream");
+			if(!ri.isKeepOpen())
+				System.out.println("WROOOOOOOOOOOONG");
+		}
+		
 		try
 		{
 			// handle content
-			if(result instanceof byte[])
+			if(ri.getResult() instanceof byte[])
 			{
-				response.getOutputStream().write((byte[])result);
-				if(response.getHeader("Content-Type") == null && sr!=null && sr.size()>0)
+				ri.getResponse().getOutputStream().write((byte[])ri.getResult());
+				if(ri.getResponse().getHeader("Content-Type") == null && ri.getResultTypes()!=null && ri.getResultTypes().size()>0)
 				{
-					response.setHeader("Content-Type", sr.get(0));
+					ri.getResponse().setHeader("Content-Type", ri.getResultTypes().get(0));
 				}
 			}
 			else
 			{
-				if(result != null)
+				if(ri.getResult() != null)
 				{
 					String ret = null;
 					String mt = null;
-					if(sr != null)
+					if(ri.getResultTypes() != null)
 					{
-						for(String mediatype : sr)
+						for(String mediatype : ri.getResultTypes())
 						{
-							mediatype = mediatype.trim(); // e.g. sent with leading
-															// space from edge, grrr
+							mediatype = mediatype.trim(); // e.g. sent with leading space from edge, grrr
 							Collection<IObjectStringConverter> convs = converters.get(mediatype);
 							if(convs != null && convs.size() > 0)
 							{
 								mt = mediatype;
-								Object input = result instanceof Response ? ((Response)result).getEntity() : result;
+								Object input = ri.getResult() instanceof Response ? ((Response)ri.getResult()).getEntity() : ri.getResult();
 								ret = convs.iterator().next().convertObject(input, null);
 								break;
 							}
@@ -1697,97 +1809,40 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						if(!mt.contains("charset"))
 							mt = mt + "; charset=utf-8";
 	
-						if(response.getHeader("Content-Type") == null)
-							response.setHeader("Content-Type", mt);
+						if(ri.getResponse().getHeader("Content-Type") == null)
+							ri.getResponse().setHeader("Content-Type", mt);
 
 						// Important: writer access must be deferred to happen after setting charset! Will be ignored otherwise
 						// https://stackoverflow.com/questions/51014481/setting-default-character-encoding-and-content-type-in-embedded-jetty
-						PrintWriter out = response.getWriter();
+						PrintWriter out = ri.getResponse().getWriter();
 						out.write(ret);
-						// System.out.println("Response content: "+ret);
+						System.out.println("Response content: "+ret);
 					}
 					else
 					{
-						if(response.getHeader("Content-Type") == null)
-							response.setHeader("Content-Type", MediaType.TEXT_PLAIN + "; charset=utf-8");
-						if(!(result instanceof String) && !(result instanceof Response))
-							System.out.println("cannot convert result, writing as string: " + result);
+						if(ri.getResponse().getHeader("Content-Type") == null)
+							ri.getResponse().setHeader("Content-Type", MediaType.TEXT_PLAIN + "; charset=utf-8");
+						if(!(ri.getResult() instanceof String) && !(ri.getResult() instanceof Response))
+							System.out.println("cannot convert result, writing as string: " + ri.getResult());
 
 						// Important: writer access must be deferred to happen after setting charset!
-						PrintWriter out = response.getWriter();
-						out.write(result instanceof Response ? "" + ((Response)result).getEntity() : result.toString());
+						PrintWriter out = ri.getResponse().getWriter();
+						String res = ri.getResult() instanceof Response ? "" + ((Response)ri.getResult()).getEntity() : ri.getResult().toString();
+						out.write(res);
 					}
 	
 					// for testing with browser
 					// http://brockallen.com/2012/04/27/change-firefoxs-default-accept-header-to-prefer-json-over-xml/
-	
-					// if(sr!=null && sr.contains(MediaType.APPLICATION_JSON))
-					// {
-					// System.out.println("write response in json");
-					// byte[] data = JsonTraverser.objectToByteArray(result,
-					// component.getClassLoader());
-					// if(response.getHeader("Content-Type")==null)
-					// response.setHeader("Content-Type",
-					// MediaType.APPLICATION_JSON);
-					// out.write(new String(data));
-					// }
-					// else if(sr!=null && sr.contains(MediaType.APPLICATION_XML))
-					// {
-					// System.out.println("write response in xml");
-					// byte[] data = JavaWriter.objectToByteArray(result,
-					// component.getClassLoader());
-					// if(response.getHeader("Content-Type")==null)
-					// response.setHeader("Content-Type",
-					// MediaType.APPLICATION_XML);
-					//
-					// // this code below writes <?xml... prolog only once>
-					//// byte[] data;
-					//// if(response.getHeader("Content-Type")==null)
-					//// {
-					//// response.setHeader("Content-Type",
-					// MediaType.APPLICATION_XML);
-					//// data = JavaWriter.objectToByteArray(result,
-					// component.getClassLoader());
-					//// }
-					//// else
-					//// {
-					//// // write without xml prolog
-					//// data = JavaWriter.objectToByteArray(result, null,
-					// component.getClassLoader(), null);
-					//// }
-					// out.write(new String(data));
-					// }
-					// else if(sr!=null && sr.contains("*/*"))
-					// {
-					// System.out.println("write response as json cause all is
-					// allowed");
-					// // use json if all is allowed
-					// if(response.getHeader("Content-Type")==null)
-					// response.setHeader("Content-Type",
-					// MediaType.APPLICATION_JSON);
-					// byte[] data = JsonTraverser.objectToByteArray(result,
-					// component.getClassLoader());
-					// out.write(new String(data));
-					// }
-					// else if(sr!=null && sr.contains(MediaType.TEXT_PLAIN)) //
-					// SReflect.isStringConvertableType(result.getClass())
-					// {
-					// System.out.println("write response as string");
-					// if(response.getHeader("Content-Type")==null)
-					// response.setContentType("text/plain; charset=utf-8");
-					// out.write(result.toString());
-					// }
-					// else
-					// {
-					// System.out.println("cannot convert result: "+result);
-					// }
-	
-					// causes tomcat 8 to throw nullpointer?
-					// out.flush();
 				}
 			}
 			
-			complete(request, response);
+			if(!ri.isKeepOpen())
+				complete(ri.getRequest(), ri.getResponse());
+			else
+			{
+				System.out.println("wrote result to sse channel: "+ri.getRequest().getAsyncContext());
+				ri.getResponse().getWriter().flush();
+			}
 		}
 		catch(Exception e)
 		{
@@ -1796,16 +1851,17 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	}
 
 	/**
-	 * @param callid
-	 * @param ctx
+	 *  Save a request context per callid.
+	 *  @param callid The callid.
+	 *  @param ctx The context.
 	 */
-	protected void saveRequestContext(String callid, AsyncContext ctx)
+	protected void saveRequestContext(String callid, IAsyncContextInfo ctx)
 	{
 		//System.out.println("add request: "+callid+" "+ctx.hashCode());
-		Collection<AsyncContext> ctxs = requestspercall.get(callid);
+		Collection<IAsyncContextInfo> ctxs = requestspercall.get(callid);
 		if(ctxs==null)
 		{
-			ctxs = new ArrayList<AsyncContext>();
+			ctxs = new ArrayList<IAsyncContextInfo>();
 			requestspercall.put(callid, ctxs);
 		}
 		ctxs.add(ctx);
@@ -1813,7 +1869,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 		// Set individual time if is contained in request
 		// todo: add support for individual lease times in map
-		long to = getRequestTimeout((HttpServletRequest)ctx.getRequest());
+		//long to = getRequestTimeout((HttpServletRequest)ctx.getRequest());
 		//((LeaseTimeMap)requestspercall).touch(key);
 		
 		/*if(to > 0)
@@ -3013,105 +3069,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		return new Tuple2<>(ret, targettypes);
 	}
 	
-	// Should be in SReflect but requires asm
-	// and also exists in SHelper
-	/**
-	 * Get parameter names via asm reader.
-	 * 
-	 * @param m The method.
-	 * @return The list of parameter names or null
-	 * /
-	public static List<String> getParameterNames(Method m)
-	{
-		List<String> ret = null;
-
-		// Try to find via annotation
-		boolean anused = false;
-		Annotation[][] annos = m.getParameterAnnotations();
-		if(annos.length > 0)
-		{
-			ret = new ArrayList<String>();
-			for(Annotation[] ans : annos)
-			{
-				boolean found = false;
-				for(Annotation an : ans)
-				{
-					if(an instanceof ParameterInfo)
-					{
-						ret.add(((ParameterInfo)an).value());
-						found = true;
-						anused = true;
-						break;
-					}
-				}
-				if(!found)
-					ret.add(null);
-			}
-			if(!anused)
-				ret = null;
-		}
-
-		// only works when compiled with debug info
-		// Try to find via debug info
-		// if(!anused)
-		// {
-		// Class<?> deccl = m.getDeclaringClass();
-		// String mdesc = Type.getMethodDescriptor(m);
-		// String url = Type.getType(deccl).getInternalName() + ".class";
-		//
-		// InputStream is = deccl.getClassLoader().getResourceAsStream(url);
-		// if(is!=null)
-		// {
-		// ClassNode cn = null;
-		// try
-		// {
-		// cn = new ClassNode();
-		// ClassReader cr = new ClassReader(is);
-		// cr.accept(cn, 0);
-		// }
-		// catch(Exception e)
-		// {
-		// }
-		// finally
-		// {
-		// try
-		// {
-		// is.close();
-		// }
-		// catch(Exception e)
-		// {
-		// }
-		// }
-		//
-		// if(cn!=null)
-		// {
-		// List<MethodNode> methods = cn.methods;
-		//
-		// for(MethodNode method: methods)
-		// {
-		// if(method.name.equals(m.getName()) && method.desc.equals(mdesc))
-		// {
-		// Type[] argtypes = Type.getArgumentTypes(method.desc);
-		// List<LocalVariableNode> lvars = method.localVariables;
-		// if(lvars!=null && lvars.size()>0)
-		// {
-		// ret = new ArrayList<String>();
-		// for(int i=0; i<argtypes.length; i++)
-		// {
-		// // first local variable represents the "this" object
-		// ret.add(lvars.get(i+1).name);
-		// }
-		// }
-		// break;
-		// }
-		// }
-		// }
-		// }
-		// }
-
-		return ret;
-	}*/
-
 	/**
 	 * Extract caller values like ip and browser.
 	 * 
@@ -3153,6 +3110,208 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	public String getCleanPublishId(String id)
 	{
 		return id != null ? id.replace("[", "").replace("]", "") : null;
+	}
+	
+	public static class ResponseInfo
+	{
+		protected Object result;
+		protected int status;
+		protected String callid;
+		protected MappingInfo mi;
+		protected HttpServletRequest request;
+		protected HttpServletResponse response;
+		protected boolean finished; 
+		protected Integer max;
+		protected List<String> resulttypes;
+		protected boolean keepopen;
+
+		/**
+		 *  Create a new response info.
+		 */
+		public ResponseInfo() 
+		{
+		}
+		
+		/**
+		 *  Create a new response info.
+		 *  @param result
+		 */
+		public ResponseInfo(Object result) 
+		{
+			this.result = result;
+		}
+
+		/**
+		 * @return the result
+		 */
+		public Object getResult() 
+		{
+			return result;
+		}
+		
+		/**
+		 * @param result the result to set
+		 */
+		public ResponseInfo setResult(Object result) 
+		{
+			this.result = result;
+			return this;
+		}
+		
+		/**
+		 * @return the status
+		 */
+		public int getStatus() 
+		{
+			return status;
+		}
+		
+		/**
+		 * @param status the status to set
+		 */
+		public ResponseInfo setStatus(int status) 
+		{
+			this.status = status;
+			return this;
+		}
+		
+		/**
+		 * @return the callid
+		 */
+		public String getCallid() 
+		{
+			return callid;
+		}
+		
+		/**
+		 * @param callid the callid to set
+		 */
+		public ResponseInfo setCallid(String callid) 
+		{
+			this.callid = callid;
+			return this;
+		}
+		
+		/**
+		 * @return the mi
+		 */
+		public MappingInfo getMappingInfo() 
+		{
+			return mi;
+		}
+		
+		/**
+		 * @param mi the mi to set
+		 */
+		public ResponseInfo setMappingInfo(MappingInfo mi) 
+		{
+			this.mi = mi;
+			return this;
+		}
+		
+		/**
+		 * @return the request
+		 */
+		public HttpServletRequest getRequest() 
+		{
+			return request;
+		}
+		
+		/**
+		 * @param request the request to set
+		 */
+		public ResponseInfo setRequest(HttpServletRequest request) 
+		{
+			this.request = request;
+			return this;
+		}
+		
+		/**
+		 * @return the response
+		 */
+		public HttpServletResponse getResponse() 
+		{
+			return response;
+		}
+		
+		/**
+		 * @param response the response to set
+		 */
+		public ResponseInfo setResponse(HttpServletResponse response) 
+		{
+			this.response = response;
+			return this;
+		}
+		
+		/**
+		 * @return the finished
+		 */
+		public boolean isFinished() 
+		{
+			return finished;
+		}
+		
+		/**
+		 * @param finished the finished to set
+		 */
+		public ResponseInfo setFinished(boolean finished) 
+		{
+			this.finished = finished;
+			return this;
+		}
+
+		/**
+		 * @return the max
+		 */
+		public Integer getMax() 
+		{
+			return max;
+		}
+		
+		/**
+		 * @param max the max to set
+		 */
+		public ResponseInfo setMax(Integer max) 
+		{
+			this.max = max;
+			return this;
+		}
+
+		/**
+		 * @return the resulttypes
+		 */
+		public List<String> getResultTypes() 
+		{
+			return resulttypes;
+		}
+
+		/**
+		 * @param resulttype the resulttypes to set
+		 */
+		public ResponseInfo setResultTypes(List<String> resulttypes) 
+		{
+			this.resulttypes = resulttypes;
+			return this;
+		}
+		
+		/**
+		 *  Should the connection be kept open?
+		 *  @return the keepopen flag
+		 */
+		public boolean isKeepOpen() 
+		{
+			return keepopen;
+		}
+
+		/**
+		 *  Set the keep open flag.
+		 *  @param keepopen the keepopen flag to set
+		 */
+		public ResponseInfo setKeepOpen(boolean keepopen) 
+		{
+			this.keepopen = keepopen;
+			return this;
+		}
 	}
 }
 

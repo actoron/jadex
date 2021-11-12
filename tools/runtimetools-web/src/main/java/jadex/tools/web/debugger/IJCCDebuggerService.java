@@ -2,6 +2,7 @@ package jadex.tools.web.debugger;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.future.IFuture;
@@ -56,7 +57,20 @@ public interface IJCCDebuggerService extends IJCCPluginService
 	public IFuture<String[]> getBreakpoints(IComponentIdentifier compo);
 	
 	/**
-	 *  Subscribe to a component for update events.
+	 *  Set the breakpoints. 
+	 *  @param compo The component cid.
+	 *  @param breakpoints The platform breakpoints.
+	 */
+	public IFuture<Void> setComponentBreakpoints(IComponentIdentifier compo, String[] breakpoints);
+	
+	/**
+	 *  Subscribe to cms to get execution updates.
+	 *  @param compo The component cid.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> subscribeToCMS(IComponentIdentifier compo);
+	
+	/**
+	 *  Subscribe to a component for monitoring events.
 	 *  @param compo The component cid.
 	 */
 	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToComponent(IComponentIdentifier compo);

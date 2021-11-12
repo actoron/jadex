@@ -1,7 +1,10 @@
 package jadex.tools.web.debugger;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
+import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -90,6 +93,7 @@ public class JCCDebuggerPluginAgent extends JCCPluginAgent implements IJCCDebugg
 	 */
 	public IFuture<IComponentDescription> resumeComponent(IComponentIdentifier compo)
 	{
+		System.out.println("resume called: "+compo);
 		Future<IComponentDescription> ret = new Future<IComponentDescription>();
 		agent.getExternalAccess(compo).resumeComponent().then(Void ->
 		{
@@ -148,6 +152,17 @@ public class JCCDebuggerPluginAgent extends JCCPluginAgent implements IJCCDebugg
 	}
 	
 	/**
+	 *  Set the breakpoints. 
+	 *  @param compo The component cid.
+	 *  @param breakpoints The platform breakpoints.
+	 */
+	public IFuture<Void> setComponentBreakpoints(IComponentIdentifier compo, String[] breakpoints)
+	{
+		return agent.getExternalAccess(compo).setComponentBreakpoints(breakpoints);
+	}
+	
+	
+	/**
 	 *  Subscribe to a component for update events.
 	 *  @param compo The component cid.
 	 */
@@ -161,6 +176,17 @@ public class JCCDebuggerPluginAgent extends JCCPluginAgent implements IJCCDebugg
 			}
 		}, true, PublishEventLevel.FINE);
 	}
+	
+	
+	/**
+	 *  Subscribe to cms to get execution updates.
+	 *  @param compo The component cid.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> subscribeToCMS(IComponentIdentifier compo)
+	{
+		return SComponentManagementService.listenToAll(agent.getExternalAccess(compo));
+	}
+	
 	
 	/**
 	 *  Get the sservice of the own platform or of cid platform.

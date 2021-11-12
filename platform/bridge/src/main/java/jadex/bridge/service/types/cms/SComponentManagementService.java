@@ -223,6 +223,17 @@ public class SComponentManagementService
     {
     	return listenToComponent(null, agent);
     }
+    
+	// r: listeners
+	// w: listeners
+	/**
+     *  Add a component listener for all components.
+     *  The listener is registered for component changes.
+     */
+    public static ISubscriptionIntermediateFuture<CMSStatusEvent> listenToAll(IExternalAccess agent)
+    {
+    	return listenToComponent(null, agent);
+    }
 	
 	// r: listeners
 	// w: listeners
@@ -234,61 +245,74 @@ public class SComponentManagementService
      */
     public static ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(final IComponentIdentifier cid, IInternalAccess agent)
     {
-    	final SubscriptionIntermediateFuture<CMSStatusEvent> ret = new SubscriptionIntermediateFuture<CMSStatusEvent>();
-    	SFuture.avoidCallTimeouts(ret, agent);
-    	
-//    	if(getListeners()==null)
-//    		listeners	= new MultiCollection<IComponentIdentifier, SubscriptionIntermediateFuture<CMSStatusEvent>>();
-    	// todo: make this transactional (with features this could be broken)
-    	
-    	CmsState cmsstate = getState(agent.getId());
-    	try(IAutoLock l = cmsstate.writeLock())
-    	{
-    		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>> col = null;
-    		if(cid != null)
-    		{
-	    		CmsComponentState compstate = cmsstate.getComponent(cid);
-	    		if(compstate == null)
-	    		{
-	    			ret.setException(new IllegalStateException("Component not found: " + cid));
-	    			return ret;
-	    		}
-	    		
-	    		compstate.addCmsListener(ret);
-	    		col = compstate.getCmsListeners();
-	    		/*compstate.getCmsListeners();
-	    		if(col==null)
-		    	{
-	    			System.out.println(" ");
-		    		col = new ArrayList<SubscriptionIntermediateFuture<CMSStatusEvent>>();
-		    		compstate.setCmsListeners(col);
-	    	    	System.out.println("listenToComponent 2: "+cid+" "+col+" "+System.identityHashCode(cmsstate)+" "+System.identityHashCode(col));
-		    	}*/
-    		}
-    		else
-    		{
-    			col = cmsstate.getAllListeners();
-    			col.add(ret);
-    		}
-	    	//System.out.println("listenToComponent: "+cid+" "+col+" "+System.identityHashCode(col));
-    	}
-    	
-    	ret.setTerminationCommand(new TerminationCommand()
-    	{
-    		@Override
-    		public void terminated(Exception reason)
-    		{
-    			try(IAutoLock l = cmsstate.writeLock())
-    			{
-	    			Collection<SubscriptionIntermediateFuture<CMSStatusEvent>> col = getState(agent.getId()).getCmsListeners(cid);
-	    			if(col!=null)
-	    				col.remove(ret);
-    			}
-    		}
-    	});
-    	
-    	return ret;    	
+    	return listenToComponent(cid, agent.getExternalAccess());
     }
+    
+ // r: listeners
+ 	// w: listeners
+ 	/**
+      *  Add a component listener for a specific component.
+      *  The listener is registered for component changes.
+      *  @param cid	The component to be listened.
+      *  @throws IllegalStateException when the component is not found.
+      */
+     public static ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(final IComponentIdentifier cid, IExternalAccess agent)
+     {
+     	final SubscriptionIntermediateFuture<CMSStatusEvent> ret = new SubscriptionIntermediateFuture<CMSStatusEvent>();
+     	SFuture.avoidCallTimeouts(ret, agent);
+     	
+//     	if(getListeners()==null)
+//     		listeners	= new MultiCollection<IComponentIdentifier, SubscriptionIntermediateFuture<CMSStatusEvent>>();
+     	// todo: make this transactional (with features this could be broken)
+     	
+     	CmsState cmsstate = getState(agent.getId());
+     	try(IAutoLock l = cmsstate.writeLock())
+     	{
+     		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>> col = null;
+     		if(cid != null)
+     		{
+ 	    		CmsComponentState compstate = cmsstate.getComponent(cid);
+ 	    		if(compstate == null)
+ 	    		{
+ 	    			ret.setException(new IllegalStateException("Component not found: " + cid));
+ 	    			return ret;
+ 	    		}
+ 	    		
+ 	    		compstate.addCmsListener(ret);
+ 	    		col = compstate.getCmsListeners();
+ 	    		/*compstate.getCmsListeners();
+ 	    		if(col==null)
+ 		    	{
+ 	    			System.out.println(" ");
+ 		    		col = new ArrayList<SubscriptionIntermediateFuture<CMSStatusEvent>>();
+ 		    		compstate.setCmsListeners(col);
+ 	    	    	System.out.println("listenToComponent 2: "+cid+" "+col+" "+System.identityHashCode(cmsstate)+" "+System.identityHashCode(col));
+ 		    	}*/
+     		}
+     		else
+     		{
+     			col = cmsstate.getAllListeners();
+     			col.add(ret);
+     		}
+ 	    	//System.out.println("listenToComponent: "+cid+" "+col+" "+System.identityHashCode(col));
+     	}
+     	
+     	ret.setTerminationCommand(new TerminationCommand()
+     	{
+     		@Override
+     		public void terminated(Exception reason)
+     		{
+     			try(IAutoLock l = cmsstate.writeLock())
+     			{
+ 	    			Collection<SubscriptionIntermediateFuture<CMSStatusEvent>> col = getState(agent.getId()).getCmsListeners(cid);
+ 	    			if(col!=null)
+ 	    				col.remove(ret);
+     			}
+     		}
+     	});
+     	
+     	return ret;    	
+     }
     
     // r: listeners
  	// w: -
