@@ -130,14 +130,16 @@
 
 				init: function()
 				{
+					var self = this;
+					
 					this.source = new EventSource('webjcc');
 					this.source.addEventListener('open', function(e) 
 					{
-						console.log('con established');
+						//console.log('con established');
 					}, false);
 					this.source.onmessage = function(event) 
 					{
-						console.log("message received: "+event);
+						self.processEvent(event, 0);
 					};
 					/*this.source.addEventListener('message', function (e) 
 					{
@@ -146,9 +148,41 @@
 					}, false);*/
 					this.source.addEventListener('error', function(e) 
 					{
-					    if(e.readyState === EventSource.CLOSED) 
-					    	console.log('connection closed');
+					    //if(e.readyState === EventSource.CLOSED) 
+					    //	console.log('connection closed');
 					}, false);
+				},
+				
+				processEvent: function(event, cnt)
+				{
+					//console.log("message received: "+JSON.stringify(event.data));
+					var self = this;
+					
+					// [callback, errhandler]
+					var cb = self.conversations[event.lastEventId];
+					if(cb!=null)
+					{
+						var event = JSON.parse(event.data);
+					
+						if(event?.data?.stackTrace!=null)
+							cb[1](event);
+						else if(event?.max!=null)
+							cb[2](event);
+						else
+							cb[0](event);
+					}
+					else
+					{
+						if(cnt<3)
+						{
+							console.log("retry event: "+JSON.stringify(event)+" "+cnt);
+							setTimeout(() => self.processEvent(event, ++cnt), 1000);
+						}
+						else
+						{
+							console.log("cannot handle event: "+JSON.stringify(event)+" "+cnt);
+						}
+					}
 				},
 										
 				transform: 
@@ -164,11 +198,11 @@
 						    }
 						    return value;
 						}*/
-						console.log("received data: "+data);
+						//console.log("received data: "+data);
 						try
 						{
 							var ret = JSON.parse(data);//, daterev);
-							console.log("json: "+ret);
+							//console.log("json: "+ret);
 							return ret;
 						}
 						catch(ex)
@@ -180,30 +214,42 @@
 					}]
 				},	
 					
-				getIntermediate: function(path, handler, error, maxhandler) 
+				getIntermediate: function(path, handler, errhandler, maxhandler) 
 				{
+					//console.log("getIntermediate: "+path);
+					
+					var self = this;
+					
 					// problem with hanging requests to same URL because of cache
 					// https://stackoverflow.com/questions/27513994/chrome-stalls-when-making-multiple-requests-to-same-resource
-					if(path.indexOf("?")==-1)
-						path = path+'?__random='+Math.random();
-					else 
-						path = path+'&__random='+Math.random();
+					//if(path.indexOf("?")==-1)
+					//	path = path+'?__random='+Math.random();
+					//else 
+					//	path = path+'&__random='+Math.random();
 					
 					var terminated = false;
 					var call;
 			
-					var erfunc = function(err)
+					var errfunc = function(err)
 					{
 						//if(axios.isCancel(err))
 			            //   console.log('request canceled', err.message);
+						
+						//console.log("errfunc: "+JSON.stringify(err));
+						
+						if(err.exceptionType?.indexOf("TerminatedException")!=-1)
+						{
+							//console.log("call terminated: "+JSON.stringify(err));
+							return;
+						}
 						
 						if(terminated)
 						{
 							//console.log("call terminated: "+path);
 							return;
 						}
-						
-						error(err);
+							
+						errhandler(err);
 					}
 					
 					var	func = function(resp)
@@ -217,44 +263,50 @@
 						var fini = resp.headers["x-jadex-callidfin"];
 						var callid = resp.headers["x-jadex-callid"];
 						var max = resp.headers["x-jadex-max"];
-						var sse = resp.headers["x-jadex-sse"];
+						var sse = resp.data=="sse";
+						if(fini!=null && callid==null)
+							callid = fini;
+						//console.log("call sse:"+sse+" "+resp.data);
 						
-						if(resp.status!=202)	// ignore updatetimer commands
+						if(!sse)
 						{
-							if(max!=null)
-								maxhandler(max);
-							else
-								handler(resp);
+							if(resp.status!=202)	// ignore updatetimer commands
+							{
+								if(max!=null)
+									maxhandler(max);
+								else
+									handler(resp);
+							}
 						}
 						
 						call = axios.CancelToken.source();
-		
+						
 						//console.log("received: "+resp)
 						
 						//console.log("call headers: "+resp.headers["x-jadex-callid"]+" "+resp.headers["x-jadex-callidfin"]);
 						
-						if(fini)
+						if(sse)
+						{
+							//console.log("response via sse: "+path+" "+callid);
+							if(self.conversations[callid]==null)
+							{
+								//console.log("saved conversation: "+callid);
+								self.conversations[callid] = [handler, errfunc, maxhandler]; //errhandler
+							}
+						}
+						else if(fini)
 						{
 							//console.log("call finished: "+fini);
 						}
-						else if(sse!=null)
-						{
-							console.log("call via sse: "+path+" "+callid);
-							if(this.conversations[callid]==null)
-							{
-								console.log("saved conversation: "+callid);
-								this.conversations[callid] = [func, errfunc];
-							}
-						}
 						else
 						{
-							console.log("long poll call: "+path+" "+callid);
+							//console.log("long poll call: "+path+" "+callid);
 							if(callid!=null)
 							{
 								//console.log("long-poll request sent: "+path);
 								
 								var headers = {'x-jadex-callid': callid, 'cache-control': 'no-cache, no-store', "x-jadex-sse": true};
-								axios.get(path, {cancelToken: call.token, headers: headers}, this.transform).then(func).catch(erfunc); 
+								axios.get(path, {cancelToken: call.token, headers: headers}, this.transform).then(func).catch(errfunc); 
 							}
 						}
 						
@@ -279,7 +331,7 @@
 							.catch(function(err) 
 							{
 								reject(err); 
-								erfunc(err);
+								errfunc(err);
 							});
 					});
 					
@@ -287,6 +339,19 @@
 					{
 						return new Promise(function(resolve, reject)
 						{
+							var errhandler = function(err)
+							{
+								console.log("error in termination: "+JSON.stringify(err));
+								
+								if(err.exceptionType?.indexOf("TerminatedException")!=-1)
+								{
+									console.log("call terminated: "+JSON.stringify(err));
+									resolve();
+								}
+
+								reject(err);
+							};
+							
 							prom.then(function(callid)
 							{
 								if(call)
@@ -297,13 +362,9 @@
 								
 								//console.log("terminating request sent: "+path);
 								axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': r, headers: {'x-jadex-callid': callid, 'cache-control': 'no-cache, no-store', "x-jadex-sse": true}}}, this.transform)
-									.then(resolve).catch(reject); 
+									.then(resolve).catch(errhandler); 
 							})
-							.catch(function(err)
-							{
-								console.log("error: "+err);
-								reject(err);
-							});
+							.catch(errhandler);
 						});
 					}
 					

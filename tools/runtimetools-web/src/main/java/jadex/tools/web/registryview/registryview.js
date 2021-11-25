@@ -268,12 +268,12 @@ class RegistryViewElement extends CidElement
 		
 	//	alert("Service: "+JSON.stringify(service));
 	
-		var elms = this.getSubscription(x).elements;
+		var elems = this.getSubscription(x).elements;
 		var table = this.getSubscription(x).table;
 	
-		for(var i=0; i<elms.length; i++)
+		for(var i=0; i<elems.length; i++)
 		{
-			found = equals(elms[i], event);
+			found = equals(elems[i], event);
 			if(found)
 			{
 				// 0: added, 1: removed, 2: changed

@@ -48,7 +48,7 @@ class PlatformsElement extends BaseElement
 	{
 		if(this.termcmd!=null)
 			this.termcmd().then(() => {/*console.log("Terminated subscription.")*/})
-				.catch(() => {console.log("Could not terminate subscription")});
+				.catch(err => {console.log("Could not terminate subscription: "+err)});
 	}
 	
 	subscribe(interval)
@@ -61,7 +61,7 @@ class PlatformsElement extends BaseElement
 			function(resp)
 			{
 				//console.log("Set up subscription");
-				self.updatePlatform(resp.data.service.name, resp.data.service.type);
+				self.updatePlatform(resp.data.service.name, resp.data.type);
 				self.connected = true;
 				self.termcmd = tc;
 			},
