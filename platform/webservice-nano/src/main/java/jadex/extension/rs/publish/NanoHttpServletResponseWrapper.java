@@ -241,6 +241,8 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
     
     public void flushBuffer() throws IOException
     {
+    	// todo: support nano flush
+    	// must support chunked response
     	throw new UnsupportedOperationException();
     }
     

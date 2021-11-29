@@ -8,6 +8,7 @@ import java.util.Map;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
@@ -182,6 +183,13 @@ public class JettyRestPublishService extends AbstractRestPublishService
             {
                 System.out.println("Starting new server: "+uri.getPort());
                 server = new Server(uri.getPort());
+                
+                // todo: http2, browser only support with tls?!
+                //ServerConnector connector = new ServerConnector(server, ssl, alpn, http2, http1);
+                //connector.setPort(webProperties.getPort());
+                //server.addConnector(connector);
+                
+                
                 //server.dumpStdErr();
 
                 // https://stackoverflow.com/questions/62199102/sessionhandler-becomes-null-in-jetty-v9-4-5

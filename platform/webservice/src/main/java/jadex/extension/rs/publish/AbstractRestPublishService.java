@@ -8,9 +8,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URLDecoder;
-import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,9 +18,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.NoSuchElementException;
-import java.util.Queue;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -54,12 +49,9 @@ import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
-import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.TimeoutException;
 import jadex.commons.Tuple2;
-import jadex.commons.collection.LeaseTimeMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -3562,7 +3554,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		 */
 		public boolean isSSERequest()
 		{
-			return getRequest().getHeader("Accept").indexOf(MediaType.SERVER_SENT_EVENTS)!=-1;
+			return getRequest().getHeader("Accept")!=null && getRequest().getHeader("Accept").indexOf(MediaType.SERVER_SENT_EVENTS)!=-1;
 		}
 		
 		/**

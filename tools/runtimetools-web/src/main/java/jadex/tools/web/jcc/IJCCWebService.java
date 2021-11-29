@@ -78,6 +78,12 @@ public interface IJCCWebService
 	public IFuture<Map<String, Object>> getWebClientConfiguration();
 	
 	/**
+	 *  Get the platform id of the webgateway.
+	 *  @return The platform id.
+	 */
+	public IFuture<IComponentIdentifier> getPlatformId();
+	
+	/**
 	 *  Login to the webjcc.
 	 *  @param platformpass The platform password.
 	 *  @return True if logged in.

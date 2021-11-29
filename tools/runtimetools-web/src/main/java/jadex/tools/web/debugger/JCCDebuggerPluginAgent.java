@@ -93,7 +93,7 @@ public class JCCDebuggerPluginAgent extends JCCPluginAgent implements IJCCDebugg
 	 */
 	public IFuture<IComponentDescription> resumeComponent(IComponentIdentifier compo)
 	{
-		System.out.println("resume called: "+compo);
+		//System.out.println("resume called: "+compo);
 		Future<IComponentDescription> ret = new Future<IComponentDescription>();
 		agent.getExternalAccess(compo).resumeComponent().then(Void ->
 		{

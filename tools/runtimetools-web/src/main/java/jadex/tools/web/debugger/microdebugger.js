@@ -43,7 +43,7 @@ class MicroAgentDebuggerElement extends CidElement
 			interval = 5000;
 
 		var self = this;
-		console.log("sub at: "+this.cid);
+		//console.log("sub at: "+this.cid);
 		self.sub.terminate = jadex.getIntermediate(this.getMethodPrefix()+'&methodname=subscribeToComponent&args_0='+this.cid+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		response =>
 		{
@@ -54,6 +54,8 @@ class MicroAgentDebuggerElement extends CidElement
 			
 			if(event.bulkEvents!=null && event.bulkEvents.length>0)
 			{
+				// bulk event indicates initial event -> remove all before adding
+				self.steps.length = 0;
 				for(var i=0; i<event.bulkEvents.length; i++)
 				{
 					self.updateEvent(event.bulkEvents[i]);

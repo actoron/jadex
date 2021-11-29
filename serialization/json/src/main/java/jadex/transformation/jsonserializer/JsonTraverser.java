@@ -148,11 +148,12 @@ public class JsonTraverser extends Traverser
 		nestedreadprocs = new ArrayList<ITraverseProcessor>(readprocs);
 		nestedreadprocs.add(new JsonNestedMapProcessor());
 		readprocs.add(new JsonMapProcessor());
-		int pos = readprocs.size();
 		readprocs.add(new JsonBigIntegerProcessor());
 		readprocs.add(new JsonLocalDateTimeProcessor());
 		readprocs.add(new JsonOptionalProcessor());
 		readprocs.add(new JsonJsonStringProcessor());
+
+		int pos = readprocs.size();
 		readprocs.add(new JsonBeanProcessor());
 		readprocs.add(new JsonPrimitiveProcessor());
 		

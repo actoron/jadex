@@ -173,6 +173,11 @@
 					}
 					else
 					{
+						// todo: refactor id handling and create id on client
+						// problem: order of http and sse answer is undertermined
+						// but currently http answer contains conversation id and is needed before sse event
+						// that must use the id to lookup the handlers
+						
 						if(cnt<3)
 						{
 							console.log("retry event: "+JSON.stringify(event)+" "+cnt);

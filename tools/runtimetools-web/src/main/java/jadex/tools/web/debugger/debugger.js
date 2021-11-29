@@ -92,7 +92,7 @@ class DebuggerElement extends CidElement
 			
 			if(event.componentDescription?.name?.name===self.getAgentName())
 			{
-				console.log("update of comp: "+self.getAgentName());
+				//console.log("update of comp: "+self.getAgentName());
 				
 				self.desc = event.componentDescription;
 				

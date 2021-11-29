@@ -111,7 +111,7 @@ public class JCCWebAgent implements IJCCWebService
 		
 		wps.publishResources("[http://localhost:"+port+"/]", "META-INF/resources2").get();
 		
-		if (openbrowser)
+		if(openbrowser)
 		{
 			try
 			{
@@ -516,6 +516,15 @@ public class JCCWebAgent implements IJCCWebService
 		conf.put("footer", footer);
 		
 		return new Future<Map<String, Object>>(conf);
+	}
+	
+	/**
+	 *  Get the platform id of the webgateway.
+	 *  @return The platform id.
+	 */
+	public IFuture<IComponentIdentifier> getPlatformId()
+	{
+		return new Future<IComponentIdentifier>(agent.getId().getRoot());
 	}
 	
 	/**
