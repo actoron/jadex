@@ -167,7 +167,7 @@
 						if(event?.data?.stackTrace!=null)
 							cb[1](event);
 						else if(event?.max!=null)
-							cb[2](event);
+							cb[2](event.max);
 						else
 							cb[0](event);
 					}

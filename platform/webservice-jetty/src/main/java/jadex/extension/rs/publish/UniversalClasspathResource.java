@@ -150,14 +150,19 @@ public class UniversalClasspathResource extends Resource
 
 	public boolean exists()
 	{
+		boolean ret = false;
 		try
 		{
-			return asFile().exists();
+			File f = asFile();
+			if(f!=null)
+				ret = f.exists();
 		}
 		catch(Exception e)
 		{
-			return false;
+			e.printStackTrace();
 		}
+		
+		return ret;
 	}
 
 	/**

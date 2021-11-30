@@ -56,12 +56,12 @@ export class CidElement extends BaseElement
 		{
 			axios.get('webjcc/getPlatformId', self.transform).then(function(resp)
 			{
-				console.log("cid resolved: "+resp);
+				//console.log("cid resolved: "+resp.data);
 				resolve(resp.data);
 			})
 			.catch(function(err) 
 			{
-				console.log("cid resolve failed: "+err);	
+				console.log("cid webgateway resolve failed: "+err);	
 				reject(err);
 			});
 		});

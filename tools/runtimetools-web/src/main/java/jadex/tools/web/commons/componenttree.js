@@ -17,7 +17,7 @@ class ComponentTree extends BaseElement
 	
 	init() 
 	{
-		console.log("component tree");
+		//console.log("component tree");
 		
 		this.typemap = null;
 		this.treedata = {};

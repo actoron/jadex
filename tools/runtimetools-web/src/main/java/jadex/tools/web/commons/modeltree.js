@@ -20,7 +20,7 @@ class ModelTree extends CidElement
 	
 	init()
 	{
-		console.log("modetree init");
+		//console.log("modetree init");
 		
 		let self = this;
 		this.app.lang.listeners.add(this);
@@ -69,7 +69,7 @@ class ModelTree extends CidElement
 				{
 					if(!response.data)
 					{
-						console.log("received: "+response.data);
+						//console.log("received: "+response.data);
 						return;
 					}
 					 

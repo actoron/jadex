@@ -206,7 +206,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 								Object val = convertFromJsonString((String)as[i], null);
 								// Checks expected type with read Json type
 								// Problem could be e.g. a json number that is just a string paremeter
-								if(i>=argtypes.length || val!=null && argtypes[i].equals(new ClassInfo(val.getClass()))) //SReflect.isSupertype(argtypes[i], val.getClass()))
+								if(argtypes==null || (i>=argtypes.length || val!=null && argtypes[i].equals(new ClassInfo(val.getClass())))) //SReflect.isSupertype(argtypes[i], val.getClass()))
 									as[i] = val;
 							}
 							catch(Exception e)

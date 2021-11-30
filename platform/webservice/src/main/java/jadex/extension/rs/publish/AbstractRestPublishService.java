@@ -1852,7 +1852,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		try
 		{
 			// If SSE is explicitly requested or the request is already finished MUST use SSE
-			if(ri.isSSERequest() || ((IAsyncContextInfo)ri.getRequest().getAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO)).isComplete())
+			if(ri.isSSERequest() 
+				|| ((IAsyncContextInfo)ri.getRequest().getAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO))==null // can null after timeout
+				|| ((IAsyncContextInfo)ri.getRequest().getAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO)).isComplete())
 			{
 				//if(ri.getResult()!=null && ri.getResult().toString().indexOf("isTrusted")!=-1)
 				//	System.out.println("sse result: "+ri.isSSERequest()+" "+ri.getRequest()+" "+ri.getResult());
