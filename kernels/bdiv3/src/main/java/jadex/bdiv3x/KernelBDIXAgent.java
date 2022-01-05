@@ -17,7 +17,8 @@ import jadex.micro.annotation.ProvidedServices;
 	autostart=Boolean3.FALSE,
 	predecessors="jadex.platform.service.security.SecurityAgent")
 @Properties({
-	@NameValue(name="kernel.types", value="new String[]{\"agent.xml\", \"capability.xml\"}")
+	@NameValue(name="kernel.types", value="new String[]{\"agent.xml\", \"capability.xml\"}"),
+	@NameValue(name="kernel.componenttypes", value="new String[]{\""+BDIXComponentFactory.FILETYPE_AGENT+"\","+"\""+BDIXComponentFactory.FILETYPE_CAPABILITY+"\"}"),
 })
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="new jadex.bdiv3x.BDIXComponentFactory($component, jadex.commons.SUtil.createHashMap(new String[]{\"debugger.panels\"},new Object[]{\"jadex.tools.debugger.bdiv3.BDIViewerDebuggerPanel\"}))"))

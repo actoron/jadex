@@ -168,7 +168,7 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, final IResourceIdentifier rid)
+	public IFuture<IModelInfo> loadModel(final String model, Object pojo, final String[] imports, final IResourceIdentifier rid)
 	{
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 //		System.out.println("filename: "+filename);
@@ -256,7 +256,7 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<Boolean> isLoadable(String model, Object pojo, String[] imports, IResourceIdentifier rid)
 	{
 		Future<Boolean> ret = new Future<Boolean>();
 		
@@ -326,15 +326,15 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture<Boolean> isStartable(final String model, final String[] imports, final IResourceIdentifier rid)
+	public IFuture<Boolean> isStartable(final String model, final Object pojo, final String[] imports, final IResourceIdentifier rid)
 	{
 		IFuture<Boolean>	ret;
 		
-		if(isLoadable(model, imports, rid).get().booleanValue())
+		if(isLoadable(model, pojo, imports, rid).get().booleanValue())
 		{
 			final Future<Boolean>	fut	= new Future<Boolean>();
 			ret	= fut;
-			loadModel(model, imports, rid).addResultListener(new IResultListener<IModelInfo>()
+			loadModel(model, null, imports, rid).addResultListener(new IResultListener<IModelInfo>()
 			{
 				public void resultAvailable(final IModelInfo mi) 
 				{
@@ -397,6 +397,11 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	{
 		return new String[]{FILETYPE_MICROSERVICE};
 	}
+	
+	public String[] getComponentAnnotationTypes()
+	{
+		return SUtil.EMPTY_STRING_ARRAY;
+	}
 
 	/**
 	 *  Get a default icon for a file type.
@@ -442,7 +447,7 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	 *  @param model The component model.
 	 *  @return The component features.
 	 */
-	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model)
+	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model, Object pojo)
 	{
 //		Collection<IComponentFeatureFactory> ret = features;
 //		if(model.getFeatures().length>0)

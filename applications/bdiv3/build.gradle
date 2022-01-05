@@ -37,6 +37,7 @@ dependencies
 	testImplementation project(':transports:websocket')
 	testImplementation project(':transports:relay')
 	testImplementation project(':transports:intravm')
+	testImplementation project(':util:bytecode')
 
  	// Allow starting examples from Main.java without extra dependencies
  	runtimeOnly project(':distributions:minimal')

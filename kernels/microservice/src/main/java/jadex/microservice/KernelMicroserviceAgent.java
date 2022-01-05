@@ -5,9 +5,7 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.IFilter;
 import jadex.commons.SClassReader;
-import jadex.commons.SReflect;
 import jadex.commons.SClassReader.AnnotationInfo;
-import jadex.micro.MicroAgentFactory;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
@@ -27,7 +25,8 @@ import jadex.microservice.annotation.Microservice;
 {
 	@NameValue(name="system", value="true"), 
 	@NameValue(name="kernel.types", value="new String[]{\".class\"}"),
-	@NameValue(name="kernel.filter", value="jadex.microservice.KernelMicroserviceAgent.AGENTFILTER")
+	@NameValue(name="kernel.filter", value="jadex.microservice.KernelMicroserviceAgent.AGENTFILTER"),
+	@NameValue(name="kernel.componenttypes", value="new String[]{\""+MicroserviceFactory.FILETYPE_MICROSERVICE+"\"}")
 })
 public class KernelMicroserviceAgent
 {

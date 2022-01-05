@@ -467,8 +467,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		while(!shutdown && ret.getException()==null && features.hasNext())
 		{
 			final IComponentFeature	cf	= features.next();
-//			if(getComponentIdentifier().getName().indexOf("Custom")!=-1)
-//				System.out.println("Body "+cf+" of "+getComponentIdentifier());
+			//if(getId().getName().indexOf("Hello")!=-1)
+			//	System.out.println("Body "+cf+" of "+getId());
 			
 			// Execute user body on separate step to allow blocking get() and still execute the other bodies.
 			if(cf.hasUserBody())

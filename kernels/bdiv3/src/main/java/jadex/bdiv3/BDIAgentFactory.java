@@ -30,10 +30,12 @@ import jadex.bridge.component.impl.ArgumentsResultsComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.Raw;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IBootstrapFactory;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -44,6 +46,7 @@ import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -245,7 +248,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 *  @param model The component model.
 	 *  @return The component features.
 	 */
-	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model)
+	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model, Object pojo)
 	{
 		return new Future<Collection<IComponentFeatureFactory>>(features);
 	}
@@ -267,7 +270,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, final IResourceIdentifier rid)
+	public IFuture<IModelInfo> loadModel(final String model, Object pojo, final String[] imports, final IResourceIdentifier rid)
 	{
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 //		System.out.println("filename: "+model);
@@ -281,7 +284,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 				{
 					try
 					{
-						IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
+						IModelInfo mi = loader.loadComponentModel(model, pojo, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
 						ret.setResult(mi);
 					}
 					catch(Exception e)
@@ -296,7 +299,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 			try
 			{
 				ClassLoader cl = getClass().getClassLoader();
-				IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
+				IModelInfo mi = loader.loadComponentModel(model, pojo, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
 				
 				ret.setResult(mi);
 			}
@@ -343,32 +346,42 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 *  @return True, if model can be loaded.
 	 */
 	// todo: reuse code from MicroAgentFactory :-(
-	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<Boolean> isLoadable(String model, Object pojo, String[] imports, IResourceIdentifier rid)
 	{
 		Future<Boolean> ret = new Future<>();
-		loadClassInfo0(model, imports, rid)
-			.addResultListener(new IResultListener<ClassInfo>()
+		
+		if(pojo!=null)
 		{
-			@Override
-			public void resultAvailable(ClassInfo ci)
+			String pojotype = SComponentManagementService.getPojoComponentType(pojo);
+			boolean ok = pojotype!=null && SUtil.arrayToSet(getComponentAnnotationTypes()).contains(pojotype); 
+			ret.setResult(ok);
+		}
+		else
+		{
+			loadClassInfo0(model, imports, rid)
+				.addResultListener(new IResultListener<ClassInfo>()
 			{
-				if(ci!=null)
+				@Override
+				public void resultAvailable(ClassInfo ci)
 				{
-					String	modeltype	= getLoadableType(ci);
-					ret.setResult(modeltype!=null);
+					if(ci!=null)
+					{
+						String	modeltype = getLoadableType(ci);
+						ret.setResult(modeltype!=null);
+					}
+					else
+					{
+						ret.setResult(false);
+					}
 				}
-				else
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setResult(false);
 				}
-			}
-			
-			@Override
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setResult(false);
-			}
-		});
+			});
+		}
 		return ret;
 	}
 	
@@ -482,7 +495,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture<Boolean> isStartable(final String model, final String[] imports, final IResourceIdentifier rid)
+	public IFuture<Boolean> isStartable(final String model, final Object pojo, final String[] imports, final IResourceIdentifier rid)
 	{
 		Future<Boolean> ret = new Future<>();
 		loadClassInfo0(model, imports, rid)
@@ -517,6 +530,11 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	public String[] getComponentTypes()
 	{
 		return new String[]{FILETYPE_BDIAGENT};
+	}
+	
+	public String[] getComponentAnnotationTypes()
+	{
+		return new String[]{TYPE};
 	}
 
 	/**
@@ -563,7 +581,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 				{
 					String	modeltype	= getLoadableType(ci);
 					ret.setResult(TYPE.equals(modeltype) ? FILETYPE_BDIAGENT
-						: CAPA_TYPE.equals(modeltype) ? FILETYPE_BDIAGENT : null);
+						: CAPA_TYPE.equals(modeltype) ? FILETYPE_BDICAPA : null);
 				}
 				else
 				{

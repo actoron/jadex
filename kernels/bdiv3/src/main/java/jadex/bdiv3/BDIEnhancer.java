@@ -108,7 +108,7 @@ public class BDIEnhancer
 				
                 try
                 {
-                	BDIModel model = loader.loadComponentModel(ci.getFilename(), null, null, cl, new Object[]{new ResourceIdentifier(), null, null});
+                	BDIModel model = loader.loadComponentModel(ci.getFilename(), null, null, null, cl, new Object[]{new ResourceIdentifier(), null, null});
                 }
                 catch(Exception e)
                 {

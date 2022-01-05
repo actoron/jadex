@@ -42,9 +42,9 @@ public class MicroModelLoader extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public MicroModel loadComponentModel(String name, String[] imports, IResourceIdentifier clkey, ClassLoader classloader, Object context) throws Exception
+	public MicroModel loadComponentModel(String name, Object pojo, String[] imports, IResourceIdentifier clkey, ClassLoader classloader, Object context) throws Exception
 	{
-		return (MicroModel)loadModel(name, FILE_EXTENSION_MICRO, imports, clkey, classloader, context);
+		return (MicroModel)loadModel(name, pojo, FILE_EXTENSION_MICRO, imports, clkey, classloader, context);
 	}
 	
 	//-------- AbstractModelLoader methods --------
@@ -54,13 +54,13 @@ public class MicroModelLoader extends AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected ICacheableModel doLoadModel(String name, String[] imports, ResourceInfo info, 
+	protected ICacheableModel doLoadModel(String name, Object pojo, String[] imports, ResourceInfo info, 
 		ClassLoader classloader, Object context) throws Exception
 	{
 //		if(name.indexOf("HelloWorldAgent")!=-1)
 //			System.out.println("cache miss: "+name);
 		
-		return (ICacheableModel)reader.read(name, imports, classloader, 
+		return (ICacheableModel)reader.read(name, pojo, imports, classloader, 
 			(IResourceIdentifier)((Object[])context)[0], (IComponentIdentifier)((Object[])context)[1], (List<IComponentFeatureFactory>)((Object[])context)[2]);
 	}
 	

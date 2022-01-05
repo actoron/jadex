@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.cms;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -515,6 +516,57 @@ public class SComponentManagementService
 	}
 	
 	/**
+	 *  todo: introduce non-kernel specific annotation @Component(type=x).
+	 *  would be best if @Agent could inherit from @Component
+	 */
+	public static String getPojoComponentType(Object pojo)
+	{
+		String ret = null;
+		
+		try
+		{
+			if(pojo!=null)
+			{
+				Annotation[] anns = pojo.getClass().getAnnotations();
+				for(int i=0; i<anns.length; i++)
+				{
+					// this is a hack as it uses a kernel specific annotation 
+					if(anns[i].annotationType().getName().indexOf("jadex.micro.annotation.Agent")!=-1)
+					{
+						Class<? extends Annotation> type = anns[i].annotationType();
+			            //System.out.println("Values of " + type.getName());
+	
+			            Method method = type.getDeclaredMethod("type", new Class[0]);
+			            ret = (String)method.invoke(anns[i], new Object[0]);
+			            
+			            //System.out.println("Found agent type is: "+ret);
+			            break;
+			            
+			            /*for(Method method : type.getDeclaredMethods()) 
+			            {
+			            	try
+			            	{
+				                Object value = method.invoke(anns[i], (Object[])null);
+				                System.out.println(" " + method.getName() + ": " + value);
+			            	}
+			            	catch(Exception e)
+			            	{
+			            		e.printStackTrace();
+			            	}
+			            }*/
+					}
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Get a fitting component factory for a specific model.
 	 *  Searches the cached factories for the one that fits
 	 *  the model and returns it. Possibly reevaluates the
@@ -534,7 +586,14 @@ public class SComponentManagementService
 //		if(model.indexOf("KernelMicro")!=-1)
 //			System.out.println("getCompFac: "+model);
 		
-		FactoryFilter ff = new FactoryFilter(model, cinfo==null? null: cinfo.getImports(), rid);
+		FactoryFilter ff;
+		String anntype = getPojoComponentType(cinfo.getPojo());
+		// todo: convert anntype to component type
+		if(anntype==null)
+			ff = new FactoryFilter(model, cinfo==null? null: cinfo.getImports(), rid);
+		else
+			ff = new FactoryFilter(anntype, true);
+		
 		SComponentFactory.getFactory(ff, agent).addResultListener(new DelegationResultListener<IComponentFactory>(ret)
 		{
 			@Override
@@ -1739,8 +1798,9 @@ public class SComponentManagementService
 						{
 							public void customResultAvailable(final IComponentFactory factory)
 							{
-//								System.out.println("load: "+model+" "+rid);
-								factory.loadModel(model, cinfo.getImports(), rid)
+								//if(model.indexOf("HelloAgent")!=-1)
+								//	System.out.println("load: "+model+" "+rid);
+								factory.loadModel(model, cinfo.getPojo(), cinfo.getImports(), rid)
 									.addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>>(ret)
 								{
 									@Override
@@ -1753,7 +1813,7 @@ public class SComponentManagementService
 										}
 										else
 										{
-											IFuture<Collection<IComponentFeatureFactory>> fut = factory.getComponentFeatures(result);
+											IFuture<Collection<IComponentFeatureFactory>> fut = factory.getComponentFeatures(result, cinfo.getPojo());
 											fut.addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<Collection<IComponentFeatureFactory>, Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>>(ret)
 											{
 												public void customResultAvailable(Collection<IComponentFeatureFactory> features)
@@ -2051,6 +2111,9 @@ public class SComponentManagementService
 			{
 				public void customResultAvailable(final Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>> t)
 				{
+					//if(modelname.indexOf("Hello")!=-1)
+					//	System.out.println("here");
+					
 					IPlatformComponentAccess component = null;
 					ComponentCreationInfo cci = null;
 					Collection<IComponentFeatureFactory> features = null;

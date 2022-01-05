@@ -768,7 +768,7 @@ public class StarterPanel extends JLayeredPane
 			if(adf!=null)
 			{
 				showLoading(ret);
-				SComponentFactory.isLoadable(jcc.getPlatformAccess(), adf, rid).addResultListener(new SwingDelegationResultListener(ret)
+				SComponentFactory.isLoadable(jcc.getPlatformAccess(), adf, null, rid).addResultListener(new SwingDelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{

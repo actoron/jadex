@@ -24,6 +24,7 @@ import jadex.bridge.component.impl.ArgumentsResultsComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.Raw;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -34,6 +35,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -224,7 +226,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, final IResourceIdentifier rid)
+	public IFuture<IModelInfo> loadModel(final String model, Object pojo, final String[] imports, final IResourceIdentifier rid)
 	{
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 //		System.out.println("filename: "+filename);
@@ -271,7 +273,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<Boolean> isLoadable(String model, Object pojo, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<Boolean>(model.endsWith(".bpmn") || model.endsWith(".bpmn2")? Boolean.TRUE: Boolean.FALSE);
 	}
@@ -282,7 +284,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<Boolean> isStartable(String model, Object pojo, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<Boolean>(model.endsWith(".bpmn") || model.endsWith(".bpmn2")? Boolean.TRUE: Boolean.FALSE);
 	}
@@ -293,6 +295,11 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	public String[] getComponentTypes()
 	{
 		return new String[]{FILETYPE_BPMNPROCESS, FILETYPE_BPMNLEGACYPROCESS};
+	}
+	
+	public String[] getComponentAnnotationTypes()
+	{
+		return SUtil.EMPTY_STRING_ARRAY;
 	}
 
 	/**
@@ -347,7 +354,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 *  @param model The component model.
 	 *  @return The component features.
 	 */
-	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model)
+	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model, Object pojo)
 	{
 		return new Future<Collection<IComponentFeatureFactory>>(features);
 	}

@@ -15,7 +15,7 @@ public class BDIClassReaderTest
 			{
 				System.out.println("done: "+i);				
 			}
-			bcr.read("jadex.bdiv3.TestBDI.class", (String[])null,
+			bcr.read("jadex.bdiv3.TestBDI.class", null, (String[])null,
 				BDIClassReaderTest.class.getClassLoader(), null, new ComponentIdentifier("dummy"), null);
 		}
 		

@@ -125,7 +125,7 @@ public class MicroClassReader
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public MicroModel read(String model, String[] imports, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root,
+	public MicroModel read(String model, Object pojo, String[] imports, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root,
 		List<IComponentFeatureFactory> features)
 	{
 //		System.out.println("loading micro: "+model);
@@ -141,7 +141,25 @@ public class MicroClassReader
 		clname = clname.replace('/', '.');
 		//clname = clname.replace("..", ".");
 		
-		Class<?> cma = getMicroAgentClass(clname, imports, classloader);
+		Class<?> cma = null;
+		try
+		{
+			cma = getMicroAgentClass(clname, imports, classloader);
+		}
+		catch(Exception e)
+		{
+			// try loading from pojo class (class of dynamically generated pojo could not be available on disk)
+			if(pojo!=null)
+			{
+				System.out.println("using pojo class to read model, resetting classloader: "+model);
+				cma = pojo.getClass();
+				classloader = pojo.getClass().getClassLoader();
+			}
+			else
+			{
+				SUtil.rethrowAsUnchecked(e);
+			}
+		}
 		
 		return read(model, cma, classloader, rid, root, features);
 	}
@@ -280,6 +298,9 @@ public class MicroClassReader
 	 */
 	protected void fillMicroModelFromAnnotations(MicroModel micromodel, String model, final Class<?> clazz, ClassLoader cl)
 	{
+		//if(model.indexOf("Hello")!=-1)
+		//	System.out.println("fillMicroModel Hello");
+		
 		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
 		Class<?> cma = clazz;
 		

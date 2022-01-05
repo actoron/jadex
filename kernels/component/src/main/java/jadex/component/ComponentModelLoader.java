@@ -42,7 +42,7 @@ public class ComponentModelLoader extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public CacheableKernelModel loadComponentModel(String name, String[] imports, 
+	public CacheableKernelModel loadComponentModel(String name, Object pojo, String[] imports, 
 		ClassLoader classloader, Object context) throws Exception
 	{
 		return (CacheableKernelModel)loadModel(name, FILE_EXTENSION_COMPONENT, imports, classloader, classloader, context); // Todo: RID as clkey
@@ -55,7 +55,7 @@ public class ComponentModelLoader extends AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected ICacheableModel doLoadModel(String name, String[] imports, ResourceInfo info, 
+	protected ICacheableModel doLoadModel(String name, Object pojo, String[] imports, ResourceInfo info, 
 			ClassLoader classloader, Object context) throws Exception
 	{
 		return (ICacheableModel)reader.read(info, classloader, 

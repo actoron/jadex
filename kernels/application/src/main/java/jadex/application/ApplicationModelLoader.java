@@ -43,9 +43,9 @@ public class ApplicationModelLoader extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public CacheableKernelModel loadApplicationModel(String name, String[] imports, IResourceIdentifier clkey, ClassLoader classloader, Object context) throws Exception
+	public CacheableKernelModel loadApplicationModel(String name, Object pojo, String[] imports, IResourceIdentifier clkey, ClassLoader classloader, Object context) throws Exception
 	{
-		return (CacheableKernelModel)loadModel(name, FILE_EXTENSION_APPLICATION, imports, clkey, classloader, context);
+		return (CacheableKernelModel)loadModel(name, pojo, FILE_EXTENSION_APPLICATION, imports, clkey, classloader, context);
 	}
 	
 	//-------- AbstractModelLoader methods --------
@@ -55,7 +55,7 @@ public class ApplicationModelLoader extends AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected ICacheableModel doLoadModel(String name, String[] imports, ResourceInfo info, ClassLoader classloader, Object context) throws Exception
+	protected ICacheableModel doLoadModel(String name, Object pojo, String[] imports, ResourceInfo info, ClassLoader classloader, Object context) throws Exception
 	{
 		return (ICacheableModel)reader.read(info, classloader, 
 			(IResourceIdentifier)((Object[])context)[0], (IComponentIdentifier)((Object[])context)[1]);

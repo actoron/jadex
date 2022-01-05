@@ -505,7 +505,7 @@ public class Starter
 			
 //			System.out.println("Using config file: "+configfile);
 			
-			final IModelInfo model	= cfac.loadModel(configfile, null, null).get();	// No execution yet, can only work if method is synchronous.
+			final IModelInfo model	= cfac.loadModel(configfile, null, null, null).get();	// No execution yet, can only work if method is synchronous.
 			
 			if(model.getReport()!=null)
 			{
@@ -666,7 +666,7 @@ public class Starter
 				}
 				putPlatformValue(cid, IPlatformConfiguration.PLATFORMARGS, argsmap);
 				ComponentCreationInfo cci = new ComponentCreationInfo(model, config.getConfigurationName(), argsmap, desc, null, null);
-				Collection<IComponentFeatureFactory> features = cfac.getComponentFeatures(model).get();
+				Collection<IComponentFeatureFactory> features = cfac.getComponentFeatures(model, null).get(); // no pojo in config possible?!
 				component.create(cci, features);
 
 				// Required for bootstrapping init.
@@ -1552,7 +1552,7 @@ public class Starter
 		if(Starter.getPlatformValue(pcid, Starter.DATA_INVOKEDMETHODS)==null)
 			Starter.putPlatformValue(pcid, Starter.DATA_INVOKEDMETHODS, Collections.synchronizedMap(new WeakHashMap<Object, Set<String>>()));
 		
-		IModelInfo model = cfac.loadModel(filename, null, null).get();
+		IModelInfo model = cfac.loadModel(filename, null, null, null).get();
 		String ctype = cfac.getComponentType(filename, null, model.getResourceIdentifier()).get();
 		
 		ComponentIdentifier cid = new ComponentIdentifier(SUtil.createPlainRandomId(filename, 6)+"@"+pcid);
@@ -1563,7 +1563,7 @@ public class Starter
 		
 		// create component from model
 		ComponentCreationInfo cci = new ComponentCreationInfo(model, null, null, desc, null, null);
-		Collection<IComponentFeatureFactory> features = cfac.getComponentFeatures(model).get();
+		Collection<IComponentFeatureFactory> features = cfac.getComponentFeatures(model, null).get();
 		
 		IPlatformComponentAccess component = SComponentManagementService.createPlatformComponent(Starter.class.getClassLoader(),
 			new PlatformComponent() 

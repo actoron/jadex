@@ -51,7 +51,7 @@ public abstract class AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected abstract ICacheableModel	doLoadModel(String name, String[] imports, ResourceInfo info, ClassLoader classloader, Object context) throws Exception;
+	protected abstract ICacheableModel	doLoadModel(String name, Object pojo, String[] imports, ResourceInfo info, ClassLoader classloader, Object context) throws Exception;
 	
 	/**
 	 *  Find the file for a given name using any supported extension.
@@ -237,9 +237,9 @@ public abstract class AbstractModelLoader
 	 *  @param imports	The imports to use when resolving logical names.
 	 *  @param clkey	The class loader key to allow caching by e.g. RID.
 	 */
-	public synchronized ICacheableModel	loadModel(String name, String[] imports, Object clkey, ClassLoader classloader, Object context) throws Exception
+	public synchronized ICacheableModel	loadModel(String name, Object pojo, String[] imports, Object clkey, ClassLoader classloader, Object context) throws Exception
 	{
-		return loadModel(name, null, imports, clkey, classloader, context);
+		return loadModel(name, pojo, null, imports, clkey, classloader, context);
 	}
 
 	/**
@@ -249,7 +249,7 @@ public abstract class AbstractModelLoader
 	 *  @param imports	The imports to use when resolving logical names.
 	 *  @param clkey	The class loader key to allow caching by e.g. RID.
 	 */
-	public synchronized ICacheableModel	loadModel(String name, String extension, String[] imports, Object clkey, ClassLoader classloader, Object context) throws Exception
+	public synchronized ICacheableModel	loadModel(String name, Object pojo, String extension, String[] imports, Object clkey, ClassLoader classloader, Object context) throws Exception
 	{
 //		System.out.println("filename: "+name);
 		
@@ -314,7 +314,7 @@ public abstract class AbstractModelLoader
 				{
 					try
 					{
-						cached	= doLoadModel(name, imports, info, classloader, context);
+						cached	= doLoadModel(name, pojo, imports, info, classloader, context);
 					}
 					catch(Exception e)
 					{

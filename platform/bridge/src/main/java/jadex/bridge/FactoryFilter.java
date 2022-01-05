@@ -19,13 +19,16 @@ public class FactoryFilter implements IAsyncFilter<IComponentFactory>
 	//-------- attributes --------
 
 	/** The component type. */
-	protected String	type;
+	protected String type;
+	
+	/** The annotation type. */
+	protected String anntype;
 	
 	/** The model to be loaded. */
-	protected String	model;
+	protected String model;
 	
 	/** The imports (if any). */
-	protected String[]	imports;
+	protected String[] imports;
 	
 	/** The resource identifier. */
 	protected IResourceIdentifier rid;
@@ -51,7 +54,19 @@ public class FactoryFilter implements IAsyncFilter<IComponentFactory>
 	 */
 	public FactoryFilter(String type)
 	{
-		this.type	= type;
+		this(type, false);
+	}
+	
+	/**
+	 *  Find a component factory for loading a specific component ann type.
+	 *  @param type	The component type.
+	 */
+	public FactoryFilter(String type, boolean ann)
+	{
+		if(ann)
+			this.anntype = type;
+		else
+			this.type = type;
 	}
 	
 	//-------- methods --------
@@ -68,11 +83,17 @@ public class FactoryFilter implements IAsyncFilter<IComponentFactory>
 		
 		if(type!=null)
 		{
+			//System.out.print("factypes: "+fac+" "+fac.getComponentTypes());
 			ret.setResult(Arrays.asList(fac.getComponentTypes()).contains(type));
+		}
+		else if(anntype!=null)
+		{
+			//System.out.print("ann factypes: "+fac+" "+fac.getComponentAnnotationTypes());
+			ret.setResult(Arrays.asList(fac.getComponentAnnotationTypes()).contains(anntype));
 		}
 		else
 		{
-			fac.isLoadable(model, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret));
+			fac.isLoadable(model, null, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret));
 		}
 		
 		return ret;

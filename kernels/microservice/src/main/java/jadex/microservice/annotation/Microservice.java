@@ -7,6 +7,8 @@ import java.lang.annotation.Target;
 
 /**
  *  Marker for agent class and variable.
+ *  
+ *  todo: replace with generic @Component annotation
  */
 @Target({ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)

@@ -184,7 +184,7 @@ public class StarterPluginPanel extends JPanel
 
 //							System.out.println("loading: "+ffilename+" "+rid);
 							
-							SComponentFactory.isLoadable(jcc.getPlatformAccess(), ffilename, rid).addResultListener(new SwingDefaultResultListener(spanel)
+							SComponentFactory.isLoadable(jcc.getPlatformAccess(), ffilename, null, rid).addResultListener(new SwingDefaultResultListener(spanel)
 							{
 								public void customResultAvailable(Object result)
 								{
@@ -240,7 +240,7 @@ public class StarterPluginPanel extends JPanel
 									public void customResultAvailable(final IResourceIdentifier rid)
 									{
 //										IResourceIdentifier rid = createResourceIdentifier();
-										SComponentFactory.isStartable(jcc.getPlatformAccess(), filename, rid).addResultListener(new SwingDefaultResultListener(spanel)
+										SComponentFactory.isStartable(jcc.getPlatformAccess(), filename, null, rid).addResultListener(new SwingDefaultResultListener(spanel)
 										{
 											public void customResultAvailable(Object result)
 											{

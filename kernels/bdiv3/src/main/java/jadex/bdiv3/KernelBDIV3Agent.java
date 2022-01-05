@@ -30,7 +30,9 @@ import jadex.micro.annotation.ProvidedServices;
 {
 	@NameValue(name="system", value="true"), 
 	@NameValue(name="kernel.types", value="new String[]{\".class\"}"),
-	@NameValue(name="kernel.filter", value="jadex.bdiv3.KernelBDIV3Agent.AGENTFILTER")
+	@NameValue(name="kernel.filter", value="jadex.bdiv3.KernelBDIV3Agent.AGENTFILTER"),
+	@NameValue(name="kernel.componenttypes", value="new String[]{\""+BDIAgentFactory.FILETYPE_BDIAGENT+"\","+"\""+BDIAgentFactory.FILETYPE_BDICAPA+"\"}"),
+	@NameValue(name="kernel.anntypes", value="new String[]{\""+BDIAgentFactory.TYPE+"\", null}") // must declare in same order as component types 1:1 mapping
 })
 @Agent(name="kernel_bdi",
 	autostart=Boolean3.FALSE,

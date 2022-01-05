@@ -26,6 +26,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IBootstrapFactory;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
@@ -130,6 +131,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	
 	/** The micro agent file type. */
 	public static final String FILETYPE_MICROAGENT = "Micro Agent";
+	
+	/** The annotation typename used in @Agent. */
 	public static final String TYPE = "micro";
 	
 	/** The image icon. */
@@ -306,7 +309,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, final IResourceIdentifier rid)
+	public IFuture<IModelInfo> loadModel(final String model, Object pojo, final String[] imports, final IResourceIdentifier rid)
 	{
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 //		System.out.println("filename: "+filename);
@@ -333,7 +336,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 						{
 							try
 							{
-								IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), getStandardFeatures()}).getModelInfo();
+								IModelInfo mi = loader.loadComponentModel(model, pojo, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), getStandardFeatures()}).getModelInfo();
 								ret.setResult(mi);
 							}
 							catch(Exception e)
@@ -348,7 +351,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 					try
 					{
 						ClassLoader cl = getClass().getClassLoader();
-						IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), getStandardFeatures()}).getModelInfo();
+						IModelInfo mi = loader.loadComponentModel(model, pojo, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), getStandardFeatures()}).getModelInfo();
 						ret.setResult(mi);
 					}
 					catch(Exception e)
@@ -384,13 +387,19 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<Boolean> isLoadable(String model, Object pojo, String[] imports, IResourceIdentifier rid)
 	{
 		Future<Boolean> ret = new Future<Boolean>();
 		
 //		System.out.println("isLoadable (micro): "+model+" "+rid);
 		
-		if(model.toLowerCase().endsWith(".class"))
+		if(pojo!=null)
+		{
+			String pojotype = SComponentManagementService.getPojoComponentType(pojo);
+			boolean ok = pojotype!=null && SUtil.arrayToSet(getComponentAnnotationTypes()).contains(pojotype); 
+			ret.setResult(ok);
+		}
+		else if(model.toLowerCase().endsWith(".class"))
 		{
 			ILibraryService libservice = getLibraryService();
 			if(libservice!=null)
@@ -478,15 +487,15 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture<Boolean> isStartable(final String model, final String[] imports, final IResourceIdentifier rid)
+	public IFuture<Boolean> isStartable(final String model, Object pojo, final String[] imports, final IResourceIdentifier rid)
 	{
 		IFuture<Boolean>	ret;
 		
-		if(isLoadable(model, imports, rid).get().booleanValue())
+		if(isLoadable(model, pojo, imports, rid).get().booleanValue())
 		{
 			final Future<Boolean>	fut	= new Future<Boolean>();
 			ret	= fut;
-			loadModel(model, imports, rid).addResultListener(new IResultListener<IModelInfo>()
+			loadModel(model, null, imports, rid).addResultListener(new IResultListener<IModelInfo>()
 			{
 				public void resultAvailable(final IModelInfo mi) 
 				{
@@ -550,6 +559,11 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		return new String[]{FILETYPE_MICROAGENT};
 	}
+	
+	public String[] getComponentAnnotationTypes()
+	{
+		return new String[]{TYPE};
+	}
 
 	/**
 	 *  Get a default icon for a file type.
@@ -596,7 +610,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param model The component model.
 	 *  @return The component features.
 	 */
-	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model)
+	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model, Object pojo)
 	{
 //		Collection<IComponentFeatureFactory> ret = features;
 //		if(model.getFeatures().length>0)

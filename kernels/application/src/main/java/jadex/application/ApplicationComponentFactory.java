@@ -15,6 +15,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.Raw;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IBootstrapFactory;
@@ -23,6 +24,7 @@ import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -223,7 +225,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, final IResourceIdentifier rid)
+	public IFuture<IModelInfo> loadModel(final String model, Object pojo, final String[] imports, final IResourceIdentifier rid)
 	{
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 		
@@ -236,7 +238,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 				{
 					try
 					{
-						ret.setResult(loader.loadApplicationModel(model, imports, rid, cl, 
+						ret.setResult(loader.loadApplicationModel(model, pojo, imports, rid, cl, 
 							new Object[]{rid, getProviderId().getRoot()}).getModelInfo());
 					}
 					catch(Exception e)
@@ -251,7 +253,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 			try
 			{
 				ClassLoader cl = getClass().getClassLoader();
-				ret.setResult(loader.loadApplicationModel(model, imports, rid, cl, 
+				ret.setResult(loader.loadApplicationModel(model, pojo, imports, rid, cl, 
 						new Object[]{rid, getProviderId().getRoot()}).getModelInfo());
 			}
 			catch(Exception e)
@@ -269,7 +271,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<Boolean> isLoadable(String model, Object pojo, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<Boolean>(model.endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION));
 	}
@@ -280,7 +282,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<Boolean> isStartable(String model, Object pojo, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<Boolean>(model.endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION));
 	}
@@ -291,6 +293,11 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	public String[] getComponentTypes()
 	{
 		return new String[]{FILETYPE_APPLICATION};
+	}
+	
+	public String[] getComponentAnnotationTypes()
+	{
+		return SUtil.EMPTY_STRING_ARRAY;
 	}
 
 	/**
@@ -352,7 +359,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param model The component model.
 	 *  @return The component features.
 	 */
-	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model)
+	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model, Object pojo)
 	{
 		return new Future<Collection<IComponentFeatureFactory>>(features);
 	}

@@ -28,7 +28,9 @@ import jadex.micro.annotation.ProvidedServices;
 {
 	@NameValue(name="system", value="true"), 
 	@NameValue(name="kernel.types", value="new String[]{\".class\"}"),
-	@NameValue(name="kernel.filter", value="jadex.micro.KernelMicroAgent.AGENTFILTER")
+	@NameValue(name="kernel.filter", value="jadex.micro.KernelMicroAgent.AGENTFILTER"),
+	@NameValue(name="kernel.componenttypes", value="new String[]{\""+MicroAgentFactory.FILETYPE_MICROAGENT+"\"}"),
+	@NameValue(name="kernel.anntypes", value="new String[]{\""+MicroAgentFactory.TYPE+"\"}") // must declare in same order as component types 1:1 mapping
 })
 public class KernelMicroAgent
 {

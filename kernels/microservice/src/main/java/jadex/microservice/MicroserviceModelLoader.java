@@ -55,7 +55,7 @@ public class MicroserviceModelLoader extends AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected ICacheableModel doLoadModel(String name, String[] imports, ResourceInfo info, 
+	protected ICacheableModel doLoadModel(String name, Object pojo, String[] imports, ResourceInfo info, 
 		ClassLoader classloader, Object context) throws Exception
 	{
 //		if(name.indexOf("HelloWorldAgent")!=-1)
@@ -74,7 +74,7 @@ public class MicroserviceModelLoader extends AbstractModelLoader
 	 *  @param imports	The imports, if any.
 	 *  @return The resource info identifying the file.
 	 */
-	protected ResourceInfo	getResourceInfo(String name, String extension, String[] imports, ClassLoader classloader) throws Exception
+	protected ResourceInfo	getResourceInfo(String name, Object pojo, String extension, String[] imports, ClassLoader classloader) throws Exception
 	{
 		ResourceInfo ret = null;
 		if(registered.containsKey(name))

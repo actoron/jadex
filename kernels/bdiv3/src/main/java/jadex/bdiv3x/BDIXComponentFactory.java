@@ -34,6 +34,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -195,7 +196,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, final IResourceIdentifier rid)
+	public IFuture<IModelInfo> loadModel(final String model, Object pojo, final String[] imports, final IResourceIdentifier rid)
 	{
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 		
@@ -257,7 +258,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<Boolean> isLoadable(String model, Object pojo, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<Boolean>(model.endsWith(BDIXModelLoader.FILE_EXTENSION_AGENT) || model.endsWith(BDIXModelLoader.FILE_EXTENSION_CAPABILITY));
 	}
@@ -268,7 +269,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<Boolean> isStartable(String model, Object pojo, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<Boolean>(model.endsWith(BDIXModelLoader.FILE_EXTENSION_AGENT));
 	}
@@ -279,6 +280,11 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 	public String[] getComponentTypes()
 	{
 		return new String[]{FILETYPE_AGENT, FILETYPE_CAPABILITY};
+	}
+	
+	public String[] getComponentAnnotationTypes()
+	{
+		return SUtil.EMPTY_STRING_ARRAY;
 	}
 
 	/**
@@ -344,7 +350,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 	 *  @param model The component model.
 	 *  @return The component features.
 	 */
-	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model)
+	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model, Object pojo)
 	{
 		return new Future<Collection<IComponentFeatureFactory>>(features);
 	}

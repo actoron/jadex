@@ -260,7 +260,7 @@ public class SComponentFactory
 						{
 							public void customResultAvailable(IComponentFactory fac)
 							{
-								fac.loadModel(model, null, rid).addResultListener(new DelegationResultListener<IModelInfo>(ret));
+								fac.loadModel(model, null, null, rid).addResultListener(new DelegationResultListener<IModelInfo>(ret));
 							}
 							
 //							public void exceptionOccurred(Exception exception)
@@ -312,7 +312,7 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if model can be loaded.
 	 */
-	public static IFuture<Boolean> isLoadable(IExternalAccess exta, final String model, final IResourceIdentifier rid)
+	public static IFuture<Boolean> isLoadable(IExternalAccess exta, final String model, final Object pojo, final IResourceIdentifier rid)
 	{
 		Future<Boolean> ret = new Future<Boolean>();
 		
@@ -338,7 +338,7 @@ public class SComponentFactory
 						{
 							public void customResultAvailable(IComponentFactory fac)
 							{
-								fac.isLoadable(model, null, rid)
+								fac.isLoadable(model, pojo, null, rid)
 									.addResultListener(new DelegationResultListener<Boolean>(ret));
 							}
 							
@@ -511,7 +511,7 @@ public class SComponentFactory
 //				}
 //			}, ea));
 			
-			facts[i].isLoadable(model, null, rid)
+			facts[i].isLoadable(model, null, null, rid)
 				.addResultListener(createResultListener(new DelegationResultListener<Boolean>(ret)
 			{
 				public void customResultAvailable(Boolean result)
@@ -537,7 +537,7 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if startable (and should therefore also be loadable).
 	 */
-	public static IFuture<Boolean> isStartable(IExternalAccess exta, final String model, final IResourceIdentifier rid)
+	public static IFuture<Boolean> isStartable(IExternalAccess exta, final String model, final Object pojo, final IResourceIdentifier rid)
 	{
 		Future<Boolean> ret = new Future<Boolean>();
 				
@@ -562,7 +562,7 @@ public class SComponentFactory
 						{
 							public void customResultAvailable(IComponentFactory fac)
 							{
-								fac.isStartable(model, null, rid)
+								fac.isStartable(model, pojo, null, rid)
 									.addResultListener(new DelegationResultListener<Boolean>(ret));
 							}
 							

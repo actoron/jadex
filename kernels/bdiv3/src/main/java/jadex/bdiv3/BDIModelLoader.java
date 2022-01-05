@@ -55,9 +55,9 @@ public class BDIModelLoader extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public BDIModel loadComponentModel(String name, String[] imports, IResourceIdentifier clkey, ClassLoader classloader, Object context) throws Exception
+	public BDIModel loadComponentModel(String name, Object pojo, String[] imports, IResourceIdentifier clkey, ClassLoader classloader, Object context) throws Exception
 	{
-		return (BDIModel)loadModel(name, FILE_EXTENSION_BDIV3, imports, clkey, classloader, context);
+		return (BDIModel)loadModel(name, pojo, FILE_EXTENSION_BDIV3, imports, clkey, classloader, context);
 	}
 	
 	//-------- AbstractModelLoader methods --------
@@ -67,11 +67,11 @@ public class BDIModelLoader extends AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected ICacheableModel doLoadModel(String name, String[] imports, ResourceInfo info, 
+	protected ICacheableModel doLoadModel(String name, Object pojo, String[] imports, ResourceInfo info, 
 		ClassLoader classloader, Object context) throws Exception
 	{
 //		System.out.println("cache miss: "+name);
-		return (ICacheableModel)reader.read(name, imports, classloader, 
+		return (ICacheableModel)reader.read(name, pojo, imports, classloader, 
 			(IResourceIdentifier)((Object[])context)[0], (IComponentIdentifier)((Object[])context)[1], (List<IComponentFeatureFactory>)((Object[])context)[2]);
 	}
 	

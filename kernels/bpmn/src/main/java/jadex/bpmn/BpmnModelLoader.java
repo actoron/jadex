@@ -63,7 +63,7 @@ public class BpmnModelLoader extends AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected ICacheableModel doLoadModel(String name, String[] imports, ResourceInfo info, 
+	protected ICacheableModel doLoadModel(String name, Object pojo, String[] imports, ResourceInfo info, 
 		ClassLoader classloader, Object context) throws Exception
 	{	
 		if (name != null && name.endsWith(".bpmn2"))

@@ -125,6 +125,10 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	/** Currently supported types (loadable suffixes) */
 	protected Set<String> componenttypes = new HashSet<>();
 	
+	/** The annotation type values representing different class component types. () */
+	protected Set<String> allcomponenttypes;
+	protected Map<String, String> allannotationtypes; // ann type -> component type
+	
 	/** The scanned kernel files (suffix -> {(classname, suffixes)} ). */
 	protected Map<String, Collection<Tuple2<String, Set<String>>>> kernelfiles;
 
@@ -155,13 +159,13 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	public static final Map<String, Object> props = SUtil.createHashMap(new String[]{MULTIFACTORY}, new Object[]{Boolean.TRUE});
 
 	/** The sequentializer to execute getNewFactory() one by one and not interleaved. */
-	protected CallSequentializer<IComponentFactory> getnewfac = new CallSequentializer<IComponentFactory>(new IResultCommand<IFuture<IComponentFactory>, Object[]>()
+	/*protected CallSequentializer<IComponentFactory> getnewfac = new CallSequentializer<IComponentFactory>(new IResultCommand<IFuture<IComponentFactory>, Object[]>()
 	{
 		public IFuture<IComponentFactory> execute(Object[] args)
 		{
-			return getNewFactory((String)args[0], (String[])args[1], (IResourceIdentifier)args[2]);
+			return getNewFactory((String)args[0], args[1], (String[])args[2], (IResourceIdentifier)args[3]);
 		}
-	});
+	});*/
 	
 	/**
 	 *  Starts the service.
@@ -257,18 +261,20 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture<IModelInfo> loadModel(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<IModelInfo> loadModel(String model, Object pojo, String[] imports, IResourceIdentifier rid)
 	{
 		if(!isLoadable(model))
 			return new Future<IModelInfo>(new RuntimeException("Cannot be loaded: "+model));
+	
+		//System.out.println("loadModel "+model);
 		
 		Future<IModelInfo> ret = new Future<>();
 		
-		getFactoryForModel(model, imports, rid).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
+		getFactoryForModel(model, pojo, imports, rid).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
 		{
 			public void customResultAvailable(IComponentFactory fac) throws Exception
 			{
-				fac.loadModel(model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+				fac.loadModel(model, pojo, imports, rid).addResultListener(new DelegationResultListener<>(ret));
 			}
 		});
 		
@@ -283,12 +289,12 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	 *  
 	 *  @return A factory that can load the model (or null if none was found).
 	 */
-	protected IFuture<IComponentFactory> getFactoryForModel(String model, String[] imports, IResourceIdentifier rid)
+	protected IFuture<IComponentFactory> getFactoryForModel(String model, Object pojo, String[] imports, IResourceIdentifier rid)
 	{
-		//System.out.println("getFacForModelS: "+model);
+		//System.out.println("getFacForModel: "+model);
 		Future<IComponentFactory> ret = new Future<IComponentFactory>();
 		
-		getRunningFactory(model, imports, rid, null).addResultListener(new IResultListener<IComponentFactory>()
+		getRunningFactory(model, pojo, imports, rid, null).addResultListener(new IResultListener<IComponentFactory>()
 		{
 			public void resultAvailable(IComponentFactory fac)
 			{
@@ -299,7 +305,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 			public void exceptionOccurred(Exception exception)
 			{
 //				getnewfac.call(new Object[]{model, imports, rid}).addResultListener(new DelegationResultListener<>(ret));
-				getNewFactory(model, imports, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret)
+				getNewFactory(model, pojo, imports, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret)
 				{
 					public void customResultAvailable(IComponentFactory result)
 					{
@@ -323,9 +329,9 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	 *  If there are other kernel specs for the current filename suffix start and test them.
 	 *  Returns a new factory that can load the model (if any).
 	 */
-	protected IFuture<IComponentFactory> getNewFactory(String model, String[] imports, IResourceIdentifier rid)
+	protected IFuture<IComponentFactory> getNewFactory(String model, Object pojo, String[] imports, IResourceIdentifier rid)
 	{
-//		System.out.println("getNewFactory: "+model);
+		//System.out.println("getNewFactory: "+model);
 		
 		Future<IComponentFactory> ret = new Future<IComponentFactory>();
 		
@@ -342,7 +348,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		
 		//System.out.println("found: "+found);
 		
-		check(it, model, imports, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret)
+		check(it, model, pojo, imports, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret)
 		{
 			public void exceptionOccurred(Exception exception)
 			{
@@ -358,7 +364,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 				}
 				final Iterator<Tuple2<String, Set<String>>> it = found.iterator();
 				
-				check(it, model, imports, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret));
+				check(it, model, pojo, imports, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret));
 			}
 		});
 		
@@ -411,7 +417,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 
 		for(ClassInfo ci: cis)
 		{
-			String[] types = getKernelTypes(ci);
+			String[] types = getKernelSuffixes(ci);
 			
 			if(types!=null)
 			{
@@ -429,7 +435,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	 *  Check a factory
 	 *  @param it factory iterator.
 	 */
-	protected IFuture<IComponentFactory> check(Iterator<Tuple2<String, Set<String>>> it, String model, String[] imports, IResourceIdentifier rid)
+	protected IFuture<IComponentFactory> check(Iterator<Tuple2<String, Set<String>>> it, String model, Object pojo, String[] imports, IResourceIdentifier rid)
 	{
 		Future<IComponentFactory> ret = new Future<>();
 		
@@ -442,7 +448,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 			
 			if(kernels.containsKey(f.getFirstEntity()) && k==null)
 			{				
-				check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+				check(it, model, pojo, imports, rid).addResultListener(new DelegationResultListener<>(ret));
 			}
 			else if(k instanceof IComponentIdentifier)
 			{
@@ -451,20 +457,20 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 				q.setProvider(exta.getId());
 				final IComponentFactory fac = agent.getFeature(IRequiredServicesFeature.class).getLocalService(q);
 				
-				fac.isLoadable(model, imports, rid).addResultListener(new IResultListener<Boolean>()
+				fac.isLoadable(model, pojo, imports, rid).addResultListener(new IResultListener<Boolean>()
 				{
 					public void resultAvailable(Boolean loadable) 
 					{
 						if(loadable.booleanValue())
 							ret.setResult(fac);
 						else 
-							check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+							check(it, model, pojo, imports, rid).addResultListener(new DelegationResultListener<>(ret));
 					}
 
 					public void exceptionOccurred(Exception exception)
 					{
-//						System.out.println("Kernel cannot load: "+exta.getId()+" "+model);
-						check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+						System.out.println("Kernel cannot load: "+((IService)fac).getServiceId()+" "+model);
+						check(it, model, pojo, imports, rid).addResultListener(new DelegationResultListener<>(ret));
 					}
 				});
 			}
@@ -474,27 +480,27 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 				{
 					public void resultAvailable(IComponentFactory fac) 
 					{
-						fac.isLoadable(model, imports, rid).addResultListener(new IResultListener<Boolean>()
+						fac.isLoadable(model, pojo, imports, rid).addResultListener(new IResultListener<Boolean>()
 						{
 							public void resultAvailable(Boolean loadable) 
 							{
 								if(loadable.booleanValue())
 									ret.setResult(fac);
 								else 
-									check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+									check(it, model, pojo, imports, rid).addResultListener(new DelegationResultListener<>(ret));
 							}
 
 							public void exceptionOccurred(Exception exception)
 							{
-//								System.out.println("Kernel cannot load: "+exta.getId()+" "+model);
-								check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+								System.out.println("Kernel cannot load: "+((IService)fac).getServiceId()+" "+model);
+								check(it, model, pojo, imports, rid).addResultListener(new DelegationResultListener<>(ret));
 							}
 						});
 					}
 					
 					public void exceptionOccurred(Exception exception) 
 					{
-						check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+						check(it, model, pojo, imports, rid).addResultListener(new DelegationResultListener<>(ret));
 					}
 				});
 			}
@@ -513,20 +519,20 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 						
 						fut.setResult(fac);
 						
-						fac.isLoadable(model, imports, rid).addResultListener(new IResultListener<Boolean>()
+						fac.isLoadable(model, pojo, imports, rid).addResultListener(new IResultListener<Boolean>()
 						{
 							public void resultAvailable(Boolean loadable) 
 							{
 								if(loadable.booleanValue())
 									ret.setResult(fac);
 								else 
-									check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+									check(it, model, pojo, imports, rid).addResultListener(new DelegationResultListener<>(ret));
 							}
 
 							public void exceptionOccurred(Exception exception)
 							{
-//								System.out.println("Kernel cannot load: "+exta.getId()+" "+model);
-								check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+								System.out.println("Kernel cannot load: "+((IService)fac).getServiceId()+" "+model);
+								check(it, model, pojo, imports, rid).addResultListener(new DelegationResultListener<>(ret));
 							}
 						});
 					}
@@ -536,7 +542,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 						kernels.put(f.getFirstEntity(), null);
 						
 						System.out.println("error starting factory: "+exception);
-						check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+						check(it, model, pojo, imports, rid).addResultListener(new DelegationResultListener<>(ret));
 					}
 				});
 			}
@@ -661,7 +667,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	}
 	
 	/**
-	 *  Get known kernels.
+	 *  Get known kernels. suffix -> [factory class name, {types}]
 	 */
 	protected Map<String, Collection<Tuple2<String, Set<String>>>> getKnownKernels()
 	{
@@ -678,13 +684,13 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 					InputStream is = SUtil.getResource(kk, cl);
 					ClassInfo ci = SClassReader.getClassInfo(is);
 				
-					String[] types = getKernelTypes(ci);
+					String[] suffs = getKernelSuffixes(ci);
 				
-					if(types!=null)
+					if(suffs!=null)
 					{
-						for(String type: types)
+						for(String suff: suffs)
 						{
-							known_kernels_cache.add(type, new Tuple2<String, Set<String>>(ci.getClassName(), SUtil.arrayToSet(types)));
+							known_kernels_cache.add(suff, new Tuple2<String, Set<String>>(ci.getClassName(), SUtil.arrayToSet(suffs)));
 						}
 					}
 				}
@@ -699,9 +705,65 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	}
 	
 	/**
-	 *  Add infos about a kernel to the map.
+	 *  Get known class component types in annotation.
 	 */
-	protected String[] getKernelTypes(ClassInfo ci)
+	protected void initKnownComponentTypes()
+	{
+		if(allcomponenttypes==null)
+		{
+			allcomponenttypes = new HashSet<String>();
+			allannotationtypes = new HashMap<String, String>();
+			
+			for(String kk: known_kernels)
+			{
+				// todo: use library loader (needs rid besides classname)
+				try
+				{
+					ClassLoader cl = agent.getClassLoader();
+					InputStream is = SUtil.getResource(kk, cl);
+					ClassInfo ci = SClassReader.getClassInfo(is);
+				
+					String[] ctypes = getKernelComponentTypes(ci);
+					String[] atypes = getKernelComponentAnnotationTypes(ci);
+					
+					if(ctypes!=null)
+					{
+
+						for(String ctype: ctypes)
+						{
+							allcomponenttypes.add(ctype);
+						}
+						
+						if(atypes!=null)
+						{
+							if(ctypes.length==atypes.length)
+							{	
+								for(int i=0; i<ctypes.length; i++)
+								{
+									allannotationtypes.put(atypes[i], ctypes[i]);
+								}
+							}
+							else
+							{
+								System.out.println("err: anntypes unequal componenttypes length");
+							}
+						}
+					}
+				}
+				catch(Exception e)
+				{
+					agent.getLogger().info("Predefined Jadex kernel not available: "+kk+", "+e);
+				}
+			}
+		}
+	}
+	
+	/**
+	 *  Get supported kernel suffixes.
+	 *  These types are the file suffixes.
+	 */
+	//protected String[] getKernelTypes(ClassInfo ci)
+	protected String[] getKernelSuffixes(ClassInfo ci)
 	{
 		AnnotationInfo ai = ci.getAnnotation("jadex.micro.annotation.Properties");
 		if(ai!=null)
@@ -714,6 +776,97 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 					AnnotationInfo a = (AnnotationInfo)val;
 					String name = (String)a.getValue("name");
 					if("kernel.types".equals(name))
+					{
+						String value = (String)a.getValue("value");
+						String[] types = (String[])SJavaParser.evaluateExpression(value, null);
+//						System.out.println("foound: "+ci.getClassname()+" "+Arrays.toString(types));
+						return types;
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 *  Get supported kernel component types.
+	 *  Add infos about a kernel 
+	 */
+	protected String[] getKernelComponentTypes(ClassInfo ci)
+	{
+		String[] ret = null;
+		
+		AnnotationInfo ai = ci.getAnnotation("jadex.micro.annotation.Properties");
+		if(ai!=null)
+		{
+			Object[] vals = (Object[])ai.getValue("value");
+			if(vals!=null)
+			{
+				for(Object val: vals)
+				{
+					AnnotationInfo a = (AnnotationInfo)val;
+					String name = (String)a.getValue("name");
+					if("kernel.componenttypes".equals(name))
+					{
+						String value = (String)a.getValue("value");
+						ret = (String[])SJavaParser.evaluateExpression(value, null);
+//						System.out.println("foound: "+ci.getClassname()+" "+Arrays.toString(types));
+						break;
+					}
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get supported kernel component types.
+	 *  Add infos about a kernel 
+	 */
+	protected String[] getKernelComponentAnnotationTypes(ClassInfo ci)
+	{
+		String[] ret = null;
+		
+		AnnotationInfo ai = ci.getAnnotation("jadex.micro.annotation.Properties");
+		if(ai!=null)
+		{
+			Object[] vals = (Object[])ai.getValue("value");
+			if(vals!=null)
+			{
+				for(Object val: vals)
+				{
+					AnnotationInfo a = (AnnotationInfo)val;
+					String name = (String)a.getValue("name");
+					if("kernel.anntypes".equals(name))
+					{
+						String value = (String)a.getValue("value");
+						ret = (String[])SJavaParser.evaluateExpression(value, null);
+						break;
+					}
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Add infos about a kernel to the map (@Agent(type=))
+	 */
+	protected String[] getKernelAnnotationTypes(ClassInfo ci)
+	{
+		AnnotationInfo ai = ci.getAnnotation("jadex.micro.annotation.Properties");
+		if(ai!=null)
+		{
+			Object[] vals = (Object[])ai.getValue("value");
+			if(vals!=null)
+			{
+				for(Object val: vals)
+				{
+					AnnotationInfo a = (AnnotationInfo)val;
+					String name = (String)a.getValue("name");
+					if("kernel.anntypes".equals(name))
 					{
 						String value = (String)a.getValue("value");
 						String[] types = (String[])SJavaParser.evaluateExpression(value, null);
@@ -740,12 +893,12 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	/**
 	 *  Get a running subfactory.
 	 */
-	protected IFuture<IComponentFactory> getRunningFactory(String model, String[] imports, IResourceIdentifier rid, Iterator<IComponentFactory> it)
+	protected IFuture<IComponentFactory> getRunningFactory(String model, Object pojo, String[] imports, IResourceIdentifier rid, Iterator<IComponentFactory> it)
 	{		
 		if(!isLoadable(model))
 			return new Future<IComponentFactory>(new RuntimeException());
 		
-		//if(model.indexOf("HelplineAgent")!=-1)
+		//if(model.indexOf("HelloAgent")!=-1)
 		//	System.out.println("getRunningFactory: "+model);
 
 		Future<IComponentFactory> ret = new Future<IComponentFactory>();
@@ -755,7 +908,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		if(facs.hasNext())
 		{
 			IComponentFactory fac = facs.next();
-			fac.isLoadable(model, imports, rid).addResultListener(new IResultListener<Boolean>()
+			fac.isLoadable(model, pojo, imports, rid).addResultListener(new IResultListener<Boolean>()
 			{
 				public void resultAvailable(Boolean result)
 				{
@@ -765,7 +918,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 					if(result.booleanValue())
 						ret.setResult(fac);
 					else
-						getRunningFactory(model, imports, rid, facs).addResultListener(new DelegationResultListener<>(ret));
+						getRunningFactory(model, pojo, imports, rid, facs).addResultListener(new DelegationResultListener<>(ret));
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -773,7 +926,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 					//if(model.indexOf("HelplineAgent")!=-1)
 					//	System.out.println("getRunningFactoryEx: "+model+" "+exception);
 					
-					getRunningFactory(model, imports, rid, facs).addResultListener(new DelegationResultListener<>(ret));
+					getRunningFactory(model, pojo, imports, rid, facs).addResultListener(new DelegationResultListener<>(ret));
 				}
 			});
 		}
@@ -792,7 +945,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	 *  @return True, if model can be loaded.
 	 */
 	protected int cnt = 0;
-	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<Boolean> isLoadable(String model, Object pojo, String[] imports, IResourceIdentifier rid)
 	{		
 		if(!isLoadable(model))
 			return IFuture.FALSE;
@@ -803,14 +956,14 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 
 		Future<Boolean> ret = new Future<>();
 		
-		getFactoryForModel(model, imports, rid).addResultListener(new IResultListener<IComponentFactory>()
+		getFactoryForModel(model, pojo, imports, rid).addResultListener(new IResultListener<IComponentFactory>()
 		{
 			public void resultAvailable(IComponentFactory fac)
 			{
 				//if(model.indexOf("HelplineAgent")!=-1)
 				//	System.out.println("is Loadable middle: "+model+" "+fac+" "+fcnt);
 
-				fac.isLoadable(model, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret)
+				fac.isLoadable(model, pojo, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret)
 				{
 					public void customResultAvailable(Boolean result)
 					{
@@ -839,20 +992,20 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<Boolean> isStartable(String model, Object pojo, String[] imports, IResourceIdentifier rid)
 	{		
 		if(!isLoadable(model))
 			return IFuture.FALSE;
 		
-//		System.out.println("isStartable: "+model);
+		System.out.println("isStartable: "+model);
 
 		Future<Boolean> ret = new Future<>();
 		
-		getFactoryForModel(model, imports, rid).addResultListener(new IResultListener<IComponentFactory>()
+		getFactoryForModel(model, pojo, imports, rid).addResultListener(new IResultListener<IComponentFactory>()
 		{
 			public void resultAvailable(IComponentFactory fac)
 			{
-				fac.isStartable(model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+				fac.isStartable(model, pojo, imports, rid).addResultListener(new DelegationResultListener<>(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -878,7 +1031,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		
 		Future<String> ret = new Future<>();
 		
-		getFactoryForModel(model, imports, rid).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, String>(ret)
+		getFactoryForModel(model, null, imports, rid).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, String>(ret)
 		{
 			public void customResultAvailable(IComponentFactory fac) throws Exception
 			{
@@ -896,7 +1049,24 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	 */
 	public String[] getComponentTypes()
 	{
-		return (String[])componenttypes.toArray(new String[componenttypes.size()]);
+		//System.out.println("ann types: "+getKnownAnnotationTypes());
+		
+		//return (String[])componenttypes.toArray(new String[componenttypes.size()]);
+		
+		initKnownComponentTypes();
+		System.out.println("allcomponenttypes: "+allcomponenttypes);
+		return allcomponenttypes.toArray(new String[0]);
+		
+		//return (String[])getKnownKernels().keySet().toArray(new String[0]);
+		
+		//return getKnownAnnotationTypes().toArray(new String[0]);
+	}
+	
+	public String[] getComponentAnnotationTypes()
+	{
+		initKnownComponentTypes();
+		//System.out.println("allcomponentanntypes: "+allannotationtypes);
+		return allannotationtypes.keySet().toArray(new String[0]);
 	}
 
 	//-------- excluded --------
@@ -945,17 +1115,18 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	 *  @param model The component model.
 	 *  @return The component features.
 	 */
-	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(final IModelInfo model)
+	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(final IModelInfo model, final Object pojo)
 	{
-//		System.out.println("getComponentFeatures");
+		//if(pojo!=null)
+		//	System.out.println("getComponentFeatures: "+pojo);
 		
 		Future<Collection<IComponentFeatureFactory>> ret = new Future<>();
 		
-		getFactoryForModel(model.getFilename(), model.getAllImports(), model.getResourceIdentifier()).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, Collection<IComponentFeatureFactory>>(ret)
+		getFactoryForModel(model.getFilename(), pojo, model.getAllImports(), model.getResourceIdentifier()).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, Collection<IComponentFeatureFactory>>(ret)
 		{
 			public void customResultAvailable(IComponentFactory fac) throws Exception
 			{
-				fac.getComponentFeatures(model).addResultListener(new DelegationResultListener<>(ret));
+				fac.getComponentFeatures(model, pojo).addResultListener(new DelegationResultListener<>(ret));
 			}
 		});
 		
@@ -964,6 +1135,8 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	
 	/**
 	 *  Get the filename suffixes that can be loaded with any of the found factories.
+	 *  
+	 *  Used for isLoadAble()
 	 */
 	protected Set<String> getSuffixes()
 	{

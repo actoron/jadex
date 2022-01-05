@@ -54,9 +54,9 @@ public class ComponentTestLazyPlatform extends ComponentTestBase
 	public void setPlatform(IExternalAccess platform)
 	{
 		this.platform = platform;
-		if((SComponentFactory.isLoadable(platform, comp, rid).get()).booleanValue())
+		if((SComponentFactory.isLoadable(platform, comp, null, rid).get()).booleanValue())
 		{
-			boolean startable = SComponentFactory.isStartable(platform, comp, rid).get().booleanValue();
+			boolean startable = SComponentFactory.isStartable(platform, comp, null, rid).get().booleanValue();
 			IModelInfo model = null;
 			model = SComponentFactory.loadModel(platform, comp, rid).get();
 			if(model != null && model.getReport() == null && startable)

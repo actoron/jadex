@@ -65,7 +65,7 @@ public class BDIXModelLoader extends AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected ICacheableModel doLoadModel(String name, String[] imports, ResourceInfo info, ClassLoader classloader, Object context) throws Exception
+	protected ICacheableModel doLoadModel(String name, Object pojo, String[] imports, ResourceInfo info, ClassLoader classloader, Object context) throws Exception
 	{
 		return (ICacheableModel)reader.read(info, classloader, 
 			(IResourceIdentifier)((Object[])context)[0], (IComponentIdentifier)((Object[])context)[1]);

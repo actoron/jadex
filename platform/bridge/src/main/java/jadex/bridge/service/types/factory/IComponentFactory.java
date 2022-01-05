@@ -32,7 +32,8 @@ public interface IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture<IModelInfo> loadModel(String model, String[] imports, IResourceIdentifier rid);
+	//public IFuture<IModelInfo> loadModel(String model, String[] imports, IResourceIdentifier rid);
+	public IFuture<IModelInfo> loadModel(String model, Object pojo, String[] imports, IResourceIdentifier rid);
 
 	/**
 	 *  Test if a model can be loaded by the factory.
@@ -40,7 +41,7 @@ public interface IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid);
+	public IFuture<Boolean> isLoadable(String model, Object pojo, String[] imports, IResourceIdentifier rid);
 	
 	/**
 	 *  Test if a model is startable (e.g. an component).
@@ -48,7 +49,7 @@ public interface IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid);
+	public IFuture<Boolean> isStartable(String model, Object pojo, String[] imports, IResourceIdentifier rid);
 
 	/**
 	 *  Get the component type of a model.
@@ -64,6 +65,9 @@ public interface IComponentFactory
 	 */
 	@Raw
 	public String[] getComponentTypes();
+	
+	@Raw
+	public String[] getComponentAnnotationTypes();
 
 	//-------- excluded --------
 	
@@ -84,5 +88,5 @@ public interface IComponentFactory
 	 *  @return The component features.
 	 */
 	@Excluded
-	public @Reference(remote=false) IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model);
+	public @Reference(remote=false) IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model, Object pojo);
 }

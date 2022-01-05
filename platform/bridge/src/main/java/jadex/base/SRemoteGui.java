@@ -1070,14 +1070,14 @@ public class SRemoteGui
 				try
 				{
 					final IExternalAccess access	= ia.getExternalAccess();
-					SComponentFactory.isLoadable(access, model, rid)
+					SComponentFactory.isLoadable(access, model, null, rid)
 						.addResultListener(new DelegationResultListener<Boolean>(ret)
 					{
 						public void customResultAvailable(Boolean result)
 						{
 							if(result.booleanValue())
 							{
-								SComponentFactory.isStartable(access, model, rid)
+								SComponentFactory.isStartable(access, model, null, rid)
 									.addResultListener(new DelegationResultListener<Boolean>(ret)
 								{
 									public void customResultAvailable(Boolean result)

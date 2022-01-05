@@ -133,13 +133,13 @@ public class BDIClassReader extends MicroClassReader
 	 *  @return The loaded model.
 	 */
 	@Override
-	public MicroModel read(String model, String[] imports, ClassLoader classloader, IResourceIdentifier rid, 
+	public MicroModel read(String model, Object pojo, String[] imports, ClassLoader classloader, IResourceIdentifier rid, 
 		IComponentIdentifier root, List<IComponentFeatureFactory> features)
 	{
 		// use dummy classloader that will not be visisble outside
 		List<URL> urls = SUtil.getClasspathURLs(classloader, false);
 		DummyClassLoader cl = createDummyClassLoader(classloader, null, urls);
-		return super.read(model, imports, cl, rid, root, features);
+		return super.read(model, pojo, imports, cl, rid, root, features);
 	}
 
 	/**
@@ -157,7 +157,8 @@ public class BDIClassReader extends MicroClassReader
 	protected BDIModel read(String model, Class<?> cma, ClassLoader cl, IResourceIdentifier rid, IComponentIdentifier root,
 		List<IComponentFeatureFactory> features)
 	{
-		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
+		// can be original when pojo is used
+		ClassLoader classloader = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
 		
 		ModelInfo modelinfo = new ModelInfo();
 		BDIModel ret = new BDIModel(modelinfo, new MCapability(cma.getName()));
@@ -194,8 +195,12 @@ public class BDIClassReader extends MicroClassReader
 		
 		fillBDIModelFromAnnotations(ret, model, cma, cl, rid, root, features);
 		
+		// why do we need to check on generated class the modifiers?
 		Class<?> genclass = SReflect.findClass0(cma.getName(), null, classloader);
-		modelinfo.setStartable(!Modifier.isAbstract(genclass.getModifiers()));
+		if(genclass!=null)
+			modelinfo.setStartable(!Modifier.isAbstract(genclass.getModifiers()));
+		else // can happen when no class is generated (eg. pojo case)
+			modelinfo.setStartable(!Modifier.isAbstract(cma.getModifiers()));
 		
 		initBDIModelAfterClassLoading(ret, classloader);
 		
@@ -252,7 +257,8 @@ public class BDIClassReader extends MicroClassReader
 				{
 					try
 					{
-						BDIModel cap = loader.loadComponentModel(fields[i].getType().getName()+".class", null, rid, ((DummyClassLoader)cl).getOriginal(), new Object[]{rid, root, features});
+						// todo: support capa as pojo?!
+						BDIModel cap = loader.loadComponentModel(fields[i].getType().getName()+".class", null, null, rid, ((DummyClassLoader)cl).getOriginal(), new Object[]{rid, root, features});
 //						System.out.println("found capability: "+fields[i].getName()+", "+cap);
 						capas.put(fields[i].getName(), cap);
 						
@@ -550,40 +556,46 @@ public class BDIClassReader extends MicroClassReader
 		}
 		
 		// Create enhanced classes if not already present.
-		
-		for(Class<?> agcl: agtcls)
+		if(cl instanceof DummyClassLoader) // else is pojo case without generation
 		{
-			try 
+			for(Class<?> agcl: agtcls)
 			{
-				
-				if(!IBDIClassGenerator.isEnhanced(agcl))
-					gen.generateBDIClass(agcl.getName(), bdimodel, cl);
-				else
-					System.out.println("already enhanced: "+agcl);
-			} 
-			catch (JadexBDIGenerationException e) 
-			{
-				throw new JadexBDIGenerationRuntimeException("Could not read bdi agent: " + agcl, e);
+				try 
+				{
+					
+					if(!IBDIClassGenerator.isEnhanced(agcl))
+						gen.generateBDIClass(agcl.getName(), bdimodel, cl);
+					else
+						System.out.println("already enhanced: "+agcl);
+				} 
+				catch (JadexBDIGenerationException e) 
+				{
+					throw new JadexBDIGenerationRuntimeException("Could not read bdi agent: " + agcl, e);
+				}
+	//			System.out.println("genclazz: "+agcl.getName()+" "+agcl.hashCode()+" "+agcl.getClassLoader());
 			}
-//			System.out.println("genclazz: "+agcl.getName()+" "+agcl.hashCode()+" "+agcl.getClassLoader());
-		}
 		
-		// Sort the plans according to their declaration order in the source file
-		// Must be done after class enhancement to contain the "__getLineNumber()" method
-		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
-		
-		// HacK?!
-		// todo: how to handle order of inner plan classes?
-		// possible solution would be using asm to generate a line number map for the plans :-(
-		SClassReader.ClassInfo ci = SClassReader.getClassInfo(fcma.getName(), cl, true, true);
-		//System.out.println("methods of "+fcma+" "+ci.getMethodInfos());
-		Map<String, Integer> order = new HashMap<>();
-		int cnt = 0;
-		for(SClassReader.MethodInfo mi: SUtil.notNull(ci.getMethodInfos()))
-		{
-			order.put(mi.getMethodName(), cnt++);
+			// Sort the plans according to their declaration order in the source file
+			// Must be done after class enhancement to contain the "__getLineNumber()" method
+			ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
+			
+			// HacK?!
+			// todo: how to handle order of inner plan classes?
+			// possible solution would be using asm to generate a line number map for the plans :-(
+			SClassReader.ClassInfo ci = SClassReader.getClassInfo(fcma.getName(), cl, true, true);
+			// can null when agent class is not available on disk (pure pojo agent)
+			if(ci!=null)
+			{
+				//System.out.println("methods of "+fcma+" "+ci.getMethodInfos());
+				Map<String, Integer> order = new HashMap<>();
+				int cnt = 0;
+				for(SClassReader.MethodInfo mi: SUtil.notNull(ci.getMethodInfos()))
+				{
+					order.put(mi.getMethodName(), cnt++);
+				}
+				bdimodel.getCapability().sortPlans(order, classloader);
+			}
 		}
-		bdimodel.getCapability().sortPlans(order, classloader);
 		
 //		System.out.println("genclazz: "+genclazz);
 		

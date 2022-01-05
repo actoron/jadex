@@ -45,7 +45,7 @@ public class PlatformConfigurationTest
 		Class<?> cfclass = SReflect.classForName(IPlatformConfiguration.FALLBACK_COMPONENT_FACTORY, this.getClass().getClassLoader());
 		final IComponentFactory cfac = (IComponentFactory)cfclass.getConstructor(new Class[]{String.class})
 			.newInstance(new Object[]{"rootid"});
-		final IModelInfo defmodel	= cfac.loadModel(IPlatformConfiguration.FALLBACK_PLATFORM_CONFIGURATION, null, null).get();	// No execution yet, can only work if method is synchronous.
+		final IModelInfo defmodel	= cfac.loadModel(IPlatformConfiguration.FALLBACK_PLATFORM_CONFIGURATION, null, null, null).get();	// No execution yet, can only work if method is synchronous.
 		
 		// start whole platfrom
 //		IExternalAccess	platform = (IExternalAccess)Starter.createPlatform(config).get(timeout);
