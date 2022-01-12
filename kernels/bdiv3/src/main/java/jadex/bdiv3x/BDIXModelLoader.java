@@ -45,7 +45,7 @@ public class BDIXModelLoader extends AbstractModelLoader
 	 */
 	public CacheableKernelModel loadAgentModel(String name, String[] imports, IResourceIdentifier clkey, ClassLoader classloader, Object context) throws Exception
 	{
-		return (CacheableKernelModel)loadModel(name, FILE_EXTENSION_AGENT, imports, clkey, classloader, context);
+		return (CacheableKernelModel)loadModel(name, null, FILE_EXTENSION_AGENT, imports, clkey, classloader, context);
 	}
 	
 	/**
@@ -55,7 +55,7 @@ public class BDIXModelLoader extends AbstractModelLoader
 	 */
 	public CacheableKernelModel loadCapabilityModel(String name, String[] imports, IResourceIdentifier clkey, ClassLoader classloader, Object context) throws Exception
 	{
-		return (CacheableKernelModel)loadModel(name, FILE_EXTENSION_CAPABILITY, imports, clkey, classloader, context);
+		return (CacheableKernelModel)loadModel(name, null, FILE_EXTENSION_CAPABILITY, imports, clkey, classloader, context);
 	}
 	
 	//-------- AbstractModelLoader methods --------

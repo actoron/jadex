@@ -264,6 +264,8 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //		}
 //		
 		IPlatformConfiguration conf = STest.getLocalTestConfig(getName());	// Avoid dependencies to created platforms
+		//conf.getExtendedPlatformConfiguration().setDebugFutures(true);
+		
 		
 		// Initial timeout for starting platform.
 		// Use larger timeout so we can reduce default timeout on build slave
@@ -294,7 +296,8 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		long ctimeout = Starter.getDefaultTimeout(platform.getId());	// Start with normal timeout for platform startup/shutdown.
 
 		IResourceIdentifier[] rids = new IResourceIdentifier[roots.length];
-		for (int projectIndex=0; projectIndex < roots.length; projectIndex++) {
+		for (int projectIndex=0; projectIndex < roots.length; projectIndex++) 
+		{
 			File[] project = roots[projectIndex];
 			IResourceIdentifier	parentRid	= null;
 			for(int rootIndex=0; rootIndex<project.length; rootIndex++)
