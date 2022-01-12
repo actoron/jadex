@@ -740,9 +740,8 @@ task copyJars(type: Copy) {
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/testreport")
     // Include the results from the `test` task in all subprojects
-	// Deprecated but replacements creates dependency to test task. grr
-	// https://docs.gradle.org/current/dsl/org.gradle.api.tasks.testing.Test.html#org.gradle.api.tasks.testing.Test:binResultsDir
-	reportOn subprojects.collect { it.tasks.withType(Test).collect {it.binResultsDir} }
+	// Use dir.asFile.get() to avoid dependency to test task being added
+	reportOn subprojects.collect { it.tasks.withType(Test).collect {it.binaryResultsDirectory.asFile.get()} }
 	mustRunAfter subprojects.collect { it.tasks.withType(Test) }
 }
 
