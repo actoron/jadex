@@ -583,8 +583,8 @@ public class SComponentManagementService
 	{
 		Future<IComponentFactory> ret = new Future<>();
 		
-//		if(model.indexOf("KernelMicro")!=-1)
-//			System.out.println("getCompFac: "+model);
+		if(model.indexOf("Buyer")!=-1)
+			System.out.println("getCompFac: "+model);
 		
 		FactoryFilter ff;
 		String anntype = getPojoComponentType(cinfo.getPojo());

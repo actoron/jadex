@@ -81,6 +81,9 @@ public class FactoryFilter implements IAsyncFilter<IComponentFactory>
 		
 		IComponentFactory fac = (IComponentFactory)obj;
 		
+		//if(model.indexOf("Buyer")!=-1)
+		//	System.out.println("filter");
+		
 		if(type!=null)
 		{
 			//System.out.print("factypes: "+fac+" "+fac.getComponentTypes());

@@ -70,7 +70,7 @@ public class STest
 		config.setValue("kernel_application", true);
 		config.setValue("kernel_bpmn", true);
 		config.setValue("kernel_bdix", true);
-		//config.setValue("kernel_bdi", true);
+		config.setValue("kernel_bdi", true);
 		
 		if(!REALTIME)
 		{
