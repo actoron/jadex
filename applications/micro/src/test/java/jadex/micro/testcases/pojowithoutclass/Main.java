@@ -1,7 +1,9 @@
-package jadex.bdiv3.testcases.pojowithoutclass;
+package jadex.micro.testcases.pojowithoutclass;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,10 +15,14 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.RecordComponentVisitor;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.util.ASMifier;
+import org.objectweb.asm.util.TraceClassVisitor;
 
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
+import jadex.bytecode.SASM;
 
 public class Main 
 {
@@ -119,13 +125,12 @@ public class Main
 		MethodVisitor methodVisitor;
 		AnnotationVisitor annotationVisitor0;
 
-		classWriter.visit(Opcodes.V11, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, "pojowithoutclass/HelloAgent", null, "jadex/bdiv3/runtime/BDIAgent", null);
+		classWriter.visit(Opcodes.V11, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, "pojowithoutclass/HelloAgent", null, "java/lang/Object", null);
 
 		classWriter.visitSource("HelloAgent.java", null);
 
 		{
 		annotationVisitor0 = classWriter.visitAnnotation("Ljadex/micro/annotation/Agent;", true);
-		annotationVisitor0.visit("type", "bdi");
 		annotationVisitor0.visitEnd();
 		}
 		{
@@ -149,9 +154,9 @@ public class Main
 		methodVisitor.visitCode();
 		Label label0 = new Label();
 		methodVisitor.visitLabel(label0);
-		methodVisitor.visitLineNumber(11, label0);
+		methodVisitor.visitLineNumber(9, label0);
 		methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
-		methodVisitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "jadex/bdiv3/runtime/BDIAgent", "<init>", "()V", false);
+		methodVisitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
 		methodVisitor.visitInsn(Opcodes.RETURN);
 		Label label1 = new Label();
 		methodVisitor.visitLabel(label1);
@@ -168,7 +173,7 @@ public class Main
 		methodVisitor.visitCode();
 		Label label0 = new Label();
 		methodVisitor.visitLabel(label0);
-		methodVisitor.visitLineNumber(25, label0);
+		methodVisitor.visitLineNumber(23, label0);
 		methodVisitor.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
 		methodVisitor.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
 		methodVisitor.visitInsn(Opcodes.DUP);
@@ -182,20 +187,20 @@ public class Main
 		methodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
 		Label label1 = new Label();
 		methodVisitor.visitLabel(label1);
-		methodVisitor.visitLineNumber(26, label1);
+		methodVisitor.visitLineNumber(24, label1);
 		methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
 		methodVisitor.visitLdcInsn("executed");
 		methodVisitor.visitFieldInsn(Opcodes.PUTFIELD, "pojowithoutclass/HelloAgent", "result", "Ljava/lang/String;");
 		Label label2 = new Label();
 		methodVisitor.visitLabel(label2);
-		methodVisitor.visitLineNumber(27, label2);
+		methodVisitor.visitLineNumber(25, label2);
 		methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
 		methodVisitor.visitFieldInsn(Opcodes.GETFIELD, "pojowithoutclass/HelloAgent", "agent", "Ljadex/bridge/IInternalAccess;");
 		methodVisitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, "jadex/bridge/IInternalAccess", "killComponent", "()Ljadex/commons/future/IFuture;", true);
 		methodVisitor.visitInsn(Opcodes.POP);
 		Label label3 = new Label();
 		methodVisitor.visitLabel(label3);
-		methodVisitor.visitLineNumber(28, label3);
+		methodVisitor.visitLineNumber(26, label3);
 		methodVisitor.visitInsn(Opcodes.RETURN);
 		Label label4 = new Label();
 		methodVisitor.visitLabel(label4);
@@ -206,72 +211,6 @@ public class Main
 		classWriter.visitEnd();
 
 		return classWriter.toByteArray();
-		
-		/*ClassWriter classWriter = new ClassWriter(0);
-		FieldVisitor fieldVisitor;
-		RecordComponentVisitor recordComponentVisitor;
-		MethodVisitor methodVisitor;
-		AnnotationVisitor annotationVisitor0;
-
-		classWriter.visit(Opcodes.V11, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, "pojowithoutclass/HelloAgent", null, "jadex/bdiv3/runtime/BDIAgent", null);
-
-		classWriter.visitSource("HelloAgent.java", null);
-
-		{
-			annotationVisitor0 = classWriter.visitAnnotation("Ljadex/micro/annotation/Agent;", true);
-			annotationVisitor0.visit("type", "bdi");
-			annotationVisitor0.visitEnd();
-		}
-		
-		{
-		methodVisitor = classWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
-		methodVisitor.visitCode();
-		Label label0 = new Label();
-		methodVisitor.visitLabel(label0);
-		methodVisitor.visitLineNumber(6, label0);
-		methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
-		methodVisitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "jadex/bdiv3/runtime/BDIAgent", "<init>", "()V", false);
-		methodVisitor.visitInsn(Opcodes.RETURN);
-		Label label1 = new Label();
-		methodVisitor.visitLabel(label1);
-		methodVisitor.visitLocalVariable("this", "Ljadex/bdiv3/testcases/pojowithoutclass/HelloAgent;", null, label0, label1, 0);
-		methodVisitor.visitMaxs(1, 1);
-		methodVisitor.visitEnd();
-		}
-		{
-		methodVisitor = classWriter.visitMethod(Opcodes.ACC_PUBLIC, "body", "()V", null, null);
-		{
-		annotationVisitor0 = methodVisitor.visitAnnotation("Ljadex/bridge/service/annotation/OnStart;", true);
-		annotationVisitor0.visitEnd();
-		}
-		methodVisitor.visitCode();
-		Label label0 = new Label();
-		methodVisitor.visitLabel(label0);
-		methodVisitor.visitLineNumber(14, label0);
-		methodVisitor.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
-		methodVisitor.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
-		methodVisitor.visitInsn(Opcodes.DUP);
-		methodVisitor.visitLdcInsn("body end: ");
-		methodVisitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false);
-		methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
-		methodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
-		methodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Class", "getName", "()Ljava/lang/String;", false);
-		methodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
-		methodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
-		methodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
-		Label label1 = new Label();
-		methodVisitor.visitLabel(label1);
-		methodVisitor.visitLineNumber(15, label1);
-		methodVisitor.visitInsn(Opcodes.RETURN);
-		Label label2 = new Label();
-		methodVisitor.visitLabel(label2);
-		methodVisitor.visitLocalVariable("this", "Ljadex/bdiv3/testcases/pojowithoutclass/HelloAgent;", null, label0, label2, 0);
-		methodVisitor.visitMaxs(4, 1);
-		methodVisitor.visitEnd();
-		}
-		classWriter.visitEnd();
-
-		return classWriter.toByteArray();*/
 	}
 }
 
