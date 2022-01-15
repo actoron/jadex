@@ -3,7 +3,16 @@ package jadex.base;
 import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
 import jadex.bridge.ComponentIdentifier;
@@ -49,7 +58,6 @@ import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.settings.IPlatformSettings;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bytecode.vmhacks.VmHacks;
-import jadex.commons.SAccess;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -998,7 +1006,7 @@ public class Starter
 			try
 			{
 				tp = (IThreadPool)SReflect.classForName(
-					rootconfig.getExtendedPlatformConfiguration().getThreadpoolClass(), Starter.class.getClassLoader()).newInstance();
+					rootconfig.getExtendedPlatformConfiguration().getThreadpoolClass(), Starter.class.getClassLoader()).getConstructor().newInstance();
 			}
 			catch(Exception e)
 			{
@@ -1025,9 +1033,9 @@ public class Starter
 						{
 							next.run();
 						}
-						catch(Exception e)
+						catch(Throwable t)
 						{
-							Logger.getLogger(fcid.getLocalName()).severe("Exception during step on rescue thread: "+SUtil.getExceptionStacktrace(e));
+							Logger.getLogger(fcid.getLocalName()).severe("Exception during step on rescue thread: "+SUtil.getExceptionStacktrace(t));
 						}
 					}
 				}

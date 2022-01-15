@@ -909,8 +909,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				finally
 				{
 //					System.err.println(getComponent() + ": finished rescue thread");
-					isonrescue	= false;
-					if(switchtorescue)
+					boolean	run1;
+					synchronized(ExecutionComponentFeature.this)
+					{
+						run1	= switchtorescue;
+						isonrescue	= false;
+					}
+					if(run1)
 						switchToRescueThread();
 				}
 			} );
