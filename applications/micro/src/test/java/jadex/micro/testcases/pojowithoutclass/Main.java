@@ -1,9 +1,7 @@
 package jadex.micro.testcases.pojowithoutclass;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,15 +12,10 @@ import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.RecordComponentVisitor;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.util.ASMifier;
-import org.objectweb.asm.util.TraceClassVisitor;
 
-import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
+import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
-import jadex.bytecode.SASM;
 
 public class Main 
 {
@@ -55,7 +48,7 @@ public class Main
 			Class<?> hacl = loader.loadClass("pojowithoutclass.HelloAgent");                                                                        
 			Object pojo = hacl.getDeclaredConstructor().newInstance();
 
-			IExternalAccess platform = Starter.createPlatform(PlatformConfigurationHandler.getDefault()).get();
+			IExternalAccess platform = Starter.createPlatform(STest.getLocalTestConfig(getClass())).get();
 			//System.out.println("started platform");
 			IExternalAccess agent = platform.addComponent(pojo).get();
 			Map<String, Object> res = agent.waitForTermination().get();
@@ -121,7 +114,6 @@ public class Main
 	{
 		ClassWriter classWriter = new ClassWriter(0);
 		FieldVisitor fieldVisitor;
-		RecordComponentVisitor recordComponentVisitor;
 		MethodVisitor methodVisitor;
 		AnnotationVisitor annotationVisitor0;
 
