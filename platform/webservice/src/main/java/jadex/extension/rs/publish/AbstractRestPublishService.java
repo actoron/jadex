@@ -900,7 +900,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					PrintWriter out = response.getWriter();
 	
 					// setup SSE if requested via header
-					//if(MediaType.SERVER_SENT_EVENTS.equals(request.getHeader("Accept")))
+					String ah = request.getHeader("Accept");
+					if(ah!=null && ah.toLowerCase().indexOf(MediaType.SERVER_SENT_EVENTS)!=-1)
 					{
 						// SSE flag in session 
 						request.getSession().setAttribute("sse", request.getAsyncContext()); 
@@ -914,7 +915,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					    
 					    sendDelayedSSEEvents(request.getSession());
 					}
-					/*else
+					else
 					{
 						response.setContentType(MediaType.TEXT_HTML+"; charset=utf-8");
 						String info = getServiceInfo(service, getServletUrl(request), pm);
@@ -922,7 +923,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						// Set to ok and send back response
 						response.setStatus(HttpServletResponse.SC_OK);
 						complete(request, response);
-					}*/
+					}
 				}
 			}
 		}
