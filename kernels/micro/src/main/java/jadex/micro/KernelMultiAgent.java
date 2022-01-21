@@ -1054,7 +1054,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		//return (String[])componenttypes.toArray(new String[componenttypes.size()]);
 		
 		initKnownComponentTypes();
-		System.out.println("allcomponenttypes: "+allcomponenttypes);
+		//System.out.println("allcomponenttypes: "+allcomponenttypes);
 		return allcomponenttypes.toArray(new String[0]);
 		
 		//return (String[])getKnownKernels().keySet().toArray(new String[0]);
