@@ -173,20 +173,20 @@
 					}
 					else
 					{
-						// todo: refactor id handling and create id on client
+						// done! todo: refactor id handling and create id on client
 						// problem: order of http and sse answer is undertermined
 						// but currently http answer contains conversation id and is needed before sse event
 						// that must use the id to lookup the handlers
 						
-						if(cnt<3)
+						/*if(cnt<3)
 						{
 							console.log("retry event: "+JSON.stringify(event)+" "+cnt);
 							setTimeout(() => self.processEvent(event, ++cnt), 1000);
 						}
 						else
-						{
+						{*/
 							console.log("cannot handle event: "+JSON.stringify(event)+" "+cnt);
-						}
+						//}
 					}
 				},
 										
@@ -290,7 +290,7 @@
 						
 						//console.log("call headers: "+resp.headers["x-jadex-callid"]+" "+resp.headers["x-jadex-callidfin"]);
 						
-						if(sse)
+						/*if(sse)
 						{
 							//console.log("response via sse: "+path+" "+callid);
 							if(self.conversations[callid]==null)
@@ -299,13 +299,13 @@
 								self.conversations[callid] = [handler, errfunc, maxhandler]; //errhandler
 							}
 						}
-						else if(fini)
+						else */if(fini)
 						{
 							//console.log("call finished: "+fini);
 						}
-						else
+						else if(!sse)
 						{
-							//console.log("long poll call: "+path+" "+callid);
+							console.log("long poll call: "+path+" "+callid);
 							if(callid!=null)
 							{
 								//console.log("long-poll request sent: "+path);
@@ -323,7 +323,27 @@
 						//console.log("initial request sent: "+path);
 						call = axios.CancelToken.source();
 						
-						axios.get(path, {cancelToken: call.token, headers: {'cache-control': 'no-cache, no-store', "x-jadex-sse": true}}, this.transform)
+						var ok = false;
+						var callid;
+						while(!ok)
+						{
+							callid = self.generateUUID();
+						
+							//console.log("response via sse: "+path+" "+callid);
+							if(self.conversations[callid]==null)
+							{
+								//console.log("saved conversation: "+callid);
+								self.conversations[callid] = [handler, errfunc, maxhandler]; //errhandler
+								ok = true;
+							}
+							else
+							{
+								console.log("convid collision, retry: "+callid);
+							}
+						}
+						
+						var headers = {'x-jadex-callid': callid, 'cache-control': 'no-cache, no-store', "x-jadex-sse": true};
+						axios.get(path, {cancelToken: call.token, headers: headers}, this.transform)
 							.then(function(resp) 
 							{
 								var callid = func(resp); 
@@ -395,7 +415,7 @@
 						}
 				    });
 					return ret;
-				}
+				},
 				
 				/*generateUUID: function() 
 				{ 
@@ -409,6 +429,13 @@
 				        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
 				    });
 				}*/
+				
+				// https://www.arungudelli.com/tutorial/javascript/how-to-create-uuid-guid-in-javascript-with-examples/
+				generateUUID: function() 
+				{
+					return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+					    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+				}
 			};
 			jadex.init();
 				
