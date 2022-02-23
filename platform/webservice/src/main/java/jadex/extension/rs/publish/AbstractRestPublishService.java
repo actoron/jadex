@@ -557,7 +557,11 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				Collection<MappingInfo> mis = pm.getElementsForPath(methodname);
 				List<Map<String, String>> bindings = mis.stream().map(x -> pm.getBindingsForPath(fmn)).collect(Collectors.toList());
 				
-				if(mis!=null && mis.size()>0)
+				if(methodname.endsWith("jadex.js"))
+				{
+					writeResponse(ri.setStatus(Response.Status.OK.getStatusCode()).setFinished(true).setResult(loadJadexJS()));
+				}
+				else if(mis!=null && mis.size()>0)
 				{
 					// convert and map parameters
 					Tuple2<MappingInfo, Object[]> tup = mapParameters(request, mis, bindings);
@@ -919,6 +923,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					}
 					else
 					{
+						
+						
 						response.setContentType(MediaType.TEXT_HTML+"; charset=utf-8");
 						String info = getServiceInfo(service, getServletUrl(request), pm);
 						out.write(info);
@@ -926,7 +932,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						response.setStatus(HttpServletResponse.SC_OK);
 						complete(request, response);
 						
-						 System.out.println("info site sent");
+						System.out.println("info site sent");
 					}
 				}
 			}
@@ -2871,6 +2877,27 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		if(cinfo == null)
 			System.out.println("warning, async context info is null: " + request);// .getRequestURL());
 		return cinfo != null ? cinfo.isComplete() : response.isCommitted();
+	}
+	
+	/**
+	 *  Load jadex.js
+	 *  @return The text from the file.
+	 */
+	public IFuture<byte[]> loadJadexJS()
+	{
+		try
+		{
+			InputStream is = SUtil.getResource0("jadex/extension/rs/publish/jadex.js", component.getClassLoader());
+			//String mt = SUtil.guessContentTypeByFilename(filename);
+			
+			byte[] data = SUtil.readStream(is);
+		
+			return new Future<byte[]>(data);
+		}
+		catch(Exception e)
+		{
+			return new Future<byte[]>(e);
+		}
 	}
 
 	/**
