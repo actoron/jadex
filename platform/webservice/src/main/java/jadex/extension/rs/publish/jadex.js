@@ -328,5 +328,5 @@
 		}
 	};
 	Jadex.init();
+	window.jadex = Jadex;
 });
-var jadex = Jadex;
