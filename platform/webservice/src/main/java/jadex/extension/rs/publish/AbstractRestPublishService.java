@@ -559,7 +559,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				
 				if(methodname.endsWith("jadex.js"))
 				{
-					writeResponse(ri.setStatus(Response.Status.OK.getStatusCode()).setFinished(true).setResult(loadJadexJS()));
+					loadJadexJS().then(js -> writeResponse(ri.setStatus(Response.Status.OK.getStatusCode()).setFinished(true).setResult(js)));
 				}
 				else if(mis!=null && mis.size()>0)
 				{
