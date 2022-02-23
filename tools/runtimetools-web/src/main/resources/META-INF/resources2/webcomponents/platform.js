@@ -262,7 +262,12 @@ class PlatformElement extends CidElement
 				{
 					self.plugins[pis[i].name] = pis[i];
 					pis[i].image = new Image();
-					pis[i].image.src = 'data:image/png;base64,'+pis[i].icon.__base64;
+					if (!pis[i].icon)
+					{
+						pis[i].icon={};
+						pis[i].icon.__base64 = 'iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAJklEQVR42mNk2GJTz0BDwDhqwagFoxaMWjBqwagFoxaMWjA0LAAAF6UigebJIGoAAAAASUVORK5CYII=';
+					}
+					pis[i].image.src = 'data:image/png;base64,' + pis[i].icon.__base64;
 					pis[i].image.onload = function()
 					{
 						cnt++;
