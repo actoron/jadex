@@ -593,7 +593,7 @@ public class SComponentFactory
 	public static IFuture<byte[]> getFileTypeIcon(IExternalAccess exta, final String type)
 	{
 		Future<byte[]> ret = new Future<byte[]>();
-		
+				
 		exta.scheduleStep(new IComponentStep<byte[]>()
 		{
 			@Classname("getFileTypeIcon")

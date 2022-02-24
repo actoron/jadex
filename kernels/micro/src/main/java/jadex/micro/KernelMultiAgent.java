@@ -231,7 +231,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	 */
 	public IFuture<byte[]> getComponentTypeIcon(String type)
 	{
-//		System.out.println("multi factory icon: "+type+" "+iconcache.containsKey(type));
+		System.out.println("multi factory icon: "+type+" "+iconcache.containsKey(type));
 		
 		byte[] icon = iconcache.get(type);
 		
@@ -771,6 +771,9 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 					agent.getLogger().info("Predefined Jadex kernel not available: "+kk+", "+e);
 				}
 			}
+			
+			System.out.println("comp types: "+allcomponenttypes);
+			System.out.println("ann types: "+allannotationtypes);
 		}
 	}
 	

@@ -15,7 +15,10 @@ import jadex.micro.annotation.ProvidedServices;
  */
 // Hack!!! allows starting bpmn kernel when micro kernel is available, but avoids dependency from bpmn to micro
 // and vice versa.
-@Properties({@NameValue(name="system", value="true"), @NameValue(name="kernel.types", value="new String[]{\".bpmn\", \".bpmn2\"}")})
+@Properties({@NameValue(name="system", value="true"), 
+	@NameValue(name="kernel.types", value="new String[]{\".bpmn\", \".bpmn2\"}"),
+	@NameValue(name="kernel.componenttypes", value="new String[]{\""+BpmnFactory.FILETYPE_BPMNPROCESS+"\","+"\""+BpmnFactory.FILETYPE_BPMNLEGACYPROCESS+"\"}")
+})
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(
 	expression="new jadex.bpmn.BpmnFactory($component, jadex.commons.SUtil.createHashMap("

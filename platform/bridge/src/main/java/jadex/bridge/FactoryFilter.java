@@ -86,7 +86,7 @@ public class FactoryFilter implements IAsyncFilter<IComponentFactory>
 		
 		if(type!=null)
 		{
-			//System.out.print("factypes: "+fac+" "+fac.getComponentTypes());
+			System.out.print("factypes: "+fac+" "+fac.getComponentTypes());
 			ret.setResult(Arrays.asList(fac.getComponentTypes()).contains(type));
 		}
 		else if(anntype!=null)
