@@ -231,7 +231,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	 */
 	public IFuture<byte[]> getComponentTypeIcon(String type)
 	{
-		System.out.println("multi factory icon: "+type+" "+iconcache.containsKey(type));
+		//System.out.println("multi factory icon: "+type+" "+iconcache.containsKey(type));
 		
 		byte[] icon = iconcache.get(type);
 		
@@ -730,6 +730,8 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 			allcomponenttypes = new HashSet<String>();
 			allannotationtypes = new HashMap<String, String>();
 			
+			// todo: use scanForKernels()
+			
 			for(String kk: known_kernels)
 			{
 				// todo: use library loader (needs rid besides classname)
@@ -772,8 +774,8 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 				}
 			}
 			
-			System.out.println("comp types: "+allcomponenttypes);
-			System.out.println("ann types: "+allannotationtypes);
+			//System.out.println("comp types: "+allcomponenttypes);
+			//System.out.println("ann types: "+allannotationtypes);
 		}
 	}
 	
