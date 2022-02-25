@@ -42,7 +42,7 @@ class StarterElement extends CidElement
 		{
 			this.listener = (e) => 
 			{
-				console.log("jadex model event: "+e)
+				//console.log("jadex model event: "+e)
 				self.model = e.detail.model;
 				self.requestUpdate();
 			}
@@ -131,7 +131,7 @@ class StarterElement extends CidElement
 			if(conf!=null && conf.length>0)
 				ci.configuration = conf;
 			ci.synchronous = sync;
-			ci.suspended = sus;
+			ci.suspend = sus;
 			ci.monitoring = mon;
 			if(name!=null && name.length>0)
 				ci.name = name;
@@ -139,7 +139,8 @@ class StarterElement extends CidElement
 			
 			//axios.get(self.getMethodPrefix()+'&methodname=createComponent&args_0='+selected+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
 			//console.log("starting: "+ci);
-			axios.get(this.getMethodPrefix()+'&methodname=createComponent&args_0='+JSON.stringify(ci)+"&argtypes_0=jadex.bridge.service.types.cms.CreationInfo", this.transform).then(function(resp)
+			axios.get(this.getMethodPrefix()+'&methodname=createComponent&args_0='+JSON.stringify(ci)
+				+"&argtypes_0=jadex.bridge.service.types.cms.CreationInfo", this.transform).then(function(resp)
 			{
 				// todo: show running components?!
 				//console.log("started: "+resp.data);
@@ -220,46 +221,42 @@ class StarterElement extends CidElement
 						</div>
 					</div>
 					<div class="row m-1">
-						<div class="col-2">
+						<div class="col-3">
 							${this.app.lang.t('Filename')}
 						</div>
-						<div class="col-10" id="filename">
+						<div class="col" id="filename">
 							<input type="text" ref="filename" class="w100" value="${this.model!=null? this.model.filename: ''}">
 						</div>
 					</div>
 					<div class="row m-1">
-						<div class="col-2">
+						<div class="col-3">
 							${this.app.lang.t('Configuration')}
 						</div>
-						<div class="col-10">
+						<div class="col">
 							<select id="config" class="w100">
 		   						${this.getConfigurationNames().map((c) => html`<option value="${c}"></option>`)}
 		 					</select>
 						</div>
 					</div>
 					<div class="row m-1">
-						<div class="col-2">
-							${this.app.lang.t('Comp. name')}
+						<div class="col-3">
+							${this.app.lang.t('Component name')}
 						</div>
-						<div class="col-5">
+						<div class="col-4">
 							<input type="text" class="w100" value="${this.model!=null && this.model.instancename!=null? this.model.instancename: ''}" id="name"></input>
 						</div>
 						<div class="col-3">
 							<input type="checkbox" id="autogen">${this.app.lang.t('Auto generate')}</input>
 						</div>
-						<div class="col-2">
+						<div class="col">
 							<input class="w100" type="number" value="1" id="gencnt"></input>
 						</div>
 					</div>
 					<div class="row m-1">
-						<div class="col-4">
-							<input type="checkbox" id="suspended">${this.app.lang.t('Suspended')}</input>
-						</div>
-						<div class="col-4">
-							<input type="checkbox" id="synchronous">${this.app.lang.t('Synchronous')}</input>
-						</div>
-						<div class="col-4">
+						<div class="col-3">
 							${this.app.lang.t('Monitoring')}
+						</div>
+						<div class="col">
 							<select id="monitoring" class="w100">
 		   						<option value="OFF">OFF</option> 
 		   						<option value="COARSE">${this.app.lang.t('COARSE')}</option> 
@@ -267,6 +264,22 @@ class StarterElement extends CidElement
 		   						<option value="FINE">${this.app.lang.t('FINE')}</option> 
 		 					</select>
 		 				</div>
+					</div>
+					<div class="row m-1">
+						<div class="col-3">
+							${this.app.lang.t('Suspended')}
+						</div>
+						<div class="col">
+							<input type="checkbox" id="suspended"></input>
+						</div>
+					</div>
+					<div class="row m-1">
+						<div class="col-3">
+							${this.app.lang.t('Synchronous')}
+						</div>
+						<div class="col">
+							<input type="checkbox" id="synchronous"></input>
+						</div>
 					</div>
 					
 					<div class="row m-1">

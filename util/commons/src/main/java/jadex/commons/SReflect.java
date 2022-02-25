@@ -2300,7 +2300,8 @@ public class SReflect
 		});
 		for(File fi: files)
 		{
-			if(fi.getName().endsWith(".class") && filter.filter(fi))
+			//if(fi.getName().endsWith(".class") && filter.filter(fi))
+			if(filter.filter(fi))
 			{
 				String fn = SUtil.convertPathToPackage(fi.getAbsolutePath(), urls);
 //				System.out.println("fn: "+fi.getName());

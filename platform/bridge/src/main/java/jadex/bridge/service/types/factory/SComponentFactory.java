@@ -3,6 +3,7 @@ package jadex.bridge.service.types.factory;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -984,8 +985,8 @@ public class SComponentFactory
 												break;
 										}
 									}
-									if(ret)
-										System.out.println("found: "+file);
+									//if(ret)
+									//	System.out.println("found: "+file);
 									return ret;
 								}
 							};
@@ -1031,12 +1032,17 @@ public class SComponentFactory
 			{
 				ls.getAllURLs().then(urls ->
 				{
+					// remark: this system out does not work for some reason (no printout on console)
 					//System.out.println("urls are: "+urls);
+					//for(URL u : urls)
+					//	System.out.println("url: "+u);
+					
 					getComponentModelsAsStream(component, urls.toArray(new URL[urls.size()])).next(res ->
 					{
 						ret.addIntermediateResult(res);
 						allres.add(res);
-						//System.out.println("ires: "+res);
+						//for(String[] stra: res)
+						//	System.out.println("ires: "+Arrays.toString(stra));
 					})
 					.max(max -> {/*System.out.println("max: "+max);*/ ret.setMaxResultCount(max);})
 					.finished(v ->
@@ -1082,6 +1088,10 @@ public class SComponentFactory
 				URL[] url = new URL[]{u};
 				
 				IFilter<Object>[] filters = getKernelFilters(component, urllist).toArray(new IFilter[0]);
+				
+				//for(Object f: filters)
+				//	System.out.println("kernelfilter: "+f.getClass());
+				
 				IFilter fil = new ComposedFilter(filters, ComposedFilter.OR);
 
 				try
@@ -1099,6 +1109,9 @@ public class SComponentFactory
 				//	.finished(v -> ret.setResult(res))
 				//	.catchEx(ex -> ret.setException(ex));
 				
+				//if(url[0].toString().indexOf("applications")!=-1 && url[0].toString().indexOf("bpmn")!=-1)
+				//	System.out.println("herrrrree");
+				
 				String[] res2 = SUtil.EMPTY_STRING_ARRAY;
 				try
 				{
@@ -1110,10 +1123,18 @@ public class SComponentFactory
 				}
 				
 				for(String r: res2)
-					res.add(new String[]{r, r});
-			
+				{
+					// strip suffix for name
+					String name = r;
+					int idx = r.lastIndexOf(".");
+					if(idx!=-1)
+						name = r.substring(0, idx);
+					res.add(new String[]{r, name});
+				}
+				
+				//if(url[0].toString().indexOf("applications")!=-1 && url[0].toString().indexOf("bpmn")!=-1)
 				//if(res.size()>0)
-				//	System.out.println("found for: "+url[0]+" "+res.size());
+				//System.out.println("found for: "+url[0]+" "+res.size());
 				
 				ret.setResult(res);
 				

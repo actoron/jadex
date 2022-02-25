@@ -239,6 +239,7 @@ class ModelTree extends CidElement
 	{
 		var ret = null;
 		var n = name.lastIndexOf(".");
+		
 		if(n>=0)
 		{
 			ret = {name: name.substring(n+1), pck: name.substring(0,n)};
@@ -247,6 +248,7 @@ class ModelTree extends CidElement
 		{
 			ret = {name: name, pck: null};
 		}
+		
 		return ret;
 	}
 		

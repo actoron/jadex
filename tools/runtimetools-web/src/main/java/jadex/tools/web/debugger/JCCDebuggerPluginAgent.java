@@ -117,7 +117,11 @@ public class JCCDebuggerPluginAgent extends JCCPluginAgent implements IJCCDebugg
 			SComponentFactory.getProperty(agent.getExternalAccess(compo), desc.getType(), "debugger.panel_web")
 			.then(filename ->
 			{
-				loadResource((String)filename).delegate(ret);
+				if(filename!=null)
+					loadResource((String)filename).delegate(ret);
+				else
+					ret.setException(new RuntimeException("No debugger.panel_web for component type defined"));
+					
 			});
 		}).catchEx(ret);
 		

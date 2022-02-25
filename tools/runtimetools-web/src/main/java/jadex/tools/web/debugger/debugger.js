@@ -182,7 +182,7 @@ class DebuggerElement extends CidElement
 						resolve(null);
 					}).catch(function(err) 
 					{
-						console.log("err: "+err);	
+						//console.log("err: "+err);	
 						self.debuggers[type] = null;
 						reject(err);
 					});
@@ -190,7 +190,7 @@ class DebuggerElement extends CidElement
 				else
 				{
 					let html = "<jadex-"+type+" cid='"+cid+"'></jadex-"+type+">";
-					console.log("Insert plugin element: " + type);
+					//console.log("Insert plugin element: " + type);
 					self.shadowRoot.getElementById("debugger").innerHTML = html;
 					resolve(null);
 				}
@@ -227,7 +227,7 @@ class DebuggerElement extends CidElement
 				resolve(fragment);
 			}).catch(function(err) 
 			{
-				console.log("err: "+err);	
+				console.log("Could not load debugger fragment"+err);	
 				reject(err);
 			});
 		});		
