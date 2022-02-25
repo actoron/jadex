@@ -13,7 +13,7 @@ import jadex.tools.web.jcc.JCCPluginAgent;
  *  Security web jcc plugin.
  */
 @ProvidedServices({@ProvidedService(name="bpmnweb", type=IJCCBpmnService.class)})
-@Agent(autostart=Boolean3.FALSE)
+@Agent(autostart=Boolean3.TRUE)
 public class JCCBpmnPluginAgent extends JCCPluginAgent implements IJCCBpmnService
 {
 	/** The agent. */
@@ -54,5 +54,6 @@ public class JCCBpmnPluginAgent extends JCCPluginAgent implements IJCCBpmnServic
 	public IFuture<byte[]> getPluginIcon()
 	{
 		return new Future<>((byte[])null);
+		//return loadResource("jadex/tools/web/chat/chat.png");
 	}
 }

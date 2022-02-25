@@ -11,6 +11,11 @@
 
 #content {
 	padding: 20px;
+	display: flex;
+}
+
+jadex-platform {
+	flex: 1;
 }
 
 table.actwtable {
@@ -190,6 +195,9 @@ fieldset, label {
 
 body{ 
     /*padding-top: 100px;*/
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
 	height: 100%;
 	padding: 0px; 
 	padding-bottom: 60px;
@@ -396,4 +404,13 @@ z-index: 1;
 
 .back-lightgray {
 	background-color: #F9F9F9;
+}
+
+jadex-app {
+	flex: 1;
+}
+
+#plugin {
+	display: flex;
+	height: 100%;
 }
