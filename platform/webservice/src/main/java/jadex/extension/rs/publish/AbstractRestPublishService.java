@@ -2863,7 +2863,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		
 		if(request.isAsyncStarted() && request.getAsyncContext() != null && !isComplete(request, response))
 		{
-			request.getAsyncContext().complete();
+			try
+			{
+				request.getAsyncContext().complete();
+			}
+			catch(Exception e)
+			{
+				System.out.println("Exception in context complete(): "+e);
+			}
 		}
 	}
 

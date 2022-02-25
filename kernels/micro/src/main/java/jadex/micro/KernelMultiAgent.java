@@ -231,7 +231,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	 */
 	public IFuture<byte[]> getComponentTypeIcon(String type)
 	{
-//		System.out.println("multi factory icon: "+type+" "+iconcache.containsKey(type));
+		//System.out.println("multi factory icon: "+type+" "+iconcache.containsKey(type));
 		
 		byte[] icon = iconcache.get(type);
 		
@@ -353,82 +353,98 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 			public void exceptionOccurred(Exception exception)
 			{
 //				System.out.println("getKernelFiles: "+model);
-				Map<String, Collection<Tuple2<String, Set<String>>>> kernelfiles = getKernelFiles();
-				Set<Tuple2<String, Set<String>>> found = new HashSet<>();
-				for(Map.Entry<String, Collection<Tuple2<String, Set<String>>>> entry: kernelfiles.entrySet())
+				getKernelFiles().then(kernelfiles -> 
 				{
-					if(model.endsWith(entry.getKey()))
+					Set<Tuple2<String, Set<String>>> found = new HashSet<>();
+					for(Map.Entry<String, Collection<Tuple2<String, Set<String>>>> entry: kernelfiles.entrySet())
 					{
-						found.addAll(entry.getValue());
+						if(model.endsWith(entry.getKey()))
+						{
+							found.addAll(entry.getValue());
+						}
 					}
-				}
-				final Iterator<Tuple2<String, Set<String>>> it = found.iterator();
-				
-				check(it, model, pojo, imports, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret));
+					final Iterator<Tuple2<String, Set<String>>> it = found.iterator();
+					
+					check(it, model, pojo, imports, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret));
+				}).catchEx(ret);
 			}
 		});
 		
 		return ret;
 	}
 	
+	
+	protected Future<Map<String, Collection<Tuple2<String, Set<String>>>>> scanfuture;
 	/**
 	 *  Scan files for kernel components.
 	 *  @return (suffix -> classname)
 	 */
-	protected Map<String, Collection<Tuple2<String, Set<String>>>> scanForKernels()
+	protected IFuture<Map<String, Collection<Tuple2<String, Set<String>>>>> scanForKernels()
 	{
-		MultiCollection<String, Tuple2<String, Set<String>>> ret = new MultiCollection<>();
-		
-//		System.out.println("MultiFactory scanning...");
-		
-//		List<URL> urls = new ArrayList<URL>();
-//		ClassLoader basecl = MultiFactory.class.getClassLoader();
-//		for(URL url: SUtil.getClasspathURLs(basecl, true))
-//		{
-//			// Hack to avoid at least some Java junk.
-//			if(!url.toString().contains("jre/lib/ext"))
-//			{
-//				urls.add(url);
-//			}
-//		}
-//		System.out.println(urls.size());
-		
-		ILibraryService ls = agent.getFeature(IRequiredServicesFeature.class).getLocalService(ILibraryService.class);
-		List<URL> urls2 = ls.getAllURLs().get();
-
-//		System.out.println("urls2: "+urls2.size());
-//		for(URL u: urls2)
-//			System.out.println(u);
-		for(Iterator<URL> it=urls2.iterator(); it.hasNext(); )
+		if(scanfuture==null)
 		{
-			String u = it.next().toString();
-			if(u.indexOf("jre/lib/ext")!=-1
-			//	|| u.indexOf("jadex")==-1
-				|| u.indexOf("SYSTEMCPRID")!=-1)
-			{
-				it.remove();
-			}
-		}
+			scanfuture = new Future<>();
 		
-		//System.out.println("scan: "+urls2.size());
-		
-//		System.out.println("urls: "+urls);
-		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls2.toArray(new URL[urls2.size()]), ffilter, cfilter);
-
-		for(ClassInfo ci: cis)
-		{
-			String[] types = getKernelSuffixes(ci);
+			MultiCollection<String, Tuple2<String, Set<String>>> ret = new MultiCollection<>();
 			
-			if(types!=null)
+			//System.out.println("MultiFactory scanning..."+Thread.currentThread()+" "+agent.isComponentThread());
+			
+	//		List<URL> urls = new ArrayList<URL>();
+	//		ClassLoader basecl = MultiFactory.class.getClassLoader();
+	//		for(URL url: SUtil.getClasspathURLs(basecl, true))
+	//		{
+	//			// Hack to avoid at least some Java junk.
+	//			if(!url.toString().contains("jre/lib/ext"))
+	//			{
+	//				urls.add(url);
+	//			}
+	//		}
+	//		System.out.println(urls.size());
+			
+			ILibraryService ls = agent.getFeature(IRequiredServicesFeature.class).getLocalService(ILibraryService.class);
+			//List<URL> urls2 = 
+			ls.getAllURLs().then(urls2 -> 
 			{
-				for(String type: types)
+				//System.out.println("urls2: "+urls2.size());
+		//		for(URL u: urls2)
+		//			System.out.println(u);
+				for(Iterator<URL> it=urls2.iterator(); it.hasNext(); )
 				{
-					ret.add(type, new Tuple2<String, Set<String>>(ci.getClassName(), SUtil.arrayToSet(types)));
+					String u = it.next().toString();
+					if(u.indexOf("jre/lib/ext")!=-1
+					//	|| u.indexOf("jadex")==-1
+						|| u.indexOf("SYSTEMCPRID")!=-1)
+					{
+						it.remove();
+					}
 				}
-			}
+				
+				//System.out.println("scan: "+urls2.size());
+				
+		//		System.out.println("urls: "+urls);
+				Set<ClassInfo> cis = SReflect.scanForClassInfos(urls2.toArray(new URL[urls2.size()]), ffilter, cfilter);
+				//System.out.println("scan end: "+cis);
+				
+				for(ClassInfo ci: cis)
+				{
+					String[] types = getKernelSuffixes(ci);
+					
+					if(types!=null)
+					{
+						for(String type: types)
+						{
+							ret.add(type, new Tuple2<String, Set<String>>(ci.getClassName(), SUtil.arrayToSet(types)));
+						}
+					}
+				}
+				
+				scanfuture.setResult(ret);
+				scanfuture = null;
+				
+			}).catchEx(scanfuture);
 		}
 		
-		return ret;
+		return scanfuture;
 	}
 	
 	/**
@@ -714,6 +730,8 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 			allcomponenttypes = new HashSet<String>();
 			allannotationtypes = new HashMap<String, String>();
 			
+			// todo: use scanForKernels()
+			
 			for(String kk: known_kernels)
 			{
 				// todo: use library loader (needs rid besides classname)
@@ -755,6 +773,9 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 					agent.getLogger().info("Predefined Jadex kernel not available: "+kk+", "+e);
 				}
 			}
+			
+			//System.out.println("comp types: "+allcomponenttypes);
+			//System.out.println("ann types: "+allannotationtypes);
 		}
 	}
 	
@@ -882,12 +903,24 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	/**
 	 *  Get all kernel files, i.e. specs to start a kernel.
 	 */
-	protected Map<String, Collection<Tuple2<String, Set<String>>>> getKernelFiles()
+	protected Future<Map<String, Collection<Tuple2<String, Set<String>>>>> getKernelFiles()
 	{
+		Future<Map<String, Collection<Tuple2<String, Set<String>>>>> ret = new Future<>();
 		if(kernelfiles==null || dirty)
-			kernelfiles = scanForKernels();
-		dirty = false;
-		return kernelfiles;
+		{
+			scanForKernels().then(kfs -> 
+			{
+				kernelfiles = kfs;
+				dirty = false;
+				ret.setResult(kernelfiles);
+			});
+		}
+		else if(kernelfiles!=null)
+		{
+			ret.setResult(kernelfiles);
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -950,35 +983,37 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 		if(!isLoadable(model))
 			return IFuture.FALSE;
 		
-		final int fcnt = cnt++;
-		//if(model.indexOf("HelplineAgent")!=-1)
-		//	System.out.println("isLoadable: "+model+" "+fcnt);
-
 		Future<Boolean> ret = new Future<>();
+
+		final int fcnt = cnt++;
+		//if(model.indexOf("ANDL")!=-1)
+		//{
+			//System.out.println("isLoadable: "+model+" "+fcnt);
+			//ret.then(x -> System.out.println("isLoadableFin: "+model)).catchEx(ex ->System.out.println("isLoadableFin (ex): "+model));
+		//}
 		
 		getFactoryForModel(model, pojo, imports, rid).addResultListener(new IResultListener<IComponentFactory>()
 		{
 			public void resultAvailable(IComponentFactory fac)
 			{
-				//if(model.indexOf("HelplineAgent")!=-1)
-				//	System.out.println("is Loadable middle: "+model+" "+fac+" "+fcnt);
+				//if(model.indexOf("ANDL")!=-1)
+				//System.out.println("is Loadable middle: "+model+" "+fac+" "+fcnt);
 
 				fac.isLoadable(model, pojo, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret)
 				{
 					public void customResultAvailable(Boolean result)
 					{
 						super.customResultAvailable(result);
-////						if(model.indexOf("Block")!=-1)
-						//if(model.indexOf("HelplineAgent")!=-1)
-						//	System.out.println("is Loadable end: "+model+" "+result+" "+fcnt);
+						//if(model.indexOf("ANDL")!=-1)
+						//System.out.println("is Loadable end: "+model+" "+result+" "+fcnt);
 					}
 				});
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				//if(model.indexOf("HelplineAgent")!=-1)
-				//	System.out.println("is Loadable ex: "+exception+" "+model+" "+fcnt);
+				//if(model.indexOf("ANDL")!=-1)
+				//System.out.println("is Loadable ex: "+exception+" "+model+" "+fcnt);
 				ret.setResult(false);
 			}
 		});

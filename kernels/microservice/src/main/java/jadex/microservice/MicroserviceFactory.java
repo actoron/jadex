@@ -260,7 +260,7 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	{
 		Future<Boolean> ret = new Future<Boolean>();
 		
-	//	System.out.println("isLoadable (micro): "+model+" "+rid);
+		//System.out.println("isLoadable (microservice): "+model+" "+rid);
 		
 		if(model.toLowerCase().endsWith(".class"))
 		{
