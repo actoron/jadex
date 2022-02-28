@@ -156,30 +156,6 @@ class StarterElement extends CidElement
 			ret.push(super.styles);
 		ret.push(
 		    css`
-	    	/* Navbar styling. */
-	    	/* background color. */
-	    	.navbar-custom {
-	    		background-color: #aaaaaa;
-	    	}
-	    	/* brand and text color */
-	    	.navbar-custom .navbar-brand,
-	    	.navbar-custom .navbar-text {
-	    		color: rgba(255,255,255,.8);
-	    	}
-	    	/* link color */
-	    	.navbar-custom .navbar-nav .nav-link {
-	    		color: rgba(255,255,255,.5);
-	    	}
-	    	/* color of active or hovered links */
-	    	.navbar-custom .nav-item.active .nav-link,
-	    	.navbar-custom .nav-item:focus .nav-link,
-	    	.navbar-custom .nav-item:hover .nav-link {
-	    		color: #ffffff;
-	    	}
-	    	
-	    	.w100 {
-				width: 100%;
-			}
 			.loader {
 				border: 8px solid #f3f3f3;
 				border-top: 8px solid #070707; 
@@ -192,116 +168,108 @@ class StarterElement extends CidElement
 	  			0% { transform: rotate(0deg); }
 	  			100% { transform: rotate(360deg); }
 			}
+			
+			.flex-container {
+				display: flex;
+				flex-direction: column;
+			}
+			.grid-container {
+				display: grid;
+				grid-template-columns: min-content auto; 
+				grid-template-rows: repeat(8, minmax(min-content, max-content));
+				grid-gap: 10px;
+				align-items: center;
+			}
+			.span {
+				grid-column: 1 / span 2;
+			}
+			.right { 
+				justify-self: right;
+			}
+			.row-flex-container {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				flex-shrink: 0;
+			}
+			.flexgrow {
+				flex-grow: 1;
+			}
+			.yscrollable {
+				overflow-y: auto;
+			}
+			.marginright {
+				margin-right: 1em;
+			}
+			.marginleft {
+				margin-right: 1em;
+			}
+			.marginbottom {
+				margin-bottom: 0.3em;
+			}
 		    `);
 		return ret;
 	}
 	
 	asyncRender() {
 		return html`
-			<div class="container-fluid m-0 p-0">
-				<div class="row m-0 p-0">
-					<div class="col-12 m-0 p-0">
-						<h3>${this.app.lang.t('Components')}</h3>
-						<jadex-componenttree cid='${this.cid}'></jadex-componenttree>
-					</div>
+			<div id="panel" class="flex-container">
+				<div>
+					<h3>${this.app.lang.t('Components')}</h3>
+					<jadex-componenttree cid='${this.cid}'></jadex-componenttree>
 				</div>
 				
-				<div class="row m-0 p-0">
-					<div class="col-12 m-0 p-0">
-						<h3>${this.app.lang.t('Available Models')}</h3>
-						<jadex-modeltree cid='${this.cid}'></jadex-modeltree>
-					</div>
+				<div>
+					<h3>${this.app.lang.t('Available Models')}</h3>
+					<jadex-modeltree cid='${this.cid}'></jadex-modeltree>
 				</div>
 				
 				${this.model!=null? html`
-				<div class="bgwhitealpha m-0 p-0"> <!-- sticky-top  -->
-					<div class="row m-1">
-						<div class="col-12">
-							<h3>${this.app.lang.t('Settings')}</h3>
-						</div>
-					</div>
-					<div class="row m-1">
-						<div class="col-3">
-							${this.app.lang.t('Filename')}
-						</div>
-						<div class="col" id="filename">
-							<input type="text" ref="filename" class="w100" value="${this.model!=null? this.model.filename: ''}">
-						</div>
-					</div>
-					<div class="row m-1">
-						<div class="col-3">
-							${this.app.lang.t('Configuration')}
-						</div>
-						<div class="col">
-							<select id="config" class="w100">
-		   						${this.getConfigurationNames().map((c) => html`<option value="${c}"></option>`)}
-		 					</select>
-						</div>
-					</div>
-					<div class="row m-1">
-						<div class="col-3">
-							${this.app.lang.t('Component name')}
-						</div>
-						<div class="col-4">
-							<input type="text" class="w100" value="${this.model!=null && this.model.instancename!=null? this.model.instancename: ''}" id="name"></input>
-						</div>
-						<div class="col-3">
-							<input type="checkbox" id="autogen">${this.app.lang.t('Auto generate')}</input>
-						</div>
-						<div class="col">
-							<input class="w100" type="number" value="1" id="gencnt"></input>
-						</div>
-					</div>
-					<div class="row m-1">
-						<div class="col-3">
-							${this.app.lang.t('Monitoring')}
-						</div>
-						<div class="col">
-							<select id="monitoring" class="w100">
-		   						<option value="OFF">OFF</option> 
-		   						<option value="COARSE">${this.app.lang.t('COARSE')}</option> 
-		   						<option value="MEDIUM">${this.app.lang.t('MEDIUM')}</option> 
-		   						<option value="FINE">${this.app.lang.t('FINE')}</option> 
-		 					</select>
-		 				</div>
-					</div>
-					<div class="row m-1">
-						<div class="col-3">
-							${this.app.lang.t('Suspended')}
-						</div>
-						<div class="col">
-							<input type="checkbox" id="suspended"></input>
-						</div>
-					</div>
-					<div class="row m-1">
-						<div class="col-3">
-							${this.app.lang.t('Synchronous')}
-						</div>
-						<div class="col">
-							<input type="checkbox" id="synchronous"></input>
+				<div class="bgwhitealpha grid-container w100">
+					<h3 class="span">${this.app.lang.t('Settings')}</h3>
+					
+					${this.app.lang.t('Filename')}
+					<input type="text" ref="filename" class="w100" value="${this.model!=null? this.model.filename: ''}">
+					
+					${this.app.lang.t('Configuration')}
+					<select id="config" class="w100">
+		   				${this.getConfigurationNames().map((c) => html`<option value="${c}"></option>`)}
+		 			</select>
+					
+					${this.app.lang.t('Component Name')}
+					<div>
+						<input type="text" class="w100 marginbottom" value="${this.model!=null && this.model.instancename!=null? this.model.instancename: ''}" id="name"></input>
+						<div class="row-flex-container">
+							<span class="marginright">${this.app.lang.t('Auto generate')}</span>
+							<input class="marginright" type="checkbox" id="autogen"></input>
+							<input class="flexgrow" type="number" value="1" id="gencnt"></input>
 						</div>
 					</div>
 					
-					<div class="row m-1">
+					${this.app.lang.t('Monitoring')}
+					<select id="monitoring" class="w100">
+		   				<option value="OFF">OFF</option> 
+		   				<option value="COARSE">${this.app.lang.t('COARSE')}</option> 
+		   				<option value="MEDIUM">${this.app.lang.t('MEDIUM')}</option> 
+		   				<option value="FINE">${this.app.lang.t('FINE')}</option> 
+		 			</select>
+					
+					${this.app.lang.t('Suspended')}
+					<input type="checkbox" id="suspended"></input>
+					
+					${this.app.lang.t('Synchronous')}
+					<input type="checkbox" id="synchronous"></input>
+					
+					<div class="${this.getArguments().length==0? 'hidden': ''}">
 						${this.getArguments().map((arg, i) => html`
-						<div class="col-4"">
-							${"["+arg.clazz.value+"] "+arg.name}
-						</div>
-						<div class="col-4 p-0">
-							<input class="w100" type="text" value="${arg.value!=null? arg.value: ''}" readonly></input>
-						</div>
-						<div class="col-4 pl-2"> 
-							<input class="w100" type="text" id="${'arg_'+i}">
-						</div>
+						${"["+arg.clazz.value+"] "+arg.name}
+						<input class="w100" type="text" value="${arg.value!=null? arg.value: ''}" readonly></input>
+						<input class="w100" type="text" id="${'arg_'+i}">
 						`)}
 					</div>
 					
-					<div class="row m-1">
-						<div class="col-10">
-						</div>
-						<div class="col-2">
-							<button class=" float-right" @click="${e => this.start(e)}">Start</button> <!-- class="w100" -->
-						</div>
+					<div class="span right">
+						<button class="jadexbtn" @click="${e => this.start(e)}">Start</button>
 					</div>
 				</div>
 				`: ''}

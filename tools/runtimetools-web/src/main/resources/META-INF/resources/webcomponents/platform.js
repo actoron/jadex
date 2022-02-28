@@ -168,7 +168,7 @@ class PlatformElement extends CidElement
 			{
 				this.loadPlugin(pi.name).then(function()
 				{
-					let html = "<jadex-"+name+" cid='"+self.cid+"'></jadex-"+name+">";
+					let html = "<jadex-"+name+" cid='"+self.cid+"'"+" class='w100'></jadex-"+name+">";
 					//console.log("Insert plugin element: " + p.name);
 					self.shadowRoot.getElementById("plugin").innerHTML = html;
 					//console.log("Req update: " + p.name);

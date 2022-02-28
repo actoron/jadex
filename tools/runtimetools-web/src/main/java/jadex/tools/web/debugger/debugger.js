@@ -18,10 +18,9 @@ class DebuggerElement extends CidElement
 		this.breakpoints = []; // active breakpoints selected by user
 		this.sub = {};
 		
+		// load subcomponent
 		var res = "jadex/tools/web/commons/componenttree.js";
 		var ures = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String";
-
-		// load subcomponent
 		return this.loadSubmodule(ures);
 	}
 	
