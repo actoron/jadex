@@ -114,6 +114,8 @@ class StarterElement extends CidElement
 			var gen = this.shadowRoot.getElementById("autogen").checked;
 			var gencnt = this.shadowRoot.getElementById("gencnt").value;
 			var name = this.shadowRoot.getElementById("name").value;
+			if(name.length==0)
+				name = null;
 
 			var args = {};
 			if(this.model!=null && this.model.arguments!=null)
@@ -133,19 +135,40 @@ class StarterElement extends CidElement
 			ci.synchronous = sync;
 			ci.suspend = sus;
 			ci.monitoring = mon;
-			if(name!=null && name.length>0)
-				ci.name = name;
+			
 			ci.arguments = args;
 			
-			//axios.get(self.getMethodPrefix()+'&methodname=createComponent&args_0='+selected+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
-			//console.log("starting: "+ci);
-			axios.get(this.getMethodPrefix()+'&methodname=createComponent&args_0='+JSON.stringify(ci)
-				+"&argtypes_0=jadex.bridge.service.types.cms.CreationInfo", this.transform).then(function(resp)
+			var an = gen? null: name===this.model.name || name===this.model.nameHint? null: name;
+			
+			if(an==null) // i.e. name auto generate
 			{
-				// todo: show running components?!
-				//console.log("started: "+resp.data);
-				self.createInfoMessage("Started component "+resp.data.name+" ["+self.model.filename+"]"); 
-			});
+				for(var i=0; i<gencnt; i++)
+				{
+					//axios.get(self.getMethodPrefix()+'&methodname=createComponent&args_0='+selected+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
+					//console.log("starting: "+ci);
+					axios.get(this.getMethodPrefix()+'&methodname=createComponent&args_0='+JSON.stringify(ci)
+						+"&argtypes_0=jadex.bridge.service.types.cms.CreationInfo", this.transform).then(function(resp)
+					{
+						// todo: show running components?!
+						//console.log("started: "+resp.data);
+						self.createInfoMessage("Started component "+i+" "+resp.data.name+" ["+self.model.filename+"]"); 
+					});
+				}
+			}
+			else
+			{
+				ci.name = an;
+				
+				//axios.get(self.getMethodPrefix()+'&methodname=createComponent&args_0='+selected+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
+				//console.log("starting: "+ci);
+				axios.get(this.getMethodPrefix()+'&methodname=createComponent&args_0='+JSON.stringify(ci)
+					+"&argtypes_0=jadex.bridge.service.types.cms.CreationInfo", this.transform).then(function(resp)
+				{
+					// todo: show running components?!
+					//console.log("started: "+resp.data);
+					self.createInfoMessage("Started component "+resp.data.name+" ["+self.model.filename+"]"); 
+				});
+			}
 		}
 	}
 		
