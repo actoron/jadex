@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.VersionInfo;
@@ -535,13 +536,14 @@ public class PlatformAgent
 			{
 				try
 				{
-					if(!agent.getId().getRoot().equals(result.getId().getRoot()))
+					IComponentIdentifier cid = result!=null && result.getId()!=null? result.getId(): null;
+					if(cid!=null && !agent.getId().getRoot().equals(cid.getRoot()))
 					{
 						//System.out.println("found platform: "+result.getId());//+" "+SComponentManagementService.containsComponent(result.getId()));
 						Map<String, Object> args = new HashMap<>();
-						args.put("component", result.getId());
+						args.put("component", cid);
 						agent.createComponent(new CreationInfo().setFilename("jadex.platform.service.remote.ProxyAgent.class")
-							.setArguments(args).setName(result.getId().toString()));
+							.setArguments(args).setName(cid.toString()));
 					}
 				}
 				catch(Exception e)

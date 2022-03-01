@@ -42,7 +42,7 @@ class StarterElement extends CidElement
 		{
 			this.listener = (e) => 
 			{
-				//console.log("jadex model event: "+e)
+				console.log("received jadex model event: "+e)
 				self.model = e.detail.model;
 				self.requestUpdate();
 			}
@@ -230,6 +230,9 @@ class StarterElement extends CidElement
 			.marginbottom {
 				margin-bottom: 0.3em;
 			}
+			.alignleft {
+				justify-self: flex-start;
+			}
 		    `);
 		return ret;
 	}
@@ -278,10 +281,10 @@ class StarterElement extends CidElement
 		 			</select>
 					
 					${this.app.lang.t('Suspended')}
-					<input type="checkbox" id="suspended"></input>
+					<input type="checkbox" class="alignleft" id="suspended"></input>
 					
 					${this.app.lang.t('Synchronous')}
-					<input type="checkbox" id="synchronous"></input>
+					<input type="checkbox" class="alignleft" id="synchronous"></input>
 					
 					<div class="${this.getArguments().length==0? 'hidden': ''}">
 						${this.getArguments().map((arg, i) => html`

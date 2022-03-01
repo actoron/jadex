@@ -495,9 +495,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					
 					writeResponse(ri.setStatus(Response.Status.OK.getStatusCode()).setFinished(true));
 				}
-				else
+				else if(terminate!=null && rinfo.getFuture()==null)
 				{
-					System.out.println("UNKNOWN client message: "+callid+" "+request);
+					rinfo.setTerminated(true);
+					writeResponse(ri.setStatus(Response.Status.OK.getStatusCode()).setFinished(true));
+				}
+				else if(terminate!=null)
+				{
+					System.out.println("Future cannot be terminated: "+callid+" "+request);
 					writeResponse(ri.setStatus(Response.Status.NOT_FOUND.getStatusCode()).setFinished(true));
 				}
 				
@@ -601,10 +606,21 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 								final Method method = mi.getMethod();
 								final Object ret = method.invoke(service, params);
 								ri.setMethod(method);
+
+								if(ret instanceof IFuture)
+									cinfo.setFuture((IFuture<?>)ret);
+
+								// Call can already be terminated from client
+								if(cinfo.isTerminated())
+								{
+									if(ret instanceof ITerminableFuture)
+										((ITerminableFuture)ret).terminate();
+									else
+										System.out.println("Call cannot be terminated, future not terminable: "+method+" "+callid);
+								}
 								
 								if(ret instanceof IIntermediateFuture)
 								{
-									cinfo.setFuture((IFuture<?>)ret);
 									writeResponse(ri.setResult("sse").setStatus(Response.Status.OK.getStatusCode()).setMappingInfo(mi).setFinished(true));
 
 									/*if(session.getAttribute("sse")!=null)
@@ -3110,16 +3126,16 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		{
 			this.session = session;
 			//this.mappingInfo = mappingInfo;
-			this.future = future;
+			//this.future = future;
 			//this.lastcheck = System.currentTimeMillis();
 		}
 
 		/**
 		 *  Set it to terminated.
 		 */
-		public void setTerminated()
+		public void setTerminated(boolean term)
 		{
-			terminated = true;
+			terminated = term;
 		}
 
 		/**
