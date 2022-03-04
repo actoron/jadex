@@ -662,7 +662,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					ri.setCallid(fcallid);
 					
 					//final ConversationInfo cinfo = new ConversationInfo(getSession(request, true));
-					final ConversationInfo cinfo = new ConversationInfo(getSession(sessionid, true));
+					final ConversationInfo cinfo = new ConversationInfo(sessionid);
 					conversationinfos.put(fcallid, cinfo);
 	
 					// Check security
@@ -1164,7 +1164,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		boolean ret = false;
 		ConversationInfo cinfo = conversationinfos.get(callid);
 		if(cinfo!=null)
-			ret = cinfo.getSession().get("loggedin")==Boolean.TRUE;
+			ret = getSession(cinfo.getSessionId(), false).get("loggedin")==Boolean.TRUE;
 		return new Future<>(ret? Boolean.TRUE: Boolean.FALSE);
 	}
 	
@@ -3209,16 +3209,16 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		
 		protected IFuture<?> future;
 		
-		protected Map<String, Object> session;
+		protected String sessionid;
 		
 		/**
 		 *  Create a request info.
 		 */
 		//public RequestInfo(MappingInfo mappingInfo, IFuture<?> future)
-		public ConversationInfo(Map<String, Object> session)
+		public ConversationInfo(String sessionid)
 		//public ConversationInfo(HttpSession session, IFuture<?> future)
 		{
-			this.session = session;
+			this.sessionid = sessionid;
 			//this.mappingInfo = mappingInfo;
 			//this.future = future;
 			//this.lastcheck = System.currentTimeMillis();
@@ -3339,17 +3339,17 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		/**
 		 * @return the session
 		 */
-		public Map<String, Object> getSession() 
+		public String getSessionId() 
 		{
-			return session;
+			return sessionid;
 		}
 
 		/**
 		 * @param session the session to set
 		 */
-		public void setSession(Map<String, Object> session) 
+		public void setSessionId(String sessionid) 
 		{
-			this.session = session;
+			this.sessionid = sessionid;
 		}
 		
 		/**
