@@ -256,11 +256,11 @@ class ModelTree extends CidElement
 	{
 		var self = this;
 		
-		console.log("selected: "+filename);
+		//console.log("selected: "+filename);
 		
 		axios.get(this.getMethodPrefix()+'&methodname=loadComponentModel&args_0='+filename+"&argtypes_0=java.lang.String", this.transform).then(function(resp)
 		{
-			console.log("selected model is (event dispatch): "+resp.data);
+			//console.log("selected model is (event dispatch): "+resp.data);
 			
 			var event = new CustomEvent("jadex-model-selected", 
 			{ 

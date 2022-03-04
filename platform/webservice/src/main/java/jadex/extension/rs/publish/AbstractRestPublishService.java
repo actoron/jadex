@@ -52,6 +52,7 @@ import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.LeaseTimeMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -172,6 +173,13 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	/** The binary processor. */
 	protected JadexBinarySerializer binser;
 	
+	/** The sessions. Cannot use built-in due to problem with concurrent inital requests (and also after platform restart). 
+	    Two requests (sse, subscribeX) arrive at server with the same jsessionid -> session not known, server
+	    creates a new one for both with different ids.
+	    https://community.oracle.com/tech/developers/discussion/1455774/multiple-sessions-created. 
+	 */
+	protected Map<String, Map<String, Object>> sessions;
+	
 	/**
 	 * The service init.
 	 */
@@ -198,6 +206,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		converters = new MultiCollection<String, IObjectStringConverter>();
 		conversationinfos = new LinkedHashMap<String, ConversationInfo>();
 		sseevents = new ArrayList<SSEEvent>();
+		sessions = new LeaseTimeMap<String, Map<String,Object>>(1000*60*10);// new HashMap<String, Map<String,Object>>();
 
 		// todo: move this code out
 		IObjectStringConverter jsonc = new IObjectStringConverter()
@@ -328,6 +337,73 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	}
 	
 	/**
+	 *  Get a session.
+	 *  @param request The request
+	 *  @param create Flag if shall be created.
+	 *  @return The session.
+	 */
+	public Map<String, Object> getSession(HttpServletRequest request, boolean create)
+	{
+		String id = getSessionId(request);
+		return getSession(id, create);
+	}
+	
+	/**
+	 *  Get a session.
+	 *  @param request The request
+	 *  @param create Flag if shall be created.
+	 *  @return The session.
+	 */
+	public Map<String, Object> getSession(String sessionid, boolean create)
+	{
+		if(sessionid==null && !create)
+			return null;
+		else if(sessionid==null)
+			throw new RuntimeException("Session id null, no jadex cookie for session provided by client");
+		
+		Map<String, Object> session = sessions.get(sessionid);
+		
+		if(session==null && create)
+		{
+			session = new HashMap<String, Object>();
+			sessions.put(sessionid, session);
+		}
+	
+		return session;
+	}
+	
+	/**
+	 *  Get a session id.
+	 *  @param request The request
+	 *  @return The session id.
+	 */
+	public String getSessionId(HttpServletRequest request)
+	{
+		String cookie = request.getHeader("cookie");
+		String id = null;
+		
+		if(cookie!=null)
+		{
+			StringTokenizer stok = new StringTokenizer(cookie, ";");
+			while(stok.hasMoreTokens())
+			{
+				String c = stok.nextToken();
+
+				int del = c.indexOf("=");
+				String name = c.substring(0, del).trim();
+				
+				if("jadex".equals(name))
+				{
+					id = c.substring(del+1, c.length()).trim();
+					break;
+				}
+			}
+		}
+		
+		return id;
+	}
+	
+	/**
 	 *  Turn on or off the login security.
 	 *  If true one has to log in with platform secret before using published services.
 	 *  @param sec On or off.
@@ -409,7 +485,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 		// https://stackoverflow.com/questions/14139753/httpservletrequest-getsessiontrue-thread-safe
 		// solution: always create on container thread and remember
-		final HttpSession session = request.getSession(true);
+		//final Map<String, Object> session = getSession(request, true);
+		final String sessionid = getSessionId(request);
 		
 		//if(request.getRequestURI().indexOf("subscribeTo")!=-1)
 		//System.out.println("handleRequest: "+request.getRequestURI()+" session: "+request.getSession().getId());
@@ -584,7 +661,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					ServiceCall.getOrCreateNextInvocation().setProperty("callid", fcallid);
 					ri.setCallid(fcallid);
 					
-					final ConversationInfo cinfo = new ConversationInfo(request.getSession());
+					//final ConversationInfo cinfo = new ConversationInfo(getSession(request, true));
+					final ConversationInfo cinfo = new ConversationInfo(getSession(sessionid, true));
 					conversationinfos.put(fcallid, cinfo);
 	
 					// Check security
@@ -686,6 +764,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 										 */
 										protected void handleResult(Object result, Throwable exception, Object command, Integer max)
 										{
+											//if(result!=null)
+											//	System.out.println("handleResult: "+result);
+											
 											//if(max!=null)
 											//if(command==null)
 											//	System.out.println("handleResult:"+result+", "+exception+", "+command+", sse:"+(session.getAttribute("sse")!=null));
@@ -699,19 +780,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 											}*/
 											
 											ResponseInfo ri = new ResponseInfo().setCallid(fcallid).setMappingInfo(mi).setMethod(method);
-											
-											AsyncContext ctx = (AsyncContext)session.getAttribute("sse");
-											if(ctx!=null)
-											{
-												ri.setRequest((HttpServletRequest)ctx.getRequest());
-												ri.setResponse((HttpServletResponse)ctx.getResponse());
-											}
-											else
-											{
-												System.out.println("No sse connection, delay sending: "+result+" "+session);
-												sseevents.add(createSSEEvent(ri));
-												return;
-											}
 											
 											if(FINISHED.equals(result))
 											{
@@ -734,6 +802,20 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 											
 											if(max!=null)
 												ri.setMax(max);
+											
+											final Map<String, Object> session = getSession(sessionid, true);
+											AsyncContext ctx = (AsyncContext)session.get("sse");
+											if(ctx!=null)
+											{
+												ri.setRequest((HttpServletRequest)ctx.getRequest());
+												ri.setResponse((HttpServletResponse)ctx.getResponse());
+											}
+											else
+											{
+												System.out.println("No sse connection, delay sending: "+result+" "+session);
+												sseevents.add(createSSEEvent(ri));
+												return;
+											}
 											
 											if(cinfo!=null && cinfo.isTerminated())
 											{
@@ -926,21 +1008,19 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					if(ah!=null && ah.toLowerCase().indexOf(MediaType.SERVER_SENT_EVENTS)!=-1)
 					{
 						// SSE flag in session 
-						request.getSession().setAttribute("sse", request.getAsyncContext()); 
+						getSession(sessionid, true).put("sse", request.getAsyncContext()); 
 						
 						response.setContentType(MediaType.SERVER_SENT_EVENTS+"; charset=utf-8");
 					    response.setCharacterEncoding("UTF-8");
 					    response.setStatus(HttpServletResponse.SC_OK);
 						//out.write("data: {'a': 'a'}\n\n");
 						response.flushBuffer();
-					    System.out.println("sse connection saved: "+request.getAsyncContext()+" "+request.getSession().getId());
+					    System.out.println("sse connection saved: "+request.getAsyncContext()+" "+getSessionId(request));
 					    
-					    sendDelayedSSEEvents(request.getSession());
+					    sendDelayedSSEEvents(getSession(sessionid, true));
 					}
 					else
 					{
-						
-						
 						response.setContentType(MediaType.TEXT_HTML+"; charset=utf-8");
 						String info = getServiceInfo(service, getServletUrl(request), pm);
 						out.write(info);
@@ -948,7 +1028,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						response.setStatus(HttpServletResponse.SC_OK);
 						complete(request, response);
 						
-						System.out.println("info site sent");
+						//System.out.println("info site sent");
 					}
 				}
 			}
@@ -956,12 +1036,13 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	}
 	
 	/**
-	 * 
+	 * Send the delayed events which have been collected during connection loss.
+	 * Must check if callid belongs to still ongoing call (could be terminated).
 	 */
-	protected void sendDelayedSSEEvents(HttpSession session)
+	protected void sendDelayedSSEEvents(Map<String, Object> session)
 	{
 		int cnt = sseevents.size();
-		AsyncContext ctx = (AsyncContext)session.getAttribute("sse");
+		AsyncContext ctx = (AsyncContext)session.get("sse");
 		HttpServletResponse response;
 		if(ctx!=null)
 		{
@@ -974,8 +1055,15 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			{
 				for(SSEEvent event: sseevents)
 				{
-					String ret = createSSEJson(event);
-					response.getWriter().write(ret);				
+					if(conversationinfos.containsKey(event.getCallId()))
+					{
+						String ret = createSSEJson(event);
+						response.getWriter().write(ret);	
+					}
+					else
+					{
+						System.out.println("trashing delayed but obsolete event: "+event);
+					}
 				}
 			
 				response.flushBuffer();
@@ -1031,7 +1119,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		ss.checkPlatformPassword(secret).then((Boolean ok) ->
 		{
 			if(ok)
-				request.getSession().setAttribute("loggedin", Boolean.TRUE);
+				getSession(request, true).put("loggedin", Boolean.TRUE);
 			ret.setResult(ok);
 		}).catchEx((Exception e) -> 
 		{
@@ -1048,8 +1136,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	public IFuture<Boolean> logout(HttpServletRequest request)
 	{
 		boolean ret = true;
-		if(request.getSession(false)!=null)
-			request.getSession(false).removeAttribute("loggedin");
+		if(getSession(request, false)!=null)
+			getSession(request, false).remove("loggedin");
 		else
 			ret = false;
 		return new Future<Boolean>(ret);
@@ -1062,8 +1150,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 */
 	public boolean isLoggedIn(HttpServletRequest request)
 	{
-		HttpSession sess = request.getSession(false);
-		return sess!=null && sess.getAttribute("loggedin")==Boolean.TRUE;
+		Map<String, Object> sess = getSession(request, false);
+		return sess!=null && sess.get("loggedin")==Boolean.TRUE;
 	}
 	
 	/**
@@ -1076,7 +1164,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		boolean ret = false;
 		ConversationInfo cinfo = conversationinfos.get(callid);
 		if(cinfo!=null)
-			ret = cinfo.getSession().getAttribute("loggedin")==Boolean.TRUE;
+			ret = cinfo.getSession().get("loggedin")==Boolean.TRUE;
 		return new Future<>(ret? Boolean.TRUE: Boolean.FALSE);
 	}
 	
@@ -1892,6 +1980,12 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				// Wrap content in SSE event class to add Jadex meta info 
 				SSEEvent event = createSSEEvent(ri);
 	
+				if(!conversationinfos.containsKey(event.getCallId()))
+				{
+					System.out.println("trashing obsolete event: "+event);
+					return;
+				}
+				
 				if(ri.isSSEConnectionAvailable())
 				{
 					PrintWriter out = ri.getResponse().getWriter();
@@ -2038,7 +2132,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	}
 	
 	/**
-	 * 
+	 *  Create an sse event for a JavaSSE event.
 	 */
 	protected String createSSEJson(SSEEvent event)
 	{
@@ -3115,13 +3209,13 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		
 		protected IFuture<?> future;
 		
-		protected HttpSession session;
+		protected Map<String, Object> session;
 		
 		/**
 		 *  Create a request info.
 		 */
 		//public RequestInfo(MappingInfo mappingInfo, IFuture<?> future)
-		public ConversationInfo(HttpSession session)
+		public ConversationInfo(Map<String, Object> session)
 		//public ConversationInfo(HttpSession session, IFuture<?> future)
 		{
 			this.session = session;
@@ -3245,7 +3339,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		/**
 		 * @return the session
 		 */
-		public HttpSession getSession() 
+		public Map<String, Object> getSession() 
 		{
 			return session;
 		}
@@ -3253,7 +3347,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		/**
 		 * @param session the session to set
 		 */
-		public void setSession(HttpSession session) 
+		public void setSession(Map<String, Object> session) 
 		{
 			this.session = session;
 		}
@@ -3384,7 +3478,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	/**
 	 *  Info struct for response.
 	 */
-	public static class ResponseInfo
+	public class ResponseInfo
 	{
 		protected Object result;
 		protected Exception exception;
@@ -3621,9 +3715,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		public boolean isSSEConnectionAvailable()
 		{
 			boolean ret = false;
-			HttpSession session = getRequest().getSession(false);
+			Map<String, Object> session = getSession(getRequest(), false);
 			if(session!=null)
-				ret = session.getAttribute("sse")!=null;
+				ret = session.get("sse")!=null;
 			return ret;
 		}
 	}
@@ -3633,10 +3727,19 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 */
 	public static class SSEEvent
 	{
+		/** The real data. */
 		protected Object data;
+		
+		/** Exception type name when exception has occurred. */
 		protected String execptiontype;
+		
+		/** The max value. */
 		protected Integer max;
+		
+		/** Flag indicating if the call is finished. */
 		protected boolean finished;
+		
+		/** The callid. */
 		protected String callid;
 		
 		public SSEEvent()

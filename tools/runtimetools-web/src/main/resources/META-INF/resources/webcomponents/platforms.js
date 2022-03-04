@@ -3,10 +3,16 @@ let { BaseElement } = modLoad('base-element');
 
 class PlatformsElement extends BaseElement 
 {
+	// sort order
 	reversed = false;
+	
+	// discovered platforms
 	platforms = [];
-	connected = false;
-	termcmd = null;
+	
+	// Conversation id of the active subscription
+	callid = null;
+	
+	// Is the gui component connected (otherwise no subscriptions necessary)
 	comconn = false;
 	
 	static get properties() 
@@ -19,7 +25,7 @@ class PlatformsElement extends BaseElement
 		}
 		ret['reversed'] = {attribute: false, type: Boolean};
 		ret['platforms'] = {attribute: false};
-		ret['connected'] = {attribute: false, type: Boolean};
+		ret['callid'] = {attribute: false, type: String};
 		return ret;
 	}
 	
@@ -46,9 +52,10 @@ class PlatformsElement extends BaseElement
 	
 	terminateSubscription()
 	{
-		if(this.termcmd!=null)
-			this.termcmd().then(() => {/*console.log("Terminated subscription.")*/})
-				.catch(err => {console.log("Could not terminate subscription: "+err)});
+		var self = this;
+		if(self.callid!=null)
+			jadex.terminateCall(self.callid).then(() => {console.log("Terminated subscription: "+self.callid)})
+				.catch(err => {console.log("Could not terminate subscription: "+err+" "+self.callid)});
 	}
 	
 	subscribe(interval)
@@ -57,17 +64,36 @@ class PlatformsElement extends BaseElement
 		
 		this.terminateSubscription();
 			
-		var tc = jadex.getIntermediate('webjcc/subscribeToPlatforms',
+		var callid = jadex.getIntermediate('webjcc/subscribeToPlatforms',
 			function(resp)
 			{
-				//console.log("Set up subscription");
+				// if no ongoing subscription -> dev/null
+				//if(self.callid!=resp.callId)
+				if(self.callid!==callid)
+				{
+					console.log("not current subscription (suc): "+callid+" "+self.callid);
+					return;
+				}
+					
+				console.log("Set up subscription");
 				self.updatePlatform(resp.data.service.name, resp.data.type);
-				self.connected = true;
-				self.termcmd = tc;
 			},
 			function(err)
 			{
 				console.log("Could not reach Jadex webjcc.");
+				
+				// if no ongoing subscription -> dev/null
+				if(self.callid!==callid)
+				//if(self.callid!=err?.response?.callId)
+				{
+					console.log("not current subscription (err): "+callid+" "+self.callid);
+					return;
+				}
+				/*else
+				{
+					console.log("current subscription (err)"+callid+" "+self.callid);
+				}*/
+				
 				if(err!=null && err.response!=null && err.response.status==401)
 				{
 					self.createErrorMessage("Login required to WebJCC platform (use platform secret)");
@@ -77,7 +103,8 @@ class PlatformsElement extends BaseElement
 					self.createErrorMessage("Could not reach Jadex WebJCC platform", err);
 				}
 				//console.log("Err: "+JSON.stringify(err));
-				self.connected = false;
+				self.callid = null;
+				
 				self.platforms = [];
 				self.requestUpdate();
 				
@@ -95,40 +122,8 @@ class PlatformsElement extends BaseElement
 				}, interval);
 			}
 		);
-	}
-	
-	asyncRender() 
-	{
-		return html`
-			<div class="section">
-				<div>
-					<div class="head">
-						<h1 class="m-0 p-0 inline" id="HConnectedPlatforms">${this.app.lang.t('Connected Platforms')}</h1>
-						<span id="connected" class="dot fl ${this.connected? "green": "red"}"></span>
-					</div>
-					<p>
-						${this.app.lang.t('This page shows a self-updating list of remote platforms known to this Jadex platform.')}
-					</p>
-				</div>
-
-				<!-- <div class="jumbotron jumbotron-fluid m-0 p-3"> -->
-				<div class="m-0">
-					<div class="row">
-						<div class="col-12" >
-					<table class="actwtable col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 pr-0 pl-0">
-						<tbody>
-							<tr>
-								<th>Name</th>
-								<!-- <th>${this.app.lang.t("Connected")}</th> 
-								<th>Protocol</th>-->
-							</tr>
-							
-							${this.platforms.map((p) => html`<tr><td><a href="#/platform/${p}">${p}</a></td></tr>`)}
-						</tbody>
-					</table>
-				</div>
-			</div>
-		`;
+		//console.log("assinged: "+callid+" "+new Date());
+		this.callid = callid;
 	}
 	
 	// todo: order by name
@@ -191,6 +186,39 @@ class PlatformsElement extends BaseElement
 				background-color: green;
 			}
 	    `;
+	}
+	
+	asyncRender() 
+	{
+		return html`
+			<div>
+				<div class="head">
+					<h1 class="inline" id="HConnectedPlatforms">${this.app.lang.t('Connected Platforms')}</h1>
+					<span id="connected" class="dot fl ${this.callid? "green": "red"}"></span>
+				</div>
+				<p>
+					${this.app.lang.t('This page shows a self-updating list of remote platforms known to this Jadex platform.')}
+				</p>
+			</div>
+
+			<div class="${this.platforms.length==0? 'hidden': ''}">
+				<table>
+					<tbody>
+						<tr>
+							<th>Name</th>
+							<!-- <th>${this.app.lang.t("Connected")}</th> 
+							<th>Protocol</th>-->
+						</tr>
+						
+						${this.platforms.map((p) => html`
+						<tr>
+							<td><a href="#/platform/${p}">${p}</a></td>
+						</tr>`
+						)}
+					</tbody>
+				</table>
+			</div>
+		`;
 	}
 	
 }

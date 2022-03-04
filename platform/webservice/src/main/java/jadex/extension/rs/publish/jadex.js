@@ -20,7 +20,18 @@
 	
 		init: function()
 		{
+			console.log("jadex init running");
+			
 			var self = this;
+			
+			// create/set cookie for unique id for 
+			var cookie = self.getCookie("jadex");
+			if(!cookie)
+			{
+				var id = self.generateUUID();
+				self.setCookie("jadex", id);
+				console.log("created Jadex cookie: "+id);
+			}
 			
 			this.source = new EventSource('webjcc');
 			this.source.addEventListener('open', function(e) 
@@ -36,10 +47,27 @@
 				console.log("message received: "+e.data);
 				
 			}, false);*/
+			var retries = 0;
 			this.source.addEventListener('error', function(e) 
 			{
-			    //if(e.readyState === EventSource.CLOSED) 
-			    //	console.log('connection closed');
+				//console.log('event source err: '+e);
+				// notify all ongoing conversations that connection was closed	
+				if(e.target.readyState === EventSource.CONNECTING)
+				{
+					retries++;
+				}		
+			    if(e.target.readyState === EventSource.CLOSED || retries===2) 
+				{
+			    	console.log('sse connection closed');
+					retries = 0;
+					var event = {data: {name: 'sse connection closed'}};
+					for(var convid in self.conversations) 
+					{
+						var cb = self.conversations[convid];
+						cb[1](event);
+					}
+					self.conversations = {};
+				}
 			}, false);
 		},
 		
@@ -122,38 +150,33 @@
 			//else 
 			//	path = path+'&__random='+Math.random();
 			
-			var terminated = false;
-			var call;
+			// ensure that errhandler is called at most once
+			var finished = false;
 	
 			var errfunc = function(err)
 			{
+				if(finished)
+					return;
+				finished = true;
+				
 				//if(axios.isCancel(err))
 	            //   console.log('request canceled', err.message);
 				
 				//console.log("errfunc: "+JSON.stringify(err));
 				
-				if(err.exceptionType?.indexOf("TerminatedException")!=-1)
+				if(err.exceptionType!=null && err.exceptionType.indexOf("TerminatedException")!=-1)
 				{
 					//console.log("call terminated: "+JSON.stringify(err));
 					return;
 				}
 				
-				if(terminated)
-				{
-					//console.log("call terminated: "+path);
-					return;
-				}
-					
 				errhandler(err);
 			}
 			
 			var	func = function(resp)
 			{
-				if(terminated)
-				{
-					//console.log("call terminated: "+path);
+				if(finished)
 					return;
-				}
 				
 				var fini = resp.headers["x-jadex-callidfin"];
 				var callid = resp.headers["x-jadex-callid"];
@@ -174,7 +197,7 @@
 					}
 				}
 				
-				call = axios.CancelToken.source();
+				//call = axios.CancelToken.source();
 				
 				//console.log("received: "+resp)
 				
@@ -195,96 +218,113 @@
 				}
 				else if(!sse)
 				{
-					console.log("long poll call: "+path+" "+callid);
-					if(callid!=null)
+					console.log("not supported long poll: "+path+" "+callid);
+					/*if(callid!=null)
 					{
 						//console.log("long-poll request sent: "+path);
 						
 						var headers = {'x-jadex-callid': callid, 'cache-control': 'no-cache, no-store', "x-jadex-sse": true};
 						axios.get(path, {cancelToken: call.token, headers: headers}, this.transform).then(func).catch(errfunc); 
-					}
+					}*/
 				}
 				
 				return callid;
 			};
 			
-			var prom = new Promise(function(resolve, reject)
+			var ok = false;
+			var callid;
+			while(!ok)
 			{
-				//console.log("initial request sent: "+path);
-				call = axios.CancelToken.source();
-				
-				var ok = false;
-				var callid;
-				while(!ok)
-				{
-					callid = self.generateUUID();
-				
-					//console.log("response via sse: "+path+" "+callid);
-					if(self.conversations[callid]==null)
-					{
-						//console.log("saved conversation: "+callid);
-						self.conversations[callid] = [handler, errfunc, maxhandler]; //errhandler
-						ok = true;
-					}
-					else
-					{
-						console.log("convid collision, retry: "+callid);
-					}
-				}
-				
-				var headers = {'x-jadex-callid': callid, 'cache-control': 'no-cache, no-store', "x-jadex-sse": true};
-				axios.get(path, {cancelToken: call.token, headers: headers}, this.transform)
-					.then(function(resp) 
-					{
-						var callid = func(resp); 
-						if(callid!=null) 
-						{
-							//console.log("received callid: "+callid);
-							resolve(callid);
-						}
-					})
-					.catch(function(err) 
-					{
-						reject(err); 
-						errfunc(err);
-					});
-			});
+				callid = self.generateUUID();
 			
-			var termcom = function(reason)
+				//console.log("response via sse: "+path+" "+callid);
+				if(self.conversations[callid]==null)
+				{
+					//console.log("saved conversation: "+callid);
+					self.conversations[callid] = [handler, errfunc, maxhandler, path]; //errhandler
+					ok = true;
+				}
+				else
+				{
+					console.log("convid collision, retry: "+callid);
+				}
+			}
+			
+			//console.log("initial request sent: "+path);
+			//call = axios.CancelToken.source();
+			
+			var headers = {'x-jadex-callid': callid, 'cache-control': 'no-cache, no-store', "x-jadex-sse": true};
+			axios.get(path, {headers: headers}, this.transform)
+			//axios.get(path, {cancelToken: call.token, headers: headers}, this.transform)
+				.then(function(resp) 
+				{
+					var callid = func(resp); 
+					//if(callid!=null) 
+					//{
+						//console.log("received callid: "+callid);
+						//resolve(callid);
+					//}
+				})
+				.catch(function(err) 
+				{
+					//reject(err); 
+					errfunc(err);
+				});
+			
+			return callid;
+		},
+		
+		terminateCall: function(callid, reason)
+		{
+			var self = this;
+			
+			if(this.conversations[callid]==undefined)
 			{
+				return new Promise(function(resolve, reject)
+				{
+					reject("Callid unknown: "+callid);
+				});
+			}
+			else
+			{
+				// remove the property
+				var path = this.conversations[callid][3];
+				delete this.conversations.callid;
+				
 				return new Promise(function(resolve, reject)
 				{
 					var errhandler = function(err)
 					{
-						console.log("error in termination: "+JSON.stringify(err));
-						
-						if(err.exceptionType?.indexOf("TerminatedException")!=-1)
+						if(err.message!=null && err.message.indexOf('Network Error')!=-1)
 						{
-							console.log("call terminated: "+JSON.stringify(err));
+							// when connection lost
+							reject(err);
+						}
+						else if(err.exceptionType?.indexOf("TerminatedException")!=-1)
+						{
+							// no real err when it was jadex terminated exception
+							//console.log("call terminated: "+JSON.stringify(err));
 							resolve();
 						}
-	
-						reject(err);
+						else
+						{
+							console.log("error in termination: "+err);//JSON.stringify(err));
+							reject(err);
+						}
 					};
 					
-					prom.then(function(callid)
-					{
-						if(call)
-				            call.cancel();
-						
-						terminated = true;
-						var r = reason==null? 'true': reason;
-						
-						//console.log("terminating request sent: "+path);
-						axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': r, headers: {'x-jadex-callid': callid, 'cache-control': 'no-cache, no-store', "x-jadex-sse": true}}}, this.transform)
-							.then(resolve).catch(errhandler); 
-					})
-					.catch(errhandler);
+					//if(call)
+			        //    call.cancel();
+					
+					//terminated = true;
+					var r = reason==null? 'true': reason;
+					
+					//console.log("terminating request sent: "+path);
+					axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': r, 
+						'cache-control': 'no-cache, no-store', "x-jadex-sse": true}}, this.transform)
+						.then(resolve).catch(errhandler);
 				});
 			}
-			
-			// return termination command
-			return termcom;
 		},
 		
 		createProxy: function(cid, servicetype)
@@ -325,6 +365,34 @@
 		{
 			return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
 			    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+		},
+		
+		getCookie: function(cname)
+		{
+			cname=cname+"=";
+			var ret=undefined;
+			var toks=document.cookie.split(';');
+		
+			for(var i=0; i<toks.length; i++) 
+			{
+				var tok=toks[i].trim();
+				if (tok.indexOf(cname)==0) 
+				{
+					ret=decodeURIComponent(atob(tok.substring(cname.length,tok.length)));
+				}
+			}
+			return ret;
+		},
+	
+		deleteCookie: function(cname)
+		{
+			document.cookie=cname+"=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+		},
+	
+		setCookie: function(cname, value)
+		{
+			this.deleteCookie(cname);
+			document.cookie=cname+"="+btoa(encodeURIComponent(value));
 		}
 	};
 	Jadex.init();
