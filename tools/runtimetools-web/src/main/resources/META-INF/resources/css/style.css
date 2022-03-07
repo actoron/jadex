@@ -414,3 +414,37 @@ jadex-app {
 	display: flex;
 	height: 100%;
 }
+
+
+/* Panel style */
+.accordion .a-container .a-panel {
+	width: 100%;
+	transition: all 0.2s ease-in-out;
+	opacity: 0;
+    height: auto;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0px 10px;
+}
+   
+/* Panel style when active */
+.accordion .a-container.active .a-panel {
+	padding: 15px 10px 10px 10px;
+    opacity: 1;
+    height: auto;
+    max-height: 500px;
+}
+
+.a-btn {
+	margin: 0;
+    position: relative;
+    padding: 1em 0 1em 0.5em;
+    width: 100%;
+    font-weight: 400;
+    display: block;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    border: solid 1px #DFDFDF;
+	background-color: #F7F7F7;
+}

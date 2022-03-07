@@ -99,6 +99,38 @@ class RegistryViewElement extends CidElement
 		self.getSubscription("Platforms").table.insert({headings: ["","",""]})
 		self.getSubscription("Queries").table.insert({headings: ["","",""]})
 		
+		function initAcc(elem, option) 
+		{
+	        self.shadowRoot.addEventListener('click', function (e) 
+			{
+	            if(!e.target.matches(elem+' .a-btn')) 
+				{	
+					return;
+	            }
+				else
+				{
+	                if(!e.target.parentElement.classList.contains('active'))
+					{
+	                    if(option==true)
+						{
+	                        var elems = self.shadowRoot.querySelectorAll(elem +' .a-container');
+	                        Array.prototype.forEach.call(elems, function (e) 
+							{
+	                            e.classList.remove('active');
+	                        });
+	                    }    
+	                   	e.target.parentElement.classList.add('active');
+	                }
+					else
+					{
+	                    e.target.parentElement.classList.remove('active');
+	                }
+	            }
+	        });
+	    }
+     
+	    initAcc('.accordion', true);
+		
 		//self.initready = true;
 		self.subscribe();
 	}
@@ -384,55 +416,47 @@ class RegistryViewElement extends CidElement
 		return super.requestUpdate();
 	}
 	
+	/*static get styles() 
+	{
+		var ret = [];
+		if(super.styles!=null)
+			ret.push(super.styles);
+		ret.push(
+		    css`
+	    	
+		    `);
+		return ret;
+	}*/
+	
 	asyncRender() 
 	{
 		return html`
-		<div id="tab"></div>
+		<div id="panel">
+			<label for="global">${this.app.lang.t('Show only global services and queries')}</label>
+  			<input type="checkbox" id="global" .checked="${this.global}" @click="${(e) => {this.global = e.target.checked;}}">
 		
-		<!--<lit-datatable .data="${this.services}" .conf="${[{ property: 'type', header: 'Service Type', hidden: false }, { property: 'providerId.name', header: 'Provided By', hidden: false }]}"></lit-datatable>-->
+			<div class="accordion">
+		        <div class="a-container"> 
+		            <h4 class="a-btn">${this.app.lang.t('Services')}</h4>
+		            <div class="a-panel">
+						<table id="tableservices" class="${this.getSubscription("Services")?'': 'down'}"></table>
+					</div>
+		        </div>
+		     
+		        <div class="a-container"> 
+		            <h4 class="a-btn">${this.app.lang.t('Platforms')}</h4>
+		            <div class="a-panel">
+						<table id="tableplatforms" class="${this.getSubscription("Platforms").connected?'': 'down'}"></table>
+					</div>
+		        </div>
 		
-		<div id="panel" class="container-fluid m-0 p-0">
-			<div>
-    			<input type="checkbox" id="global" .checked="${this.global}" @click="${(e) => {this.global = e.target.checked;}}">
-				<label for="global">${this.app.lang.t('Show only global services and queries')}</label>
-  			</div>
-			<div id="accordion">
-				<div class="card m-0">
-					<div class="card-header">
-    					<h4 class="card-link" data-toggle="collapse" href="#collapseOne">${this.app.lang.t('Services')}</h4>
+		        <div class="a-container"> 
+		            <h4 class="a-btn">${this.app.lang.t('Queries')}</h4>
+		            <div class="a-panel">
+						<table id="tablequeries" class="${this.getSubscription("Queries")?'': 'down'}"></table>
 					</div>
-					<div id="collapseOne" class="collapse show" data-parent="#accordion">
-						<div class="card-body">
-							<table id="tableservices" class="${this.getSubscription("Services")?'': 'down'}">
-							</table>
-						</div>
-    				</div>
-  				</div>
-		
-				<div class="card m-0">
-					<div class="card-header">
-						<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">${this.app.lang.t('Platforms')}</h4>
-					</div>
-					<div id="collapseTwo" class="collapse" data-parent="#accordion">
-						<div class="card-body">
-							<table id="tableplatforms" class="${this.getSubscription("Platforms").connected?'': 'down'}">
-							</table>
-						</div>
-					</div>
-				</div>
-				
-				<div class="card m-0">
-					<div class="card-header">
-						<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseThree">Queries</h4>
-					</div>
-					<div id="collapseThree" class="collapse" data-parent="#accordion">
-						<div class="card-body">
-							<table id="tablequeries" class="${this.getSubscription("Queries")?'': 'down'}">
-							</table>
-						</div>
-					</div>
-				</div>
-			</div>
+		        </div>
+		    </div>
 		</div>
 		`;
 	}
