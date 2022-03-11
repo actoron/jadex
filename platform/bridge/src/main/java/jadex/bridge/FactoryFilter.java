@@ -81,7 +81,7 @@ public class FactoryFilter implements IAsyncFilter<IComponentFactory>
 		
 		IComponentFactory fac = (IComponentFactory)obj;
 		
-		//if(model.indexOf("Buyer")!=-1)
+		//if(model.indexOf("bpmn")!=-1)
 		//	System.out.println("filter");
 		
 		if(type!=null)
@@ -96,7 +96,14 @@ public class FactoryFilter implements IAsyncFilter<IComponentFactory>
 		}
 		else
 		{
-			fac.isLoadable(model, null, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret));
+			//long start = System.currentTimeMillis();
+			fac.isLoadable(model, null, imports, rid)
+			/*.then(l->
+			{
+				if(System.currentTimeMillis()-start>5000)
+					System.out.println("SLOWWWWW: "+model);
+			})*/
+			.delegate((Future)ret);
 		}
 		
 		return ret;

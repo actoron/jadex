@@ -1,8 +1,9 @@
 let { LitElement, html, css } = modLoad('lit-element');
 let { BaseElement } = modLoad('base-element');
+let { CidElement } = modLoad('cid-element');
 
 // Tag name 'jadex-starter'
-class BpmnElement extends BaseElement {
+class BpmnElement extends CidElement {
 
 	bpmnmodeler = null;
 	
@@ -29,18 +30,19 @@ class BpmnElement extends BaseElement {
 		let self = this;
 		
 		let styles = ["jadex/tools/web/bpmn/diagram-js.css",
+					  "jadex/tools/web/bpmn/bpmn-js.css",
 					  "jadex/tools/web/bpmn/bpmn.css"];
-		
+
 		this.loadServiceFont('bpmn', 'jadex/tools/web/bpmn/bpmn.woff2').then((values) =>
 		{
 			console.log("BPMN load fonts ok");
-			
-			this.loadServiceStyles(styles).then((values) => 
+
+			this.loadServiceStyles(styles).then((values) =>
 			{
 				console.log("BPMN load styles ok");
-				
-				let scripts = ["jadex/tools/web/bpmn/bpmnmodeler.js" ];
-				this.loadServiceScripts(scripts).then((values) => 
+
+				let scripts = ["jadex/tools/web/bpmn/bpmn-modeler.development.js" ];
+				this.loadServiceScripts(scripts).then((values) =>
 				{
 					console.log("BPMN load scripts ok");
 					let celem = this.shadowRoot.getElementById('bpmnview');
@@ -72,7 +74,9 @@ class BpmnElement extends BaseElement {
 	
 	render() {
 		return html`
-		<div style="height:100px" id="bpmnview"/>
+		<div style="height: 100%; display: flex;">
+			<div style="flex:1;" id="bpmnview"/>
+		</div>
 		`;
 	}
 }

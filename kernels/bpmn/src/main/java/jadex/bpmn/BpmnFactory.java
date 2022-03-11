@@ -24,7 +24,6 @@ import jadex.bridge.component.impl.ArgumentsResultsComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.annotation.Raw;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;

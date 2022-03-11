@@ -4,9 +4,10 @@
 		listeners: new Set(),
 		lang: "en",
 		translationtable: {},
-		translate: function(text) {
+		translate: function(text) 
+		{
 			let ret;
-			if (this.lang !== "en")
+			if(this.lang !== "en")
 			{
 				let langtl = this.translationtable[this.lang];
 				if (langtl)
@@ -60,10 +61,12 @@
 				else
 				{
 					// Try to get language file
-					axios.get('/language/' + newLang + '.txt').then(function(resp) {
+					axios.get('/language/' + newLang + '.txt').then(function(resp) 
+					{
 						console.log('lang loaded: ' + newLang);
 						table[newLang] = {};
-						let lines = resp.data.split('\n').forEach(line => {
+						let lines = resp.data.split('\n').forEach(line => 
+						{
 							let ind = line.indexOf('#');
 							if (ind !== 0)
 							{

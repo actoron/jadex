@@ -350,6 +350,8 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	{
 		Future<Boolean> ret = new Future<>();
 		
+		//System.out.println("BDI isLoadable: "+model);
+		
 		if(pojo!=null)
 		{
 			String pojotype = SComponentManagementService.getPojoComponentType(pojo);

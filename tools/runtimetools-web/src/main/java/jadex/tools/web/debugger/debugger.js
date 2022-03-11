@@ -18,10 +18,9 @@ class DebuggerElement extends CidElement
 		this.breakpoints = []; // active breakpoints selected by user
 		this.sub = {};
 		
+		// load subcomponent
 		var res = "jadex/tools/web/commons/componenttree.js";
 		var ures = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String";
-
-		// load subcomponent
 		return this.loadSubmodule(ures);
 	}
 	
@@ -182,7 +181,7 @@ class DebuggerElement extends CidElement
 						resolve(null);
 					}).catch(function(err) 
 					{
-						console.log("err: "+err);	
+						//console.log("err: "+err);	
 						self.debuggers[type] = null;
 						reject(err);
 					});
@@ -190,7 +189,7 @@ class DebuggerElement extends CidElement
 				else
 				{
 					let html = "<jadex-"+type+" cid='"+cid+"'></jadex-"+type+">";
-					console.log("Insert plugin element: " + type);
+					//console.log("Insert plugin element: " + type);
 					self.shadowRoot.getElementById("debugger").innerHTML = html;
 					resolve(null);
 				}
@@ -227,7 +226,7 @@ class DebuggerElement extends CidElement
 				resolve(fragment);
 			}).catch(function(err) 
 			{
-				console.log("err: "+err);	
+				console.log("Could not load debugger fragment"+err);	
 				reject(err);
 			});
 		});		

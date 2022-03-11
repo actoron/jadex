@@ -42,7 +42,7 @@ class StarterElement extends CidElement
 		{
 			this.listener = (e) => 
 			{
-				console.log("jadex model event: "+e)
+				console.log("received jadex model event: "+e)
 				self.model = e.detail.model;
 				self.requestUpdate();
 			}
@@ -114,6 +114,8 @@ class StarterElement extends CidElement
 			var gen = this.shadowRoot.getElementById("autogen").checked;
 			var gencnt = this.shadowRoot.getElementById("gencnt").value;
 			var name = this.shadowRoot.getElementById("name").value;
+			if(name.length==0)
+				name = null;
 
 			var args = {};
 			if(this.model!=null && this.model.arguments!=null)
@@ -131,20 +133,42 @@ class StarterElement extends CidElement
 			if(conf!=null && conf.length>0)
 				ci.configuration = conf;
 			ci.synchronous = sync;
-			ci.suspended = sus;
+			ci.suspend = sus;
 			ci.monitoring = mon;
-			if(name!=null && name.length>0)
-				ci.name = name;
+			
 			ci.arguments = args;
 			
-			//axios.get(self.getMethodPrefix()+'&methodname=createComponent&args_0='+selected+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
-			//console.log("starting: "+ci);
-			axios.get(this.getMethodPrefix()+'&methodname=createComponent&args_0='+JSON.stringify(ci)+"&argtypes_0=jadex.bridge.service.types.cms.CreationInfo", this.transform).then(function(resp)
+			var an = gen? null: name===this.model.name || name===this.model.nameHint? null: name;
+			
+			if(an==null) // i.e. name auto generate
 			{
-				// todo: show running components?!
-				//console.log("started: "+resp.data);
-				self.createInfoMessage("Started component "+resp.data.name+" ["+self.model.filename+"]"); 
-			});
+				for(var i=0; i<gencnt; i++)
+				{
+					//axios.get(self.getMethodPrefix()+'&methodname=createComponent&args_0='+selected+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
+					//console.log("starting: "+ci);
+					axios.get(this.getMethodPrefix()+'&methodname=createComponent&args_0='+JSON.stringify(ci)
+						+"&argtypes_0=jadex.bridge.service.types.cms.CreationInfo", this.transform).then(function(resp)
+					{
+						// todo: show running components?!
+						//console.log("started: "+resp.data);
+						self.createInfoMessage("Started component "+i+" "+resp.data.name+" ["+self.model.filename+"]"); 
+					});
+				}
+			}
+			else
+			{
+				ci.name = an;
+				
+				//axios.get(self.getMethodPrefix()+'&methodname=createComponent&args_0='+selected+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
+				//console.log("starting: "+ci);
+				axios.get(this.getMethodPrefix()+'&methodname=createComponent&args_0='+JSON.stringify(ci)
+					+"&argtypes_0=jadex.bridge.service.types.cms.CreationInfo", this.transform).then(function(resp)
+				{
+					// todo: show running components?!
+					//console.log("started: "+resp.data);
+					self.createInfoMessage("Started component "+resp.data.name+" ["+self.model.filename+"]"); 
+				});
+			}
 		}
 	}
 		
@@ -155,30 +179,6 @@ class StarterElement extends CidElement
 			ret.push(super.styles);
 		ret.push(
 		    css`
-	    	/* Navbar styling. */
-	    	/* background color. */
-	    	.navbar-custom {
-	    		background-color: #aaaaaa;
-	    	}
-	    	/* brand and text color */
-	    	.navbar-custom .navbar-brand,
-	    	.navbar-custom .navbar-text {
-	    		color: rgba(255,255,255,.8);
-	    	}
-	    	/* link color */
-	    	.navbar-custom .navbar-nav .nav-link {
-	    		color: rgba(255,255,255,.5);
-	    	}
-	    	/* color of active or hovered links */
-	    	.navbar-custom .nav-item.active .nav-link,
-	    	.navbar-custom .nav-item:focus .nav-link,
-	    	.navbar-custom .nav-item:hover .nav-link {
-	    		color: #ffffff;
-	    	}
-	    	
-	    	.w100 {
-				width: 100%;
-			}
 			.loader {
 				border: 8px solid #f3f3f3;
 				border-top: 8px solid #070707; 
@@ -191,104 +191,111 @@ class StarterElement extends CidElement
 	  			0% { transform: rotate(0deg); }
 	  			100% { transform: rotate(360deg); }
 			}
+			
+			.flex-container {
+				display: flex;
+				flex-direction: column;
+			}
+			.grid-container {
+				display: grid;
+				grid-template-columns: min-content auto; 
+				grid-template-rows: repeat(8, minmax(min-content, max-content));
+				grid-gap: 10px;
+				align-items: center;
+			}
+			.span {
+				grid-column: 1 / span 2;
+			}
+			.right { 
+				justify-self: right;
+			}
+			.row-flex-container {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				flex-shrink: 0;
+			}
+			.flexgrow {
+				flex-grow: 1;
+			}
+			.yscrollable {
+				overflow-y: auto;
+			}
+			.marginright {
+				margin-right: 1em;
+			}
+			.marginleft {
+				margin-right: 1em;
+			}
+			.marginbottom {
+				margin-bottom: 0.3em;
+			}
+			.alignleft {
+				justify-self: flex-start;
+			}
 		    `);
 		return ret;
 	}
 	
 	asyncRender() {
 		return html`
-			<div class="container-fluid m-0 p-0">
-				<div class="row m-0 p-0">
-					<div class="col-12 m-0 p-0">
-						<h3>${this.app.lang.t('Components')}</h3>
-						<jadex-componenttree cid='${this.cid}'></jadex-componenttree>
-					</div>
+			<div id="panel" class="flex-container">
+				<div>
+					<h3>${this.app.lang.t('Components')}</h3>
+					<jadex-componenttree cid='${this.cid}'></jadex-componenttree>
 				</div>
 				
-				<div class="row m-0 p-0">
-					<div class="col-12 m-0 p-0">
-						<h3>${this.app.lang.t('Available Models')}</h3>
-						<jadex-modeltree cid='${this.cid}'></jadex-modeltree>
-					</div>
+				<div>
+					<h3>${this.app.lang.t('Available Models')}</h3>
+					<jadex-modeltree cid='${this.cid}'></jadex-modeltree>
 				</div>
 				
 				${this.model!=null? html`
-				<div class="bgwhitealpha m-0 p-0"> <!-- sticky-top  -->
-					<div class="row m-1">
-						<div class="col-12">
-							<h3>${this.app.lang.t('Settings')}</h3>
+				<div class="bgwhitealpha grid-container w100">
+					<h3 class="span">${this.app.lang.t('Settings')}</h3>
+					
+					${this.app.lang.t('Filename')}
+					<input type="text" ref="filename" class="w100" value="${this.model!=null? this.model.filename: ''}">
+					
+					${this.app.lang.t('Configuration')}
+					<select id="config" class="w100">
+		   				${this.getConfigurationNames().map((c) => html`<option value="${c}"></option>`)}
+		 			</select>
+					
+					${this.app.lang.t('Component Name')}
+					<div>
+						<input type="text" class="w100 marginbottom" value="${this.model!=null && this.model.instancename!=null? this.model.instancename: ''}" id="name"></input>
+						<div class="row-flex-container">
+							<span class="marginright">${this.app.lang.t('Auto generate')}</span>
+							<input class="marginright" type="checkbox" id="autogen"></input>
+							<input class="flexgrow" type="number" value="1" id="gencnt"></input>
 						</div>
-					</div>
-					<div class="row m-1">
-						<div class="col-2">
-							${this.app.lang.t('Filename')}
-						</div>
-						<div class="col-10" id="filename">
-							<input type="text" ref="filename" class="w100" value="${this.model!=null? this.model.filename: ''}">
-						</div>
-					</div>
-					<div class="row m-1">
-						<div class="col-2">
-							${this.app.lang.t('Configuration')}
-						</div>
-						<div class="col-10">
-							<select id="config" class="w100">
-		   						${this.getConfigurationNames().map((c) => html`<option value="${c}"></option>`)}
-		 					</select>
-						</div>
-					</div>
-					<div class="row m-1">
-						<div class="col-2">
-							${this.app.lang.t('Comp. name')}
-						</div>
-						<div class="col-5">
-							<input type="text" class="w100" value="${this.model!=null && this.model.instancename!=null? this.model.instancename: ''}" id="name"></input>
-						</div>
-						<div class="col-3">
-							<input type="checkbox" id="autogen">${this.app.lang.t('Auto generate')}</input>
-						</div>
-						<div class="col-2">
-							<input class="w100" type="number" value="1" id="gencnt"></input>
-						</div>
-					</div>
-					<div class="row m-1">
-						<div class="col-4">
-							<input type="checkbox" id="suspended">${this.app.lang.t('Suspended')}</input>
-						</div>
-						<div class="col-4">
-							<input type="checkbox" id="synchronous">${this.app.lang.t('Synchronous')}</input>
-						</div>
-						<div class="col-4">
-							${this.app.lang.t('Monitoring')}
-							<select id="monitoring" class="w100">
-		   						<option value="OFF">OFF</option> 
-		   						<option value="COARSE">${this.app.lang.t('COARSE')}</option> 
-		   						<option value="MEDIUM">${this.app.lang.t('MEDIUM')}</option> 
-		   						<option value="FINE">${this.app.lang.t('FINE')}</option> 
-		 					</select>
-		 				</div>
 					</div>
 					
-					<div class="row m-1">
+					${this.app.lang.t('Monitoring')}
+					<select id="monitoring" class="w100">
+		   				<option value="OFF">OFF</option> 
+		   				<option value="COARSE">${this.app.lang.t('COARSE')}</option> 
+		   				<option value="MEDIUM">${this.app.lang.t('MEDIUM')}</option> 
+		   				<option value="FINE">${this.app.lang.t('FINE')}</option> 
+		 			</select>
+					
+					${this.app.lang.t('Suspended')}
+					<input type="checkbox" class="alignleft" id="suspended"></input>
+					
+					${this.app.lang.t('Synchronous')}
+					<input type="checkbox" class="alignleft" id="synchronous"></input>
+					
+					<div class="${this.getArguments().length==0? 'hidden': ''}">
 						${this.getArguments().map((arg, i) => html`
-						<div class="col-4"">
-							${"["+arg.clazz.value+"] "+arg.name}
-						</div>
-						<div class="col-4 p-0">
-							<input class="w100" type="text" value="${arg.value!=null? arg.value: ''}" readonly></input>
-						</div>
-						<div class="col-4 pl-2"> 
-							<input class="w100" type="text" id="${'arg_'+i}">
-						</div>
+						${"["+arg.clazz.value+"] "+arg.name}
+						<input class="w100" type="text" value="${arg.value!=null? arg.value: ''}" readonly></input>
+						<input class="w100" type="text" id="${'arg_'+i}">
 						`)}
 					</div>
 					
-					<div class="row m-1">
-						<div class="col-10">
-						</div>
-						<div class="col-2">
-							<button class=" float-right" @click="${e => this.start(e)}">Start</button> <!-- class="w100" -->
-						</div>
+					<div class="span right">
+						<button class="jadexbtn" @click="${e => this.start(e)}">Start</button>
 					</div>
 				</div>
 				`: ''}

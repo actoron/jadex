@@ -391,7 +391,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		Future<Boolean> ret = new Future<Boolean>();
 		
-//		System.out.println("isLoadable (micro): "+model+" "+rid);
+		//System.out.println("Micro isLoadable (micro): "+model+" "+rid);
 		
 		if(pojo!=null)
 		{

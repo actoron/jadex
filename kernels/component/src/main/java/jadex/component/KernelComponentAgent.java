@@ -15,7 +15,8 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Properties({
 	@NameValue(name="system", value="true"),
-	@NameValue(name="kernel.types", value="new String[] {\"component.xml\"}")
+	@NameValue(name="kernel.types", value="new String[] {\"component.xml\"}"),
+	@NameValue(name="kernel.componenttypes", value="new String[]{\""+ComponentComponentFactory.FILETYPE_COMPONENT+"\"}")
 })
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="new jadex.component.ComponentComponentFactory($component)"))

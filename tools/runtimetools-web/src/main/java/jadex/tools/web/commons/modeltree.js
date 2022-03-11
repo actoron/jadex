@@ -239,6 +239,7 @@ class ModelTree extends CidElement
 	{
 		var ret = null;
 		var n = name.lastIndexOf(".");
+		
 		if(n>=0)
 		{
 			ret = {name: name.substring(n+1), pck: name.substring(0,n)};
@@ -247,6 +248,7 @@ class ModelTree extends CidElement
 		{
 			ret = {name: name, pck: null};
 		}
+		
 		return ret;
 	}
 		
@@ -254,11 +256,11 @@ class ModelTree extends CidElement
 	{
 		var self = this;
 		
-		console.log("selected: "+filename);
+		//console.log("selected: "+filename);
 		
 		axios.get(this.getMethodPrefix()+'&methodname=loadComponentModel&args_0='+filename+"&argtypes_0=java.lang.String", this.transform).then(function(resp)
 		{
-			console.log("selected model is: "+resp.data);
+			//console.log("selected model is (event dispatch): "+resp.data);
 			
 			var event = new CustomEvent("jadex-model-selected", 
 			{ 
@@ -433,7 +435,9 @@ class ModelTree extends CidElement
 				
 				<div class="row m-0 p-0">
 					<div class="col-12 m-0 p-0">
-						<input id="model" list="models" placeholder="${this.app.lang.t('Search models...')+' ['+this.models.length+']'}" class="w100" type="text" @change="${(e) => this.select(e)}"></input>
+						<input id="model" list="models" placeholder="${this.app.lang.t('Search models...')+' ['+this.models.length+']'}" class="w100" type="text" 
+							@input="${(e) => this.select(e)}">
+						</input>
 						<datalist id="models">
 							${this.getModelNames().map((model) => html`<option class="w100" value="${model.name+' ['+model.pck+']'}"></option>`)}
 						</datalist>

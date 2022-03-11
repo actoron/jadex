@@ -1,5 +1,5 @@
 /*!
- * bpmn-js - bpmn-modeler v7.1.0
+ * bpmn-js - bpmn-modeler v9.0.2
  *
  * Copyright (c) 2014-present, camunda Services GmbH
  *
@@ -8,51 +8,53 @@
  *
  * Source Code: https://github.com/bpmn-io/bpmn-js
  *
- * Date: 2020-06-08
+ * Date: 2022-02-23
  */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
-	(global = global || self, global.BpmnJS = factory());
-}(this, function () { 'use strict';
+	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BpmnJS = factory());
+}(this, (function () { 'use strict';
 
 	var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+	var inherits_browser = {exports: {}};
+
+	if (typeof Object.create === 'function') {
+	  // implementation from standard node.js 'util' module
+	  inherits_browser.exports = function inherits(ctor, superCtor) {
+	    if (superCtor) {
+	      ctor.super_ = superCtor;
+	      ctor.prototype = Object.create(superCtor.prototype, {
+	        constructor: {
+	          value: ctor,
+	          enumerable: false,
+	          writable: true,
+	          configurable: true
+	        }
+	      });
+	    }
+	  };
+	} else {
+	  // old school shim for old browsers
+	  inherits_browser.exports = function inherits(ctor, superCtor) {
+	    if (superCtor) {
+	      ctor.super_ = superCtor;
+	      var TempCtor = function () {};
+	      TempCtor.prototype = superCtor.prototype;
+	      ctor.prototype = new TempCtor();
+	      ctor.prototype.constructor = ctor;
+	    }
+	  };
+	}
+
+	var inherits$1 = inherits_browser.exports;
 
 	function createCommonjsModule(fn, module) {
 		return module = { exports: {} }, fn(module, module.exports), module.exports;
 	}
 
-	var inherits_browser = createCommonjsModule(function (module) {
-	if (typeof Object.create === 'function') {
-	  // implementation from standard node.js 'util' module
-	  module.exports = function inherits(ctor, superCtor) {
-	    ctor.super_ = superCtor;
-	    ctor.prototype = Object.create(superCtor.prototype, {
-	      constructor: {
-	        value: ctor,
-	        enumerable: false,
-	        writable: true,
-	        configurable: true
-	      }
-	    });
-	  };
-	} else {
-	  // old school shim for old browsers
-	  module.exports = function inherits(ctor, superCtor) {
-	    ctor.super_ = superCtor;
-	    var TempCtor = function () {};
-	    TempCtor.prototype = superCtor.prototype;
-	    ctor.prototype = new TempCtor();
-	    ctor.prototype.constructor = ctor;
-	  };
-	}
-	});
-
-	function createCommonjsModule$1(fn, module) {
-		return module = { exports: {} }, fn(module, module.exports), module.exports;
-	}
-
-	var hat_1 = createCommonjsModule$1(function (module) {
+	var hat_1 = createCommonjsModule(function (module) {
 	var hat = module.exports = function (bits, base) {
 	    if (!base) base = 16;
 	    if (bits === undefined) bits = 128;
@@ -224,7 +226,7 @@
 
 	var nativeToString = Object.prototype.toString;
 	var nativeHasOwnProperty = Object.prototype.hasOwnProperty;
-	function isUndefined(obj) {
+	function isUndefined$1(obj) {
 	  return obj === undefined;
 	}
 	function isDefined(obj) {
@@ -233,7 +235,7 @@
 	function isNil(obj) {
 	  return obj == null;
 	}
-	function isArray(obj) {
+	function isArray$2(obj) {
 	  return nativeToString.call(obj) === '[object Array]';
 	}
 	function isObject(obj) {
@@ -256,7 +258,7 @@
 	 */
 
 	function ensureArray(obj) {
-	  if (isArray(obj)) {
+	  if (isArray$2(obj)) {
 	    return;
 	  }
 
@@ -306,7 +308,7 @@
 
 	function findIndex(collection, matcher) {
 	  matcher = toMatcher(matcher);
-	  var idx = isArray(collection) ? -1 : undefined;
+	  var idx = isArray$2(collection) ? -1 : undefined;
 	  forEach(collection, function (val, key) {
 	    if (matcher(val, key)) {
 	      idx = key;
@@ -346,11 +348,11 @@
 	function forEach(collection, iterator) {
 	  var val, result;
 
-	  if (isUndefined(collection)) {
+	  if (isUndefined$1(collection)) {
 	    return;
 	  }
 
-	  var convertKey = isArray(collection) ? toNum : identity;
+	  var convertKey = isArray$2(collection) ? toNum : identity;
 
 	  for (var key in collection) {
 	    if (has(collection, key)) {
@@ -373,7 +375,7 @@
 	 */
 
 	function without(arr, matcher) {
-	  if (isUndefined(arr)) {
+	  if (isUndefined$1(arr)) {
 	    return [];
 	  }
 
@@ -437,7 +439,7 @@
 	 * @return {Array} transformed collection
 	 */
 
-	function map(collection, fn) {
+	function map$1(collection, fn) {
 	  var result = [];
 	  forEach(collection, function (val, key) {
 	    result.push(fn(val, key));
@@ -475,7 +477,7 @@
 	 */
 
 	function values(collection) {
-	  return map(collection, function (val) {
+	  return map$1(collection, function (val) {
 	    return val;
 	  });
 	}
@@ -514,7 +516,7 @@
 	  forEach(collections, function (c) {
 	    return groupBy(c, extractor, grouped);
 	  });
-	  var result = map(grouped, function (val, key) {
+	  var result = map$1(grouped, function (val, key) {
 	    return val[0];
 	  });
 	  return result;
@@ -551,7 +553,7 @@
 
 	    sorted.push(entry);
 	  });
-	  return map(sorted, function (e) {
+	  return map$1(sorted, function (e) {
 	    return e.v;
 	  });
 	}
@@ -562,7 +564,7 @@
 	 *
 	 * const matcher = matchPattern({ id: 1 });
 	 *
-	 * var element = find(elements, matcher);
+	 * let element = find(elements, matcher);
 	 *
 	 * @param  {Object} pattern
 	 *
@@ -598,8 +600,11 @@
 	}
 
 	/**
-	 * Debounce fn, calling it only once if
-	 * the given time elapsed between calls.
+	 * Debounce fn, calling it only once if the given time
+	 * elapsed between calls.
+	 *
+	 * Lodash-style the function exposes methods to `#clear`
+	 * and `#flush` to control internal behavior.
 	 *
 	 * @param  {Function} fn
 	 * @param  {Number} timeout
@@ -612,23 +617,39 @@
 	  var lastThis;
 	  var lastNow;
 
-	  function fire() {
+	  function fire(force) {
 	    var now = Date.now();
-	    var scheduledDiff = lastNow + timeout - now;
+	    var scheduledDiff = force ? 0 : lastNow + timeout - now;
 
 	    if (scheduledDiff > 0) {
 	      return schedule(scheduledDiff);
 	    }
 
 	    fn.apply(lastThis, lastArgs);
-	    timer = lastNow = lastArgs = lastThis = undefined;
+	    clear();
 	  }
 
 	  function schedule(timeout) {
 	    timer = setTimeout(fire, timeout);
 	  }
 
-	  return function () {
+	  function clear() {
+	    if (timer) {
+	      clearTimeout(timer);
+	    }
+
+	    timer = lastNow = lastArgs = lastThis = undefined;
+	  }
+
+	  function flush() {
+	    if (timer) {
+	      fire(true);
+	    }
+
+	    clear();
+	  }
+
+	  function callback() {
 	    lastNow = Date.now();
 
 	    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
@@ -641,7 +662,11 @@
 	    if (!timer) {
 	      schedule(timeout);
 	    }
-	  };
+	  }
+
+	  callback.flush = flush;
+	  callback.cancel = clear;
+	  return callback;
 	}
 	/**
 	 * Bind function against target <this>.
@@ -652,7 +677,7 @@
 	 * @return {Function} bound function
 	 */
 
-	function bind(fn, target) {
+	function bind$2(fn, target) {
 	  return fn.bind(target);
 	}
 
@@ -737,7 +762,7 @@
 	 * @param {String} [val]
 	 * @api public
 	 */
-	function attr(el, name, val) {
+	function attr$1(el, name, val) {
 	  // get
 	  if (arguments.length == 2) {
 	    return el.getAttribute(name);
@@ -754,10 +779,10 @@
 	  return el;
 	}
 
-	var indexOf = [].indexOf;
+	var indexOf$1 = [].indexOf;
 
 	var indexof = function(arr, obj){
-	  if (indexOf) return arr.indexOf(obj);
+	  if (indexOf$1) return arr.indexOf(obj);
 	  for (var i = 0; i < arr.length; ++i) {
 	    if (arr[i] === obj) return i;
 	  }
@@ -774,13 +799,13 @@
 	 * Whitespace regexp.
 	 */
 
-	var re = /\s+/;
+	var re$1 = /\s+/;
 
 	/**
 	 * toString reference.
 	 */
 
-	var toString = Object.prototype.toString;
+	var toString$1 = Object.prototype.toString;
 
 	/**
 	 * Wrap `el` in a `ClassList`.
@@ -790,8 +815,8 @@
 	 * @api public
 	 */
 
-	function classes(el) {
-	  return new ClassList(el);
+	function classes$1(el) {
+	  return new ClassList$1(el);
 	}
 
 	/**
@@ -801,7 +826,7 @@
 	 * @api private
 	 */
 
-	function ClassList(el) {
+	function ClassList$1(el) {
 	  if (!el || !el.nodeType) {
 	    throw new Error('A DOM element reference is required');
 	  }
@@ -817,7 +842,7 @@
 	 * @api public
 	 */
 
-	ClassList.prototype.add = function (name) {
+	ClassList$1.prototype.add = function (name) {
 	  // classList
 	  if (this.list) {
 	    this.list.add(name);
@@ -842,8 +867,8 @@
 	 * @api public
 	 */
 
-	ClassList.prototype.remove = function (name) {
-	  if ('[object RegExp]' == toString.call(name)) {
+	ClassList$1.prototype.remove = function (name) {
+	  if ('[object RegExp]' == toString$1.call(name)) {
 	    return this.removeMatching(name);
 	  }
 
@@ -869,7 +894,7 @@
 	 * @api private
 	 */
 
-	ClassList.prototype.removeMatching = function (re) {
+	ClassList$1.prototype.removeMatching = function (re) {
 	  var arr = this.array();
 	  for (var i = 0; i < arr.length; i++) {
 	    if (re.test(arr[i])) {
@@ -891,7 +916,7 @@
 	 * @api public
 	 */
 
-	ClassList.prototype.toggle = function (name, force) {
+	ClassList$1.prototype.toggle = function (name, force) {
 	  // classList
 	  if (this.list) {
 	    if ('undefined' !== typeof force) {
@@ -929,10 +954,10 @@
 	 * @api public
 	 */
 
-	ClassList.prototype.array = function () {
+	ClassList$1.prototype.array = function () {
 	  var className = this.el.getAttribute('class') || '';
 	  var str = className.replace(/^\s+|\s+$/g, '');
-	  var arr = str.split(re);
+	  var arr = str.split(re$1);
 	  if ('' === arr[0]) arr.shift();
 	  return arr;
 	};
@@ -945,14 +970,14 @@
 	 * @api public
 	 */
 
-	ClassList.prototype.has = ClassList.prototype.contains = function (name) {
+	ClassList$1.prototype.has = ClassList$1.prototype.contains = function (name) {
 	  return this.list ? this.list.contains(name) : !!~indexof(this.array(), name);
 	};
 
 	/**
 	 * Remove all children from the given element.
 	 */
-	function clear(el) {
+	function clear$1(el) {
 
 	  var c;
 
@@ -1015,58 +1040,9 @@
 	  return matchesSelector(currentElem, selector) ? currentElem : null;
 	}
 
-	/**
-	 * Element prototype.
-	 */
-
-	var proto$1 = Element.prototype;
-
-	/**
-	 * Vendor function.
-	 */
-
-	var vendor$1 = proto$1.matchesSelector
-	  || proto$1.webkitMatchesSelector
-	  || proto$1.mozMatchesSelector
-	  || proto$1.msMatchesSelector
-	  || proto$1.oMatchesSelector;
-
-	/**
-	 * Expose `match()`.
-	 */
-
-	var matchesSelector$1 = match$1;
-
-	/**
-	 * Match `el` to `selector`.
-	 *
-	 * @param {Element} el
-	 * @param {String} selector
-	 * @return {Boolean}
-	 * @api public
-	 */
-
-	function match$1(el, selector) {
-	  if (vendor$1) return vendor$1.call(el, selector);
-	  var nodes = el.parentNode.querySelectorAll(selector);
-	  for (var i = 0; i < nodes.length; ++i) {
-	    if (nodes[i] == el) return true;
-	  }
-	  return false;
-	}
-
-	var closest$1 = function (element, selector, checkYoSelf) {
-	  var parent = checkYoSelf ? element : element.parentNode;
-
-	  while (parent && parent !== document) {
-	    if (matchesSelector$1(parent, selector)) return parent;
-	    parent = parent.parentNode;
-	  }
-	};
-
-	var bind$1 = window.addEventListener ? 'addEventListener' : 'attachEvent',
+	var bind = window.addEventListener ? 'addEventListener' : 'attachEvent',
 	    unbind = window.removeEventListener ? 'removeEventListener' : 'detachEvent',
-	    prefix = bind$1 !== 'addEventListener' ? 'on' : '';
+	    prefix$6 = bind !== 'addEventListener' ? 'on' : '';
 
 	/**
 	 * Bind `el` event `type` to `fn`.
@@ -1080,7 +1056,7 @@
 	 */
 
 	var bind_1 = function(el, type, fn, capture){
-	  el[bind$1](prefix + type, fn, capture || false);
+	  el[bind](prefix$6 + type, fn, capture || false);
 	  return fn;
 	};
 
@@ -1096,7 +1072,7 @@
 	 */
 
 	var unbind_1 = function(el, type, fn, capture){
-	  el[unbind](prefix + type, fn, capture || false);
+	  el[unbind](prefix$6 + type, fn, capture || false);
 	  return fn;
 	};
 
@@ -1108,8 +1084,6 @@
 	/**
 	 * Module dependencies.
 	 */
-
-
 
 	/**
 	 * Delegate event `type` to `selector`
@@ -1129,15 +1103,19 @@
 	// when delegating.
 	var forceCaptureEvents = ['focus', 'blur'];
 
-	var bind$1$1 = function(el, selector, type, fn, capture){
-	  if (forceCaptureEvents.indexOf(type) !== -1) capture = true;
+	function bind$1(el, selector, type, fn, capture) {
+	  if (forceCaptureEvents.indexOf(type) !== -1) {
+	    capture = true;
+	  }
 
-	  return componentEvent.bind(el, type, function(e){
+	  return componentEvent.bind(el, type, function (e) {
 	    var target = e.target || e.srcElement;
-	    e.delegateTarget = closest$1(target, selector, true);
-	    if (e.delegateTarget) fn.call(el, e);
+	    e.delegateTarget = closest(target, selector, true);
+	    if (e.delegateTarget) {
+	      fn.call(el, e);
+	    }
 	  }, capture);
-	};
+	}
 
 	/**
 	 * Unbind event `type`'s callback `fn`.
@@ -1148,23 +1126,24 @@
 	 * @param {Boolean} capture
 	 * @api public
 	 */
+	function unbind$1(el, type, fn, capture) {
+	  if (forceCaptureEvents.indexOf(type) !== -1) {
+	    capture = true;
+	  }
 
-	var unbind$1 = function(el, type, fn, capture){
-	  if (forceCaptureEvents.indexOf(type) !== -1) capture = true;
+	  return componentEvent.unbind(el, type, fn, capture);
+	}
 
-	  componentEvent.unbind(el, type, fn, capture);
-	};
-
-	var delegateEvents = {
-		bind: bind$1$1,
-		unbind: unbind$1
+	var delegate = {
+	  bind: bind$1,
+	  unbind: unbind$1
 	};
 
 	/**
 	 * Expose `parse`.
 	 */
 
-	var domify = parse;
+	var domify = parse$1;
 
 	/**
 	 * Tests for browser support.
@@ -1186,7 +1165,7 @@
 	 * Wrap map from jquery.
 	 */
 
-	var map$1 = {
+	var map = {
 	  legend: [1, '<fieldset>', '</fieldset>'],
 	  tr: [2, '<table><tbody>', '</tbody></table>'],
 	  col: [2, '<table><tbody></tbody><colgroup>', '</colgroup></table>'],
@@ -1195,27 +1174,27 @@
 	  _default: innerHTMLBug ? [1, 'X<div>', '</div>'] : [0, '', '']
 	};
 
-	map$1.td =
-	map$1.th = [3, '<table><tbody><tr>', '</tr></tbody></table>'];
+	map.td =
+	map.th = [3, '<table><tbody><tr>', '</tr></tbody></table>'];
 
-	map$1.option =
-	map$1.optgroup = [1, '<select multiple="multiple">', '</select>'];
+	map.option =
+	map.optgroup = [1, '<select multiple="multiple">', '</select>'];
 
-	map$1.thead =
-	map$1.tbody =
-	map$1.colgroup =
-	map$1.caption =
-	map$1.tfoot = [1, '<table>', '</table>'];
+	map.thead =
+	map.tbody =
+	map.colgroup =
+	map.caption =
+	map.tfoot = [1, '<table>', '</table>'];
 
-	map$1.polyline =
-	map$1.ellipse =
-	map$1.polygon =
-	map$1.circle =
-	map$1.text =
-	map$1.line =
-	map$1.path =
-	map$1.rect =
-	map$1.g = [1, '<svg xmlns="http://www.w3.org/2000/svg" version="1.1">','</svg>'];
+	map.polyline =
+	map.ellipse =
+	map.polygon =
+	map.circle =
+	map.text =
+	map.line =
+	map.path =
+	map.rect =
+	map.g = [1, '<svg xmlns="http://www.w3.org/2000/svg" version="1.1">','</svg>'];
 
 	/**
 	 * Parse `html` and return a DOM Node instance, which could be a TextNode,
@@ -1228,7 +1207,7 @@
 	 * @api private
 	 */
 
-	function parse(html, doc) {
+	function parse$1(html, doc) {
 	  if ('string' != typeof html) throw new TypeError('String expected');
 
 	  // default to the global `document` object
@@ -1250,7 +1229,7 @@
 	  }
 
 	  // wrap map
-	  var wrap = map$1[tag] || map$1._default;
+	  var wrap = map[tag] || map._default;
 	  var depth = wrap[0];
 	  var prefix = wrap[1];
 	  var suffix = wrap[2];
@@ -1284,7 +1263,7 @@
 	  return el.querySelectorAll(selector);
 	}
 
-	function remove(el) {
+	function remove$2(el) {
 	  el.parentNode && el.parentNode.removeChild(el);
 	}
 
@@ -1450,7 +1429,7 @@
 	 *
 	 * @return {String}
 	 */
-	function attr$1(node, name, value) {
+	function attr(node, name, value) {
 	  if (typeof name === 'string') {
 	    if (value !== undefined) {
 	      setAttribute(node, name, value);
@@ -1482,9 +1461,9 @@
 	  return -1;
 	}
 
-	var re$1 = /\s+/;
+	var re = /\s+/;
 
-	var toString$1 = Object.prototype.toString;
+	var toString = Object.prototype.toString;
 
 	function defined(o) {
 	  return typeof o !== 'undefined';
@@ -1498,11 +1477,11 @@
 	 * @api public
 	 */
 
-	function classes$1(el) {
-	  return new ClassList$1(el);
+	function classes(el) {
+	  return new ClassList(el);
 	}
 
-	function ClassList$1(el) {
+	function ClassList(el) {
 	  if (!el || !el.nodeType) {
 	    throw new Error('A DOM element reference is required');
 	  }
@@ -1518,7 +1497,7 @@
 	 * @api public
 	 */
 
-	ClassList$1.prototype.add = function(name) {
+	ClassList.prototype.add = function(name) {
 
 	  // classList
 	  if (this.list) {
@@ -1552,8 +1531,8 @@
 	 * @api public
 	 */
 
-	ClassList$1.prototype.remove = function(name) {
-	  if ('[object RegExp]' === toString$1.call(name)) {
+	ClassList.prototype.remove = function(name) {
+	  if ('[object RegExp]' === toString.call(name)) {
 	    return this.removeMatching(name);
 	  }
 
@@ -1581,7 +1560,7 @@
 	 * @api private
 	 */
 
-	ClassList$1.prototype.removeMatching = function(re) {
+	ClassList.prototype.removeMatching = function(re) {
 	  var arr = this.array();
 	  for (var i = 0; i < arr.length; i++) {
 	    if (re.test(arr[i])) {
@@ -1603,7 +1582,7 @@
 	 * @api public
 	 */
 
-	ClassList$1.prototype.toggle = function(name, force) {
+	ClassList.prototype.toggle = function(name, force) {
 	  // classList
 	  if (this.list) {
 	    if (defined(force)) {
@@ -1641,10 +1620,10 @@
 	 * @api public
 	 */
 
-	ClassList$1.prototype.array = function() {
+	ClassList.prototype.array = function() {
 	  var className = this.el.getAttribute('class') || '';
 	  var str = className.replace(/^\s+|\s+$/g, '');
-	  var arr = str.split(re$1);
+	  var arr = str.split(re);
 	  if ('' === arr[0]) {
 	    arr.shift();
 	  }
@@ -1659,8 +1638,8 @@
 	 * @api public
 	 */
 
-	ClassList$1.prototype.has =
-	ClassList$1.prototype.contains = function(name) {
+	ClassList.prototype.has =
+	ClassList.prototype.contains = function(name) {
 	  return (
 	    this.list ?
 	      this.list.contains(name) :
@@ -1688,7 +1667,7 @@
 	 * @param  {DOMElement} element
 	 * @return {DOMElement} the element (for chaining)
 	 */
-	function clear$1(element) {
+	function clear(element) {
 	  var child;
 
 	  while ((child = element.firstChild)) {
@@ -1698,7 +1677,7 @@
 	  return element;
 	}
 
-	function clone(element) {
+	function clone$1(element) {
 	  return element.cloneNode(true);
 	}
 
@@ -1712,7 +1691,7 @@
 
 	var SVG_START = '<svg xmlns="' + ns.svg + '"';
 
-	function parse$1(svg) {
+	function parse(svg) {
 
 	  var unwrap = false;
 
@@ -1768,18 +1747,18 @@
 	 *
 	 * @returns {SVGElement}
 	 */
-	function create(name, attrs) {
+	function create$1(name, attrs) {
 	  var element;
 
 	  if (name.charAt(0) === '<') {
-	    element = parse$1(name).firstChild;
+	    element = parse(name).firstChild;
 	    element = document.importNode(element, true);
 	  } else {
 	    element = document.createElementNS(ns.svg, name);
 	  }
 
 	  if (attrs) {
-	    attr$1(element, attrs);
+	    attr(element, attrs);
 	  }
 
 	  return element;
@@ -1790,9 +1769,9 @@
 	 */
 
 	// fake node used to instantiate svg geometry elements
-	var node = create('svg');
+	var node = create$1('svg');
 
-	function extend(object, props) {
+	function extend$1(object, props) {
 	  var i, k, keys = Object.keys(props);
 
 	  for (i = 0; (k = keys[i]); i++) {
@@ -1820,9 +1799,9 @@
 	  case 0:
 	    return matrix;
 	  case 1:
-	    return extend(matrix, a);
+	    return extend$1(matrix, a);
 	  case 6:
-	    return extend(matrix, {
+	    return extend$1(matrix, {
 	      a: a,
 	      b: b,
 	      c: c,
@@ -1855,7 +1834,7 @@
 	  '"': '\''
 	};
 
-	function escape(str, pattern) {
+	function escape$1(str, pattern) {
 
 	  function replaceFn(match, entity) {
 	    return ENTITY_REPLACEMENT[entity] || entity;
@@ -1872,7 +1851,7 @@
 	  // TEXT
 	  case 3:
 	    // replace special XML characters
-	    output.push(escape(node.textContent, TEXT_ENTITIES));
+	    output.push(escape$1(node.textContent, TEXT_ENTITIES));
 	    break;
 
 	  // ELEMENT
@@ -1883,7 +1862,7 @@
 	      attrMap = node.attributes;
 	      for (i = 0, len = attrMap.length; i < len; ++i) {
 	        attrNode = attrMap.item(i);
-	        output.push(' ', attrNode.name, '="', escape(attrNode.value, ATTR_ENTITIES), '"');
+	        output.push(' ', attrNode.name, '="', escape$1(attrNode.value, ATTR_ENTITIES), '"');
 	      }
 	    }
 
@@ -1901,7 +1880,7 @@
 
 	  // COMMENT
 	  case 8:
-	    output.push('<!--', escape(node.nodeValue, TEXT_ENTITIES), '-->');
+	    output.push('<!--', escape$1(node.nodeValue, TEXT_ENTITIES), '-->');
 	    break;
 
 	  // CDATA
@@ -1922,12 +1901,12 @@
 	 */
 
 
-	function set(element, svg) {
+	function set$1(element, svg) {
 
-	  var parsed = parse$1(svg);
+	  var parsed = parse(svg);
 
 	  // clear element contents
-	  clear$1(element);
+	  clear(element);
 
 	  if (!svg) {
 	    return;
@@ -1938,7 +1917,7 @@
 	    parsed = parsed.documentElement;
 	  }
 
-	  var nodes = slice(parsed.childNodes);
+	  var nodes = slice$1(parsed.childNodes);
 
 	  // import + append each node
 	  for (var i = 0; i < nodes.length; i++) {
@@ -1947,7 +1926,7 @@
 
 	}
 
-	function get(element) {
+	function get$1(element) {
 	  var child = element.firstChild,
 	      output = [];
 
@@ -1968,19 +1947,19 @@
 	  if (svg !== undefined) {
 
 	    try {
-	      set(element, svg);
+	      set$1(element, svg);
 	    } catch (e) {
 	      throw new Error('error parsing SVG: ' + e.message);
 	    }
 
 	    return element;
 	  } else {
-	    return get(element);
+	    return get$1(element);
 	  }
 	}
 
 
-	function slice(arr) {
+	function slice$1(arr) {
 	  return Array.prototype.slice.call(arr);
 	}
 
@@ -2015,7 +1994,7 @@
 	 *
 	 * @return {SVGTransform} the consolidated transform
 	 */
-	function transform(node, transforms) {
+	function transform$1(node, transforms) {
 	  var transformList = node.transform.baseVal;
 
 	  if (transforms) {
@@ -2040,6 +2019,10 @@
 	  return Object.prototype.toString.call(obj) === '[object Array]';
 	}
 
+	function hasOwnProp(obj, prop) {
+	  return Object.prototype.hasOwnProperty.call(obj, prop);
+	}
+
 	function annotate() {
 	  var args = Array.prototype.slice.call(arguments);
 
@@ -2053,6 +2036,7 @@
 
 	  return fn;
 	}
+
 
 	// Current limitations:
 	// - can't put into "function arg" comments
@@ -2068,10 +2052,10 @@
 	// of a nested class, too.
 
 	var CONSTRUCTOR_ARGS = /constructor\s*[^(]*\(\s*([^)]*)\)/m;
-	var FN_ARGS = /^function\s*[^(]*\(\s*([^)]*)\)/m;
+	var FN_ARGS = /^(?:async )?(?:function\s*)?[^(]*\(\s*([^)]*)\)/m;
 	var FN_ARG = /\/\*([^*]*)\*\//m;
 
-	function parse$2(fn) {
+	function parseAnnotations(fn) {
 
 	  if (typeof fn !== 'function') {
 	    throw new Error('Cannot annotate "' + fn + '". Expected a function!');
@@ -2084,7 +2068,7 @@
 	    return [];
 	  }
 
-	  return match[1] && match[1].split(',').map(function (arg) {
+	  return match[1] && match[1].split(',').map(function(arg) {
 	    match = arg.match(FN_ARG);
 	    return match ? match[1].trim() : arg.trim();
 	  }) || [];
@@ -2093,33 +2077,30 @@
 	function Module() {
 	  var providers = [];
 
-	  this.factory = function (name, factory) {
+	  this.factory = function(name, factory) {
 	    providers.push([name, 'factory', factory]);
 	    return this;
 	  };
 
-	  this.value = function (name, value) {
+	  this.value = function(name, value) {
 	    providers.push([name, 'value', value]);
 	    return this;
 	  };
 
-	  this.type = function (name, type) {
+	  this.type = function(name, type) {
 	    providers.push([name, 'type', type]);
 	    return this;
 	  };
 
-	  this.forEach = function (iterator) {
+	  this.forEach = function(iterator) {
 	    providers.forEach(iterator);
 	  };
+
 	}
-
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	function Injector(modules, parent) {
 	  parent = parent || {
-	    get: function get(name, strict) {
+	    get: function(name, strict) {
 	      currentlyResolving.push(name);
 
 	      if (strict === false) {
@@ -2136,7 +2117,7 @@
 
 	  var self = instances.injector = this;
 
-	  var error = function error(msg) {
+	  var error = function(msg) {
 	    var stack = currentlyResolving.join(' -> ');
 	    currentlyResolving.length = 0;
 	    return new Error(stack ? msg + ' (Resolving: ' + stack + ')' : msg);
@@ -2150,7 +2131,7 @@
 	   *
 	   * @return {Object}
 	   */
-	  var get = function get(name, strict) {
+	  var get = function(name, strict) {
 	    if (!providers[name] && name.indexOf('.') !== -1) {
 	      var parts = name.split('.');
 	      var pivot = get(parts.shift());
@@ -2162,11 +2143,11 @@
 	      return pivot;
 	    }
 
-	    if (hasProp(instances, name)) {
+	    if (hasOwnProp(instances, name)) {
 	      return instances[name];
 	    }
 
-	    if (hasProp(providers, name)) {
+	    if (hasOwnProp(providers, name)) {
 	      if (currentlyResolving.indexOf(name) !== -1) {
 	        currentlyResolving.push(name);
 	        throw error('Cannot resolve circular dependency!');
@@ -2182,8 +2163,11 @@
 	    return parent.get(name, strict);
 	  };
 
-	  var fnDef = function fnDef(fn) {
-	    var locals = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	  var fnDef = function(fn, locals) {
+
+	    if (typeof locals === 'undefined') {
+	      locals = {};
+	    }
 
 	    if (typeof fn !== 'function') {
 	      if (isArray$1(fn)) {
@@ -2193,9 +2177,9 @@
 	      }
 	    }
 
-	    var inject = fn.$inject || parse$2(fn);
-	    var dependencies = inject.map(function (dep) {
-	      if (hasProp(locals, dep)) {
+	    var inject = fn.$inject || parseAnnotations(fn);
+	    var dependencies = inject.map(function(dep) {
+	      if (hasOwnProp(locals, dep)) {
 	        return locals[dep];
 	      } else {
 	        return get(dep);
@@ -2208,29 +2192,35 @@
 	    };
 	  };
 
-	  var instantiate = function instantiate(Type) {
-	    var _fnDef = fnDef(Type),
-	        dependencies = _fnDef.dependencies,
-	        fn = _fnDef.fn;
+	  var instantiate = function(Type) {
+	    var def = fnDef(Type);
 
-	    return new (Function.prototype.bind.apply(fn, [null].concat(_toConsumableArray(dependencies))))();
+	    var fn = def.fn,
+	        dependencies = def.dependencies;
+
+	    // instantiate var args constructor
+	    var Constructor = Function.prototype.bind.apply(fn, [ null ].concat(dependencies));
+
+	    return new Constructor();
 	  };
 
-	  var invoke = function invoke(func, context, locals) {
-	    var _fnDef2 = fnDef(func, locals),
-	        dependencies = _fnDef2.dependencies,
-	        fn = _fnDef2.fn;
+	  var invoke = function(func, context, locals) {
+	    var def = fnDef(func, locals);
 
-	    return fn.call.apply(fn, [context].concat(_toConsumableArray(dependencies)));
+	    var fn = def.fn,
+	        dependencies = def.dependencies;
+
+	    return fn.apply(context, dependencies);
 	  };
 
-	  var createPrivateInjectorFactory = function createPrivateInjectorFactory(privateChildInjector) {
-	    return annotate(function (key) {
+
+	  var createPrivateInjectorFactory = function(privateChildInjector) {
+	    return annotate(function(key) {
 	      return privateChildInjector.get(key);
 	    });
 	  };
 
-	  var createChild = function createChild(modules, forceNewInstances) {
+	  var createChild = function(modules, forceNewInstances) {
 	    if (forceNewInstances && forceNewInstances.length) {
 	      var fromParentModule = Object.create(null);
 	      var matchedScopes = Object.create(null);
@@ -2267,7 +2257,7 @@
 
 	        if ((provider[2] === 'factory' || provider[2] === 'type') && provider[1].$scope) {
 	          /* jshint -W083 */
-	          forceNewInstances.forEach(function (scope) {
+	          forceNewInstances.forEach(function(scope) {
 	            if (provider[1].$scope.indexOf(scope) !== -1) {
 	              fromParentModule[name] = [provider[2], provider[1]];
 	              matchedScopes[scope] = true;
@@ -2276,7 +2266,7 @@
 	        }
 	      }
 
-	      forceNewInstances.forEach(function (scope) {
+	      forceNewInstances.forEach(function(scope) {
 	        if (!matchedScopes[scope]) {
 	          throw new Error('No provider for "' + scope + '". Cannot use provider from the parent!');
 	        }
@@ -2291,12 +2281,12 @@
 	  var factoryMap = {
 	    factory: invoke,
 	    type: instantiate,
-	    value: function value(_value) {
-	      return _value;
+	    value: function(value) {
+	      return value;
 	    }
 	  };
 
-	  modules.forEach(function (module) {
+	  modules.forEach(function(module) {
 
 	    function arrayUnwrap(type, value) {
 	      if (type !== 'value' && isArray$1(value)) {
@@ -2308,16 +2298,16 @@
 
 	    // TODO(vojta): handle wrong inputs (modules)
 	    if (module instanceof Module) {
-	      module.forEach(function (provider) {
+	      module.forEach(function(provider) {
 	        var name = provider[0];
 	        var type = provider[1];
 	        var value = provider[2];
 
 	        providers[name] = [factoryMap[type], arrayUnwrap(type, value), type];
 	      });
-	    } else if ((typeof module === 'undefined' ? 'undefined' : _typeof(module)) === 'object') {
+	    } else if (typeof module === 'object') {
 	      if (module.__exports__) {
-	        var clonedModule = Object.keys(module).reduce(function (m, key) {
+	        var clonedModule = Object.keys(module).reduce(function(m, key) {
 	          if (key.substring(0, 2) !== '__') {
 	            m[key] = module[key];
 	          }
@@ -2325,14 +2315,14 @@
 	        }, Object.create(null));
 
 	        var privateInjector = new Injector((module.__modules__ || []).concat([clonedModule]), self);
-	        var getFromPrivateInjector = annotate(function (key) {
+	        var getFromPrivateInjector = annotate(function(key) {
 	          return privateInjector.get(key);
 	        });
-	        module.__exports__.forEach(function (key) {
+	        module.__exports__.forEach(function(key) {
 	          providers[key] = [getFromPrivateInjector, key, 'private', privateInjector];
 	        });
 	      } else {
-	        Object.keys(module).forEach(function (name) {
+	        Object.keys(module).forEach(function(name) {
 	          if (module[name][2] === 'private') {
 	            providers[name] = module[name];
 	            return;
@@ -2354,13 +2344,7 @@
 	  this.createChild = createChild;
 	}
 
-	// helpers /////////////////
-
-	function hasProp(obj, prop) {
-	  return Object.hasOwnProperty.call(obj, prop);
-	}
-
-	var DEFAULT_RENDER_PRIORITY = 1000;
+	var DEFAULT_RENDER_PRIORITY$1 = 1000;
 
 	/**
 	 * The base implementation of shape and connection renderers.
@@ -2371,18 +2355,19 @@
 	function BaseRenderer(eventBus, renderPriority) {
 	  var self = this;
 
-	  renderPriority = renderPriority || DEFAULT_RENDER_PRIORITY;
+	  renderPriority = renderPriority || DEFAULT_RENDER_PRIORITY$1;
 
 	  eventBus.on([ 'render.shape', 'render.connection' ], renderPriority, function(evt, context) {
 	    var type = evt.type,
 	        element = context.element,
-	        visuals = context.gfx;
+	        visuals = context.gfx,
+	        attrs = context.attrs;
 
 	    if (self.canRender(element)) {
 	      if (type === 'render.shape') {
-	        return self.drawShape(visuals, element);
+	        return self.drawShape(visuals, element, attrs);
 	      } else {
-	        return self.drawConnection(visuals, element);
+	        return self.drawConnection(visuals, element, attrs);
 	      }
 	    }
 	  });
@@ -2462,18 +2447,18 @@
 
 	function createLine(points, attrs) {
 
-	  var line = create('polyline');
-	  attr$1(line, { points: toSVGPoints(points) });
+	  var line = create$1('polyline');
+	  attr(line, { points: toSVGPoints(points) });
 
 	  if (attrs) {
-	    attr$1(line, attrs);
+	    attr(line, attrs);
 	  }
 
 	  return line;
 	}
 
 	function updateLine(gfx, points) {
-	  attr$1(gfx, { points: toSVGPoints(points) });
+	  attr(gfx, { points: toSVGPoints(points) });
 
 	  return gfx;
 	}
@@ -2485,18 +2470,18 @@
 	 *
 	 * @returns {Array<djs.model.Base>}
 	 */
-	function getParents(elements) {
+	function getParents$1(elements) {
 
 	  // find elements that are not children of any other elements
 	  return filter(elements, function(element) {
 	    return !find(elements, function(e) {
-	      return e !== element && getParent(element, e);
+	      return e !== element && getParent$1(element, e);
 	    });
 	  });
 	}
 
 
-	function getParent(element, parent) {
+	function getParent$1(element, parent) {
 	  if (!parent) {
 	    return;
 	  }
@@ -2509,7 +2494,7 @@
 	    return;
 	  }
 
-	  return getParent(element.parent, parent);
+	  return getParent$1(element.parent, parent);
 	}
 
 
@@ -2521,7 +2506,7 @@
 	 * @param {Object} e
 	 * @param {boolean} unique
 	 */
-	function add(elements, e, unique) {
+	function add$1(elements, e, unique) {
 	  var canAdd = !unique || elements.indexOf(e) === -1;
 
 	  if (canAdd) {
@@ -2546,14 +2531,14 @@
 
 	  depth = depth || 0;
 
-	  if (!isArray(elements)) {
+	  if (!isArray$2(elements)) {
 	    elements = [ elements ];
 	  }
 
 	  forEach(elements, function(s, i) {
 	    var filter = fn(s, i, depth);
 
-	    if (isArray(filter) && filter.length) {
+	    if (isArray$2(filter) && filter.length) {
 	      eachElement(filter, fn, depth + 1);
 	    }
 	  });
@@ -2574,7 +2559,7 @@
 	      processedChildren = [];
 
 	  eachElement(elements, function(element, i, depth) {
-	    add(result, element, unique);
+	    add$1(result, element, unique);
 
 	    var children = element.children;
 
@@ -2582,7 +2567,7 @@
 	    if (maxDepth === -1 || depth < maxDepth) {
 
 	      // children exist && children not yet processed
-	      if (children && add(processedChildren, children, unique)) {
+	      if (children && add$1(processedChildren, children, unique)) {
 	        return children;
 	      }
 	    }
@@ -2617,7 +2602,7 @@
 	 */
 	function getClosure(elements, isTopLevel, closure) {
 
-	  if (isUndefined(isTopLevel)) {
+	  if (isUndefined$1(isTopLevel)) {
 	    isTopLevel = true;
 	  }
 
@@ -2698,7 +2683,7 @@
 	function getBBox(elements, stopRecursion) {
 
 	  stopRecursion = !!stopRecursion;
-	  if (!isArray(elements)) {
+	  if (!isArray$2(elements)) {
 	    elements = [elements];
 	  }
 
@@ -2804,7 +2789,7 @@
 	  return 'root';
 	}
 
-	function isFrameElement(element) {
+	function isFrameElement$1(element) {
 
 	  return !!(element && element.isFrame);
 	}
@@ -2817,7 +2802,7 @@
 
 	// apply default renderer with lowest possible priority
 	// so that it only kicks in if noone else could render
-	var DEFAULT_RENDER_PRIORITY$1 = 1;
+	var DEFAULT_RENDER_PRIORITY = 1;
 
 	/**
 	 * The default renderer used for shapes and connections.
@@ -2828,34 +2813,34 @@
 	function DefaultRenderer(eventBus, styles) {
 
 	  //
-	  BaseRenderer.call(this, eventBus, DEFAULT_RENDER_PRIORITY$1);
+	  BaseRenderer.call(this, eventBus, DEFAULT_RENDER_PRIORITY);
 
 	  this.CONNECTION_STYLE = styles.style([ 'no-fill' ], { strokeWidth: 5, stroke: 'fuchsia' });
 	  this.SHAPE_STYLE = styles.style({ fill: 'white', stroke: 'fuchsia', strokeWidth: 2 });
 	  this.FRAME_STYLE = styles.style([ 'no-fill' ], { stroke: 'fuchsia', strokeDasharray: 4, strokeWidth: 2 });
 	}
 
-	inherits_browser(DefaultRenderer, BaseRenderer);
+	inherits$1(DefaultRenderer, BaseRenderer);
 
 
 	DefaultRenderer.prototype.canRender = function() {
 	  return true;
 	};
 
-	DefaultRenderer.prototype.drawShape = function drawShape(visuals, element) {
-	  var rect = create('rect');
+	DefaultRenderer.prototype.drawShape = function drawShape(visuals, element, attrs) {
+	  var rect = create$1('rect');
 
-	  attr$1(rect, {
+	  attr(rect, {
 	    x: 0,
 	    y: 0,
 	    width: element.width || 0,
 	    height: element.height || 0
 	  });
 
-	  if (isFrameElement(element)) {
-	    attr$1(rect, this.FRAME_STYLE);
+	  if (isFrameElement$1(element)) {
+	    attr(rect, assign({}, this.FRAME_STYLE, attrs || {}));
 	  } else {
-	    attr$1(rect, this.SHAPE_STYLE);
+	    attr(rect, assign({}, this.SHAPE_STYLE, attrs || {}));
 	  }
 
 	  append(visuals, rect);
@@ -2863,9 +2848,9 @@
 	  return rect;
 	};
 
-	DefaultRenderer.prototype.drawConnection = function drawConnection(visuals, connection) {
+	DefaultRenderer.prototype.drawConnection = function drawConnection(visuals, connection, attrs) {
 
-	  var line = createLine(connection.waypoints, this.CONNECTION_STYLE);
+	  var line = createLine(connection.waypoints, assign({}, this.CONNECTION_STYLE, attrs || {}));
 	  append(visuals, line);
 
 	  return line;
@@ -2954,7 +2939,7 @@
 	   */
 	  this.style = function(traits, additionalAttrs) {
 
-	    if (!isArray(traits) && !additionalAttrs) {
+	    if (!isArray$2(traits) && !additionalAttrs) {
 	      additionalAttrs = traits;
 	      traits = [];
 	    }
@@ -2967,7 +2952,7 @@
 	  };
 
 	  this.computeStyle = function(custom, traits, defaultStyles) {
-	    if (!isArray(traits)) {
+	    if (!isArray$2(traits)) {
 	      defaultStyles = traits;
 	      traits = [];
 	    }
@@ -2976,7 +2961,7 @@
 	  };
 	}
 
-	var DrawModule = {
+	var DrawModule$1 = {
 	  __init__: [ 'defaultRenderer' ],
 	  defaultRenderer: [ 'type', DefaultRenderer ],
 	  styles: [ 'type', Styles ]
@@ -2990,7 +2975,7 @@
 	 *
 	 * @return {number} the previous index of the element
 	 */
-	function remove$2(collection, element) {
+	function remove(collection, element) {
 
 	  if (!collection || !element) {
 	    return -1;
@@ -3013,7 +2998,7 @@
 	 * @param {Object} element
 	 * @param {number} idx
 	 */
-	function add$1(collection, element, idx) {
+	function add(collection, element, idx) {
 
 	  if (!collection || !element) {
 	    return;
@@ -3066,7 +3051,7 @@
 	 * @return {number} the index or -1 if collection or element do
 	 *                  not exist or the element is not contained.
 	 */
-	function indexOf$1(collection, element) {
+	function indexOf(collection, element) {
 
 	  if (!collection || !element) {
 	    return -1;
@@ -3075,12 +3060,1286 @@
 	  return collection.indexOf(element);
 	}
 
-	function round(number, resolution) {
+	/**
+	 * Computes the distance between two points
+	 *
+	 * @param  {Point}  p
+	 * @param  {Point}  q
+	 *
+	 * @return {number}  distance
+	 */
+	function pointDistance(a, b) {
+	  if (!a || !b) {
+	    return -1;
+	  }
+
+	  return Math.sqrt(
+	    Math.pow(a.x - b.x, 2) +
+	    Math.pow(a.y - b.y, 2)
+	  );
+	}
+
+
+	/**
+	 * Returns true if the point r is on the line between p and q
+	 *
+	 * @param  {Point}  p
+	 * @param  {Point}  q
+	 * @param  {Point}  r
+	 * @param  {number} [accuracy=5] accuracy for points on line check (lower is better)
+	 *
+	 * @return {boolean}
+	 */
+	function pointsOnLine(p, q, r, accuracy) {
+
+	  if (typeof accuracy === 'undefined') {
+	    accuracy = 5;
+	  }
+
+	  if (!p || !q || !r) {
+	    return false;
+	  }
+
+	  var val = (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x),
+	      dist = pointDistance(p, q);
+
+	  // @see http://stackoverflow.com/a/907491/412190
+	  return Math.abs(val / dist) <= accuracy;
+	}
+
+
+	var ALIGNED_THRESHOLD = 2;
+
+	/**
+	 * Check whether two points are horizontally or vertically aligned.
+	 *
+	 * @param {Array<Point>|Point}
+	 * @param {Point}
+	 *
+	 * @return {string|boolean}
+	 */
+	function pointsAligned(a, b) {
+	  var points;
+
+	  if (isArray$2(a)) {
+	    points = a;
+	  } else {
+	    points = [ a, b ];
+	  }
+
+	  if (pointsAlignedHorizontally(points)) {
+	    return 'h';
+	  }
+
+	  if (pointsAlignedVertically(points)) {
+	    return 'v';
+	  }
+
+	  return false;
+	}
+
+	function pointsAlignedHorizontally(a, b) {
+	  var points;
+
+	  if (isArray$2(a)) {
+	    points = a;
+	  } else {
+	    points = [ a, b ];
+	  }
+
+	  var firstPoint = points.slice().shift();
+
+	  return every(points, function(point) {
+	    return Math.abs(firstPoint.y - point.y) <= ALIGNED_THRESHOLD;
+	  });
+	}
+
+	function pointsAlignedVertically(a, b) {
+	  var points;
+
+	  if (isArray$2(a)) {
+	    points = a;
+	  } else {
+	    points = [ a, b ];
+	  }
+
+	  var firstPoint = points.slice().shift();
+
+	  return every(points, function(point) {
+	    return Math.abs(firstPoint.x - point.x) <= ALIGNED_THRESHOLD;
+	  });
+	}
+
+
+
+	/**
+	 * Returns true if the point p is inside the rectangle rect
+	 *
+	 * @param  {Point}  p
+	 * @param  {Rect} rect
+	 * @param  {number} tolerance
+	 *
+	 * @return {boolean}
+	 */
+	function pointInRect(p, rect, tolerance) {
+	  tolerance = tolerance || 0;
+
+	  return p.x > rect.x - tolerance &&
+	         p.y > rect.y - tolerance &&
+	         p.x < rect.x + rect.width + tolerance &&
+	         p.y < rect.y + rect.height + tolerance;
+	}
+
+	/**
+	 * Returns a point in the middle of points p and q
+	 *
+	 * @param  {Point}  p
+	 * @param  {Point}  q
+	 *
+	 * @return {Point} middle point
+	 */
+	function getMidPoint(p, q) {
+	  return {
+	    x: Math.round(p.x + ((q.x - p.x) / 2.0)),
+	    y: Math.round(p.y + ((q.y - p.y) / 2.0))
+	  };
+	}
+
+	/**
+	 * This file contains source code adapted from Snap.svg (licensed Apache-2.0).
+	 *
+	 * @see https://github.com/adobe-webplatform/Snap.svg/blob/master/src/path.js
+	 */
+
+	/* eslint no-fallthrough: "off" */
+
+	var p2s = /,?([a-z]),?/gi,
+	    toFloat = parseFloat,
+	    math = Math,
+	    PI = math.PI,
+	    mmin = math.min,
+	    mmax = math.max,
+	    pow = math.pow,
+	    abs$7 = math.abs,
+	    pathCommand = /([a-z])[\s,]*((-?\d*\.?\d*(?:e[-+]?\d+)?[\s]*,?[\s]*)+)/ig,
+	    pathValues = /(-?\d*\.?\d*(?:e[-+]?\d+)?)[\s]*,?[\s]*/ig;
+
+	var isArray = Array.isArray || function(o) { return o instanceof Array; };
+
+	function hasProperty(obj, property) {
+	  return Object.prototype.hasOwnProperty.call(obj, property);
+	}
+
+	function clone(obj) {
+
+	  if (typeof obj == 'function' || Object(obj) !== obj) {
+	    return obj;
+	  }
+
+	  var res = new obj.constructor;
+
+	  for (var key in obj) {
+	    if (hasProperty(obj, key)) {
+	      res[key] = clone(obj[key]);
+	    }
+	  }
+
+	  return res;
+	}
+
+	function repush(array, item) {
+	  for (var i = 0, ii = array.length; i < ii; i++) if (array[i] === item) {
+	    return array.push(array.splice(i, 1)[0]);
+	  }
+	}
+
+	function cacher(f) {
+
+	  function newf() {
+
+	    var arg = Array.prototype.slice.call(arguments, 0),
+	        args = arg.join('\u2400'),
+	        cache = newf.cache = newf.cache || {},
+	        count = newf.count = newf.count || [];
+
+	    if (hasProperty(cache, args)) {
+	      repush(count, args);
+	      return cache[args];
+	    }
+
+	    count.length >= 1e3 && delete cache[count.shift()];
+	    count.push(args);
+	    cache[args] = f.apply(0, arg);
+
+	    return cache[args];
+	  }
+	  return newf;
+	}
+
+	function parsePathString(pathString) {
+
+	  if (!pathString) {
+	    return null;
+	  }
+
+	  var pth = paths(pathString);
+
+	  if (pth.arr) {
+	    return clone(pth.arr);
+	  }
+
+	  var paramCounts = { a: 7, c: 6, h: 1, l: 2, m: 2, q: 4, s: 4, t: 2, v: 1, z: 0 },
+	      data = [];
+
+	  if (isArray(pathString) && isArray(pathString[0])) { // rough assumption
+	    data = clone(pathString);
+	  }
+
+	  if (!data.length) {
+
+	    String(pathString).replace(pathCommand, function(a, b, c) {
+	      var params = [],
+	          name = b.toLowerCase();
+
+	      c.replace(pathValues, function(a, b) {
+	        b && params.push(+b);
+	      });
+
+	      if (name == 'm' && params.length > 2) {
+	        data.push([b].concat(params.splice(0, 2)));
+	        name = 'l';
+	        b = b == 'm' ? 'l' : 'L';
+	      }
+
+	      while (params.length >= paramCounts[name]) {
+	        data.push([b].concat(params.splice(0, paramCounts[name])));
+	        if (!paramCounts[name]) {
+	          break;
+	        }
+	      }
+	    });
+	  }
+
+	  data.toString = paths.toString;
+	  pth.arr = clone(data);
+
+	  return data;
+	}
+
+	function paths(ps) {
+	  var p = paths.ps = paths.ps || {};
+
+	  if (p[ps]) {
+	    p[ps].sleep = 100;
+	  } else {
+	    p[ps] = {
+	      sleep: 100
+	    };
+	  }
+
+	  setTimeout(function() {
+	    for (var key in p) {
+	      if (hasProperty(p, key) && key != ps) {
+	        p[key].sleep--;
+	        !p[key].sleep && delete p[key];
+	      }
+	    }
+	  });
+
+	  return p[ps];
+	}
+
+	function rectBBox(x, y, width, height) {
+
+	  if (arguments.length === 1) {
+	    y = x.y;
+	    width = x.width;
+	    height = x.height;
+	    x = x.x;
+	  }
+
+	  return {
+	    x: x,
+	    y: y,
+	    width: width,
+	    height: height,
+	    x2: x + width,
+	    y2: y + height
+	  };
+	}
+
+	function pathToString() {
+	  return this.join(',').replace(p2s, '$1');
+	}
+
+	function pathClone(pathArray) {
+	  var res = clone(pathArray);
+	  res.toString = pathToString;
+	  return res;
+	}
+
+	function findDotsAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
+	  var t1 = 1 - t,
+	      t13 = pow(t1, 3),
+	      t12 = pow(t1, 2),
+	      t2 = t * t,
+	      t3 = t2 * t,
+	      x = t13 * p1x + t12 * 3 * t * c1x + t1 * 3 * t * t * c2x + t3 * p2x,
+	      y = t13 * p1y + t12 * 3 * t * c1y + t1 * 3 * t * t * c2y + t3 * p2y;
+
+	  return {
+	    x: fixError(x),
+	    y: fixError(y)
+	  };
+	}
+
+	function bezierBBox(points) {
+
+	  var bbox = curveBBox.apply(null, points);
+
+	  return rectBBox(
+	    bbox.x0,
+	    bbox.y0,
+	    bbox.x1 - bbox.x0,
+	    bbox.y1 - bbox.y0
+	  );
+	}
+
+	function isPointInsideBBox$2(bbox, x, y) {
+	  return x >= bbox.x &&
+	    x <= bbox.x + bbox.width &&
+	    y >= bbox.y &&
+	    y <= bbox.y + bbox.height;
+	}
+
+	function isBBoxIntersect(bbox1, bbox2) {
+	  bbox1 = rectBBox(bbox1);
+	  bbox2 = rectBBox(bbox2);
+	  return isPointInsideBBox$2(bbox2, bbox1.x, bbox1.y)
+	    || isPointInsideBBox$2(bbox2, bbox1.x2, bbox1.y)
+	    || isPointInsideBBox$2(bbox2, bbox1.x, bbox1.y2)
+	    || isPointInsideBBox$2(bbox2, bbox1.x2, bbox1.y2)
+	    || isPointInsideBBox$2(bbox1, bbox2.x, bbox2.y)
+	    || isPointInsideBBox$2(bbox1, bbox2.x2, bbox2.y)
+	    || isPointInsideBBox$2(bbox1, bbox2.x, bbox2.y2)
+	    || isPointInsideBBox$2(bbox1, bbox2.x2, bbox2.y2)
+	    || (bbox1.x < bbox2.x2 && bbox1.x > bbox2.x
+	        || bbox2.x < bbox1.x2 && bbox2.x > bbox1.x)
+	    && (bbox1.y < bbox2.y2 && bbox1.y > bbox2.y
+	        || bbox2.y < bbox1.y2 && bbox2.y > bbox1.y);
+	}
+
+	function base3(t, p1, p2, p3, p4) {
+	  var t1 = -3 * p1 + 9 * p2 - 9 * p3 + 3 * p4,
+	      t2 = t * t1 + 6 * p1 - 12 * p2 + 6 * p3;
+	  return t * t2 - 3 * p1 + 3 * p2;
+	}
+
+	function bezlen(x1, y1, x2, y2, x3, y3, x4, y4, z) {
+
+	  if (z == null) {
+	    z = 1;
+	  }
+
+	  z = z > 1 ? 1 : z < 0 ? 0 : z;
+
+	  var z2 = z / 2,
+	      n = 12,
+	      Tvalues = [-.1252,.1252,-.3678,.3678,-.5873,.5873,-.7699,.7699,-.9041,.9041,-.9816,.9816],
+	      Cvalues = [0.2491,0.2491,0.2335,0.2335,0.2032,0.2032,0.1601,0.1601,0.1069,0.1069,0.0472,0.0472],
+	      sum = 0;
+
+	  for (var i = 0; i < n; i++) {
+	    var ct = z2 * Tvalues[i] + z2,
+	        xbase = base3(ct, x1, x2, x3, x4),
+	        ybase = base3(ct, y1, y2, y3, y4),
+	        comb = xbase * xbase + ybase * ybase;
+
+	    sum += Cvalues[i] * math.sqrt(comb);
+	  }
+
+	  return z2 * sum;
+	}
+
+
+	function intersectLines(x1, y1, x2, y2, x3, y3, x4, y4) {
+
+	  if (
+	    mmax(x1, x2) < mmin(x3, x4) ||
+	      mmin(x1, x2) > mmax(x3, x4) ||
+	      mmax(y1, y2) < mmin(y3, y4) ||
+	      mmin(y1, y2) > mmax(y3, y4)
+	  ) {
+	    return;
+	  }
+
+	  var nx = (x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4),
+	      ny = (x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4),
+	      denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+
+	  if (!denominator) {
+	    return;
+	  }
+
+	  var px = fixError(nx / denominator),
+	      py = fixError(ny / denominator),
+	      px2 = +px.toFixed(2),
+	      py2 = +py.toFixed(2);
+
+	  if (
+	    px2 < +mmin(x1, x2).toFixed(2) ||
+	      px2 > +mmax(x1, x2).toFixed(2) ||
+	      px2 < +mmin(x3, x4).toFixed(2) ||
+	      px2 > +mmax(x3, x4).toFixed(2) ||
+	      py2 < +mmin(y1, y2).toFixed(2) ||
+	      py2 > +mmax(y1, y2).toFixed(2) ||
+	      py2 < +mmin(y3, y4).toFixed(2) ||
+	      py2 > +mmax(y3, y4).toFixed(2)
+	  ) {
+	    return;
+	  }
+
+	  return { x: px, y: py };
+	}
+
+	function fixError(number) {
+	  return Math.round(number * 100000000000) / 100000000000;
+	}
+
+	function findBezierIntersections(bez1, bez2, justCount) {
+	  var bbox1 = bezierBBox(bez1),
+	      bbox2 = bezierBBox(bez2);
+
+	  if (!isBBoxIntersect(bbox1, bbox2)) {
+	    return justCount ? 0 : [];
+	  }
+
+	  // As an optimization, lines will have only 1 segment
+
+	  var l1 = bezlen.apply(0, bez1),
+	      l2 = bezlen.apply(0, bez2),
+	      n1 = isLine(bez1) ? 1 : ~~(l1 / 5) || 1,
+	      n2 = isLine(bez2) ? 1 : ~~(l2 / 5) || 1,
+	      dots1 = [],
+	      dots2 = [],
+	      xy = {},
+	      res = justCount ? 0 : [];
+
+	  for (var i = 0; i < n1 + 1; i++) {
+	    var p = findDotsAtSegment.apply(0, bez1.concat(i / n1));
+	    dots1.push({ x: p.x, y: p.y, t: i / n1 });
+	  }
+
+	  for (i = 0; i < n2 + 1; i++) {
+	    p = findDotsAtSegment.apply(0, bez2.concat(i / n2));
+	    dots2.push({ x: p.x, y: p.y, t: i / n2 });
+	  }
+
+	  for (i = 0; i < n1; i++) {
+
+	    for (var j = 0; j < n2; j++) {
+	      var di = dots1[i],
+	          di1 = dots1[i + 1],
+	          dj = dots2[j],
+	          dj1 = dots2[j + 1],
+	          ci = abs$7(di1.x - di.x) < .01 ? 'y' : 'x',
+	          cj = abs$7(dj1.x - dj.x) < .01 ? 'y' : 'x',
+	          is = intersectLines(di.x, di.y, di1.x, di1.y, dj.x, dj.y, dj1.x, dj1.y),
+	          key;
+
+	      if (is) {
+	        key = is.x.toFixed(9) + '#' + is.y.toFixed(9);
+
+	        if (xy[key]) {
+	          continue;
+	        }
+
+	        xy[key] = true;
+
+	        var t1 = di.t + abs$7((is[ci] - di[ci]) / (di1[ci] - di[ci])) * (di1.t - di.t),
+	            t2 = dj.t + abs$7((is[cj] - dj[cj]) / (dj1[cj] - dj[cj])) * (dj1.t - dj.t);
+
+	        if (t1 >= 0 && t1 <= 1 && t2 >= 0 && t2 <= 1) {
+
+	          if (justCount) {
+	            res++;
+	          } else {
+	            res.push({
+	              x: is.x,
+	              y: is.y,
+	              t1: t1,
+	              t2: t2
+	            });
+	          }
+	        }
+	      }
+	    }
+	  }
+
+	  return res;
+	}
+
+
+	/**
+	 * Find or counts the intersections between two SVG paths.
+	 *
+	 * Returns a number in counting mode and a list of intersections otherwise.
+	 *
+	 * A single intersection entry contains the intersection coordinates (x, y)
+	 * as well as additional information regarding the intersecting segments
+	 * on each path (segment1, segment2) and the relative location of the
+	 * intersection on these segments (t1, t2).
+	 *
+	 * The path may be an SVG path string or a list of path components
+	 * such as `[ [ 'M', 0, 10 ], [ 'L', 20, 0 ] ]`.
+	 *
+	 * @example
+	 *
+	 * var intersections = findPathIntersections(
+	 *   'M0,0L100,100',
+	 *   [ [ 'M', 0, 100 ], [ 'L', 100, 0 ] ]
+	 * );
+	 *
+	 * // intersections = [
+	 * //   { x: 50, y: 50, segment1: 1, segment2: 1, t1: 0.5, t2: 0.5 }
+	 * // ]
+	 *
+	 * @param {String|Array<PathDef>} path1
+	 * @param {String|Array<PathDef>} path2
+	 * @param {Boolean} [justCount=false]
+	 *
+	 * @return {Array<Intersection>|Number}
+	 */
+	function findPathIntersections(path1, path2, justCount) {
+	  path1 = pathToCurve(path1);
+	  path2 = pathToCurve(path2);
+
+	  var x1, y1, x2, y2, x1m, y1m, x2m, y2m, bez1, bez2,
+	      res = justCount ? 0 : [];
+
+	  for (var i = 0, ii = path1.length; i < ii; i++) {
+	    var pi = path1[i];
+
+	    if (pi[0] == 'M') {
+	      x1 = x1m = pi[1];
+	      y1 = y1m = pi[2];
+	    } else {
+
+	      if (pi[0] == 'C') {
+	        bez1 = [x1, y1].concat(pi.slice(1));
+	        x1 = bez1[6];
+	        y1 = bez1[7];
+	      } else {
+	        bez1 = [x1, y1, x1, y1, x1m, y1m, x1m, y1m];
+	        x1 = x1m;
+	        y1 = y1m;
+	      }
+
+	      for (var j = 0, jj = path2.length; j < jj; j++) {
+	        var pj = path2[j];
+
+	        if (pj[0] == 'M') {
+	          x2 = x2m = pj[1];
+	          y2 = y2m = pj[2];
+	        } else {
+
+	          if (pj[0] == 'C') {
+	            bez2 = [x2, y2].concat(pj.slice(1));
+	            x2 = bez2[6];
+	            y2 = bez2[7];
+	          } else {
+	            bez2 = [x2, y2, x2, y2, x2m, y2m, x2m, y2m];
+	            x2 = x2m;
+	            y2 = y2m;
+	          }
+
+	          var intr = findBezierIntersections(bez1, bez2, justCount);
+
+	          if (justCount) {
+	            res += intr;
+	          } else {
+
+	            for (var k = 0, kk = intr.length; k < kk; k++) {
+	              intr[k].segment1 = i;
+	              intr[k].segment2 = j;
+	              intr[k].bez1 = bez1;
+	              intr[k].bez2 = bez2;
+	            }
+
+	            res = res.concat(intr);
+	          }
+	        }
+	      }
+	    }
+	  }
+
+	  return res;
+	}
+
+
+	function pathToAbsolute(pathArray) {
+	  var pth = paths(pathArray);
+
+	  if (pth.abs) {
+	    return pathClone(pth.abs);
+	  }
+
+	  if (!isArray(pathArray) || !isArray(pathArray && pathArray[0])) { // rough assumption
+	    pathArray = parsePathString(pathArray);
+	  }
+
+	  if (!pathArray || !pathArray.length) {
+	    return [['M', 0, 0]];
+	  }
+
+	  var res = [],
+	      x = 0,
+	      y = 0,
+	      mx = 0,
+	      my = 0,
+	      start = 0,
+	      pa0;
+
+	  if (pathArray[0][0] == 'M') {
+	    x = +pathArray[0][1];
+	    y = +pathArray[0][2];
+	    mx = x;
+	    my = y;
+	    start++;
+	    res[0] = ['M', x, y];
+	  }
+
+	  for (var r, pa, i = start, ii = pathArray.length; i < ii; i++) {
+	    res.push(r = []);
+	    pa = pathArray[i];
+	    pa0 = pa[0];
+
+	    if (pa0 != pa0.toUpperCase()) {
+	      r[0] = pa0.toUpperCase();
+
+	      switch (r[0]) {
+	      case 'A':
+	        r[1] = pa[1];
+	        r[2] = pa[2];
+	        r[3] = pa[3];
+	        r[4] = pa[4];
+	        r[5] = pa[5];
+	        r[6] = +pa[6] + x;
+	        r[7] = +pa[7] + y;
+	        break;
+	      case 'V':
+	        r[1] = +pa[1] + y;
+	        break;
+	      case 'H':
+	        r[1] = +pa[1] + x;
+	        break;
+	      case 'M':
+	        mx = +pa[1] + x;
+	        my = +pa[2] + y;
+	      default:
+	        for (var j = 1, jj = pa.length; j < jj; j++) {
+	          r[j] = +pa[j] + ((j % 2) ? x : y);
+	        }
+	      }
+	    } else {
+	      for (var k = 0, kk = pa.length; k < kk; k++) {
+	        r[k] = pa[k];
+	      }
+	    }
+	    pa0 = pa0.toUpperCase();
+
+	    switch (r[0]) {
+	    case 'Z':
+	      x = +mx;
+	      y = +my;
+	      break;
+	    case 'H':
+	      x = r[1];
+	      break;
+	    case 'V':
+	      y = r[1];
+	      break;
+	    case 'M':
+	      mx = r[r.length - 2];
+	      my = r[r.length - 1];
+	    default:
+	      x = r[r.length - 2];
+	      y = r[r.length - 1];
+	    }
+	  }
+
+	  res.toString = pathToString;
+	  pth.abs = pathClone(res);
+
+	  return res;
+	}
+
+	function isLine(bez) {
+	  return (
+	    bez[0] === bez[2] &&
+	    bez[1] === bez[3] &&
+	    bez[4] === bez[6] &&
+	    bez[5] === bez[7]
+	  );
+	}
+
+	function lineToCurve(x1, y1, x2, y2) {
+	  return [
+	    x1, y1, x2,
+	    y2, x2, y2
+	  ];
+	}
+
+	function qubicToCurve(x1, y1, ax, ay, x2, y2) {
+	  var _13 = 1 / 3,
+	      _23 = 2 / 3;
+
+	  return [
+	    _13 * x1 + _23 * ax,
+	    _13 * y1 + _23 * ay,
+	    _13 * x2 + _23 * ax,
+	    _13 * y2 + _23 * ay,
+	    x2,
+	    y2
+	  ];
+	}
+
+	function arcToCurve(x1, y1, rx, ry, angle, large_arc_flag, sweep_flag, x2, y2, recursive) {
+
+	  // for more information of where this math came from visit:
+	  // http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
+	  var _120 = PI * 120 / 180,
+	      rad = PI / 180 * (+angle || 0),
+	      res = [],
+	      xy,
+	      rotate = cacher(function(x, y, rad) {
+	        var X = x * math.cos(rad) - y * math.sin(rad),
+	            Y = x * math.sin(rad) + y * math.cos(rad);
+
+	        return { x: X, y: Y };
+	      });
+
+	  if (!recursive) {
+	    xy = rotate(x1, y1, -rad);
+	    x1 = xy.x;
+	    y1 = xy.y;
+	    xy = rotate(x2, y2, -rad);
+	    x2 = xy.x;
+	    y2 = xy.y;
+
+	    var x = (x1 - x2) / 2,
+	        y = (y1 - y2) / 2;
+
+	    var h = (x * x) / (rx * rx) + (y * y) / (ry * ry);
+
+	    if (h > 1) {
+	      h = math.sqrt(h);
+	      rx = h * rx;
+	      ry = h * ry;
+	    }
+
+	    var rx2 = rx * rx,
+	        ry2 = ry * ry,
+	        k = (large_arc_flag == sweep_flag ? -1 : 1) *
+	            math.sqrt(abs$7((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
+	        cx = k * rx * y / ry + (x1 + x2) / 2,
+	        cy = k * -ry * x / rx + (y1 + y2) / 2,
+	        f1 = math.asin(((y1 - cy) / ry).toFixed(9)),
+	        f2 = math.asin(((y2 - cy) / ry).toFixed(9));
+
+	    f1 = x1 < cx ? PI - f1 : f1;
+	    f2 = x2 < cx ? PI - f2 : f2;
+	    f1 < 0 && (f1 = PI * 2 + f1);
+	    f2 < 0 && (f2 = PI * 2 + f2);
+
+	    if (sweep_flag && f1 > f2) {
+	      f1 = f1 - PI * 2;
+	    }
+	    if (!sweep_flag && f2 > f1) {
+	      f2 = f2 - PI * 2;
+	    }
+	  } else {
+	    f1 = recursive[0];
+	    f2 = recursive[1];
+	    cx = recursive[2];
+	    cy = recursive[3];
+	  }
+
+	  var df = f2 - f1;
+
+	  if (abs$7(df) > _120) {
+	    var f2old = f2,
+	        x2old = x2,
+	        y2old = y2;
+
+	    f2 = f1 + _120 * (sweep_flag && f2 > f1 ? 1 : -1);
+	    x2 = cx + rx * math.cos(f2);
+	    y2 = cy + ry * math.sin(f2);
+	    res = arcToCurve(x2, y2, rx, ry, angle, 0, sweep_flag, x2old, y2old, [f2, f2old, cx, cy]);
+	  }
+
+	  df = f2 - f1;
+
+	  var c1 = math.cos(f1),
+	      s1 = math.sin(f1),
+	      c2 = math.cos(f2),
+	      s2 = math.sin(f2),
+	      t = math.tan(df / 4),
+	      hx = 4 / 3 * rx * t,
+	      hy = 4 / 3 * ry * t,
+	      m1 = [x1, y1],
+	      m2 = [x1 + hx * s1, y1 - hy * c1],
+	      m3 = [x2 + hx * s2, y2 - hy * c2],
+	      m4 = [x2, y2];
+
+	  m2[0] = 2 * m1[0] - m2[0];
+	  m2[1] = 2 * m1[1] - m2[1];
+
+	  if (recursive) {
+	    return [m2, m3, m4].concat(res);
+	  } else {
+	    res = [m2, m3, m4].concat(res).join().split(',');
+	    var newres = [];
+
+	    for (var i = 0, ii = res.length; i < ii; i++) {
+	      newres[i] = i % 2 ? rotate(res[i - 1], res[i], rad).y : rotate(res[i], res[i + 1], rad).x;
+	    }
+
+	    return newres;
+	  }
+	}
+
+	// Returns bounding box of cubic bezier curve.
+	// Source: http://blog.hackers-cafe.net/2009/06/how-to-calculate-bezier-curves-bounding.html
+	// Original version: NISHIO Hirokazu
+	// Modifications: https://github.com/timo22345
+	function curveBBox(x0, y0, x1, y1, x2, y2, x3, y3) {
+	  var tvalues = [],
+	      bounds = [[], []],
+	      a, b, c, t, t1, t2, b2ac, sqrtb2ac;
+
+	  for (var i = 0; i < 2; ++i) {
+
+	    if (i == 0) {
+	      b = 6 * x0 - 12 * x1 + 6 * x2;
+	      a = -3 * x0 + 9 * x1 - 9 * x2 + 3 * x3;
+	      c = 3 * x1 - 3 * x0;
+	    } else {
+	      b = 6 * y0 - 12 * y1 + 6 * y2;
+	      a = -3 * y0 + 9 * y1 - 9 * y2 + 3 * y3;
+	      c = 3 * y1 - 3 * y0;
+	    }
+
+	    if (abs$7(a) < 1e-12) {
+
+	      if (abs$7(b) < 1e-12) {
+	        continue;
+	      }
+
+	      t = -c / b;
+
+	      if (0 < t && t < 1) {
+	        tvalues.push(t);
+	      }
+
+	      continue;
+	    }
+
+	    b2ac = b * b - 4 * c * a;
+	    sqrtb2ac = math.sqrt(b2ac);
+
+	    if (b2ac < 0) {
+	      continue;
+	    }
+
+	    t1 = (-b + sqrtb2ac) / (2 * a);
+
+	    if (0 < t1 && t1 < 1) {
+	      tvalues.push(t1);
+	    }
+
+	    t2 = (-b - sqrtb2ac) / (2 * a);
+
+	    if (0 < t2 && t2 < 1) {
+	      tvalues.push(t2);
+	    }
+	  }
+
+	  var j = tvalues.length,
+	      jlen = j,
+	      mt;
+
+	  while (j--) {
+	    t = tvalues[j];
+	    mt = 1 - t;
+	    bounds[0][j] = (mt * mt * mt * x0) + (3 * mt * mt * t * x1) + (3 * mt * t * t * x2) + (t * t * t * x3);
+	    bounds[1][j] = (mt * mt * mt * y0) + (3 * mt * mt * t * y1) + (3 * mt * t * t * y2) + (t * t * t * y3);
+	  }
+
+	  bounds[0][jlen] = x0;
+	  bounds[1][jlen] = y0;
+	  bounds[0][jlen + 1] = x3;
+	  bounds[1][jlen + 1] = y3;
+	  bounds[0].length = bounds[1].length = jlen + 2;
+
+	  return {
+	    x0: mmin.apply(0, bounds[0]),
+	    y0: mmin.apply(0, bounds[1]),
+	    x1: mmax.apply(0, bounds[0]),
+	    y1: mmax.apply(0, bounds[1])
+	  };
+	}
+
+	function pathToCurve(path) {
+
+	  var pth = paths(path);
+
+	  // return cached curve, if existing
+	  if (pth.curve) {
+	    return pathClone(pth.curve);
+	  }
+
+	  var curvedPath = pathToAbsolute(path),
+	      attrs = { x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null },
+	      processPath = function(path, d, pathCommand) {
+	        var nx, ny;
+
+	        if (!path) {
+	          return ['C', d.x, d.y, d.x, d.y, d.x, d.y];
+	        }
+
+	        !(path[0] in { T: 1, Q: 1 }) && (d.qx = d.qy = null);
+
+	        switch (path[0]) {
+	        case 'M':
+	          d.X = path[1];
+	          d.Y = path[2];
+	          break;
+	        case 'A':
+	          path = ['C'].concat(arcToCurve.apply(0, [d.x, d.y].concat(path.slice(1))));
+	          break;
+	        case 'S':
+	          if (pathCommand == 'C' || pathCommand == 'S') {
+
+	            // In 'S' case we have to take into account, if the previous command is C/S.
+	            nx = d.x * 2 - d.bx;
+
+	            // And reflect the previous
+	            ny = d.y * 2 - d.by;
+
+	            // command's control point relative to the current point.
+	          }
+	          else {
+
+	            // or some else or nothing
+	            nx = d.x;
+	            ny = d.y;
+	          }
+	          path = ['C', nx, ny].concat(path.slice(1));
+	          break;
+	        case 'T':
+	          if (pathCommand == 'Q' || pathCommand == 'T') {
+
+	            // In 'T' case we have to take into account, if the previous command is Q/T.
+	            d.qx = d.x * 2 - d.qx;
+
+	            // And make a reflection similar
+	            d.qy = d.y * 2 - d.qy;
+
+	            // to case 'S'.
+	          }
+	          else {
+
+	            // or something else or nothing
+	            d.qx = d.x;
+	            d.qy = d.y;
+	          }
+	          path = ['C'].concat(qubicToCurve(d.x, d.y, d.qx, d.qy, path[1], path[2]));
+	          break;
+	        case 'Q':
+	          d.qx = path[1];
+	          d.qy = path[2];
+	          path = ['C'].concat(qubicToCurve(d.x, d.y, path[1], path[2], path[3], path[4]));
+	          break;
+	        case 'L':
+	          path = ['C'].concat(lineToCurve(d.x, d.y, path[1], path[2]));
+	          break;
+	        case 'H':
+	          path = ['C'].concat(lineToCurve(d.x, d.y, path[1], d.y));
+	          break;
+	        case 'V':
+	          path = ['C'].concat(lineToCurve(d.x, d.y, d.x, path[1]));
+	          break;
+	        case 'Z':
+	          path = ['C'].concat(lineToCurve(d.x, d.y, d.X, d.Y));
+	          break;
+	        }
+
+	        return path;
+	      },
+
+	      fixArc = function(pp, i) {
+
+	        if (pp[i].length > 7) {
+	          pp[i].shift();
+	          var pi = pp[i];
+
+	          while (pi.length) {
+	            pathCommands[i] = 'A'; // if created multiple C:s, their original seg is saved
+	            pp.splice(i++, 0, ['C'].concat(pi.splice(0, 6)));
+	          }
+
+	          pp.splice(i, 1);
+	          ii = curvedPath.length;
+	        }
+	      },
+
+	      pathCommands = [], // path commands of original path p
+	      pfirst = '', // temporary holder for original path command
+	      pathCommand = ''; // holder for previous path command of original path
+
+	  for (var i = 0, ii = curvedPath.length; i < ii; i++) {
+	    curvedPath[i] && (pfirst = curvedPath[i][0]); // save current path command
+
+	    if (pfirst != 'C') // C is not saved yet, because it may be result of conversion
+	    {
+	      pathCommands[i] = pfirst; // Save current path command
+	      i && (pathCommand = pathCommands[i - 1]); // Get previous path command pathCommand
+	    }
+	    curvedPath[i] = processPath(curvedPath[i], attrs, pathCommand); // Previous path command is inputted to processPath
+
+	    if (pathCommands[i] != 'A' && pfirst == 'C') pathCommands[i] = 'C'; // A is the only command
+	    // which may produce multiple C:s
+	    // so we have to make sure that C is also C in original path
+
+	    fixArc(curvedPath, i); // fixArc adds also the right amount of A:s to pathCommands
+
+	    var seg = curvedPath[i],
+	        seglen = seg.length;
+
+	    attrs.x = seg[seglen - 2];
+	    attrs.y = seg[seglen - 1];
+	    attrs.bx = toFloat(seg[seglen - 4]) || attrs.x;
+	    attrs.by = toFloat(seg[seglen - 3]) || attrs.y;
+	  }
+
+	  // cache curve
+	  pth.curve = pathClone(curvedPath);
+
+	  return curvedPath;
+	}
+
+	var intersect = findPathIntersections;
+
+	function roundBounds(bounds) {
+	  return {
+	    x: Math.round(bounds.x),
+	    y: Math.round(bounds.y),
+	    width: Math.round(bounds.width),
+	    height: Math.round(bounds.height)
+	  };
+	}
+
+
+	function roundPoint(point) {
+
+	  return {
+	    x: Math.round(point.x),
+	    y: Math.round(point.y)
+	  };
+	}
+
+
+	/**
+	 * Convert the given bounds to a { top, left, bottom, right } descriptor.
+	 *
+	 * @param {Bounds|Point} bounds
+	 *
+	 * @return {Object}
+	 */
+	function asTRBL(bounds) {
+	  return {
+	    top: bounds.y,
+	    right: bounds.x + (bounds.width || 0),
+	    bottom: bounds.y + (bounds.height || 0),
+	    left: bounds.x
+	  };
+	}
+
+
+	/**
+	 * Convert a { top, left, bottom, right } to an objects bounds.
+	 *
+	 * @param {Object} trbl
+	 *
+	 * @return {Bounds}
+	 */
+	function asBounds(trbl) {
+	  return {
+	    x: trbl.left,
+	    y: trbl.top,
+	    width: trbl.right - trbl.left,
+	    height: trbl.bottom - trbl.top
+	  };
+	}
+
+
+	/**
+	 * Get the mid of the given bounds or point.
+	 *
+	 * @param {Bounds|Point} bounds
+	 *
+	 * @return {Point}
+	 */
+	function getMid(bounds) {
+	  return roundPoint({
+	    x: bounds.x + (bounds.width || 0) / 2,
+	    y: bounds.y + (bounds.height || 0) / 2
+	  });
+	}
+
+
+	// orientation utils //////////////////////
+
+	/**
+	 * Get orientation of the given rectangle with respect to
+	 * the reference rectangle.
+	 *
+	 * A padding (positive or negative) may be passed to influence
+	 * horizontal / vertical orientation and intersection.
+	 *
+	 * @param {Bounds} rect
+	 * @param {Bounds} reference
+	 * @param {Point|number} padding
+	 *
+	 * @return {string} the orientation; one of top, top-left, left, ..., bottom, right or intersect.
+	 */
+	function getOrientation(rect, reference, padding) {
+
+	  padding = padding || 0;
+
+	  // make sure we can use an object, too
+	  // for individual { x, y } padding
+	  if (!isObject(padding)) {
+	    padding = { x: padding, y: padding };
+	  }
+
+
+	  var rectOrientation = asTRBL(rect),
+	      referenceOrientation = asTRBL(reference);
+
+	  var top = rectOrientation.bottom + padding.y <= referenceOrientation.top,
+	      right = rectOrientation.left - padding.x >= referenceOrientation.right,
+	      bottom = rectOrientation.top - padding.y >= referenceOrientation.bottom,
+	      left = rectOrientation.right + padding.x <= referenceOrientation.left;
+
+	  var vertical = top ? 'top' : (bottom ? 'bottom' : null),
+	      horizontal = left ? 'left' : (right ? 'right' : null);
+
+	  if (horizontal && vertical) {
+	    return vertical + '-' + horizontal;
+	  } else {
+	    return horizontal || vertical || 'intersect';
+	  }
+	}
+
+
+	// intersection utils //////////////////////
+
+	/**
+	 * Get intersection between an element and a line path.
+	 *
+	 * @param {PathDef} elementPath
+	 * @param {PathDef} linePath
+	 * @param {boolean} cropStart crop from start or end
+	 *
+	 * @return {Point}
+	 */
+	function getElementLineIntersection(elementPath, linePath, cropStart) {
+
+	  var intersections = getIntersections(elementPath, linePath);
+
+	  // recognize intersections
+	  // only one -> choose
+	  // two close together -> choose first
+	  // two or more distinct -> pull out appropriate one
+	  // none -> ok (fallback to point itself)
+	  if (intersections.length === 1) {
+	    return roundPoint(intersections[0]);
+	  } else if (intersections.length === 2 && pointDistance(intersections[0], intersections[1]) < 1) {
+	    return roundPoint(intersections[0]);
+	  } else if (intersections.length > 1) {
+
+	    // sort by intersections based on connection segment +
+	    // distance from start
+	    intersections = sortBy(intersections, function(i) {
+	      var distance = Math.floor(i.t2 * 100) || 1;
+
+	      distance = 100 - distance;
+
+	      distance = (distance < 10 ? '0' : '') + distance;
+
+	      // create a sort string that makes sure we sort
+	      // line segment ASC + line segment position DESC (for cropStart)
+	      // line segment ASC + line segment position ASC (for cropEnd)
+	      return i.segment2 + '#' + distance;
+	    });
+
+	    return roundPoint(intersections[cropStart ? 0 : intersections.length - 1]);
+	  }
+
+	  return null;
+	}
+
+
+	function getIntersections(a, b) {
+	  return intersect(a, b);
+	}
+
+
+	function filterRedundantWaypoints(waypoints) {
+
+	  // alter copy of waypoints, not original
+	  waypoints = waypoints.slice();
+
+	  var idx = 0,
+	      point,
+	      previousPoint,
+	      nextPoint;
+
+	  while (waypoints[idx]) {
+	    point = waypoints[idx];
+	    previousPoint = waypoints[idx - 1];
+	    nextPoint = waypoints[idx + 1];
+
+	    if (pointDistance(point, nextPoint) === 0 ||
+	        pointsOnLine(previousPoint, nextPoint, point)) {
+
+	      // remove point, if overlapping with {nextPoint}
+	      // or on line with {previousPoint} -> {point} -> {nextPoint}
+	      waypoints.splice(idx, 1);
+	    } else {
+	      idx++;
+	    }
+	  }
+
+	  return waypoints;
+	}
+
+	function round$b(number, resolution) {
 	  return Math.round(number * resolution) / resolution;
 	}
 
 	function ensurePx(number) {
 	  return isNumber(number) ? number + 'px' : number;
+	}
+
+	function findRoot(element) {
+	  while (element.parent) {
+	    element = element.parent;
+	  }
+
+	  return element;
 	}
 
 	/**
@@ -3115,8 +4374,8 @@
 	}
 
 	function createGroup(parent, cls, childIndex) {
-	  var group = create('g');
-	  classes$1(group).add(cls);
+	  var group = create$1('g');
+	  classes(group).add(cls);
 
 	  var index = childIndex !== undefined ? childIndex : parent.childNodes.length - 1;
 
@@ -3128,6 +4387,10 @@
 	}
 
 	var BASE_LAYER = 'base';
+
+	// render plane contents behind utility layers
+	var PLANE_LAYER_INDEX = 0;
+	var UTILITY_LAYER_INDEX = 1;
 
 
 	var REQUIRED_MODEL_ATTRS = {
@@ -3154,6 +4417,12 @@
 	  this._elementRegistry = elementRegistry;
 	  this._graphicsFactory = graphicsFactory;
 
+	  this._rootsIdx = 0;
+
+	  this._layers = {};
+	  this._planes = [];
+	  this._rootElement = null;
+
 	  this._init(config || {});
 	}
 
@@ -3164,39 +4433,37 @@
 	  'elementRegistry'
 	];
 
+	/**
+	 * Creates a <svg> element that is wrapped into a <div>.
+	 * This way we are always able to correctly figure out the size of the svg element
+	 * by querying the parent node.
 
+	 * (It is not possible to get the size of a svg element cross browser @ 2014-04-01)
+
+	 * <div class="djs-container" style="width: {desired-width}, height: {desired-height}">
+	 *   <svg width="100%" height="100%">
+	 *    ...
+	 *   </svg>
+	 * </div>
+	 */
 	Canvas.prototype._init = function(config) {
 
 	  var eventBus = this._eventBus;
 
-	  // Creates a <svg> element that is wrapped into a <div>.
-	  // This way we are always able to correctly figure out the size of the svg element
-	  // by querying the parent node.
-	  //
-	  // (It is not possible to get the size of a svg element cross browser @ 2014-04-01)
-	  //
-	  // <div class="djs-container" style="width: {desired-width}, height: {desired-height}">
-	  //   <svg width="100%" height="100%">
-	  //    ...
-	  //   </svg>
-	  // </div>
-
 	  // html container
 	  var container = this._container = createContainer(config);
 
-	  var svg = this._svg = create('svg');
-	  attr$1(svg, { width: '100%', height: '100%' });
+	  var svg = this._svg = create$1('svg');
+	  attr(svg, { width: '100%', height: '100%' });
 
 	  append(container, svg);
 
 	  var viewport = this._viewport = createGroup(svg, 'viewport');
 
-	  this._layers = {};
-
 	  // debounce canvas.viewbox.changed events
 	  // for smoother diagram interaction
 	  if (config.deferUpdate !== false) {
-	    this._viewboxChanged = debounce(bind(this._viewboxChanged, this), 300);
+	    this._viewboxChanged = debounce(bind$2(this._viewboxChanged, this), 300);
 	  }
 
 	  eventBus.on('diagram.init', function() {
@@ -3226,7 +4493,8 @@
 	    'connection.added',
 	    'shape.removed',
 	    'connection.removed',
-	    'elements.changed'
+	    'elements.changed',
+	    'root.set'
 	  ], function() {
 	    delete this._cachedViewbox;
 	  }, this);
@@ -3250,6 +4518,7 @@
 	  delete this._svg;
 	  delete this._container;
 	  delete this._layers;
+	  delete this._planes;
 	  delete this._rootElement;
 	  delete this._viewport;
 	};
@@ -3265,11 +4534,15 @@
 	    var type = getType(element);
 
 	    if (type === 'root') {
-	      self.setRootElement(null, true);
+	      self.removeRootElement(element);
 	    } else {
 	      self._removeElement(element, type);
 	    }
 	  });
+
+	  // remove all planes
+	  this._planes = [];
+	  this._rootElement = null;
 
 	  // force recomputation of view box
 	  delete this._cachedViewbox;
@@ -3282,7 +4555,7 @@
 	 * @returns {SVGElement}
 	 */
 	Canvas.prototype.getDefaultLayer = function() {
-	  return this.getLayer(BASE_LAYER, 0);
+	  return this.getLayer(BASE_LAYER, PLANE_LAYER_INDEX);
 	};
 
 	/**
@@ -3331,8 +4604,8 @@
 	 */
 	Canvas.prototype._createLayer = function(name, index) {
 
-	  if (!index) {
-	    index = 0;
+	  if (typeof index === 'undefined') {
+	    index = UTILITY_LAYER_INDEX;
 	  }
 
 	  var childIndex = reduce(this._layers, function(childIndex, layer) {
@@ -3349,6 +4622,75 @@
 	  };
 
 	};
+
+
+	Canvas.prototype._removeLayer = function(name) {
+
+	  var layer = this._layers[name];
+
+	  if (layer) {
+	    delete this._layers[name];
+
+	    remove$1(layer.group);
+	  }
+	};
+
+	/**
+	 * Returns the currently active layer. Can be null.
+	 *
+	 * @returns {SVGElement|null}
+	 */
+	Canvas.prototype.getActiveLayer = function() {
+	  var plane = this._findPlaneForRoot(this.getRootElement());
+
+	  if (!plane) {
+	    return null;
+	  }
+
+	  return plane.layer;
+	};
+
+
+	/**
+	 * Returns the plane which contains the given element.
+	 *
+	 * @param {string|djs.model.Base} element
+	 *
+	 * @return {djs.model.Base} root for element
+	 */
+	Canvas.prototype.findRoot = function(element) {
+	  if (typeof element === 'string') {
+	    element = this._elementRegistry.get(element);
+	  }
+
+	  if (!element) {
+	    return;
+	  }
+
+	  var plane = this._findPlaneForRoot(
+	    findRoot(element)
+	  ) || {};
+
+	  return plane.rootElement;
+	};
+
+	/**
+	 * Return a list of all root elements on the diagram.
+	 *
+	 * @return {djs.model.Root[]}
+	 */
+	Canvas.prototype.getRootElements = function() {
+	  return this._planes.map(function(plane) {
+	    return plane.rootElement;
+	  });
+	};
+
+	Canvas.prototype._findPlaneForRoot = function(rootElement) {
+	  return find(this._planes, function(plane) {
+	    return plane.rootElement === rootElement;
+	  });
+	};
+
 
 	/**
 	 * Returns the html element that encloses the
@@ -3382,9 +4724,9 @@
 
 	      // invoke either addClass or removeClass based on mode
 	      if (add) {
-	        classes$1(gfx).add(marker);
+	        classes(gfx).add(marker);
 	      } else {
-	        classes$1(gfx).remove(marker);
+	        classes(gfx).remove(marker);
 	      }
 	    }
 	  });
@@ -3450,7 +4792,7 @@
 
 	  var gfx = this.getGraphics(element);
 
-	  return classes$1(gfx).has(marker);
+	  return classes(gfx).has(marker);
 	};
 
 	/**
@@ -3470,14 +4812,106 @@
 	  }
 	};
 
+	/**
+	 * Returns the current root element.
+	 *
+	 * Supports two different modes for handling root elements:
+	 *
+	 * 1. if no root element has been added before, an implicit root will be added
+	 * and returned. This is used in applications that don't require explicit
+	 * root elements.
+	 *
+	 * 2. when root elements have been added before calling `getRootElement`,
+	 * root elements can be null. This is used for applications that want to manage
+	 * root elements themselves.
+	 *
+	 * @returns {Object|djs.model.Root|null} rootElement.
+	 */
 	Canvas.prototype.getRootElement = function() {
-	  if (!this._rootElement) {
-	    this.setRootElement({ id: '__implicitroot', children: [] });
+	  var rootElement = this._rootElement;
+
+	  // can return null if root elements are present but none was set yet
+	  if (rootElement || this._planes.length) {
+	    return rootElement;
 	  }
 
-	  return this._rootElement;
+	  return this.setRootElement(this.addRootElement(null));
 	};
 
+	/**
+	 * Adds a given root element and returns it.
+	 *
+	 * @param {Object|djs.model.Root} rootElement
+	 *
+	 * @return {Object|djs.model.Root} rootElement
+	 */
+
+	Canvas.prototype.addRootElement = function(rootElement) {
+	  var idx = this._rootsIdx++;
+
+	  if (!rootElement) {
+	    rootElement = {
+	      id: '__implicitroot_' + idx,
+	      children: [],
+	      isImplicit: true
+	    };
+	  }
+
+	  var layerName = rootElement.layer = 'root-' + idx;
+
+	  this._ensureValid('root', rootElement);
+
+	  var layer = this.getLayer(layerName, PLANE_LAYER_INDEX);
+
+	  attr(layer, 'display', 'none');
+
+	  this._addRoot(rootElement, layer);
+
+	  this._planes.push({
+	    rootElement: rootElement,
+	    layer: layer
+	  });
+
+	  return rootElement;
+	};
+
+	/**
+	 * Removes a given rootElement and returns it.
+	 *
+	 * @param {djs.model.Root|String} rootElement
+	 *
+	 * @return {Object|djs.model.Root} rootElement
+	 */
+	Canvas.prototype.removeRootElement = function(rootElement) {
+
+	  if (typeof rootElement === 'string') {
+	    rootElement = this._elementRegistry.get(rootElement);
+	  }
+
+	  var plane = this._findPlaneForRoot(rootElement);
+
+	  if (!plane) {
+	    return;
+	  }
+
+	  // hook up life-cycle events
+	  this._removeRoot(rootElement);
+
+	  // clean up layer
+	  this._removeLayer(rootElement.layer);
+
+	  // clean up plane
+	  this._planes = this._planes.filter(function(plane) {
+	    return plane.rootElement !== rootElement;
+	  });
+
+	  // clean up active root
+	  if (this._rootElement === rootElement) {
+	    this._rootElement = null;
+	  }
+
+	  return rootElement;
+	};
 
 
 	// root element handling //////////////////////
@@ -3486,50 +4920,98 @@
 	 * Sets a given element as the new root element for the canvas
 	 * and returns the new root element.
 	 *
-	 * @param {Object|djs.model.Root} element
-	 * @param {boolean} [override] whether to override the current root element, if any
+	 * @param {Object|djs.model.Root} rootElement
 	 *
 	 * @return {Object|djs.model.Root} new root element
 	 */
-	Canvas.prototype.setRootElement = function(element, override) {
+	Canvas.prototype.setRootElement = function(rootElement, override) {
 
-	  if (element) {
-	    this._ensureValid('root', element);
+	  if (isDefined(override)) {
+	    throw new Error('override not supported');
 	  }
 
-	  var currentRoot = this._rootElement,
-	      elementRegistry = this._elementRegistry,
-	      eventBus = this._eventBus;
-
-	  if (currentRoot) {
-	    if (!override) {
-	      throw new Error('rootElement already set, need to specify override');
-	    }
-
-	    // simulate element remove event sequence
-	    eventBus.fire('root.remove', { element: currentRoot });
-	    eventBus.fire('root.removed', { element: currentRoot });
-
-	    elementRegistry.remove(currentRoot);
+	  if (rootElement === this._rootElement) {
+	    return;
 	  }
 
-	  if (element) {
-	    var gfx = this.getDefaultLayer();
+	  var plane;
 
-	    // resemble element add event sequence
-	    eventBus.fire('root.add', { element: element });
-
-	    elementRegistry.add(element, gfx, this._svg);
-
-	    eventBus.fire('root.added', { element: element, gfx: gfx });
+	  if (!rootElement) {
+	    throw new Error('rootElement required');
 	  }
 
-	  this._rootElement = element;
+	  plane = this._findPlaneForRoot(rootElement);
 
-	  return element;
+	  // give set add semantics for backwards compatibility
+	  if (!plane) {
+	    rootElement = this.addRootElement(rootElement);
+	  }
+
+	  this._setRoot(rootElement);
+
+	  return rootElement;
 	};
 
 
+	Canvas.prototype._removeRoot = function(element) {
+	  var elementRegistry = this._elementRegistry,
+	      eventBus = this._eventBus;
+
+	  // simulate element remove event sequence
+	  eventBus.fire('root.remove', { element: element });
+	  eventBus.fire('root.removed', { element: element });
+
+	  elementRegistry.remove(element);
+	};
+
+
+	Canvas.prototype._addRoot = function(element, gfx) {
+	  var elementRegistry = this._elementRegistry,
+	      eventBus = this._eventBus;
+
+	  // resemble element add event sequence
+	  eventBus.fire('root.add', { element: element });
+
+	  elementRegistry.add(element, gfx);
+
+	  eventBus.fire('root.added', { element: element, gfx: gfx });
+	};
+
+
+	Canvas.prototype._setRoot = function(rootElement, layer) {
+
+	  var currentRoot = this._rootElement;
+
+	  var currentLayer;
+
+	  if (currentRoot) {
+
+	    // un-associate previous root element <svg>
+	    this._elementRegistry.updateGraphics(currentRoot, null, true);
+
+	    // hide previous layer
+	    currentLayer = this._findPlaneForRoot(currentRoot).layer;
+
+	    attr(currentLayer, 'display', 'none');
+	  }
+
+	  if (rootElement) {
+
+	    if (!layer) {
+	      layer = this._findPlaneForRoot(rootElement).layer;
+	    }
+
+	    // associate element with <svg>
+	    this._elementRegistry.updateGraphics(rootElement, this._svg, true);
+
+	    // show root layer
+	    attr(layer, 'display', null);
+	  }
+
+	  this._rootElement = rootElement;
+
+	  this._eventBus.fire('root.set', { element: rootElement });
+	};
 
 	// add functionality //////////////////////
 
@@ -3539,7 +5021,7 @@
 	  }
 
 	  if (this._elementRegistry.get(element.id)) {
-	    throw new Error('element with id ' + element.id + ' already exists');
+	    throw new Error('element <' + element.id + '> already exists');
 	  }
 
 	  var requiredAttrs = REQUIRED_MODEL_ATTRS[type];
@@ -3555,7 +5037,7 @@
 	};
 
 	Canvas.prototype._setParent = function(element, parent, parentIndex) {
-	  add$1(parent.children, element, parentIndex);
+	  add(parent.children, element, parentIndex);
 	  element.parent = parent;
 	};
 
@@ -3654,7 +5136,7 @@
 	  graphicsFactory.remove(element);
 
 	  // unset parent <-> child relationship
-	  remove$2(element.parent && element.parent.children, element);
+	  remove(element.parent && element.parent.children, element);
 	  element.parent = null;
 
 	  eventBus.fire(type + '.removed', { element: element });
@@ -3829,23 +5311,26 @@
 	      innerBox,
 	      outerBox = this.getSize(),
 	      matrix,
-	      transform$1,
+	      activeLayer,
+	      transform,
 	      scale,
 	      x, y;
 
 	  if (!box) {
 
 	    // compute the inner box based on the
-	    // diagrams default layer. This allows us to exclude
+	    // diagrams active layer. This allows us to exclude
 	    // external components, such as overlays
-	    innerBox = this.getDefaultLayer().getBBox();
 
-	    transform$1 = transform(viewport);
-	    matrix = transform$1 ? transform$1.matrix : createMatrix();
-	    scale = round(matrix.a, 1000);
+	    activeLayer = this._rootElement ? this.getActiveLayer() : null;
+	    innerBox = activeLayer && activeLayer.getBBox() || {};
 
-	    x = round(-matrix.e || 0, 1000);
-	    y = round(-matrix.f || 0, 1000);
+	    transform = transform$1(viewport);
+	    matrix = transform ? transform.matrix : createMatrix();
+	    scale = round$b(matrix.a, 1000);
+
+	    x = round$b(-matrix.e || 0, 1000);
+	    y = round$b(-matrix.f || 0, 1000);
 
 	    box = this._cachedViewbox = {
 	      x: x ? x / scale : 0,
@@ -3854,10 +5339,10 @@
 	      height: outerBox.height / scale,
 	      scale: scale,
 	      inner: {
-	        width: innerBox.width,
-	        height: innerBox.height,
-	        x: innerBox.x,
-	        y: innerBox.y
+	        width: innerBox.width || 0,
+	        height: innerBox.height || 0,
+	        x: innerBox.x || 0,
+	        y: innerBox.y || 0
 	      },
 	      outer: outerBox
 	    };
@@ -3872,7 +5357,7 @@
 	        .scale(scale)
 	        .translate(-box.x, -box.y);
 
-	      transform(viewport, matrix);
+	      transform$1(viewport, matrix);
 	    });
 	  }
 
@@ -3906,6 +5391,78 @@
 	  return { x: matrix.e, y: matrix.f };
 	};
 
+	/**
+	 * Scrolls the viewbox to contain the given element.
+	 * Optionally specify a padding to be applied to the edges.
+	 *
+	 * @param {Object|String} [element] the element to scroll to.
+	 * @param {Object|Number} [padding=100] the padding to be applied. Can also specify top, bottom, left and right.
+	 *
+	 */
+	Canvas.prototype.scrollToElement = function(element, padding) {
+	  var defaultPadding = 100;
+
+	  if (typeof element === 'string') {
+	    element = this._elementRegistry.get(element);
+	  }
+
+	  // set to correct rootElement
+	  var rootElement = this.findRoot(element);
+
+	  if (rootElement !== this.getRootElement()) {
+	    this.setRootElement(rootElement);
+	  }
+
+	  if (!padding) {
+	    padding = {};
+	  }
+	  if (typeof padding === 'number') {
+	    defaultPadding = padding;
+	  }
+
+	  padding = {
+	    top: padding.top || defaultPadding,
+	    right: padding.right || defaultPadding,
+	    bottom: padding.bottom || defaultPadding,
+	    left: padding.left || defaultPadding
+	  };
+
+	  var elementBounds = getBBox(element),
+	      elementTrbl = asTRBL(elementBounds),
+	      viewboxBounds = this.viewbox(),
+	      zoom = this.zoom(),
+	      dx, dy;
+
+	  // shrink viewboxBounds with padding
+	  viewboxBounds.y += padding.top / zoom;
+	  viewboxBounds.x += padding.left / zoom;
+	  viewboxBounds.width -= (padding.right + padding.left) / zoom;
+	  viewboxBounds.height -= (padding.bottom + padding.top) / zoom;
+
+	  var viewboxTrbl = asTRBL(viewboxBounds);
+
+	  var canFit = elementBounds.width < viewboxBounds.width && elementBounds.height < viewboxBounds.height;
+
+	  if (!canFit) {
+
+	    // top-left when element can't fit
+	    dx = elementBounds.x - viewboxBounds.x;
+	    dy = elementBounds.y - viewboxBounds.y;
+
+	  } else {
+
+	    var dRight = Math.max(0, elementTrbl.right - viewboxTrbl.right),
+	        dLeft = Math.min(0, elementTrbl.left - viewboxTrbl.left),
+	        dBottom = Math.max(0, elementTrbl.bottom - viewboxTrbl.bottom),
+	        dTop = Math.min(0, elementTrbl.top - viewboxTrbl.top);
+
+	    dx = dRight || dLeft;
+	    dy = dBottom || dTop;
+
+	  }
+
+	  this.scroll({ dx: -dx * zoom, dy: -dy * zoom });
+	};
 
 	/**
 	 * Gets or sets the current zoom of the canvas, optionally zooming
@@ -3947,7 +5504,7 @@
 	    matrix = this._setZoom(newScale, center);
 	  });
 
-	  return round(matrix.a, 1000);
+	  return round$b(matrix.a, 1000);
 	};
 
 	function setCTM(node, m) {
@@ -4137,10 +5694,10 @@
 	  this._validateId(id);
 
 	  // associate dom node with element
-	  attr$1(gfx, ELEMENT_ID, id);
+	  attr(gfx, ELEMENT_ID, id);
 
 	  if (secondaryGfx) {
-	    attr$1(secondaryGfx, ELEMENT_ID, id);
+	    attr(secondaryGfx, ELEMENT_ID, id);
 	  }
 
 	  this._elements[id] = { element: element, gfx: gfx, secondaryGfx: secondaryGfx };
@@ -4159,10 +5716,10 @@
 	  if (container) {
 
 	    // unset element id on gfx
-	    attr$1(container.gfx, ELEMENT_ID, '');
+	    attr(container.gfx, ELEMENT_ID, '');
 
 	    if (container.secondaryGfx) {
-	      attr$1(container.secondaryGfx, ELEMENT_ID, '');
+	      attr(container.secondaryGfx, ELEMENT_ID, '');
 	    }
 
 	    delete elements[id];
@@ -4199,6 +5756,31 @@
 	};
 
 	/**
+	 * Update the graphics of an element
+	 *
+	 * @param {djs.model.Base} element
+	 * @param {SVGElement} gfx
+	 * @param {boolean} [secondary=false] whether to update the secondary connected element
+	 */
+	ElementRegistry.prototype.updateGraphics = function(filter, gfx, secondary) {
+	  var id = filter.id || filter;
+
+	  var container = this._elements[id];
+
+	  if (secondary) {
+	    container.secondaryGfx = gfx;
+	  } else {
+	    container.gfx = gfx;
+	  }
+
+	  if (gfx) {
+	    attr(gfx, ELEMENT_ID, id);
+	  }
+
+	  return gfx;
+	};
+
+	/**
 	 * Return the model element for a given id or graphics.
 	 *
 	 * @example
@@ -4217,7 +5799,7 @@
 	  if (typeof filter === 'string') {
 	    id = filter;
 	  } else {
-	    id = filter && attr$1(filter, ELEMENT_ID);
+	    id = filter && attr(filter, ELEMENT_ID);
 	  }
 
 	  var container = this._elements[id];
@@ -4242,6 +5824,29 @@
 	  });
 
 	  return filtered;
+	};
+
+	/**
+	 * Return the first element that satisfies the provided testing function.
+	 *
+	 * @param {Function} fn
+	 *
+	 * @return {djs.model.Base}
+	 */
+	ElementRegistry.prototype.find = function(fn) {
+	  var map = this._elements,
+	      keys = Object.keys(map);
+
+	  for (var i = 0; i < keys.length; i++) {
+	    var id = keys[i],
+	        container = map[id],
+	        element = container.element,
+	        gfx = container.gfx;
+
+	    if (fn(element, gfx)) {
+	      return element;
+	    }
+	  }
 	};
 
 	/**
@@ -4311,6 +5916,10 @@
 	  }
 	};
 
+	var objectRefs = {exports: {}};
+
+	var collection = {};
+
 	/**
 	 * An empty collection stub. Use {@link RefsCollection.extend} to extend a
 	 * collection with ref semantics.
@@ -4331,7 +5940,7 @@
 	 *
 	 * @return {RefsCollection<Object>} the extended array
 	 */
-	function extend$1(collection, refs, property, target) {
+	function extend(collection, refs, property, target) {
 
 	  var inverseProperty = property.inverse;
 
@@ -4426,38 +6035,35 @@
 	  return collection.__refs_collection === true;
 	}
 
-	var extend_1 = extend$1;
+	collection.extend = extend;
 
-	var isExtended_1 = isExtended;
+	collection.isExtended = isExtended;
 
-	var collection = {
-		extend: extend_1,
-		isExtended: isExtended_1
-	};
+	var Collection = collection;
 
-	function hasOwnProperty(e, property) {
+	function hasOwnProperty$1(e, property) {
 	  return Object.prototype.hasOwnProperty.call(e, property.name || property);
 	}
 
 	function defineCollectionProperty(ref, property, target) {
 
-	  var collection$1 = collection.extend(target[property.name] || [], ref, property, target);
+	  var collection = Collection.extend(target[property.name] || [], ref, property, target);
 
 	  Object.defineProperty(target, property.name, {
 	    enumerable: property.enumerable,
-	    value: collection$1
+	    value: collection
 	  });
 
-	  if (collection$1.length) {
+	  if (collection.length) {
 
-	    collection$1.forEach(function(o) {
+	    collection.forEach(function(o) {
 	      ref.set(o, property.inverse, target);
 	    });
 	  }
 	}
 
 
-	function defineProperty(ref, property, target) {
+	function defineProperty$1(ref, property, target) {
 
 	  var inverseProperty = property.inverse;
 
@@ -4540,10 +6146,10 @@
 	 *
 	 * wheels[0].car // undefined
 	 */
-	function Refs(a, b) {
+	function Refs$1(a, b) {
 
-	  if (!(this instanceof Refs)) {
-	    return new Refs(a, b);
+	  if (!(this instanceof Refs$1)) {
+	    return new Refs$1(a, b);
 	  }
 
 	  // link
@@ -4564,7 +6170,7 @@
 	 * @param  {Object} target
 	 * @param  {String} property
 	 */
-	Refs.prototype.bind = function(target, property) {
+	Refs$1.prototype.bind = function(target, property) {
 	  if (typeof property === 'string') {
 	    if (!this.props[property]) {
 	      throw new Error('no property <' + property + '> in ref');
@@ -4575,28 +6181,28 @@
 	  if (property.collection) {
 	    defineCollectionProperty(this, property, target);
 	  } else {
-	    defineProperty(this, property, target);
+	    defineProperty$1(this, property, target);
 	  }
 	};
 
-	Refs.prototype.ensureRefsCollection = function(target, property) {
+	Refs$1.prototype.ensureRefsCollection = function(target, property) {
 
-	  var collection$1 = target[property.name];
+	  var collection = target[property.name];
 
-	  if (!collection.isExtended(collection$1)) {
+	  if (!Collection.isExtended(collection)) {
 	    defineCollectionProperty(this, property, target);
 	  }
 
-	  return collection$1;
+	  return collection;
 	};
 
-	Refs.prototype.ensureBound = function(target, property) {
-	  if (!hasOwnProperty(target, property)) {
+	Refs$1.prototype.ensureBound = function(target, property) {
+	  if (!hasOwnProperty$1(target, property)) {
 	    this.bind(target, property);
 	  }
 	};
 
-	Refs.prototype.unset = function(target, property, value) {
+	Refs$1.prototype.unset = function(target, property, value) {
 
 	  if (target) {
 	    this.ensureBound(target, property);
@@ -4609,7 +6215,7 @@
 	  }
 	};
 
-	Refs.prototype.set = function(target, property, value) {
+	Refs$1.prototype.set = function(target, property, value) {
 
 	  if (target) {
 	    this.ensureBound(target, property);
@@ -4622,18 +6228,19 @@
 	  }
 	};
 
-	var refs = Refs;
+	var refs = Refs$1;
 
-	var objectRefs = refs;
+	objectRefs.exports = refs;
 
-	var Collection = collection;
-	objectRefs.Collection = Collection;
+	objectRefs.exports.Collection = collection;
 
-	var parentRefs = new objectRefs({ name: 'children', enumerable: true, collection: true }, { name: 'parent' }),
-	    labelRefs = new objectRefs({ name: 'labels', enumerable: true, collection: true }, { name: 'labelTarget' }),
-	    attacherRefs = new objectRefs({ name: 'attachers', collection: true }, { name: 'host' }),
-	    outgoingRefs = new objectRefs({ name: 'outgoing', collection: true }, { name: 'source' }),
-	    incomingRefs = new objectRefs({ name: 'incoming', collection: true }, { name: 'target' });
+	var Refs = objectRefs.exports;
+
+	var parentRefs = new Refs({ name: 'children', enumerable: true, collection: true }, { name: 'parent' }),
+	    labelRefs = new Refs({ name: 'labels', enumerable: true, collection: true }, { name: 'labelTarget' }),
+	    attacherRefs = new Refs({ name: 'attachers', collection: true }, { name: 'host' }),
+	    outgoingRefs = new Refs({ name: 'outgoing', collection: true }, { name: 'source' }),
+	    incomingRefs = new Refs({ name: 'incoming', collection: true }, { name: 'target' });
 
 	/**
 	 * @namespace djs.model
@@ -4650,7 +6257,7 @@
 	 *
 	 * @abstract
 	 */
-	function Base() {
+	function Base$1() {
 
 	  /**
 	   * The object that backs up the shape
@@ -4729,7 +6336,7 @@
 	 * @extends Base
 	 */
 	function Shape() {
-	  Base.call(this);
+	  Base$1.call(this);
 
 	  /**
 	   * Indicates frame shapes
@@ -4759,7 +6366,7 @@
 	  attacherRefs.bind(this, 'attachers');
 	}
 
-	inherits_browser(Shape, Base);
+	inherits$1(Shape, Base$1);
 
 
 	/**
@@ -4774,7 +6381,7 @@
 	  Shape.call(this);
 	}
 
-	inherits_browser(Root, Shape);
+	inherits$1(Root, Shape);
 
 
 	/**
@@ -4797,7 +6404,7 @@
 	  labelRefs.bind(this, 'labelTarget');
 	}
 
-	inherits_browser(Label, Shape);
+	inherits$1(Label, Shape);
 
 
 	/**
@@ -4809,7 +6416,7 @@
 	 * @extends Base
 	 */
 	function Connection() {
-	  Base.call(this);
+	  Base$1.call(this);
 
 	  /**
 	   * The element this connection originates from
@@ -4828,10 +6435,10 @@
 	  incomingRefs.bind(this, 'target');
 	}
 
-	inherits_browser(Connection, Base);
+	inherits$1(Connection, Base$1);
 
 
-	var types = {
+	var types$6 = {
 	  connection: Connection,
 	  shape: Shape,
 	  label: Label,
@@ -4855,8 +6462,8 @@
 	 *
 	 * @return {Base} the new model instance
 	 */
-	function create$1(type, attrs) {
-	  var Type = types[type];
+	function create(type, attrs) {
+	  var Type = types$6[type];
 	  if (!Type) {
 	    throw new Error('unknown type: <' + type + '>');
 	  }
@@ -4866,24 +6473,24 @@
 	/**
 	 * A factory for diagram-js shapes
 	 */
-	function ElementFactory() {
+	function ElementFactory$1() {
 	  this._uid = 12;
 	}
 
 
-	ElementFactory.prototype.createRoot = function(attrs) {
+	ElementFactory$1.prototype.createRoot = function(attrs) {
 	  return this.create('root', attrs);
 	};
 
-	ElementFactory.prototype.createLabel = function(attrs) {
+	ElementFactory$1.prototype.createLabel = function(attrs) {
 	  return this.create('label', attrs);
 	};
 
-	ElementFactory.prototype.createShape = function(attrs) {
+	ElementFactory$1.prototype.createShape = function(attrs) {
 	  return this.create('shape', attrs);
 	};
 
-	ElementFactory.prototype.createConnection = function(attrs) {
+	ElementFactory$1.prototype.createConnection = function(attrs) {
 	  return this.create('connection', attrs);
 	};
 
@@ -4895,7 +6502,7 @@
 	 * @param  {Object} attrs
 	 * @return {djs.model.Base} the newly created model instance
 	 */
-	ElementFactory.prototype.create = function(type, attrs) {
+	ElementFactory$1.prototype.create = function(type, attrs) {
 
 	  attrs = assign({}, attrs || {});
 
@@ -4903,14 +6510,14 @@
 	    attrs.id = type + '_' + (this._uid++);
 	  }
 
-	  return create$1(type, attrs);
+	  return create(type, attrs);
 	};
 
 	var FN_REF = '__fn';
 
-	var DEFAULT_PRIORITY = 1000;
+	var DEFAULT_PRIORITY$5 = 1000;
 
-	var slice$1 = Array.prototype.slice;
+	var slice = Array.prototype.slice;
 
 	/**
 	 * A general purpose event bus.
@@ -5023,12 +6630,12 @@
 	 */
 	EventBus.prototype.on = function(events, priority, callback, that) {
 
-	  events = isArray(events) ? events : [ events ];
+	  events = isArray$2(events) ? events : [ events ];
 
 	  if (isFunction(priority)) {
 	    that = callback;
 	    callback = priority;
-	    priority = DEFAULT_PRIORITY;
+	    priority = DEFAULT_PRIORITY$5;
 	  }
 
 	  if (!isNumber(priority)) {
@@ -5038,7 +6645,7 @@
 	  var actualCallback = callback;
 
 	  if (that) {
-	    actualCallback = bind(callback, that);
+	    actualCallback = bind$2(callback, that);
 
 	    // make sure we remember and are able to remove
 	    // bound callbacks via {@link #off} using the original
@@ -5072,7 +6679,7 @@
 	  if (isFunction(priority)) {
 	    that = callback;
 	    callback = priority;
-	    priority = DEFAULT_PRIORITY;
+	    priority = DEFAULT_PRIORITY$5;
 	  }
 
 	  if (!isNumber(priority)) {
@@ -5080,6 +6687,8 @@
 	  }
 
 	  function wrappedCallback() {
+	    wrappedCallback.__isTomb = true;
+
 	    var result = callback.apply(that, arguments);
 
 	    self.off(event, wrappedCallback);
@@ -5106,7 +6715,7 @@
 	 */
 	EventBus.prototype.off = function(events, callback) {
 
-	  events = isArray(events) ? events : [ events ];
+	  events = isArray$2(events) ? events : [ events ];
 
 	  var self = this;
 
@@ -5169,7 +6778,7 @@
 	      returnValue,
 	      args;
 
-	  args = slice$1.call(arguments);
+	  args = slice.call(arguments);
 
 	  if (typeof type === 'object') {
 	    data = type;
@@ -5259,6 +6868,10 @@
 
 	  var returnValue;
 
+	  if (listener.callback.__isTomb) {
+	    return returnValue;
+	  }
+
 	  try {
 
 	    // returning false prevents the default action
@@ -5274,12 +6887,11 @@
 	    if (returnValue === false) {
 	      event.preventDefault();
 	    }
-	  } catch (e) {
-	    if (!this.handleError(e)) {
-	      console.error('unhandled error in event listener');
-	      console.error(e.stack);
+	  } catch (error) {
+	    if (!this.handleError(error)) {
+	      console.error('unhandled error in event listener', error);
 
-	      throw e;
+	      throw error;
 	    }
 	  }
 
@@ -5438,7 +7050,7 @@
 	 * @param {Snap<SVGElement>} gfx
 	 * @return {Snap<SVGElement>}
 	 */
-	function getChildren(gfx) {
+	function getChildren$1(gfx) {
 	  return gfx.parentNode.childNodes[1];
 	}
 
@@ -5449,7 +7061,7 @@
 	 * @param {number} angle
 	 * @param {number} amount
 	 */
-	function transform$1(gfx, x, y, angle, amount) {
+	function transform(gfx, x, y, angle, amount) {
 	  var translate = createTransform();
 	  translate.setTranslate(x, y);
 
@@ -5459,7 +7071,7 @@
 	  var scale = createTransform();
 	  scale.setScale(amount || 1, amount || 1);
 
-	  transform(gfx, [ translate, rotate, scale ]);
+	  transform$1(gfx, [ translate, rotate, scale ]);
 	}
 
 
@@ -5468,11 +7080,11 @@
 	 * @param {number} x
 	 * @param {number} y
 	 */
-	function translate(gfx, x, y) {
+	function translate$2(gfx, x, y) {
 	  var translate = createTransform();
 	  translate.setTranslate(x, y);
 
-	  transform(gfx, translate);
+	  transform$1(gfx, translate);
 	}
 
 
@@ -5484,7 +7096,7 @@
 	  var rotate = createTransform();
 	  rotate.setRotate(angle, 0, 0);
 
-	  transform(gfx, rotate);
+	  transform$1(gfx, rotate);
 	}
 
 	/**
@@ -5511,10 +7123,10 @@
 	  if (!element.parent) {
 	    childrenGfx = gfx;
 	  } else {
-	    childrenGfx = getChildren(gfx);
+	    childrenGfx = getChildren$1(gfx);
 	    if (!childrenGfx) {
-	      childrenGfx = create('g');
-	      classes$1(childrenGfx).add('djs-children');
+	      childrenGfx = create$1('g');
+	      classes(childrenGfx).add('djs-children');
 
 	      append(gfx.parentNode, childrenGfx);
 	    }
@@ -5530,7 +7142,7 @@
 	GraphicsFactory.prototype._clear = function(gfx) {
 	  var visual = getVisual(gfx);
 
-	  clear(visual);
+	  clear$1(visual);
 
 	  return visual;
 	};
@@ -5565,8 +7177,8 @@
 	GraphicsFactory.prototype._createContainer = function(
 	    type, childrenGfx, parentIndex, isFrame
 	) {
-	  var outerGfx = create('g');
-	  classes$1(outerGfx).add('djs-group');
+	  var outerGfx = create$1('g');
+	  classes(outerGfx).add('djs-group');
 
 	  // insert node at position
 	  if (typeof parentIndex !== 'undefined') {
@@ -5575,19 +7187,19 @@
 	    append(childrenGfx, outerGfx);
 	  }
 
-	  var gfx = create('g');
-	  classes$1(gfx).add('djs-element');
-	  classes$1(gfx).add('djs-' + type);
+	  var gfx = create$1('g');
+	  classes(gfx).add('djs-element');
+	  classes(gfx).add('djs-' + type);
 
 	  if (isFrame) {
-	    classes$1(gfx).add('djs-frame');
+	    classes(gfx).add('djs-frame');
 	  }
 
 	  append(outerGfx, gfx);
 
 	  // create visual
-	  var visual = create('g');
-	  classes$1(visual).add('djs-visual');
+	  var visual = create$1('g');
+	  classes(visual).add('djs-visual');
 
 	  append(gfx, visual);
 
@@ -5596,7 +7208,7 @@
 
 	GraphicsFactory.prototype.create = function(type, element, parentIndex) {
 	  var childrenGfx = this._getChildrenContainer(element.parent);
-	  return this._createContainer(type, childrenGfx, parentIndex, isFrameElement(element));
+	  return this._createContainer(type, childrenGfx, parentIndex, isFrameElement$1(element));
 	};
 
 	GraphicsFactory.prototype.updateContainments = function(elements) {
@@ -5672,7 +7284,7 @@
 	    this.drawShape(visual, element);
 
 	    // update positioning
-	    translate(gfx, element.x, element.y);
+	    translate$2(gfx, element.x, element.y);
 	  } else
 	  if (type === 'connection') {
 	    this.drawConnection(visual, element);
@@ -5681,9 +7293,9 @@
 	  }
 
 	  if (element.hidden) {
-	    attr$1(gfx, 'display', 'none');
+	    attr(gfx, 'display', 'none');
 	  } else {
-	    attr$1(gfx, 'display', 'block');
+	    attr(gfx, 'display', 'block');
 	  }
 	};
 
@@ -5709,12 +7321,12 @@
 	  parentNode.insertBefore(newNode, node);
 	}
 
-	var CoreModule = {
-	  __depends__: [ DrawModule ],
+	var CoreModule$1 = {
+	  __depends__: [ DrawModule$1 ],
 	  __init__: [ 'canvas' ],
 	  canvas: [ 'type', Canvas ],
 	  elementRegistry: [ 'type', ElementRegistry ],
-	  elementFactory: [ 'type', ElementFactory ],
+	  elementFactory: [ 'type', ElementFactory$1 ],
 	  eventBus: [ 'type', EventBus ],
 	  graphicsFactory: [ 'type', GraphicsFactory ]
 	};
@@ -5794,7 +7406,7 @@
 	    'config': ['value', options]
 	  };
 
-	  var modules = [ configModule, CoreModule ].concat(options.modules || []);
+	  var modules = [ configModule, CoreModule$1 ].concat(options.modules || []);
 
 	  return bootstrap(modules);
 	}
@@ -5921,13 +7533,13 @@
 	/**
 	 * Moddle base element.
 	 */
-	function Base$1() { }
+	function Base() { }
 
-	Base$1.prototype.get = function(name) {
+	Base.prototype.get = function(name) {
 	  return this.$model.properties.get(this, name);
 	};
 
-	Base$1.prototype.set = function(name, value) {
+	Base.prototype.set = function(name, value) {
 	  this.$model.properties.set(this, name, value);
 	};
 
@@ -5948,7 +7560,7 @@
 	  var model = this.model;
 
 	  var props = this.properties,
-	      prototype = Object.create(Base$1.prototype);
+	      prototype = Object.create(Base.prototype);
 
 	  // initialize default values
 	  forEach(descriptor.properties, function(p) {
@@ -5970,7 +7582,7 @@
 	    props.define(this, '$attrs', { value: {} });
 	    props.define(this, '$parent', { writable: true });
 
-	    forEach(attrs, bind(function(val, key) {
+	    forEach(attrs, bind$2(function(val, key) {
 	      this.set(key, val);
 	    }, this));
 	  }
@@ -6004,7 +7616,7 @@
 	  String: function(s) { return s; },
 	  Boolean: function(s) { return s === 'true'; },
 	  Integer: function(s) { return parseInt(s, 10); },
-	  Real: function(s) { return parseFloat(s, 10); }
+	  Real: function(s) { return parseFloat(s); }
 	};
 
 	/**
@@ -6259,7 +7871,7 @@
 	    return;
 	  }
 
-	  forEach(t.properties, bind(function(p) {
+	  forEach(t.properties, bind$2(function(p) {
 
 	    // clone property to allow extensions
 	    p = assign({}, p, {
@@ -6306,7 +7918,7 @@
 
 	  this.properties = properties;
 
-	  forEach(packages, bind(this.registerPackage, this));
+	  forEach(packages, bind$2(this.registerPackage, this));
 	}
 
 
@@ -6330,7 +7942,7 @@
 	  ensureAvailable(pkgMap, pkg, 'uri');
 
 	  // register types
-	  forEach(pkg.types, bind(function(descriptor) {
+	  forEach(pkg.types, bind$2(function(descriptor) {
 	    this.registerType(descriptor, pkg);
 	  }, this));
 
@@ -6356,7 +7968,7 @@
 	      propertiesByName = {};
 
 	  // parse properties
-	  forEach(type.properties, bind(function(p) {
+	  forEach(type.properties, bind$2(function(p) {
 
 	    // namespace property names
 	    var propertyNs = parseName(p.name, ns.prefix),
@@ -6382,7 +7994,7 @@
 	    propertiesByName: propertiesByName
 	  });
 
-	  forEach(type.extends, bind(function(extendsName) {
+	  forEach(type.extends, bind$2(function(extendsName) {
 	    var extended = this.typeMap[extendsName];
 
 	    extended.traits = extended.traits || [];
@@ -6512,7 +8124,7 @@
 
 	  var propertyName = property && property.name;
 
-	  if (isUndefined$1(value)) {
+	  if (isUndefined(value)) {
 	    // unset the property, if the specified value is undefined;
 	    // delete from $attrs (for extensions) or the target itself
 	    if (property) {
@@ -6527,7 +8139,7 @@
 	      if (propertyName in target) {
 	        target[propertyName] = value;
 	      } else {
-	        defineProperty$1(target, property, value);
+	        defineProperty(target, property, value);
 	      }
 	    } else {
 	      target.$attrs[name] = value;
@@ -6555,7 +8167,7 @@
 
 	  // check if access to collection property and lazily initialize it
 	  if (!target[propertyName] && property.isMany) {
-	    defineProperty$1(target, property, []);
+	    defineProperty(target, property, []);
 	  }
 
 	  return target[propertyName];
@@ -6589,11 +8201,11 @@
 	};
 
 
-	function isUndefined$1(val) {
+	function isUndefined(val) {
 	  return typeof val === 'undefined';
 	}
 
-	function defineProperty$1(target, property, value) {
+	function defineProperty(target, property, value) {
 	  Object.defineProperty(target, property.name, {
 	    enumerable: !property.isReference,
 	    writable: true,
@@ -6742,6 +8354,7 @@
 	  this.properties.defineDescriptor(element, descriptor);
 	  this.properties.defineModel(element, this);
 	  this.properties.define(element, '$parent', { enumerable: false, writable: true });
+	  this.properties.define(element, '$instanceOf', { enumerable: false, writable: true });
 
 	  forEach(properties, function(a, key) {
 	    if (isObject(a) && a.value !== undefined) {
@@ -6812,7 +8425,7 @@
 
 	var fromCharCode = String.fromCharCode;
 
-	var hasOwnProperty$1 = Object.prototype.hasOwnProperty;
+	var hasOwnProperty = Object.prototype.hasOwnProperty;
 
 	var ENTITY_PATTERN = /&#(\d+);|&#x([0-9a-f]+);|&(\w+);/ig;
 
@@ -6834,7 +8447,7 @@
 
 	  // reserved names, i.e. &nbsp;
 	  if (z) {
-	    if (hasOwnProperty$1.call(ENTITY_MAPPING, z)) {
+	    if (hasOwnProperty.call(ENTITY_MAPPING, z)) {
 	      return ENTITY_MAPPING[z];
 	    } else {
 
@@ -6872,11 +8485,11 @@
 
 	var XSI_URI = 'http://www.w3.org/2001/XMLSchema-instance';
 	var XSI_PREFIX = 'xsi';
-	var XSI_TYPE = 'xsi:type';
+	var XSI_TYPE$1 = 'xsi:type';
 
 	var NON_WHITESPACE_OUTSIDE_ROOT_NODE = 'non-whitespace outside of root node';
 
-	function error(msg) {
+	function error$2(msg) {
 	  return new Error(msg);
 	}
 
@@ -6997,7 +8610,7 @@
 	   */
 	  function handleError(err) {
 	    if (!(err instanceof Error)) {
-	      err = error(err);
+	      err = error$2(err);
 	    }
 
 	    returnError = err;
@@ -7017,7 +8630,7 @@
 	    }
 
 	    if (!(err instanceof Error)) {
-	      err = error(err);
+	      err = error$2(err);
 	    }
 
 	    onWarning(err, getContext);
@@ -7034,7 +8647,7 @@
 	  this['on'] = function(name, cb) {
 
 	    if (typeof cb !== 'function') {
-	      throw error('required args <name, cb>');
+	      throw error$2('required args <name, cb>');
 	    }
 
 	    switch (name) {
@@ -7048,7 +8661,7 @@
 	    case 'question': onQuestion = cb; break; // <? ....  ?>
 	    case 'comment': onComment = cb; break;
 	    default:
-	      throw error('unsupported event: ' + name);
+	      throw error$2('unsupported event: ' + name);
 	    }
 
 	    return this;
@@ -7075,7 +8688,7 @@
 	    }
 
 	    if (typeof nsMap !== 'object') {
-	      throw error('required args <nsMap={}>');
+	      throw error$2('required args <nsMap={}>');
 	    }
 
 	    var _nsUriToPrefix = {}, k;
@@ -7102,7 +8715,7 @@
 	   */
 	  this['parse'] = function(xml) {
 	    if (typeof xml !== 'string') {
-	      throw error('required args <xml=string>');
+	      throw error$2('required args <xml=string>');
 	    }
 
 	    returnError = null;
@@ -7411,7 +9024,7 @@
 	        // end: normalize ns attribute name
 
 	        // normalize xsi:type ns attribute value
-	        if (name === XSI_TYPE) {
+	        if (name === XSI_TYPE$1) {
 	          w = value.indexOf(':');
 
 	          if (w !== -1) {
@@ -7457,7 +9070,7 @@
 	            // end: normalize ns attribute name
 
 	            // normalize xsi:type ns attribute value
-	            if (name === XSI_TYPE) {
+	            if (name === XSI_TYPE$1) {
 	              w = value.indexOf(':');
 
 	              if (w !== -1) {
@@ -7900,14 +9513,14 @@
 	  'xml': 'http://www.w3.org/XML/1998/namespace'
 	};
 
-	var XSI_TYPE$1 = 'xsi:type';
+	var XSI_TYPE = 'xsi:type';
 
 	function serializeFormat(element) {
 	  return element.xml && element.xml.serialize;
 	}
 
 	function serializeAsType(element) {
-	  return serializeFormat(element) === XSI_TYPE$1;
+	  return serializeFormat(element) === XSI_TYPE;
 	}
 
 	function serializeAsProperty(element) {
@@ -8021,6 +9634,7 @@
 	      id = element.get(idProperty.name);
 
 	      if (id) {
+
 	        // for QName validation as per http://www.w3.org/TR/REC-xml/#NT-NameChar
 	        if (!/^([a-z][\w-.]*:)?[a-z_][\w-.]*$/i.test(id)) {
 	          throw new Error('illegal ID <' + id + '>');
@@ -8218,6 +9832,7 @@
 	          id: value
 	        });
 	      } else {
+
 	        // IDREFS: parse references as whitespace-separated list
 	        values = value.split(' ');
 
@@ -8276,7 +9891,7 @@
 	  if (property && !property.isAttr) {
 
 	    if (serializeAsType(property)) {
-	      elementTypeName = node.attributes[XSI_TYPE$1];
+	      elementTypeName = node.attributes[XSI_TYPE];
 
 	      // xsi type is optional, if it does not exists the
 	      // default type is assumed
@@ -8315,6 +9930,7 @@
 	      });
 	    }
 	  } else {
+
 	    // parse unknown element (maybe extension)
 	    property = find(descriptor.properties, function(p) {
 	      return !p.isReference && !p.isAttribute && p.type === 'Element';
@@ -8390,6 +10006,7 @@
 
 	      this.context.addReference(newElement);
 	    } else {
+
 	      // establish child -> parent relationship
 	      newElement.$parent = element;
 	    }
@@ -8527,15 +10144,18 @@
 	  var rootHandler = options.rootHandler;
 
 	  if (options instanceof ElementHandler) {
+
 	    // root handler passed via (xml, { rootHandler: ElementHandler }, ...)
 	    rootHandler = options;
 	    options = {};
 	  } else {
 	    if (typeof options === 'string') {
+
 	      // rootHandler passed via (xml, 'someString', ...)
 	      rootHandler = this.handler(options);
 	      options = {};
 	    } else if (typeof rootHandler === 'string') {
+
 	      // rootHandler passed via (xml, { rootHandler: 'someString' }, ...)
 	      rootHandler = this.handler(rootHandler);
 	    }
@@ -8597,6 +10217,7 @@
 	  }
 
 	  function handleWarning(err, getContext) {
+
 	    // just like handling errors in <lax=true> mode
 	    return handleError(err, getContext, true);
 	  }
@@ -8636,9 +10257,11 @@
 	        }
 
 	        if (!reference) {
+
 	          // remove unresolvable reference
 	          collection.splice(idx, 1);
 	        } else {
+
 	          // add or update reference in collection
 	          collection[idx] = reference;
 	        }
@@ -8701,11 +10324,11 @@
 	  }
 
 	  function handleText(text, getContext) {
+
 	    // strip whitespace only nodes, i.e. before
 	    // <!CDATA[ ... ]> sections and in between tags
-	    text = text.trim();
 
-	    if (!text) {
+	    if (!text.trim()) {
 	      return;
 	    }
 
@@ -8923,7 +10546,11 @@
 
 	function getNsAttrs(namespaces) {
 
-	  return map(namespaces.getUsed(), function(ns) {
+	  return namespaces.getUsed().filter(function(ns) {
+
+	    // do not serialize built in <xml> namespace
+	    return ns.prefix !== 'xml';
+	  }).map(function(ns) {
 	    var name = 'xmlns' + (ns.prefix ? ':' + ns.prefix : '');
 	    return { name: name, value: ns.uri };
 	  });
@@ -8953,7 +10580,7 @@
 	    }
 
 	    // do not serialize defaults
-	    if (!element.hasOwnProperty(name)) {
+	    if (!has(element, name)) {
 	      return false;
 	    }
 
@@ -8989,7 +10616,7 @@
 	  '&': 'amp'
 	};
 
-	function escape$1(str, charPattern, replaceMap) {
+	function escape(str, charPattern, replaceMap) {
 
 	  // ensure we are handling strings here
 	  str = isString(str) ? str : '' + str;
@@ -9006,11 +10633,11 @@
 	 * @return {String} the escaped string
 	 */
 	function escapeAttr(str) {
-	  return escape$1(str, ESCAPE_ATTR_CHARS, ESCAPE_ATTR_MAP);
+	  return escape(str, ESCAPE_ATTR_CHARS, ESCAPE_ATTR_MAP);
 	}
 
 	function escapeBody(str) {
-	  return escape$1(str, ESCAPE_CHARS, ESCAPE_MAP);
+	  return escape(str, ESCAPE_CHARS, ESCAPE_MAP);
 	}
 
 	function filterAttributes(props) {
@@ -9231,9 +10858,11 @@
 	  }
 
 	  if (model && model.getPackage(value)) {
+
 	    // register well known namespace
 	    this.logNamespace(ns, true, true);
 	  } else {
+
 	    // log custom namespace directly as used
 	    var actualNs = this.logNamespaceUsed(ns, true);
 
@@ -9278,7 +10907,7 @@
 
 	    // do not serialize xsi:type attribute
 	    // it is set manually based on the actual implementation type
-	    if (attr.name === XSI_TYPE$1) {
+	    if (attr.name === XSI_TYPE) {
 	      return;
 	    }
 
@@ -9321,6 +10950,7 @@
 	        body.push(new ReferenceSerializer(self.addTagName(self.nsPropertyTagName(p))).build(v));
 	      });
 	    } else {
+
 	      // allow serialization via type
 	      // rather than element name
 	      var asType = serializeAsType(p),
@@ -9371,7 +11001,7 @@
 
 	  var existing = namespaces.byUri(nsUri);
 
-	  if (nsPrefix !== 'xml' && (!existing || local)) {
+	  if (!existing || local) {
 	    namespaces.add(ns, wellknown);
 	  }
 
@@ -9448,6 +11078,7 @@
 	        forEach(value, function(v) {
 	          values.push(v.id);
 	        });
+
 	        // IDREFS is a whitespace-separated list of references.
 	        value = values.join(' ');
 	      }
@@ -9558,7 +11189,7 @@
 	      typePrefix = (pkg.xml && pkg.xml.typePrefix) || '';
 
 	  this.addAttribute(
-	    this.nsAttributeName(XSI_TYPE$1),
+	    this.nsAttributeName(XSI_TYPE),
 	    (typeNs.prefix ? typeNs.prefix + ':' : '') + typePrefix + descriptor.ns.localName
 	  );
 
@@ -9735,10 +11366,10 @@
 
 	var name = "BPMN20";
 	var uri = "http://www.omg.org/spec/BPMN/20100524/MODEL";
-	var prefix$1 = "bpmn";
+	var prefix = "bpmn";
 	var associations = [
 	];
-	var types$1 = [
+	var types = [
 		{
 			name: "Interface",
 			superClass: [
@@ -12212,7 +13843,8 @@
 		{
 			name: "CallActivity",
 			superClass: [
-				"Activity"
+				"Activity",
+				"InteractionNode"
 			],
 			properties: [
 				{
@@ -12693,17 +14325,17 @@
 	var BpmnPackage = {
 		name: name,
 		uri: uri,
-		prefix: prefix$1,
+		prefix: prefix,
 		associations: associations,
-		types: types$1,
+		types: types,
 		enumerations: enumerations,
 		xml: xml
 	};
 
 	var name$1 = "BPMNDI";
 	var uri$1 = "http://www.omg.org/spec/BPMN/20100524/DI";
-	var prefix$1$1 = "bpmndi";
-	var types$1$1 = [
+	var prefix$1 = "bpmndi";
+	var types$1 = [
 		{
 			name: "BPMNDiagram",
 			properties: [
@@ -12895,8 +14527,8 @@
 	var BpmnDiPackage = {
 		name: name$1,
 		uri: uri$1,
-		prefix: prefix$1$1,
-		types: types$1$1,
+		prefix: prefix$1,
+		types: types$1,
 		enumerations: enumerations$1,
 		associations: associations$1
 	};
@@ -13307,12 +14939,75 @@
 		associations: associations$4
 	};
 
+	var name$5 = "BPMN in Color";
+	var uri$5 = "http://www.omg.org/spec/BPMN/non-normative/color/1.0";
+	var prefix$5 = "color";
+	var types$5 = [
+		{
+			name: "ColoredLabel",
+			"extends": [
+				"bpmndi:BPMNLabel"
+			],
+			properties: [
+				{
+					name: "color",
+					isAttr: true,
+					type: "String"
+				}
+			]
+		},
+		{
+			name: "ColoredShape",
+			"extends": [
+				"bpmndi:BPMNShape"
+			],
+			properties: [
+				{
+					name: "background-color",
+					isAttr: true,
+					type: "String"
+				},
+				{
+					name: "border-color",
+					isAttr: true,
+					type: "String"
+				}
+			]
+		},
+		{
+			name: "ColoredEdge",
+			"extends": [
+				"bpmndi:BPMNEdge"
+			],
+			properties: [
+				{
+					name: "border-color",
+					isAttr: true,
+					type: "String"
+				}
+			]
+		}
+	];
+	var enumerations$3 = [
+	];
+	var associations$5 = [
+	];
+	var BpmnInColorPackage = {
+		name: name$5,
+		uri: uri$5,
+		prefix: prefix$5,
+		types: types$5,
+		enumerations: enumerations$3,
+		associations: associations$5
+	};
+
 	var packages = {
 	  bpmn: BpmnPackage,
 	  bpmndi: BpmnDiPackage,
 	  dc: DcPackage,
 	  di: DiPackage,
-	  bioc: BiocPackage
+	  bioc: BiocPackage,
+	  color: BpmnInColorPackage
 	};
 
 	function simple(additionalPackages, options) {
@@ -13329,10 +15024,74 @@
 	  return '<' + e.$type + (e.id ? ' id="' + e.id : '') + '" />';
 	}
 
-	var diRefs = new objectRefs(
-	  { name: 'bpmnElement', enumerable: true },
-	  { name: 'di', configurable: true }
-	);
+	// TODO(nikku): remove with future bpmn-js version
+
+	/**
+	 * Wraps APIs to check:
+	 *
+	 * 1) If a callback is passed -> Warn users about callback deprecation.
+	 * 2) If Promise class is implemented in current environment.
+	 *
+	 * @private
+	 */
+	function wrapForCompatibility(api) {
+
+	  return function() {
+
+	    if (!window.Promise) {
+	      throw new Error('Promises is not supported in this environment. Please polyfill Promise.');
+	    }
+
+	    var argLen = arguments.length;
+	    if (argLen >= 1 && isFunction(arguments[argLen - 1])) {
+
+	      var callback = arguments[argLen - 1];
+
+	      console.warn(new Error(
+	        'Passing callbacks to ' + api.name + ' is deprecated and will be removed in a future major release. ' +
+	        'Please switch to promises: https://bpmn.io/l/moving-to-promises.html'
+	      ));
+
+	      var argsWithoutCallback = Array.prototype.slice.call(arguments, 0, -1);
+
+	      api.apply(this, argsWithoutCallback).then(function(result) {
+
+	        var firstKey = Object.keys(result)[0];
+
+	        // The APIs we are wrapping all resolve a single item depending on the API.
+	        // For instance, importXML resolves { warnings } and saveXML returns { xml }.
+	        // That's why we can call the callback with the first item of result.
+	        return callback(null, result[firstKey]);
+
+	        // Passing a second paramter instead of catch because we don't want to
+	        // catch errors thrown by callback().
+	      }, function(err) {
+
+	        return callback(err, err.warnings);
+	      });
+	    } else {
+
+	      return api.apply(this, arguments);
+	    }
+	  };
+	}
+
+
+	// TODO(nikku): remove with future bpmn-js version
+
+	var DI_ERROR_MESSAGE = 'Tried to access di from the businessObject. The di is available through the diagram element only. For more information, see https://github.com/bpmn-io/bpmn-js/issues/1472';
+
+	function ensureCompatDiRef(businessObject) {
+
+	  // bpmnElement can have multiple independent DIs
+	  if (!has(businessObject, 'di')) {
+	    Object.defineProperty(businessObject, 'di', {
+	      get: function() {
+	        throw new Error(DI_ERROR_MESSAGE);
+	      }
+	    });
+	  }
+	}
 
 	/**
 	 * Returns true if an element has the given meta-model type
@@ -13342,7 +15101,7 @@
 	 *
 	 * @return {boolean}
 	 */
-	function is(element, type) {
+	function is$2(element, type) {
 	  return element.$instanceOf(type);
 	}
 
@@ -13353,7 +15112,7 @@
 	 */
 	function findDisplayCandidate(definitions) {
 	  return find(definitions.rootElements, function(e) {
-	    return is(e, 'bpmn:Process') || is(e, 'bpmn:Collaboration');
+	    return is$2(e, 'bpmn:Process') || is$2(e, 'bpmn:Collaboration');
 	  });
 	}
 
@@ -13366,6 +15125,8 @@
 	  // list of elements to handle deferred to ensure
 	  // prerequisites are drawn
 	  var deferred = [];
+
+	  var diMap = {};
 
 	  // Helpers //////////////////////
 
@@ -13395,17 +15156,17 @@
 	    }
 
 	    // call handler
-	    return handler.element(element, ctx);
+	    return handler.element(element, diMap[element.id], ctx);
 	  }
 
 	  function visitRoot(element, diagram) {
-	    return handler.root(element, diagram);
+	    return handler.root(element, diMap[element.id], diagram);
 	  }
 
 	  function visitIfDi(element, ctx) {
 
 	    try {
-	      var gfx = element.di && visit(element, ctx);
+	      var gfx = diMap[element.id] && visit(element, ctx);
 
 	      handled(element);
 
@@ -13428,7 +15189,7 @@
 	    var bpmnElement = di.bpmnElement;
 
 	    if (bpmnElement) {
-	      if (bpmnElement.di) {
+	      if (diMap[bpmnElement.id]) {
 	        logError(
 	          translate('multiple DI elements defined for {element}', {
 	            element: elementToString(bpmnElement)
@@ -13436,8 +15197,9 @@
 	          { element: bpmnElement }
 	        );
 	      } else {
-	        diRefs.bind(bpmnElement, 'di');
-	        bpmnElement.di = di;
+	        diMap[bpmnElement.id] = di;
+
+	        ensureCompatDiRef(bpmnElement);
 	      }
 	    } else {
 	      logError(
@@ -13494,6 +15256,7 @@
 	    }
 
 	    // load DI from selected diagram only
+	    diMap = {};
 	    handleDiagram(diagram);
 
 
@@ -13533,10 +15296,10 @@
 
 	    var ctx = visitRoot(rootElement, plane);
 
-	    if (is(rootElement, 'bpmn:Process')) {
+	    if (is$2(rootElement, 'bpmn:Process') || is$2(rootElement, 'bpmn:SubProcess')) {
 	      handleProcess(rootElement, ctx);
-	    } else if (is(rootElement, 'bpmn:Collaboration')) {
-	      handleCollaboration(rootElement);
+	    } else if (is$2(rootElement, 'bpmn:Collaboration')) {
+	      handleCollaboration(rootElement, ctx);
 
 	      // force drawing of everything not yet drawn that is part of the target DI
 	      handleUnhandledProcesses(definitions.rootElements, ctx);
@@ -13581,7 +15344,7 @@
 	    // if they contain lanes with DI information.
 	    // we do this to pass the free-floating lane test cases in the MIWG test suite
 	    var processes = filter(rootElements, function(e) {
-	      return !isHandled(e) && is(e, 'bpmn:Process') && e.laneSets;
+	      return !isHandled(e) && is$2(e, 'bpmn:Process') && e.laneSets;
 	    });
 
 	    processes.forEach(contextual(handleProcess, ctx));
@@ -13619,7 +15382,7 @@
 	  function handleArtifacts(artifacts, context) {
 
 	    forEach(artifacts, function(e) {
-	      if (is(e, 'bpmn:Association')) {
+	      if (is$2(e, 'bpmn:Association')) {
 	        deferred.push(function() {
 	          handleArtifact(e, context);
 	        });
@@ -13647,11 +15410,11 @@
 	  function handleFlowNode(flowNode, context) {
 	    var childCtx = visitIfDi(flowNode, context);
 
-	    if (is(flowNode, 'bpmn:SubProcess')) {
+	    if (is$2(flowNode, 'bpmn:SubProcess')) {
 	      handleSubProcess(flowNode, childCtx || context);
 	    }
 
-	    if (is(flowNode, 'bpmn:Activity')) {
+	    if (is$2(flowNode, 'bpmn:Activity')) {
 	      handleIoSpecification(flowNode.ioSpecification, context);
 	    }
 
@@ -13708,19 +15471,19 @@
 
 	  function handleFlowElements(flowElements, context) {
 	    forEach(flowElements, function(e) {
-	      if (is(e, 'bpmn:SequenceFlow')) {
+	      if (is$2(e, 'bpmn:SequenceFlow')) {
 	        deferred.push(function() {
 	          handleSequenceFlow(e, context);
 	        });
-	      } else if (is(e, 'bpmn:BoundaryEvent')) {
+	      } else if (is$2(e, 'bpmn:BoundaryEvent')) {
 	        deferred.unshift(function() {
 	          handleFlowNode(e, context);
 	        });
-	      } else if (is(e, 'bpmn:FlowNode')) {
+	      } else if (is$2(e, 'bpmn:FlowNode')) {
 	        handleFlowNode(e, context);
-	      } else if (is(e, 'bpmn:DataObject')) ; else if (is(e, 'bpmn:DataStoreReference')) {
+	      } else if (is$2(e, 'bpmn:DataObject')) ; else if (is$2(e, 'bpmn:DataStoreReference')) {
 	        handleDataElement(e, context);
-	      } else if (is(e, 'bpmn:DataObjectReference')) {
+	      } else if (is$2(e, 'bpmn:DataObjectReference')) {
 	        handleDataElement(e, context);
 	      } else {
 	        logError(
@@ -13743,15 +15506,15 @@
 	    }
 	  }
 
-	  function handleCollaboration(collaboration) {
+	  function handleCollaboration(collaboration, context) {
 
-	    forEach(collaboration.participants, contextual(handleParticipant));
+	    forEach(collaboration.participants, contextual(handleParticipant, context));
 
-	    handleArtifacts(collaboration.artifacts);
+	    handleArtifacts(collaboration.artifacts, context);
 
 	    // handle message flows latest in the process
 	    deferred.push(function() {
-	      handleMessageFlows(collaboration.messageFlows);
+	      handleMessageFlows(collaboration.messageFlows, context);
 	    });
 	  }
 
@@ -13776,6 +15539,57 @@
 	    handleSubProcess: handleSubProcess,
 	    registerDi: registerDi
 	  };
+	}
+
+	/**
+	 * Is an element of the given BPMN type?
+	 *
+	 * @param  {djs.model.Base|ModdleElement} element
+	 * @param  {string} type
+	 *
+	 * @return {boolean}
+	 */
+	function is$1(element, type) {
+	  var bo = getBusinessObject(element);
+
+	  return bo && (typeof bo.$instanceOf === 'function') && bo.$instanceOf(type);
+	}
+
+
+	/**
+	 * Return true if element has any of the given types.
+	 *
+	 * @param {djs.model.Base} element
+	 * @param {Array<string>} types
+	 *
+	 * @return {boolean}
+	 */
+	function isAny(element, types) {
+	  return some(types, function(t) {
+	    return is$1(element, t);
+	  });
+	}
+
+	/**
+	 * Return the business object for a given element.
+	 *
+	 * @param  {djs.model.Base|ModdleElement} element
+	 *
+	 * @return {ModdleElement}
+	 */
+	function getBusinessObject(element) {
+	  return (element && element.businessObject) || element;
+	}
+
+	/**
+	 * Return the di object for a given element.
+	 *
+	 * @param  {djs.model.Base} element
+	 *
+	 * @return {ModdleElement}
+	 */
+	function getDi(element) {
+	  return element && element.di;
 	}
 
 	/**
@@ -13810,7 +15624,8 @@
 
 	  var importer,
 	      eventBus,
-	      translate;
+	      translate,
+	      canvas;
 
 	  var error,
 	      warnings = [];
@@ -13826,12 +15641,12 @@
 
 	    var visitor = {
 
-	      root: function(element) {
-	        return importer.add(element);
+	      root: function(element, di) {
+	        return importer.add(element, di);
 	      },
 
-	      element: function(element, parentShape) {
-	        return importer.add(element, parentShape);
+	      element: function(element, di, parentShape) {
+	        return importer.add(element, di, parentShape);
 	      },
 
 	      error: function(message, context) {
@@ -13841,9 +15656,29 @@
 
 	    var walker = new BpmnTreeWalker(visitor, translate);
 
+
+	    bpmnDiagram = bpmnDiagram || (definitions.diagrams && definitions.diagrams[0]);
+
+	    var diagramsToImport = getDiagramsToImport(definitions, bpmnDiagram);
+
+	    if (!diagramsToImport) {
+	      throw new Error(translate('no diagram to display'));
+	    }
+
 	    // traverse BPMN 2.0 document model,
 	    // starting at definitions
-	    walker.handleDefinitions(definitions, bpmnDiagram);
+	    forEach(diagramsToImport, function(diagram) {
+	      walker.handleDefinitions(definitions, diagram);
+	    });
+
+	    var rootId = bpmnDiagram.plane.bpmnElement.id;
+
+	    // we do need to account for different ways we create root elements
+	    // each nested imported <root> do have the `_plane` suffix, while
+	    // the root <root> is found under the business object ID
+	    canvas.setRootElement(
+	      canvas.findRoot(rootId + '_plane') || canvas.findRoot(rootId)
+	    );
 	  }
 
 	  return new Promise(function(resolve, reject) {
@@ -13851,6 +15686,7 @@
 	      importer = diagram.get('bpmnImporter');
 	      eventBus = diagram.get('eventBus');
 	      translate = diagram.get('translate');
+	      canvas = diagram.get('canvas');
 
 	      eventBus.fire('import.render.start', { definitions: definitions });
 
@@ -13870,56 +15706,105 @@
 	  });
 	}
 
-	// TODO(nikku): remove with future bpmn-js version
-
 	/**
-	 * Wraps APIs to check:
+	 * Returns all diagrams in the same hirarchy as the requested diagram.
+	 * Includes all parent and sub process diagrams.
 	 *
-	 * 1) If a callback is passed -> Warn users about callback deprecation.
-	 * 2) If Promise class is implemented in current environment.
+	 * @param {Array} definitions
+	 * @param {Object} bpmnDiagram
 	 *
-	 * @private
+	 * @returns {Array<Object>}
 	 */
-	function wrapForCompatibility(api) {
+	function getDiagramsToImport(definitions, bpmnDiagram) {
+	  if (!bpmnDiagram) {
+	    return;
+	  }
 
-	  return function() {
+	  var bpmnElement = bpmnDiagram.plane.bpmnElement,
+	      rootElement = bpmnElement;
 
-	    if (!window.Promise) {
-	      throw new Error('Promises is not supported in this environment. Please polyfill Promise.');
-	    }
+	  if (!is$1(bpmnElement, 'bpmn:Process') && !is$1(bpmnElement, 'bpmn:Collaboration')) {
+	    rootElement = findRootProcess(bpmnElement);
+	  }
 
-	    var argLen = arguments.length;
-	    if (argLen >= 1 && isFunction(arguments[argLen - 1])) {
+	  // in case the process is part of a collaboration, the plane references the
+	  // collaboration, not the process
+	  var collaboration;
 
-	      var callback = arguments[argLen - 1];
+	  if (is$1(rootElement, 'bpmn:Collaboration')) {
+	    collaboration = rootElement;
+	  } else {
+	    collaboration = find(definitions.rootElements, function(element) {
+	      if (!is$1(element, 'bpmn:Collaboration')) {
+	        return;
+	      }
 
-	      console.warn(new Error(
-	        'Passing callbacks to ' + api.name + ' is deprecated and will be removed in a future major release. ' +
-	        'Please switch to promises: https://bpmn.io/l/moving-to-promises.html'
-	      ));
-
-	      var argsWithoutCallback = Array.prototype.slice.call(arguments, 0, -1);
-
-	      api.apply(this, argsWithoutCallback).then(function(result) {
-
-	        var firstKey = Object.keys(result)[0];
-
-	        // The APIs we are wrapping all resolve a single item depending on the API.
-	        // For instance, importXML resolves { warnings } and saveXML returns { xml }.
-	        // That's why we can call the callback with the first item of result.
-	        return callback(null, result[firstKey]);
-
-	        // Passing a second paramter instead of catch because we don't want to
-	        // catch errors thrown by callback().
-	      }, function(err) {
-
-	        return callback(err, err.warnings);
+	      return find(element.participants, function(participant) {
+	        return participant.processRef === rootElement;
 	      });
-	    } else {
+	    });
+	  }
 
-	      return api.apply(this, arguments);
+	  var rootElements = [ rootElement ];
+
+	  // all collaboration processes can contain sub-diagrams
+	  if (collaboration) {
+	    rootElements = map$1(collaboration.participants, function(participant) {
+	      return participant.processRef;
+	    });
+
+	    rootElements.push(collaboration);
+	  }
+
+	  var allChildren = selfAndAllFlowElements(rootElements);
+
+	  // if we have multiple diagrams referencing the same element, we
+	  // use the first in the file
+	  var diagramsToImport = [ bpmnDiagram ];
+	  var handledElements = [ bpmnElement ];
+
+	  forEach(definitions.diagrams, function(diagram) {
+	    var businessObject = diagram.plane.bpmnElement;
+
+	    if (
+	      allChildren.indexOf(businessObject) !== -1 &&
+	      handledElements.indexOf(businessObject) === -1
+	    ) {
+	      diagramsToImport.push(diagram);
+	      handledElements.push(businessObject);
 	    }
-	  };
+	  });
+
+
+	  return diagramsToImport;
+	}
+
+	function selfAndAllFlowElements(elements) {
+	  var result = [];
+
+	  forEach(elements, function(element) {
+	    if (!element) {
+	      return;
+	    }
+
+	    result.push(element);
+
+	    result = result.concat(selfAndAllFlowElements(element.flowElements));
+	  });
+
+	  return result;
+	}
+
+	function findRootProcess(element) {
+	  var parent = element;
+
+	  while (parent) {
+	    if (is$1(parent, 'bpmn:Process')) {
+	      return parent;
+	    }
+
+	    parent = parent.$parent;
+	  }
 	}
 
 	/**
@@ -13994,7 +15879,7 @@
 	  if (!lightbox) {
 	    lightbox = domify(LIGHTBOX_MARKUP);
 
-	    delegateEvents.bind(lightbox, '.backdrop', 'click', function(event) {
+	    delegate.bind(lightbox, '.backdrop', 'click', function(event) {
 	      document.body.removeChild(lightbox);
 	    });
 	  }
@@ -14040,7 +15925,7 @@
 	  this._init(this._container, this._moddle, options);
 	}
 
-	inherits_browser(BaseViewer, Diagram);
+	inherits$1(BaseViewer, Diagram);
 
 	/**
 	* The importXML result.
@@ -14333,12 +16218,12 @@
 
 	  var definitions = this._definitions;
 
-	  return new Promise(function(resolve, reject) {
+	  return new Promise(function(resolve) {
 
 	    if (!definitions) {
-	      var err = new Error('no definitions loaded');
-
-	      return reject(err);
+	      return resolve({
+	        error: new Error('no definitions loaded')
+	      });
 	    }
 
 	    // allow to fiddle around with definitions
@@ -14350,25 +16235,27 @@
 
 	      var xml = result.xml;
 
-	      try {
-	        xml = self._emit('saveXML.serialized', {
-	          error: null,
-	          xml: xml
-	        }) || xml;
+	      xml = self._emit('saveXML.serialized', {
+	        xml: xml
+	      }) || xml;
 
-	        self._emit('saveXML.done', {
-	          error: null,
-	          xml: xml
-	        });
-	      } catch (e) {
-	        console.error('error in saveXML life-cycle listener', e);
-	      }
-
-	      return resolve({ xml: xml });
-	    }).catch(function(err) {
-
-	      return reject(err);
+	      return resolve({
+	        xml: xml
+	      });
 	    });
+	  }).catch(function(error) {
+	    return { error: error };
+	  }).then(function(result) {
+
+	    self._emit('saveXML.done', result);
+
+	    var error = result.error;
+
+	    if (error) {
+	      return Promise.reject(error);
+	    }
+
+	    return result;
 	  });
 	});
 
@@ -14410,7 +16297,7 @@
 	    try {
 	      var canvas = self.get('canvas');
 
-	      var contentNode = canvas.getDefaultLayer(),
+	      var contentNode = canvas.getActiveLayer(),
 	          defsNode = query('defs', canvas._svg);
 
 	      var contents = innerSVG(contentNode),
@@ -14499,19 +16386,6 @@
 	    return;
 	  }
 
-	  // remove businessObject#di binding
-	  //
-	  // this is necessary, as we establish the bindings
-	  // in the BpmnTreeWalker (and assume none are given
-	  // on reimport)
-	  this.get('elementRegistry').forEach(function(element) {
-	    var bo = element.businessObject;
-
-	    if (bo && bo.di) {
-	      delete bo.di;
-	    }
-	  });
-
 	  // remove drawn elements
 	  Diagram.prototype.clear.call(this);
 	};
@@ -14526,7 +16400,7 @@
 	  Diagram.prototype.destroy.call(this);
 
 	  // dom detach
-	  remove(this._container);
+	  remove$2(this._container);
 	};
 
 	/**
@@ -14774,7 +16648,7 @@
 	  }, this);
 	}
 
-	inherits_browser(BaseModeler, BaseViewer);
+	inherits$1(BaseModeler, BaseViewer);
 
 
 	/**
@@ -14814,40 +16688,20 @@
 	  }
 	};
 
-	/**
-	 * Is an element of the given BPMN type?
-	 *
-	 * @param  {djs.model.Base|ModdleElement} element
-	 * @param  {string} type
-	 *
-	 * @return {boolean}
-	 */
-	function is$1(element, type) {
-	  var bo = getBusinessObject(element);
-
-	  return bo && (typeof bo.$instanceOf === 'function') && bo.$instanceOf(type);
-	}
-
-
-	/**
-	 * Return the business object for a given element.
-	 *
-	 * @param  {djs.model.Base|ModdleElement} element
-	 *
-	 * @return {ModdleElement}
-	 */
-	function getBusinessObject(element) {
-	  return (element && element.businessObject) || element;
-	}
-
-	function isExpanded(element) {
+	function isExpanded(element, di) {
 
 	  if (is$1(element, 'bpmn:CallActivity')) {
 	    return false;
 	  }
 
 	  if (is$1(element, 'bpmn:SubProcess')) {
-	    return !!getBusinessObject(element).di.isExpanded;
+	    di = di || getDi(element);
+
+	    if (di && is$1(di, 'bpmndi:BPMNPlane')) {
+	      return true;
+	    }
+
+	    return di && !!di.isExpanded;
 	  }
 
 	  if (is$1(element, 'bpmn:Participant')) {
@@ -14865,7 +16719,7 @@
 	  return element && !!getBusinessObject(element).triggeredByEvent;
 	}
 
-	function hasEventDefinition(element, eventType) {
+	function hasEventDefinition$2(element, eventType) {
 	  var bo = getBusinessObject(element),
 	      hasEventDefinition = false;
 
@@ -14881,15 +16735,15 @@
 	}
 
 	function hasErrorEventDefinition(element) {
-	  return hasEventDefinition(element, 'bpmn:ErrorEventDefinition');
+	  return hasEventDefinition$2(element, 'bpmn:ErrorEventDefinition');
 	}
 
 	function hasEscalationEventDefinition(element) {
-	  return hasEventDefinition(element, 'bpmn:EscalationEventDefinition');
+	  return hasEventDefinition$2(element, 'bpmn:EscalationEventDefinition');
 	}
 
 	function hasCompensateEventDefinition(element) {
-	  return hasEventDefinition(element, 'bpmn:CompensateEventDefinition');
+	  return hasEventDefinition$2(element, 'bpmn:CompensateEventDefinition');
 	}
 
 	function getLabelAttr(semantic) {
@@ -14992,10 +16846,6 @@
 	  return element.isCollection || (dataObject && dataObject.isCollection);
 	}
 
-	function getDi(element) {
-	  return element.businessObject.di;
-	}
-
 	function getSemantic(element) {
 	  return element.businessObject;
 	}
@@ -15004,13 +16854,24 @@
 	// color access //////////////////////
 
 	function getFillColor(element, defaultColor) {
-	  return getDi(element).get('bioc:fill') || defaultColor || 'white';
+	  var di = getDi(element);
+
+	  return di.get('color:background-color') || di.get('bioc:fill') || defaultColor || 'white';
 	}
 
-	function getStrokeColor(element, defaultColor) {
-	  return getDi(element).get('bioc:stroke') || defaultColor || 'black';
+	function getStrokeColor$1(element, defaultColor) {
+	  var di = getDi(element);
+
+	  return di.get('color:border-color') || di.get('bioc:stroke') || defaultColor || 'black';
 	}
 
+	function getLabelColor(element, defaultColor, defaultStrokeColor) {
+	  var di = getDi(element),
+	      label = di.get('label');
+
+	  return label && label.get('color:color') || defaultColor ||
+	    getStrokeColor$1(element, defaultStrokeColor);
+	}
 
 	// cropping path customizations //////////////////////
 
@@ -15099,6 +16960,7 @@
 	var DEFAULT_FILL_OPACITY = .95,
 	    HIGH_FILL_OPACITY = .35;
 
+	var ELEMENT_LABEL_DISTANCE$1 = 10;
 
 	function BpmnRenderer(
 	    config, eventBus, styles, pathMap,
@@ -15107,7 +16969,8 @@
 	  BaseRenderer.call(this, eventBus, priority);
 
 	  var defaultFillColor = config && config.defaultFillColor,
-	      defaultStrokeColor = config && config.defaultStrokeColor;
+	      defaultStrokeColor = config && config.defaultStrokeColor,
+	      defaultLabelColor = config && config.defaultLabelColor;
 
 	  var rendererId = RENDERER_IDS.next();
 
@@ -15133,13 +16996,13 @@
 	      attrs.strokeDasharray = [10000, 1];
 	    }
 
-	    var marker = create('marker');
+	    var marker = create$1('marker');
 
-	    attr$1(options.element, attrs);
+	    attr(options.element, attrs);
 
 	    append(marker, options.element);
 
-	    attr$1(marker, {
+	    attr(marker, {
 	      id: id,
 	      viewBox: '0 0 20 20',
 	      refX: ref.x,
@@ -15152,7 +17015,7 @@
 	    var defs = query('defs', canvas._svg);
 
 	    if (!defs) {
-	      defs = create('defs');
+	      defs = create$1('defs');
 
 	      append(canvas._svg, defs);
 	    }
@@ -15181,8 +17044,8 @@
 	  function createMarker(id, type, fill, stroke) {
 
 	    if (type === 'sequenceflow-end') {
-	      var sequenceflowEnd = create('path');
-	      attr$1(sequenceflowEnd, { d: 'M 1 5 L 11 10 L 1 15 Z' });
+	      var sequenceflowEnd = create$1('path');
+	      attr(sequenceflowEnd, { d: 'M 1 5 L 11 10 L 1 15 Z' });
 
 	      addMarker(id, {
 	        element: sequenceflowEnd,
@@ -15196,8 +17059,8 @@
 	    }
 
 	    if (type === 'messageflow-start') {
-	      var messageflowStart = create('circle');
-	      attr$1(messageflowStart, { cx: 6, cy: 6, r: 3.5 });
+	      var messageflowStart = create$1('circle');
+	      attr(messageflowStart, { cx: 6, cy: 6, r: 3.5 });
 
 	      addMarker(id, {
 	        element: messageflowStart,
@@ -15210,8 +17073,8 @@
 	    }
 
 	    if (type === 'messageflow-end') {
-	      var messageflowEnd = create('path');
-	      attr$1(messageflowEnd, { d: 'm 1 5 l 0 -3 l 7 3 l -7 3 z' });
+	      var messageflowEnd = create$1('path');
+	      attr(messageflowEnd, { d: 'm 1 5 l 0 -3 l 7 3 l -7 3 z' });
 
 	      addMarker(id, {
 	        element: messageflowEnd,
@@ -15225,8 +17088,8 @@
 	    }
 
 	    if (type === 'association-start') {
-	      var associationStart = create('path');
-	      attr$1(associationStart, { d: 'M 11 5 L 1 10 L 11 15' });
+	      var associationStart = create$1('path');
+	      attr(associationStart, { d: 'M 11 5 L 1 10 L 11 15' });
 
 	      addMarker(id, {
 	        element: associationStart,
@@ -15241,8 +17104,8 @@
 	    }
 
 	    if (type === 'association-end') {
-	      var associationEnd = create('path');
-	      attr$1(associationEnd, { d: 'M 1 5 L 11 10 L 1 15' });
+	      var associationEnd = create$1('path');
+	      attr(associationEnd, { d: 'M 1 5 L 11 10 L 1 15' });
 
 	      addMarker(id, {
 	        element: associationEnd,
@@ -15257,8 +17120,8 @@
 	    }
 
 	    if (type === 'conditional-flow-marker') {
-	      var conditionalflowMarker = create('path');
-	      attr$1(conditionalflowMarker, { d: 'M 0 10 L 8 6 L 16 10 L 8 14 Z' });
+	      var conditionalflowMarker = create$1('path');
+	      attr(conditionalflowMarker, { d: 'M 0 10 L 8 6 L 16 10 L 8 14 Z' });
 
 	      addMarker(id, {
 	        element: conditionalflowMarker,
@@ -15272,8 +17135,8 @@
 	    }
 
 	    if (type === 'conditional-default-flow-marker') {
-	      var conditionaldefaultflowMarker = create('path');
-	      attr$1(conditionaldefaultflowMarker, { d: 'M 6 4 L 10 16' });
+	      var conditionaldefaultflowMarker = create$1('path');
+	      attr(conditionaldefaultflowMarker, { d: 'M 6 4 L 10 16' });
 
 	      addMarker(id, {
 	        element: conditionaldefaultflowMarker,
@@ -15308,13 +17171,13 @@
 	    var cx = width / 2,
 	        cy = height / 2;
 
-	    var circle = create('circle');
-	    attr$1(circle, {
+	    var circle = create$1('circle');
+	    attr(circle, {
 	      cx: cx,
 	      cy: cy,
 	      r: Math.round((width + height) / 4 - offset)
 	    });
-	    attr$1(circle, attrs);
+	    attr(circle, attrs);
 
 	    append(parentGfx, circle);
 
@@ -15336,8 +17199,8 @@
 	      fill: 'white'
 	    });
 
-	    var rect = create('rect');
-	    attr$1(rect, {
+	    var rect = create$1('rect');
+	    attr(rect, {
 	      x: offset,
 	      y: offset,
 	      width: width - offset * 2,
@@ -15345,7 +17208,7 @@
 	      rx: r,
 	      ry: r
 	    });
-	    attr$1(rect, attrs);
+	    attr(rect, attrs);
 
 	    append(parentGfx, rect);
 
@@ -15369,11 +17232,11 @@
 	      fill: 'white'
 	    });
 
-	    var polygon = create('polygon');
-	    attr$1(polygon, {
+	    var polygon = create$1('polygon');
+	    attr(polygon, {
 	      points: pointsString
 	    });
-	    attr$1(polygon, attrs);
+	    attr(polygon, attrs);
 
 	    append(parentGfx, polygon);
 
@@ -15401,9 +17264,9 @@
 	      stroke: 'black'
 	    });
 
-	    var path = create('path');
-	    attr$1(path, { d: d });
-	    attr$1(path, attrs);
+	    var path = create$1('path');
+	    attr(path, { d: d });
+	    attr(path, attrs);
 
 	    append(parentGfx, path);
 
@@ -15414,14 +17277,14 @@
 	    return drawPath(parentGfx, path, assign({ 'data-marker': type }, attrs));
 	  }
 
-	  function as(type) {
-	    return function(parentGfx, element) {
-	      return handlers[type](parentGfx, element);
-	    };
-	  }
-
 	  function renderer(type) {
 	    return handlers[type];
+	  }
+
+	  function as(type) {
+	    return function(parentGfx, element) {
+	      return renderer(type)(parentGfx, element);
+	    };
 	  }
 
 	  function renderEventContent(element, parentGfx) {
@@ -15491,7 +17354,7 @@
 
 	    var text = textRenderer.createText(label || '', options);
 
-	    classes$1(text).add('djs-label');
+	    classes(text).add('djs-label');
 
 	    append(parentGfx, text);
 
@@ -15506,7 +17369,7 @@
 	      align: align,
 	      padding: 5,
 	      style: {
-	        fill: getStrokeColor(element, defaultStrokeColor)
+	        fill: getLabelColor(element, defaultLabelColor, defaultStrokeColor)
 	      }
 	    });
 	  }
@@ -15527,7 +17390,7 @@
 	        {},
 	        textRenderer.getExternalStyle(),
 	        {
-	          fill: getStrokeColor(element, defaultStrokeColor)
+	          fill: getLabelColor(element, defaultLabelColor, defaultStrokeColor)
 	        }
 	      )
 	    });
@@ -15541,13 +17404,13 @@
 	      },
 	      align: 'center-middle',
 	      style: {
-	        fill: getStrokeColor(element, defaultStrokeColor)
+	        fill: getLabelColor(element, defaultLabelColor, defaultStrokeColor)
 	      }
 	    });
 
 	    var top = -1 * element.height;
 
-	    transform$1(textBox, 0, -top, 270);
+	    transform(textBox, 0, -top, 270);
 	  }
 
 	  function createPathFromConnection(connection) {
@@ -15572,7 +17435,7 @@
 	    'bpmn:StartEvent': function(parentGfx, element) {
 	      var attrs = {
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      };
 
 	      var semantic = getSemantic(element);
@@ -15582,7 +17445,7 @@
 	          strokeDasharray: '6',
 	          strokeLinecap: 'round',
 	          fill: getFillColor(element, defaultFillColor),
-	          stroke: getStrokeColor(element, defaultStrokeColor)
+	          stroke: getStrokeColor$1(element, defaultStrokeColor)
 	        };
 	      }
 
@@ -15604,8 +17467,8 @@
 	        }
 	      });
 
-	      var fill = isThrowing ? getStrokeColor(element, defaultStrokeColor) : getFillColor(element, defaultFillColor);
-	      var stroke = isThrowing ? getFillColor(element, defaultFillColor) : getStrokeColor(element, defaultStrokeColor);
+	      var fill = isThrowing ? getStrokeColor$1(element, defaultStrokeColor) : getFillColor(element, defaultFillColor);
+	      var stroke = isThrowing ? getFillColor(element, defaultFillColor) : getStrokeColor$1(element, defaultStrokeColor);
 
 	      var messagePath = drawPath(parentGfx, pathData, {
 	        strokeWidth: 1,
@@ -15619,7 +17482,7 @@
 	      var circle = drawCircle(parentGfx, element.width, element.height, 0.2 * element.height, {
 	        strokeWidth: 2,
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      var pathData = pathMap.getScaledPath('EVENT_TIMER_WH', {
@@ -15636,7 +17499,7 @@
 	      drawPath(parentGfx, pathData, {
 	        strokeWidth: 2,
 	        strokeLinecap: 'square',
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      for (var i = 0;i < 12; i++) {
@@ -15659,7 +17522,7 @@
 	          strokeWidth: 1,
 	          strokeLinecap: 'square',
 	          transform: 'rotate(' + (i * 30) + ',' + height + ',' + width + ')',
-	          stroke: getStrokeColor(element, defaultStrokeColor)
+	          stroke: getStrokeColor$1(element, defaultStrokeColor)
 	        });
 	      }
 
@@ -15677,12 +17540,12 @@
 	        }
 	      });
 
-	      var fill = isThrowing ? getStrokeColor(event, defaultStrokeColor) : 'none';
+	      var fill = isThrowing ? getStrokeColor$1(event, defaultStrokeColor) : 'none';
 
 	      return drawPath(parentGfx, pathData, {
 	        strokeWidth: 1,
 	        fill: fill,
-	        stroke: getStrokeColor(event, defaultStrokeColor)
+	        stroke: getStrokeColor$1(event, defaultStrokeColor)
 	      });
 	    },
 	    'bpmn:ConditionalEventDefinition': function(parentGfx, event) {
@@ -15699,7 +17562,7 @@
 
 	      return drawPath(parentGfx, pathData, {
 	        strokeWidth: 1,
-	        stroke: getStrokeColor(event, defaultStrokeColor)
+	        stroke: getStrokeColor$1(event, defaultStrokeColor)
 	      });
 	    },
 	    'bpmn:LinkEventDefinition': function(parentGfx, event, isThrowing) {
@@ -15714,12 +17577,12 @@
 	        }
 	      });
 
-	      var fill = isThrowing ? getStrokeColor(event, defaultStrokeColor) : 'none';
+	      var fill = isThrowing ? getStrokeColor$1(event, defaultStrokeColor) : 'none';
 
 	      return drawPath(parentGfx, pathData, {
 	        strokeWidth: 1,
 	        fill: fill,
-	        stroke: getStrokeColor(event, defaultStrokeColor)
+	        stroke: getStrokeColor$1(event, defaultStrokeColor)
 	      });
 	    },
 	    'bpmn:ErrorEventDefinition': function(parentGfx, event, isThrowing) {
@@ -15734,12 +17597,12 @@
 	        }
 	      });
 
-	      var fill = isThrowing ? getStrokeColor(event, defaultStrokeColor) : 'none';
+	      var fill = isThrowing ? getStrokeColor$1(event, defaultStrokeColor) : 'none';
 
 	      return drawPath(parentGfx, pathData, {
 	        strokeWidth: 1,
 	        fill: fill,
-	        stroke: getStrokeColor(event, defaultStrokeColor)
+	        stroke: getStrokeColor$1(event, defaultStrokeColor)
 	      });
 	    },
 	    'bpmn:CancelEventDefinition': function(parentGfx, event, isThrowing) {
@@ -15754,12 +17617,12 @@
 	        }
 	      });
 
-	      var fill = isThrowing ? getStrokeColor(event, defaultStrokeColor) : 'none';
+	      var fill = isThrowing ? getStrokeColor$1(event, defaultStrokeColor) : 'none';
 
 	      var path = drawPath(parentGfx, pathData, {
 	        strokeWidth: 1,
 	        fill: fill,
-	        stroke: getStrokeColor(event, defaultStrokeColor)
+	        stroke: getStrokeColor$1(event, defaultStrokeColor)
 	      });
 
 	      rotate(path, 45);
@@ -15778,12 +17641,12 @@
 	        }
 	      });
 
-	      var fill = isThrowing ? getStrokeColor(event, defaultStrokeColor) : 'none';
+	      var fill = isThrowing ? getStrokeColor$1(event, defaultStrokeColor) : 'none';
 
 	      return drawPath(parentGfx, pathData, {
 	        strokeWidth: 1,
 	        fill: fill,
-	        stroke: getStrokeColor(event, defaultStrokeColor)
+	        stroke: getStrokeColor$1(event, defaultStrokeColor)
 	      });
 	    },
 	    'bpmn:SignalEventDefinition': function(parentGfx, event, isThrowing) {
@@ -15798,12 +17661,12 @@
 	        }
 	      });
 
-	      var fill = isThrowing ? getStrokeColor(event, defaultStrokeColor) : 'none';
+	      var fill = isThrowing ? getStrokeColor$1(event, defaultStrokeColor) : 'none';
 
 	      return drawPath(parentGfx, pathData, {
 	        strokeWidth: 1,
 	        fill: fill,
-	        stroke: getStrokeColor(event, defaultStrokeColor)
+	        stroke: getStrokeColor$1(event, defaultStrokeColor)
 	      });
 	    },
 	    'bpmn:MultipleEventDefinition': function(parentGfx, event, isThrowing) {
@@ -15818,7 +17681,7 @@
 	        }
 	      });
 
-	      var fill = isThrowing ? getStrokeColor(event, defaultStrokeColor) : 'none';
+	      var fill = isThrowing ? getStrokeColor$1(event, defaultStrokeColor) : 'none';
 
 	      return drawPath(parentGfx, pathData, {
 	        strokeWidth: 1,
@@ -15839,15 +17702,15 @@
 
 	      return drawPath(parentGfx, pathData, {
 	        strokeWidth: 1,
-	        fill: getStrokeColor(event, defaultStrokeColor),
-	        stroke: getStrokeColor(event, defaultStrokeColor)
+	        fill: getStrokeColor$1(event, defaultStrokeColor),
+	        stroke: getStrokeColor$1(event, defaultStrokeColor)
 	      });
 	    },
 	    'bpmn:EndEvent': function(parentGfx, element) {
 	      var circle = renderer('bpmn:Event')(parentGfx, element, {
 	        strokeWidth: 4,
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      renderEventContent(element, parentGfx);
@@ -15857,8 +17720,8 @@
 	    'bpmn:TerminateEventDefinition': function(parentGfx, element) {
 	      var circle = drawCircle(parentGfx, element.width, element.height, 8, {
 	        strokeWidth: 4,
-	        fill: getStrokeColor(element, defaultStrokeColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        fill: getStrokeColor$1(element, defaultStrokeColor),
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      return circle;
@@ -15867,14 +17730,14 @@
 	      var outer = renderer('bpmn:Event')(parentGfx, element, {
 	        strokeWidth: 1,
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      /* inner */
 	      drawCircle(parentGfx, element.width, element.height, INNER_OUTER_DIST, {
 	        strokeWidth: 1,
 	        fill: getFillColor(element, 'none'),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      renderEventContent(element, parentGfx);
@@ -15898,7 +17761,7 @@
 	    'bpmn:Task': function(parentGfx, element) {
 	      var attrs = {
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      };
 
 	      var rect = renderer('bpmn:Activity')(parentGfx, element, attrs);
@@ -15921,7 +17784,7 @@
 	      /* service bg */ drawPath(parentGfx, pathDataBG, {
 	        strokeWidth: 1,
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      var fillPathData = pathMap.getScaledPath('TASK_TYPE_SERVICE_FILL', {
@@ -15946,7 +17809,7 @@
 	      /* service */ drawPath(parentGfx, pathData, {
 	        strokeWidth: 1,
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      return task;
@@ -15967,7 +17830,7 @@
 	      /* user path */ drawPath(parentGfx, pathData, {
 	        strokeWidth: 0.5,
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      var pathData2 = pathMap.getScaledPath('TASK_TYPE_USER_2', {
@@ -15980,7 +17843,7 @@
 	      /* user2 path */ drawPath(parentGfx, pathData2, {
 	        strokeWidth: 0.5,
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      var pathData3 = pathMap.getScaledPath('TASK_TYPE_USER_3', {
@@ -15992,8 +17855,8 @@
 
 	      /* user3 path */ drawPath(parentGfx, pathData3, {
 	        strokeWidth: 0.5,
-	        fill: getStrokeColor(element, defaultStrokeColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        fill: getStrokeColor$1(element, defaultStrokeColor),
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      return task;
@@ -16011,7 +17874,7 @@
 	      /* manual path */ drawPath(parentGfx, pathData, {
 	        strokeWidth: 0.5, // 0.25,
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      return task;
@@ -16032,7 +17895,7 @@
 
 	      /* send path */ drawPath(parentGfx, pathData, {
 	        strokeWidth: 1,
-	        fill: getStrokeColor(element, defaultStrokeColor),
+	        fill: getStrokeColor$1(element, defaultStrokeColor),
 	        stroke: getFillColor(element, defaultFillColor)
 	      });
 
@@ -16070,7 +17933,7 @@
 	      /* receive path */ drawPath(parentGfx, pathData, {
 	        strokeWidth: 1,
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      return task;
@@ -16087,7 +17950,7 @@
 
 	      /* script path */ drawPath(parentGfx, pathData, {
 	        strokeWidth: 1,
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      return task;
@@ -16103,10 +17966,10 @@
 	      });
 
 	      var businessHeaderPath = drawPath(parentGfx, headerPathData);
-	      attr$1(businessHeaderPath, {
+	      attr(businessHeaderPath, {
 	        strokeWidth: 1,
 	        fill: getFillColor(element, '#aaaaaa'),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      var headerData = pathMap.getScaledPath('TASK_TYPE_BUSINESS_RULE_MAIN', {
@@ -16117,9 +17980,9 @@
 	      });
 
 	      var businessPath = drawPath(parentGfx, headerData);
-	      attr$1(businessPath, {
+	      attr(businessPath, {
 	        strokeWidth: 1,
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      return task;
@@ -16127,7 +17990,7 @@
 	    'bpmn:SubProcess': function(parentGfx, element, attrs) {
 	      attrs = assign({
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      }, attrs);
 
 	      var rect = renderer('bpmn:Activity')(parentGfx, element, attrs);
@@ -16135,7 +17998,7 @@
 	      var expanded = isExpanded(element);
 
 	      if (isEventSubProcess(element)) {
-	        attr$1(rect, {
+	        attr(rect, {
 	          strokeDasharray: '1,2'
 	        });
 	      }
@@ -16157,7 +18020,7 @@
 	      var outer = renderer('bpmn:SubProcess')(parentGfx, element);
 
 	      var innerAttrs = styles.style([ 'no-fill', 'no-events' ], {
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      /* inner path */ drawRect(parentGfx, element.width, element.height, TASK_BORDER_RADIUS - 2, INNER_OUTER_DIST, innerAttrs);
@@ -16174,7 +18037,7 @@
 	      var attrs = {
 	        fillOpacity: DEFAULT_FILL_OPACITY,
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      };
 
 	      var lane = renderer('bpmn:Lane')(parentGfx, element, attrs);
@@ -16186,7 +18049,7 @@
 	          { x: 30, y: 0 },
 	          { x: 30, y: element.height }
 	        ], {
-	          stroke: getStrokeColor(element, defaultStrokeColor)
+	          stroke: getStrokeColor$1(element, defaultStrokeColor)
 	        });
 	        var text = getSemantic(element).name;
 	        renderLaneLabel(parentGfx, text, element);
@@ -16197,7 +18060,7 @@
 	        renderLabel(parentGfx, text2, {
 	          box: element, align: 'center-middle',
 	          style: {
-	            fill: getStrokeColor(element, defaultStrokeColor)
+	            fill: getLabelColor(element, defaultLabelColor, defaultStrokeColor)
 	          }
 	        });
 	      }
@@ -16214,7 +18077,7 @@
 	      var rect = drawRect(parentGfx, element.width, element.height, 0, assign({
 	        fill: getFillColor(element, defaultFillColor),
 	        fillOpacity: HIGH_FILL_OPACITY,
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      }, attrs));
 
 	      var semantic = getSemantic(element);
@@ -16233,7 +18096,7 @@
 	      drawCircle(parentGfx, element.width, element.height, element.height * 0.24, {
 	        strokeWidth: 2.5,
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      return diamond;
@@ -16255,8 +18118,8 @@
 	      if ((getDi(element).isMarkerVisible)) {
 	        drawPath(parentGfx, pathData, {
 	          strokeWidth: 1,
-	          fill: getStrokeColor(element, defaultStrokeColor),
-	          stroke: getStrokeColor(element, defaultStrokeColor)
+	          fill: getStrokeColor$1(element, defaultStrokeColor),
+	          stroke: getStrokeColor$1(element, defaultStrokeColor)
 	        });
 	      }
 
@@ -16278,8 +18141,8 @@
 
 	      /* complex path */ drawPath(parentGfx, pathData, {
 	        strokeWidth: 1,
-	        fill: getStrokeColor(element, defaultStrokeColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        fill: getStrokeColor$1(element, defaultStrokeColor),
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      return diamond;
@@ -16300,8 +18163,8 @@
 
 	      /* parallel path */ drawPath(parentGfx, pathData, {
 	        strokeWidth: 1,
-	        fill: getStrokeColor(element, defaultStrokeColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        fill: getStrokeColor$1(element, defaultStrokeColor),
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      return diamond;
@@ -16315,7 +18178,7 @@
 	      /* outer circle path */ drawCircle(parentGfx, element.width, element.height, element.height * 0.20, {
 	        strokeWidth: 1,
 	        fill: 'none',
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      var type = semantic.eventGatewayType;
@@ -16337,7 +18200,7 @@
 	        var attrs = {
 	          strokeWidth: 2,
 	          fill: getFillColor(element, 'none'),
-	          stroke: getStrokeColor(element, defaultStrokeColor)
+	          stroke: getStrokeColor$1(element, defaultStrokeColor)
 	        };
 
 	        /* event path */ drawPath(parentGfx, pathData, attrs);
@@ -16357,7 +18220,7 @@
 	        });
 
 	        var parallelPath = drawPath(parentGfx, pathData);
-	        attr$1(parallelPath, {
+	        attr(parallelPath, {
 	          strokeWidth: 1,
 	          fill: 'none'
 	        });
@@ -16365,10 +18228,10 @@
 
 	        if (!instantiate) {
 	          var innerCircle = drawCircle(parentGfx, element.width, element.height, element.height * 0.26);
-	          attr$1(innerCircle, {
+	          attr(innerCircle, {
 	            strokeWidth: 1,
 	            fill: 'none',
-	            stroke: getStrokeColor(element, defaultStrokeColor)
+	            stroke: getStrokeColor$1(element, defaultStrokeColor)
 	          });
 	        }
 
@@ -16382,7 +18245,7 @@
 	      var attrs = {
 	        fill: getFillColor(element, defaultFillColor),
 	        fillOpacity: DEFAULT_FILL_OPACITY,
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      };
 
 	      return drawDiamond(parentGfx, element.width, element.height, attrs);
@@ -16391,12 +18254,12 @@
 	      var pathData = createPathFromConnection(element);
 
 	      var fill = getFillColor(element, defaultFillColor),
-	          stroke = getStrokeColor(element, defaultStrokeColor);
+	          stroke = getStrokeColor$1(element, defaultStrokeColor);
 
 	      var attrs = {
 	        strokeLinejoin: 'round',
 	        markerEnd: marker('sequenceflow-end', fill, stroke),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      };
 
 	      var path = drawPath(parentGfx, pathData, attrs);
@@ -16410,7 +18273,7 @@
 
 	        // conditional flow marker
 	        if (sequenceFlow.conditionExpression && source.$instanceOf('bpmn:Activity')) {
-	          attr$1(path, {
+	          attr(path, {
 	            markerStart: marker('conditional-flow-marker', fill, stroke)
 	          });
 	        }
@@ -16418,7 +18281,7 @@
 	        // default marker
 	        if (source.default && (source.$instanceOf('bpmn:Gateway') || source.$instanceOf('bpmn:Activity')) &&
 	            source.default === sequenceFlow) {
-	          attr$1(path, {
+	          attr(path, {
 	            markerStart: marker('conditional-default-flow-marker', fill, stroke)
 	          });
 	        }
@@ -16431,13 +18294,13 @@
 	      var semantic = getSemantic(element);
 
 	      var fill = getFillColor(element, defaultFillColor),
-	          stroke = getStrokeColor(element, defaultStrokeColor);
+	          stroke = getStrokeColor$1(element, defaultStrokeColor);
 
 	      attrs = assign({
 	        strokeDasharray: '0.5, 5',
 	        strokeLinecap: 'round',
 	        strokeLinejoin: 'round',
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      }, attrs || {});
 
 	      if (semantic.associationDirection === 'One' ||
@@ -16453,7 +18316,7 @@
 	    },
 	    'bpmn:DataInputAssociation': function(parentGfx, element) {
 	      var fill = getFillColor(element, defaultFillColor),
-	          stroke = getStrokeColor(element, defaultStrokeColor);
+	          stroke = getStrokeColor$1(element, defaultStrokeColor);
 
 	      return renderer('bpmn:Association')(parentGfx, element, {
 	        markerEnd: marker('association-end', fill, stroke)
@@ -16461,7 +18324,7 @@
 	    },
 	    'bpmn:DataOutputAssociation': function(parentGfx, element) {
 	      var fill = getFillColor(element, defaultFillColor),
-	          stroke = getStrokeColor(element, defaultStrokeColor);
+	          stroke = getStrokeColor$1(element, defaultStrokeColor);
 
 	      return renderer('bpmn:Association')(parentGfx, element, {
 	        markerEnd: marker('association-end', fill, stroke)
@@ -16473,7 +18336,7 @@
 	          di = getDi(element);
 
 	      var fill = getFillColor(element, defaultFillColor),
-	          stroke = getStrokeColor(element, defaultStrokeColor);
+	          stroke = getStrokeColor$1(element, defaultStrokeColor);
 
 	      var pathData = createPathFromConnection(element);
 
@@ -16484,7 +18347,7 @@
 	        strokeLinecap: 'round',
 	        strokeLinejoin: 'round',
 	        strokeWidth: '1.5px',
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      };
 
 	      var path = drawPath(parentGfx, pathData, attrs);
@@ -16509,7 +18372,25 @@
 	          messageAttrs.stroke = 'white';
 	        }
 
-	        drawPath(parentGfx, markerPathData, messageAttrs);
+	        var message = drawPath(parentGfx, markerPathData, messageAttrs);
+
+	        var labelText = semantic.messageRef.name;
+	        var label = renderLabel(parentGfx, labelText, {
+	          align: 'center-top',
+	          fitBox: true,
+	          style: {
+	            fill: getStrokeColor$1(element, defaultLabelColor)
+	          }
+	        });
+
+	        var messageBounds = message.getBBox(),
+	            labelBounds = label.getBBox();
+
+	        var translateX = midPoint.x - labelBounds.width / 2,
+	            translateY = midPoint.y + messageBounds.height / 2 + ELEMENT_LABEL_DISTANCE$1;
+
+	        transform(label, translateX, translateY, 0);
+
 	      }
 
 	      return path;
@@ -16529,7 +18410,7 @@
 	      var elementObject = drawPath(parentGfx, pathData, {
 	        fill: getFillColor(element, defaultFillColor),
 	        fillOpacity: DEFAULT_FILL_OPACITY,
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      var semantic = getSemantic(element);
@@ -16581,7 +18462,7 @@
 	        strokeWidth: 2,
 	        fill: getFillColor(element, defaultFillColor),
 	        fillOpacity: DEFAULT_FILL_OPACITY,
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      return elementStore;
@@ -16594,7 +18475,7 @@
 	      var attrs = {
 	        strokeWidth: 1,
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      };
 
 	      if (!cancel) {
@@ -16623,7 +18504,7 @@
 	    'bpmn:Group': function(parentGfx, element) {
 
 	      var group = drawRect(parentGfx, element.width, element.height, TASK_BORDER_RADIUS, {
-	        stroke: getStrokeColor(element, defaultStrokeColor),
+	        stroke: getStrokeColor$1(element, defaultStrokeColor),
 	        strokeWidth: 1,
 	        strokeDasharray: '8,3,1,3',
 	        fill: 'none',
@@ -16655,7 +18536,7 @@
 	      });
 
 	      drawPath(parentGfx, textPathData, {
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      var text = getSemantic(element).text || '';
@@ -16664,7 +18545,7 @@
 	        align: 'left-top',
 	        padding: 5,
 	        style: {
-	          fill: getStrokeColor(element, defaultStrokeColor)
+	          fill: getLabelColor(element, defaultLabelColor, defaultStrokeColor)
 	        }
 	      });
 
@@ -16683,21 +18564,21 @@
 	      });
 
 	      drawMarker('participant-multiplicity', parentGfx, markerPath, {
-	        strokeWidth: 1,
+	        strokeWidth: 2,
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 	    },
 	    'SubProcessMarker': function(parentGfx, element) {
 	      var markerRect = drawRect(parentGfx, 14, 14, 0, {
 	        strokeWidth: 1,
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 
 	      // Process marker is placed in the middle of the box
 	      // therefore fixed values can be used here
-	      translate(markerRect, element.width / 2 - 7.5, element.height - 20);
+	      translate$2(markerRect, element.width / 2 - 7.5, element.height - 20);
 
 	      var markerPath = pathMap.getScaledPath('MARKER_SUB_PROCESS', {
 	        xScaleFactor: 1.5,
@@ -16712,7 +18593,7 @@
 
 	      drawMarker('sub-process', parentGfx, markerPath, {
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 	    },
 	    'ParallelMarker': function(parentGfx, element, position) {
@@ -16729,7 +18610,7 @@
 
 	      drawMarker('parallel', parentGfx, markerPath, {
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 	    },
 	    'SequentialMarker': function(parentGfx, element, position) {
@@ -16746,7 +18627,7 @@
 
 	      drawMarker('sequential', parentGfx, markerPath, {
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 	    },
 	    'CompensationMarker': function(parentGfx, element, position) {
@@ -16764,7 +18645,7 @@
 	      drawMarker('compensation', parentGfx, markerMath, {
 	        strokeWidth: 1,
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 	    },
 	    'LoopMarker': function(parentGfx, element, position) {
@@ -16782,7 +18663,7 @@
 	      drawMarker('loop', parentGfx, markerPath, {
 	        strokeWidth: 1,
 	        fill: getFillColor(element, defaultFillColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor),
+	        stroke: getStrokeColor$1(element, defaultStrokeColor),
 	        strokeLinecap: 'round',
 	        strokeMiterlimit: 0.5
 	      });
@@ -16801,8 +18682,8 @@
 
 	      drawMarker('adhoc', parentGfx, markerPath, {
 	        strokeWidth: 1,
-	        fill: getStrokeColor(element, defaultStrokeColor),
-	        stroke: getStrokeColor(element, defaultStrokeColor)
+	        fill: getStrokeColor$1(element, defaultStrokeColor),
+	        stroke: getStrokeColor$1(element, defaultStrokeColor)
 	      });
 	    }
 	  };
@@ -16864,7 +18745,7 @@
 
 	  function renderDataItemCollection(parentGfx, element) {
 
-	    var yPosition = (element.height - 16) / element.height;
+	    var yPosition = (element.height - 18) / element.height;
 
 	    var pathData = pathMap.getScaledPath('DATA_OBJECT_COLLECTION_PATH', {
 	      xScaleFactor: 1,
@@ -16872,7 +18753,7 @@
 	      containerWidth: element.width,
 	      containerHeight: element.height,
 	      position: {
-	        mx: 0.451,
+	        mx: 0.33,
 	        my: yPosition
 	      }
 	    });
@@ -16886,10 +18767,11 @@
 	  // extension API, use at your own risk
 	  this._drawPath = drawPath;
 
+	  this._renderer = renderer;
 	}
 
 
-	inherits_browser(BpmnRenderer, BaseRenderer);
+	inherits$1(BpmnRenderer, BaseRenderer);
 
 	BpmnRenderer.$inject = [
 	  'config.bpmnRenderer',
@@ -16907,7 +18789,7 @@
 
 	BpmnRenderer.prototype.drawShape = function(parentGfx, element) {
 	  var type = element.type;
-	  var h = this.handlers[type];
+	  var h = this._renderer(type);
 
 	  /* jshint -W040 */
 	  return h(parentGfx, element);
@@ -16915,7 +18797,7 @@
 
 	BpmnRenderer.prototype.drawConnection = function(parentGfx, element) {
 	  var type = element.type;
-	  var h = this.handlers[type];
+	  var h = this._renderer(type);
 
 	  /* jshint -W040 */
 	  return h(parentGfx, element);
@@ -16940,7 +18822,7 @@
 
 	var DEFAULT_BOX_PADDING = 0;
 
-	var DEFAULT_LABEL_SIZE = {
+	var DEFAULT_LABEL_SIZE$1 = {
 	  width: 150,
 	  height: 50
 	};
@@ -17049,6 +18931,8 @@
 	  };
 	}
 
+	var SOFT_BREAK = '\u00AD';
+
 
 	/**
 	 * Shortens a line based on spacing and hyphens.
@@ -17059,13 +18943,15 @@
 	 * @return {string} the shortened string
 	 */
 	function semanticShorten(line, maxLength) {
-	  var parts = line.split(/(\s|-)/g),
+
+	  var parts = line.split(/(\s|-|\u00AD)/g),
 	      part,
 	      shortenedParts = [],
 	      length = 0;
 
-	  // try to shorten via spaces + hyphens
+	  // try to shorten via break chars
 	  if (parts.length > 1) {
+
 	    while ((part = parts.shift())) {
 	      if (part.length + length < maxLength) {
 	        shortenedParts.push(part);
@@ -17073,13 +18959,20 @@
 	      } else {
 
 	        // remove previous part, too if hyphen does not fit anymore
-	        if (part === '-') {
+	        if (part === '-' || part === SOFT_BREAK) {
 	          shortenedParts.pop();
 	        }
 
 	        break;
 	      }
 	    }
+	  }
+
+	  var last = shortenedParts[shortenedParts.length - 1];
+
+	  // translate trailing soft break to actual hyphen
+	  if (last && last === SOFT_BREAK) {
+	    shortenedParts[shortenedParts.length - 1] = '-';
 	  }
 
 	  return shortenedParts.join('');
@@ -17106,9 +18999,9 @@
 	  var helperSvg = document.getElementById('helper-svg');
 
 	  if (!helperSvg) {
-	    helperSvg = create('svg');
+	    helperSvg = create$1('svg');
 
-	    attr$1(helperSvg, {
+	    attr(helperSvg, {
 	      id: 'helper-svg',
 	      width: 0,
 	      height: 0,
@@ -17134,7 +19027,7 @@
 	function Text(config) {
 
 	  this._config = assign({}, {
-	    size: DEFAULT_LABEL_SIZE,
+	    size: DEFAULT_LABEL_SIZE$1,
 	    padding: DEFAULT_BOX_PADDING,
 	    style: {},
 	    align: 'center-top'
@@ -17190,15 +19083,17 @@
 
 	  var lineHeight = getLineHeight(style);
 
-	  var lines = text.split(/\r?\n/g),
+	  // we split text by lines and normalize
+	  // {soft break} + {line break} => { line break }
+	  var lines = text.split(/\u00AD?\r?\n/),
 	      layouted = [];
 
 	  var maxWidth = box.width - padding.left - padding.right;
 
 	  // ensure correct rendering by attaching helper text node to invisible SVG
-	  var helperText = create('text');
-	  attr$1(helperText, { x: 0, y: 0 });
-	  attr$1(helperText, style);
+	  var helperText = create$1('text');
+	  attr(helperText, { x: 0, y: 0 });
+	  attr(helperText, style);
 
 	  var helperSvg = getHelperSvg();
 
@@ -17231,9 +19126,9 @@
 	  y -= (lineHeight || layouted[0].height) / 4;
 
 
-	  var textElement = create('text');
+	  var textElement = create$1('text');
 
-	  attr$1(textElement, style);
+	  attr(textElement, style);
 
 	  // layout each line taking into account that parent
 	  // shape might resize to fit text size
@@ -17260,8 +19155,8 @@
 	        - line.width) / 2 + padding.left), 0);
 	    }
 
-	    var tspan = create('tspan');
-	    attr$1(tspan, { x: x, y: y });
+	    var tspan = create$1('tspan');
+	    attr(tspan, { x: x, y: y });
 
 	    tspan.textContent = line.text;
 
@@ -17574,14 +19469,11 @@
 	      widthElements: [10, 40, 50, 60]
 	    },
 	    'DATA_OBJECT_COLLECTION_PATH': {
-	      d:'m {mx}, {my} ' +
-	        'm  0 15  l 0 -15 ' +
-	        'm  4 15  l 0 -15 ' +
-	        'm  4 15  l 0 -15 ',
-	      height: 61,
-	      width:  51,
-	      heightElements: [12],
-	      widthElements: [1, 6, 12, 15]
+	      d: 'm{mx},{my} m 3,2 l 0,10 m 3,-10 l 0,10 m 3,-10 l 0,10',
+	      height: 10,
+	      width: 10,
+	      heightElements: [],
+	      widthElements: []
 	    },
 	    'DATA_ARROW': {
 	      d:'m 5,9 9,0 0,-3 5,5 -5,5 0,-3 -9,0 z',
@@ -17850,8 +19742,8 @@
 
 	// helpers //////////////////////
 
-	// copied from https://github.com/adobe-webplatform/Snap.svg/blob/master/src/svg.js
-	var tokenRegex = /\{([^}]+)\}/g,
+	// copied and adjusted from https://github.com/adobe-webplatform/Snap.svg/blob/master/src/svg.js
+	var tokenRegex = /\{([^{}]+)\}/g,
 	    objNotationRegex = /(?:(?:^|\.)(.+?)(?=\[|\.|$|\()|\[('|")(.+?)\2\])(\(\))?/g; // matches .xxxxx or ["xxxxx"] to run over object properties
 
 	function replacer(all, key, obj) {
@@ -17876,7 +19768,7 @@
 	  });
 	}
 
-	var DrawModule$1 = {
+	var DrawModule = {
 	  __init__: [ 'bpmnRenderer' ],
 	  bpmnRenderer: [ 'type', BpmnRenderer ],
 	  textRenderer: [ 'type', TextRenderer ],
@@ -17910,11 +19802,11 @@
 	  });
 	}
 
-	var translate$2 = {
+	var translate = {
 	  translate: [ 'value', translate$1 ]
 	};
 
-	var DEFAULT_LABEL_SIZE$1 = {
+	var DEFAULT_LABEL_SIZE = {
 	  width: 90,
 	  height: 20
 	};
@@ -17947,7 +19839,7 @@
 	 * @return {boolean} true if has label
 	 */
 	function hasExternalLabel(element) {
-	  return isLabel(element.label);
+	  return isLabel$6(element.label);
 	}
 
 	/**
@@ -18010,12 +19902,12 @@
 	  } else if (is$1(element, 'bpmn:Group')) {
 	    return {
 	      x: element.x + element.width / 2,
-	      y: element.y + DEFAULT_LABEL_SIZE$1.height / 2
+	      y: element.y + DEFAULT_LABEL_SIZE.height / 2
 	    };
 	  } else {
 	    return {
 	      x: element.x + element.width / 2,
-	      y: element.y + element.height + DEFAULT_LABEL_SIZE$1.height / 2
+	      y: element.y + element.height + DEFAULT_LABEL_SIZE.height / 2
 	    };
 	  }
 	}
@@ -18025,22 +19917,21 @@
 	 * Returns the bounds of an elements label, parsed from the elements DI or
 	 * generated from its bounds.
 	 *
-	 * @param {BpmnElement} semantic
+	 * @param {BpmndDi} di
 	 * @param {djs.model.Base} element
 	 */
-	function getExternalLabelBounds(semantic, element) {
+	function getExternalLabelBounds(di, element) {
 
 	  var mid,
 	      size,
 	      bounds,
-	      di = semantic.di,
 	      label = di.label;
 
 	  if (label && label.bounds) {
 	    bounds = label.bounds;
 
 	    size = {
-	      width: Math.max(DEFAULT_LABEL_SIZE$1.width, bounds.width),
+	      width: Math.max(DEFAULT_LABEL_SIZE.width, bounds.width),
 	      height: bounds.height
 	    };
 
@@ -18052,7 +19943,7 @@
 
 	    mid = getExternalLabelMid(element);
 
-	    size = DEFAULT_LABEL_SIZE$1;
+	    size = DEFAULT_LABEL_SIZE;
 	  }
 
 	  return assign({
@@ -18061,1279 +19952,29 @@
 	  }, size);
 	}
 
-	function isLabel(element) {
+	function isLabel$6(element) {
 	  return element && !!element.labelTarget;
 	}
 
 	/**
-	 * Computes the distance between two points
-	 *
-	 * @param  {Point}  p
-	 * @param  {Point}  q
-	 *
-	 * @return {number}  distance
-	 */
-	function pointDistance(a, b) {
-	  if (!a || !b) {
-	    return -1;
-	  }
-
-	  return Math.sqrt(
-	    Math.pow(a.x - b.x, 2) +
-	    Math.pow(a.y - b.y, 2)
-	  );
-	}
-
-
-	/**
-	 * Returns true if the point r is on the line between p and q
-	 *
-	 * @param  {Point}  p
-	 * @param  {Point}  q
-	 * @param  {Point}  r
-	 * @param  {number} [accuracy=5] accuracy for points on line check (lower is better)
-	 *
-	 * @return {boolean}
-	 */
-	function pointsOnLine(p, q, r, accuracy) {
-
-	  if (typeof accuracy === 'undefined') {
-	    accuracy = 5;
-	  }
-
-	  if (!p || !q || !r) {
-	    return false;
-	  }
-
-	  var val = (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x),
-	      dist = pointDistance(p, q);
-
-	  // @see http://stackoverflow.com/a/907491/412190
-	  return Math.abs(val / dist) <= accuracy;
-	}
-
-
-	var ALIGNED_THRESHOLD = 2;
-
-	/**
-	 * Check whether two points are horizontally or vertically aligned.
-	 *
-	 * @param {Array<Point>|Point}
-	 * @param {Point}
-	 *
-	 * @return {string|boolean}
-	 */
-	function pointsAligned(a, b) {
-	  var points;
-
-	  if (isArray(a)) {
-	    points = a;
-	  } else {
-	    points = [ a, b ];
-	  }
-
-	  if (pointsAlignedHorizontally(points)) {
-	    return 'h';
-	  }
-
-	  if (pointsAlignedVertically(points)) {
-	    return 'v';
-	  }
-
-	  return false;
-	}
-
-	function pointsAlignedHorizontally(a, b) {
-	  var points;
-
-	  if (isArray(a)) {
-	    points = a;
-	  } else {
-	    points = [ a, b ];
-	  }
-
-	  var firstPoint = points.slice().shift();
-
-	  return every(points, function(point) {
-	    return Math.abs(firstPoint.y - point.y) <= ALIGNED_THRESHOLD;
-	  });
-	}
-
-	function pointsAlignedVertically(a, b) {
-	  var points;
-
-	  if (isArray(a)) {
-	    points = a;
-	  } else {
-	    points = [ a, b ];
-	  }
-
-	  var firstPoint = points.slice().shift();
-
-	  return every(points, function(point) {
-	    return Math.abs(firstPoint.x - point.x) <= ALIGNED_THRESHOLD;
-	  });
-	}
-
-
-
-	/**
-	 * Returns true if the point p is inside the rectangle rect
-	 *
-	 * @param  {Point}  p
-	 * @param  {Rect} rect
-	 * @param  {number} tolerance
-	 *
-	 * @return {boolean}
-	 */
-	function pointInRect(p, rect, tolerance) {
-	  tolerance = tolerance || 0;
-
-	  return p.x > rect.x - tolerance &&
-	         p.y > rect.y - tolerance &&
-	         p.x < rect.x + rect.width + tolerance &&
-	         p.y < rect.y + rect.height + tolerance;
-	}
-
-	/**
-	 * Returns a point in the middle of points p and q
-	 *
-	 * @param  {Point}  p
-	 * @param  {Point}  q
-	 *
-	 * @return {Point} middle point
-	 */
-	function getMidPoint(p, q) {
-	  return {
-	    x: Math.round(p.x + ((q.x - p.x) / 2.0)),
-	    y: Math.round(p.y + ((q.y - p.y) / 2.0))
-	  };
-	}
-
-	/**
-	 * This file contains source code adapted from Snap.svg (licensed Apache-2.0).
-	 *
-	 * @see https://github.com/adobe-webplatform/Snap.svg/blob/master/src/path.js
-	 */
-
-	/* eslint no-fallthrough: "off" */
-
-	var p2s = /,?([a-z]),?/gi,
-	    toFloat = parseFloat,
-	    math = Math,
-	    PI = math.PI,
-	    mmin = math.min,
-	    mmax = math.max,
-	    pow = math.pow,
-	    abs = math.abs,
-	    pathCommand = /([a-z])[\s,]*((-?\d*\.?\d*(?:e[-+]?\d+)?[\s]*,?[\s]*)+)/ig,
-	    pathValues = /(-?\d*\.?\d*(?:e[-+]?\\d+)?)[\s]*,?[\s]*/ig;
-
-	var isArray$2 = Array.isArray || function(o) { return o instanceof Array; };
-
-	function hasProperty(obj, property) {
-	  return Object.prototype.hasOwnProperty.call(obj, property);
-	}
-
-	function clone$1(obj) {
-
-	  if (typeof obj == 'function' || Object(obj) !== obj) {
-	    return obj;
-	  }
-
-	  var res = new obj.constructor;
-
-	  for (var key in obj) {
-	    if (hasProperty(obj, key)) {
-	      res[key] = clone$1(obj[key]);
-	    }
-	  }
-
-	  return res;
-	}
-
-	function repush(array, item) {
-	  for (var i = 0, ii = array.length; i < ii; i++) if (array[i] === item) {
-	    return array.push(array.splice(i, 1)[0]);
-	  }
-	}
-
-	function cacher(f) {
-
-	  function newf() {
-
-	    var arg = Array.prototype.slice.call(arguments, 0),
-	        args = arg.join('\u2400'),
-	        cache = newf.cache = newf.cache || {},
-	        count = newf.count = newf.count || [];
-
-	    if (hasProperty(cache, args)) {
-	      repush(count, args);
-	      return cache[args];
-	    }
-
-	    count.length >= 1e3 && delete cache[count.shift()];
-	    count.push(args);
-	    cache[args] = f.apply(0, arg);
-
-	    return cache[args];
-	  }
-	  return newf;
-	}
-
-	function parsePathString(pathString) {
-
-	  if (!pathString) {
-	    return null;
-	  }
-
-	  var pth = paths(pathString);
-
-	  if (pth.arr) {
-	    return clone$1(pth.arr);
-	  }
-
-	  var paramCounts = { a: 7, c: 6, h: 1, l: 2, m: 2, q: 4, s: 4, t: 2, v: 1, z: 0 },
-	      data = [];
-
-	  if (isArray$2(pathString) && isArray$2(pathString[0])) { // rough assumption
-	    data = clone$1(pathString);
-	  }
-
-	  if (!data.length) {
-
-	    String(pathString).replace(pathCommand, function(a, b, c) {
-	      var params = [],
-	          name = b.toLowerCase();
-
-	      c.replace(pathValues, function(a, b) {
-	        b && params.push(+b);
-	      });
-
-	      if (name == 'm' && params.length > 2) {
-	        data.push([b].concat(params.splice(0, 2)));
-	        name = 'l';
-	        b = b == 'm' ? 'l' : 'L';
-	      }
-
-	      while (params.length >= paramCounts[name]) {
-	        data.push([b].concat(params.splice(0, paramCounts[name])));
-	        if (!paramCounts[name]) {
-	          break;
-	        }
-	      }
-	    });
-	  }
-
-	  data.toString = paths.toString;
-	  pth.arr = clone$1(data);
-
-	  return data;
-	}
-
-	function paths(ps) {
-	  var p = paths.ps = paths.ps || {};
-
-	  if (p[ps]) {
-	    p[ps].sleep = 100;
-	  } else {
-	    p[ps] = {
-	      sleep: 100
-	    };
-	  }
-
-	  setTimeout(function() {
-	    for (var key in p) {
-	      if (hasProperty(p, key) && key != ps) {
-	        p[key].sleep--;
-	        !p[key].sleep && delete p[key];
-	      }
-	    }
-	  });
-
-	  return p[ps];
-	}
-
-	function rectBBox(x, y, width, height) {
-
-	  if (arguments.length === 1) {
-	    y = x.y;
-	    width = x.width;
-	    height = x.height;
-	    x = x.x;
-	  }
-
-	  return {
-	    x: x,
-	    y: y,
-	    width: width,
-	    height: height,
-	    x2: x + width,
-	    y2: y + height
-	  };
-	}
-
-	function pathToString() {
-	  return this.join(',').replace(p2s, '$1');
-	}
-
-	function pathClone(pathArray) {
-	  var res = clone$1(pathArray);
-	  res.toString = pathToString;
-	  return res;
-	}
-
-	function findDotsAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
-	  var t1 = 1 - t,
-	      t13 = pow(t1, 3),
-	      t12 = pow(t1, 2),
-	      t2 = t * t,
-	      t3 = t2 * t,
-	      x = t13 * p1x + t12 * 3 * t * c1x + t1 * 3 * t * t * c2x + t3 * p2x,
-	      y = t13 * p1y + t12 * 3 * t * c1y + t1 * 3 * t * t * c2y + t3 * p2y;
-
-	  return {
-	    x: fixError(x),
-	    y: fixError(y)
-	  };
-	}
-
-	function bezierBBox(points) {
-
-	  var bbox = curveBBox.apply(null, points);
-
-	  return rectBBox(
-	    bbox.x0,
-	    bbox.y0,
-	    bbox.x1 - bbox.x0,
-	    bbox.y1 - bbox.y0
-	  );
-	}
-
-	function isPointInsideBBox(bbox, x, y) {
-	  return x >= bbox.x &&
-	    x <= bbox.x + bbox.width &&
-	    y >= bbox.y &&
-	    y <= bbox.y + bbox.height;
-	}
-
-	function isBBoxIntersect(bbox1, bbox2) {
-	  bbox1 = rectBBox(bbox1);
-	  bbox2 = rectBBox(bbox2);
-	  return isPointInsideBBox(bbox2, bbox1.x, bbox1.y)
-	    || isPointInsideBBox(bbox2, bbox1.x2, bbox1.y)
-	    || isPointInsideBBox(bbox2, bbox1.x, bbox1.y2)
-	    || isPointInsideBBox(bbox2, bbox1.x2, bbox1.y2)
-	    || isPointInsideBBox(bbox1, bbox2.x, bbox2.y)
-	    || isPointInsideBBox(bbox1, bbox2.x2, bbox2.y)
-	    || isPointInsideBBox(bbox1, bbox2.x, bbox2.y2)
-	    || isPointInsideBBox(bbox1, bbox2.x2, bbox2.y2)
-	    || (bbox1.x < bbox2.x2 && bbox1.x > bbox2.x
-	        || bbox2.x < bbox1.x2 && bbox2.x > bbox1.x)
-	    && (bbox1.y < bbox2.y2 && bbox1.y > bbox2.y
-	        || bbox2.y < bbox1.y2 && bbox2.y > bbox1.y);
-	}
-
-	function base3(t, p1, p2, p3, p4) {
-	  var t1 = -3 * p1 + 9 * p2 - 9 * p3 + 3 * p4,
-	      t2 = t * t1 + 6 * p1 - 12 * p2 + 6 * p3;
-	  return t * t2 - 3 * p1 + 3 * p2;
-	}
-
-	function bezlen(x1, y1, x2, y2, x3, y3, x4, y4, z) {
-
-	  if (z == null) {
-	    z = 1;
-	  }
-
-	  z = z > 1 ? 1 : z < 0 ? 0 : z;
-
-	  var z2 = z / 2,
-	      n = 12,
-	      Tvalues = [-.1252,.1252,-.3678,.3678,-.5873,.5873,-.7699,.7699,-.9041,.9041,-.9816,.9816],
-	      Cvalues = [0.2491,0.2491,0.2335,0.2335,0.2032,0.2032,0.1601,0.1601,0.1069,0.1069,0.0472,0.0472],
-	      sum = 0;
-
-	  for (var i = 0; i < n; i++) {
-	    var ct = z2 * Tvalues[i] + z2,
-	        xbase = base3(ct, x1, x2, x3, x4),
-	        ybase = base3(ct, y1, y2, y3, y4),
-	        comb = xbase * xbase + ybase * ybase;
-
-	    sum += Cvalues[i] * math.sqrt(comb);
-	  }
-
-	  return z2 * sum;
-	}
-
-
-	function intersectLines(x1, y1, x2, y2, x3, y3, x4, y4) {
-
-	  if (
-	    mmax(x1, x2) < mmin(x3, x4) ||
-	      mmin(x1, x2) > mmax(x3, x4) ||
-	      mmax(y1, y2) < mmin(y3, y4) ||
-	      mmin(y1, y2) > mmax(y3, y4)
-	  ) {
-	    return;
-	  }
-
-	  var nx = (x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4),
-	      ny = (x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4),
-	      denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-
-	  if (!denominator) {
-	    return;
-	  }
-
-	  var px = fixError(nx / denominator),
-	      py = fixError(ny / denominator),
-	      px2 = +px.toFixed(2),
-	      py2 = +py.toFixed(2);
-
-	  if (
-	    px2 < +mmin(x1, x2).toFixed(2) ||
-	      px2 > +mmax(x1, x2).toFixed(2) ||
-	      px2 < +mmin(x3, x4).toFixed(2) ||
-	      px2 > +mmax(x3, x4).toFixed(2) ||
-	      py2 < +mmin(y1, y2).toFixed(2) ||
-	      py2 > +mmax(y1, y2).toFixed(2) ||
-	      py2 < +mmin(y3, y4).toFixed(2) ||
-	      py2 > +mmax(y3, y4).toFixed(2)
-	  ) {
-	    return;
-	  }
-
-	  return { x: px, y: py };
-	}
-
-	function fixError(number) {
-	  return Math.round(number * 100000000000) / 100000000000;
-	}
-
-	function findBezierIntersections(bez1, bez2, justCount) {
-	  var bbox1 = bezierBBox(bez1),
-	      bbox2 = bezierBBox(bez2);
-
-	  if (!isBBoxIntersect(bbox1, bbox2)) {
-	    return justCount ? 0 : [];
-	  }
-
-	  // As an optimization, lines will have only 1 segment
-
-	  var l1 = bezlen.apply(0, bez1),
-	      l2 = bezlen.apply(0, bez2),
-	      n1 = isLine(bez1) ? 1 : ~~(l1 / 5) || 1,
-	      n2 = isLine(bez2) ? 1 : ~~(l2 / 5) || 1,
-	      dots1 = [],
-	      dots2 = [],
-	      xy = {},
-	      res = justCount ? 0 : [];
-
-	  for (var i = 0; i < n1 + 1; i++) {
-	    var p = findDotsAtSegment.apply(0, bez1.concat(i / n1));
-	    dots1.push({ x: p.x, y: p.y, t: i / n1 });
-	  }
-
-	  for (i = 0; i < n2 + 1; i++) {
-	    p = findDotsAtSegment.apply(0, bez2.concat(i / n2));
-	    dots2.push({ x: p.x, y: p.y, t: i / n2 });
-	  }
-
-	  for (i = 0; i < n1; i++) {
-
-	    for (var j = 0; j < n2; j++) {
-	      var di = dots1[i],
-	          di1 = dots1[i + 1],
-	          dj = dots2[j],
-	          dj1 = dots2[j + 1],
-	          ci = abs(di1.x - di.x) < .01 ? 'y' : 'x',
-	          cj = abs(dj1.x - dj.x) < .01 ? 'y' : 'x',
-	          is = intersectLines(di.x, di.y, di1.x, di1.y, dj.x, dj.y, dj1.x, dj1.y),
-	          key;
-
-	      if (is) {
-	        key = is.x.toFixed(9) + '#' + is.y.toFixed(9);
-
-	        if (xy[key]) {
-	          continue;
-	        }
-
-	        xy[key] = true;
-
-	        var t1 = di.t + abs((is[ci] - di[ci]) / (di1[ci] - di[ci])) * (di1.t - di.t),
-	            t2 = dj.t + abs((is[cj] - dj[cj]) / (dj1[cj] - dj[cj])) * (dj1.t - dj.t);
-
-	        if (t1 >= 0 && t1 <= 1 && t2 >= 0 && t2 <= 1) {
-
-	          if (justCount) {
-	            res++;
-	          } else {
-	            res.push({
-	              x: is.x,
-	              y: is.y,
-	              t1: t1,
-	              t2: t2
-	            });
-	          }
-	        }
-	      }
-	    }
-	  }
-
-	  return res;
-	}
-
-
-	/**
-	 * Find or counts the intersections between two SVG paths.
-	 *
-	 * Returns a number in counting mode and a list of intersections otherwise.
-	 *
-	 * A single intersection entry contains the intersection coordinates (x, y)
-	 * as well as additional information regarding the intersecting segments
-	 * on each path (segment1, segment2) and the relative location of the
-	 * intersection on these segments (t1, t2).
-	 *
-	 * The path may be an SVG path string or a list of path components
-	 * such as `[ [ 'M', 0, 10 ], [ 'L', 20, 0 ] ]`.
-	 *
-	 * @example
-	 *
-	 * var intersections = findPathIntersections(
-	 *   'M0,0L100,100',
-	 *   [ [ 'M', 0, 100 ], [ 'L', 100, 0 ] ]
-	 * );
-	 *
-	 * // intersections = [
-	 * //   { x: 50, y: 50, segment1: 1, segment2: 1, t1: 0.5, t2: 0.5 }
-	 * // ]
-	 *
-	 * @param {String|Array<PathDef>} path1
-	 * @param {String|Array<PathDef>} path2
-	 * @param {Boolean} [justCount=false]
-	 *
-	 * @return {Array<Intersection>|Number}
-	 */
-	function findPathIntersections(path1, path2, justCount) {
-	  path1 = pathToCurve(path1);
-	  path2 = pathToCurve(path2);
-
-	  var x1, y1, x2, y2, x1m, y1m, x2m, y2m, bez1, bez2,
-	      res = justCount ? 0 : [];
-
-	  for (var i = 0, ii = path1.length; i < ii; i++) {
-	    var pi = path1[i];
-
-	    if (pi[0] == 'M') {
-	      x1 = x1m = pi[1];
-	      y1 = y1m = pi[2];
-	    } else {
-
-	      if (pi[0] == 'C') {
-	        bez1 = [x1, y1].concat(pi.slice(1));
-	        x1 = bez1[6];
-	        y1 = bez1[7];
-	      } else {
-	        bez1 = [x1, y1, x1, y1, x1m, y1m, x1m, y1m];
-	        x1 = x1m;
-	        y1 = y1m;
-	      }
-
-	      for (var j = 0, jj = path2.length; j < jj; j++) {
-	        var pj = path2[j];
-
-	        if (pj[0] == 'M') {
-	          x2 = x2m = pj[1];
-	          y2 = y2m = pj[2];
-	        } else {
-
-	          if (pj[0] == 'C') {
-	            bez2 = [x2, y2].concat(pj.slice(1));
-	            x2 = bez2[6];
-	            y2 = bez2[7];
-	          } else {
-	            bez2 = [x2, y2, x2, y2, x2m, y2m, x2m, y2m];
-	            x2 = x2m;
-	            y2 = y2m;
-	          }
-
-	          var intr = findBezierIntersections(bez1, bez2, justCount);
-
-	          if (justCount) {
-	            res += intr;
-	          } else {
-
-	            for (var k = 0, kk = intr.length; k < kk; k++) {
-	              intr[k].segment1 = i;
-	              intr[k].segment2 = j;
-	              intr[k].bez1 = bez1;
-	              intr[k].bez2 = bez2;
-	            }
-
-	            res = res.concat(intr);
-	          }
-	        }
-	      }
-	    }
-	  }
-
-	  return res;
-	}
-
-
-	function pathToAbsolute(pathArray) {
-	  var pth = paths(pathArray);
-
-	  if (pth.abs) {
-	    return pathClone(pth.abs);
-	  }
-
-	  if (!isArray$2(pathArray) || !isArray$2(pathArray && pathArray[0])) { // rough assumption
-	    pathArray = parsePathString(pathArray);
-	  }
-
-	  if (!pathArray || !pathArray.length) {
-	    return [['M', 0, 0]];
-	  }
-
-	  var res = [],
-	      x = 0,
-	      y = 0,
-	      mx = 0,
-	      my = 0,
-	      start = 0,
-	      pa0;
-
-	  if (pathArray[0][0] == 'M') {
-	    x = +pathArray[0][1];
-	    y = +pathArray[0][2];
-	    mx = x;
-	    my = y;
-	    start++;
-	    res[0] = ['M', x, y];
-	  }
-
-	  for (var r, pa, i = start, ii = pathArray.length; i < ii; i++) {
-	    res.push(r = []);
-	    pa = pathArray[i];
-	    pa0 = pa[0];
-
-	    if (pa0 != pa0.toUpperCase()) {
-	      r[0] = pa0.toUpperCase();
-
-	      switch (r[0]) {
-	      case 'A':
-	        r[1] = pa[1];
-	        r[2] = pa[2];
-	        r[3] = pa[3];
-	        r[4] = pa[4];
-	        r[5] = pa[5];
-	        r[6] = +pa[6] + x;
-	        r[7] = +pa[7] + y;
-	        break;
-	      case 'V':
-	        r[1] = +pa[1] + y;
-	        break;
-	      case 'H':
-	        r[1] = +pa[1] + x;
-	        break;
-	      case 'M':
-	        mx = +pa[1] + x;
-	        my = +pa[2] + y;
-	      default:
-	        for (var j = 1, jj = pa.length; j < jj; j++) {
-	          r[j] = +pa[j] + ((j % 2) ? x : y);
-	        }
-	      }
-	    } else {
-	      for (var k = 0, kk = pa.length; k < kk; k++) {
-	        r[k] = pa[k];
-	      }
-	    }
-	    pa0 = pa0.toUpperCase();
-
-	    switch (r[0]) {
-	    case 'Z':
-	      x = +mx;
-	      y = +my;
-	      break;
-	    case 'H':
-	      x = r[1];
-	      break;
-	    case 'V':
-	      y = r[1];
-	      break;
-	    case 'M':
-	      mx = r[r.length - 2];
-	      my = r[r.length - 1];
-	    default:
-	      x = r[r.length - 2];
-	      y = r[r.length - 1];
-	    }
-	  }
-
-	  res.toString = pathToString;
-	  pth.abs = pathClone(res);
-
-	  return res;
-	}
-
-	function isLine(bez) {
-	  return (
-	    bez[0] === bez[2] &&
-	    bez[1] === bez[3] &&
-	    bez[4] === bez[6] &&
-	    bez[5] === bez[7]
-	  );
-	}
-
-	function lineToCurve(x1, y1, x2, y2) {
-	  return [
-	    x1, y1, x2,
-	    y2, x2, y2
-	  ];
-	}
-
-	function qubicToCurve(x1, y1, ax, ay, x2, y2) {
-	  var _13 = 1 / 3,
-	      _23 = 2 / 3;
-
-	  return [
-	    _13 * x1 + _23 * ax,
-	    _13 * y1 + _23 * ay,
-	    _13 * x2 + _23 * ax,
-	    _13 * y2 + _23 * ay,
-	    x2,
-	    y2
-	  ];
-	}
-
-	function arcToCurve(x1, y1, rx, ry, angle, large_arc_flag, sweep_flag, x2, y2, recursive) {
-
-	  // for more information of where this math came from visit:
-	  // http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
-	  var _120 = PI * 120 / 180,
-	      rad = PI / 180 * (+angle || 0),
-	      res = [],
-	      xy,
-	      rotate = cacher(function(x, y, rad) {
-	        var X = x * math.cos(rad) - y * math.sin(rad),
-	            Y = x * math.sin(rad) + y * math.cos(rad);
-
-	        return { x: X, y: Y };
-	      });
-
-	  if (!recursive) {
-	    xy = rotate(x1, y1, -rad);
-	    x1 = xy.x;
-	    y1 = xy.y;
-	    xy = rotate(x2, y2, -rad);
-	    x2 = xy.x;
-	    y2 = xy.y;
-
-	    var x = (x1 - x2) / 2,
-	        y = (y1 - y2) / 2;
-
-	    var h = (x * x) / (rx * rx) + (y * y) / (ry * ry);
-
-	    if (h > 1) {
-	      h = math.sqrt(h);
-	      rx = h * rx;
-	      ry = h * ry;
-	    }
-
-	    var rx2 = rx * rx,
-	        ry2 = ry * ry,
-	        k = (large_arc_flag == sweep_flag ? -1 : 1) *
-	            math.sqrt(abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
-	        cx = k * rx * y / ry + (x1 + x2) / 2,
-	        cy = k * -ry * x / rx + (y1 + y2) / 2,
-	        f1 = math.asin(((y1 - cy) / ry).toFixed(9)),
-	        f2 = math.asin(((y2 - cy) / ry).toFixed(9));
-
-	    f1 = x1 < cx ? PI - f1 : f1;
-	    f2 = x2 < cx ? PI - f2 : f2;
-	    f1 < 0 && (f1 = PI * 2 + f1);
-	    f2 < 0 && (f2 = PI * 2 + f2);
-
-	    if (sweep_flag && f1 > f2) {
-	      f1 = f1 - PI * 2;
-	    }
-	    if (!sweep_flag && f2 > f1) {
-	      f2 = f2 - PI * 2;
-	    }
-	  } else {
-	    f1 = recursive[0];
-	    f2 = recursive[1];
-	    cx = recursive[2];
-	    cy = recursive[3];
-	  }
-
-	  var df = f2 - f1;
-
-	  if (abs(df) > _120) {
-	    var f2old = f2,
-	        x2old = x2,
-	        y2old = y2;
-
-	    f2 = f1 + _120 * (sweep_flag && f2 > f1 ? 1 : -1);
-	    x2 = cx + rx * math.cos(f2);
-	    y2 = cy + ry * math.sin(f2);
-	    res = arcToCurve(x2, y2, rx, ry, angle, 0, sweep_flag, x2old, y2old, [f2, f2old, cx, cy]);
-	  }
-
-	  df = f2 - f1;
-
-	  var c1 = math.cos(f1),
-	      s1 = math.sin(f1),
-	      c2 = math.cos(f2),
-	      s2 = math.sin(f2),
-	      t = math.tan(df / 4),
-	      hx = 4 / 3 * rx * t,
-	      hy = 4 / 3 * ry * t,
-	      m1 = [x1, y1],
-	      m2 = [x1 + hx * s1, y1 - hy * c1],
-	      m3 = [x2 + hx * s2, y2 - hy * c2],
-	      m4 = [x2, y2];
-
-	  m2[0] = 2 * m1[0] - m2[0];
-	  m2[1] = 2 * m1[1] - m2[1];
-
-	  if (recursive) {
-	    return [m2, m3, m4].concat(res);
-	  } else {
-	    res = [m2, m3, m4].concat(res).join().split(',');
-	    var newres = [];
-
-	    for (var i = 0, ii = res.length; i < ii; i++) {
-	      newres[i] = i % 2 ? rotate(res[i - 1], res[i], rad).y : rotate(res[i], res[i + 1], rad).x;
-	    }
-
-	    return newres;
-	  }
-	}
-
-	// Returns bounding box of cubic bezier curve.
-	// Source: http://blog.hackers-cafe.net/2009/06/how-to-calculate-bezier-curves-bounding.html
-	// Original version: NISHIO Hirokazu
-	// Modifications: https://github.com/timo22345
-	function curveBBox(x0, y0, x1, y1, x2, y2, x3, y3) {
-	  var tvalues = [],
-	      bounds = [[], []],
-	      a, b, c, t, t1, t2, b2ac, sqrtb2ac;
-
-	  for (var i = 0; i < 2; ++i) {
-
-	    if (i == 0) {
-	      b = 6 * x0 - 12 * x1 + 6 * x2;
-	      a = -3 * x0 + 9 * x1 - 9 * x2 + 3 * x3;
-	      c = 3 * x1 - 3 * x0;
-	    } else {
-	      b = 6 * y0 - 12 * y1 + 6 * y2;
-	      a = -3 * y0 + 9 * y1 - 9 * y2 + 3 * y3;
-	      c = 3 * y1 - 3 * y0;
-	    }
-
-	    if (abs(a) < 1e-12) {
-
-	      if (abs(b) < 1e-12) {
-	        continue;
-	      }
-
-	      t = -c / b;
-
-	      if (0 < t && t < 1) {
-	        tvalues.push(t);
-	      }
-
-	      continue;
-	    }
-
-	    b2ac = b * b - 4 * c * a;
-	    sqrtb2ac = math.sqrt(b2ac);
-
-	    if (b2ac < 0) {
-	      continue;
-	    }
-
-	    t1 = (-b + sqrtb2ac) / (2 * a);
-
-	    if (0 < t1 && t1 < 1) {
-	      tvalues.push(t1);
-	    }
-
-	    t2 = (-b - sqrtb2ac) / (2 * a);
-
-	    if (0 < t2 && t2 < 1) {
-	      tvalues.push(t2);
-	    }
-	  }
-
-	  var j = tvalues.length,
-	      jlen = j,
-	      mt;
-
-	  while (j--) {
-	    t = tvalues[j];
-	    mt = 1 - t;
-	    bounds[0][j] = (mt * mt * mt * x0) + (3 * mt * mt * t * x1) + (3 * mt * t * t * x2) + (t * t * t * x3);
-	    bounds[1][j] = (mt * mt * mt * y0) + (3 * mt * mt * t * y1) + (3 * mt * t * t * y2) + (t * t * t * y3);
-	  }
-
-	  bounds[0][jlen] = x0;
-	  bounds[1][jlen] = y0;
-	  bounds[0][jlen + 1] = x3;
-	  bounds[1][jlen + 1] = y3;
-	  bounds[0].length = bounds[1].length = jlen + 2;
-
-	  return {
-	    x0: mmin.apply(0, bounds[0]),
-	    y0: mmin.apply(0, bounds[1]),
-	    x1: mmax.apply(0, bounds[0]),
-	    y1: mmax.apply(0, bounds[1])
-	  };
-	}
-
-	function pathToCurve(path) {
-
-	  var pth = paths(path);
-
-	  // return cached curve, if existing
-	  if (pth.curve) {
-	    return pathClone(pth.curve);
-	  }
-
-	  var curvedPath = pathToAbsolute(path),
-	      attrs = { x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null },
-	      processPath = function(path, d, pathCommand) {
-	        var nx, ny;
-
-	        if (!path) {
-	          return ['C', d.x, d.y, d.x, d.y, d.x, d.y];
-	        }
-
-	        !(path[0] in { T: 1, Q: 1 }) && (d.qx = d.qy = null);
-
-	        switch (path[0]) {
-	        case 'M':
-	          d.X = path[1];
-	          d.Y = path[2];
-	          break;
-	        case 'A':
-	          path = ['C'].concat(arcToCurve.apply(0, [d.x, d.y].concat(path.slice(1))));
-	          break;
-	        case 'S':
-	          if (pathCommand == 'C' || pathCommand == 'S') {
-	            // In 'S' case we have to take into account, if the previous command is C/S.
-	            nx = d.x * 2 - d.bx;
-	            // And reflect the previous
-	            ny = d.y * 2 - d.by;
-	            // command's control point relative to the current point.
-	          }
-	          else {
-	            // or some else or nothing
-	            nx = d.x;
-	            ny = d.y;
-	          }
-	          path = ['C', nx, ny].concat(path.slice(1));
-	          break;
-	        case 'T':
-	          if (pathCommand == 'Q' || pathCommand == 'T') {
-	            // In 'T' case we have to take into account, if the previous command is Q/T.
-	            d.qx = d.x * 2 - d.qx;
-	            // And make a reflection similar
-	            d.qy = d.y * 2 - d.qy;
-	            // to case 'S'.
-	          }
-	          else {
-	            // or something else or nothing
-	            d.qx = d.x;
-	            d.qy = d.y;
-	          }
-	          path = ['C'].concat(qubicToCurve(d.x, d.y, d.qx, d.qy, path[1], path[2]));
-	          break;
-	        case 'Q':
-	          d.qx = path[1];
-	          d.qy = path[2];
-	          path = ['C'].concat(qubicToCurve(d.x, d.y, path[1], path[2], path[3], path[4]));
-	          break;
-	        case 'L':
-	          path = ['C'].concat(lineToCurve(d.x, d.y, path[1], path[2]));
-	          break;
-	        case 'H':
-	          path = ['C'].concat(lineToCurve(d.x, d.y, path[1], d.y));
-	          break;
-	        case 'V':
-	          path = ['C'].concat(lineToCurve(d.x, d.y, d.x, path[1]));
-	          break;
-	        case 'Z':
-	          path = ['C'].concat(lineToCurve(d.x, d.y, d.X, d.Y));
-	          break;
-	        }
-
-	        return path;
-	      },
-
-	      fixArc = function(pp, i) {
-
-	        if (pp[i].length > 7) {
-	          pp[i].shift();
-	          var pi = pp[i];
-
-	          while (pi.length) {
-	            pathCommands[i] = 'A'; // if created multiple C:s, their original seg is saved
-	            pp.splice(i++, 0, ['C'].concat(pi.splice(0, 6)));
-	          }
-
-	          pp.splice(i, 1);
-	          ii = curvedPath.length;
-	        }
-	      },
-
-	      pathCommands = [], // path commands of original path p
-	      pfirst = '', // temporary holder for original path command
-	      pathCommand = ''; // holder for previous path command of original path
-
-	  for (var i = 0, ii = curvedPath.length; i < ii; i++) {
-	    curvedPath[i] && (pfirst = curvedPath[i][0]); // save current path command
-
-	    if (pfirst != 'C') // C is not saved yet, because it may be result of conversion
-	    {
-	      pathCommands[i] = pfirst; // Save current path command
-	      i && (pathCommand = pathCommands[i - 1]); // Get previous path command pathCommand
-	    }
-	    curvedPath[i] = processPath(curvedPath[i], attrs, pathCommand); // Previous path command is inputted to processPath
-
-	    if (pathCommands[i] != 'A' && pfirst == 'C') pathCommands[i] = 'C'; // A is the only command
-	    // which may produce multiple C:s
-	    // so we have to make sure that C is also C in original path
-
-	    fixArc(curvedPath, i); // fixArc adds also the right amount of A:s to pathCommands
-
-	    var seg = curvedPath[i],
-	        seglen = seg.length;
-
-	    attrs.x = seg[seglen - 2];
-	    attrs.y = seg[seglen - 1];
-	    attrs.bx = toFloat(seg[seglen - 4]) || attrs.x;
-	    attrs.by = toFloat(seg[seglen - 3]) || attrs.y;
-	  }
-
-	  // cache curve
-	  pth.curve = pathClone(curvedPath);
-
-	  return curvedPath;
-	}
-
-	var intersect = findPathIntersections;
-
-	function roundBounds(bounds) {
-	  return {
-	    x: Math.round(bounds.x),
-	    y: Math.round(bounds.y),
-	    width: Math.round(bounds.width),
-	    height: Math.round(bounds.height)
-	  };
-	}
-
-
-	function roundPoint(point) {
-
-	  return {
-	    x: Math.round(point.x),
-	    y: Math.round(point.y)
-	  };
-	}
-
-
-	/**
-	 * Convert the given bounds to a { top, left, bottom, right } descriptor.
-	 *
-	 * @param {Bounds|Point} bounds
+	 * @param {ModdleElement} semantic
+	 * @param {ModdleElement} di
+	 * @param {Object} [attrs=null]
 	 *
 	 * @return {Object}
 	 */
-	function asTRBL(bounds) {
-	  return {
-	    top: bounds.y,
-	    right: bounds.x + (bounds.width || 0),
-	    bottom: bounds.y + (bounds.height || 0),
-	    left: bounds.x
-	  };
-	}
-
-
-	/**
-	 * Convert a { top, left, bottom, right } to an objects bounds.
-	 *
-	 * @param {Object} trbl
-	 *
-	 * @return {Bounds}
-	 */
-	function asBounds(trbl) {
-	  return {
-	    x: trbl.left,
-	    y: trbl.top,
-	    width: trbl.right - trbl.left,
-	    height: trbl.bottom - trbl.top
-	  };
-	}
-
-
-	/**
-	 * Get the mid of the given bounds or point.
-	 *
-	 * @param {Bounds|Point} bounds
-	 *
-	 * @return {Point}
-	 */
-	function getMid(bounds) {
-	  return roundPoint({
-	    x: bounds.x + (bounds.width || 0) / 2,
-	    y: bounds.y + (bounds.height || 0) / 2
-	  });
-	}
-
-
-	// orientation utils //////////////////////
-
-	/**
-	 * Get orientation of the given rectangle with respect to
-	 * the reference rectangle.
-	 *
-	 * A padding (positive or negative) may be passed to influence
-	 * horizontal / vertical orientation and intersection.
-	 *
-	 * @param {Bounds} rect
-	 * @param {Bounds} reference
-	 * @param {Point|number} padding
-	 *
-	 * @return {string} the orientation; one of top, top-left, left, ..., bottom, right or intersect.
-	 */
-	function getOrientation(rect, reference, padding) {
-
-	  padding = padding || 0;
-
-	  // make sure we can use an object, too
-	  // for individual { x, y } padding
-	  if (!isObject(padding)) {
-	    padding = { x: padding, y: padding };
-	  }
-
-
-	  var rectOrientation = asTRBL(rect),
-	      referenceOrientation = asTRBL(reference);
-
-	  var top = rectOrientation.bottom + padding.y <= referenceOrientation.top,
-	      right = rectOrientation.left - padding.x >= referenceOrientation.right,
-	      bottom = rectOrientation.top - padding.y >= referenceOrientation.bottom,
-	      left = rectOrientation.right + padding.x <= referenceOrientation.left;
-
-	  var vertical = top ? 'top' : (bottom ? 'bottom' : null),
-	      horizontal = left ? 'left' : (right ? 'right' : null);
-
-	  if (horizontal && vertical) {
-	    return vertical + '-' + horizontal;
-	  } else {
-	    return horizontal || vertical || 'intersect';
-	  }
-	}
-
-
-	// intersection utils //////////////////////
-
-	/**
-	 * Get intersection between an element and a line path.
-	 *
-	 * @param {PathDef} elementPath
-	 * @param {PathDef} linePath
-	 * @param {boolean} cropStart crop from start or end
-	 *
-	 * @return {Point}
-	 */
-	function getElementLineIntersection(elementPath, linePath, cropStart) {
-
-	  var intersections = getIntersections(elementPath, linePath);
-
-	  // recognize intersections
-	  // only one -> choose
-	  // two close together -> choose first
-	  // two or more distinct -> pull out appropriate one
-	  // none -> ok (fallback to point itself)
-	  if (intersections.length === 1) {
-	    return roundPoint(intersections[0]);
-	  } else if (intersections.length === 2 && pointDistance(intersections[0], intersections[1]) < 1) {
-	    return roundPoint(intersections[0]);
-	  } else if (intersections.length > 1) {
-
-	    // sort by intersections based on connection segment +
-	    // distance from start
-	    intersections = sortBy(intersections, function(i) {
-	      var distance = Math.floor(i.t2 * 100) || 1;
-
-	      distance = 100 - distance;
-
-	      distance = (distance < 10 ? '0' : '') + distance;
-
-	      // create a sort string that makes sure we sort
-	      // line segment ASC + line segment position DESC (for cropStart)
-	      // line segment ASC + line segment position ASC (for cropEnd)
-	      return i.segment2 + '#' + distance;
-	    });
-
-	    return roundPoint(intersections[cropStart ? 0 : intersections.length - 1]);
-	  }
-
-	  return null;
-	}
-
-
-	function getIntersections(a, b) {
-	  return intersect(a, b);
-	}
-
-
-	function filterRedundantWaypoints(waypoints) {
-
-	  // alter copy of waypoints, not original
-	  waypoints = waypoints.slice();
-
-	  var idx = 0,
-	      point,
-	      previousPoint,
-	      nextPoint;
-
-	  while (waypoints[idx]) {
-	    point = waypoints[idx];
-	    previousPoint = waypoints[idx - 1];
-	    nextPoint = waypoints[idx + 1];
-
-	    if (pointDistance(point, nextPoint) === 0 ||
-	        pointsOnLine(previousPoint, nextPoint, point)) {
-
-	      // remove point, if overlapping with {nextPoint}
-	      // or on line with {previousPoint} -> {point} -> {nextPoint}
-	      waypoints.splice(idx, 1);
-	    } else {
-	      idx++;
-	    }
-	  }
-
-	  return waypoints;
-	}
-
-	function elementData(semantic, attrs) {
+	function elementData(semantic, di, attrs) {
 	  return assign({
 	    id: semantic.id,
 	    type: semantic.$type,
-	    businessObject: semantic
+	    businessObject: semantic,
+	    di: di
 	  }, attrs);
 	}
 
-	function getWaypoints(bo, source, target) {
+	function getWaypoints(di, source, target) {
 
-	  var waypoints = bo.di.waypoint;
+	  var waypoints = di.waypoint;
 
 	  if (!waypoints || waypoints.length < 2) {
 	    return [ getMid(source), getMid(target) ];
@@ -19389,10 +20030,8 @@
 	 * Add bpmn element (semantic) to the canvas onto the
 	 * specified parent shape.
 	 */
-	BpmnImporter.prototype.add = function(semantic, parentElement) {
-
-	  var di = semantic.di,
-	      element,
+	BpmnImporter.prototype.add = function(semantic, di, parentElement) {
+	  var element,
 	      translate = this._translate,
 	      hidden;
 
@@ -19400,25 +20039,30 @@
 
 	  // ROOT ELEMENT
 	  // handle the special case that we deal with a
-	  // invisible root element (process or collaboration)
+	  // invisible root element (process, subprocess or collaboration)
 	  if (is$1(di, 'bpmndi:BPMNPlane')) {
 
-	    // add a virtual element (not being drawn)
-	    element = this._elementFactory.createRoot(elementData(semantic));
+	    var attrs = is$1(semantic, 'bpmn:SubProcess')
+	      ? { id: semantic.id + '_plane' }
+	      : {};
 
-	    this._canvas.setRootElement(element);
+	    // add a virtual element (not being drawn)
+	    element = this._elementFactory.createRoot(elementData(semantic, di, attrs));
+
+	    this._canvas.addRootElement(element);
 	  }
 
 	  // SHAPE
 	  else if (is$1(di, 'bpmndi:BPMNShape')) {
 
-	    var collapsed = !isExpanded(semantic),
-	        isFrame = isFrameElement$1(semantic);
+	    var collapsed = !isExpanded(semantic, di),
+	        isFrame = isFrameElement(semantic);
+
 	    hidden = parentElement && (parentElement.hidden || parentElement.collapsed);
 
-	    var bounds = semantic.di.bounds;
+	    var bounds = di.bounds;
 
-	    element = this._elementFactory.createShape(elementData(semantic, {
+	    element = this._elementFactory.createShape(elementData(semantic, di, {
 	      collapsed: collapsed,
 	      hidden: hidden,
 	      x: Math.round(bounds.x),
@@ -19441,7 +20085,7 @@
 
 	      // check whether data store is inside our outside of its semantic parent
 	      if (!isPointInsideBBox$1(parentElement, getMid(bounds))) {
-	        parentElement = this._canvas.getRootElement();
+	        parentElement = this._canvas.findRoot(parentElement);
 	      }
 	    }
 
@@ -19456,11 +20100,11 @@
 
 	    hidden = parentElement && (parentElement.hidden || parentElement.collapsed);
 
-	    element = this._elementFactory.createConnection(elementData(semantic, {
+	    element = this._elementFactory.createConnection(elementData(semantic, di, {
 	      hidden: hidden,
 	      source: source,
 	      target: target,
-	      waypoints: getWaypoints(semantic, source, target)
+	      waypoints: getWaypoints(di, source, target)
 	    }));
 
 	    if (is$1(semantic, 'bpmn:DataAssociation')) {
@@ -19469,7 +20113,7 @@
 	      // are rendered correctly across different "hacks" people
 	      // love to model such as cross participant / sub process
 	      // associations
-	      parentElement = null;
+	      parentElement = this._canvas.findRoot(parentElement);
 	    }
 
 	    // insert sequence flows behind other flow nodes (cf. #727)
@@ -19487,7 +20131,7 @@
 
 	  // (optional) LABEL
 	  if (isLabelExternal(semantic) && getLabel(element)) {
-	    this.addLabel(semantic, element);
+	    this.addLabel(semantic, di, element);
 	  }
 
 
@@ -19536,12 +20180,12 @@
 	/**
 	 * add label for an element
 	 */
-	BpmnImporter.prototype.addLabel = function(semantic, element) {
+	BpmnImporter.prototype.addLabel = function(semantic, di, element) {
 	  var bounds,
 	      text,
 	      label;
 
-	  bounds = getExternalLabelBounds(semantic, element);
+	  bounds = getExternalLabelBounds(di, element);
 
 	  text = getLabel(element);
 
@@ -19551,7 +20195,7 @@
 	    bounds = this._textRenderer.getExternalLabelBounds(bounds, text);
 	  }
 
-	  label = this._elementFactory.createLabel(elementData(semantic, {
+	  label = this._elementFactory.createLabel(elementData(semantic, di, {
 	    id: semantic.id + '_label',
 	    labelTarget: element,
 	    type: 'label',
@@ -19633,20 +20277,20 @@
 	    y <= bbox.y + bbox.height;
 	}
 
-	function isFrameElement$1(semantic) {
+	function isFrameElement(semantic) {
 	  return is$1(semantic, 'bpmn:Group');
 	}
 
 	var ImportModule = {
 	  __depends__: [
-	    translate$2
+	    translate
 	  ],
 	  bpmnImporter: [ 'type', BpmnImporter ]
 	};
 
-	var CoreModule$1 = {
+	var CoreModule = {
 	  __depends__: [
-	    DrawModule$1,
+	    DrawModule,
 	    ImportModule
 	  ]
 	};
@@ -19660,14 +20304,14 @@
 	}
 
 
-	function getOriginal(event) {
+	function getOriginal$1(event) {
 	  return event.originalEvent || event.srcEvent;
 	}
 
 
-	function stopPropagation(event, immediate) {
+	function stopPropagation$1(event, immediate) {
 	  __stopPropagation(event);
-	  __stopPropagation(getOriginal(event));
+	  __stopPropagation(getOriginal$1(event));
 	}
 
 
@@ -19691,20 +20335,30 @@
 	  return (/mac/i).test(navigator.platform);
 	}
 
+	function isButton(event, button) {
+	  return (getOriginal$1(event) || event).button === button;
+	}
+
 	function isPrimaryButton(event) {
 
 	  // button === 0 -> left áka primary mouse button
-	  return !(getOriginal(event) || event).button;
+	  return isButton(event, 0);
+	}
+
+	function isAuxiliaryButton(event) {
+
+	  // button === 1 -> auxiliary áka wheel button
+	  return isButton(event, 1);
 	}
 
 	function hasPrimaryModifier(event) {
-	  var originalEvent = getOriginal(event) || event;
+	  var originalEvent = getOriginal$1(event) || event;
 
 	  if (!isPrimaryButton(event)) {
 	    return false;
 	  }
 
-	  // Use alt as primary modifier key for mac OS
+	  // Use cmd as primary modifier key for mac OS
 	  if (isMac()) {
 	    return originalEvent.metaKey;
 	  } else {
@@ -19714,14 +20368,18 @@
 
 
 	function hasSecondaryModifier(event) {
-	  var originalEvent = getOriginal(event) || event;
+	  var originalEvent = getOriginal$1(event) || event;
 
 	  return isPrimaryButton(event) && originalEvent.shiftKey;
 	}
 
-	function allowAll(e) { return true; }
+	function allowAll(event) { return true; }
 
-	var LOW_PRIORITY = 500;
+	function allowPrimaryAndAuxiliary(event) {
+	  return isPrimaryButton(event) || isAuxiliaryButton(event);
+	}
+
+	var LOW_PRIORITY$o = 500;
 
 
 	/**
@@ -19821,7 +20479,11 @@
 	  };
 
 	  var ignoredFilters = {
-	    'element.contextmenu': allowAll
+	    'element.contextmenu': allowAll,
+	    'element.mousedown': allowPrimaryAndAuxiliary,
+	    'element.mouseup': allowPrimaryAndAuxiliary,
+	    'element.click': allowPrimaryAndAuxiliary,
+	    'element.dblclick': allowPrimaryAndAuxiliary
 	  };
 
 
@@ -19862,7 +20524,7 @@
 	      ignoredFilters[localEvent] = ignoredFilter;
 	    }
 
-	    handler.$delegate = delegateEvents.bind(node, ELEMENT_SELECTOR, event, handler);
+	    handler.$delegate = delegate.bind(node, ELEMENT_SELECTOR, event, handler);
 	  }
 
 	  function unregisterEvent(node, event, localEvent) {
@@ -19873,7 +20535,7 @@
 	      return;
 	    }
 
-	    delegateEvents.unbind(node, event, handler.$delegate);
+	    delegate.unbind(node, event, handler.$delegate);
 	  }
 
 	  function registerEvents(svg) {
@@ -19912,7 +20574,7 @@
 	  eventBus.on([
 	    'shape.changed',
 	    'connection.changed'
-	  ], LOW_PRIORITY, function(event) {
+	  ], LOW_PRIORITY$o, function(event) {
 
 	    var element = event.element,
 	        gfx = event.gfx;
@@ -19920,7 +20582,7 @@
 	    eventBus.fire('interactionEvents.updateHit', { element: element, gfx: gfx });
 	  });
 
-	  eventBus.on('interactionEvents.createHit', LOW_PRIORITY, function(event) {
+	  eventBus.on('interactionEvents.createHit', LOW_PRIORITY$o, function(event) {
 	    var element = event.element,
 	        gfx = event.gfx;
 
@@ -19970,7 +20632,7 @@
 	      throw new Error('invalid hit type <' + type + '>');
 	    }
 
-	    attr$1(hit, attrs);
+	    attr(hit, attrs);
 
 	    return hit;
 	  }
@@ -20054,11 +20716,11 @@
 	      y: 0
 	    }, attrs);
 
-	    var hit = create('rect');
+	    var hit = create$1('rect');
 
 	    applyStyle(hit, type);
 
-	    attr$1(hit, attrs);
+	    attr(hit, attrs);
 
 	    appendHit(gfx, hit);
 
@@ -20084,7 +20746,7 @@
 	    if (element.waypoints) {
 	      updateLine(hit, element.waypoints);
 	    } else {
-	      attr$1(hit, {
+	      attr(hit, {
 	        width: element.width,
 	        height: element.height
 	      });
@@ -20189,12 +20851,12 @@
 	 * @property {Event} originalEvent
 	 */
 
-	var InteractionEventsModule = {
+	var InteractionEventsModule$1 = {
 	  __init__: [ 'interactionEvents' ],
 	  interactionEvents: [ 'type', InteractionEvents ]
 	};
 
-	var LOW_PRIORITY$1 = 500;
+	var LOW_PRIORITY$n = 500;
 
 
 	/**
@@ -20216,9 +20878,9 @@
 	  var self = this;
 
 	  function createOutline(gfx, bounds) {
-	    var outline = create('rect');
+	    var outline = create$1('rect');
 
-	    attr$1(outline, assign({
+	    attr(outline, assign({
 	      x: 10,
 	      y: 10,
 	      width: 100,
@@ -20232,7 +20894,7 @@
 
 	  // A low priortity is necessary, because outlines of labels have to be updated
 	  // after the label bounds have been updated in the renderer.
-	  eventBus.on([ 'shape.added', 'shape.changed' ], LOW_PRIORITY$1, function(event) {
+	  eventBus.on([ 'shape.added', 'shape.changed' ], LOW_PRIORITY$n, function(event) {
 	    var element = event.element,
 	        gfx = event.gfx;
 
@@ -20269,7 +20931,7 @@
 	 */
 	Outline.prototype.updateShapeOutline = function(outline, element) {
 
-	  attr$1(outline, {
+	  attr(outline, {
 	    x: -this.offset,
 	    y: -this.offset,
 	    width: element.width + this.offset * 2,
@@ -20290,7 +20952,7 @@
 
 	  var bbox = getBBox(connection);
 
-	  attr$1(outline, {
+	  attr(outline, {
 	    x: bbox.x - this.offset,
 	    y: bbox.y - this.offset,
 	    width: bbox.width + this.offset * 2,
@@ -20315,9 +20977,10 @@
 	 *
 	 * @param {EventBus} eventBus the event bus
 	 */
-	function Selection(eventBus) {
+	function Selection(eventBus, canvas) {
 
 	  this._eventBus = eventBus;
+	  this._canvas = canvas;
 
 	  this._selectedElements = [];
 
@@ -20328,12 +20991,12 @@
 	    self.deselect(element);
 	  });
 
-	  eventBus.on([ 'diagram.clear' ], function(e) {
+	  eventBus.on([ 'diagram.clear', 'root.set' ], function(e) {
 	    self.select(null);
 	  });
 	}
 
-	Selection.$inject = [ 'eventBus' ];
+	Selection.$inject = [ 'eventBus', 'canvas' ];
 
 
 	Selection.prototype.deselect = function(element) {
@@ -20375,9 +21038,19 @@
 	  var selectedElements = this._selectedElements,
 	      oldSelection = selectedElements.slice();
 
-	  if (!isArray(elements)) {
+	  if (!isArray$2(elements)) {
 	    elements = elements ? [ elements ] : [];
 	  }
+
+	  var canvas = this._canvas;
+
+	  var rootElement = canvas.getRootElement();
+
+	  elements = elements.filter(function(element) {
+	    var elementRoot = canvas.findRoot(element);
+
+	    return rootElement === elementRoot;
+	  });
 
 	  // selection may be cleared by passing an empty array or null
 	  // to the method
@@ -20468,68 +21141,69 @@
 	  'styles'
 	];
 
-	function SelectionBehavior(
-	    eventBus, selection, canvas,
-	    elementRegistry) {
+	function SelectionBehavior(eventBus, selection, canvas, elementRegistry) {
 
-	  eventBus.on('create.end', 500, function(e) {
-
-	    var context = e.context,
+	  // Select elements on create
+	  eventBus.on('create.end', 500, function(event) {
+	    var context = event.context,
 	        canExecute = context.canExecute,
 	        elements = context.elements,
 	        hints = context.hints || {},
 	        autoSelect = hints.autoSelect;
 
-	    // select elements after they have been created
 	    if (canExecute) {
 	      if (autoSelect === false) {
 
-	        // select no elements
+	        // Select no elements
 	        return;
 	      }
 
-	      if (isArray(autoSelect)) {
+	      if (isArray$2(autoSelect)) {
 	        selection.select(autoSelect);
 	      } else {
 
-	        // select all elements by default
+	        // Select all elements by default
 	        selection.select(elements.filter(isShown));
 	      }
 	    }
 	  });
 
-	  eventBus.on('connect.end', 500, function(e) {
+	  // Select connection targets on connect
+	  eventBus.on('connect.end', 500, function(event) {
+	    var context = event.context,
+	        canExecute = context.canExecute,
+	        hover = context.hover;
 
-	    // select the connect end target
-	    // after a connect operation
-	    if (e.context.canExecute && e.context.hover) {
-	      selection.select(e.context.hover);
+	    if (canExecute && hover) {
+	      selection.select(hover);
 	    }
 	  });
 
-	  eventBus.on('shape.move.end', 500, function(e) {
-	    var previousSelection = e.previousSelection || [];
+	  // Select shapes on move
+	  eventBus.on('shape.move.end', 500, function(event) {
+	    var previousSelection = event.previousSelection || [];
 
-	    var shape = elementRegistry.get(e.context.shape.id);
+	    var shape = elementRegistry.get(event.context.shape.id);
 
-	    // make sure at least the main moved element is being
-	    // selected after a move operation
-	    var inSelection = find(previousSelection, function(selectedShape) {
+	    // Always select main shape on move
+	    var isSelected = find(previousSelection, function(selectedShape) {
 	      return shape.id === selectedShape.id;
 	    });
 
-	    if (!inSelection) {
+	    if (!isSelected) {
 	      selection.select(shape);
 	    }
 	  });
 
-	  // Shift + click selection
+	  // Select elements on click
 	  eventBus.on('element.click', function(event) {
+
+	    if (!isPrimaryButton(event)) {
+	      return;
+	    }
 
 	    var element = event.element;
 
-	    // do not select the root element
-	    // or connections
 	    if (element === canvas.getRootElement()) {
 	      element = null;
 	    }
@@ -20537,20 +21211,26 @@
 	    var isSelected = selection.isSelected(element),
 	        isMultiSelect = selection.get().length > 1;
 
-	    // mouse-event: SELECTION_KEY
-	    var add = hasPrimaryModifier(event);
+	    // Add to selection if CTRL or SHIFT pressed
+	    var add = hasPrimaryModifier(event) || hasSecondaryModifier(event);
 
-	    // select OR deselect element in multi selection
 	    if (isSelected && isMultiSelect) {
 	      if (add) {
+
+	        // Deselect element
 	        return selection.deselect(element);
 	      } else {
+
+	        // Select element only
 	        return selection.select(element);
 	      }
-	    } else
-	    if (!isSelected) {
+	    } else if (!isSelected) {
+
+	      // Select element
 	      selection.select(element, add);
 	    } else {
+
+	      // Deselect element
 	      selection.deselect(element);
 	    }
 	  });
@@ -20571,7 +21251,7 @@
 	var SelectionModule = {
 	  __init__: [ 'selectionVisuals', 'selectionBehavior' ],
 	  __depends__: [
-	    InteractionEventsModule,
+	    InteractionEventsModule$1,
 	    OutlineModule
 	  ],
 	  selection: [ 'type', Selection ],
@@ -20608,9 +21288,9 @@
 	};
 
 	// document wide unique overlay ids
-	var ids = new IdGenerator('ov');
+	var ids$1 = new IdGenerator('ov');
 
-	var LOW_PRIORITY$2 = 500;
+	var LOW_PRIORITY$m = 500;
 
 
 	/**
@@ -20683,7 +21363,7 @@
 	  this._canvas = canvas;
 	  this._elementRegistry = elementRegistry;
 
-	  this._ids = ids;
+	  this._ids = ids$1;
 
 	  this._overlayDefaults = assign({
 
@@ -20705,7 +21385,7 @@
 	  this._overlayContainers = [];
 
 	  // root html element for all overlays
-	  this._overlayRoot = createRoot(canvas.getContainer());
+	  this._overlayRoot = createRoot$1(canvas.getContainer());
 
 	  this._init();
 	}
@@ -20840,14 +21520,13 @@
 	 *
 	 * @see Overlays#get for filter options.
 	 *
-	 * @param {string} [id]
-	 * @param {Object} [filter]
+	 * @param {string|object} [filter]
 	 */
 	Overlays.prototype.remove = function(filter) {
 
 	  var overlays = this.get(filter) || [];
 
-	  if (!isArray(overlays)) {
+	  if (!isArray$2(overlays)) {
 	    overlays = [ overlays ];
 	  }
 
@@ -20858,8 +21537,8 @@
 	    var container = self._getOverlayContainer(overlay.element, true);
 
 	    if (overlay) {
-	      remove(overlay.html);
-	      remove(overlay.htmlContainer);
+	      remove$2(overlay.html);
+	      remove$2(overlay.htmlContainer);
 
 	      delete overlay.htmlContainer;
 	      delete overlay.element;
@@ -20879,12 +21558,12 @@
 
 
 	Overlays.prototype.show = function() {
-	  setVisible(this._overlayRoot);
+	  setVisible$1(this._overlayRoot);
 	};
 
 
 	Overlays.prototype.hide = function() {
-	  setVisible(this._overlayRoot, false);
+	  setVisible$1(this._overlayRoot, false);
 	};
 
 	Overlays.prototype.clear = function() {
@@ -20892,7 +21571,7 @@
 
 	  this._overlayContainers = [];
 
-	  clear(this._overlayRoot);
+	  clear$1(this._overlayRoot);
 	};
 
 	Overlays.prototype._updateOverlayContainer = function(container) {
@@ -20911,9 +21590,9 @@
 	    y = bbox.y;
 	  }
 
-	  setPosition(html, x, y);
+	  setPosition$1(html, x, y);
 
-	  attr(container.html, 'data-container-id', element.id);
+	  attr$1(container.html, 'data-container-id', element.id);
 	};
 
 
@@ -20956,7 +21635,8 @@
 	    top = position.bottom * -1 + height;
 	  }
 
-	  setPosition(htmlContainer, left || 0, top || 0);
+	  setPosition$1(htmlContainer, left || 0, top || 0);
+	  this._updateOverlayVisibilty(overlay, this._canvas.viewbox());
 	};
 
 
@@ -20993,7 +21673,7 @@
 	  ].join(',') +
 	  ')';
 
-	  setTransform(this._overlayRoot, matrix);
+	  setTransform$1(this._overlayRoot, matrix);
 	};
 
 
@@ -21037,8 +21717,13 @@
 	  htmlContainer.appendChild(html);
 
 	  if (overlay.type) {
-	    classes(htmlContainer).add('djs-overlay-' + overlay.type);
+	    classes$1(htmlContainer).add('djs-overlay-' + overlay.type);
 	  }
+
+	  var elementRoot = this._canvas.findRoot(element);
+	  var activeRoot = this._canvas.getRootElement();
+
+	  setVisible$1(htmlContainer, elementRoot === activeRoot);
 
 	  overlay.htmlContainer = htmlContainer;
 
@@ -21054,21 +21739,25 @@
 
 	Overlays.prototype._updateOverlayVisibilty = function(overlay, viewbox) {
 	  var show = overlay.show,
+	      rootElement = this._canvas.findRoot(overlay.element),
 	      minZoom = show && show.minZoom,
 	      maxZoom = show && show.maxZoom,
 	      htmlContainer = overlay.htmlContainer,
+	      activeRootElement = this._canvas.getRootElement(),
 	      visible = true;
 
-	  if (show) {
+	  if (rootElement !== activeRootElement) {
+	    visible = false;
+	  } else if (show) {
 	    if (
 	      (isDefined(minZoom) && minZoom > viewbox.scale) ||
 	      (isDefined(maxZoom) && maxZoom < viewbox.scale)
 	    ) {
 	      visible = false;
 	    }
-
-	    setVisible(htmlContainer, visible);
 	  }
+
+	  setVisible$1(htmlContainer, visible);
 
 	  this._updateOverlayScale(overlay, viewbox);
 	};
@@ -21105,7 +21794,7 @@
 	    transform = 'scale(' + scale + ',' + scale + ')';
 	  }
 
-	  setTransform(htmlContainer, transform);
+	  setTransform$1(htmlContainer, transform);
 	};
 
 
@@ -21157,7 +21846,7 @@
 	    var container = self._getOverlayContainer(element);
 
 	    if (container) {
-	      remove(container.html);
+	      remove$2(container.html);
 	      var i = self._overlayContainers.indexOf(container);
 	      if (i !== -1) {
 	        self._overlayContainers.splice(i, 1);
@@ -21168,7 +21857,7 @@
 
 	  // move integration
 
-	  eventBus.on('element.changed', LOW_PRIORITY$2, function(e) {
+	  eventBus.on('element.changed', LOW_PRIORITY$m, function(e) {
 	    var element = e.element;
 
 	    var container = self._getOverlayContainer(element, true);
@@ -21188,10 +21877,14 @@
 	  eventBus.on('element.marker.update', function(e) {
 	    var container = self._getOverlayContainer(e.element, true);
 	    if (container) {
-	      classes(container.html)[e.add ? 'add' : 'remove'](e.marker);
+	      classes$1(container.html)[e.add ? 'add' : 'remove'](e.marker);
 	    }
 	  });
 
+
+	  eventBus.on('root.set', function() {
+	    self._updateOverlaysVisibilty(self._canvas.viewbox());
+	  });
 
 	  // clear overlays with diagram
 
@@ -21202,7 +21895,7 @@
 
 	// helpers /////////////////////////////
 
-	function createRoot(parentNode) {
+	function createRoot$1(parentNode) {
 	  var root = domify(
 	    '<div class="djs-overlay-container" style="position: absolute; width: 0; height: 0;" />'
 	  );
@@ -21212,15 +21905,15 @@
 	  return root;
 	}
 
-	function setPosition(el, x, y) {
+	function setPosition$1(el, x, y) {
 	  assign(el.style, { left: x + 'px', top: y + 'px' });
 	}
 
-	function setVisible(el, visible) {
+	function setVisible$1(el, visible) {
 	  el.style.display = visible === false ? 'none' : '';
 	}
 
-	function setTransform(el, transform) {
+	function setTransform$1(el, transform) {
 
 	  el.style['transform-origin'] = 'top left';
 
@@ -21232,6 +21925,1051 @@
 	var OverlaysModule = {
 	  __init__: [ 'overlays' ],
 	  overlays: [ 'type', Overlays ]
+	};
+
+	/**
+	 * Adds change support to the diagram, including
+	 *
+	 * <ul>
+	 *   <li>redrawing shapes and connections on change</li>
+	 * </ul>
+	 *
+	 * @param {EventBus} eventBus
+	 * @param {Canvas} canvas
+	 * @param {ElementRegistry} elementRegistry
+	 * @param {GraphicsFactory} graphicsFactory
+	 */
+	function ChangeSupport(
+	    eventBus, canvas, elementRegistry,
+	    graphicsFactory) {
+
+
+	  // redraw shapes / connections on change
+
+	  eventBus.on('element.changed', function(event) {
+
+	    var element = event.element;
+
+	    // element might have been deleted and replaced by new element with same ID
+	    // thus check for parent of element except for root element
+	    if (element.parent || element === canvas.getRootElement()) {
+	      event.gfx = elementRegistry.getGraphics(element);
+	    }
+
+	    // shape + gfx may have been deleted
+	    if (!event.gfx) {
+	      return;
+	    }
+
+	    eventBus.fire(getType(element) + '.changed', event);
+	  });
+
+	  eventBus.on('elements.changed', function(event) {
+
+	    var elements = event.elements;
+
+	    elements.forEach(function(e) {
+	      eventBus.fire('element.changed', { element: e });
+	    });
+
+	    graphicsFactory.updateContainments(elements);
+	  });
+
+	  eventBus.on('shape.changed', function(event) {
+	    graphicsFactory.update('shape', event.element, event.gfx);
+	  });
+
+	  eventBus.on('connection.changed', function(event) {
+	    graphicsFactory.update('connection', event.element, event.gfx);
+	  });
+	}
+
+	ChangeSupport.$inject = [
+	  'eventBus',
+	  'canvas',
+	  'elementRegistry',
+	  'graphicsFactory'
+	];
+
+	var ChangeSupportModule = {
+	  __init__: [ 'changeSupport'],
+	  changeSupport: [ 'type', ChangeSupport ]
+	};
+
+	var DEFAULT_PRIORITY$4 = 1000;
+
+	/**
+	 * A utility that can be used to plug-in into the command execution for
+	 * extension and/or validation.
+	 *
+	 * @param {EventBus} eventBus
+	 *
+	 * @example
+	 *
+	 * import inherits from 'inherits';
+	 *
+	 * import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
+	 *
+	 * function CommandLogger(eventBus) {
+	 *   CommandInterceptor.call(this, eventBus);
+	 *
+	 *   this.preExecute(function(event) {
+	 *     console.log('command pre-execute', event);
+	 *   });
+	 * }
+	 *
+	 * inherits(CommandLogger, CommandInterceptor);
+	 *
+	 */
+	function CommandInterceptor(eventBus) {
+	  this._eventBus = eventBus;
+	}
+
+	CommandInterceptor.$inject = [ 'eventBus' ];
+
+	function unwrapEvent(fn, that) {
+	  return function(event) {
+	    return fn.call(that || null, event.context, event.command, event);
+	  };
+	}
+
+	/**
+	 * Register an interceptor for a command execution
+	 *
+	 * @param {string|Array<string>} [events] list of commands to register on
+	 * @param {string} [hook] command hook, i.e. preExecute, executed to listen on
+	 * @param {number} [priority] the priority on which to hook into the execution
+	 * @param {Function} handlerFn interceptor to be invoked with (event)
+	 * @param {boolean} unwrap if true, unwrap the event and pass (context, command, event) to the
+	 *                          listener instead
+	 * @param {Object} [that] Pass context (`this`) to the handler function
+	 */
+	CommandInterceptor.prototype.on = function(events, hook, priority, handlerFn, unwrap, that) {
+
+	  if (isFunction(hook) || isNumber(hook)) {
+	    that = unwrap;
+	    unwrap = handlerFn;
+	    handlerFn = priority;
+	    priority = hook;
+	    hook = null;
+	  }
+
+	  if (isFunction(priority)) {
+	    that = unwrap;
+	    unwrap = handlerFn;
+	    handlerFn = priority;
+	    priority = DEFAULT_PRIORITY$4;
+	  }
+
+	  if (isObject(unwrap)) {
+	    that = unwrap;
+	    unwrap = false;
+	  }
+
+	  if (!isFunction(handlerFn)) {
+	    throw new Error('handlerFn must be a function');
+	  }
+
+	  if (!isArray$2(events)) {
+	    events = [ events ];
+	  }
+
+	  var eventBus = this._eventBus;
+
+	  forEach(events, function(event) {
+
+	    // concat commandStack(.event)?(.hook)?
+	    var fullEvent = [ 'commandStack', event, hook ].filter(function(e) { return e; }).join('.');
+
+	    eventBus.on(fullEvent, priority, unwrap ? unwrapEvent(handlerFn, that) : handlerFn, that);
+	  });
+	};
+
+
+	var hooks = [
+	  'canExecute',
+	  'preExecute',
+	  'preExecuted',
+	  'execute',
+	  'executed',
+	  'postExecute',
+	  'postExecuted',
+	  'revert',
+	  'reverted'
+	];
+
+	/*
+	 * Install hook shortcuts
+	 *
+	 * This will generate the CommandInterceptor#(preExecute|...|reverted) methods
+	 * which will in term forward to CommandInterceptor#on.
+	 */
+	forEach(hooks, function(hook) {
+
+	  /**
+	   * {canExecute|preExecute|preExecuted|execute|executed|postExecute|postExecuted|revert|reverted}
+	   *
+	   * A named hook for plugging into the command execution
+	   *
+	   * @param {string|Array<string>} [events] list of commands to register on
+	   * @param {number} [priority] the priority on which to hook into the execution
+	   * @param {Function} handlerFn interceptor to be invoked with (event)
+	   * @param {boolean} [unwrap=false] if true, unwrap the event and pass (context, command, event) to the
+	   *                          listener instead
+	   * @param {Object} [that] Pass context (`this`) to the handler function
+	   */
+	  CommandInterceptor.prototype[hook] = function(events, priority, handlerFn, unwrap, that) {
+
+	    if (isFunction(events) || isNumber(events)) {
+	      that = unwrap;
+	      unwrap = handlerFn;
+	      handlerFn = priority;
+	      priority = events;
+	      events = null;
+	    }
+
+	    this.on(events, hook, priority, handlerFn, unwrap, that);
+	  };
+	});
+
+	/**
+	 * A modeling behavior that ensures we set the correct root element
+	 * as we undo and redo commands.
+	 *
+	 * @param {Canvas} canvas
+	 * @param {didi.Injector} injector
+	 */
+	function RootElementsBehavior(canvas, injector) {
+
+	  injector.invoke(CommandInterceptor, this);
+
+	  this.executed(function(event) {
+	    var context = event.context;
+
+	    if (context.rootElement) {
+	      canvas.setRootElement(context.rootElement);
+	    } else {
+	      context.rootElement = canvas.getRootElement();
+	    }
+	  });
+
+	  this.revert(function(event) {
+	    var context = event.context;
+
+	    if (context.rootElement) {
+	      canvas.setRootElement(context.rootElement);
+	    }
+	  });
+	}
+
+	inherits$1(RootElementsBehavior, CommandInterceptor);
+
+	RootElementsBehavior.$inject = [ 'canvas', 'injector'];
+
+	var RootElementsModule = {
+	  __init__: [ 'rootElementsBehavior' ],
+	  rootElementsBehavior: [ 'type', RootElementsBehavior ]
+	};
+
+	var css_escape = {exports: {}};
+
+	/*! https://mths.be/cssescape v1.5.1 by @mathias | MIT license */
+
+	(function (module, exports) {
+	(function(root, factory) {
+		// https://github.com/umdjs/umd/blob/master/returnExports.js
+		{
+			// For Node.js.
+			module.exports = factory(root);
+		}
+	}(typeof commonjsGlobal != 'undefined' ? commonjsGlobal : commonjsGlobal, function(root) {
+
+		if (root.CSS && root.CSS.escape) {
+			return root.CSS.escape;
+		}
+
+		// https://drafts.csswg.org/cssom/#serialize-an-identifier
+		var cssEscape = function(value) {
+			if (arguments.length == 0) {
+				throw new TypeError('`CSS.escape` requires an argument.');
+			}
+			var string = String(value);
+			var length = string.length;
+			var index = -1;
+			var codeUnit;
+			var result = '';
+			var firstCodeUnit = string.charCodeAt(0);
+			while (++index < length) {
+				codeUnit = string.charCodeAt(index);
+				// Note: there’s no need to special-case astral symbols, surrogate
+				// pairs, or lone surrogates.
+
+				// If the character is NULL (U+0000), then the REPLACEMENT CHARACTER
+				// (U+FFFD).
+				if (codeUnit == 0x0000) {
+					result += '\uFFFD';
+					continue;
+				}
+
+				if (
+					// If the character is in the range [\1-\1F] (U+0001 to U+001F) or is
+					// U+007F, […]
+					(codeUnit >= 0x0001 && codeUnit <= 0x001F) || codeUnit == 0x007F ||
+					// If the character is the first character and is in the range [0-9]
+					// (U+0030 to U+0039), […]
+					(index == 0 && codeUnit >= 0x0030 && codeUnit <= 0x0039) ||
+					// If the character is the second character and is in the range [0-9]
+					// (U+0030 to U+0039) and the first character is a `-` (U+002D), […]
+					(
+						index == 1 &&
+						codeUnit >= 0x0030 && codeUnit <= 0x0039 &&
+						firstCodeUnit == 0x002D
+					)
+				) {
+					// https://drafts.csswg.org/cssom/#escape-a-character-as-code-point
+					result += '\\' + codeUnit.toString(16) + ' ';
+					continue;
+				}
+
+				if (
+					// If the character is the first character and is a `-` (U+002D), and
+					// there is no second character, […]
+					index == 0 &&
+					length == 1 &&
+					codeUnit == 0x002D
+				) {
+					result += '\\' + string.charAt(index);
+					continue;
+				}
+
+				// If the character is not handled by one of the above rules and is
+				// greater than or equal to U+0080, is `-` (U+002D) or `_` (U+005F), or
+				// is in one of the ranges [0-9] (U+0030 to U+0039), [A-Z] (U+0041 to
+				// U+005A), or [a-z] (U+0061 to U+007A), […]
+				if (
+					codeUnit >= 0x0080 ||
+					codeUnit == 0x002D ||
+					codeUnit == 0x005F ||
+					codeUnit >= 0x0030 && codeUnit <= 0x0039 ||
+					codeUnit >= 0x0041 && codeUnit <= 0x005A ||
+					codeUnit >= 0x0061 && codeUnit <= 0x007A
+				) {
+					// the character itself
+					result += string.charAt(index);
+					continue;
+				}
+
+				// Otherwise, the escaped character.
+				// https://drafts.csswg.org/cssom/#escape-a-character
+				result += '\\' + string.charAt(index);
+
+			}
+			return result;
+		};
+
+		if (!root.CSS) {
+			root.CSS = {};
+		}
+
+		root.CSS.escape = cssEscape;
+		return cssEscape;
+
+	}));
+	}(css_escape));
+
+	var cssEscape = css_escape.exports;
+
+	var HTML_ESCAPE_MAP = {
+	  '&': '&amp;',
+	  '<': '&lt;',
+	  '>': '&gt;',
+	  '"': '&quot;',
+	  '\'': '&#39;'
+	};
+
+	function escapeHTML(str) {
+	  str = '' + str;
+
+	  return str && str.replace(/[&<>"']/g, function(match) {
+	    return HTML_ESCAPE_MAP[match];
+	  });
+	}
+
+	var planeSuffix = '_plane';
+
+	/**
+	 * Get primary shape ID for a plane.
+	 *
+	 * @param  {djs.model.Base|ModdleElement} element
+	 *
+	 * @returns {String}
+	 */
+	function getShapeIdFromPlane(element) {
+	  var id = element.id;
+
+	  return removePlaneSuffix(id);
+	}
+
+	/**
+	 * Get plane ID for a primary shape.
+	 *
+	 * @param  {djs.model.Base|ModdleElement} element
+	 *
+	 * @returns {String}
+	 */
+	function getPlaneIdFromShape(element) {
+	  var id = element.id;
+
+	  if (is$1(element, 'bpmn:SubProcess')) {
+	    return addPlaneSuffix(id);
+	  }
+
+	  return id;
+	}
+
+	/**
+	 * Get plane ID for primary shape ID.
+	 *
+	 * @param {String} id
+	 *
+	 * @returns {String}
+	 */
+	function toPlaneId(id) {
+	  return addPlaneSuffix(id);
+	}
+
+	/**
+	 * Check wether element is plane.
+	 *
+	 * @param  {djs.model.Base|ModdleElement} element
+	 *
+	 * @returns {Boolean}
+	 */
+	function isPlane(element) {
+	  var di = getDi(element);
+
+	  return is$1(di, 'bpmndi:BPMNPlane');
+	}
+
+	function addPlaneSuffix(id) {
+	  return id + planeSuffix;
+	}
+
+	function removePlaneSuffix(id) {
+	  return id.replace(new RegExp(planeSuffix + '$'), '');
+	}
+
+	var OPEN_CLASS = 'bjs-breadcrumbs-shown';
+
+
+	/**
+	 * Adds overlays that allow switching planes on collapsed subprocesses.
+	 *
+	 * @param {eventBus} eventBus
+	 * @param {elementRegistry} elementRegistry
+	 * @param {overlays} overlays
+	 * @param {canvas} canvas
+	 */
+	function DrilldownBreadcrumbs(eventBus, elementRegistry, overlays, canvas) {
+	  var breadcrumbs = domify('<ul class="bjs-breadcrumbs"></ul>');
+	  var container = canvas.getContainer();
+	  var containerClasses = classes$1(container);
+	  container.appendChild(breadcrumbs);
+
+	  var boParents = [];
+
+	  // update breadcrumbs if name or ID of the primary shape changes
+	  eventBus.on('element.changed', function(e) {
+	    var shape = e.element,
+	        bo = getBusinessObject(shape);
+
+	    var isPresent = find(boParents, function(el) {
+	      return el === bo;
+	    });
+
+	    if (!isPresent) {
+	      return;
+	    }
+
+	    updateBreadcrumbs();
+	  });
+
+	  /**
+	   * Updates the displayed breadcrumbs. If no element is provided, only the
+	   * labels are updated.
+	   *
+	   * @param {djs.model.Base} [element]
+	   */
+	  function updateBreadcrumbs(element) {
+	    if (element) {
+	      boParents = getBoParentChain(element);
+	    }
+
+	    var path = boParents.map(function(parent) {
+	      var title = escapeHTML(parent.name || parent.id);
+	      var link = domify('<li><span class="bjs-crumb"><a title="' + title + '">' + title + '</a></span></li>');
+
+	      var parentPlane = canvas.findRoot(getPlaneIdFromShape(parent)) || canvas.findRoot(parent.id);
+
+	      // when the root is a collaboration, the process does not have a corresponding
+	      // element in the elementRegisty. Instead, we search for the corresponding participant
+	      if (!parentPlane && is$1(parent, 'bpmn:Process')) {
+	        var participant = elementRegistry.find(function(element) {
+	          var bo = getBusinessObject(element);
+	          return bo && bo.processRef && bo.processRef === parent;
+	        });
+
+	        parentPlane = canvas.findRoot(participant.id);
+	      }
+
+	      link.addEventListener('click', function() {
+	        canvas.setRootElement(parentPlane);
+	      });
+
+	      return link;
+	    });
+
+	    breadcrumbs.innerHTML = '';
+
+	    // show breadcrumbs and expose state to .djs-container
+	    var visible = path.length > 1;
+	    containerClasses.toggle(OPEN_CLASS, visible);
+
+	    path.forEach(function(el) {
+	      breadcrumbs.appendChild(el);
+	    });
+	  }
+
+	  eventBus.on('root.set', function(event) {
+	    updateBreadcrumbs(event.element);
+	  });
+
+	}
+
+	DrilldownBreadcrumbs.$inject = [ 'eventBus', 'elementRegistry', 'overlays', 'canvas' ];
+
+
+	// helpers //////////
+
+	/**
+	 * Returns the parents for the element using the business object chain,
+	 * starting with the root element.
+	 *
+	 * @param {djs.model.Shape} child
+	 *
+	 * @returns {Array<djs.model.Shape>} parents
+	 */
+	function getBoParentChain(child) {
+	  var bo = getBusinessObject(child);
+
+	  var parents = [];
+
+	  for (var element = bo; element; element = element.$parent) {
+	    if (is$1(element, 'bpmn:SubProcess') || is$1(element, 'bpmn:Process')) {
+	      parents.push(element);
+	    }
+	  }
+
+	  return parents.reverse();
+	}
+
+	/**
+	 * Move collapsed subprocesses into view when drilling down.
+	 *
+	 * Zoom and scroll are saved in a session.
+	 *
+	 * @param {eventBus} eventBus
+	 * @param {canvas} canvas
+	 */
+	function DrilldownCentering(eventBus, canvas) {
+
+	  var currentRoot = null;
+	  var positionMap = new Map();
+
+	  eventBus.on('root.set', function(event) {
+	    var newRoot = event.element;
+	    var currentViewbox = canvas.viewbox();
+	    var storedViewbox = positionMap.get(newRoot);
+
+	    positionMap.set(currentRoot, {
+	      x: currentViewbox.x,
+	      y: currentViewbox.y,
+	      zoom: currentViewbox.scale
+	    });
+
+	    currentRoot = newRoot;
+
+	    // current root was replaced with a collaboration, we don't update the viewbox
+	    if (is$1(newRoot, 'bpmn:Collaboration') && !storedViewbox) {
+	      return;
+	    }
+
+	    storedViewbox = storedViewbox || { x: 0, y: 0, zoom: 1 };
+
+	    var dx = (currentViewbox.x - storedViewbox.x) * currentViewbox.scale,
+	        dy = (currentViewbox.y - storedViewbox.y) * currentViewbox.scale;
+
+	    if (dx !== 0 || dy !== 0) {
+	      canvas.scroll({
+	        dx: dx,
+	        dy: dy
+	      });
+	    }
+
+	    if (storedViewbox.zoom !== currentViewbox.scale) {
+	      canvas.zoom(storedViewbox.zoom, { x: 0, y: 0 });
+	    }
+	  });
+
+	  eventBus.on('diagram.clear', function() {
+	    positionMap.clear();
+	    currentRoot = null;
+	  });
+
+	}
+
+	DrilldownCentering.$inject = [ 'eventBus', 'canvas' ];
+
+
+	/**
+	 * ES5 Map implementation. Works.
+	 */
+	function Map() {
+
+	  this._entries = [];
+
+	  this.set = function(key, value) {
+
+	    var found = false;
+
+	    for (var k in this._entries) {
+	      if (this._entries[k][0] === key) {
+	        this._entries[k][1] = value;
+
+	        found = true;
+
+	        break;
+	      }
+	    }
+
+	    if (!found) {
+	      this._entries.push([ key, value ]);
+	    }
+	  };
+
+	  this.get = function(key) {
+
+	    for (var k in this._entries) {
+	      if (this._entries[k][0] === key) {
+	        return this._entries[k][1];
+	      }
+	    }
+
+	    return null;
+	  };
+
+	  this.clear = function() {
+	    this._entries.length = 0;
+	  };
+
+	  this.remove = function(key) {
+
+	    var idx = -1;
+
+	    for (var k in this._entries) {
+	      if (this._entries[k][0] === key) {
+	        idx = k;
+
+	        break;
+	      }
+	    }
+
+	    if (idx !== -1) {
+	      this._entries.splice(idx, 1);
+	    }
+	  };
+	}
+
+	var DEFAULT_POSITION$1 = {
+	  x: 180,
+	  y: 160
+	};
+
+	/**
+	 * Hook into `import.render.start` and create new planes for diagrams with
+	 * collapsed subprocesses and all dis on the same plane.
+	 *
+	 * @param {eventBus} eventBus
+	 * @param {moddle} moddle
+	 */
+	function SubprocessCompatibility(eventBus, moddle) {
+	  this._eventBus = eventBus;
+	  this._moddle = moddle;
+
+	  var self = this;
+
+	  eventBus.on('import.render.start', 1500, function(e, context) {
+	    self.handleImport(context.definitions);
+	  });
+	}
+
+	SubprocessCompatibility.prototype.handleImport = function(definitions) {
+	  if (!definitions.diagrams) {
+	    return;
+	  }
+
+	  var self = this;
+	  this._definitions = definitions;
+	  this._processToDiagramMap = {};
+
+	  definitions.diagrams.forEach(function(diagram) {
+	    if (!diagram.plane || !diagram.plane.bpmnElement) {
+	      return;
+	    }
+
+	    self._processToDiagramMap[diagram.plane.bpmnElement.id] = diagram;
+	  });
+
+	  var newDiagrams = [];
+	  definitions.diagrams.forEach(function(diagram) {
+	    var createdDiagrams = self.createNewDiagrams(diagram.plane);
+	    Array.prototype.push.apply(newDiagrams, createdDiagrams);
+	  });
+
+	  newDiagrams.forEach(function(diagram) {
+	    self.movePlaneElementsToOrigin(diagram.plane);
+	  });
+	};
+
+
+	/**
+	 * Moves all DI elements from collapsed subprocesses to a new plane.
+	 *
+	 * @param {Object} plane
+	 * @return {Array} new diagrams created for the collapsed subprocesses
+	 */
+	SubprocessCompatibility.prototype.createNewDiagrams = function(plane) {
+	  var self = this;
+
+	  var collapsedElements = [];
+	  var elementsToMove = [];
+
+	  plane.get('planeElement').forEach(function(diElement) {
+	    var bo = diElement.bpmnElement;
+
+	    if (!bo) {
+	      return;
+	    }
+
+	    var parent = bo.$parent;
+
+	    if (is$1(bo, 'bpmn:SubProcess') && !diElement.isExpanded) {
+	      collapsedElements.push(bo);
+	    }
+
+	    if (is$1(parent, 'bpmn:SubProcess') && parent !== plane.bpmnElement) {
+
+	      // don't change the array while we iterate over it
+	      elementsToMove.push({ diElement: diElement, parent: parent });
+	    }
+	  });
+
+	  var newDiagrams = [];
+
+	  // create new planes for all collapsed subprocesses, even when they are empty
+	  collapsedElements.forEach(function(element) {
+	    if (!self._processToDiagramMap[element.id]) {
+	      var diagram = self.createDiagram(element);
+	      self._processToDiagramMap[element.id] = diagram;
+	      newDiagrams.push(diagram);
+	    }
+	  });
+
+	  elementsToMove.forEach(function(element) {
+	    var diElement = element.diElement;
+	    var parent = element.parent;
+
+	    // parent is expanded, get nearest collapsed parent
+	    while (parent && collapsedElements.indexOf(parent) === -1) {
+	      parent = parent.$parent;
+	    }
+
+	    // false positive, all parents are expanded
+	    if (!parent) {
+	      return;
+	    }
+
+	    var diagram = self._processToDiagramMap[parent.id];
+	    self.moveToDiPlane(diElement, diagram.plane);
+	  });
+
+	  return newDiagrams;
+	};
+
+	SubprocessCompatibility.prototype.movePlaneElementsToOrigin = function(plane) {
+	  var elements = plane.get('planeElement');
+
+	  // get bounding box of all elements
+	  var planeBounds = getPlaneBounds(plane);
+
+	  var offset = {
+	    x: planeBounds.x - DEFAULT_POSITION$1.x,
+	    y: planeBounds.y - DEFAULT_POSITION$1.y
+	  };
+
+	  elements.forEach(function(diElement) {
+	    if (diElement.waypoint) {
+	      diElement.waypoint.forEach(function(waypoint) {
+	        waypoint.x = waypoint.x - offset.x;
+	        waypoint.y = waypoint.y - offset.y;
+	      });
+	    } else if (diElement.bounds) {
+	      diElement.bounds.x = diElement.bounds.x - offset.x;
+	      diElement.bounds.y = diElement.bounds.y - offset.y;
+	    }
+	  });
+	};
+
+
+	SubprocessCompatibility.prototype.moveToDiPlane = function(diElement, newPlane) {
+	  var containingDiagram = findRootDiagram(diElement);
+
+	  // remove DI from old Plane and add it to the new one
+	  var parentPlaneElement = containingDiagram.plane.get('planeElement');
+	  parentPlaneElement.splice(parentPlaneElement.indexOf(diElement), 1);
+	  newPlane.get('planeElement').push(diElement);
+	};
+
+
+	SubprocessCompatibility.prototype.createDiagram = function(bo) {
+	  var plane = this._moddle.create('bpmndi:BPMNPlane', { bpmnElement: bo });
+	  var diagram = this._moddle.create('bpmndi:BPMNDiagram', {
+	    plane: plane
+	  });
+	  plane.$parent = diagram;
+	  plane.bpmnElement = bo;
+	  diagram.$parent = this._definitions;
+	  this._definitions.diagrams.push(diagram);
+	  return diagram;
+	};
+
+	SubprocessCompatibility.$inject = [ 'eventBus', 'moddle' ];
+
+
+	// helpers
+
+	function findRootDiagram(element) {
+	  if (is$1(element, 'bpmndi:BPMNDiagram')) {
+	    return element;
+	  } else {
+	    return findRootDiagram(element.$parent);
+	  }
+	}
+
+	function getPlaneBounds(plane) {
+	  var planeTrbl = {
+	    top: Infinity,
+	    right: -Infinity,
+	    bottom: -Infinity,
+	    left: Infinity
+	  };
+
+	  plane.planeElement.forEach(function(element) {
+	    if (!element.bounds) {
+	      return;
+	    }
+
+	    var trbl = asTRBL(element.bounds);
+
+	    planeTrbl.top = Math.min(trbl.top, planeTrbl.top);
+	    planeTrbl.left = Math.min(trbl.left, planeTrbl.left);
+	  });
+
+	  return asBounds(planeTrbl);
+	}
+
+	var LOW_PRIORITY$l = 250;
+	var ARROW_DOWN_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.81801948,3.50735931 L10.4996894,9.1896894 L10.5,4 L12,4 L12,12 L4,12 L4,10.5 L9.6896894,10.4996894 L3.75735931,4.56801948 C3.46446609,4.27512627 3.46446609,3.80025253 3.75735931,3.50735931 C4.05025253,3.21446609 4.52512627,3.21446609 4.81801948,3.50735931 Z"/></svg>';
+
+	var EMPTY_MARKER = 'bjs-drilldown-empty';
+
+	function DrilldownOverlayBehavior(
+	    canvas, eventBus, elementRegistry, overlays
+	) {
+	  CommandInterceptor.call(this, eventBus);
+
+	  this._canvas = canvas;
+	  this._eventBus = eventBus;
+	  this._elementRegistry = elementRegistry;
+	  this._overlays = overlays;
+
+	  var self = this;
+
+	  this.executed('shape.toggleCollapse', LOW_PRIORITY$l, function(context) {
+	    var shape = context.shape;
+
+	    // Add overlay to the collapsed shape
+	    if (self.canDrillDown(shape)) {
+	      self.addOverlay(shape);
+	    } else {
+	      self.removeOverlay(shape);
+	    }
+	  }, true);
+
+
+	  this.reverted('shape.toggleCollapse', LOW_PRIORITY$l, function(context) {
+	    var shape = context.shape;
+
+	    // Add overlay to the collapsed shape
+	    if (self.canDrillDown(shape)) {
+	      self.addOverlay(shape);
+	    } else {
+	      self.removeOverlay(shape);
+	    }
+	  }, true);
+
+
+	  this.executed(['shape.create', 'shape.move', 'shape.delete'], LOW_PRIORITY$l,
+	    function(context) {
+	      var oldParent = context.oldParent,
+	          newParent = context.newParent || context.parent,
+	          shape = context.shape;
+
+	      // Add overlay to the collapsed shape
+	      if (self.canDrillDown(shape)) {
+	        self.addOverlay(shape);
+	      }
+
+	      self.updateDrilldownOverlay(oldParent);
+	      self.updateDrilldownOverlay(newParent);
+	      self.updateDrilldownOverlay(shape);
+	    }, true);
+
+
+	  this.reverted(['shape.create', 'shape.move', 'shape.delete'], LOW_PRIORITY$l,
+	    function(context) {
+	      var oldParent = context.oldParent,
+	          newParent = context.newParent || context.parent,
+	          shape = context.shape;
+
+	      // Add overlay to the collapsed shape
+	      if (self.canDrillDown(shape)) {
+	        self.addOverlay(shape);
+	      }
+
+	      self.updateDrilldownOverlay(oldParent);
+	      self.updateDrilldownOverlay(newParent);
+	      self.updateDrilldownOverlay(shape);
+	    }, true);
+
+
+	  eventBus.on('import.done', function() {
+	    elementRegistry.filter(function(e) {
+	      return self.canDrillDown(e);
+	    }).map(function(el) {
+	      self.addOverlay(el);
+	    });
+	  });
+
+	}
+
+	inherits$1(DrilldownOverlayBehavior, CommandInterceptor);
+
+	DrilldownOverlayBehavior.prototype.updateDrilldownOverlay = function(shape) {
+	  var canvas = this._canvas;
+
+	  if (!shape) {
+	    return;
+	  }
+
+	  var root = canvas.findRoot(shape);
+	  if (root) {
+	    this.updateOverlayVisibility(root);
+	  }
+	};
+
+
+	DrilldownOverlayBehavior.prototype.canDrillDown = function(element) {
+	  var canvas = this._canvas;
+	  return is$1(element, 'bpmn:SubProcess') && canvas.findRoot(getPlaneIdFromShape(element));
+	};
+
+	/**
+	 * Updates visibility of the drilldown overlay. If the plane has no elements,
+	 * the drilldown will be only shown when the element is selected.
+	 *
+	 * @param {djs.model.Shape|djs.model.Root} element collapsed shape or root element
+	 */
+	DrilldownOverlayBehavior.prototype.updateOverlayVisibility = function(element) {
+	  var overlays = this._overlays;
+
+	  var bo = element.businessObject;
+
+	  var overlay = overlays.get({ element: bo.id, type: 'drilldown' })[0];
+
+	  if (!overlay) {
+	    return;
+	  }
+
+	  var hasContent = bo && bo.flowElements && bo.flowElements.length;
+	  classes$1(overlay.html).toggle(EMPTY_MARKER, !hasContent);
+	};
+
+	/**
+	 * Attaches a drilldown button to the given element. We assume that the plane has
+	 * the same id as the element.
+	 *
+	 * @param {djs.model.Shape} element collapsed shape
+	 */
+	DrilldownOverlayBehavior.prototype.addOverlay = function(element) {
+	  var canvas = this._canvas;
+	  var overlays = this._overlays;
+
+	  var existingOverlays = overlays.get({ element: element, type: 'drilldown' });
+	  if (existingOverlays.length) {
+	    this.removeOverlay(element);
+	  }
+
+	  var button = domify('<button class="bjs-drilldown">' + ARROW_DOWN_SVG + '</button>');
+
+	  button.addEventListener('click', function() {
+	    canvas.setRootElement(canvas.findRoot(getPlaneIdFromShape(element)));
+	  });
+
+	  overlays.add(element, 'drilldown', {
+	    position: {
+	      bottom: -7,
+	      right: -8
+	    },
+	    html: button
+	  });
+
+	  this.updateOverlayVisibility(element);
+	};
+
+	DrilldownOverlayBehavior.prototype.removeOverlay = function(element) {
+	  var overlays = this._overlays;
+
+	  overlays.remove({
+	    element: element,
+	    type: 'drilldown'
+	  });
+	};
+
+	DrilldownOverlayBehavior.$inject = [
+	  'canvas',
+	  'eventBus',
+	  'elementRegistry',
+	  'overlays'
+	];
+
+	var DrilldownModdule = {
+	  __depends__: [ OverlaysModule, ChangeSupportModule, RootElementsModule ],
+	  __init__: [ 'drilldownBreadcrumbs', 'drilldownOverlayBehavior', 'drilldownCentering', 'subprocessCompatibility'],
+	  drilldownBreadcrumbs: [ 'type', DrilldownBreadcrumbs ],
+	  drilldownCentering: [ 'type', DrilldownCentering ],
+	  drilldownOverlayBehavior: [ 'type', DrilldownOverlayBehavior ],
+	  subprocessCompatibility: [ 'type', SubprocessCompatibility ]
 	};
 
 	/**
@@ -21285,14 +23023,15 @@
 	  BaseViewer.call(this, options);
 	}
 
-	inherits_browser(Viewer, BaseViewer);
+	inherits$1(Viewer, BaseViewer);
 
 	// modules the viewer is composed of
 	Viewer.prototype._modules = [
-	  CoreModule$1,
-	  translate$2,
+	  CoreModule,
+	  translate,
 	  SelectionModule,
-	  OverlaysModule
+	  OverlaysModule,
+	  DrilldownModdule
 	];
 
 	// default moddle extensions the viewer is composed of
@@ -21327,7 +23066,7 @@
 	 * @param {KeyboardEvent} event
 	 */
 	function isKey(keys, event) {
-	  keys = isArray(keys) ? keys : [ keys ];
+	  keys = isArray$2(keys) ? keys : [ keys ];
 
 	  return keys.indexOf(event.key) !== -1 || keys.indexOf(event.keyCode) !== -1;
 	}
@@ -21342,8 +23081,9 @@
 	var KEYDOWN_EVENT = 'keyboard.keydown',
 	    KEYUP_EVENT = 'keyboard.keyup';
 
-	var DEFAULT_PRIORITY$1 = 1000;
+	var HANDLE_MODIFIER_ATTRIBUTE = 'input-handle-modified-keys';
 
+	var DEFAULT_PRIORITY$3 = 1000;
 
 	/**
 	 * A keyboard abstraction that may be activated and
@@ -21414,10 +23154,9 @@
 	};
 
 	Keyboard.prototype._keyHandler = function(event, type) {
-	  var target = event.target,
-	      eventBusResult;
+	  var eventBusResult;
 
-	  if (isInput(target)) {
+	  if (this._isEventIgnored(event)) {
 	    return;
 	  }
 
@@ -21430,6 +23169,29 @@
 	  if (eventBusResult) {
 	    event.preventDefault();
 	  }
+	};
+
+	Keyboard.prototype._isEventIgnored = function(event) {
+	  return isInput(event.target) && this._isModifiedKeyIgnored(event);
+	};
+
+	Keyboard.prototype._isModifiedKeyIgnored = function(event) {
+	  if (!isCmd(event)) {
+	    return true;
+	  }
+
+	  var allowedModifiers = this._getAllowedModifiers(event.target);
+	  return allowedModifiers.indexOf(event.key) === -1;
+	};
+
+	Keyboard.prototype._getAllowedModifiers = function(element) {
+	  var modifierContainer = closest(element, '[' + HANDLE_MODIFIER_ATTRIBUTE + ']', true);
+
+	  if (!modifierContainer || (this._node && !this._node.contains(modifierContainer))) {
+	    return [];
+	  }
+
+	  return modifierContainer.getAttribute(HANDLE_MODIFIER_ATTRIBUTE).split(',');
 	};
 
 	Keyboard.prototype.bind = function(node) {
@@ -21481,7 +23243,7 @@
 	  if (isFunction(priority)) {
 	    type = listener;
 	    listener = priority;
-	    priority = DEFAULT_PRIORITY$1;
+	    priority = DEFAULT_PRIORITY$3;
 	  }
 
 	  this._eventBus.on(type || KEYDOWN_EVENT, priority, listener);
@@ -21504,7 +23266,7 @@
 	  return target && (matchesSelector(target, 'input, textarea') || target.contentEditable === 'true');
 	}
 
-	var LOW_PRIORITY$3 = 500;
+	var LOW_PRIORITY$k = 500;
 
 	var KEYCODE_C = 67;
 	var KEYCODE_V = 86;
@@ -21530,7 +23292,7 @@
 
 	  var self = this;
 
-	  eventBus.on('editorActions.init', LOW_PRIORITY$3, function(event) {
+	  eventBus.on('editorActions.init', LOW_PRIORITY$k, function(event) {
 
 	    var editorActions = event.editorActions;
 
@@ -21626,7 +23388,9 @@
 
 	    var event = context.keyEvent;
 
-	    if (isKey([ '+', 'Add' ], event) && isCmd(event)) {
+	    // quirk: it has to be triggered by `=` as well to work on international keyboard layout
+	    // cf: https://github.com/bpmn-io/bpmn-js/issues/1362#issuecomment-722989754
+	    if (isKey([ '+', 'Add', '=' ], event) && isCmd(event)) {
 	      editorActions.trigger('stepZoom', { value: 1 });
 
 	      return true;
@@ -21665,7 +23429,7 @@
 
 	    var event = context.keyEvent;
 
-	    if (isKey([ 'Delete', 'Del' ], event)) {
+	    if (isKey(['Backspace', 'Delete', 'Del' ], event)) {
 	      editorActions.trigger('removeSelection');
 
 	      return true;
@@ -21673,13 +23437,13 @@
 	  });
 	};
 
-	var KeyboardModule = {
+	var KeyboardModule$1 = {
 	  __init__: [ 'keyboard', 'keyboardBindings' ],
 	  keyboard: [ 'type', Keyboard ],
 	  keyboardBindings: [ 'type', KeyboardBindings ]
 	};
 
-	var DEFAULT_CONFIG = {
+	var DEFAULT_CONFIG$1 = {
 	  moveSpeed: 50,
 	  moveSpeedAccelerated: 200
 	};
@@ -21702,7 +23466,7 @@
 
 	  var self = this;
 
-	  this._config = assign({}, DEFAULT_CONFIG, config || {});
+	  this._config = assign({}, DEFAULT_CONFIG$1, config || {});
 
 	  keyboard.addListener(arrowsListener);
 
@@ -21799,7 +23563,7 @@
 
 	var KeyboardMoveModule = {
 	  __depends__: [
-	    KeyboardModule
+	    KeyboardModule$1
 	  ],
 	  __init__: [ 'keyboardMove' ],
 	  keyboardMove: [ 'type', KeyboardMove ]
@@ -21808,18 +23572,18 @@
 	var CURSOR_CLS_PATTERN = /^djs-cursor-.*$/;
 
 
-	function set$1(mode) {
-	  var classes$1 = classes(document.body);
+	function set(mode) {
+	  var classes = classes$1(document.body);
 
-	  classes$1.removeMatching(CURSOR_CLS_PATTERN);
+	  classes.removeMatching(CURSOR_CLS_PATTERN);
 
 	  if (mode) {
-	    classes$1.add('djs-cursor-' + mode);
+	    classes.add('djs-cursor-' + mode);
 	  }
 	}
 
 	function unset() {
-	  set$1(null);
+	  set(null);
 	}
 
 	var TRAP_PRIORITY = 5000;
@@ -21859,7 +23623,7 @@
 	  };
 	}
 
-	var THRESHOLD = 15;
+	var THRESHOLD$1 = 15;
 
 
 	/**
@@ -21884,15 +23648,18 @@
 	  function handleMove(event) {
 
 	    var start = context.start,
+	        button = context.button,
 	        position = toPoint(event),
 	        delta$1 = delta(position, start);
 
-	    if (!context.dragging && length(delta$1) > THRESHOLD) {
+	    if (!context.dragging && length(delta$1) > THRESHOLD$1) {
 	      context.dragging = true;
 
-	      install(eventBus);
+	      if (button === 0) {
+	        install(eventBus);
+	      }
 
-	      set$1('grab');
+	      set('grab');
 	    }
 
 	    if (context.dragging) {
@@ -21930,13 +23697,15 @@
 	      return;
 	    }
 
+	    var button = event.button;
 
-	    // reject non-left left mouse button or modifier key
-	    if (event.button || event.ctrlKey || event.shiftKey || event.altKey) {
+	    // reject right mouse button or modifier key
+	    if (button >= 2 || event.ctrlKey || event.shiftKey || event.altKey) {
 	      return;
 	    }
 
 	    context = {
+	      button: button,
 	      start: toPoint(event)
 	    };
 
@@ -21946,6 +23715,11 @@
 	    // we've handled the event
 	    return true;
 	  }
+
+	  this.isActive = function() {
+	    return !!context;
+	  };
+
 	}
 
 
@@ -22029,7 +23803,7 @@
 	  this._canvas = canvas;
 	  this._container = canvas._container;
 
-	  this._handleWheel = bind(this._handleWheel, this);
+	  this._handleWheel = bind$2(this._handleWheel, this);
 
 	  this._totalDelta = 0;
 	  this._scale = config.scale || DEFAULT_SCALE;
@@ -22231,7 +24005,7 @@
 	  Viewer.call(this, options);
 	}
 
-	inherits_browser(NavigatedViewer, Viewer);
+	inherits$1(NavigatedViewer, Viewer);
 
 
 	NavigatedViewer.prototype._navigationModules = [
@@ -22245,12 +24019,15 @@
 	  NavigatedViewer.prototype._navigationModules
 	);
 
-	var hammer = createCommonjsModule(function (module) {
+	var hammer = {exports: {}};
+
 	/*! Hammer.JS - v2.0.7 - 2016-04-22
 	 * http://hammerjs.github.io/
 	 *
 	 * Copyright (c) 2016 Jorik Tangelder;
 	 * Licensed under the MIT license */
+
+	(function (module) {
 	(function(window, document, exportName, undefined$1) {
 
 	var VENDOR_PREFIXES = ['', 'webkit', 'Moz', 'MS', 'ms', 'o'];
@@ -24881,14 +26658,16 @@
 	    undefined$1(function() {
 	        return Hammer;
 	    });
-	} else if ( module.exports) {
+	} else if (module.exports) {
 	    module.exports = Hammer;
 	} else {
 	    window[exportName] = Hammer;
 	}
 
 	})(window, document, 'Hammer');
-	});
+	}(hammer));
+
+	var Hammer = hammer.exports;
 
 	var MIN_ZOOM = 0.2,
 	    MAX_ZOOM = 4;
@@ -24902,14 +26681,21 @@
 	  'dblclick'
 	];
 
-	function get$1(service, injector) {
+	function get(service, injector) {
 	  return injector.get(service, false);
 	}
 
 	function stopEvent(event) {
 
 	  event.preventDefault();
-	  event.stopPropagation();
+
+	  if (typeof event.stopPropagation === 'function') {
+	    event.stopPropagation();
+	  } else if (event.srcEvent && typeof event.srcEvent.stopPropagation === 'function') {
+
+	    // iPhone & iPad
+	    event.srcEvent.stopPropagation();
+	  }
 
 	  if (typeof event.stopImmediatePropagation === 'function') {
 	    event.stopImmediatePropagation();
@@ -24942,18 +26728,19 @@
 	  // touch events only (we know, we can already handle
 	  // mouse events out of the box)
 
-	  var recognizer = new hammer.Manager(node, {
-	    inputClass: hammer.TouchInput,
-	    recognizers: []
+	  var recognizer = new Hammer.Manager(node, {
+	    inputClass: Hammer.TouchInput,
+	    recognizers: [],
+	    domEvents: true
 	  });
 
 
-	  var tap = new hammer.Tap();
-	  var pan = new hammer.Pan({ threshold: 10 });
-	  var press = new hammer.Press();
-	  var pinch = new hammer.Pinch();
+	  var tap = new Hammer.Tap();
+	  var pan = new Hammer.Pan({ threshold: 10 });
+	  var press = new Hammer.Press();
+	  var pinch = new Hammer.Pinch();
 
-	  var doubleTap = new hammer.Tap({ event: 'doubletap', taps: 2 });
+	  var doubleTap = new Hammer.Tap({ event: 'doubletap', taps: 2 });
 
 	  pinch.requireFailure(pan);
 	  pinch.requireFailure(press);
@@ -25001,21 +26788,30 @@
 	    elementRegistry, interactionEvents) {
 
 	  // optional integrations
-	  var dragging = get$1('dragging', injector),
-	      move = get$1('move', injector),
-	      contextPad = get$1('contextPad', injector),
-	      palette = get$1('palette', injector);
+	  var dragging = get('dragging', injector),
+	      move = get('move', injector),
+	      contextPad = get('contextPad', injector),
+	      palette = get('palette', injector);
 
 	  // the touch recognizer
 	  var recognizer;
 
-	  function handler(type) {
+	  function handler(type, buttonType) {
 
 	    return function(event) {
 
-	      interactionEvents.fire(type, event);
+	      var gfx = getGfx(event.target),
+	          element = gfx && elementRegistry.get(gfx);
+
+	      // translate into an actual mouse click event
+	      if (buttonType) {
+	        event.srcEvent.button = buttonType;
+	      }
+
+	      return interactionEvents.fire(type, event, element);
 	    };
 	  }
+
 
 	  function getGfx(target) {
 	    var node = closest(target, 'svg, .djs-element', true);
@@ -25026,10 +26822,6 @@
 
 	    // touch recognizer
 	    recognizer = createTouchRecognizer(svg);
-
-	    recognizer.on('doubletap', handler('element.dblclick'));
-
-	    recognizer.on('tap', handler('element.click'));
 
 	    function startGrabCanvas(event) {
 
@@ -25097,6 +26889,9 @@
 	      recognizer.on('pinchend', end);
 	      recognizer.on('pinchcancel', end);
 	    }
+
+	    recognizer.on('tap', handler('element.click'));
+	    recognizer.on('doubletap', handler('element.dblclick', 1));
 
 	    recognizer.on('panstart', startGrab);
 	    recognizer.on('press', startGrab);
@@ -25221,39 +27016,39 @@
 	    class: 'outer-bound-marker'
 	  };
 
-	  var rect1 = create('rect');
-	  attr$1(rect1, {
+	  var rect1 = create$1('rect');
+	  attr(rect1, {
 	    x: -10000,
 	    y: 10000,
 	    width: 10,
 	    height: 10
 	  });
-	  attr$1(rect1, markerStyle);
+	  attr(rect1, markerStyle);
 
 	  append(svg, rect1);
 
-	  var rect2 = create('rect');
-	  attr$1(rect2, {
+	  var rect2 = create$1('rect');
+	  attr(rect2, {
 	    x: 10000,
 	    y: 10000,
 	    width: 10,
 	    height: 10
 	  });
-	  attr$1(rect2, markerStyle);
+	  attr(rect2, markerStyle);
 
 	  append(svg, rect2);
 	};
 
-	var TouchModule = {
-	  __depends__: [ InteractionEventsModule ],
+	var TouchModule$1 = {
+	  __depends__: [ InteractionEventsModule$1 ],
 	  __init__: [ 'touchInteractionEvents' ],
 	  touchInteractionEvents: [ 'type', TouchInteractionEvents ],
 	  touchFix: [ 'type', TouchFix ]
 	};
 
-	var TouchModule$1 = {
+	var TouchModule = {
 	  __depends__: [
-	    TouchModule
+	    TouchModule$1
 	  ]
 	};
 
@@ -25290,11 +27085,11 @@
 	};
 
 
-	function AlignElements(modeling) {
+	function AlignElements$1(modeling) {
 	  this._modeling = modeling;
 	}
 
-	AlignElements.$inject = [ 'modeling' ];
+	AlignElements$1.$inject = [ 'modeling' ];
 
 
 	/**
@@ -25304,7 +27099,7 @@
 	 *
 	 * @return {Object} { axis, dimension }
 	 */
-	AlignElements.prototype._getOrientationDetails = function(type) {
+	AlignElements$1.prototype._getOrientationDetails = function(type) {
 	  var vertical = [ 'top', 'bottom', 'middle' ],
 	      axis = 'x',
 	      dimension = 'width';
@@ -25320,7 +27115,7 @@
 	  };
 	};
 
-	AlignElements.prototype._isType = function(type, types) {
+	AlignElements$1.prototype._isType = function(type, types) {
 	  return types.indexOf(type) !== -1;
 	};
 
@@ -25332,7 +27127,7 @@
 	 *
 	 * @return {Object}
 	 */
-	AlignElements.prototype._alignmentPosition = function(type, sortedElements) {
+	AlignElements$1.prototype._alignmentPosition = function(type, sortedElements) {
 	  var orientation = this._getOrientationDetails(type),
 	      axis = orientation.axis,
 	      dimension = orientation.dimension,
@@ -25403,15 +27198,19 @@
 	/**
 	 * Executes the alignment of a selection of elements
 	 *
-	 * @param  {Array} elements [description]
+	 * @param  {Array} elements
 	 * @param  {string} type left|right|center|top|bottom|middle
 	 */
-	AlignElements.prototype.trigger = function(elements, type) {
+	AlignElements$1.prototype.trigger = function(elements, type) {
 	  var modeling = this._modeling;
 
 	  var filteredElements = filter(elements, function(element) {
 	    return !(element.waypoints || element.host || element.labelTarget);
 	  });
+
+	  if (filteredElements.length < 2) {
+	    return;
+	  }
 
 	  var sortFn = ALIGNMENT_SORTING[type];
 
@@ -25424,7 +27223,7 @@
 
 	var AlignElementsModule = {
 	  __init__: [ 'alignElements' ],
-	  alignElements: [ 'type', AlignElements ]
+	  alignElements: [ 'type', AlignElements$1 ]
 	};
 
 	// padding to detect element placement
@@ -25714,7 +27513,7 @@
 	  return true;
 	}
 
-	var LOW_PRIORITY$4 = 100;
+	var LOW_PRIORITY$j = 100;
 
 
 	/**
@@ -25724,13 +27523,17 @@
 	 * @param {EventBus} eventBus
 	 * @param {Modeling} modeling
 	 */
-	function AutoPlace(eventBus, modeling) {
+	function AutoPlace$1(eventBus, modeling, canvas) {
 
-	  eventBus.on('autoPlace', LOW_PRIORITY$4, function(context) {
+	  eventBus.on('autoPlace', LOW_PRIORITY$j, function(context) {
 	    var shape = context.shape,
 	        source = context.source;
 
-	    return getNewShapePosition(source, shape);
+	    return getNewShapePosition$1(source, shape);
+	  });
+
+	  eventBus.on('autoPlace.end', function(event) {
+	    canvas.scrollToElement(event.shape);
 	  });
 
 	  /**
@@ -25766,9 +27569,10 @@
 
 	}
 
-	AutoPlace.$inject = [
+	AutoPlace$1.$inject = [
 	  'eventBus',
-	  'modeling'
+	  'modeling',
+	  'canvas'
 	];
 
 	// helpers //////////
@@ -25784,7 +27588,7 @@
 	 *
 	 * @returns {Point}
 	 */
-	function getNewShapePosition(source, element, hints) {
+	function getNewShapePosition$1(source, element, hints) {
 	  if (!hints) {
 	    hints = {};
 	  }
@@ -25820,26 +27624,11 @@
 	  'selection'
 	];
 
-	var AutoPlaceModule = {
+	var AutoPlaceModule$1 = {
 	  __init__: [ 'autoPlaceSelectionBehavior' ],
-	  autoPlace: [ 'type', AutoPlace ],
+	  autoPlace: [ 'type', AutoPlace$1 ],
 	  autoPlaceSelectionBehavior: [ 'type', AutoPlaceSelectionBehavior ]
 	};
-
-	/**
-	 * Return true if element has any of the given types.
-	 *
-	 * @param {djs.model.Base} element
-	 * @param {Array<string>} types
-	 *
-	 * @return {boolean}
-	 */
-	function isAny(element, types) {
-	  return some(types, function(t) {
-	    return is$1(element, t);
-	  });
-	}
-
 
 	/**
 	 * Return the parent of the element with any of the given types.
@@ -25849,7 +27638,7 @@
 	 *
 	 * @return {djs.model.Base}
 	 */
-	function getParent$1(element, anyType) {
+	function getParent(element, anyType) {
 
 	  if (typeof anyType === 'string') {
 	    anyType = [ anyType ];
@@ -25873,7 +27662,7 @@
 	 *
 	 * @return {Point}
 	 */
-	function getNewShapePosition$1(source, element) {
+	function getNewShapePosition(source, element) {
 
 	  if (is$1(element, 'bpmn:TextAnnotation')) {
 	    return getTextAnnotationPosition(source, element);
@@ -25992,158 +27781,22 @@
 	 *
 	 * @param {EventBus} eventBus
 	 */
-	function AutoPlace$1(eventBus) {
+	function AutoPlace(eventBus) {
 	  eventBus.on('autoPlace', function(context) {
 	    var shape = context.shape,
 	        source = context.source;
 
-	    return getNewShapePosition$1(source, shape);
+	    return getNewShapePosition(source, shape);
 	  });
 	}
 
-	AutoPlace$1.$inject = [ 'eventBus' ];
+	AutoPlace.$inject = [ 'eventBus' ];
 
-	var AutoPlaceModule$1 = {
-	  __depends__: [ AutoPlaceModule ],
+	var AutoPlaceModule = {
+	  __depends__: [ AutoPlaceModule$1 ],
 	  __init__: [ 'bpmnAutoPlace' ],
-	  bpmnAutoPlace: [ 'type', AutoPlace$1 ]
+	  bpmnAutoPlace: [ 'type', AutoPlace ]
 	};
-
-	var DEFAULT_PRIORITY$2 = 1000;
-
-	/**
-	 * A utility that can be used to plug-in into the command execution for
-	 * extension and/or validation.
-	 *
-	 * @param {EventBus} eventBus
-	 *
-	 * @example
-	 *
-	 * import inherits from 'inherits';
-	 *
-	 * import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
-	 *
-	 * function CommandLogger(eventBus) {
-	 *   CommandInterceptor.call(this, eventBus);
-	 *
-	 *   this.preExecute(function(event) {
-	 *     console.log('command pre-execute', event);
-	 *   });
-	 * }
-	 *
-	 * inherits(CommandLogger, CommandInterceptor);
-	 *
-	 */
-	function CommandInterceptor(eventBus) {
-	  this._eventBus = eventBus;
-	}
-
-	CommandInterceptor.$inject = [ 'eventBus' ];
-
-	function unwrapEvent(fn, that) {
-	  return function(event) {
-	    return fn.call(that || null, event.context, event.command, event);
-	  };
-	}
-
-	/**
-	 * Register an interceptor for a command execution
-	 *
-	 * @param {string|Array<string>} [events] list of commands to register on
-	 * @param {string} [hook] command hook, i.e. preExecute, executed to listen on
-	 * @param {number} [priority] the priority on which to hook into the execution
-	 * @param {Function} handlerFn interceptor to be invoked with (event)
-	 * @param {boolean} unwrap if true, unwrap the event and pass (context, command, event) to the
-	 *                          listener instead
-	 * @param {Object} [that] Pass context (`this`) to the handler function
-	 */
-	CommandInterceptor.prototype.on = function(events, hook, priority, handlerFn, unwrap, that) {
-
-	  if (isFunction(hook) || isNumber(hook)) {
-	    that = unwrap;
-	    unwrap = handlerFn;
-	    handlerFn = priority;
-	    priority = hook;
-	    hook = null;
-	  }
-
-	  if (isFunction(priority)) {
-	    that = unwrap;
-	    unwrap = handlerFn;
-	    handlerFn = priority;
-	    priority = DEFAULT_PRIORITY$2;
-	  }
-
-	  if (isObject(unwrap)) {
-	    that = unwrap;
-	    unwrap = false;
-	  }
-
-	  if (!isFunction(handlerFn)) {
-	    throw new Error('handlerFn must be a function');
-	  }
-
-	  if (!isArray(events)) {
-	    events = [ events ];
-	  }
-
-	  var eventBus = this._eventBus;
-
-	  forEach(events, function(event) {
-
-	    // concat commandStack(.event)?(.hook)?
-	    var fullEvent = [ 'commandStack', event, hook ].filter(function(e) { return e; }).join('.');
-
-	    eventBus.on(fullEvent, priority, unwrap ? unwrapEvent(handlerFn, that) : handlerFn, that);
-	  });
-	};
-
-
-	var hooks = [
-	  'canExecute',
-	  'preExecute',
-	  'preExecuted',
-	  'execute',
-	  'executed',
-	  'postExecute',
-	  'postExecuted',
-	  'revert',
-	  'reverted'
-	];
-
-	/*
-	 * Install hook shortcuts
-	 *
-	 * This will generate the CommandInterceptor#(preExecute|...|reverted) methods
-	 * which will in term forward to CommandInterceptor#on.
-	 */
-	forEach(hooks, function(hook) {
-
-	  /**
-	   * {canExecute|preExecute|preExecuted|execute|executed|postExecute|postExecuted|revert|reverted}
-	   *
-	   * A named hook for plugging into the command execution
-	   *
-	   * @param {string|Array<string>} [events] list of commands to register on
-	   * @param {number} [priority] the priority on which to hook into the execution
-	   * @param {Function} handlerFn interceptor to be invoked with (event)
-	   * @param {boolean} [unwrap=false] if true, unwrap the event and pass (context, command, event) to the
-	   *                          listener instead
-	   * @param {Object} [that] Pass context (`this`) to the handler function
-	   */
-	  CommandInterceptor.prototype[hook] = function(events, priority, handlerFn, unwrap, that) {
-
-	    if (isFunction(events) || isNumber(events)) {
-	      that = unwrap;
-	      unwrap = handlerFn;
-	      handlerFn = priority;
-	      priority = events;
-	      events = null;
-	    }
-
-	    this.on(events, hook, priority, handlerFn, unwrap, that);
-	  };
-	});
 
 	/**
 	 * An auto resize component that takes care of expanding a parent element
@@ -26195,7 +27848,7 @@
 	    forEach(expandings, function(elements, parentId) {
 
 	      // optionally filter elements to be considered when resizing
-	      if (isArray(autoResize)) {
+	      if (isArray$2(autoResize)) {
 	        elements = elements.filter(function(element) {
 	          return find(autoResize, matchPattern({ id: element.id }));
 	        });
@@ -26245,7 +27898,7 @@
 	  'rules'
 	];
 
-	inherits_browser(AutoResize, CommandInterceptor);
+	inherits$1(AutoResize, CommandInterceptor);
 
 
 	/**
@@ -26312,7 +27965,7 @@
 	  // calculate the new bounds
 	  var newBounds = this._getOptimalBounds(elements, target);
 
-	  if (!boundsChanged(newBounds, target)) {
+	  if (!boundsChanged$1(newBounds, target)) {
 	    return;
 	  }
 
@@ -26370,7 +28023,7 @@
 	};
 
 
-	function boundsChanged(newBounds, oldBounds) {
+	function boundsChanged$1(newBounds, oldBounds) {
 	  return (
 	    newBounds.x !== oldBounds.x ||
 	    newBounds.y !== oldBounds.y ||
@@ -26425,7 +28078,7 @@
 	  'injector'
 	];
 
-	inherits_browser(BpmnAutoResize, AutoResize);
+	inherits$1(BpmnAutoResize, AutoResize);
 
 
 	/**
@@ -26460,7 +28113,7 @@
 
 	RuleProvider.$inject = [ 'eventBus' ];
 
-	inherits_browser(RuleProvider, CommandInterceptor);
+	inherits$1(RuleProvider, CommandInterceptor);
 
 
 	/**
@@ -26544,7 +28197,7 @@
 
 	AutoResizeProvider.$inject = [ 'eventBus' ];
 
-	inherits_browser(AutoResizeProvider, RuleProvider);
+	inherits$1(AutoResizeProvider, RuleProvider);
 
 	/**
 	 * Needs to be implemented by sub classes to allow actual auto resize
@@ -26567,7 +28220,7 @@
 	  this._modeling = modeling;
 	}
 
-	inherits_browser(BpmnAutoResizeProvider, AutoResizeProvider);
+	inherits$1(BpmnAutoResizeProvider, AutoResizeProvider);
 
 	BpmnAutoResizeProvider.$inject = [
 	  'eventBus',
@@ -26583,6 +28236,12 @@
 	 * @return {boolean}
 	 */
 	BpmnAutoResizeProvider.prototype.canResize = function(elements, target) {
+
+	  // do not resize plane elements:
+	  // root elements, collapsed sub-processes
+	  if (is$1(target.di, 'bpmndi:BPMNPlane')) {
+	    return false;
+	  }
 
 	  if (!is$1(target, 'bpmn:Participant') && !is$1(target, 'bpmn:Lane') && !(is$1(target, 'bpmn:SubProcess'))) {
 	    return false;
@@ -26610,14 +28269,172 @@
 	  bpmnAutoResizeProvider: [ 'type', BpmnAutoResizeProvider ]
 	};
 
-	/* global TouchEvent */
+	var HIGH_PRIORITY$k = 1500;
 
-	var round$1 = Math.round;
+
+	/**
+	 * Browsers may swallow certain events (hover, out ...) if users are to
+	 * fast with the mouse.
+	 *
+	 * @see http://stackoverflow.com/questions/7448468/why-cant-i-reliably-capture-a-mouseout-event
+	 *
+	 * The fix implemented in this component ensure that we
+	 *
+	 * 1) have a hover state after a successful drag.move event
+	 * 2) have an out event when dragging leaves an element
+	 *
+	 * @param {ElementRegistry} elementRegistry
+	 * @param {EventBus} eventBus
+	 * @param {Injector} injector
+	 */
+	function HoverFix(elementRegistry, eventBus, injector) {
+
+	  var self = this;
+
+	  var dragging = injector.get('dragging', false);
+
+	  /**
+	   * Make sure we are god damn hovering!
+	   *
+	   * @param {Event} dragging event
+	   */
+	  function ensureHover(event) {
+
+	    if (event.hover) {
+	      return;
+	    }
+
+	    var originalEvent = event.originalEvent;
+
+	    var gfx = self._findTargetGfx(originalEvent);
+
+	    var element = gfx && elementRegistry.get(gfx);
+
+	    if (gfx && element) {
+
+	      // 1) cancel current mousemove
+	      event.stopPropagation();
+
+	      // 2) emit fake hover for new target
+	      dragging.hover({ element: element, gfx: gfx });
+
+	      // 3) re-trigger move event
+	      dragging.move(originalEvent);
+	    }
+	  }
+
+
+	  if (dragging) {
+
+	    /**
+	     * We wait for a specific sequence of events before
+	     * emitting a fake drag.hover event.
+	     *
+	     * Event Sequence:
+	     *
+	     * drag.start
+	     * drag.move >> ensure we are hovering
+	     */
+	    eventBus.on('drag.start', function(event) {
+
+	      eventBus.once('drag.move', HIGH_PRIORITY$k, function(event) {
+
+	        ensureHover(event);
+
+	      });
+
+	    });
+	  }
+
+
+	  /**
+	   * We make sure that element.out is always fired, even if the
+	   * browser swallows an element.out event.
+	   *
+	   * Event sequence:
+	   *
+	   * element.hover
+	   * (element.out >> sometimes swallowed)
+	   * element.hover >> ensure we fired element.out
+	   */
+	  (function() {
+	    var hoverGfx;
+	    var hover;
+
+	    eventBus.on('element.hover', function(event) {
+
+	      // (1) remember current hover element
+	      hoverGfx = event.gfx;
+	      hover = event.element;
+	    });
+
+	    eventBus.on('element.hover', HIGH_PRIORITY$k, function(event) {
+
+	      // (3) am I on an element still?
+	      if (hover) {
+
+	        // (4) that is a problem, gotta "simulate the out"
+	        eventBus.fire('element.out', {
+	          element: hover,
+	          gfx: hoverGfx
+	        });
+	      }
+
+	    });
+
+	    eventBus.on('element.out', function() {
+
+	      // (2) unset hover state if we correctly outed us *GG*
+	      hoverGfx = null;
+	      hover = null;
+	    });
+
+	  })();
+
+	  this._findTargetGfx = function(event) {
+	    var position,
+	        target;
+
+	    if (!(event instanceof MouseEvent)) {
+	      return;
+	    }
+
+	    position = toPoint(event);
+
+	    // damn expensive operation, ouch!
+	    target = document.elementFromPoint(position.x, position.y);
+
+	    return getGfx(target);
+	  };
+
+	}
+
+	HoverFix.$inject = [
+	  'elementRegistry',
+	  'eventBus',
+	  'injector'
+	];
+
+
+	// helpers /////////////////////
+
+	function getGfx(target) {
+	  return closest(target, 'svg, .djs-element', true);
+	}
+
+	var HoverFixModule = {
+	  __init__: [
+	    'hoverFix'
+	  ],
+	  hoverFix: [ 'type', HoverFix ],
+	};
+
+	var round$a = Math.round;
 
 	var DRAG_ACTIVE_CLS = 'djs-drag-active';
 
 
-	function preventDefault(event) {
+	function preventDefault$1(event) {
 	  event.preventDefault();
 	}
 
@@ -26788,8 +28605,8 @@
 	      // starting coordinates
 
 	      assign(payload, {
-	        x: round$1(localStart.x + displacement.x),
-	        y: round$1(localStart.y + displacement.y),
+	        x: round$a(localStart.x + displacement.x),
+	        y: round$a(localStart.y + displacement.y),
 	        dx: 0,
 	        dy: 0
 	      }, { originalEvent: event });
@@ -26810,23 +28627,23 @@
 
 	      // allow custom cursor
 	      if (context.cursor) {
-	        set$1(context.cursor);
+	        set(context.cursor);
 	      }
 
 	      // indicate dragging via marker on root element
 	      canvas.addMarker(canvas.getRootElement(), DRAG_ACTIVE_CLS);
 	    }
 
-	    stopPropagation(event);
+	    stopPropagation$1(event);
 
 	    if (context.active) {
 
 	      // update payload with actual coordinates
 	      assign(payload, {
-	        x: round$1(localCurrent.x + displacement.x),
-	        y: round$1(localCurrent.y + displacement.y),
-	        dx: round$1(localDelta.x),
-	        dy: round$1(localDelta.y)
+	        x: round$a(localCurrent.x + displacement.x),
+	        y: round$a(localCurrent.y + displacement.y),
+	        dx: round$a(localDelta.x),
+	        dy: round$a(localDelta.y)
 	      }, { originalEvent: event });
 
 	      // emit move event
@@ -26845,7 +28662,7 @@
 
 	        // suppress original event (click, ...)
 	        // because we just ended a drag operation
-	        stopPropagation(event);
+	        stopPropagation$1(event);
 	      }
 
 	      // implementations may stop restoring the
@@ -26872,7 +28689,7 @@
 	  function checkCancel(event) {
 
 	    if (event.which === 27) {
-	      preventDefault(event);
+	      preventDefault$1(event);
 
 	      cancel();
 	    }
@@ -26897,7 +28714,7 @@
 	      setTimeout(untrap, 400);
 
 	      // prevent default action (click)
-	      preventDefault(event);
+	      preventDefault$1(event);
 	    }
 
 	    end(event);
@@ -26973,8 +28790,8 @@
 	    // reset dom listeners
 	    componentEvent.unbind(document, 'mousemove', move);
 
-	    componentEvent.unbind(document, 'dragstart', preventDefault);
-	    componentEvent.unbind(document, 'selectstart', preventDefault);
+	    componentEvent.unbind(document, 'dragstart', preventDefault$1);
+	    componentEvent.unbind(document, 'selectstart', preventDefault$1);
 
 	    componentEvent.unbind(document, 'mousedown', endDrag, true);
 	    componentEvent.unbind(document, 'mouseup', endDrag, true);
@@ -27046,14 +28863,14 @@
 	    }
 
 	    if (event) {
-	      originalEvent = getOriginal(event) || event;
+	      originalEvent = getOriginal$1(event) || event;
 	      globalStart = toPoint(event);
 
-	      stopPropagation(event);
+	      stopPropagation$1(event);
 
 	      // prevent default browser dragging behavior
 	      if (originalEvent.type === 'dragstart') {
-	        preventDefault(originalEvent);
+	        preventDefault$1(originalEvent);
 	      }
 	    } else {
 	      originalEvent = null;
@@ -27095,8 +28912,8 @@
 	        componentEvent.bind(document, 'mousemove', move);
 
 	        // prevent default browser drag and text selection behavior
-	        componentEvent.bind(document, 'dragstart', preventDefault);
-	        componentEvent.bind(document, 'selectstart', preventDefault);
+	        componentEvent.bind(document, 'dragstart', preventDefault$1);
+	        componentEvent.bind(document, 'selectstart', preventDefault$1);
 
 	        componentEvent.bind(document, 'mousedown', endDrag, true);
 	        componentEvent.bind(document, 'mouseup', endDrag, true);
@@ -27147,173 +28964,12 @@
 	  'elementRegistry'
 	];
 
-	var HIGH_PRIORITY = 1500;
-
-
-	/**
-	 * Browsers may swallow certain events (hover, out ...) if users are to
-	 * fast with the mouse.
-	 *
-	 * @see http://stackoverflow.com/questions/7448468/why-cant-i-reliably-capture-a-mouseout-event
-	 *
-	 * The fix implemented in this component ensure that we
-	 *
-	 * 1) have a hover state after a successful drag.move event
-	 * 2) have an out event when dragging leaves an element
-	 *
-	 * @param {EventBus} eventBus
-	 * @param {Dragging} dragging
-	 * @param {ElementRegistry} elementRegistry
-	 */
-	function HoverFix(eventBus, dragging, elementRegistry) {
-
-	  var self = this;
-
-	  /**
-	   * Make sure we are god damn hovering!
-	   *
-	   * @param {Event} dragging event
-	   */
-	  function ensureHover(event) {
-
-	    if (event.hover) {
-	      return;
-	    }
-
-	    var originalEvent = event.originalEvent;
-
-	    var gfx = self._findTargetGfx(originalEvent);
-
-	    var element = gfx && elementRegistry.get(gfx);
-
-	    if (gfx && element) {
-
-	      // 1) cancel current mousemove
-	      event.stopPropagation();
-
-	      // 2) emit fake hover for new target
-	      dragging.hover({ element: element, gfx: gfx });
-
-	      // 3) re-trigger move event
-	      dragging.move(originalEvent);
-	    }
-	  }
-
-	  /**
-	   * We wait for a specific sequence of events before
-	   * emitting a fake drag.hover event.
-	   *
-	   * Event Sequence:
-	   *
-	   * drag.start
-	   * drag.move >> ensure we are hovering
-	   */
-	  eventBus.on('drag.start', function(event) {
-
-	    eventBus.once('drag.move', HIGH_PRIORITY, function(event) {
-
-	      ensureHover(event);
-
-	    });
-
-	  });
-
-
-	  /**
-	   * We make sure that drag.out is always fired, even if the
-	   * browser swallows an element.out event.
-	   *
-	   * Event sequence:
-	   *
-	   * drag.hover
-	   * (element.out >> sometimes swallowed)
-	   * element.hover >> ensure we fired drag.out
-	   */
-	  eventBus.on('drag.init', function() {
-
-	    var hover, hoverGfx;
-
-	    function setDragHover(event) {
-	      hover = event.hover;
-	      hoverGfx = event.hoverGfx;
-	    }
-
-	    function unsetHover() {
-	      hover = null;
-	      hoverGfx = null;
-	    }
-
-	    function ensureOut() {
-
-	      if (!hover) {
-	        return;
-	      }
-
-	      var element = hover,
-	          gfx = hoverGfx;
-
-	      hover = null;
-	      hoverGfx = null;
-
-	      // emit synthetic out event
-	      dragging.out({
-	        element: element,
-	        gfx: gfx
-	      });
-	    }
-
-	    eventBus.on('drag.hover', setDragHover);
-	    eventBus.on('element.out', unsetHover);
-	    eventBus.on('element.hover', HIGH_PRIORITY, ensureOut);
-
-	    eventBus.once('drag.cleanup', function() {
-	      eventBus.off('drag.hover', setDragHover);
-	      eventBus.off('element.out', unsetHover);
-	      eventBus.off('element.hover', ensureOut);
-	    });
-
-	  });
-
-	  this._findTargetGfx = function(event) {
-	    var position,
-	        target;
-
-	    if (!(event instanceof MouseEvent)) {
-	      return;
-	    }
-
-	    position = toPoint(event);
-
-	    // damn expensive operation, ouch!
-	    target = document.elementFromPoint(position.x, position.y);
-
-	    return getGfx(target);
-	  };
-
-	}
-
-	HoverFix.$inject = [
-	  'eventBus',
-	  'dragging',
-	  'elementRegistry'
-	];
-
-
-	// helpers /////////////////////
-
-	function getGfx(target) {
-	  return closest(target, 'svg, .djs-element', true);
-	}
-
 	var DraggingModule = {
-	  __init__: [
-	    'hoverFix'
-	  ],
 	  __depends__: [
-	    SelectionModule
+	    HoverFixModule,
+	    SelectionModule,
 	  ],
 	  dragging: [ 'type', Dragging ],
-	  hoverFix: [ 'type', HoverFix ]
 	};
 
 	/**
@@ -27509,13 +29165,13 @@
 	  return allowed === undefined ? true : allowed;
 	};
 
-	var RulesModule = {
+	var RulesModule$1 = {
 	  __init__: [ 'rules' ],
 	  rules: [ 'type', Rules ]
 	};
 
-	var round$2 = Math.round,
-	    max = Math.max;
+	var round$9 = Math.round,
+	    max$6 = Math.max;
 
 
 	function circlePath(center, r) {
@@ -27542,7 +29198,7 @@
 	}
 
 
-	var INTERSECTION_THRESHOLD = 10;
+	var INTERSECTION_THRESHOLD$1 = 10;
 
 	function getBendpointIntersection(waypoints, reference) {
 
@@ -27550,7 +29206,7 @@
 
 	  for (i = 0; (w = waypoints[i]); i++) {
 
-	    if (pointDistance(w, reference) <= INTERSECTION_THRESHOLD) {
+	    if (pointDistance(w, reference) <= INTERSECTION_THRESHOLD$1) {
 	      return {
 	        point: waypoints[i],
 	        bendpoint: true,
@@ -27564,7 +29220,7 @@
 
 	function getPathIntersection(waypoints, reference) {
 
-	  var intersections = intersect(circlePath(reference, INTERSECTION_THRESHOLD), linePath(waypoints));
+	  var intersections = intersect(circlePath(reference, INTERSECTION_THRESHOLD$1), linePath(waypoints));
 
 	  var a = intersections[0],
 	      b = intersections[intersections.length - 1],
@@ -27583,7 +29239,7 @@
 	      // we use the bendpoint in between both segments
 	      // as the intersection point
 
-	      idx = max(a.segment2, b.segment2) - 1;
+	      idx = max$6(a.segment2, b.segment2) - 1;
 
 	      return {
 	        point: waypoints[idx],
@@ -27594,8 +29250,8 @@
 
 	    return {
 	      point: {
-	        x: (round$2(a.x + b.x) / 2),
-	        y: (round$2(a.y + b.y) / 2)
+	        x: (round$9(a.x + b.x) / 2),
+	        y: (round$9(a.y + b.y) / 2)
 	      },
 	      index: a.segment2
 	    };
@@ -27603,8 +29259,8 @@
 
 	  return {
 	    point: {
-	      x: round$2(a.x),
-	      y: round$2(a.y)
+	      x: round$9(a.x),
+	      y: round$9(a.y)
 	    },
 	    index: a.segment2
 	  };
@@ -27656,68 +29312,68 @@
 	}
 
 	function addBendpoint(parentGfx, cls) {
-	  var groupGfx = create('g');
-	  classes$1(groupGfx).add(BENDPOINT_CLS);
+	  var groupGfx = create$1('g');
+	  classes(groupGfx).add(BENDPOINT_CLS);
 
 	  append(parentGfx, groupGfx);
 
-	  var visual = create('circle');
-	  attr$1(visual, {
+	  var visual = create$1('circle');
+	  attr(visual, {
 	    cx: 0,
 	    cy: 0,
 	    r: 4
 	  });
-	  classes$1(visual).add('djs-visual');
+	  classes(visual).add('djs-visual');
 
 	  append(groupGfx, visual);
 
-	  var hit = create('circle');
-	  attr$1(hit, {
+	  var hit = create$1('circle');
+	  attr(hit, {
 	    cx: 0,
 	    cy: 0,
 	    r: 10
 	  });
-	  classes$1(hit).add('djs-hit');
+	  classes(hit).add('djs-hit');
 
 	  append(groupGfx, hit);
 
 	  if (cls) {
-	    classes$1(groupGfx).add(cls);
+	    classes(groupGfx).add(cls);
 	  }
 
 	  return groupGfx;
 	}
 
 	function createParallelDragger(parentGfx, segmentStart, segmentEnd, alignment) {
-	  var draggerGfx = create('g');
+	  var draggerGfx = create$1('g');
 
 	  append(parentGfx, draggerGfx);
 
 	  var width = 14,
 	      height = 3,
-	      padding = 6,
+	      padding = 11,
 	      hitWidth = calculateHitWidth(segmentStart, segmentEnd, alignment),
 	      hitHeight = height + padding;
 
-	  var visual = create('rect');
-	  attr$1(visual, {
+	  var visual = create$1('rect');
+	  attr(visual, {
 	    x: -width / 2,
 	    y: -height / 2,
 	    width: width,
 	    height: height
 	  });
-	  classes$1(visual).add('djs-visual');
+	  classes(visual).add('djs-visual');
 
 	  append(draggerGfx, visual);
 
-	  var hit = create('rect');
-	  attr$1(hit, {
+	  var hit = create$1('rect');
+	  attr(hit, {
 	    x: -hitWidth / 2,
 	    y: -hitHeight / 2,
 	    width: hitWidth,
 	    height: hitHeight
 	  });
-	  classes$1(hit).add('djs-hit');
+	  classes(hit).add('djs-hit');
 
 	  append(draggerGfx, hit);
 
@@ -27729,7 +29385,7 @@
 
 	function addSegmentDragger(parentGfx, segmentStart, segmentEnd) {
 
-	  var groupGfx = create('g'),
+	  var groupGfx = create$1('g'),
 	      mid = getMidPoint(segmentStart, segmentEnd),
 	      alignment = pointsAligned(segmentStart, segmentEnd);
 
@@ -27737,10 +29393,10 @@
 
 	  createParallelDragger(groupGfx, segmentStart, segmentEnd, alignment);
 
-	  classes$1(groupGfx).add(SEGMENT_DRAGGER_CLS);
-	  classes$1(groupGfx).add(alignment === 'h' ? 'horizontal' : 'vertical');
+	  classes(groupGfx).add(SEGMENT_DRAGGER_CLS);
+	  classes(groupGfx).add(alignment === 'h' ? 'horizontal' : 'vertical');
 
-	  translate(groupGfx, mid.x, mid.y);
+	  translate$2(groupGfx, mid.x, mid.y);
 
 	  return groupGfx;
 	}
@@ -27764,124 +29420,6 @@
 	  return alignment === 'h' ?
 	    calculateSegmentMoveRegion(segmentLengthXAxis) :
 	    calculateSegmentMoveRegion(segmentLengthYAxis);
-	}
-
-	var css_escape = createCommonjsModule(function (module, exports) {
-	(function(root, factory) {
-		// https://github.com/umdjs/umd/blob/master/returnExports.js
-		{
-			// For Node.js.
-			module.exports = factory(root);
-		}
-	}(typeof commonjsGlobal != 'undefined' ? commonjsGlobal : commonjsGlobal, function(root) {
-
-		if (root.CSS && root.CSS.escape) {
-			return root.CSS.escape;
-		}
-
-		// https://drafts.csswg.org/cssom/#serialize-an-identifier
-		var cssEscape = function(value) {
-			if (arguments.length == 0) {
-				throw new TypeError('`CSS.escape` requires an argument.');
-			}
-			var string = String(value);
-			var length = string.length;
-			var index = -1;
-			var codeUnit;
-			var result = '';
-			var firstCodeUnit = string.charCodeAt(0);
-			while (++index < length) {
-				codeUnit = string.charCodeAt(index);
-				// Note: there’s no need to special-case astral symbols, surrogate
-				// pairs, or lone surrogates.
-
-				// If the character is NULL (U+0000), then the REPLACEMENT CHARACTER
-				// (U+FFFD).
-				if (codeUnit == 0x0000) {
-					result += '\uFFFD';
-					continue;
-				}
-
-				if (
-					// If the character is in the range [\1-\1F] (U+0001 to U+001F) or is
-					// U+007F, […]
-					(codeUnit >= 0x0001 && codeUnit <= 0x001F) || codeUnit == 0x007F ||
-					// If the character is the first character and is in the range [0-9]
-					// (U+0030 to U+0039), […]
-					(index == 0 && codeUnit >= 0x0030 && codeUnit <= 0x0039) ||
-					// If the character is the second character and is in the range [0-9]
-					// (U+0030 to U+0039) and the first character is a `-` (U+002D), […]
-					(
-						index == 1 &&
-						codeUnit >= 0x0030 && codeUnit <= 0x0039 &&
-						firstCodeUnit == 0x002D
-					)
-				) {
-					// https://drafts.csswg.org/cssom/#escape-a-character-as-code-point
-					result += '\\' + codeUnit.toString(16) + ' ';
-					continue;
-				}
-
-				if (
-					// If the character is the first character and is a `-` (U+002D), and
-					// there is no second character, […]
-					index == 0 &&
-					length == 1 &&
-					codeUnit == 0x002D
-				) {
-					result += '\\' + string.charAt(index);
-					continue;
-				}
-
-				// If the character is not handled by one of the above rules and is
-				// greater than or equal to U+0080, is `-` (U+002D) or `_` (U+005F), or
-				// is in one of the ranges [0-9] (U+0030 to U+0039), [A-Z] (U+0041 to
-				// U+005A), or [a-z] (U+0061 to U+007A), […]
-				if (
-					codeUnit >= 0x0080 ||
-					codeUnit == 0x002D ||
-					codeUnit == 0x005F ||
-					codeUnit >= 0x0030 && codeUnit <= 0x0039 ||
-					codeUnit >= 0x0041 && codeUnit <= 0x005A ||
-					codeUnit >= 0x0061 && codeUnit <= 0x007A
-				) {
-					// the character itself
-					result += string.charAt(index);
-					continue;
-				}
-
-				// Otherwise, the escaped character.
-				// https://drafts.csswg.org/cssom/#escape-a-character
-				result += '\\' + string.charAt(index);
-
-			}
-			return result;
-		};
-
-		if (!root.CSS) {
-			root.CSS = {};
-		}
-
-		root.CSS.escape = cssEscape;
-		return cssEscape;
-
-	}));
-	});
-
-	var HTML_ESCAPE_MAP = {
-	  '&': '&amp;',
-	  '<': '&lt;',
-	  '>': '&gt;',
-	  '"': '&quot;',
-	  '\'': '&#39;'
-	};
-
-	function escapeHTML(str) {
-	  str = '' + str;
-
-	  return str && str.replace(/[&<>"']/g, function(match) {
-	    return HTML_ESCAPE_MAP[match];
-	  });
 	}
 
 	/**
@@ -27978,15 +29516,15 @@
 	    });
 	  }
 
-	  function getBendpointsContainer(element, create$1) {
+	  function getBendpointsContainer(element, create) {
 
 	    var layer = canvas.getLayer('overlays'),
-	        gfx = query('.djs-bendpoints[data-element-id="' + css_escape(element.id) + '"]', layer);
+	        gfx = query('.djs-bendpoints[data-element-id="' + cssEscape(element.id) + '"]', layer);
 
-	    if (!gfx && create$1) {
-	      gfx = create('g');
-	      attr$1(gfx, { 'data-element-id': element.id });
-	      classes$1(gfx).add('djs-bendpoints');
+	    if (!gfx && create) {
+	      gfx = create$1('g');
+	      attr(gfx, { 'data-element-id': element.id });
+	      classes(gfx).add('djs-bendpoints');
 
 	      append(layer, gfx);
 
@@ -28011,7 +29549,7 @@
 
 	      append(gfx, bendpoint);
 
-	      translate(bendpoint, p.x, p.y);
+	      translate$2(bendpoint, p.x, p.y);
 	    });
 
 	    // add floating bendpoint
@@ -28034,7 +29572,7 @@
 	      if (pointsAligned(segmentStart, segmentEnd)) {
 	        segmentDraggerGfx = addSegmentDragger(gfx, segmentStart, segmentEnd);
 
-	        attr$1(segmentDraggerGfx, { 'data-segment-idx': i });
+	        attr(segmentDraggerGfx, { 'data-segment-idx': i });
 
 	        bindInteractionEvents(segmentDraggerGfx, 'mousemove', connection);
 	      }
@@ -28087,7 +29625,7 @@
 	      return;
 	    }
 
-	    translate(floating, point.x, point.y);
+	    translate$2(floating, point.x, point.y);
 
 	  }
 
@@ -28121,7 +29659,7 @@
 	      };
 	    }
 
-	    translate(draggerVisual, relativePosition.x, relativePosition.y);
+	    translate$2(draggerVisual, relativePosition.x, relativePosition.y);
 	  }
 
 	  eventBus.on('connection.changed', function(event) {
@@ -28148,9 +29686,9 @@
 	    bendpointsGfx = addHandles(element);
 
 	    if (event.add) {
-	      classes$1(bendpointsGfx).add(event.marker);
+	      classes(bendpointsGfx).add(event.marker);
 	    } else {
-	      classes$1(bendpointsGfx).remove(event.marker);
+	      classes(bendpointsGfx).remove(event.marker);
 	    }
 	  });
 
@@ -28180,6 +29718,10 @@
 	  });
 
 	  eventBus.on('element.mousedown', function(event) {
+
+	    if (!isPrimaryButton(event)) {
+	      return;
+	    }
 
 	    var originalEvent = event.originalEvent,
 	        element = event.element;
@@ -28222,7 +29764,7 @@
 	      var bendpointContainer = getBendpointsContainer(element);
 
 	      if (bendpointContainer) {
-	        attr$1(bendpointContainer, { 'data-element-id': newId });
+	        attr(bendpointContainer, { 'data-element-id': newId });
 	      }
 	    }
 	  });
@@ -28251,11 +29793,11 @@
 	  return query('.djs-visual', draggerGfx);
 	}
 
-	var round$3 = Math.round;
+	var round$8 = Math.round;
 
-	var RECONNECT_START = 'reconnectStart',
-	    RECONNECT_END = 'reconnectEnd',
-	    UPDATE_WAYPOINTS = 'updateWaypoints';
+	var RECONNECT_START$1 = 'reconnectStart',
+	    RECONNECT_END$1 = 'reconnectEnd',
+	    UPDATE_WAYPOINTS$1 = 'updateWaypoints';
 
 
 	/**
@@ -28272,15 +29814,15 @@
 	        type;
 
 	    if (!insert && bendpointIndex === 0) {
-	      type = RECONNECT_START;
+	      type = RECONNECT_START$1;
 	    } else
 	    if (!insert && bendpointIndex === waypoints.length - 1) {
-	      type = RECONNECT_END;
+	      type = RECONNECT_END$1;
 	    } else {
-	      type = UPDATE_WAYPOINTS;
+	      type = UPDATE_WAYPOINTS$1;
 	    }
 
-	    var command = type === UPDATE_WAYPOINTS ? 'connection.updateWaypoints' : 'connection.reconnect';
+	    var command = type === UPDATE_WAYPOINTS$1 ? 'connection.updateWaypoints' : 'connection.reconnect';
 
 	    var allowed = rules.allowed(command, {
 	      connection: connection,
@@ -28334,17 +29876,17 @@
 	      return;
 	    }
 
-	    var command = type === UPDATE_WAYPOINTS ? 'connection.updateWaypoints' : 'connection.reconnect';
+	    var command = type === UPDATE_WAYPOINTS$1 ? 'connection.updateWaypoints' : 'connection.reconnect';
 
 	    allowed = context.allowed = rules.allowed(command, {
 	      connection: connection,
-	      source: type === RECONNECT_START ? hover : source,
-	      target: type === RECONNECT_END ? hover : target
+	      source: type === RECONNECT_START$1 ? hover : source,
+	      target: type === RECONNECT_END$1 ? hover : target
 	    });
 
 	    if (allowed) {
-	      context.source = type === RECONNECT_START ? hover : source;
-	      context.target = type === RECONNECT_END ? hover : target;
+	      context.source = type === RECONNECT_START$1 ? hover : source;
+	      context.target = type === RECONNECT_END$1 ? hover : target;
 
 	      return;
 	    }
@@ -28352,25 +29894,28 @@
 	    if (allowed === false) {
 	      allowed = context.allowed = rules.allowed(command, {
 	        connection: connection,
-	        source: type === RECONNECT_END ? hover : target,
-	        target: type === RECONNECT_START ? hover : source
+	        source: type === RECONNECT_END$1 ? hover : target,
+	        target: type === RECONNECT_START$1 ? hover : source
 	      });
 	    }
 
 	    if (allowed) {
-	      context.source = type === RECONNECT_END ? hover : target;
-	      context.target = type === RECONNECT_START ? hover : source;
+	      context.source = type === RECONNECT_END$1 ? hover : target;
+	      context.target = type === RECONNECT_START$1 ? hover : source;
 	    }
 	  });
 
 	  eventBus.on([ 'bendpoint.move.out', 'bendpoint.move.cleanup' ], function(event) {
-	    var context = event.context;
+	    var context = event.context,
+	        type = context.type;
 
 	    context.hover = null;
 	    context.source = null;
 	    context.target = null;
 
-	    context.allowed = false;
+	    if (type !== UPDATE_WAYPOINTS$1) {
+	      context.allowed = false;
+	    }
 	  });
 
 	  eventBus.on('bendpoint.move.end', function(event) {
@@ -28387,15 +29932,15 @@
 
 	    // ensure integer values (important if zoom level was > 1 during move)
 	    var docking = {
-	      x: round$3(event.x),
-	      y: round$3(event.y)
+	      x: round$8(event.x),
+	      y: round$8(event.y)
 	    };
 
 	    if (!allowed) {
 	      return false;
 	    }
 
-	    if (type === UPDATE_WAYPOINTS) {
+	    if (type === UPDATE_WAYPOINTS$1) {
 	      if (insert) {
 
 	        // insert new bendpoint
@@ -28417,18 +29962,18 @@
 
 	      modeling.updateWaypoints(connection, filterRedundantWaypoints(newWaypoints), hints);
 	    } else {
-	      if (type === RECONNECT_START) {
+	      if (type === RECONNECT_START$1) {
 	        hints.docking = 'source';
 
-	        if (isReverse(context)) {
+	        if (isReverse$2(context)) {
 	          hints.docking = 'target';
 
 	          hints.newWaypoints = newWaypoints.reverse();
 	        }
-	      } else if (type === RECONNECT_END) {
+	      } else if (type === RECONNECT_END$1) {
 	        hints.docking = 'target';
 
-	        if (isReverse(context)) {
+	        if (isReverse$2(context)) {
 	          hints.docking = 'source';
 
 	          hints.newWaypoints = newWaypoints.reverse();
@@ -28472,32 +30017,32 @@
 
 	// helpers //////////
 
-	function isReverse(context) {
+	function isReverse$2(context) {
 	  var hover = context.hover,
 	      source = context.source,
 	      target = context.target,
 	      type = context.type;
 
-	  if (type === RECONNECT_START) {
+	  if (type === RECONNECT_START$1) {
 	    return hover && target && hover === target && source !== target;
 	  }
 
-	  if (type === RECONNECT_END) {
+	  if (type === RECONNECT_END$1) {
 	    return hover && source && hover === source && source !== target;
 	  }
 	}
 
-	var RECONNECT_START$1 = 'reconnectStart',
-	    RECONNECT_END$1 = 'reconnectEnd',
-	    UPDATE_WAYPOINTS$1 = 'updateWaypoints';
+	var RECONNECT_START = 'reconnectStart',
+	    RECONNECT_END = 'reconnectEnd',
+	    UPDATE_WAYPOINTS = 'updateWaypoints';
 
-	var MARKER_OK = 'connect-ok',
-	    MARKER_NOT_OK = 'connect-not-ok',
-	    MARKER_CONNECT_HOVER = 'connect-hover',
-	    MARKER_CONNECT_UPDATING = 'djs-updating',
+	var MARKER_OK$4 = 'connect-ok',
+	    MARKER_NOT_OK$4 = 'connect-not-ok',
+	    MARKER_CONNECT_HOVER$1 = 'connect-hover',
+	    MARKER_CONNECT_UPDATING$1 = 'djs-updating',
 	    MARKER_ELEMENT_HIDDEN = 'djs-element-hidden';
 
-	var HIGH_PRIORITY$1 = 1100;
+	var HIGH_PRIORITY$j = 1100;
 
 	/**
 	 * Preview connection while moving bendpoints.
@@ -28528,10 +30073,10 @@
 	    // add dragger gfx
 	    var draggerGfx = context.draggerGfx = addBendpoint(canvas.getLayer('overlays'));
 
-	    classes$1(draggerGfx).add('djs-dragging');
+	    classes(draggerGfx).add('djs-dragging');
 
 	    canvas.addMarker(connection, MARKER_ELEMENT_HIDDEN);
-	    canvas.addMarker(connection, MARKER_CONNECT_UPDATING);
+	    canvas.addMarker(connection, MARKER_CONNECT_UPDATING$1);
 	  });
 
 	  eventBus.on('bendpoint.move.hover', function(event) {
@@ -28541,18 +30086,18 @@
 	        type = context.type;
 
 	    if (hover) {
-	      canvas.addMarker(hover, MARKER_CONNECT_HOVER);
+	      canvas.addMarker(hover, MARKER_CONNECT_HOVER$1);
 
-	      if (type === UPDATE_WAYPOINTS$1) {
+	      if (type === UPDATE_WAYPOINTS) {
 	        return;
 	      }
 
 	      if (allowed) {
-	        canvas.removeMarker(hover, MARKER_NOT_OK);
-	        canvas.addMarker(hover, MARKER_OK);
+	        canvas.removeMarker(hover, MARKER_NOT_OK$4);
+	        canvas.addMarker(hover, MARKER_OK$4);
 	      } else if (allowed === false) {
-	        canvas.removeMarker(hover, MARKER_OK);
-	        canvas.addMarker(hover, MARKER_NOT_OK);
+	        canvas.removeMarker(hover, MARKER_OK$4);
+	        canvas.addMarker(hover, MARKER_NOT_OK$4);
 	      }
 	    }
 	  });
@@ -28560,14 +30105,14 @@
 	  eventBus.on([
 	    'bendpoint.move.out',
 	    'bendpoint.move.cleanup'
-	  ], HIGH_PRIORITY$1, function(event) {
+	  ], HIGH_PRIORITY$j, function(event) {
 	    var context = event.context,
 	        hover = context.hover,
 	        target = context.target;
 
 	    if (hover) {
-	      canvas.removeMarker(hover, MARKER_CONNECT_HOVER);
-	      canvas.removeMarker(hover, target ? MARKER_OK : MARKER_NOT_OK);
+	      canvas.removeMarker(hover, MARKER_CONNECT_HOVER$1);
+	      canvas.removeMarker(hover, target ? MARKER_OK$4 : MARKER_NOT_OK$4);
 	    }
 	  });
 
@@ -28596,8 +30141,8 @@
 	      }
 
 
-	      if (type === RECONNECT_START$1) {
-	        if (isReverse(context)) {
+	      if (type === RECONNECT_START) {
+	        if (isReverse$2(context)) {
 	          drawPreviewHints.connectionEnd = drawPreviewHints.connectionEnd || bendpoint;
 
 	          drawPreviewHints.source = target;
@@ -28610,8 +30155,8 @@
 	          drawPreviewHints.source = hover || source;
 	          drawPreviewHints.target = target;
 	        }
-	      } else if (type === RECONNECT_END$1) {
-	        if (isReverse(context)) {
+	      } else if (type === RECONNECT_END) {
+	        if (isReverse$2(context)) {
 	          drawPreviewHints.connectionStart = drawPreviewHints.connectionStart || bendpoint;
 
 	          drawPreviewHints.source = hover || target;
@@ -28631,7 +30176,7 @@
 	        newWaypoints[ bendpointIndex ] = bendpoint;
 	      }
 
-	      if (type === UPDATE_WAYPOINTS$1) {
+	      if (type === UPDATE_WAYPOINTS) {
 	        newWaypoints = bendpointMove.cropWaypoints(connection, newWaypoints);
 	      }
 
@@ -28640,13 +30185,13 @@
 	      connectionPreview.drawPreview(context, allowed, drawPreviewHints);
 	    }
 
-	    translate(draggerGfx, event.x, event.y);
+	    translate$2(draggerGfx, event.x, event.y);
 	  }, this);
 
 	  eventBus.on([
 	    'bendpoint.move.end',
 	    'bendpoint.move.cancel'
-	  ], HIGH_PRIORITY$1, function(event) {
+	  ], HIGH_PRIORITY$j, function(event) {
 	    var context = event.context,
 	        connection = context.connection,
 	        draggerGfx = context.draggerGfx,
@@ -28659,12 +30204,12 @@
 	    // remove dragger gfx
 	    remove$1(draggerGfx);
 
-	    canvas.removeMarker(connection, MARKER_CONNECT_UPDATING);
+	    canvas.removeMarker(connection, MARKER_CONNECT_UPDATING$1);
 	    canvas.removeMarker(connection, MARKER_ELEMENT_HIDDEN);
 
 	    if (hover) {
-	      canvas.removeMarker(hover, MARKER_OK);
-	      canvas.removeMarker(hover, target ? MARKER_OK : MARKER_NOT_OK);
+	      canvas.removeMarker(hover, MARKER_OK$4);
+	      canvas.removeMarker(hover, target ? MARKER_OK$4 : MARKER_NOT_OK$4);
 	    }
 
 	    if (connectionPreview) {
@@ -28680,8 +30225,8 @@
 	  'canvas'
 	];
 
-	var MARKER_CONNECT_HOVER$1 = 'connect-hover',
-	    MARKER_CONNECT_UPDATING$1 = 'djs-updating';
+	var MARKER_CONNECT_HOVER = 'connect-hover',
+	    MARKER_CONNECT_UPDATING = 'djs-updating';
 
 
 	function axisAdd(point, axis, delta) {
@@ -28722,7 +30267,7 @@
 	 *
 	 * @return {Point}
 	 */
-	function getDocking(point, referenceElement, moveAxis) {
+	function getDocking$2(point, referenceElement, moveAxis) {
 
 	  var referenceMid,
 	      inverseAxis;
@@ -28773,11 +30318,11 @@
 	    axis = direction === 'v' ? 'x' : 'y';
 
 	    if (segmentStartIndex === 0) {
-	      segmentStart = getDocking(segmentStart, connection.source, axis);
+	      segmentStart = getDocking$2(segmentStart, connection.source, axis);
 	    }
 
 	    if (segmentEndIndex === waypoints.length - 1) {
-	      segmentEnd = getDocking(segmentEnd, connection.target, axis);
+	      segmentEnd = getDocking$2(segmentEnd, connection.target, axis);
 	    }
 
 	    if (intersection) {
@@ -28860,7 +30405,7 @@
 	    var draggerPosition = axisFenced(event, segmentStart, segmentEnd, axis);
 
 	    // update dragger
-	    translate(context.draggerGfx, draggerPosition.x, draggerPosition.y);
+	    translate$2(context.draggerGfx, draggerPosition.x, draggerPosition.y);
 	  }
 
 	  /**
@@ -28904,9 +30449,9 @@
 
 	    // add dragger gfx
 	    context.draggerGfx = addSegmentDragger(layer, context.segmentStart, context.segmentEnd);
-	    classes$1(context.draggerGfx).add('djs-dragging');
+	    classes(context.draggerGfx).add('djs-dragging');
 
-	    canvas.addMarker(connection, MARKER_CONNECT_UPDATING$1);
+	    canvas.addMarker(connection, MARKER_CONNECT_UPDATING);
 	  });
 
 	  eventBus.on('connectionSegment.move.move', function(event) {
@@ -28996,7 +30541,7 @@
 	  eventBus.on('connectionSegment.move.hover', function(event) {
 
 	    event.context.hover = event.hover;
-	    canvas.addMarker(event.hover, MARKER_CONNECT_HOVER$1);
+	    canvas.addMarker(event.hover, MARKER_CONNECT_HOVER);
 	  });
 
 	  eventBus.on([
@@ -29009,7 +30554,7 @@
 	    var hover = event.context.hover;
 
 	    if (hover) {
-	      canvas.removeMarker(hover, MARKER_CONNECT_HOVER$1);
+	      canvas.removeMarker(hover, MARKER_CONNECT_HOVER);
 	    }
 	  });
 
@@ -29023,7 +30568,7 @@
 	      remove$1(context.draggerGfx);
 	    }
 
-	    canvas.removeMarker(connection, MARKER_CONNECT_UPDATING$1);
+	    canvas.removeMarker(connection, MARKER_CONNECT_UPDATING);
 	  });
 
 	  eventBus.on([
@@ -29083,8 +30628,8 @@
 	  'modeling'
 	];
 
-	var abs$1 = Math.abs,
-	    round$4 = Math.round;
+	var abs$6 = Math.abs,
+	    round$7 = Math.round;
 
 
 	/**
@@ -29104,7 +30649,7 @@
 	  for (idx = 0; idx < values.length; idx++) {
 	    snapValue = values[idx];
 
-	    if (abs$1(snapValue - value) <= tolerance) {
+	    if (abs$6(snapValue - value) <= tolerance) {
 	      return snapValue;
 	    }
 	  }
@@ -29125,15 +30670,15 @@
 	  };
 	}
 
-	function mid(bounds, defaultValue) {
+	function mid$2(bounds, defaultValue) {
 
 	  if (!bounds || isNaN(bounds.x) || isNaN(bounds.y)) {
 	    return defaultValue;
 	  }
 
 	  return {
-	    x: round$4(bounds.x + bounds.width / 2),
-	    y: round$4(bounds.y + bounds.height / 2)
+	    x: round$7(bounds.x + bounds.width / 2),
+	    y: round$7(bounds.y + bounds.height / 2)
 	  };
 	}
 
@@ -29210,12 +30755,12 @@
 	 *
 	 * @returns {Array<djs.model.Shape|djs.model.Connection>}
 	 */
-	function getChildren$1(parent) {
+	function getChildren(parent) {
 	  return parent.children || [];
 	}
 
-	var abs$2= Math.abs,
-	    round$5 = Math.round;
+	var abs$5= Math.abs,
+	    round$6 = Math.round;
 
 	var TOLERANCE = 10;
 
@@ -29224,10 +30769,10 @@
 
 	  function snapTo(values, value) {
 
-	    if (isArray(values)) {
+	    if (isArray$2(values)) {
 	      var i = values.length;
 
-	      while (i--) if (abs$2(values[i] - value) <= TOLERANCE) {
+	      while (i--) if (abs$5(values[i] - value) <= TOLERANCE) {
 	        return values[i];
 	      }
 	    } else {
@@ -29249,8 +30794,8 @@
 	  function mid(element) {
 	    if (element.width) {
 	      return {
-	        x: round$5(element.width / 2 + element.x),
-	        y: round$5(element.height / 2 + element.y)
+	        x: round$6(element.width / 2 + element.x),
+	        y: round$6(element.height / 2 + element.y)
 	      };
 	    }
 	  }
@@ -29427,7 +30972,7 @@
 	var BendpointsModule = {
 	  __depends__: [
 	    DraggingModule,
-	    RulesModule
+	    RulesModule$1
 	  ],
 	  __init__: [ 'bendpoints', 'bendpointSnapping', 'bendpointMovePreview' ],
 	  bendpoints: [ 'type', Bendpoints ],
@@ -29577,11 +31122,11 @@
 	  return hover && source && hover === source && source !== target;
 	}
 
-	var HIGH_PRIORITY$2 = 1100,
-	    LOW_PRIORITY$5 = 900;
+	var HIGH_PRIORITY$i = 1100,
+	    LOW_PRIORITY$i = 900;
 
-	var MARKER_OK$1 = 'connect-ok',
-	    MARKER_NOT_OK$1 = 'connect-not-ok';
+	var MARKER_OK$3 = 'connect-ok',
+	    MARKER_NOT_OK$3 = 'connect-not-ok';
 
 	/**
 	 * Shows connection preview during connect.
@@ -29600,33 +31145,29 @@
 	        source = context.source,
 	        start = context.start,
 	        startPosition = context.startPosition,
-	        connectionStart = context.connectionStart,
-	        connectionEnd = context.connectionEnd,
-	        target = context.target;
+	        target = context.target,
+	        connectionStart = context.connectionStart || startPosition,
+	        connectionEnd = context.connectionEnd || {
+	          x: event.x,
+	          y: event.y
+	        },
+	        previewStart = connectionStart,
+	        previewEnd = connectionEnd;
 
-	    if (!connectionStart) {
-	      connectionStart = isReverse$1(context) ? {
-	        x: event.x,
-	        y: event.y
-	      } : startPosition;
-	    }
-
-	    if (!connectionEnd) {
-	      connectionEnd = isReverse$1(context) ? startPosition : {
-	        x: event.x,
-	        y: event.y
-	      };
+	    if (isReverse$1(context)) {
+	      previewStart = connectionEnd;
+	      previewEnd = connectionStart;
 	    }
 
 	    connectionPreview.drawPreview(context, canConnect, {
 	      source: source || start,
 	      target: target || hover,
-	      connectionStart: connectionStart,
-	      connectionEnd: connectionEnd
+	      connectionStart: previewStart,
+	      connectionEnd: previewEnd
 	    });
 	  });
 
-	  eventBus.on('connect.hover', LOW_PRIORITY$5, function(event) {
+	  eventBus.on('connect.hover', LOW_PRIORITY$i, function(event) {
 	    var context = event.context,
 	        hover = event.hover,
 	        canExecute = context.canExecute;
@@ -29636,18 +31177,18 @@
 	      return;
 	    }
 
-	    canvas.addMarker(hover, canExecute ? MARKER_OK$1 : MARKER_NOT_OK$1);
+	    canvas.addMarker(hover, canExecute ? MARKER_OK$3 : MARKER_NOT_OK$3);
 	  });
 
 	  eventBus.on([
 	    'connect.out',
 	    'connect.cleanup'
-	  ], HIGH_PRIORITY$2, function(event) {
+	  ], HIGH_PRIORITY$i, function(event) {
 	    var hover = event.hover;
 
 	    if (hover) {
-	      canvas.removeMarker(hover, MARKER_OK$1);
-	      canvas.removeMarker(hover, MARKER_NOT_OK$1);
+	      canvas.removeMarker(hover, MARKER_OK$3);
+	      canvas.removeMarker(hover, MARKER_NOT_OK$3);
 	    }
 	  });
 
@@ -29665,7 +31206,7 @@
 	var ConnectModule = {
 	  __depends__: [
 	    SelectionModule,
-	    RulesModule,
+	    RulesModule$1,
 	    DraggingModule
 	  ],
 	  __init__: [
@@ -29748,7 +31289,7 @@
 	    connectionPreviewGfx = context.connectionPreviewGfx = this.createConnectionPreviewGfx();
 	  }
 
-	  clear$1(connectionPreviewGfx);
+	  clear(connectionPreviewGfx);
 
 	  if (!getConnection) {
 	    getConnection = context.getConnection = cacheReturnValues(function(canConnect, source, target) {
@@ -29871,15 +31412,15 @@
 	 * @returns {SVGElement}
 	 */
 	ConnectionPreview.prototype.createConnectionPreviewGfx = function() {
-	  var gfx = create('g');
+	  var gfx = create$1('g');
 
-	  attr$1(gfx, {
+	  attr(gfx, {
 	    pointerEvents: 'none'
 	  });
 
-	  classes$1(gfx).add(MARKER_CONNECTION_PREVIEW);
+	  classes(gfx).add(MARKER_CONNECTION_PREVIEW);
 
-	  append(this._canvas.getDefaultLayer(), gfx);
+	  append(this._canvas.getActiveLayer(), gfx);
 
 	  return gfx;
 	};
@@ -29893,16 +31434,16 @@
 	 * @returns {SVGElement}
 	 */
 	ConnectionPreview.prototype.createNoopConnection = function(start, end) {
-	  var connection = create('polyline');
+	  var connection = create$1('polyline');
 
-	  attr$1(connection, {
+	  attr(connection, {
 	    'stroke': '#333',
 	    'strokeDasharray': [ 1 ],
 	    'strokeWidth': 2,
 	    'pointer-events': 'none'
 	  });
 
-	  attr$1(connection, { 'points': [ start.x, start.y, end.x, end.y ] });
+	  attr(connection, { 'points': [ start.x, start.y, end.x, end.y ] });
 
 	  return connection;
 	};
@@ -29957,14 +31498,14 @@
 	  connectionPreview: [ 'type', ConnectionPreview ]
 	};
 
-	var min = Math.min,
-	    max$1 = Math.max;
+	var min$3 = Math.min,
+	    max$5 = Math.max;
 
-	function preventDefault$1(e) {
+	function preventDefault(e) {
 	  e.preventDefault();
 	}
 
-	function stopPropagation$1(e) {
+	function stopPropagation(e) {
 	  e.stopPropagation();
 	}
 
@@ -30005,8 +31546,8 @@
 	  this.keyHandler = options.keyHandler || function() {};
 	  this.resizeHandler = options.resizeHandler || function() {};
 
-	  this.autoResize = bind(this.autoResize, this);
-	  this.handlePaste = bind(this.handlePaste, this);
+	  this.autoResize = bind$2(this.autoResize, this);
+	  this.handlePaste = bind$2(this.handlePaste, this);
 	}
 
 
@@ -30106,7 +31647,7 @@
 	  content.innerText = value;
 
 	  componentEvent.bind(content, 'keydown', this.keyHandler);
-	  componentEvent.bind(content, 'mousedown', stopPropagation$1);
+	  componentEvent.bind(content, 'mousedown', stopPropagation);
 	  componentEvent.bind(content, 'paste', self.handlePaste);
 
 	  if (options.autoResize) {
@@ -30158,6 +31699,7 @@
 	};
 
 	TextBox.prototype.insertText = function(text) {
+	  text = normalizeEndOfLineSequences(text);
 
 	  // insertText command not supported by Internet Explorer
 	  var success = document.execCommand('insertText', false, text);
@@ -30214,7 +31756,7 @@
 	          text +
 	          endContainer.textContent.substring(endOffset);
 	      } else if (index > startContainerChildIndex && index <= endContainerChildIndex) {
-	        remove(childNode);
+	        remove$2(childNode);
 	      }
 	    });
 
@@ -30278,8 +31820,8 @@
 	    var startX, startY, startWidth, startHeight;
 
 	    var onMouseDown = function(e) {
-	      preventDefault$1(e);
-	      stopPropagation$1(e);
+	      preventDefault(e);
+	      stopPropagation(e);
 
 	      startX = e.clientX;
 	      startY = e.clientY;
@@ -30294,11 +31836,11 @@
 	    };
 
 	    var onMouseMove = function(e) {
-	      preventDefault$1(e);
-	      stopPropagation$1(e);
+	      preventDefault(e);
+	      stopPropagation(e);
 
-	      var newWidth = min(max$1(startWidth + e.clientX - startX, minWidth), maxWidth);
-	      var newHeight = min(max$1(startHeight + e.clientY - startY, minHeight), maxHeight);
+	      var newWidth = min$3(max$5(startWidth + e.clientX - startX, minWidth), maxWidth);
+	      var newHeight = min$3(max$5(startHeight + e.clientY - startY, minHeight), maxHeight);
 
 	      parent.style.width = newWidth + 'px';
 	      parent.style.height = newHeight + 'px';
@@ -30312,8 +31854,8 @@
 	    };
 
 	    var onMouseUp = function(e) {
-	      preventDefault$1(e);
-	      stopPropagation$1(e);
+	      preventDefault(e);
+	      stopPropagation(e);
 
 	      componentEvent.unbind(document,'mousemove', onMouseMove, false);
 	      componentEvent.unbind(document, 'mouseup', onMouseUp, false);
@@ -30356,17 +31898,17 @@
 	  content.removeAttribute('style');
 
 	  componentEvent.unbind(content, 'keydown', this.keyHandler);
-	  componentEvent.unbind(content, 'mousedown', stopPropagation$1);
+	  componentEvent.unbind(content, 'mousedown', stopPropagation);
 	  componentEvent.unbind(content, 'input', this.autoResize);
 	  componentEvent.unbind(content, 'paste', this.handlePaste);
 
 	  if (resizeHandle) {
 	    resizeHandle.removeAttribute('style');
 
-	    remove(resizeHandle);
+	    remove$2(resizeHandle);
 	  }
 
-	  remove(parent);
+	  remove$2(parent);
 	};
 
 
@@ -30399,6 +31941,12 @@
 	  selection.addRange(range);
 	};
 
+	// helpers //////////
+
+	function normalizeEndOfLineSequences(string) {
+	  return string.replace(/\r\n|\r|\n/g, '\n');
+	}
+
 	/**
 	 * A direct editing component that allows users
 	 * to edit an elements text directly in the diagram
@@ -30412,8 +31960,8 @@
 	  this._providers = [];
 	  this._textbox = new TextBox({
 	    container: canvas.getContainer(),
-	    keyHandler: bind(this._handleKey, this),
-	    resizeHandler: bind(this._handleResize, this)
+	    keyHandler: bind$2(this._handleKey, this),
+	    resizeHandler: bind$2(this._handleResize, this)
 	  });
 	}
 
@@ -30583,7 +32131,7 @@
 
 	var DirectEditingModule = {
 	  __depends__: [
-	    InteractionEventsModule
+	    InteractionEventsModule$1
 	  ],
 	  __init__: [ 'directEditing' ],
 	  directEditing: [ 'type', DirectEditing ]
@@ -30591,7 +32139,7 @@
 
 	var entrySelector = '.entry';
 
-	var DEFAULT_PRIORITY$3 = 1000;
+	var DEFAULT_PRIORITY$2 = 1000;
 
 
 	/**
@@ -30703,7 +32251,7 @@
 	ContextPad.prototype.registerProvider = function(priority, provider) {
 	  if (!provider) {
 	    provider = priority;
-	    priority = DEFAULT_PRIORITY$3;
+	    priority = DEFAULT_PRIORITY$2;
 	  }
 
 	  this._eventBus.on('contextPad.getProviders', priority, function(event) {
@@ -30762,7 +32310,7 @@
 	    return event.preventDefault();
 	  }
 
-	  entry = entries[attr(button, 'data-action')];
+	  entry = entries[attr$1(button, 'data-action')];
 	  handler = entry.action;
 
 	  originalEvent = event.originalEvent || event;
@@ -30798,7 +32346,7 @@
 	  this._updateAndOpen(element);
 	};
 
-	ContextPad.prototype._getProviders = function(id) {
+	ContextPad.prototype._getProviders = function() {
 
 	  var event = this._eventBus.createEvent({
 	    type: 'contextPad.getProviders',
@@ -30821,7 +32369,7 @@
 	        control = domify(entry.html || '<div class="entry" draggable="true"></div>'),
 	        container;
 
-	    attr(control, 'data-action', id);
+	    attr$1(control, 'data-action', id);
 
 	    container = query('[data-group=' + grouping + ']', html);
 	    if (!container) {
@@ -30832,11 +32380,11 @@
 	    container.appendChild(control);
 
 	    if (entry.className) {
-	      addClasses(control, entry.className);
+	      addClasses$1(control, entry.className);
 	    }
 
 	    if (entry.title) {
-	      attr(control, 'title', entry.title);
+	      attr$1(control, 'title', entry.title);
 	    }
 
 	    if (entry.imageUrl) {
@@ -30844,7 +32392,7 @@
 	    }
 	  });
 
-	  classes(html).add('open');
+	  classes$1(html).add('open');
 
 	  this._current = {
 	    element: element,
@@ -30871,11 +32419,11 @@
 	    html: html
 	  }, this._overlaysConfig);
 
-	  delegateEvents.bind(html, entrySelector, 'click', function(event) {
+	  delegate.bind(html, entrySelector, 'click', function(event) {
 	    self.trigger('click', event);
 	  });
 
-	  delegateEvents.bind(html, entrySelector, 'dragstart', function(event) {
+	  delegate.bind(html, entrySelector, 'dragstart', function(event) {
 	    self.trigger('dragstart', event);
 	  });
 
@@ -30927,19 +32475,19 @@
 
 	// helpers //////////////////////
 
-	function addClasses(element, classNames) {
+	function addClasses$1(element, classNames) {
 
-	  var classes$1 = classes(element);
+	  var classes = classes$1(element);
 
-	  var actualClassNames = isArray(classNames) ? classNames : classNames.split(/\s+/g);
+	  var actualClassNames = isArray$2(classNames) ? classNames : classNames.split(/\s+/g);
 	  actualClassNames.forEach(function(cls) {
-	    classes$1.add(cls);
+	    classes.add(cls);
 	  });
 	}
 
-	var ContextPadModule = {
+	var ContextPadModule$1 = {
 	  __depends__: [
-	    InteractionEventsModule,
+	    InteractionEventsModule$1,
 	    OverlaysModule
 	  ],
 	  contextPad: [ 'type', ContextPad ]
@@ -31014,12 +32562,12 @@
 	PreviewSupport.prototype.addDragger = function(element, group, gfx) {
 	  gfx = gfx || this.getGfx(element);
 
-	  var dragger = clone(gfx);
+	  var dragger = clone$1(gfx);
 	  var bbox = gfx.getBoundingClientRect();
 
 	  this._cloneMarkers(getVisual(dragger));
 
-	  attr$1(dragger, this._styles.cls('djs-dragger', [], {
+	  attr(dragger, this._styles.cls('djs-dragger', [], {
 	    x: bbox.top,
 	    y: bbox.left
 	  }));
@@ -31039,7 +32587,7 @@
 	 */
 	PreviewSupport.prototype.addFrame = function(shape, group) {
 
-	  var frame = create('rect', {
+	  var frame = create$1('rect', {
 	    class: 'djs-resize-overlay',
 	    width:  shape.width,
 	    height: shape.height,
@@ -31075,7 +32623,7 @@
 	  }
 
 	  MARKER_TYPES.forEach(function(markerType) {
-	    if (attr$1(gfx, markerType)) {
+	    if (attr(gfx, markerType)) {
 	      var marker = getMarker(gfx, markerType, self._canvas.getContainer());
 
 	      self._cloneMarker(gfx, marker, markerType);
@@ -31096,13 +32644,13 @@
 	  var clonedMarker = this._clonedMarkers[ markerId ];
 
 	  if (!clonedMarker) {
-	    clonedMarker = clone(marker);
+	    clonedMarker = clone$1(marker);
 
 	    var clonedMarkerId = markerId + '-clone';
 
 	    clonedMarker.id = clonedMarkerId;
 
-	    classes$1(clonedMarker)
+	    classes(clonedMarker)
 	      .add('djs-dragger')
 	      .add('djs-dragger-marker');
 
@@ -31111,7 +32659,7 @@
 	    var defs = query('defs', this._canvas._svg);
 
 	    if (!defs) {
-	      defs = create('defs');
+	      defs = create$1('defs');
 
 	      append(this._canvas._svg, defs);
 	    }
@@ -31121,7 +32669,7 @@
 
 	  var reference = idToReference(this._clonedMarkers[ markerId ].id);
 
-	  attr$1(gfx, markerType, reference);
+	  attr(gfx, markerType, reference);
 	};
 
 	// helpers //////////
@@ -31136,7 +32684,7 @@
 	 * @param {Node}
 	 */
 	function getMarker(node, markerType, parentNode) {
-	  var id = referenceToId(attr$1(node, markerType));
+	  var id = referenceToId(attr(node, markerType));
 
 	  return query('marker#' + id, parentNode || document);
 	}
@@ -31182,12 +32730,12 @@
 
 	var MARKER_OK$2 = 'drop-ok',
 	    MARKER_NOT_OK$2 = 'drop-not-ok',
-	    MARKER_ATTACH = 'attach-ok',
-	    MARKER_NEW_PARENT = 'new-parent';
+	    MARKER_ATTACH$2 = 'attach-ok',
+	    MARKER_NEW_PARENT$1 = 'new-parent';
 
 	var PREFIX = 'create';
 
-	var HIGH_PRIORITY$3 = 2000;
+	var HIGH_PRIORITY$h = 2000;
 
 
 	/**
@@ -31228,11 +32776,11 @@
 	    elements = filter(elements, function(element) {
 	      var labelTarget = element.labelTarget;
 
-	      return !element.parent && !(isLabel$1(element) && elements.indexOf(labelTarget) !== -1);
+	      return !element.parent && !(isLabel$5(element) && elements.indexOf(labelTarget) !== -1);
 	    });
 
 	    var shape = find(elements, function(element) {
-	      return !isConnection(element);
+	      return !isConnection$b(element);
 	    });
 
 	    var attach = false,
@@ -31298,7 +32846,7 @@
 	  }
 
 	  function setMarker(element, marker) {
-	    [ MARKER_ATTACH, MARKER_OK$2, MARKER_NOT_OK$2, MARKER_NEW_PARENT ].forEach(function(m) {
+	    [ MARKER_ATTACH$2, MARKER_OK$2, MARKER_NOT_OK$2, MARKER_NEW_PARENT$1 ].forEach(function(m) {
 
 	      if (m === marker) {
 	        canvas.addMarker(element, m);
@@ -31324,7 +32872,7 @@
 	      return;
 	    }
 
-	    ensureConstraints(event);
+	    ensureConstraints$2(event);
 
 	    var position = {
 	      x: event.x,
@@ -31337,9 +32885,9 @@
 	      context.target = hover;
 
 	      if (canExecute && canExecute.attach) {
-	        setMarker(hover, MARKER_ATTACH);
+	        setMarker(hover, MARKER_ATTACH$2);
 	      } else {
-	        setMarker(hover, canExecute ? MARKER_NEW_PARENT : MARKER_NOT_OK$2);
+	        setMarker(hover, canExecute ? MARKER_NEW_PARENT$1 : MARKER_NOT_OK$2);
 	      }
 	    }
 	  });
@@ -31367,7 +32915,7 @@
 	      return false;
 	    }
 
-	    ensureConstraints(event);
+	    ensureConstraints$2(event);
 
 	    var position = {
 	      x: event.x,
@@ -31387,7 +32935,7 @@
 
 	      // update shape
 	      shape = find(elements, function(element) {
-	        return !isConnection(element);
+	        return !isConnection$b(element);
 	      });
 	    }
 
@@ -31415,7 +32963,7 @@
 	  eventBus.on('create.init', function() {
 	    eventBus.on('elements.changed', cancel);
 
-	    eventBus.once([ 'create.cancel', 'create.end' ], HIGH_PRIORITY$3, function() {
+	    eventBus.once([ 'create.cancel', 'create.end' ], HIGH_PRIORITY$h, function() {
 	      eventBus.off('elements.changed', cancel);
 	    });
 	  });
@@ -31423,12 +32971,12 @@
 	  // API //////////
 
 	  this.start = function(event, elements, context) {
-	    if (!isArray(elements)) {
+	    if (!isArray$2(elements)) {
 	      elements = [ elements ];
 	    }
 
 	    var shape = find(elements, function(element) {
-	      return !isConnection(element);
+	      return !isConnection$b(element);
 	    });
 
 	    if (!shape) {
@@ -31454,12 +33002,16 @@
 	      }
 	    });
 
-	    var bbox = getBBox(elements);
+	    var visibleElements = filter(elements, function(element) {
+	      return !element.hidden;
+	    });
+
+	    var bbox = getBBox(visibleElements);
 
 	    // center elements around cursor
 	    forEach(elements, function(element) {
-	      if (isConnection(element)) {
-	        element.waypoints = map(element.waypoints, function(waypoint) {
+	      if (isConnection$b(element)) {
+	        element.waypoints = map$1(element.waypoints, function(waypoint) {
 	          return {
 	            x: waypoint.x - bbox.x - bbox.width / 2,
 	            y: waypoint.y - bbox.y - bbox.height / 2
@@ -31495,7 +33047,7 @@
 
 	// helpers //////////
 
-	function ensureConstraints(event) {
+	function ensureConstraints$2(event) {
 	  var context = event.context,
 	      createConstraints = context.createConstraints;
 
@@ -31520,19 +33072,19 @@
 	  }
 	}
 
-	function isConnection(element) {
+	function isConnection$b(element) {
 	  return !!element.waypoints;
 	}
 
 	function isSingleShape(elements) {
-	  return elements && elements.length === 1 && !isConnection(elements[0]);
+	  return elements && elements.length === 1 && !isConnection$b(elements[0]);
 	}
 
-	function isLabel$1(element) {
+	function isLabel$5(element) {
 	  return !!element.labelTarget;
 	}
 
-	var LOW_PRIORITY$6 = 750;
+	var LOW_PRIORITY$h = 750;
 
 
 	function CreatePreview(
@@ -31543,11 +33095,11 @@
 	    styles
 	) {
 	  function createDragGroup(elements) {
-	    var dragGroup = create('g');
+	    var dragGroup = create$1('g');
 
-	    attr$1(dragGroup, styles.cls('djs-drag-group', [ 'no-events' ]));
+	    attr(dragGroup, styles.cls('djs-drag-group', [ 'no-events' ]));
 
-	    var childrenGfx = create('g');
+	    var childrenGfx = create$1('g');
 
 	    elements.forEach(function(element) {
 
@@ -31567,7 +33119,7 @@
 
 	        graphicsFactory.drawShape(getVisual(gfx), element);
 
-	        translate(gfx, element.x, element.y);
+	        translate$2(gfx, element.x, element.y);
 	      }
 
 	      // add preview
@@ -31577,7 +33129,7 @@
 	    return dragGroup;
 	  }
 
-	  eventBus.on('create.move', LOW_PRIORITY$6, function(event) {
+	  eventBus.on('create.move', LOW_PRIORITY$h, function(event) {
 
 	    var hover = event.hover,
 	        context = event.context,
@@ -31589,16 +33141,16 @@
 	      dragGroup = context.dragGroup = createDragGroup(elements);
 	    }
 
-	    var defaultLayer;
+	    var activeLayer;
 
 	    if (hover) {
 	      if (!dragGroup.parentNode) {
-	        defaultLayer = canvas.getDefaultLayer();
+	        activeLayer = canvas.getActiveLayer();
 
-	        append(defaultLayer, dragGroup);
+	        append(activeLayer, dragGroup);
 	      }
 
-	      translate(dragGroup, event.x, event.y);
+	      translate$2(dragGroup, event.x, event.y);
 	    } else {
 	      remove$1(dragGroup);
 	    }
@@ -31626,7 +33178,7 @@
 	  __depends__: [
 	    DraggingModule,
 	    PreviewSupportModule,
-	    RulesModule,
+	    RulesModule$1,
 	    SelectionModule
 	  ],
 	  __init__: [
@@ -31645,7 +33197,7 @@
 	  'commandStack.changed'
 	];
 
-	var DEFAULT_PRIORITY$4 = 1000;
+	var DEFAULT_PRIORITY$1 = 1000;
 
 
 	/**
@@ -31708,7 +33260,7 @@
 	PopupMenu.prototype.registerProvider = function(id, priority, provider) {
 	  if (!provider) {
 	    provider = priority;
-	    priority = DEFAULT_PRIORITY$4;
+	    priority = DEFAULT_PRIORITY$1;
 	  }
 
 	  this._eventBus.on('popupMenu.getProviders.' + id, priority, function(event) {
@@ -31822,7 +33374,7 @@
 	  this._emit('close');
 
 	  this._unbindAutoClose();
-	  remove(this._current.container);
+	  remove$2(this._current.container);
 	  this._current.container = null;
 	};
 
@@ -31850,7 +33402,7 @@
 	  event.preventDefault();
 
 	  var element = event.delegateTarget || event.target,
-	      entryId = attr(element, DATA_REF);
+	      entryId = attr$1(element, DATA_REF);
 
 	  var entry = this._getEntry(entryId);
 
@@ -31986,7 +33538,7 @@
 	    visibility: 'hidden'
 	  });
 
-	  classes(container).add(className);
+	  classes$1(container).add(className);
 
 	  return container;
 	};
@@ -32002,7 +33554,7 @@
 	  var self = this;
 
 	  // Event handler
-	  delegateEvents.bind(container, '.entry' ,'click', function(event) {
+	  delegate.bind(container, '.entry' ,'click', function(event) {
 	    self.trigger(event);
 	  });
 
@@ -32052,7 +33604,7 @@
 
 	  }
 
-	  setTransform$1(container, 'scale(' + scale + ')');
+	  setTransform(container, 'scale(' + scale + ')');
 	};
 
 
@@ -32119,7 +33671,7 @@
 	  var entriesContainer = domify('<div>'),
 	      self = this;
 
-	  classes(entriesContainer).add(className);
+	  classes$1(entriesContainer).add(className);
 
 	  forEach(entries, function(entry, id) {
 	    var entryContainer = self._createEntry(entry, id);
@@ -32140,7 +33692,7 @@
 	PopupMenu.prototype._createEntry = function(entry, id) {
 
 	  var entryContainer = domify('<div>'),
-	      entryClasses = classes(entryContainer);
+	      entryClasses = classes$1(entryContainer);
 
 	  entryClasses.add('entry');
 
@@ -32150,7 +33702,7 @@
 	    });
 	  }
 
-	  attr(entryContainer, DATA_REF, id);
+	  attr$1(entryContainer, DATA_REF, id);
 
 	  if (entry.label) {
 	    var label = domify('<span>');
@@ -32197,7 +33749,7 @@
 
 	// helpers /////////////////////////////
 
-	function setTransform$1(element, transform) {
+	function setTransform(element, transform) {
 	  element.style['transform-origin'] = 'top left';
 
 	  [ '', '-ms-', '-webkit-' ].forEach(function(prefix) {
@@ -32205,7 +33757,7 @@
 	  });
 	}
 
-	var PopupMenuModule = {
+	var PopupMenuModule$1 = {
 	  __init__: [ 'popupMenu' ],
 	  popupMenu: [ 'type', PopupMenu ]
 	};
@@ -32326,6 +33878,14 @@
 	 */
 
 	/**
+	 * @typedef {Function} <copyPaste.createTree> listener
+	 *
+	 * @param {Object} context
+	 * @param {djs.model.Base} context.element
+	 * @param {Array<djs.model.Base>} context.children - Add children to be added to tree.
+	 */
+
+	/**
 	 * @typedef {Function} <copyPaste.elementsCopied> listener
 	 *
 	 * @param {Object} context
@@ -32400,24 +33960,24 @@
 	    }
 
 	    // attachers (priority = 2)
-	    if (isAttacher(element)) {
+	    if (isAttacher$1(element)) {
 	      descriptor.priority = 2;
 
 	      descriptor.host = element.host.id;
 	    }
 
 	    // connections (priority = 3)
-	    if (isConnection$1(element)) {
+	    if (isConnection$a(element)) {
 	      descriptor.priority = 3;
 
 	      descriptor.source = element.source.id;
 	      descriptor.target = element.target.id;
 
-	      descriptor.waypoints = copyWaypoints(element);
+	      descriptor.waypoints = copyWaypoints$1(element);
 	    }
 
 	    // labels (priority = 4)
-	    if (isLabel$2(element)) {
+	    if (isLabel$4(element)) {
 	      descriptor.priority = 4;
 
 	      descriptor.labelTarget = element.labelTarget.id;
@@ -32466,7 +34026,7 @@
 	  var allowed,
 	      tree;
 
-	  if (!isArray(elements)) {
+	  if (!isArray$2(elements)) {
 	    elements = elements ? [ elements ] : [];
 	  }
 
@@ -32477,7 +34037,7 @@
 	  if (allowed === false) {
 	    tree = {};
 	  } else {
-	    tree = this.createTree(isArray(allowed) ? allowed : elements);
+	    tree = this.createTree(isArray$2(allowed) ? allowed : elements);
 	  }
 
 	  // we set an empty tree, selection of elements
@@ -32550,8 +34110,8 @@
 
 	  // center elements around cursor
 	  forEach(elements, function(element) {
-	    if (isConnection$1(element)) {
-	      element.waypoints = map(element.waypoints, function(waypoint) {
+	    if (isConnection$a(element)) {
+	      element.waypoints = map$1(element.waypoints, function(waypoint) {
 	        return {
 	          x: waypoint.x - bbox.x - bbox.width / 2,
 	          y: waypoint.y - bbox.y - bbox.height / 2
@@ -32603,7 +34163,7 @@
 
 	      var element;
 
-	      if (isConnection$1(attrs)) {
+	      if (isConnection$a(attrs)) {
 	        attrs.source = cache[ descriptor.source ];
 	        attrs.target = cache[ descriptor.target ];
 
@@ -32614,7 +34174,7 @@
 	        return;
 	      }
 
-	      if (isLabel$2(attrs)) {
+	      if (isLabel$4(attrs)) {
 	        attrs.labelTarget = cache[ attrs.labelTarget ];
 
 	        element = cache[ descriptor.id ] = self.createLabel(attrs);
@@ -32669,7 +34229,7 @@
 	      source,
 	      target;
 
-	  if (isConnection$1(element)) {
+	  if (isConnection$a(element)) {
 	    source = find(elements, matchPattern({ id: element.source.id }));
 	    target = find(elements, matchPattern({ id: element.target.id }));
 
@@ -32678,7 +34238,7 @@
 	    }
 	  }
 
-	  if (isLabel$2(element)) {
+	  if (isLabel$4(element)) {
 	    labelTarget = find(elements, matchPattern({ id: element.labelTarget.id }));
 
 	    if (!labelTarget) {
@@ -32717,7 +34277,7 @@
 	  var tree = {},
 	      elementsData = [];
 
-	  var parents = getParents(elements);
+	  var parents = getParents$1(elements);
 
 	  function canCopy(element, elements) {
 	    return rules.allowed('element.copy', {
@@ -32768,7 +34328,7 @@
 	  eachElement(parents, function(element, _index, depth) {
 
 	    // do NOT add external labels directly
-	    if (isLabel$2(element)) {
+	    if (isLabel$4(element)) {
 	      return;
 	    }
 
@@ -32793,15 +34353,27 @@
 
 	    addElementData(element, depth);
 
-	    return element.children;
+	    var children = [];
+
+	    if (element.children) {
+	      children = element.children.slice();
+	    }
+
+	    // allow others to add children to tree
+	    self._eventBus.fire('copyPaste.createTree', {
+	      element: element,
+	      children: children
+	    });
+
+	    return children;
 	  });
 
-	  elements = map(elementsData, function(elementData) {
+	  elements = map$1(elementsData, function(elementData) {
 	    return elementData.element;
 	  });
 
 	  // (2) copy elements
-	  elementsData = map(elementsData, function(elementData) {
+	  elementsData = map$1(elementsData, function(elementData) {
 	    elementData.descriptor = {};
 
 	    self._eventBus.fire('copyPaste.copyElement', {
@@ -32818,7 +34390,7 @@
 	    return elementData.descriptor.priority;
 	  });
 
-	  elements = map(elementsData, function(elementData) {
+	  elements = map$1(elementsData, function(elementData) {
 	    return elementData.element;
 	  });
 
@@ -32850,32 +34422,32 @@
 
 	// helpers //////////
 
-	function isAttacher(element) {
+	function isAttacher$1(element) {
 	  return !!element.host;
 	}
 
-	function isConnection$1(element) {
+	function isConnection$a(element) {
 	  return !!element.waypoints;
 	}
 
-	function isLabel$2(element) {
+	function isLabel$4(element) {
 	  return !!element.labelTarget;
 	}
 
-	function copyWaypoints(element) {
-	  return map(element.waypoints, function(waypoint) {
+	function copyWaypoints$1(element) {
+	  return map$1(element.waypoints, function(waypoint) {
 
-	    waypoint = copyWaypoint(waypoint);
+	    waypoint = copyWaypoint$1(waypoint);
 
 	    if (waypoint.original) {
-	      waypoint.original = copyWaypoint(waypoint.original);
+	      waypoint.original = copyWaypoint$1(waypoint.original);
 	    }
 
 	    return waypoint;
 	  });
 	}
 
-	function copyWaypoint(waypoint) {
+	function copyWaypoint$1(waypoint) {
 	  return assign({}, waypoint);
 	}
 
@@ -32889,31 +34461,31 @@
 	  return elements.splice(index, 1);
 	}
 
-	var CopyPasteModule = {
+	var CopyPasteModule$1 = {
 	  __depends__: [
 	    ClipboardModule,
 	    CreateModule,
 	    MouseModule,
-	    RulesModule
+	    RulesModule$1
 	  ],
 	  __init__: [ 'copyPaste' ],
 	  copyPaste: [ 'type', CopyPaste ]
 	};
 
-	function copyProperties(source, target, properties) {
-	  if (!isArray(properties)) {
+	function copyProperties$1(source, target, properties) {
+	  if (!isArray$2(properties)) {
 	    properties = [ properties ];
 	  }
 
 	  forEach(properties, function(property) {
-	    if (!isUndefined(source[property])) {
+	    if (!isUndefined$1(source[property])) {
 	      target[property] = source[property];
 	    }
 	  });
 	}
 
 	function removeProperties(element, properties) {
-	  if (!isArray(properties)) {
+	  if (!isArray$2(properties)) {
 	    properties = [ properties ];
 	  }
 
@@ -32924,30 +34496,23 @@
 	  });
 	}
 
-	var LOW_PRIORITY$7 = 750;
+	var LOW_PRIORITY$g = 750;
 
 
 	function BpmnCopyPaste(bpmnFactory, eventBus, moddleCopy) {
 
-	  eventBus.on('copyPaste.copyElement', LOW_PRIORITY$7, function(context) {
+	  eventBus.on('copyPaste.copyElement', LOW_PRIORITY$g, function(context) {
 	    var descriptor = context.descriptor,
 	        element = context.element;
 
 	    var businessObject = descriptor.oldBusinessObject = getBusinessObject(element);
+	    var di = descriptor.oldDi = getDi(element);
 
 	    descriptor.type = element.type;
 
-	    copyProperties(businessObject, descriptor, 'name');
+	    copyProperties$1(businessObject, descriptor, 'name');
 
-	    descriptor.di = {};
-
-	    // fill and stroke will be set to DI
-	    copyProperties(businessObject.di, descriptor.di, [
-	      'fill',
-	      'stroke'
-	    ]);
-
-	    copyProperties(businessObject.di, descriptor, 'isExpanded');
+	    copyProperties$1(di, descriptor, 'isExpanded');
 
 	    if (isLabel$3(descriptor)) {
 	      return descriptor;
@@ -33021,11 +34586,13 @@
 	    var cache = context.cache,
 	        descriptor = context.descriptor,
 	        oldBusinessObject = descriptor.oldBusinessObject,
-	        newBusinessObject;
+	        oldDi = descriptor.oldDi,
+	        newBusinessObject, newDi;
 
 	    // do NOT copy business object if external label
 	    if (isLabel$3(descriptor)) {
 	      descriptor.businessObject = getBusinessObject(cache[ descriptor.labelTarget ]);
+	      descriptor.di = getDi(cache[ descriptor.labelTarget ]);
 
 	      return;
 	    }
@@ -33037,10 +34604,18 @@
 	      newBusinessObject
 	    );
 
+	    newDi = bpmnFactory.create(oldDi.$type);
+	    newDi.bpmnElement = newBusinessObject;
+
+	    descriptor.di = moddleCopy.copyElement(
+	      oldDi,
+	      newDi
+	    );
+
 	    // resolve references e.g. default sequence flow
 	    resolveReferences(descriptor, cache);
 
-	    copyProperties(descriptor, newBusinessObject, [
+	    copyProperties$1(descriptor, newBusinessObject, [
 	      'isExpanded',
 	      'name'
 	    ]);
@@ -33160,7 +34735,7 @@
 	  eventBus.on('moddleCopy.canSetCopiedProperty', function(context) {
 	    var property = context.property;
 
-	    if (is$2(property, 'bpmn:ExtensionElements') && (!property.values || !property.values.length)) {
+	    if (is(property, 'bpmn:ExtensionElements') && (!property.values || !property.values.length)) {
 
 	      // disallow setting copied property
 	      return false;
@@ -33186,7 +34761,7 @@
 	ModdleCopy.prototype.copyElement = function(sourceElement, targetElement, propertyNames) {
 	  var self = this;
 
-	  if (propertyNames && !isArray(propertyNames)) {
+	  if (propertyNames && !isArray$2(propertyNames)) {
 	    propertyNames = [ propertyNames ];
 	  }
 
@@ -33202,7 +34777,7 @@
 	    return targetElement;
 	  }
 
-	  if (isArray(canCopyProperties)) {
+	  if (isArray$2(canCopyProperties)) {
 	    propertyNames = canCopyProperties;
 	  }
 
@@ -33268,13 +34843,18 @@
 
 	  var propertyDescriptor = this._moddle.getPropertyDescriptor(parent, propertyName);
 
-	  // do NOT copy Ids and references
-	  if (propertyDescriptor.isId || propertyDescriptor.isReference) {
+	  // do NOT copy references
+	  if (propertyDescriptor.isReference) {
 	    return;
 	  }
 
+	  // copy id
+	  if (propertyDescriptor.isId) {
+	    return this._copyId(property, parent);
+	  }
+
 	  // copy arrays
-	  if (isArray(property)) {
+	  if (isArray$2(property)) {
 	    return reduce(property, function(childProperties, childProperty) {
 
 	      // recursion
@@ -33311,6 +34891,18 @@
 	  return property;
 	};
 
+	ModdleCopy.prototype._copyId = function(id, element) {
+
+	  // disallow if already taken
+	  if (this._moddle.ids.assigned(id)) {
+	    return;
+	  } else {
+
+	    this._moddle.ids.claim(id, element);
+	    return id;
+	  }
+	};
+
 	// helpers //////////
 
 	function getPropertyNames(descriptor, keepDefaultProperties) {
@@ -33324,20 +34916,20 @@
 	  }, []);
 	}
 
-	function is$2(element, type) {
+	function is(element, type) {
 	  return element && (typeof element.$instanceOf === 'function') && element.$instanceOf(type);
 	}
 
-	var CopyPasteModule$1 = {
+	var CopyPasteModule = {
 	  __depends__: [
-	    CopyPasteModule
+	    CopyPasteModule$1
 	  ],
 	  __init__: [ 'bpmnCopyPaste', 'moddleCopy' ],
 	  bpmnCopyPaste: [ 'type', BpmnCopyPaste ],
 	  moddleCopy: [ 'type', ModdleCopy ]
 	};
 
-	var round$6 = Math.round;
+	var round$5 = Math.round;
 
 	/**
 	 * Service that allow replacing of elements.
@@ -33372,8 +34964,8 @@
 	      height = newElementData.height || oldElement.height,
 	      x = newElementData.x || oldElement.x,
 	      y = newElementData.y || oldElement.y,
-	      centerX = round$6(x + width / 2),
-	      centerY = round$6(y + height / 2);
+	      centerX = round$5(x + width / 2),
+	      centerY = round$5(y + height / 2);
 
 	  // modeling API requires center coordinates,
 	  // account for that when handling shape bounds
@@ -33394,22 +34986,23 @@
 	  );
 	};
 
-	var ReplaceModule = {
+	var ReplaceModule$1 = {
 	  __init__: [ 'replace' ],
 	  replace: [ 'type', Replace ]
 	};
 
-	function copyProperties$1(source, target, properties) {
-	  if (!isArray(properties)) {
+	function copyProperties(source, target, properties) {
+	  if (!isArray$2(properties)) {
 	    properties = [ properties ];
 	  }
 
 	  forEach(properties, function(property) {
-	    if (!isUndefined(source[property])) {
+	    if (!isUndefined$1(source[property])) {
 	      target[property] = source[property];
 	    }
 	  });
 	}
+
 
 	var CUSTOM_PROPERTIES = [
 	  'cancelActivity',
@@ -33419,8 +35012,10 @@
 	  'isInterrupting'
 	];
 
-
-	function toggeling(element, target) {
+	/**
+	 * Check if element should be collapsed or expanded.
+	 */
+	function shouldToggleCollapsed(element, targetElement) {
 
 	  var oldCollapsed = (
 	    element && has(element, 'collapsed') ? element.collapsed : !isExpanded(element)
@@ -33428,11 +35023,11 @@
 
 	  var targetCollapsed;
 
-	  if (target && (has(target, 'collapsed') || has(target, 'isExpanded'))) {
+	  if (targetElement && (has(targetElement, 'collapsed') || has(targetElement, 'isExpanded'))) {
 
 	    // property is explicitly set so use it
 	    targetCollapsed = (
-	      has(target, 'collapsed') ? target.collapsed : !target.isExpanded
+	      has(targetElement, 'collapsed') ? targetElement.collapsed : !targetElement.isExpanded
 	    );
 	  } else {
 
@@ -33441,13 +35036,11 @@
 	  }
 
 	  if (oldCollapsed !== targetCollapsed) {
-	    element.collapsed = oldCollapsed;
 	    return true;
 	  }
 
 	  return false;
 	}
-
 
 
 	/**
@@ -33459,6 +35052,7 @@
 	    moddleCopy,
 	    modeling,
 	    replace,
+	    rules,
 	    selection
 	) {
 
@@ -33479,15 +35073,13 @@
 	    var type = target.type,
 	        oldBusinessObject = element.businessObject;
 
-	    if (isSubProcess(oldBusinessObject)) {
-	      if (type === 'bpmn:SubProcess') {
-	        if (toggeling(element, target)) {
+	    if (isSubProcess(oldBusinessObject) && type === 'bpmn:SubProcess') {
+	      if (shouldToggleCollapsed(element, target)) {
 
-	          // expanding or collapsing process
-	          modeling.toggleCollapse(element);
+	        // expanding or collapsing process
+	        modeling.toggleCollapse(element);
 
-	          return element;
-	        }
+	        return element;
 	      }
 	    }
 
@@ -33495,8 +35087,19 @@
 
 	    var newElement = {
 	      type: type,
-	      businessObject: newBusinessObject
+	      businessObject: newBusinessObject,
 	    };
+
+	    newElement.di = {};
+
+	    // colors will be set to DI
+	    copyProperties(element.di, newElement.di, [
+	      'fill',
+	      'stroke',
+	      'background-color',
+	      'border-color',
+	      'color'
+	    ]);
 
 	    var elementProps = getPropertyNames(oldBusinessObject.$descriptor),
 	        newElementProps = getPropertyNames(newBusinessObject.$descriptor, true),
@@ -33519,7 +35122,7 @@
 	      }
 
 	      // so the applied properties from 'target' don't get lost
-	      if (newBusinessObject.hasOwnProperty(propertyName)) {
+	      if (has(newBusinessObject, propertyName)) {
 	        return false;
 	      }
 
@@ -33557,7 +35160,7 @@
 	      if (isSubProcess(oldBusinessObject)) {
 
 	        // no toggeling, so keep old state
-	        newElement.isExpanded = isExpanded(oldBusinessObject);
+	        newElement.isExpanded = isExpanded(element);
 	      }
 
 	      // else if property is explicitly set, use it
@@ -33568,7 +35171,7 @@
 	      // TODO: need also to respect min/max Size
 	      // copy size, from an expanded subprocess to an expanded alternative subprocess
 	      // except bpmn:Task, because Task is always expanded
-	      if ((isExpanded(oldBusinessObject) && !is$1(oldBusinessObject, 'bpmn:Task')) && newElement.isExpanded) {
+	      if ((isExpanded(element) && !is$1(oldBusinessObject, 'bpmn:Task')) && newElement.isExpanded) {
 	        newElement.width = element.width;
 	        newElement.height = element.height;
 	      }
@@ -33593,7 +35196,12 @@
 
 	      // apply same width and default height
 	      newElement.width = element.width;
-	      newElement.height = elementFactory._getDefaultSize(newBusinessObject).height;
+	      newElement.height = elementFactory.getDefaultSize(newElement).height;
+	    }
+
+	    if (!rules.allowed('shape.resize', { shape: newBusinessObject })) {
+	      newElement.height = elementFactory.getDefaultSize(newElement).height;
+	      newElement.width = elementFactory.getDefaultSize(newElement).width;
 	    }
 
 	    newBusinessObject.name = oldBusinessObject.name;
@@ -33622,13 +35230,15 @@
 	      newElement.host = target.host;
 	    }
 
-	    newElement.di = {};
+	    // The DataStoreReference element is 14px wider than the DataObjectReference element
+	    // This ensures that they stay centered on the x axis when replaced
+	    if (
+	      newElement.type === 'bpmn:DataStoreReference' ||
+	      newElement.type === 'bpmn:DataObjectReference'
+	    ) {
+	      newElement.x = element.x + (element.width - newElement.width) / 2;
+	    }
 
-	    // fill and stroke will be set to DI
-	    copyProperties$1(oldBusinessObject.di, newElement.di, [
-	      'fill',
-	      'stroke'
-	    ]);
 
 	    newElement = replace.replaceElement(element, newElement, hints);
 
@@ -33648,6 +35258,7 @@
 	  'moddleCopy',
 	  'modeling',
 	  'replace',
+	  'rules',
 	  'selection'
 	];
 
@@ -33674,10 +35285,10 @@
 	  });
 	}
 
-	var ReplaceModule$1 = {
+	var ReplaceModule = {
 	  __depends__: [
-	    CopyPasteModule$1,
-	    ReplaceModule,
+	    CopyPasteModule,
+	    ReplaceModule$1,
 	    SelectionModule
 	  ],
 	  bpmnReplace: [ 'type', BpmnReplace ]
@@ -33712,7 +35323,7 @@
 
 	    var isExpandedEqual = (
 	      target.isExpanded === undefined ||
-	      target.isExpanded === isExpanded(businessObject)
+	      target.isExpanded === isExpanded(element)
 	    );
 
 	    return !isTypeEqual || !isEventDefinitionEqual || !isTriggeredByEventEqual || !isExpandedEqual;
@@ -33778,6 +35389,33 @@
 	    target: {
 	      type: 'bpmn:StartEvent',
 	      eventDefinitionType: 'bpmn:SignalEventDefinition'
+	    }
+	  }
+	];
+
+	var START_EVENT_SUB_PROCESS = [
+	  {
+	    label: 'Start Event',
+	    actionName: 'replace-with-none-start',
+	    className: 'bpmn-icon-start-event-none',
+	    target: {
+	      type: 'bpmn:StartEvent'
+	    }
+	  },
+	  {
+	    label: 'Intermediate Throw Event',
+	    actionName: 'replace-with-none-intermediate-throwing',
+	    className: 'bpmn-icon-intermediate-event-none',
+	    target: {
+	      type: 'bpmn:IntermediateThrowEvent'
+	    }
+	  },
+	  {
+	    label: 'End Event',
+	    actionName: 'replace-with-none-end',
+	    className: 'bpmn-icon-end-event-none',
+	    target: {
+	      type: 'bpmn:EndEvent'
 	    }
 	  }
 	];
@@ -34231,6 +35869,28 @@
 	  }
 	];
 
+	var DATA_OBJECT_REFERENCE = [
+	  {
+	    label: 'Data Store Reference',
+	    actionName: 'replace-with-data-store-reference',
+	    className: 'bpmn-icon-data-store',
+	    target: {
+	      type: 'bpmn:DataStoreReference'
+	    }
+	  }
+	];
+
+	var DATA_STORE_REFERENCE = [
+	  {
+	    label: 'Data Object Reference',
+	    actionName: 'replace-with-data-object-reference',
+	    className: 'bpmn-icon-data-object',
+	    target: {
+	      type: 'bpmn:DataObjectReference'
+	    }
+	  }
+	];
+
 	var BOUNDARY_EVENT = [
 	  {
 	    label: 'Message Boundary Event',
@@ -34501,7 +36161,15 @@
 	    }
 	  },
 	  {
-	    label: 'Collapsed Pool',
+	    label: function(element) {
+	      var label = 'Empty Pool';
+
+	      if (element.children && element.children.length) {
+	        label += ' (removes content)';
+	      }
+
+	      return label;
+	    },
 	    actionName: 'replace-with-collapsed-pool',
 
 	    // TODO(@janstuemmel): maybe design new icon
@@ -34517,9 +36185,10 @@
 	 * This module is an element agnostic replace menu provider for the popup menu.
 	 */
 	function ReplaceMenuProvider(
-	    popupMenu, modeling, moddle,
+	    bpmnFactory, popupMenu, modeling, moddle,
 	    bpmnReplace, rules, translate) {
 
+	  this._bpmnFactory = bpmnFactory;
 	  this._popupMenu = popupMenu;
 	  this._modeling = modeling;
 	  this._moddle = moddle;
@@ -34531,6 +36200,7 @@
 	}
 
 	ReplaceMenuProvider.$inject = [
+	  'bpmnFactory',
 	  'popupMenu',
 	  'modeling',
 	  'moddle',
@@ -34570,8 +36240,16 @@
 
 	  var differentType = isDifferentType(element);
 
-	  // start events outside event sub processes
-	  if (is$1(businessObject, 'bpmn:StartEvent') && !isEventSubProcess(businessObject.$parent)) {
+	  if (is$1(businessObject, 'bpmn:DataObjectReference')) {
+	    return this._createEntries(element, DATA_OBJECT_REFERENCE);
+	  }
+
+	  if (is$1(businessObject, 'bpmn:DataStoreReference') && !is$1(element.parent, 'bpmn:Collaboration')) {
+	    return this._createEntries(element, DATA_STORE_REFERENCE);
+	  }
+
+	  // start events outside sub processes
+	  if (is$1(businessObject, 'bpmn:StartEvent') && !is$1(businessObject.$parent, 'bpmn:SubProcess')) {
 
 	    entries = filter(START_EVENT, differentType);
 
@@ -34582,7 +36260,7 @@
 	  if (is$1(businessObject, 'bpmn:Participant')) {
 
 	    entries = filter(PARTICIPANT, function(entry) {
-	      return isExpanded(businessObject) !== entry.target.isExpanded;
+	      return isExpanded(element) !== entry.target.isExpanded;
 	    });
 
 	    return this._createEntries(element, entries);
@@ -34590,7 +36268,6 @@
 
 	  // start events inside event sub processes
 	  if (is$1(businessObject, 'bpmn:StartEvent') && isEventSubProcess(businessObject.$parent)) {
-
 	    entries = filter(EVENT_SUB_PROCESS_START_EVENT, function(entry) {
 
 	      var target = entry.target;
@@ -34603,6 +36280,14 @@
 	      return differentType(entry) || !differentType(entry) && !isInterruptingEqual;
 
 	    });
+
+	    return this._createEntries(element, entries);
+	  }
+
+	  // start events inside sub processes
+	  if (is$1(businessObject, 'bpmn:StartEvent') && !isEventSubProcess(businessObject.$parent)
+	      && is$1(businessObject.$parent, 'bpmn:SubProcess')) {
+	    entries = filter(START_EVENT_SUB_PROCESS, differentType);
 
 	    return this._createEntries(element, entries);
 	  }
@@ -34631,7 +36316,7 @@
 
 	      var target = entry.target;
 
-	      if (target.eventDefinition == 'bpmn:CancelEventDefinition' &&
+	      if (target.eventDefinitionType == 'bpmn:CancelEventDefinition' &&
 	         !is$1(businessObject.attachedToRef, 'bpmn:Transaction')) {
 	        return false;
 	      }
@@ -34671,7 +36356,7 @@
 	  }
 
 	  // expanded event sub processes
-	  if (isEventSubProcess(businessObject) && isExpanded(businessObject)) {
+	  if (isEventSubProcess(businessObject) && isExpanded(element)) {
 
 	    entries = filter(EVENT_SUB_PROCESS, differentType);
 
@@ -34679,7 +36364,7 @@
 	  }
 
 	  // expanded sub processes
-	  if (is$1(businessObject, 'bpmn:SubProcess') && isExpanded(businessObject)) {
+	  if (is$1(businessObject, 'bpmn:SubProcess') && isExpanded(element)) {
 
 	    entries = filter(SUBPROCESS_EXPANDED, differentType);
 
@@ -34687,7 +36372,7 @@
 	  }
 
 	  // collapsed ad hoc sub processes
-	  if (is$1(businessObject, 'bpmn:AdHocSubProcess') && !isExpanded(businessObject)) {
+	  if (is$1(businessObject, 'bpmn:AdHocSubProcess') && !isExpanded(element)) {
 
 	    entries = filter(TASK, function(entry) {
 
@@ -34713,7 +36398,7 @@
 	    entries = filter(TASK, differentType);
 
 	    // collapsed SubProcess can not be replaced with itself
-	    if (is$1(businessObject, 'bpmn:SubProcess') && !isExpanded(businessObject)) {
+	    if (is$1(businessObject, 'bpmn:SubProcess') && !isExpanded(element)) {
 	      entries = filter(entries, function(entry) {
 	        return entry.label !== 'Sub Process (collapsed)';
 	      });
@@ -34740,6 +36425,14 @@
 
 	  if (is$1(element, 'bpmn:Activity') && !isEventSubProcess(element)) {
 	    headerEntries = headerEntries.concat(this._getLoopEntries(element));
+	  }
+
+	  if (is$1(element, 'bpmn:DataObjectReference')) {
+	    headerEntries = headerEntries.concat(this._getDataObjectIsCollection(element));
+	  }
+
+	  if (is$1(element, 'bpmn:Participant')) {
+	    headerEntries = headerEntries.concat(this._getParticipantMultiplicity(element));
 	  }
 
 	  if (is$1(element, 'bpmn:SubProcess') &&
@@ -34864,10 +36557,15 @@
 	    return replaceElement(element, definition.target);
 	  };
 
+	  var label = definition.label;
+	  if (label && typeof label === 'function') {
+	    label = label(element);
+	  }
+
 	  action = action || replaceAction;
 
 	  var menuEntry = {
-	    label: translate(definition.label),
+	    label: translate(label),
 	    className: definition.className,
 	    id: definition.actionName,
 	    action: action
@@ -34954,6 +36652,80 @@
 	  return loopEntries;
 	};
 
+	/**
+	 * Get a list of menu items containing a button for the collection marker
+	 *
+	 * @param  {djs.model.Base} element
+	 *
+	 * @return {Array<Object>} a list of menu items
+	 */
+	ReplaceMenuProvider.prototype._getDataObjectIsCollection = function(element) {
+
+	  var self = this;
+	  var translate = this._translate;
+
+	  function toggleIsCollection(event, entry) {
+	    self._modeling.updateModdleProperties(
+	      element,
+	      dataObject,
+	      { isCollection: !entry.active });
+	  }
+
+	  var dataObject = element.businessObject.dataObjectRef,
+	      isCollection = dataObject.isCollection;
+
+	  var dataObjectEntries = [
+	    {
+	      id: 'toggle-is-collection',
+	      className: 'bpmn-icon-parallel-mi-marker',
+	      title: translate('Collection'),
+	      active: isCollection,
+	      action: toggleIsCollection,
+	    }
+	  ];
+	  return dataObjectEntries;
+	};
+
+	/**
+	 * Get a list of menu items containing a button for the participant multiplicity marker
+	 *
+	 * @param  {djs.model.Base} element
+	 *
+	 * @return {Array<Object>} a list of menu items
+	 */
+	ReplaceMenuProvider.prototype._getParticipantMultiplicity = function(element) {
+
+	  var self = this;
+	  var bpmnFactory = this._bpmnFactory;
+	  var translate = this._translate;
+
+	  function toggleParticipantMultiplicity(event, entry) {
+	    var isActive = entry.active;
+	    var participantMultiplicity;
+
+	    if (!isActive) {
+	      participantMultiplicity = bpmnFactory.create('bpmn:ParticipantMultiplicity');
+	    }
+
+	    self._modeling.updateProperties(
+	      element,
+	      { participantMultiplicity: participantMultiplicity });
+	  }
+
+	  var participantMultiplicity = element.businessObject.participantMultiplicity;
+
+	  var participantEntries = [
+	    {
+	      id: 'toggle-participant-multiplicity',
+	      className: 'bpmn-icon-parallel-mi-marker',
+	      title: translate('Participant Multiplicity'),
+	      active: !!participantMultiplicity,
+	      action: toggleParticipantMultiplicity,
+	    }
+	  ];
+	  return participantEntries;
+	};
+
 
 	/**
 	 * Get the menu items containing a button for the ad hoc marker
@@ -34993,17 +36765,17 @@
 	  return adHocEntry;
 	};
 
-	var PopupMenuModule$1 = {
+	var PopupMenuModule = {
 	  __depends__: [
-	    PopupMenuModule,
-	    ReplaceModule$1
+	    PopupMenuModule$1,
+	    ReplaceModule
 	  ],
 	  __init__: [ 'replaceMenuProvider' ],
 	  replaceMenuProvider: [ 'type', ReplaceMenuProvider ]
 	};
 
-	var max$2 = Math.max,
-	    min$1 = Math.min;
+	var max$4 = Math.max,
+	    min$2 = Math.min;
 
 	var DEFAULT_CHILD_BOX_PADDING = 20;
 
@@ -35034,7 +36806,7 @@
 	 *
 	 * @return {Bounds} resized bounding box
 	 */
-	function resizeBounds(bounds, direction, delta) {
+	function resizeBounds$1(bounds, direction, delta) {
 	  var dx = delta.x,
 	      dy = delta.y;
 
@@ -35089,11 +36861,11 @@
 	      maxValue = resizeConstraints.max && resizeConstraints.max[attr];
 
 	  if (isNumber(minValue)) {
-	    value = (/top|left/.test(attr) ? min$1 : max$2)(value, minValue);
+	    value = (/top|left/.test(attr) ? min$2 : max$4)(value, minValue);
 	  }
 
 	  if (isNumber(maxValue)) {
-	    value = (/top|left/.test(attr) ? max$2 : min$1)(value, maxValue);
+	    value = (/top|left/.test(attr) ? max$4 : min$2)(value, maxValue);
 	  }
 
 	  return value;
@@ -35130,10 +36902,10 @@
 	  var childrenBox = childrenBounds ? asTRBL(childrenBounds) : minBox;
 
 	  var combinedBox = {
-	    top: min$1(minBox.top, childrenBox.top),
-	    left: min$1(minBox.left, childrenBox.left),
-	    bottom: max$2(minBox.bottom, childrenBox.bottom),
-	    right: max$2(minBox.right, childrenBox.right)
+	    top: min$2(minBox.top, childrenBox.top),
+	    left: min$2(minBox.left, childrenBox.left),
+	    bottom: max$4(minBox.bottom, childrenBox.bottom),
+	    right: max$4(minBox.right, childrenBox.right)
 	  };
 
 	  return asBounds(combinedBox);
@@ -35147,7 +36919,7 @@
 	  }
 	}
 
-	function addPadding(bbox, padding) {
+	function addPadding$1(bbox, padding) {
 	  var left, right, top, bottom;
 
 	  if (typeof padding === 'object') {
@@ -35217,11 +36989,11 @@
 	  }
 
 	  if (elements.length) {
-	    return addPadding(getBBox(elements), padding);
+	    return addPadding$1(getBBox(elements), padding);
 	  }
 	}
 
-	var abs$3 = Math.abs;
+	var abs$4 = Math.abs;
 
 
 	function getTRBLResize(oldBounds, newBounds) {
@@ -35284,7 +37056,7 @@
 	 * @return {djs.model.Shape}
 	 */
 	function getLanesRoot(shape) {
-	  return getParent$1(shape, LANE_PARENTS) || shape;
+	  return getParent(shape, LANE_PARENTS) || shape;
 	}
 
 
@@ -35324,21 +37096,21 @@
 	    var otherTrbl = asTRBL(other);
 
 	    if (trblResize.top) {
-	      if (abs$3(otherTrbl.bottom - shapeTrbl.top) < 10) {
+	      if (abs$4(otherTrbl.bottom - shapeTrbl.top) < 10) {
 	        bottomResize = shapeNewTrbl.top - otherTrbl.bottom;
 	      }
 
-	      if (abs$3(otherTrbl.top - shapeTrbl.top) < 5) {
+	      if (abs$4(otherTrbl.top - shapeTrbl.top) < 5) {
 	        topResize = shapeNewTrbl.top - otherTrbl.top;
 	      }
 	    }
 
 	    if (trblResize.bottom) {
-	      if (abs$3(otherTrbl.top - shapeTrbl.bottom) < 10) {
+	      if (abs$4(otherTrbl.top - shapeTrbl.bottom) < 10) {
 	        topResize = shapeNewTrbl.bottom - otherTrbl.top;
 	      }
 
-	      if (abs$3(otherTrbl.bottom - shapeTrbl.bottom) < 5) {
+	      if (abs$4(otherTrbl.bottom - shapeTrbl.bottom) < 5) {
 	        bottomResize = shapeNewTrbl.bottom - otherTrbl.bottom;
 	      }
 	    }
@@ -35532,7 +37304,7 @@
 	  }
 
 
-	  if (isAny(businessObject, [ 'bpmn:Lane', 'bpmn:Participant' ]) && isExpanded(businessObject)) {
+	  if (isAny(businessObject, [ 'bpmn:Lane', 'bpmn:Participant' ]) && isExpanded(element)) {
 
 	    var childLanes = getChildLanes(element);
 
@@ -35697,27 +37469,49 @@
 	    });
 	  }
 
-	  if (isAny(businessObject, [
-	    'bpmn:FlowNode',
-	    'bpmn:InteractionNode',
-	    'bpmn:DataObjectReference',
-	    'bpmn:DataStoreReference'
-	  ])) {
-
+	  if (
+	    isAny(businessObject, [
+	      'bpmn:FlowNode',
+	      'bpmn:InteractionNode',
+	      'bpmn:DataObjectReference',
+	      'bpmn:DataStoreReference',
+	    ])
+	  ) {
 	    assign(actions, {
-	      'append.text-annotation': appendAction('bpmn:TextAnnotation', 'bpmn-icon-text-annotation'),
+	      'append.text-annotation': appendAction(
+	        'bpmn:TextAnnotation',
+	        'bpmn-icon-text-annotation'
+	      ),
 
 	      'connect': {
 	        group: 'connect',
 	        className: 'bpmn-icon-connection-multi',
-	        title: translate('Connect using ' +
-	                  (businessObject.isForCompensation ? '' : 'Sequence/MessageFlow or ') +
-	                  'Association'),
+	        title: translate(
+	          'Connect using ' +
+	            (businessObject.isForCompensation
+	              ? ''
+	              : 'Sequence/MessageFlow or ') +
+	            'Association'
+	        ),
 	        action: {
 	          click: startConnect,
-	          dragstart: startConnect
-	        }
-	      }
+	          dragstart: startConnect,
+	        },
+	      },
+	    });
+	  }
+
+	  if (is$1(businessObject, 'bpmn:TextAnnotation')) {
+	    assign(actions, {
+	      'connect': {
+	        group: 'connect',
+	        className: 'bpmn-icon-connection-multi',
+	        title: translate('Connect using Association'),
+	        action: {
+	          click: startConnect,
+	          dragstart: startConnect,
+	        },
+	      },
 	    });
 	  }
 
@@ -35744,7 +37538,7 @@
 	  // delete element entry, only show if allowed by rules
 	  var deleteAllowed = rules.allowed('elements.delete', { elements: [ element ] });
 
-	  if (isArray(deleteAllowed)) {
+	  if (isArray$2(deleteAllowed)) {
 
 	    // was the element returned as a deletion candidate?
 	    deleteAllowed = deleteAllowed[0] === element;
@@ -35784,14 +37578,14 @@
 	  return isType && isDefinition;
 	}
 
-	var ContextPadModule$1 = {
+	var ContextPadModule = {
 	  __depends__: [
 	    DirectEditingModule,
-	    ContextPadModule,
+	    ContextPadModule$1,
 	    SelectionModule,
 	    ConnectModule,
 	    CreateModule,
-	    PopupMenuModule$1
+	    PopupMenuModule
 	  ],
 	  __init__: [ 'contextPadProvider' ],
 	  contextPadProvider: [ 'type', ContextPadProvider ]
@@ -35802,13 +37596,13 @@
 	  vertical: [ 'y', 'height' ]
 	};
 
-	var THRESHOLD$1 = 5;
+	var THRESHOLD = 5;
 
 
 	/**
 	 * Groups and filters elements and then trigger even distribution.
 	 */
-	function DistributeElements(modeling) {
+	function DistributeElements$1(modeling) {
 	  this._modeling = modeling;
 
 	  this._filters = [];
@@ -35838,7 +37632,7 @@
 
 	}
 
-	DistributeElements.$inject = [ 'modeling' ];
+	DistributeElements$1.$inject = [ 'modeling' ];
 
 
 	/**
@@ -35847,7 +37641,7 @@
 	 *
 	 * @param  {Function} filterFn
 	 */
-	DistributeElements.prototype.registerFilter = function(filterFn) {
+	DistributeElements$1.prototype.registerFilter = function(filterFn) {
 	  if (typeof filterFn !== 'function') {
 	    throw new Error('the filter has to be a function');
 	  }
@@ -35858,10 +37652,10 @@
 	/**
 	 * Distributes the elements with a given orientation
 	 *
-	 * @param  {Array} elements    [description]
-	 * @param  {string} orientation [description]
+	 * @param  {Array} elements
+	 * @param  {string} orientation
 	 */
-	DistributeElements.prototype.trigger = function(elements, orientation) {
+	DistributeElements$1.prototype.trigger = function(elements, orientation) {
 	  var modeling = this._modeling;
 
 	  var groups,
@@ -35894,7 +37688,7 @@
 	 *
 	 * @return {Array[Elements]}
 	 */
-	DistributeElements.prototype._filterElements = function(elements) {
+	DistributeElements$1.prototype._filterElements = function(elements) {
 	  var filters = this._filters,
 	      axis = this._axis,
 	      dimension = this._dimension,
@@ -35931,7 +37725,7 @@
 	 *
 	 * @return {Array[Objects]}
 	 */
-	DistributeElements.prototype._createGroups = function(elements) {
+	DistributeElements$1.prototype._createGroups = function(elements) {
 	  var rangeGroups = [],
 	      self = this,
 	      axis = this._axis,
@@ -35968,7 +37762,7 @@
 	 *
 	 * @param  {string} direction 'horizontal' or 'vertical'
 	 */
-	DistributeElements.prototype._setOrientation = function(direction) {
+	DistributeElements$1.prototype._setOrientation = function(direction) {
 	  var orientation = AXIS_DIMENSIONS[direction];
 
 	  this._axis = orientation[0];
@@ -35984,7 +37778,7 @@
 	 *
 	 * @return {boolean}
 	 */
-	DistributeElements.prototype._hasIntersection = function(rangeA, rangeB) {
+	DistributeElements$1.prototype._hasIntersection = function(rangeA, rangeB) {
 	  return Math.max(rangeA.min, rangeA.max) >= Math.min(rangeB.min, rangeB.max) &&
 	         Math.min(rangeA.min, rangeA.max) <= Math.max(rangeB.min, rangeB.max);
 	};
@@ -35993,25 +37787,25 @@
 	/**
 	 * Returns the min and max values for an element
 	 *
-	 * @param  {[type]} element   [description]
-	 * @param  {[type]} axis      [description]
-	 * @param  {[type]} dimension [description]
+	 * @param  {Bounds} element
+	 * @param  {string} axis
+	 * @param  {string} dimension
 	 *
-	 * @return {[type]}           [description]
+	 * @return {{ min: number, max: number }}
 	 */
-	DistributeElements.prototype._findRange = function(element) {
+	DistributeElements$1.prototype._findRange = function(element) {
 	  var axis = element[this._axis],
 	      dimension = element[this._dimension];
 
 	  return {
-	    min: axis + THRESHOLD$1,
-	    max: axis + dimension - THRESHOLD$1
+	    min: axis + THRESHOLD,
+	    max: axis + dimension - THRESHOLD
 	  };
 	};
 
-	var DistributeElementsModule = {
+	var DistributeElementsModule$1 = {
 	  __init__: [ 'distributeElements' ],
-	  distributeElements: [ 'type', DistributeElements ]
+	  distributeElements: [ 'type', DistributeElements$1 ]
 	};
 
 	/**
@@ -36041,9 +37835,9 @@
 
 	BpmnDistributeElements.$inject = [ 'distributeElements' ];
 
-	var DistributeElementsModule$1 = {
+	var DistributeElementsModule = {
 	  __depends__: [
-	    DistributeElementsModule
+	    DistributeElementsModule$1
 	  ],
 	  __init__: [ 'bpmnDistributeElements' ],
 	  bpmnDistributeElements: [ 'type', BpmnDistributeElements ]
@@ -36172,7 +37966,7 @@
 	      if (allowed === false) {
 	        return;
 	      }
-	      else if (isArray(allowed)) {
+	      else if (isArray$2(allowed)) {
 	        removableElements = allowed;
 	      }
 	      else {
@@ -36210,7 +38004,7 @@
 	 */
 	EditorActions.prototype.trigger = function(action, opts) {
 	  if (!this._actions[action]) {
-	    throw error$2(action, NOT_REGISTERED_ERROR);
+	    throw error(action, NOT_REGISTERED_ERROR);
 	  }
 
 	  return this._actions[action](opts);
@@ -36259,7 +38053,7 @@
 	 */
 	EditorActions.prototype._registerAction = function(action, listener) {
 	  if (this.isRegistered(action)) {
-	    throw error$2(action, IS_REGISTERED_ERROR);
+	    throw error(action, IS_REGISTERED_ERROR);
 	  }
 
 	  this._actions[action] = listener;
@@ -36272,7 +38066,7 @@
 	 */
 	EditorActions.prototype.unregister = function(action) {
 	  if (!this.isRegistered(action)) {
-	    throw error$2(action, NOT_REGISTERED_ERROR);
+	    throw error(action, NOT_REGISTERED_ERROR);
 	  }
 
 	  this._actions[action] = undefined;
@@ -36299,11 +38093,11 @@
 	};
 
 
-	function error$2(action, message) {
+	function error(action, message) {
 	  return new Error(action + ' ' + message);
 	}
 
-	var EditorActionsModule = {
+	var EditorActionsModule$1 = {
 	  __init__: [ 'editorActions' ],
 	  editorActions: [ 'type', EditorActions ]
 	};
@@ -36317,7 +38111,7 @@
 	  injector.invoke(EditorActions, this);
 	}
 
-	inherits_browser(BpmnEditorActions, EditorActions);
+	inherits$1(BpmnEditorActions, EditorActions);
 
 	BpmnEditorActions.$inject = [
 	  'injector'
@@ -36473,9 +38267,9 @@
 
 	};
 
-	var EditorActionsModule$1 = {
+	var EditorActionsModule = {
 	  __depends__: [
-	    EditorActionsModule
+	    EditorActionsModule$1
 	  ],
 	  editorActions: [ 'type', BpmnEditorActions ]
 	};
@@ -36515,7 +38309,7 @@
 	}
 
 	var LOWER_PRIORITY = 1200;
-	var LOW_PRIORITY$8 = 800;
+	var LOW_PRIORITY$f = 800;
 
 	/**
 	 * Basic grid snapping that covers connecting, creating, moving, resizing shapes, moving bendpoints
@@ -36529,7 +38323,7 @@
 
 	  var self = this;
 
-	  eventBus.on('diagram.init', LOW_PRIORITY$8, function() {
+	  eventBus.on('diagram.init', LOW_PRIORITY$f, function() {
 	    self.setActive(active);
 	  });
 
@@ -36711,7 +38505,7 @@
 
 	  // create
 	  if (createConstraints) {
-	    if (isHorizontal(axis)) {
+	    if (isHorizontal$3(axis)) {
 	      snapConstraints.x.min = createConstraints.left;
 	      snapConstraints.x.max = createConstraints.right;
 	    } else {
@@ -36725,7 +38519,7 @@
 	      maxResizeConstraints = resizeConstraints.max;
 
 	  if (minResizeConstraints) {
-	    if (isHorizontal(axis)) {
+	    if (isHorizontal$3(axis)) {
 
 	      if (isWest(direction)) {
 	        snapConstraints.x.max = minResizeConstraints.left;
@@ -36745,7 +38539,7 @@
 	  }
 
 	  if (maxResizeConstraints) {
-	    if (isHorizontal(axis)) {
+	    if (isHorizontal$3(axis)) {
 
 	      if (isWest(direction)) {
 	        snapConstraints.x.min = maxResizeConstraints.left;
@@ -36803,7 +38597,7 @@
 
 	  if (!elementRegistry.get(shape.id)) {
 
-	    if (isHorizontal(axis)) {
+	    if (isHorizontal$3(axis)) {
 	      snapOffset[ axis ] += shape[ axis ] + shape.width / 2;
 	    } else {
 	      snapOffset[ axis ] += shape[ axis ] + shape.height / 2;
@@ -36831,7 +38625,7 @@
 	  return snapOffset[ axis ];
 	}
 
-	function isHorizontal(axis) {
+	function isHorizontal$3(axis) {
 	  return axis === 'x';
 	}
 
@@ -36846,7 +38640,7 @@
 	/**
 	 * Integrates resizing with grid snapping.
 	 */
-	function ResizeBehavior(eventBus, gridSnapping) {
+	function ResizeBehavior$1(eventBus, gridSnapping) {
 	  CommandInterceptor.call(this, eventBus);
 
 	  this._gridSnapping = gridSnapping;
@@ -36873,13 +38667,13 @@
 	  });
 	}
 
-	ResizeBehavior.$inject = [
+	ResizeBehavior$1.$inject = [
 	  'eventBus',
 	  'gridSnapping',
 	  'modeling'
 	];
 
-	inherits_browser(ResizeBehavior, CommandInterceptor);
+	inherits$1(ResizeBehavior$1, CommandInterceptor);
 
 	/**
 	 * Snap width and height in relation to center.
@@ -36889,7 +38683,7 @@
 	 *
 	 * @returns {Bounds} Snapped bounds.
 	 */
-	ResizeBehavior.prototype.snapSimple = function(shape, newBounds) {
+	ResizeBehavior$1.prototype.snapSimple = function(shape, newBounds) {
 	  var gridSnapping = this._gridSnapping;
 
 	  newBounds.width = gridSnapping.snapValue(newBounds.width, {
@@ -36914,7 +38708,7 @@
 	 *
 	 * @returns {Bounds} Snapped bounds.
 	 */
-	ResizeBehavior.prototype.snapComplex = function(newBounds, directions) {
+	ResizeBehavior$1.prototype.snapComplex = function(newBounds, directions) {
 	  if (/w|e/.test(directions)) {
 	    newBounds = this.snapHorizontally(newBounds, directions);
 	  }
@@ -36934,7 +38728,7 @@
 	 *
 	 * @returns {Bounds} Snapped bounds.
 	 */
-	ResizeBehavior.prototype.snapHorizontally = function(newBounds, directions) {
+	ResizeBehavior$1.prototype.snapHorizontally = function(newBounds, directions) {
 	  var gridSnapping = this._gridSnapping,
 	      west = /w/.test(directions),
 	      east = /e/.test(directions);
@@ -36978,7 +38772,7 @@
 	 *
 	 * @returns {Bounds} Snapped bounds.
 	 */
-	ResizeBehavior.prototype.snapVertically = function(newBounds, directions) {
+	ResizeBehavior$1.prototype.snapVertically = function(newBounds, directions) {
 	  var gridSnapping = this._gridSnapping,
 	      north = /n/.test(directions),
 	      south = /s/.test(directions);
@@ -37014,16 +38808,16 @@
 	  return newBounds;
 	};
 
-	var HIGH_PRIORITY$4 = 2000;
+	var HIGH_PRIORITY$g = 2000;
 
 	/**
 	 * Integrates space tool with grid snapping.
 	 */
-	function SpaceToolBehavior(eventBus, gridSnapping) {
+	function SpaceToolBehavior$1(eventBus, gridSnapping) {
 	  eventBus.on([
 	    'spaceTool.move',
 	    'spaceTool.end'
-	  ], HIGH_PRIORITY$4, function(event) {
+	  ], HIGH_PRIORITY$g, function(event) {
 	    var context = event.context;
 
 	    if (!context.initialized) {
@@ -37052,36 +38846,36 @@
 	  });
 	}
 
-	SpaceToolBehavior.$inject = [
+	SpaceToolBehavior$1.$inject = [
 	  'eventBus',
 	  'gridSnapping'
 	];
 
-	var GridSnappingBehaviorModule = {
+	var GridSnappingBehaviorModule$1 = {
 	  __init__: [
 	    'gridSnappingResizeBehavior',
 	    'gridSnappingSpaceToolBehavior'
 	  ],
-	  gridSnappingResizeBehavior: [ 'type', ResizeBehavior ],
-	  gridSnappingSpaceToolBehavior: [ 'type', SpaceToolBehavior ]
+	  gridSnappingResizeBehavior: [ 'type', ResizeBehavior$1 ],
+	  gridSnappingSpaceToolBehavior: [ 'type', SpaceToolBehavior$1 ]
 	};
 
-	var GridSnappingModule = {
-	  __depends__: [ GridSnappingBehaviorModule ],
+	var GridSnappingModule$1 = {
+	  __depends__: [ GridSnappingBehaviorModule$1 ],
 	  __init__: [ 'gridSnapping' ],
 	  gridSnapping: [ 'type', GridSnapping ]
 	};
 
-	var HIGH_PRIORITY$5 = 2000;
+	var HIGH_PRIORITY$f = 2000;
 
 
 	function AutoPlaceBehavior(eventBus, gridSnapping) {
-	  eventBus.on('autoPlace', HIGH_PRIORITY$5, function(context) {
+	  eventBus.on('autoPlace', HIGH_PRIORITY$f, function(context) {
 	    var source = context.source,
 	        sourceMid = getMid(source),
 	        shape = context.shape;
 
-	    var position = getNewShapePosition$1(source, shape);
+	    var position = getNewShapePosition(source, shape);
 
 	    [ 'x', 'y' ].forEach(function(axis) {
 	      var options = {};
@@ -37099,7 +38893,7 @@
 
 	      if (is$1(shape, 'bpmn:TextAnnotation')) {
 
-	        if (isHorizontal$1(axis)) {
+	        if (isHorizontal$2(axis)) {
 	          options.offset = -shape.width / 2;
 	        } else {
 	          options.offset = -shape.height / 2;
@@ -37123,18 +38917,18 @@
 
 	// helpers //////////
 
-	function isHorizontal$1(axis) {
+	function isHorizontal$2(axis) {
 	  return axis === 'x';
 	}
 
-	var HIGHER_PRIORITY = 1750;
+	var HIGHER_PRIORITY$4 = 1750;
 
 
-	function CreateParticipantBehavior(canvas, eventBus, gridSnapping) {
+	function CreateParticipantBehavior$1(canvas, eventBus, gridSnapping) {
 	  eventBus.on([
 	    'create.start',
 	    'shape.move.start'
-	  ], HIGHER_PRIORITY, function(event) {
+	  ], HIGHER_PRIORITY$4, function(event) {
 	    var context = event.context,
 	        shape = context.shape,
 	        rootElement = canvas.getRootElement();
@@ -37156,13 +38950,13 @@
 	  });
 	}
 
-	CreateParticipantBehavior.$inject = [
+	CreateParticipantBehavior$1.$inject = [
 	  'canvas',
 	  'eventBus',
 	  'gridSnapping'
 	];
 
-	var HIGH_PRIORITY$6 = 3000;
+	var HIGH_PRIORITY$e = 3000;
 
 
 	/**
@@ -37178,7 +38972,7 @@
 	  this.postExecuted([
 	    'connection.create',
 	    'connection.layout'
-	  ], HIGH_PRIORITY$6, function(event) {
+	  ], HIGH_PRIORITY$e, function(event) {
 	    var context = event.context,
 	        connection = context.connection,
 	        hints = context.hints || {},
@@ -37202,7 +38996,7 @@
 	  'modeling'
 	];
 
-	inherits_browser(LayoutConnectionBehavior, CommandInterceptor);
+	inherits$1(LayoutConnectionBehavior, CommandInterceptor);
 
 	/**
 	 * Snap middle segments of a given connection.
@@ -37297,21 +39091,21 @@
 	  return [ segmentStart, segmentEnd ];
 	}
 
-	var GridSnappingBehaviorModule$1 = {
+	var GridSnappingBehaviorModule = {
 	  __init__: [
 	    'gridSnappingAutoPlaceBehavior',
 	    'gridSnappingCreateParticipantBehavior',
 	    'gridSnappingLayoutConnectionBehavior',
 	  ],
 	  gridSnappingAutoPlaceBehavior: [ 'type', AutoPlaceBehavior ],
-	  gridSnappingCreateParticipantBehavior: [ 'type', CreateParticipantBehavior ],
+	  gridSnappingCreateParticipantBehavior: [ 'type', CreateParticipantBehavior$1 ],
 	  gridSnappingLayoutConnectionBehavior: [ 'type', LayoutConnectionBehavior ]
 	};
 
-	var GridSnappingModule$1 = {
+	var GridSnappingModule = {
 	  __depends__: [
-	    GridSnappingModule,
-	    GridSnappingBehaviorModule$1
+	    GridSnappingModule$1,
+	    GridSnappingBehaviorModule
 	  ],
 	  __init__: [ 'bpmnGridSnapping' ],
 	  bpmnGridSnapping: [ 'type', BpmnGridSnapping ]
@@ -37420,7 +39214,7 @@
 	  return true;
 	};
 
-	var InteractionEventsModule$1 = {
+	var InteractionEventsModule = {
 	  __init__: [ 'bpmnInteractionEvents' ],
 	  bpmnInteractionEvents: [ 'type', BpmnInteractionEvents ]
 	};
@@ -37434,7 +39228,7 @@
 	  injector.invoke(KeyboardBindings, this);
 	}
 
-	inherits_browser(BpmnKeyboardBindings, KeyboardBindings);
+	inherits$1(BpmnKeyboardBindings, KeyboardBindings);
 
 	BpmnKeyboardBindings.$inject = [
 	  'injector'
@@ -37579,20 +39373,20 @@
 
 	};
 
-	var KeyboardModule$1 = {
+	var KeyboardModule = {
 	  __depends__: [
-	    KeyboardModule
+	    KeyboardModule$1
 	  ],
 	  __init__: [ 'keyboardBindings' ],
 	  keyboardBindings: [ 'type', BpmnKeyboardBindings ]
 	};
 
-	var DEFAULT_CONFIG$1 = {
+	var DEFAULT_CONFIG = {
 	  moveSpeed: 1,
 	  moveSpeedAccelerated: 10
 	};
 
-	var HIGHER_PRIORITY$1 = 1500;
+	var HIGHER_PRIORITY$3 = 1500;
 
 	var LEFT = 'left';
 	var UP = 'up';
@@ -37660,9 +39454,9 @@
 
 	  var self = this;
 
-	  this._config = assign({}, DEFAULT_CONFIG$1, config || {});
+	  this._config = assign({}, DEFAULT_CONFIG, config || {});
 
-	  keyboard.addListener(HIGHER_PRIORITY$1, function(event) {
+	  keyboard.addListener(HIGHER_PRIORITY$3, function(event) {
 
 	    var keyEvent = event.keyEvent;
 
@@ -37728,82 +39522,13 @@
 
 	var KeyboardMoveSelectionModule = {
 	  __depends__: [
-	    KeyboardModule,
+	    KeyboardModule$1,
 	    SelectionModule
 	  ],
 	  __init__: [
 	    'keyboardMoveSelection'
 	  ],
 	  keyboardMoveSelection: [ 'type', KeyboardMoveSelection ]
-	};
-
-	/**
-	 * Adds change support to the diagram, including
-	 *
-	 * <ul>
-	 *   <li>redrawing shapes and connections on change</li>
-	 * </ul>
-	 *
-	 * @param {EventBus} eventBus
-	 * @param {Canvas} canvas
-	 * @param {ElementRegistry} elementRegistry
-	 * @param {GraphicsFactory} graphicsFactory
-	 */
-	function ChangeSupport(
-	    eventBus, canvas, elementRegistry,
-	    graphicsFactory) {
-
-
-	  // redraw shapes / connections on change
-
-	  eventBus.on('element.changed', function(event) {
-
-	    var element = event.element;
-
-	    // element might have been deleted and replaced by new element with same ID
-	    // thus check for parent of element except for root element
-	    if (element.parent || element === canvas.getRootElement()) {
-	      event.gfx = elementRegistry.getGraphics(element);
-	    }
-
-	    // shape + gfx may have been deleted
-	    if (!event.gfx) {
-	      return;
-	    }
-
-	    eventBus.fire(getType(element) + '.changed', event);
-	  });
-
-	  eventBus.on('elements.changed', function(event) {
-
-	    var elements = event.elements;
-
-	    elements.forEach(function(e) {
-	      eventBus.fire('element.changed', { element: e });
-	    });
-
-	    graphicsFactory.updateContainments(elements);
-	  });
-
-	  eventBus.on('shape.changed', function(event) {
-	    graphicsFactory.update('shape', event.element, event.gfx);
-	  });
-
-	  eventBus.on('connection.changed', function(event) {
-	    graphicsFactory.update('connection', event.element, event.gfx);
-	  });
-	}
-
-	ChangeSupport.$inject = [
-	  'eventBus',
-	  'canvas',
-	  'elementRegistry',
-	  'graphicsFactory'
-	];
-
-	var ChangeSupportModule = {
-	  __init__: [ 'changeSupport'],
-	  changeSupport: [ 'type', ChangeSupport ]
 	};
 
 	var DEFAULT_MIN_WIDTH = 10;
@@ -37869,7 +39594,7 @@
 
 	    context.delta = delta;
 
-	    newBounds = resizeBounds(shape, direction, delta);
+	    newBounds = resizeBounds$1(shape, direction, delta);
 
 	    // ensure constraints during resize
 	    context.newBounds = ensureConstraints$1(newBounds, resizeConstraints);
@@ -37919,7 +39644,7 @@
 	      // (important when zoom level was > 1 during move)
 	      newBounds = roundBounds(newBounds);
 
-	      if (!boundsChanged$1(shape, newBounds)) {
+	      if (!boundsChanged(shape, newBounds)) {
 
 	        // no resize necessary
 	        return;
@@ -37988,7 +39713,7 @@
 	    throw new Error('must provide a direction (n|w|s|e|nw|se|ne|sw)');
 	  }
 
-	  dragging.init(event, getReferencePoint(shape, direction), 'resize', {
+	  dragging.init(event, getReferencePoint$1(shape, direction), 'resize', {
 	    autoActivate: true,
 	    cursor: getCursor(direction),
 	    data: {
@@ -38027,14 +39752,14 @@
 
 	// helpers //////////
 
-	function boundsChanged$1(shape, newBounds) {
+	function boundsChanged(shape, newBounds) {
 	  return shape.x !== newBounds.x ||
 	    shape.y !== newBounds.y ||
 	    shape.width !== newBounds.width ||
 	    shape.height !== newBounds.height;
 	}
 
-	function getReferencePoint(shape, direction) {
+	function getReferencePoint$1(shape, direction) {
 	  var mid = getMid(shape),
 	      trbl = asTRBL(shape);
 
@@ -38072,10 +39797,10 @@
 	  }
 	}
 
-	var MARKER_RESIZING = 'djs-resizing',
+	var MARKER_RESIZING$1 = 'djs-resizing',
 	    MARKER_RESIZE_NOT_OK = 'resize-not-ok';
 
-	var LOW_PRIORITY$9 = 500;
+	var LOW_PRIORITY$e = 500;
 
 
 	/**
@@ -38099,23 +39824,23 @@
 	        frame = context.frame;
 
 	    if (!frame) {
-	      frame = context.frame = previewSupport.addFrame(shape, canvas.getDefaultLayer());
+	      frame = context.frame = previewSupport.addFrame(shape, canvas.getActiveLayer());
 
-	      canvas.addMarker(shape, MARKER_RESIZING);
+	      canvas.addMarker(shape, MARKER_RESIZING$1);
 	    }
 
 	    if (bounds.width > 5) {
-	      attr$1(frame, { x: bounds.x, width: bounds.width });
+	      attr(frame, { x: bounds.x, width: bounds.width });
 	    }
 
 	    if (bounds.height > 5) {
-	      attr$1(frame, { y: bounds.y, height: bounds.height });
+	      attr(frame, { y: bounds.y, height: bounds.height });
 	    }
 
 	    if (context.canExecute) {
-	      classes$1(frame).remove(MARKER_RESIZE_NOT_OK);
+	      classes(frame).remove(MARKER_RESIZE_NOT_OK);
 	    } else {
-	      classes$1(frame).add(MARKER_RESIZE_NOT_OK);
+	      classes(frame).add(MARKER_RESIZE_NOT_OK);
 	    }
 	  }
 
@@ -38132,11 +39857,11 @@
 	      remove$1(context.frame);
 	    }
 
-	    canvas.removeMarker(shape, MARKER_RESIZING);
+	    canvas.removeMarker(shape, MARKER_RESIZING$1);
 	  }
 
 	  // add and update previews
-	  eventBus.on('resize.move', LOW_PRIORITY$9, function(event) {
+	  eventBus.on('resize.move', LOW_PRIORITY$e, function(event) {
 	    updateFrame(event.context);
 	  });
 
@@ -38185,7 +39910,7 @@
 
 	    // add new selection markers ONLY if single selection
 	    if (newSelection.length === 1) {
-	      forEach(newSelection, bind(self.addResizer, self));
+	      forEach(newSelection, bind$2(self.addResizer, self));
 	    }
 	  });
 
@@ -38222,47 +39947,47 @@
 
 	  var offset = getHandleOffset(direction);
 
-	  var group = create('g');
+	  var group = create$1('g');
 
-	  classes$1(group).add(CLS_RESIZER);
-	  classes$1(group).add(CLS_RESIZER + '-' + element.id);
-	  classes$1(group).add(CLS_RESIZER + '-' + direction);
+	  classes(group).add(CLS_RESIZER);
+	  classes(group).add(CLS_RESIZER + '-' + element.id);
+	  classes(group).add(CLS_RESIZER + '-' + direction);
 
 	  append(resizersParent, group);
 
-	  var visual = create('rect');
+	  var visual = create$1('rect');
 
-	  attr$1(visual, {
+	  attr(visual, {
 	    x: -HANDLE_SIZE / 2 + offset.x,
 	    y: -HANDLE_SIZE / 2 + offset.y,
 	    width: HANDLE_SIZE,
 	    height: HANDLE_SIZE
 	  });
 
-	  classes$1(visual).add(CLS_RESIZER + '-visual');
+	  classes(visual).add(CLS_RESIZER + '-visual');
 
 	  append(group, visual);
 
-	  var hit = create('rect');
+	  var hit = create$1('rect');
 
-	  attr$1(hit, {
+	  attr(hit, {
 	    x: -HANDLE_HIT_SIZE / 2 + offset.x,
 	    y: -HANDLE_HIT_SIZE / 2 + offset.y,
 	    width: HANDLE_HIT_SIZE,
 	    height: HANDLE_HIT_SIZE
 	  });
 
-	  classes$1(hit).add(CLS_RESIZER + '-hit');
+	  classes(hit).add(CLS_RESIZER + '-hit');
 
 	  append(group, hit);
 
-	  transform$1(group, x, y);
+	  transform(group, x, y);
 
 	  return group;
 	};
 
 	ResizeHandles.prototype.createResizer = function(element, direction) {
-	  var point = getReferencePoint(element, direction);
+	  var point = getReferencePoint$1(element, direction);
 
 	  var resizer = this._createResizer(element, point.x, point.y, direction);
 
@@ -38296,7 +40021,7 @@
 	ResizeHandles.prototype.removeResizers = function() {
 	  var resizersParent = this._getResizersParent();
 
-	  clear$1(resizersParent);
+	  clear(resizersParent);
 	};
 
 	ResizeHandles.prototype._getResizersParent = function() {
@@ -38335,7 +40060,7 @@
 
 	var ResizeModule = {
 	  __depends__: [
-	    RulesModule,
+	    RulesModule$1,
 	    DraggingModule,
 	    PreviewSupportModule
 	  ],
@@ -38364,7 +40089,7 @@
 	      });
 
 	  // add to correct place
-	  add$1(definitions.get('rootElements'), category);
+	  add(definitions.get('rootElements'), category);
 	  getBusinessObject(category).$parent = definitions;
 	  getBusinessObject(categoryValue).$parent = category;
 
@@ -38451,7 +40176,7 @@
 
 	  function activateDirectEdit(element, force) {
 	    if (force ||
-	        isAny(element, [ 'bpmn:Task', 'bpmn:TextAnnotation', 'bpmn:Group' ]) ||
+	        isAny(element, [ 'bpmn:Task', 'bpmn:TextAnnotation' ]) ||
 	        isCollapsedSubProcess(element)) {
 
 	      directEditing.activate(element);
@@ -38620,7 +40345,7 @@
 
 
 	  // internal labels for expanded sub processes
-	  if (isExpandedSubProcess(element)) {
+	  if (isExpandedSubProcess$1(element)) {
 	    assign(bounds, {
 	      width: bbox.width,
 	      x: bbox.x
@@ -38660,7 +40385,7 @@
 	  // external label not yet created
 	  if (isLabelExternal(target)
 	      && !hasExternalLabel(target)
-	      && !isLabel(target)) {
+	      && !isLabel$6(target)) {
 
 	    var externalLabelMid = getExternalLabelMid(element);
 
@@ -38748,7 +40473,7 @@
 
 	  }
 
-	  if (isEmptyText(newLabel)) {
+	  if (isEmptyText$1(newLabel)) {
 	    newLabel = null;
 	  }
 
@@ -38763,7 +40488,7 @@
 	  return is$1(element, 'bpmn:SubProcess') && !isExpanded(element);
 	}
 
-	function isExpandedSubProcess(element) {
+	function isExpandedSubProcess$1(element) {
 	  return is$1(element, 'bpmn:SubProcess') && isExpanded(element);
 	}
 
@@ -38775,7 +40500,7 @@
 	  return is$1(element, 'bpmn:Participant') && isExpanded(element);
 	}
 
-	function isEmptyText(label) {
+	function isEmptyText$1(label) {
 	  return !label || !label.trim();
 	}
 
@@ -38802,7 +40527,7 @@
 	    if (is$1(element, 'bpmn:TextAnnotation')) {
 	      absoluteElementBBox = canvas.getAbsoluteBBox(element);
 
-	      gfx = create('g');
+	      gfx = create$1('g');
 
 	      var textPathData = pathMap.getScaledPath('TEXT_ANNOTATION', {
 	        xScaleFactor: 1,
@@ -38815,19 +40540,19 @@
 	        }
 	      });
 
-	      var path = self.path = create('path');
+	      var path = self.path = create$1('path');
 
-	      attr$1(path, {
+	      attr(path, {
 	        d: textPathData,
 	        strokeWidth: 2,
-	        stroke: getStrokeColor$1(element)
+	        stroke: getStrokeColor(element)
 	      });
 
 	      append(gfx, path);
 
 	      append(defaultLayer, gfx);
 
-	      translate(gfx, element.x, element.y);
+	      translate$2(gfx, element.x, element.y);
 	    }
 
 	    if (is$1(element, 'bpmn:TextAnnotation') ||
@@ -38861,7 +40586,7 @@
 	        }
 	      });
 
-	      attr$1(self.path, {
+	      attr(self.path, {
 	        d: textPathData
 	      });
 	    }
@@ -38896,10 +40621,10 @@
 
 	// helpers ///////////////////
 
-	function getStrokeColor$1(element, defaultColor) {
-	  var bo = getBusinessObject(element);
+	function getStrokeColor(element, defaultColor) {
+	  var di = getDi(element);
 
-	  return bo.di.get('stroke') || defaultColor || 'black';
+	  return di.get('stroke') || defaultColor || 'black';
 	}
 
 	var LabelEditingModule = {
@@ -39058,7 +40783,7 @@
 
 	}
 
-	inherits_browser(AdaptiveLabelPositioningBehavior, CommandInterceptor);
+	inherits$1(AdaptiveLabelPositioningBehavior, CommandInterceptor);
 
 	AdaptiveLabelPositioningBehavior.$inject = [
 	  'eventBus',
@@ -39201,7 +40926,7 @@
 	  }, true);
 	}
 
-	inherits_browser(AppendBehavior, CommandInterceptor);
+	inherits$1(AppendBehavior, CommandInterceptor);
 
 	AppendBehavior.$inject = [
 	  'eventBus',
@@ -39226,14 +40951,14 @@
 	  }, true);
 	}
 
-	inherits_browser(AssociationBehavior, CommandInterceptor);
+	inherits$1(AssociationBehavior, CommandInterceptor);
 
 	AssociationBehavior.$inject = [
 	  'injector',
 	  'modeling'
 	];
 
-	var LOW_PRIORITY$a = 500;
+	var LOW_PRIORITY$d = 500;
 
 
 	/**
@@ -39246,13 +40971,13 @@
 
 	  var self = this;
 
-	  this.postExecuted('elements.create', LOW_PRIORITY$a, function(context) {
+	  this.postExecuted('elements.create', LOW_PRIORITY$d, function(context) {
 	    var elements = context.elements;
 
 	    elements = elements.filter(function(shape) {
 	      var host = shape.host;
 
-	      return shouldReplace(shape, host);
+	      return shouldReplace$1(shape, host);
 	    });
 
 	    if (elements.length !== 1) {
@@ -39269,7 +40994,7 @@
 	  }, true);
 
 
-	  this.preExecute('elements.move', LOW_PRIORITY$a, function(context) {
+	  this.preExecute('elements.move', LOW_PRIORITY$d, function(context) {
 	    var shapes = context.shapes,
 	        host = context.newHost;
 
@@ -39279,7 +41004,7 @@
 
 	    var shape = shapes[0];
 
-	    if (shouldReplace(shape, host)) {
+	    if (shouldReplace$1(shape, host)) {
 	      context.shapes = [ self.replaceShape(shape, host) ];
 	    }
 	  }, true);
@@ -39290,10 +41015,10 @@
 	  'injector'
 	];
 
-	inherits_browser(AttachEventBehavior, CommandInterceptor);
+	inherits$1(AttachEventBehavior, CommandInterceptor);
 
 	AttachEventBehavior.prototype.replaceShape = function(shape, host) {
-	  var eventDefinition = getEventDefinition(shape);
+	  var eventDefinition = getEventDefinition$1(shape);
 
 	  var boundaryEvent = {
 	    type: 'bpmn:BoundaryEvent',
@@ -39310,22 +41035,25 @@
 
 	// helpers //////////
 
-	function getEventDefinition(element) {
+	function getEventDefinition$1(element) {
 	  var businessObject = getBusinessObject(element),
 	      eventDefinitions = businessObject.eventDefinitions;
 
 	  return eventDefinitions && eventDefinitions[0];
 	}
 
-	function shouldReplace(shape, host) {
-	  return !isLabel(shape) &&
+	function shouldReplace$1(shape, host) {
+	  return !isLabel$6(shape) &&
 	    isAny(shape, [ 'bpmn:IntermediateThrowEvent', 'bpmn:IntermediateCatchEvent' ]) && !!host;
 	}
+
+	var HIGH_PRIORITY$d = 2000;
+
 
 	/**
 	 * BPMN specific boundary event behavior
 	 */
-	function BoundaryEventBehavior(eventBus, modeling) {
+	function BoundaryEventBehavior(eventBus, moddle, modeling) {
 
 	  CommandInterceptor.call(this, eventBus);
 
@@ -39369,175 +41097,28 @@
 	      });
 	    }
 	  });
+
+	  // copy reference to root element on replace
+	  eventBus.on('moddleCopy.canCopyProperty', HIGH_PRIORITY$d, function(context) {
+	    var parent = context.parent,
+	        property = context.property,
+	        propertyName = context.propertyName;
+
+	    var propertyDescriptor = moddle.getPropertyDescriptor(parent, propertyName);
+
+	    if (propertyDescriptor && propertyDescriptor.isReference && is$1(property, 'bpmn:RootElement')) {
+	      parent.set(propertyName, property);
+	    }
+	  });
 	}
 
 	BoundaryEventBehavior.$inject = [
 	  'eventBus',
+	  'moddle',
 	  'modeling'
 	];
 
-	inherits_browser(BoundaryEventBehavior, CommandInterceptor);
-
-	var LOW_PRIORITY$b = 500;
-
-
-	/**
-	 * Add referenced root elements (error, escalation, message, signal) if they don't exist.
-	 * Copy referenced root elements on copy & paste.
-	 */
-	function RootElementReferenceBehavior(
-	    bpmnjs, eventBus, injector, moddleCopy, bpmnFactory
-	) {
-	  injector.invoke(CommandInterceptor, this);
-
-	  function canHaveRootElementReference(element) {
-	    return isAny(element, [ 'bpmn:ReceiveTask', 'bpmn:SendTask' ]) ||
-	      hasAnyEventDefinition(element, [
-	        'bpmn:ErrorEventDefinition',
-	        'bpmn:EscalationEventDefinition',
-	        'bpmn:MessageEventDefinition',
-	        'bpmn:SignalEventDefinition'
-	      ]);
-	  }
-
-	  function hasRootElement(rootElement) {
-	    var definitions = bpmnjs.getDefinitions(),
-	        rootElements = definitions.get('rootElements');
-
-	    return !!find(rootElements, matchPattern({ id: rootElement.id }));
-	  }
-
-	  function getRootElementReferencePropertyName(eventDefinition) {
-	    if (is$1(eventDefinition, 'bpmn:ErrorEventDefinition')) {
-	      return 'errorRef';
-	    } else if (is$1(eventDefinition, 'bpmn:EscalationEventDefinition')) {
-	      return 'escalationRef';
-	    } else if (is$1(eventDefinition, 'bpmn:MessageEventDefinition')) {
-	      return 'messageRef';
-	    } else if (is$1(eventDefinition, 'bpmn:SignalEventDefinition')) {
-	      return 'signalRef';
-	    }
-	  }
-
-	  function getRootElement(businessObject) {
-	    if (isAny(businessObject, [ 'bpmn:ReceiveTask', 'bpmn:SendTask' ])) {
-	      return businessObject.get('messageRef');
-	    }
-
-	    var eventDefinitions = businessObject.get('eventDefinitions'),
-	        eventDefinition = eventDefinitions[ 0 ];
-
-	    return eventDefinition.get(getRootElementReferencePropertyName(eventDefinition));
-	  }
-
-	  function setRootElement(businessObject, rootElement) {
-	    if (isAny(businessObject, [ 'bpmn:ReceiveTask', 'bpmn:SendTask' ])) {
-	      return businessObject.set('messageRef', rootElement);
-	    }
-
-	    var eventDefinitions = businessObject.get('eventDefinitions'),
-	        eventDefinition = eventDefinitions[ 0 ];
-
-	    return eventDefinition.set(getRootElementReferencePropertyName(eventDefinition), rootElement);
-	  }
-
-	  // create shape
-	  this.executed('shape.create', function(context) {
-	    var shape = context.shape;
-
-	    if (!canHaveRootElementReference(shape)) {
-	      return;
-	    }
-
-	    var businessObject = getBusinessObject(shape),
-	        rootElement = getRootElement(businessObject),
-	        rootElements;
-
-	    if (rootElement && !hasRootElement(rootElement)) {
-	      rootElements = bpmnjs.getDefinitions().get('rootElements');
-
-	      // add root element
-	      add$1(rootElements, rootElement);
-
-	      context.addedRootElement = rootElement;
-	    }
-	  }, true);
-
-	  this.reverted('shape.create', function(context) {
-	    var addedRootElement = context.addedRootElement;
-
-	    if (!addedRootElement) {
-	      return;
-	    }
-
-	    var rootElements = bpmnjs.getDefinitions().get('rootElements');
-
-	    // remove root element
-	    remove$2(rootElements, addedRootElement);
-	  }, true);
-
-	  eventBus.on('copyPaste.copyElement', function(context) {
-	    var descriptor = context.descriptor,
-	        element = context.element;
-
-	    if (!canHaveRootElementReference(element)) {
-	      return;
-	    }
-
-	    var businessObject = getBusinessObject(element),
-	        rootElement = getRootElement(businessObject);
-
-	    if (rootElement) {
-	      descriptor.referencedRootElement = rootElement;
-	    }
-	  });
-
-	  eventBus.on('copyPaste.pasteElement', LOW_PRIORITY$b, function(context) {
-	    var descriptor = context.descriptor,
-	        businessObject = descriptor.businessObject;
-
-	    if (!canHaveRootElementReference(businessObject)) {
-	      return;
-	    }
-
-	    var referencedRootElement = descriptor.referencedRootElement;
-
-	    if (!referencedRootElement) {
-	      return;
-	    }
-
-	    if (!hasRootElement(referencedRootElement)) {
-	      referencedRootElement = moddleCopy.copyElement(
-	        referencedRootElement,
-	        bpmnFactory.create(referencedRootElement.$type)
-	      );
-	    }
-
-	    setRootElement(businessObject, referencedRootElement);
-	  });
-	}
-
-	RootElementReferenceBehavior.$inject = [
-	  'bpmnjs',
-	  'eventBus',
-	  'injector',
-	  'moddleCopy',
-	  'bpmnFactory'
-	];
-
-	inherits_browser(RootElementReferenceBehavior, CommandInterceptor);
-
-	// helpers //////////
-
-	function hasAnyEventDefinition(element, types) {
-	  if (!isArray(types)) {
-	    types = [ types ];
-	  }
-
-	  return some(types, function(type) {
-	    return hasEventDefinition(element, type);
-	  });
-	}
+	inherits$1(BoundaryEventBehavior, CommandInterceptor);
 
 	function CreateBehavior(injector) {
 	  injector.invoke(CommandInterceptor, this);
@@ -39548,7 +41129,7 @@
 	        shape = context.shape;
 
 	    if (is$1(parent, 'bpmn:Lane') && !is$1(shape, 'bpmn:Lane')) {
-	      context.parent = getParent$1(parent, 'bpmn:Participant');
+	      context.parent = getParent(parent, 'bpmn:Participant');
 	    }
 	  });
 
@@ -39557,118 +41138,7 @@
 
 	CreateBehavior.$inject = [ 'injector' ];
 
-	inherits_browser(CreateBehavior, CommandInterceptor);
-
-	var HIGH_PRIORITY$7 = 1500;
-	var HIGHEST_PRIORITY = 2000;
-
-
-	/**
-	 * Correct hover targets in certain situations to improve diagram interaction.
-	 *
-	 * @param {ElementRegistry} elementRegistry
-	 * @param {EventBus} eventBus
-	 * @param {Canvas} canvas
-	 */
-	function FixHoverBehavior(elementRegistry, eventBus, canvas) {
-
-	  eventBus.on([
-	    'create.hover',
-	    'create.move',
-	    'create.end',
-	    'shape.move.hover',
-	    'shape.move.move',
-	    'shape.move.end'
-	  ], HIGH_PRIORITY$7, function(event) {
-	    var context = event.context,
-	        shape = context.shape || event.shape,
-	        hover = event.hover;
-
-	    // ensure elements are not dropped onto a bpmn:Lane but onto
-	    // the underlying bpmn:Participant
-	    if (is$1(hover, 'bpmn:Lane') && !isAny(shape, [ 'bpmn:Lane', 'bpmn:Participant' ])) {
-	      event.hover = getLanesRoot(hover);
-	      event.hoverGfx = elementRegistry.getGraphics(event.hover);
-	    }
-
-	    var rootElement = canvas.getRootElement();
-
-	    // ensure bpmn:Group and label elements are dropped
-	    // always onto the root
-	    if (hover !== rootElement && (shape.labelTarget || is$1(shape, 'bpmn:Group'))) {
-	      event.hover = rootElement;
-	      event.hoverGfx = elementRegistry.getGraphics(event.hover);
-	    }
-	  });
-
-
-	  eventBus.on([
-	    'connect.hover',
-	    'connect.out',
-	    'connect.end',
-	    'connect.cleanup',
-	    'global-connect.hover',
-	    'global-connect.out',
-	    'global-connect.end',
-	    'global-connect.cleanup'
-	  ], HIGH_PRIORITY$7, function(event) {
-	    var hover = event.hover;
-
-	    // ensure connections start/end on bpmn:Participant,
-	    // not the underlying bpmn:Lane
-	    if (is$1(hover, 'bpmn:Lane')) {
-	      event.hover = getLanesRoot(hover) || hover;
-	      event.hoverGfx = elementRegistry.getGraphics(event.hover);
-	    }
-	  });
-
-
-	  eventBus.on([
-	    'bendpoint.move.hover'
-	  ], HIGH_PRIORITY$7, function(event) {
-	    var context = event.context,
-	        hover = event.hover,
-	        type = context.type;
-
-	    // ensure reconnect start/end on bpmn:Participant,
-	    // not the underlying bpmn:Lane
-	    if (is$1(hover, 'bpmn:Lane') && /reconnect/.test(type)) {
-	      event.hover = getLanesRoot(hover) || hover;
-	      event.hoverGfx = elementRegistry.getGraphics(event.hover);
-	    }
-	  });
-
-
-	  eventBus.on([
-	    'connect.start'
-	  ], HIGH_PRIORITY$7, function(event) {
-	    var context = event.context,
-	        start = context.start;
-
-	    // ensure connect start on bpmn:Participant,
-	    // not the underlying bpmn:Lane
-	    if (is$1(start, 'bpmn:Lane')) {
-	      context.start = getLanesRoot(start) || start;
-	    }
-	  });
-
-
-	  // allow movement of participants from lanes
-	  eventBus.on('shape.move.start', HIGHEST_PRIORITY, function(event) {
-	    var shape = event.shape;
-
-	    if (is$1(shape, 'bpmn:Lane')) {
-	      event.shape = getLanesRoot(shape) || shape;
-	    }
-	  });
-
-	}
-
-	FixHoverBehavior.$inject = [
-	  'elementRegistry',
-	  'eventBus',
-	  'canvas'
-	];
+	inherits$1(CreateBehavior, CommandInterceptor);
 
 	/**
 	 * BPMN specific create data object behavior
@@ -39700,27 +41170,27 @@
 	  'moddle'
 	];
 
-	inherits_browser(CreateDataObjectBehavior, CommandInterceptor);
+	inherits$1(CreateDataObjectBehavior, CommandInterceptor);
 
 	var HORIZONTAL_PARTICIPANT_PADDING = 20,
 	    VERTICAL_PARTICIPANT_PADDING = 20;
 
 	var PARTICIPANT_BORDER_WIDTH = 30;
 
-	var HIGH_PRIORITY$8 = 2000;
+	var HIGH_PRIORITY$c = 2000;
 
 
 	/**
 	 * BPMN-specific behavior for creating participants.
 	 */
-	function CreateParticipantBehavior$1(canvas, eventBus, modeling) {
+	function CreateParticipantBehavior(canvas, eventBus, modeling) {
 	  CommandInterceptor.call(this, eventBus);
 
 	  // fit participant
 	  eventBus.on([
 	    'create.start',
 	    'shape.move.start'
-	  ], HIGH_PRIORITY$8, function(event) {
+	  ], HIGH_PRIORITY$c, function(event) {
 	    var context = event.context,
 	        shape = context.shape,
 	        rootElement = canvas.getRootElement();
@@ -39734,8 +41204,8 @@
 	    // ignore connections, groups and labels
 	    var children = rootElement.children.filter(function(element) {
 	      return !is$1(element, 'bpmn:Group') &&
-	        !isLabel(element) &&
-	        !isConnection$2(element);
+	        !isLabel$6(element) &&
+	        !isConnection$9(element);
 	    });
 
 	    // ensure for available children to calculate bounds
@@ -39755,7 +41225,7 @@
 	  });
 
 	  // force hovering process when creating first participant
-	  eventBus.on('create.start', HIGH_PRIORITY$8, function(event) {
+	  eventBus.on('create.start', HIGH_PRIORITY$c, function(event) {
 	    var context = event.context,
 	        shape = context.shape,
 	        rootElement = canvas.getRootElement(),
@@ -39767,7 +41237,7 @@
 	    }
 
 	    if (is$1(shape, 'bpmn:Participant') && is$1(rootElement, 'bpmn:Process')) {
-	      eventBus.on('element.hover', HIGH_PRIORITY$8, ensureHoveringProcess);
+	      eventBus.on('element.hover', HIGH_PRIORITY$c, ensureHoveringProcess);
 
 	      eventBus.once('create.cleanup', function() {
 	        eventBus.off('element.hover', ensureHoveringProcess);
@@ -39775,131 +41245,106 @@
 	    }
 	  });
 
-	  function ensureCollaboration(context) {
-	    var parent = context.parent,
-	        collaboration;
-
+	  // turn process into collaboration when creating first participant
+	  function getOrCreateCollaboration() {
 	    var rootElement = canvas.getRootElement();
 
 	    if (is$1(rootElement, 'bpmn:Collaboration')) {
-	      collaboration = rootElement;
-	    } else {
-
-	      // update root element by making collaboration
-	      collaboration = modeling.makeCollaboration();
-
-	      // re-use process when creating first participant
-	      context.process = parent;
+	      return rootElement;
 	    }
 
-	    context.parent = collaboration;
+	    return modeling.makeCollaboration();
 	  }
 
-	  // turn process into collaboration before adding participant
+	  // when creating mutliple elements through `elements.create` parent must be set to collaboration
+	  // and passed to `shape.create` as hint
+	  this.preExecute('elements.create', HIGH_PRIORITY$c, function(context) {
+	    var elements = context.elements,
+	        parent = context.parent,
+	        participant = findParticipant(elements),
+	        hints;
+
+	    if (participant && is$1(parent, 'bpmn:Process')) {
+	      context.parent = getOrCreateCollaboration();
+
+	      hints = context.hints = context.hints || {};
+
+	      hints.participant = participant;
+	      hints.process = parent;
+	      hints.processRef = getBusinessObject(participant).get('processRef');
+	    }
+	  }, true);
+
+	  // when creating single shape through `shape.create` parent must be set to collaboration
+	  // unless it was already set through `elements.create`
 	  this.preExecute('shape.create', function(context) {
 	    var parent = context.parent,
 	        shape = context.shape;
 
 	    if (is$1(shape, 'bpmn:Participant') && is$1(parent, 'bpmn:Process')) {
-	      ensureCollaboration(context);
+	      context.parent = getOrCreateCollaboration();
+
+	      context.process = parent;
+	      context.processRef = getBusinessObject(shape).get('processRef');
 	    }
 	  }, true);
 
+	  // #execute necessary because #preExecute not called on CommandStack#redo
 	  this.execute('shape.create', function(context) {
-	    var process = context.process,
-	        shape = context.shape;
+	    var hints = context.hints || {},
+	        process = context.process || hints.process,
+	        shape = context.shape,
+	        participant = hints.participant;
 
-	    if (process) {
-	      context.oldProcessRef = shape.businessObject.processRef;
+	    // both shape.create and elements.create must be handled
+	    if (process && (!participant || shape === participant)) {
 
-	      // re-use process when creating first participant
-	      shape.businessObject.processRef = process.businessObject;
+	      // monkey-patch process ref
+	      getBusinessObject(shape).set('processRef', getBusinessObject(process));
 	    }
 	  }, true);
 
 	  this.revert('shape.create', function(context) {
-	    var process = context.process,
-	        shape = context.shape;
+	    var hints = context.hints || {},
+	        process = context.process || hints.process,
+	        processRef = context.processRef || hints.processRef,
+	        shape = context.shape,
+	        participant = hints.participant;
 
-	    if (process) {
+	    // both shape.create and elements.create must be handled
+	    if (process && (!participant || shape === participant)) {
 
-	      // re-use process when creating first participant
-	      shape.businessObject.processRef = context.oldProcessRef;
+	      // monkey-patch process ref
+	      getBusinessObject(shape).set('processRef', processRef);
 	    }
 	  }, true);
 
 	  this.postExecute('shape.create', function(context) {
-	    var process = context.process,
-	        shape = context.shape;
+	    var hints = context.hints || {},
+	        process = context.process || context.hints.process,
+	        shape = context.shape,
+	        participant = hints.participant;
 
 	    if (process) {
+	      var children = process.children.slice();
 
-	      // move children from process to participant
-	      var processChildren = process.children.slice();
-
-	      modeling.moveElements(processChildren, { x: 0, y: 0 }, shape);
-	    }
-
-	  }, true);
-
-	  // turn process into collaboration when creating participants
-	  this.preExecute('elements.create', HIGH_PRIORITY$8, function(context) {
-	    var elements = context.elements,
-	        parent = context.parent,
-	        participant;
-
-	    var hasParticipants = findParticipant(elements);
-
-	    if (hasParticipants && is$1(parent, 'bpmn:Process')) {
-	      ensureCollaboration(context);
-
-	      participant = findParticipant(elements);
-
-	      context.oldProcessRef = participant.businessObject.processRef;
-
-	      // re-use process when creating first participant
-	      participant.businessObject.processRef = parent.businessObject;
+	      // both shape.create and elements.create must be handled
+	      if (!participant) {
+	        modeling.moveElements(children, { x: 0, y: 0 }, shape);
+	      } else if (shape === participant) {
+	        modeling.moveElements(children, { x: 0, y: 0 }, participant);
+	      }
 	    }
 	  }, true);
-
-	  this.revert('elements.create', function(context) {
-	    var elements = context.elements,
-	        process = context.process,
-	        participant;
-
-	    if (process) {
-	      participant = findParticipant(elements);
-
-	      // re-use process when creating first participant
-	      participant.businessObject.processRef = context.oldProcessRef;
-	    }
-	  }, true);
-
-	  this.postExecute('elements.create', function(context) {
-	    var elements = context.elements,
-	        process = context.process,
-	        participant;
-
-	    if (process) {
-	      participant = findParticipant(elements);
-
-	      // move children from process to first participant
-	      var processChildren = process.children.slice();
-
-	      modeling.moveElements(processChildren, { x: 0, y: 0 }, participant);
-	    }
-
-	  }, true);
-
 	}
 
-	CreateParticipantBehavior$1.$inject = [
+	CreateParticipantBehavior.$inject = [
 	  'canvas',
 	  'eventBus',
 	  'modeling'
 	];
 
-	inherits_browser(CreateParticipantBehavior$1, CommandInterceptor);
+	inherits$1(CreateParticipantBehavior, CommandInterceptor);
 
 	// helpers //////////
 
@@ -39931,7 +41376,7 @@
 	  };
 	}
 
-	function isConnection$2(element) {
+	function isConnection$9(element) {
 	  return !!element.waypoints;
 	}
 
@@ -39999,7 +41444,7 @@
 	        name: TARGET_REF_PLACEHOLDER_NAME
 	      });
 
-	      add$1(properties, targetRefProp);
+	      add(properties, targetRefProp);
 	    }
 
 	    return targetRefProp;
@@ -40014,7 +41459,7 @@
 	    }
 
 	    if (!usesTargetRef(element, targetRefProp, connection)) {
-	      remove$2(element.get('properties'), targetRefProp);
+	      remove(element.get('properties'), targetRefProp);
 	    }
 	  }
 
@@ -40061,7 +41506,7 @@
 	  'bpmnFactory'
 	];
 
-	inherits_browser(DataInputAssociationBehavior, CommandInterceptor);
+	inherits$1(DataInputAssociationBehavior, CommandInterceptor);
 
 
 	/**
@@ -40092,21 +41537,23 @@
 
 	UpdateSemanticParentHandler.prototype.execute = function(context) {
 	  var dataStoreBo = context.dataStoreBo,
+	      dataStoreDi = context.dataStoreDi,
 	      newSemanticParent = context.newSemanticParent,
 	      newDiParent = context.newDiParent;
 
 	  context.oldSemanticParent = dataStoreBo.$parent;
-	  context.oldDiParent = dataStoreBo.di.$parent;
+	  context.oldDiParent = dataStoreDi.$parent;
 
 	  // update semantic parent
 	  this._bpmnUpdater.updateSemanticParent(dataStoreBo, newSemanticParent);
 
 	  // update DI parent
-	  this._bpmnUpdater.updateDiParent(dataStoreBo.di, newDiParent);
+	  this._bpmnUpdater.updateDiParent(dataStoreDi, newDiParent);
 	};
 
 	UpdateSemanticParentHandler.prototype.revert = function(context) {
 	  var dataStoreBo = context.dataStoreBo,
+	      dataStoreDi = context.dataStoreDi,
 	      oldSemanticParent = context.oldSemanticParent,
 	      oldDiParent = context.oldDiParent;
 
@@ -40114,7 +41561,7 @@
 	  this._bpmnUpdater.updateSemanticParent(dataStoreBo, oldSemanticParent);
 
 	  // update DI parent
-	  this._bpmnUpdater.updateDiParent(dataStoreBo.di, oldDiParent);
+	  this._bpmnUpdater.updateDiParent(dataStoreDi, oldDiParent);
 	};
 
 	/**
@@ -40128,9 +41575,9 @@
 
 	  commandStack.registerHandler('dataStore.updateContainment', UpdateSemanticParentHandler);
 
-	  function getFirstParticipant() {
+	  function getFirstParticipantWithProcessRef() {
 	    return elementRegistry.filter(function(element) {
-	      return is$1(element, 'bpmn:Participant');
+	      return is$1(element, 'bpmn:Participant') && getBusinessObject(element).processRef;
 	    })[0];
 	  }
 
@@ -40143,15 +41590,16 @@
 	  function updateDataStoreParent(dataStore, newDataStoreParent) {
 	    var dataStoreBo = dataStore.businessObject || dataStore;
 
-	    newDataStoreParent = newDataStoreParent || getFirstParticipant();
+	    newDataStoreParent = newDataStoreParent || getFirstParticipantWithProcessRef();
 
 	    if (newDataStoreParent) {
 	      var newDataStoreParentBo = newDataStoreParent.businessObject || newDataStoreParent;
 
 	      commandStack.execute('dataStore.updateContainment', {
 	        dataStoreBo: dataStoreBo,
+	        dataStoreDi: getDi(dataStore),
 	        newSemanticParent: newDataStoreParentBo.processRef || newDataStoreParentBo,
-	        newDiParent: newDataStoreParentBo.di
+	        newDiParent: getDi(newDataStoreParent)
 	      });
 	    }
 	  }
@@ -40283,7 +41731,7 @@
 	  'eventBus',
 	];
 
-	inherits_browser(DataStoreBehavior, CommandInterceptor);
+	inherits$1(DataStoreBehavior, CommandInterceptor);
 
 
 	// helpers //////////
@@ -40410,9 +41858,9 @@
 	  'spaceTool'
 	];
 
-	inherits_browser(DeleteLaneBehavior, CommandInterceptor);
+	inherits$1(DeleteLaneBehavior, CommandInterceptor);
 
-	var LOW_PRIORITY$d = 500;
+	var LOW_PRIORITY$b = 500;
 
 
 	/**
@@ -40425,13 +41873,13 @@
 
 	  var self = this;
 
-	  this.postExecuted('elements.create', LOW_PRIORITY$d, function(context) {
+	  this.postExecuted('elements.create', LOW_PRIORITY$b, function(context) {
 	    var elements = context.elements;
 
 	    elements.filter(function(shape) {
 	      var host = shape.host;
 
-	      return shouldReplace$1(shape, host);
+	      return shouldReplace(shape, host);
 	    }).map(function(shape) {
 	      return elements.indexOf(shape);
 	    }).forEach(function(index) {
@@ -40439,14 +41887,14 @@
 	    });
 	  }, true);
 
-	  this.preExecute('elements.move', LOW_PRIORITY$d, function(context) {
+	  this.preExecute('elements.move', LOW_PRIORITY$b, function(context) {
 	    var shapes = context.shapes,
 	        newHost = context.newHost;
 
 	    shapes.forEach(function(shape, index) {
 	      var host = shape.host;
 
-	      if (shouldReplace$1(shape, includes(shapes, host) ? host : newHost)) {
+	      if (shouldReplace(shape, includes$6(shapes, host) ? host : newHost)) {
 	        shapes[ index ] = self.replaceShape(shape);
 	      }
 	    });
@@ -40458,10 +41906,10 @@
 	  'injector'
 	];
 
-	inherits_browser(DetachEventBehavior, CommandInterceptor);
+	inherits$1(DetachEventBehavior, CommandInterceptor);
 
 	DetachEventBehavior.prototype.replaceShape = function(shape) {
-	  var eventDefinition = getEventDefinition$1(shape),
+	  var eventDefinition = getEventDefinition(shape),
 	      intermediateEvent;
 
 	  if (eventDefinition) {
@@ -40481,18 +41929,18 @@
 
 	// helpers //////////
 
-	function getEventDefinition$1(element) {
+	function getEventDefinition(element) {
 	  var businessObject = getBusinessObject(element),
 	      eventDefinitions = businessObject.eventDefinitions;
 
 	  return eventDefinitions && eventDefinitions[0];
 	}
 
-	function shouldReplace$1(shape, host) {
-	  return !isLabel(shape) && is$1(shape, 'bpmn:BoundaryEvent') && !host;
+	function shouldReplace(shape, host) {
+	  return !isLabel$6(shape) && is$1(shape, 'bpmn:BoundaryEvent') && !host;
 	}
 
-	function includes(array, item) {
+	function includes$6(array, item) {
 	  return array.indexOf(item) !== -1;
 	}
 
@@ -40539,12 +41987,12 @@
 	      dockingPoint = intersection.bendpoint ? waypoints[intersection.index] : mid;
 
 	      // if last waypointBefore is inside shape's bounds, ignore docking point
-	      if (!isPointInsideBBox$2(shape, waypointsBefore[waypointsBefore.length-1])) {
+	      if (waypointsBefore.length === 1 || !isPointInsideBBox(shape, waypointsBefore[waypointsBefore.length-1])) {
 	        waypointsBefore.push(copy(dockingPoint));
 	      }
 
 	      // if first waypointAfter is inside shape's bounds, ignore docking point
-	      if (!isPointInsideBBox$2(shape, waypointsAfter[0])) {
+	      if (waypointsAfter.length === 1 || !isPointInsideBBox(shape, waypointsAfter[0])) {
 	        waypointsAfter.unshift(copy(dockingPoint));
 	      }
 	    }
@@ -40664,7 +42112,7 @@
 	  }, true);
 	}
 
-	inherits_browser(DropOnFlowBehavior, CommandInterceptor);
+	inherits$1(DropOnFlowBehavior, CommandInterceptor);
 
 	DropOnFlowBehavior.$inject = [
 	  'eventBus',
@@ -40675,7 +42123,7 @@
 
 	// helpers /////////////////////
 
-	function isPointInsideBBox$2(bbox, point) {
+	function isPointInsideBBox(bbox, point) {
 	  var x = point.x,
 	      y = point.y;
 
@@ -40759,7 +42207,7 @@
 	  'modeling'
 	];
 
-	inherits_browser(EventBasedGatewayBehavior, CommandInterceptor);
+	inherits$1(EventBasedGatewayBehavior, CommandInterceptor);
 
 
 
@@ -40769,7 +42217,119 @@
 	  return is$1(connection, 'bpmn:SequenceFlow');
 	}
 
-	var HIGH_PRIORITY$9 = 2000;
+	var HIGH_PRIORITY$b = 1500;
+	var HIGHEST_PRIORITY = 2000;
+
+
+	/**
+	 * Correct hover targets in certain situations to improve diagram interaction.
+	 *
+	 * @param {ElementRegistry} elementRegistry
+	 * @param {EventBus} eventBus
+	 * @param {Canvas} canvas
+	 */
+	function FixHoverBehavior(elementRegistry, eventBus, canvas) {
+
+	  eventBus.on([
+	    'create.hover',
+	    'create.move',
+	    'create.out',
+	    'create.end',
+	    'shape.move.hover',
+	    'shape.move.move',
+	    'shape.move.out',
+	    'shape.move.end'
+	  ], HIGH_PRIORITY$b, function(event) {
+	    var context = event.context,
+	        shape = context.shape || event.shape,
+	        hover = event.hover;
+
+	    // ensure elements are not dropped onto a bpmn:Lane but onto
+	    // the underlying bpmn:Participant
+	    if (is$1(hover, 'bpmn:Lane') && !isAny(shape, [ 'bpmn:Lane', 'bpmn:Participant' ])) {
+	      event.hover = getLanesRoot(hover);
+	      event.hoverGfx = elementRegistry.getGraphics(event.hover);
+	    }
+
+	    var rootElement = canvas.getRootElement();
+
+	    // ensure bpmn:Group and label elements are dropped
+	    // always onto the root
+	    if (hover !== rootElement && (shape.labelTarget || is$1(shape, 'bpmn:Group'))) {
+	      event.hover = rootElement;
+	      event.hoverGfx = elementRegistry.getGraphics(event.hover);
+	    }
+	  });
+
+	  eventBus.on([
+	    'connect.hover',
+	    'connect.out',
+	    'connect.end',
+	    'connect.cleanup',
+	    'global-connect.hover',
+	    'global-connect.out',
+	    'global-connect.end',
+	    'global-connect.cleanup'
+	  ], HIGH_PRIORITY$b, function(event) {
+	    var hover = event.hover;
+
+	    // ensure connections start/end on bpmn:Participant,
+	    // not the underlying bpmn:Lane
+	    if (is$1(hover, 'bpmn:Lane')) {
+	      event.hover = getLanesRoot(hover) || hover;
+	      event.hoverGfx = elementRegistry.getGraphics(event.hover);
+	    }
+	  });
+
+
+	  eventBus.on([
+	    'bendpoint.move.hover'
+	  ], HIGH_PRIORITY$b, function(event) {
+	    var context = event.context,
+	        hover = event.hover,
+	        type = context.type;
+
+	    // ensure reconnect start/end on bpmn:Participant,
+	    // not the underlying bpmn:Lane
+	    if (is$1(hover, 'bpmn:Lane') && /reconnect/.test(type)) {
+	      event.hover = getLanesRoot(hover) || hover;
+	      event.hoverGfx = elementRegistry.getGraphics(event.hover);
+	    }
+	  });
+
+
+	  eventBus.on([
+	    'connect.start'
+	  ], HIGH_PRIORITY$b, function(event) {
+	    var context = event.context,
+	        start = context.start;
+
+	    // ensure connect start on bpmn:Participant,
+	    // not the underlying bpmn:Lane
+	    if (is$1(start, 'bpmn:Lane')) {
+	      context.start = getLanesRoot(start) || start;
+	    }
+	  });
+
+
+	  // allow movement of participants from lanes
+	  eventBus.on('shape.move.start', HIGHEST_PRIORITY, function(event) {
+	    var shape = event.shape;
+
+	    if (is$1(shape, 'bpmn:Lane')) {
+	      event.shape = getLanesRoot(shape) || shape;
+	    }
+	  });
+
+	}
+
+	FixHoverBehavior.$inject = [
+	  'elementRegistry',
+	  'eventBus',
+	  'canvas'
+	];
+
+	var HIGH_PRIORITY$a = 2000;
 
 
 	/**
@@ -40777,25 +42337,13 @@
 	 */
 	function GroupBehavior(
 	    bpmnFactory,
-	    canvas,
+	    bpmnjs,
 	    elementRegistry,
 	    eventBus,
 	    injector,
 	    moddleCopy
 	) {
 	  injector.invoke(CommandInterceptor, this);
-
-	  /**
-	   * Gets process definitions
-	   *
-	   * @return {ModdleElement} definitions
-	   */
-	  function getDefinitions() {
-	    var rootElement = canvas.getRootElement(),
-	        businessObject = getBusinessObject(rootElement);
-
-	    return businessObject.$parent;
-	  }
 
 	  /**
 	   * Removes a referenced category value for a given group shape
@@ -40817,7 +42365,7 @@
 	      return;
 	    }
 
-	    remove$2(category.categoryValue, categoryValue);
+	    remove(category.categoryValue, categoryValue);
 
 	    // cleanup category if it is empty
 	    if (category && !category.categoryValue.length) {
@@ -40832,9 +42380,9 @@
 	   */
 	  function removeCategory(category) {
 
-	    var definitions = getDefinitions();
+	    var definitions = bpmnjs.getDefinitions();
 
-	    remove$2(definitions.get('rootElements'), category);
+	    remove(definitions.get('rootElements'), category);
 	  }
 
 	  /**
@@ -40897,11 +42445,11 @@
 
 	      var businessObject = getBusinessObject(shape),
 	          categoryValueRef = businessObject.categoryValueRef,
-	          definitions = getDefinitions(),
+	          definitions = bpmnjs.getDefinitions(),
 	          category = categoryValueRef ? categoryValueRef.$parent : null;
 
-	      add$1(category.get('categoryValue'), categoryValueRef);
-	      add$1(definitions.get('rootElements'), category);
+	      add(category.get('categoryValue'), categoryValueRef);
+	      add(definitions.get('rootElements'), category);
 	    }
 	  });
 
@@ -40915,7 +42463,7 @@
 
 	    if (is$1(businessObject, 'bpmn:Group') && !businessObject.categoryValueRef) {
 
-	      var definitions = getDefinitions(),
+	      var definitions = bpmnjs.getDefinitions(),
 	          categoryValue = createCategoryValue(definitions, bpmnFactory);
 
 	      // link the reference to the Group
@@ -40938,12 +42486,12 @@
 	  });
 
 	  // copy bpmn:CategoryValue when copying element
-	  eventBus.on('moddleCopy.canCopyProperty', HIGH_PRIORITY$9, function(context) {
+	  eventBus.on('moddleCopy.canCopyProperty', HIGH_PRIORITY$a, function(context) {
 	    var property = context.property,
 	        categoryValue;
 
 	    if (is$1(property, 'bpmn:CategoryValue')) {
-	      categoryValue = createCategoryValue(getDefinitions(), bpmnFactory);
+	      categoryValue = createCategoryValue(bpmnjs.getDefinitions(), bpmnFactory);
 
 	      // return copy of category
 	      return moddleCopy.copyElement(property, categoryValue);
@@ -40954,14 +42502,14 @@
 
 	GroupBehavior.$inject = [
 	  'bpmnFactory',
-	  'canvas',
+	  'bpmnjs',
 	  'elementRegistry',
 	  'eventBus',
 	  'injector',
 	  'moddleCopy'
 	];
 
-	inherits_browser(GroupBehavior, CommandInterceptor);
+	inherits$1(GroupBehavior, CommandInterceptor);
 
 	/**
 	 * Returns the intersection between two line segments a and b.
@@ -41026,7 +42574,7 @@
 	    var centerIntersect;
 
 	    if (verticalIntersect && horizontalIntersect) {
-	      if (getDistance(verticalIntersect, elementMid) > getDistance(horizontalIntersect, elementMid)) {
+	      if (getDistance$1(verticalIntersect, elementMid) > getDistance$1(horizontalIntersect, elementMid)) {
 	        centerIntersect = horizontalIntersect;
 	      } else {
 	        centerIntersect = verticalIntersect;
@@ -41071,7 +42619,7 @@
 
 	// helpers //////////////////////
 
-	function getDistance(p1, p2) {
+	function getDistance$1(p1, p2) {
 	  return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
 	}
 
@@ -41091,12 +42639,14 @@
 	  ];
 
 	  this.executed([ 'shape.move', 'shape.create', 'shape.resize' ], function(event) {
-	    var bo = getBusinessObject(event.context.shape);
+	    var shape = event.context.shape,
+	        bo = getBusinessObject(shape),
+	        di = getDi(shape);
 
-	    if (isAny(bo, elementTypesToUpdate) && !bo.di.get('isHorizontal')) {
+	    if (isAny(bo, elementTypesToUpdate) && !di.get('isHorizontal')) {
 
 	      // set attribute directly to avoid modeling#updateProperty side effects
-	      bo.di.set('isHorizontal', true);
+	      di.set('isHorizontal', true);
 	    }
 	  });
 
@@ -41104,7 +42654,7 @@
 
 	IsHorizontalFix.$inject = [ 'eventBus' ];
 
-	inherits_browser(IsHorizontalFix, CommandInterceptor);
+	inherits$1(IsHorizontalFix, CommandInterceptor);
 
 	/**
 	 * Returns the length of a vector
@@ -41229,9 +42779,9 @@
 	}
 
 	var sqrt = Math.sqrt,
-	    min$2 = Math.min,
+	    min$1 = Math.min,
 	    max$3 = Math.max,
-	    abs$4 = Math.abs;
+	    abs$3 = Math.abs;
 
 	/**
 	 * Calculate the square (power to two) of a number.
@@ -41252,7 +42802,7 @@
 	 *
 	 * @return {number}
 	 */
-	function getDistance$1(p1, p2) {
+	function getDistance(p1, p2) {
 	  return sqrt(sq(p1.x - p2.x) + sq(p1.y - p2.y));
 	}
 
@@ -41305,10 +42855,10 @@
 	    if (pointsEqual(segmentStart, segmentEnd)) {
 	      intersections = [ segmentStart ];
 	    } else {
-	      segmentStartDistance = getDistance$1(point, segmentStart);
-	      segmentEndDistance = getDistance$1(point, segmentEnd);
+	      segmentStartDistance = getDistance(point, segmentStart);
+	      segmentEndDistance = getDistance(point, segmentEnd);
 
-	      minDistance = min$2(segmentStartDistance, segmentEndDistance);
+	      minDistance = min$1(segmentStartDistance, segmentEndDistance);
 
 	      intersections = getCircleSegmentIntersections(segmentStart, segmentEnd, point, minDistance);
 	    }
@@ -41336,11 +42886,11 @@
 	        type: 'segment',
 	        position: attachmentPosition,
 	        segmentIndex: idx,
-	        relativeLocation: getDistance$1(segmentStart, attachmentPosition) / getDistance$1(segmentStart, segmentEnd)
+	        relativeLocation: getDistance(segmentStart, attachmentPosition) / getDistance(segmentStart, segmentEnd)
 	      };
 	    }
 
-	    attachmentDistance = getDistance$1(attachment.position, point);
+	    attachmentDistance = getDistance(attachment.position, point);
 
 	    if (!closestAttachment || closestAttachmentDistance > attachmentDistance) {
 	      closestAttachment = attachment;
@@ -41427,7 +42977,7 @@
 	  // precision errors in intersection computation
 
 	  return (
-	    n >= min$2(rangeStart, rangeEnd) - EQUAL_THRESHOLD &&
+	    n >= min$1(rangeStart, rangeEnd) - EQUAL_THRESHOLD &&
 	    n <= max$3(rangeStart, rangeEnd) + EQUAL_THRESHOLD
 	  );
 	}
@@ -41453,8 +43003,8 @@
 	function pointsEqual(p1, p2) {
 
 	  return (
-	    abs$4(p1.x - p2.x) <= EQUAL_THRESHOLD &&
-	    abs$4(p1.y - p2.y) <= EQUAL_THRESHOLD
+	    abs$3(p1.x - p2.x) <= EQUAL_THRESHOLD &&
+	    abs$3(p1.y - p2.y) <= EQUAL_THRESHOLD
 	  );
 	}
 
@@ -41860,7 +43410,7 @@
 	    var element = context.shape || context.connection,
 	        businessObject = element.businessObject;
 
-	    if (isLabel(element) || !isLabelExternal(element)) {
+	    if (isLabel$6(element) || !isLabelExternal(element)) {
 	      return;
 	    }
 
@@ -41902,27 +43452,27 @@
 
 	    var context = event.context,
 	        element = context.shape,
-	        businessObject,
+	        labelTarget = context.labelTarget,
 	        di;
 
 	    // we want to trigger on real labels only
-	    if (!element.labelTarget) {
+	    if (!labelTarget) {
 	      return;
 	    }
 
 	    // we want to trigger on BPMN elements only
-	    if (!is$1(element.labelTarget || element, 'bpmn:BaseElement')) {
+	    if (!is$1(labelTarget, 'bpmn:BaseElement')) {
 	      return;
 	    }
 
-	    businessObject = element.businessObject,
-	    di = businessObject.di;
-
+	    di = getDi(labelTarget);
 
 	    if (!di.label) {
 	      di.label = bpmnFactory.create('bpmndi:BPMNLabel', {
 	        bounds: bpmnFactory.create('dc:Bounds')
 	      });
+
+	      element.di = di;
 	    }
 
 	    assign(di.label.bounds, {
@@ -42017,7 +43567,7 @@
 	          edges = asEdges(oldBounds);
 
 	      // get nearest border point to label as reference point
-	      var referencePoint = getReferencePoint$1(labelMid, edges);
+	      var referencePoint = getReferencePoint(labelMid, edges);
 
 	      var delta = getReferencePointDelta(referencePoint, oldBounds, newBounds);
 
@@ -42029,7 +43579,7 @@
 
 	}
 
-	inherits_browser(LabelBehavior, CommandInterceptor);
+	inherits$1(LabelBehavior, CommandInterceptor);
 
 	LabelBehavior.$inject = [
 	  'eventBus',
@@ -42066,7 +43616,7 @@
 	 *
 	 * @param {Point}
 	 */
-	function getReferencePoint$1(point, lines) {
+	function getReferencePoint(point, lines) {
 
 	  if (!lines.length) {
 	    return;
@@ -42150,9 +43700,184 @@
 	  return sorted[0].line;
 	}
 
-	var COLLAB_ERR_MSG = 'flow elements must be children of pools/participants',
-	    PROCESS_ERR_MSG = 'participants cannot be pasted onto a non-empty process diagram';
+	function getResizedSourceAnchor(connection, shape, oldBounds) {
 
+	  var waypoints = safeGetWaypoints(connection),
+	      waypointsInsideNewBounds = getWaypointsInsideBounds(waypoints, shape),
+	      oldAnchor = waypoints[0];
+
+	  // new anchor is the last waypoint enclosed be resized source
+	  if (waypointsInsideNewBounds.length) {
+	    return waypointsInsideNewBounds[ waypointsInsideNewBounds.length - 1 ];
+	  }
+
+	  return getNewAttachPoint(oldAnchor.original || oldAnchor, oldBounds, shape);
+	}
+
+
+	function getResizedTargetAnchor(connection, shape, oldBounds) {
+
+	  var waypoints = safeGetWaypoints(connection),
+	      waypointsInsideNewBounds = getWaypointsInsideBounds(waypoints, shape),
+	      oldAnchor = waypoints[waypoints.length - 1];
+
+	  // new anchor is the first waypoint enclosed be resized target
+	  if (waypointsInsideNewBounds.length) {
+	    return waypointsInsideNewBounds[ 0 ];
+	  }
+
+	  return getNewAttachPoint(oldAnchor.original || oldAnchor, oldBounds, shape);
+	}
+
+
+	function getMovedSourceAnchor(connection, source, moveDelta) {
+
+	  var waypoints = safeGetWaypoints(connection),
+	      oldBounds = subtract(source, moveDelta),
+	      oldAnchor = waypoints[ 0 ];
+
+	  return getNewAttachPoint(oldAnchor.original || oldAnchor, oldBounds, source);
+	}
+
+
+	function getMovedTargetAnchor(connection, target, moveDelta) {
+
+	  var waypoints = safeGetWaypoints(connection),
+	      oldBounds = subtract(target, moveDelta),
+	      oldAnchor = waypoints[ waypoints.length - 1 ];
+
+	  return getNewAttachPoint(oldAnchor.original || oldAnchor, oldBounds, target);
+	}
+
+
+	// helpers //////////////////////
+
+	function subtract(bounds, delta) {
+	  return {
+	    x: bounds.x - delta.x,
+	    y: bounds.y - delta.y,
+	    width: bounds.width,
+	    height: bounds.height
+	  };
+	}
+
+
+	/**
+	 * Return waypoints of given connection; throw if non exists (should not happen!!).
+	 *
+	 * @param {Connection} connection
+	 *
+	 * @return {Array<Point>}
+	 */
+	function safeGetWaypoints(connection) {
+
+	  var waypoints = connection.waypoints;
+
+	  if (!waypoints.length) {
+	    throw new Error('connection#' + connection.id + ': no waypoints');
+	  }
+
+	  return waypoints;
+	}
+
+	function getWaypointsInsideBounds(waypoints, bounds) {
+	  var originalWaypoints = map$1(waypoints, getOriginal);
+
+	  return filter(originalWaypoints, function(waypoint) {
+	    return isInsideBounds(waypoint, bounds);
+	  });
+	}
+
+	/**
+	 * Checks if point is inside bounds, incl. edges.
+	 *
+	 * @param {Point} point
+	 * @param {Bounds} bounds
+	 */
+	function isInsideBounds(point, bounds) {
+	  return getOrientation(bounds, point, 1) === 'intersect';
+	}
+
+	function getOriginal(point) {
+	  return point.original || point;
+	}
+
+	/**
+	 * BPMN-specific message flow behavior.
+	 */
+	function MessageFlowBehavior(eventBus, modeling) {
+
+	  CommandInterceptor.call(this, eventBus);
+
+	  this.postExecute('shape.replace', function(context) {
+	    var oldShape = context.oldShape,
+	        newShape = context.newShape;
+
+	    if (!isParticipantCollapse(oldShape, newShape)) {
+	      return;
+	    }
+
+	    var messageFlows = getMessageFlows(oldShape);
+
+	    messageFlows.incoming.forEach(function(incoming) {
+	      var anchor = getResizedTargetAnchor(incoming, newShape, oldShape);
+
+	      modeling.reconnectEnd(incoming, newShape, anchor);
+	    });
+
+	    messageFlows.outgoing.forEach(function(outgoing) {
+	      var anchor = getResizedSourceAnchor(outgoing, newShape, oldShape);
+
+	      modeling.reconnectStart(outgoing, newShape, anchor);
+	    });
+	  }, true);
+
+	}
+
+	MessageFlowBehavior.$inject = [ 'eventBus', 'modeling' ];
+
+	inherits$1(MessageFlowBehavior, CommandInterceptor);
+
+	// helpers //////////
+
+	function isParticipantCollapse(oldShape, newShape) {
+	  return is$1(oldShape, 'bpmn:Participant')
+	    && isExpanded(oldShape)
+	    && is$1(newShape, 'bpmn:Participant')
+	    && !isExpanded(newShape);
+	}
+
+	function getMessageFlows(parent) {
+	  var elements = selfAndAllChildren([ parent ], false);
+
+	  var incoming = [],
+	      outgoing = [];
+
+	  elements.forEach(function(element) {
+	    if (element === parent) {
+	      return;
+	    }
+
+	    element.incoming.forEach(function(connection) {
+	      if (is$1(connection, 'bpmn:MessageFlow')) {
+	        incoming.push(connection);
+	      }
+	    });
+
+	    element.outgoing.forEach(function(connection) {
+	      if (is$1(connection, 'bpmn:MessageFlow')) {
+	        outgoing.push(connection);
+	      }
+	    });
+	  }, []);
+
+	  return {
+	    incoming: incoming,
+	    outgoing: outgoing
+	  };
+	}
+
+	var COLLAB_ERR_MSG = 'flow elements must be children of pools/participants';
 
 	function ModelingFeedback(eventBus, tooltips, translate) {
 
@@ -42178,19 +43903,6 @@
 	    }
 	  });
 
-	  eventBus.on([ 'elements.paste.rejected' ], function(event) {
-	    var context = event.context,
-	        position = context.position,
-	        target = context.target;
-
-	    if (is$1(target, 'bpmn:Collaboration')) {
-	      showError(position, translate(COLLAB_ERR_MSG));
-	    }
-
-	    if (is$1(target, 'bpmn:Process')) {
-	      showError(position, translate(PROCESS_ERR_MSG), 3000);
-	    }
-	  });
 	}
 
 	ModelingFeedback.$inject = [
@@ -42198,6 +43910,151 @@
 	  'tooltips',
 	  'translate'
 	];
+
+	/**
+	 * BPMN specific behavior ensuring that bpmndi:Label's dc:Bounds are removed
+	 * when shape is resized.
+	 */
+	function RemoveEmbeddedLabelBoundsBehavior(eventBus, modeling) {
+	  CommandInterceptor.call(this, eventBus);
+
+	  this.preExecute('shape.resize', function(context) {
+	    var shape = context.shape;
+
+	    var di = getDi(shape),
+	        label = di && di.get('label'),
+	        bounds = label && label.get('bounds');
+
+	    if (bounds) {
+	      modeling.updateModdleProperties(shape, label, {
+	        bounds: undefined
+	      });
+	    }
+	  }, true);
+	}
+
+	inherits$1(RemoveEmbeddedLabelBoundsBehavior, CommandInterceptor);
+
+	RemoveEmbeddedLabelBoundsBehavior.$inject = [
+	  'eventBus',
+	  'modeling'
+	];
+
+	function RemoveElementBehavior(eventBus, bpmnRules, modeling) {
+
+	  CommandInterceptor.call(this, eventBus);
+
+	  /**
+	   * Combine sequence flows when deleting an element
+	   * if there is one incoming and one outgoing
+	   * sequence flow
+	   */
+	  this.preExecute('shape.delete', function(e) {
+
+	    var shape = e.context.shape;
+
+	    // only handle [a] -> [shape] -> [b] patterns
+	    if (shape.incoming.length !== 1 || shape.outgoing.length !== 1) {
+	      return;
+	    }
+
+	    var inConnection = shape.incoming[0],
+	        outConnection = shape.outgoing[0];
+
+	    // only handle sequence flows
+	    if (!is$1(inConnection, 'bpmn:SequenceFlow') || !is$1(outConnection, 'bpmn:SequenceFlow')) {
+	      return;
+	    }
+
+	    if (bpmnRules.canConnect(inConnection.source, outConnection.target, inConnection)) {
+
+	      // compute new, combined waypoints
+	      var newWaypoints = getNewWaypoints(inConnection.waypoints, outConnection.waypoints);
+
+	      modeling.reconnectEnd(inConnection, outConnection.target, newWaypoints);
+	    }
+	  });
+
+	}
+
+	inherits$1(RemoveElementBehavior, CommandInterceptor);
+
+	RemoveElementBehavior.$inject = [
+	  'eventBus',
+	  'bpmnRules',
+	  'modeling'
+	];
+
+
+	// helpers //////////////////////
+
+	function getDocking$1(point) {
+	  return point.original || point;
+	}
+
+
+	function getNewWaypoints(inWaypoints, outWaypoints) {
+
+	  var intersection = lineIntersect(
+	    getDocking$1(inWaypoints[inWaypoints.length - 2]),
+	    getDocking$1(inWaypoints[inWaypoints.length - 1]),
+	    getDocking$1(outWaypoints[1]),
+	    getDocking$1(outWaypoints[0]));
+
+	  if (intersection) {
+	    return [].concat(
+	      inWaypoints.slice(0, inWaypoints.length - 1),
+	      [ intersection ],
+	      outWaypoints.slice(1));
+	  } else {
+	    return [
+	      getDocking$1(inWaypoints[0]),
+	      getDocking$1(outWaypoints[outWaypoints.length - 1])
+	    ];
+	  }
+	}
+
+	/**
+	 * BPMN specific remove behavior
+	 */
+	function RemoveParticipantBehavior(eventBus, modeling) {
+
+	  CommandInterceptor.call(this, eventBus);
+
+
+	  /**
+	   * morph collaboration diagram into process diagram
+	   * after the last participant has been removed
+	   */
+
+	  this.preExecute('shape.delete', function(context) {
+
+	    var shape = context.shape,
+	        parent = shape.parent;
+
+	    // activate the behavior if the shape to be removed
+	    // is a participant
+	    if (is$1(shape, 'bpmn:Participant')) {
+	      context.collaborationRoot = parent;
+	    }
+	  }, true);
+
+	  this.postExecute('shape.delete', function(context) {
+
+	    var collaborationRoot = context.collaborationRoot;
+
+	    if (collaborationRoot && !collaborationRoot.businessObject.participants.length) {
+
+	      // replace empty collaboration with process diagram
+	      modeling.makeProcess();
+	    }
+	  }, true);
+
+	}
+
+	RemoveParticipantBehavior.$inject = [ 'eventBus', 'modeling' ];
+
+	inherits$1(RemoveParticipantBehavior, CommandInterceptor);
 
 	function ReplaceConnectionBehavior(eventBus, modeling, bpmnRules, injector) {
 
@@ -42362,7 +44219,7 @@
 	  });
 	}
 
-	inherits_browser(ReplaceConnectionBehavior, CommandInterceptor);
+	inherits$1(ReplaceConnectionBehavior, CommandInterceptor);
 
 	ReplaceConnectionBehavior.$inject = [
 	  'eventBus',
@@ -42370,48 +44227,6 @@
 	  'bpmnRules',
 	  'injector'
 	];
-
-	/**
-	 * BPMN specific remove behavior
-	 */
-	function RemoveParticipantBehavior(eventBus, modeling) {
-
-	  CommandInterceptor.call(this, eventBus);
-
-
-	  /**
-	   * morph collaboration diagram into process diagram
-	   * after the last participant has been removed
-	   */
-
-	  this.preExecute('shape.delete', function(context) {
-
-	    var shape = context.shape,
-	        parent = shape.parent;
-
-	    // activate the behavior if the shape to be removed
-	    // is a participant
-	    if (is$1(shape, 'bpmn:Participant')) {
-	      context.collaborationRoot = parent;
-	    }
-	  }, true);
-
-	  this.postExecute('shape.delete', function(context) {
-
-	    var collaborationRoot = context.collaborationRoot;
-
-	    if (collaborationRoot && !collaborationRoot.businessObject.participants.length) {
-
-	      // replace empty collaboration with process diagram
-	      modeling.makeProcess();
-	    }
-	  }, true);
-
-	}
-
-	RemoveParticipantBehavior.$inject = [ 'eventBus', 'modeling' ];
-
-	inherits_browser(RemoveParticipantBehavior, CommandInterceptor);
 
 	/**
 	 * BPMN-specific replace behavior.
@@ -42429,6 +44244,19 @@
 	  this._bpmnReplace = bpmnReplace;
 	  this._elementRegistry = elementRegistry;
 	  this._selection = selection;
+
+	  // replace elements on create, e.g. during copy-paste
+	  this.postExecuted([ 'elements.create' ], 500, function(event) {
+	    var context = event.context,
+	        target = context.parent,
+	        elements = context.elements;
+
+	    var canReplace = bpmnRules.canReplace(elements, target);
+
+	    if (canReplace) {
+	      this.replaceElements(elements, canReplace.replacements);
+	    }
+	  }, this);
 
 	  // replace elements on move
 	  this.postExecuted([ 'elements.move' ], 500, function(event) {
@@ -42484,7 +44312,7 @@
 	  });
 	}
 
-	inherits_browser(ReplaceElementBehaviour, CommandInterceptor);
+	inherits$1(ReplaceElementBehaviour, CommandInterceptor);
 
 	ReplaceElementBehaviour.prototype.replaceElements = function(elements, newElements) {
 	  var elementRegistry = this._elementRegistry,
@@ -42517,9 +44345,52 @@
 	  'selection'
 	];
 
-	var abs$5 = Math.abs,
-	    min$3 = Math.min,
-	    max$4 = Math.max;
+	var HIGH_PRIORITY$9 = 1500;
+
+	var LANE_MIN_DIMENSIONS = { width: 300, height: 60 };
+
+	var PARTICIPANT_MIN_DIMENSIONS = { width: 300, height: 150 };
+
+	var SUB_PROCESS_MIN_DIMENSIONS = { width: 140, height: 120 };
+
+	var TEXT_ANNOTATION_MIN_DIMENSIONS = { width: 50, height: 30 };
+
+	/**
+	 * Set minimum bounds/resize constraints on resize.
+	 *
+	 * @param {EventBus} eventBus
+	 */
+	function ResizeBehavior(eventBus) {
+	  eventBus.on('resize.start', HIGH_PRIORITY$9, function(event) {
+	    var context = event.context,
+	        shape = context.shape,
+	        direction = context.direction,
+	        balanced = context.balanced;
+
+	    if (is$1(shape, 'bpmn:Lane') || is$1(shape, 'bpmn:Participant')) {
+	      context.resizeConstraints = getParticipantResizeConstraints(shape, direction, balanced);
+	    }
+
+	    if (is$1(shape, 'bpmn:Participant')) {
+	      context.minDimensions = PARTICIPANT_MIN_DIMENSIONS;
+	    }
+
+	    if (is$1(shape, 'bpmn:SubProcess') && isExpanded(shape)) {
+	      context.minDimensions = SUB_PROCESS_MIN_DIMENSIONS;
+	    }
+
+	    if (is$1(shape, 'bpmn:TextAnnotation')) {
+	      context.minDimensions = TEXT_ANNOTATION_MIN_DIMENSIONS;
+	    }
+	  });
+	}
+
+	ResizeBehavior.$inject = [ 'eventBus' ];
+
+
+	var abs$2 = Math.abs,
+	    min = Math.min,
+	    max$2 = Math.max;
 
 
 	function addToTrbl(trbl, attr, value, choice) {
@@ -42532,18 +44403,17 @@
 	}
 
 	function addMin(trbl, attr, value) {
-	  return addToTrbl(trbl, attr, value, min$3);
+	  return addToTrbl(trbl, attr, value, min);
 	}
 
 	function addMax(trbl, attr, value) {
-	  return addToTrbl(trbl, attr, value, max$4);
+	  return addToTrbl(trbl, attr, value, max$2);
 	}
 
 	var LANE_RIGHT_PADDING = 20,
 	    LANE_LEFT_PADDING = 50,
 	    LANE_TOP_PADDING = 20,
 	    LANE_BOTTOM_PADDING = 20;
-
 
 	function getParticipantResizeConstraints(laneShape, resizeDirection, balanced) {
 	  var lanesRoot = getLanesRoot(laneShape);
@@ -42577,12 +44447,12 @@
 	      }
 
 	      // max top size (based on next element)
-	      if (balanced && abs$5(laneTrbl.top - otherTrbl.bottom) < 10) {
+	      if (balanced && abs$2(laneTrbl.top - otherTrbl.bottom) < 10) {
 	        addMax(maxTrbl, 'top', otherTrbl.top + LANE_MIN_DIMENSIONS.height);
 	      }
 
 	      // min top size (based on self or nested element)
-	      if (abs$5(laneTrbl.top - otherTrbl.top) < 5) {
+	      if (abs$2(laneTrbl.top - otherTrbl.top) < 5) {
 	        addMin(minTrbl, 'top', otherTrbl.bottom - LANE_MIN_DIMENSIONS.height);
 	      }
 	    }
@@ -42594,12 +44464,12 @@
 	      }
 
 	      // max bottom size (based on previous element)
-	      if (balanced && abs$5(laneTrbl.bottom - otherTrbl.top) < 10) {
+	      if (balanced && abs$2(laneTrbl.bottom - otherTrbl.top) < 10) {
 	        addMin(maxTrbl, 'bottom', otherTrbl.bottom - LANE_MIN_DIMENSIONS.height);
 	      }
 
 	      // min bottom size (based on self or nested element)
-	      if (abs$5(laneTrbl.bottom - otherTrbl.bottom) < 5) {
+	      if (abs$2(laneTrbl.bottom - otherTrbl.bottom) < 5) {
 	        addMax(minTrbl, 'bottom', otherTrbl.top + LANE_MIN_DIMENSIONS.height);
 	      }
 	    }
@@ -42636,49 +44506,6 @@
 	    max: maxTrbl
 	  };
 	}
-
-	var HIGH_PRIORITY$a = 1500;
-
-	var LANE_MIN_DIMENSIONS = { width: 300, height: 60 };
-
-	var PARTICIPANT_MIN_DIMENSIONS = { width: 300, height: 150 };
-
-	var SUB_PROCESS_MIN_DIMENSIONS = { width: 140, height: 120 };
-
-	var TEXT_ANNOTATION_MIN_DIMENSIONS = { width: 50, height: 30 };
-
-
-	/**
-	 * Set minimum bounds/resize constraints on resize.
-	 *
-	 * @param {EventBus} eventBus
-	 */
-	function ResizeBehavior$1(eventBus) {
-	  eventBus.on('resize.start', HIGH_PRIORITY$a, function(event) {
-	    var context = event.context,
-	        shape = context.shape,
-	        direction = context.direction,
-	        balanced = context.balanced;
-
-	    if (is$1(shape, 'bpmn:Lane') || is$1(shape, 'bpmn:Participant')) {
-	      context.resizeConstraints = getParticipantResizeConstraints(shape, direction, balanced);
-	    }
-
-	    if (is$1(shape, 'bpmn:Participant')) {
-	      context.minDimensions = PARTICIPANT_MIN_DIMENSIONS;
-	    }
-
-	    if (is$1(shape, 'bpmn:SubProcess') && isExpanded(shape)) {
-	      context.minDimensions = SUB_PROCESS_MIN_DIMENSIONS;
-	    }
-
-	    if (is$1(shape, 'bpmn:TextAnnotation')) {
-	      context.minDimensions = TEXT_ANNOTATION_MIN_DIMENSIONS;
-	    }
-	  });
-	}
-
-	ResizeBehavior$1.$inject = [ 'eventBus' ];
 
 	var SLIGHTLY_HIGHER_PRIORITY = 1001;
 
@@ -42734,84 +44561,171 @@
 	  'modeling'
 	];
 
-	function RemoveElementBehavior(eventBus, bpmnRules, modeling) {
+	var LOW_PRIORITY$a = 500;
 
-	  CommandInterceptor.call(this, eventBus);
 
-	  /**
-	   * Combine sequence flows when deleting an element
-	   * if there is one incoming and one outgoing
-	   * sequence flow
-	   */
-	  this.preExecute('shape.delete', function(e) {
+	/**
+	 * Add referenced root elements (error, escalation, message, signal) if they don't exist.
+	 * Copy referenced root elements on copy & paste.
+	 */
+	function RootElementReferenceBehavior(
+	    bpmnjs, eventBus, injector, moddleCopy, bpmnFactory
+	) {
+	  injector.invoke(CommandInterceptor, this);
 
-	    var shape = e.context.shape;
+	  function canHaveRootElementReference(element) {
+	    return isAny(element, [ 'bpmn:ReceiveTask', 'bpmn:SendTask' ]) ||
+	      hasAnyEventDefinition(element, [
+	        'bpmn:ErrorEventDefinition',
+	        'bpmn:EscalationEventDefinition',
+	        'bpmn:MessageEventDefinition',
+	        'bpmn:SignalEventDefinition'
+	      ]);
+	  }
 
-	    // only handle [a] -> [shape] -> [b] patterns
-	    if (shape.incoming.length !== 1 || shape.outgoing.length !== 1) {
+	  function hasRootElement(rootElement) {
+	    var definitions = bpmnjs.getDefinitions(),
+	        rootElements = definitions.get('rootElements');
+
+	    return !!find(rootElements, matchPattern({ id: rootElement.id }));
+	  }
+
+	  function getRootElementReferencePropertyName(eventDefinition) {
+	    if (is$1(eventDefinition, 'bpmn:ErrorEventDefinition')) {
+	      return 'errorRef';
+	    } else if (is$1(eventDefinition, 'bpmn:EscalationEventDefinition')) {
+	      return 'escalationRef';
+	    } else if (is$1(eventDefinition, 'bpmn:MessageEventDefinition')) {
+	      return 'messageRef';
+	    } else if (is$1(eventDefinition, 'bpmn:SignalEventDefinition')) {
+	      return 'signalRef';
+	    }
+	  }
+
+	  function getRootElement(businessObject) {
+	    if (isAny(businessObject, [ 'bpmn:ReceiveTask', 'bpmn:SendTask' ])) {
+	      return businessObject.get('messageRef');
+	    }
+
+	    var eventDefinitions = businessObject.get('eventDefinitions'),
+	        eventDefinition = eventDefinitions[ 0 ];
+
+	    return eventDefinition.get(getRootElementReferencePropertyName(eventDefinition));
+	  }
+
+	  function setRootElement(businessObject, rootElement) {
+	    if (isAny(businessObject, [ 'bpmn:ReceiveTask', 'bpmn:SendTask' ])) {
+	      return businessObject.set('messageRef', rootElement);
+	    }
+
+	    var eventDefinitions = businessObject.get('eventDefinitions'),
+	        eventDefinition = eventDefinitions[ 0 ];
+
+	    return eventDefinition.set(getRootElementReferencePropertyName(eventDefinition), rootElement);
+	  }
+
+	  // create shape
+	  this.executed('shape.create', function(context) {
+	    var shape = context.shape;
+
+	    if (!canHaveRootElementReference(shape)) {
 	      return;
 	    }
 
-	    var inConnection = shape.incoming[0],
-	        outConnection = shape.outgoing[0];
+	    var businessObject = getBusinessObject(shape),
+	        rootElement = getRootElement(businessObject),
+	        rootElements;
 
-	    // only handle sequence flows
-	    if (!is$1(inConnection, 'bpmn:SequenceFlow') || !is$1(outConnection, 'bpmn:SequenceFlow')) {
+	    if (rootElement && !hasRootElement(rootElement)) {
+	      rootElements = bpmnjs.getDefinitions().get('rootElements');
+
+	      // add root element
+	      add(rootElements, rootElement);
+
+	      context.addedRootElement = rootElement;
+	    }
+	  }, true);
+
+	  this.reverted('shape.create', function(context) {
+	    var addedRootElement = context.addedRootElement;
+
+	    if (!addedRootElement) {
 	      return;
 	    }
 
-	    if (bpmnRules.canConnect(inConnection.source, outConnection.target, inConnection)) {
+	    var rootElements = bpmnjs.getDefinitions().get('rootElements');
 
-	      // compute new, combined waypoints
-	      var newWaypoints = getNewWaypoints(inConnection.waypoints, outConnection.waypoints);
+	    // remove root element
+	    remove(rootElements, addedRootElement);
+	  }, true);
 
-	      modeling.reconnectEnd(inConnection, outConnection.target, newWaypoints);
+	  eventBus.on('copyPaste.copyElement', function(context) {
+	    var descriptor = context.descriptor,
+	        element = context.element;
+
+	    if (!canHaveRootElementReference(element)) {
+	      return;
+	    }
+
+	    var businessObject = getBusinessObject(element),
+	        rootElement = getRootElement(businessObject);
+
+	    if (rootElement) {
+	      descriptor.referencedRootElement = rootElement;
 	    }
 	  });
 
+	  eventBus.on('copyPaste.pasteElement', LOW_PRIORITY$a, function(context) {
+	    var descriptor = context.descriptor,
+	        businessObject = descriptor.businessObject;
+
+	    if (!canHaveRootElementReference(businessObject)) {
+	      return;
+	    }
+
+	    var referencedRootElement = descriptor.referencedRootElement;
+
+	    if (!referencedRootElement) {
+	      return;
+	    }
+
+	    if (!hasRootElement(referencedRootElement)) {
+	      referencedRootElement = moddleCopy.copyElement(
+	        referencedRootElement,
+	        bpmnFactory.create(referencedRootElement.$type)
+	      );
+	    }
+
+	    setRootElement(businessObject, referencedRootElement);
+	  });
 	}
 
-	inherits_browser(RemoveElementBehavior, CommandInterceptor);
-
-	RemoveElementBehavior.$inject = [
+	RootElementReferenceBehavior.$inject = [
+	  'bpmnjs',
 	  'eventBus',
-	  'bpmnRules',
-	  'modeling'
+	  'injector',
+	  'moddleCopy',
+	  'bpmnFactory'
 	];
 
+	inherits$1(RootElementReferenceBehavior, CommandInterceptor);
 
-	// helpers //////////////////////
+	// helpers //////////
 
-	function getDocking$1(point) {
-	  return point.original || point;
-	}
-
-
-	function getNewWaypoints(inWaypoints, outWaypoints) {
-
-	  var intersection = lineIntersect(
-	    getDocking$1(inWaypoints[inWaypoints.length - 2]),
-	    getDocking$1(inWaypoints[inWaypoints.length - 1]),
-	    getDocking$1(outWaypoints[1]),
-	    getDocking$1(outWaypoints[0]));
-
-	  if (intersection) {
-	    return [].concat(
-	      inWaypoints.slice(0, inWaypoints.length - 1),
-	      [ intersection ],
-	      outWaypoints.slice(1));
-	  } else {
-	    return [
-	      getDocking$1(inWaypoints[0]),
-	      getDocking$1(outWaypoints[outWaypoints.length - 1])
-	    ];
+	function hasAnyEventDefinition(element, types) {
+	  if (!isArray$2(types)) {
+	    types = [ types ];
 	  }
+
+	  return some(types, function(type) {
+	    return hasEventDefinition$2(element, type);
+	  });
 	}
 
-	var max$5 = Math.max;
+	var max$1 = Math.max;
 
 
-	function SpaceToolBehavior$1(eventBus) {
+	function SpaceToolBehavior(eventBus) {
 	  eventBus.on('spaceTool.getMinDimensions', function(context) {
 	    var shapes = context.shapes,
 	        axis = context.axis,
@@ -42823,7 +44737,7 @@
 
 	      if (is$1(shape, 'bpmn:Participant')) {
 
-	        if (isHorizontal$2(axis)) {
+	        if (isHorizontal$1(axis)) {
 	          minDimensions[ id ] = PARTICIPANT_MIN_DIMENSIONS;
 	        } else {
 	          minDimensions[ id ] = {
@@ -42847,11 +44761,11 @@
 	  });
 	}
 
-	SpaceToolBehavior$1.$inject = [ 'eventBus' ];
+	SpaceToolBehavior.$inject = [ 'eventBus' ];
 
 
 	// helpers //////////
-	function isHorizontal$2(axis) {
+	function isHorizontal$1(axis) {
 	  return axis === 'x';
 	}
 
@@ -42872,7 +44786,7 @@
 
 	  lanesMinHeight = getLanesMinHeight(participant, start);
 
-	  return max$5(PARTICIPANT_MIN_DIMENSIONS.height, lanesMinHeight);
+	  return max$1(PARTICIPANT_MIN_DIMENSIONS.height, lanesMinHeight);
 	}
 
 	function hasChildLanes(element) {
@@ -42918,6 +44832,547 @@
 	  }
 	}
 
+	var LOW_PRIORITY$9 = 400;
+	var HIGH_PRIORITY$8 = 600;
+
+	var DEFAULT_POSITION = {
+	  x: 180,
+	  y: 160
+	};
+
+
+	/**
+	 * Creates bpmndi:BPMNPlane elements and canvas planes when collapsed subprocesses are created.
+	 *
+	 *
+	 * @param {Canvas} canvas
+	 * @param {EventBus} eventBus
+	 * @param {Modeling} modeling
+	 * @param {ElementFactory} elementFactory
+	 * @param {BpmnFactory} bpmnFactory
+	 * @param {Bpmnjs} bpmnjs
+	 * @param {ElementRegistry} elementRegistry
+	 */
+	function SubProcessPlaneBehavior(
+	    canvas, eventBus, modeling,
+	    elementFactory, bpmnFactory, bpmnjs, elementRegistry) {
+
+	  CommandInterceptor.call(this, eventBus);
+
+	  this._canvas = canvas;
+	  this._eventBus = eventBus;
+	  this._modeling = modeling;
+	  this._elementFactory = elementFactory;
+	  this._bpmnFactory = bpmnFactory;
+	  this._bpmnjs = bpmnjs;
+	  this._elementRegistry = elementRegistry;
+
+	  var self = this;
+
+	  function isCollapsedSubProcess(element) {
+	    return is$1(element, 'bpmn:SubProcess') && !isExpanded(element);
+	  }
+
+	  function createRoot(context) {
+	    var shape = context.shape,
+	        rootElement = context.newRootElement;
+
+	    var businessObject = getBusinessObject(shape);
+
+	    rootElement = self._addDiagram(rootElement || businessObject);
+
+	    context.newRootElement = canvas.addRootElement(rootElement);
+	  }
+
+	  function removeRoot(context) {
+	    var shape = context.shape;
+
+	    var businessObject = getBusinessObject(shape);
+	    self._removeDiagram(businessObject);
+
+	    var rootElement = context.newRootElement = elementRegistry.get(getPlaneIdFromShape(businessObject));
+
+	    canvas.removeRootElement(rootElement);
+	  }
+
+	  // add plane elements for newly created sub-processes
+	  // this ensures we can actually drill down into the element
+	  this.executed('shape.create', function(context) {
+	    var shape = context.shape;
+	    if (!isCollapsedSubProcess(shape)) {
+	      return;
+	    }
+
+	    createRoot(context);
+	  }, true);
+
+
+	  this.postExecuted('shape.create', function(context) {
+	    var shape = context.shape,
+	        rootElement = context.newRootElement;
+
+	    if (!rootElement || !shape.children) {
+	      return;
+	    }
+
+	    self._showRecursively(shape.children);
+
+	    self._moveChildrenToShape(shape, rootElement);
+	  }, true);
+
+
+	  this.reverted('shape.create', function(context) {
+	    var shape = context.shape;
+	    if (!isCollapsedSubProcess(shape)) {
+	      return;
+	    }
+
+	    removeRoot(context);
+	  }, true);
+
+
+	  this.preExecuted('shape.delete', function(context) {
+	    var shape = context.shape;
+	    if (!isCollapsedSubProcess(shape)) {
+	      return;
+	    }
+
+	    var attachedRoot = elementRegistry.get(getPlaneIdFromShape(shape));
+
+	    if (!attachedRoot) {
+	      return;
+	    }
+
+	    modeling.removeElements(attachedRoot.children.slice());
+	  }, true);
+
+
+	  this.executed('shape.delete', function(context) {
+	    var shape = context.shape;
+	    if (!isCollapsedSubProcess(shape)) {
+	      return;
+	    }
+	    removeRoot(context);
+	  }, true);
+
+
+	  this.reverted('shape.delete', function(context) {
+	    var shape = context.shape;
+	    if (!isCollapsedSubProcess(shape)) {
+	      return;
+	    }
+
+	    createRoot(context);
+	  }, true);
+
+
+	  this.preExecuted('shape.replace', function(context) {
+	    var oldShape = context.oldShape;
+	    var newShape = context.newShape;
+
+	    if (!isCollapsedSubProcess(oldShape) || !isCollapsedSubProcess(newShape)) {
+	      return;
+	    }
+
+	    // old plane could have content,
+	    // we remove it so it is not recursively deleted from 'shape.delete'
+	    context.oldRoot = canvas.removeRootElement(getPlaneIdFromShape(oldShape));
+	  }, true);
+
+
+	  this.postExecuted('shape.replace', function(context) {
+	    var newShape = context.newShape,
+	        source = context.oldRoot,
+	        target = canvas.findRoot(getPlaneIdFromShape(newShape));
+
+	    if (!source || !target) {
+	      return;
+	    }
+	    var elements = source.children;
+
+	    modeling.moveElements(elements, { x: 0, y: 0 }, target);
+	  }, true);
+
+
+	  // rename primary elements when the secondary element changes
+	  // this ensures rootElement.id = element.id + '_plane'
+	  this.executed('element.updateProperties', function(context) {
+	    var shape = context.element;
+
+	    if (!is$1(shape, 'bpmn:SubProcess')) {
+	      return;
+	    }
+
+	    var properties = context.properties;
+	    var oldProperties = context.oldProperties;
+
+	    var oldId = oldProperties.id,
+	        newId = properties.id;
+
+	    if (oldId === newId) {
+	      return;
+	    }
+
+	    if (isPlane(shape)) {
+	      elementRegistry.updateId(shape, toPlaneId(newId));
+	      elementRegistry.updateId(oldId, newId);
+
+	      return;
+	    }
+
+	    var planeElement = elementRegistry.get(toPlaneId(oldId));
+
+	    if (!planeElement) {
+	      return;
+	    }
+
+	    elementRegistry.updateId(toPlaneId(oldId), toPlaneId(newId));
+	  }, true);
+
+
+	  this.reverted('element.updateProperties', function(context) {
+	    var shape = context.element;
+
+	    if (!is$1(shape, 'bpmn:SubProcess')) {
+	      return;
+	    }
+
+	    var properties = context.properties;
+	    var oldProperties = context.oldProperties;
+
+	    var oldId = oldProperties.id,
+	        newId = properties.id;
+
+	    if (oldId === newId) {
+	      return;
+	    }
+
+	    if (isPlane(shape)) {
+	      elementRegistry.updateId(shape, toPlaneId(oldId));
+	      elementRegistry.updateId(newId, oldId);
+
+	      return;
+	    }
+
+	    var planeElement = elementRegistry.get(toPlaneId(newId));
+
+	    if (!planeElement) {
+	      return;
+	    }
+
+	    elementRegistry.updateId(planeElement, toPlaneId(oldId));
+	  }, true);
+
+	  // re-throw element.changed to re-render primary shape if associated plane has
+	  // changed (e.g. bpmn:name property has changed)
+	  eventBus.on('element.changed', function(context) {
+	    var element = context.element;
+
+	    if (!isPlane(element)) {
+	      return;
+	    }
+
+	    var plane = element;
+
+	    var primaryShape = elementRegistry.get(getShapeIdFromPlane(plane));
+
+	    // do not re-throw if no associated primary shape (e.g. bpmn:Process)
+	    if (!primaryShape || primaryShape === plane) {
+	      return;
+	    }
+
+	    eventBus.fire('element.changed', { element: primaryShape });
+	  });
+
+
+	  // create/remove plane for the subprocess
+	  this.executed('shape.toggleCollapse', LOW_PRIORITY$9, function(context) {
+	    var shape = context.shape;
+
+	    if (!is$1(shape, 'bpmn:SubProcess')) {
+	      return;
+	    }
+
+	    if (!isExpanded(shape)) {
+	      createRoot(context);
+	      self._showRecursively(shape.children);
+	    } else {
+	      removeRoot(context);
+	    }
+
+	  }, true);
+
+
+	  // create/remove plane for the subprocess
+	  this.reverted('shape.toggleCollapse', LOW_PRIORITY$9, function(context) {
+	    var shape = context.shape;
+
+	    if (!is$1(shape, 'bpmn:SubProcess')) {
+	      return;
+	    }
+
+	    if (!isExpanded(shape)) {
+	      createRoot(context);
+	      self._showRecursively(shape.children);
+	    } else {
+	      removeRoot(context);
+	    }
+
+	  }, true);
+
+	  // move elements between planes
+	  this.postExecuted('shape.toggleCollapse', HIGH_PRIORITY$8, function(context) {
+	    var shape = context.shape;
+
+	    if (!is$1(shape, 'bpmn:SubProcess')) {
+	      return;
+	    }
+
+	    var rootElement = context.newRootElement;
+
+	    if (!rootElement) {
+	      return;
+	    }
+
+	    if (!isExpanded(shape)) {
+
+	      // collapsed
+	      self._moveChildrenToShape(shape, rootElement);
+
+	    } else {
+	      self._moveChildrenToShape(rootElement, shape);
+	    }
+	  }, true);
+
+
+	  // copy-paste ///////////
+
+	  // add elements in plane to tree
+	  eventBus.on('copyPaste.createTree', function(context) {
+	    var element = context.element,
+	        children = context.children;
+
+	    if (!isCollapsedSubProcess(element)) {
+	      return;
+	    }
+
+	    var id = getPlaneIdFromShape(element);
+	    var parent = elementRegistry.get(id);
+
+	    if (parent) {
+
+	      // do not copy invisible root element
+	      children.push.apply(children, parent.children);
+	    }
+	  });
+
+	  // set plane children as direct children of collapsed shape
+	  eventBus.on('copyPaste.copyElement', function(context) {
+	    var descriptor = context.descriptor,
+	        element = context.element,
+	        elements = context.elements;
+
+	    var parent = element.parent;
+
+	    var isPlane = is$1(getDi(parent), 'bpmndi:BPMNPlane');
+	    if (!isPlane) {
+	      return;
+	    }
+
+	    var parentId = getShapeIdFromPlane(parent);
+
+	    var referencedShape = find(elements, function(element) {
+	      return element.id === parentId;
+	    });
+
+	    if (!referencedShape) {
+	      return;
+	    }
+
+	    descriptor.parent = referencedShape.id;
+	  });
+
+	  // hide children during pasting
+	  eventBus.on('copyPaste.pasteElement', function(context) {
+	    var descriptor = context.descriptor;
+
+	    if (!descriptor.parent) {
+	      return;
+	    }
+
+	    if (isCollapsedSubProcess(descriptor.parent) || descriptor.parent.hidden) {
+	      descriptor.hidden = true;
+	    }
+	  });
+
+	}
+
+	inherits$1(SubProcessPlaneBehavior, CommandInterceptor);
+
+	/**
+	 * Moves the child elements from source to target.
+	 *
+	 * If the target is a plane, the children are moved to the top left corner.
+	 * Otherwise, the center of the target is used.
+	 *
+	 * @param {Object|djs.model.Base} source
+	 * @param {Object|djs.model.Base} target
+	 */
+	SubProcessPlaneBehavior.prototype._moveChildrenToShape = function(source, target) {
+	  var modeling = this._modeling;
+
+	  var children = source.children;
+	  var offset;
+
+	  if (!children) {
+	    return;
+	  }
+
+	  // only change plane if there are no visible children, but don't move them
+	  var visibleChildren = children.filter(function(child) {
+	    return !child.hidden;
+	  });
+
+	  if (!visibleChildren.length) {
+	    modeling.moveElements(children, { x: 0, y: 0 }, target, { autoResize: false });
+	    return;
+	  }
+
+	  var childrenBounds = getBBox(visibleChildren);
+
+	  // target is a plane
+	  if (!target.x) {
+	    offset = {
+	      x: DEFAULT_POSITION.x - childrenBounds.x,
+	      y: DEFAULT_POSITION.y - childrenBounds.y
+	    };
+	  }
+
+	  // source is a plane
+	  else {
+
+	    // move relative to the center of the shape
+	    var targetMid = getMid(target);
+	    var childrenMid = getMid(childrenBounds);
+
+	    offset = {
+	      x: targetMid.x - childrenMid.x,
+	      y: targetMid.y - childrenMid.y
+	    };
+	  }
+
+	  modeling.moveElements(children, offset, target, { autoResize: false });
+	};
+
+	/**
+	 * Sets `hidden` property on all children of the given shape.
+	 *
+	 * @param {Array} elements
+	 * @param {Boolean} [hidden]
+	 * @returns {Array} all child elements
+	 */
+	SubProcessPlaneBehavior.prototype._showRecursively = function(elements, hidden) {
+	  var self = this;
+
+	  var result = [];
+	  elements.forEach(function(element) {
+	    element.hidden = !!hidden;
+
+	    result = result.concat(element);
+
+	    if (element.children) {
+	      result = result.concat(
+	        self._showRecursively(element.children, element.collapsed || hidden)
+	      );
+	    }
+	  });
+
+	  return result;
+	};
+
+	/**
+	* Adds a given rootElement to the bpmnDi diagrams.
+	*
+	* @param {Object} rootElement
+	* @returns {Object} planeElement
+	*/
+	SubProcessPlaneBehavior.prototype._addDiagram = function(planeElement) {
+	  var bpmnjs = this._bpmnjs;
+	  var diagrams = bpmnjs.getDefinitions().diagrams;
+
+	  if (!planeElement.businessObject) {
+	    planeElement = this._createNewDiagram(planeElement);
+	  }
+
+	  diagrams.push(planeElement.di.$parent);
+
+	  return planeElement;
+	};
+
+
+	/**
+	* Creates a new plane element for the given sub process.
+	*
+	* @param {Object} bpmnElement
+	*
+	* @return {Object} new diagram element
+	*/
+	SubProcessPlaneBehavior.prototype._createNewDiagram = function(bpmnElement) {
+	  var bpmnFactory = this._bpmnFactory;
+	  var elementFactory = this._elementFactory;
+
+	  var diPlane = bpmnFactory.create('bpmndi:BPMNPlane', {
+	    bpmnElement: bpmnElement
+	  });
+	  var diDiagram = bpmnFactory.create('bpmndi:BPMNDiagram', {
+	    plane: diPlane
+	  });
+	  diPlane.$parent = diDiagram;
+
+	  // add a virtual element (not being drawn),
+	  // a copy cat of our BpmnImporter code
+	  var planeElement = elementFactory.createRoot({
+	    id: getPlaneIdFromShape(bpmnElement),
+	    type: bpmnElement.$type,
+	    di: diPlane,
+	    businessObject: bpmnElement,
+	    collapsed: true
+	  });
+
+	  return planeElement;
+	};
+
+	/**
+	 * Removes the diagram for a given root element
+	 *
+	 * @param {Object} rootElement
+	 * @returns {Object} removed bpmndi:BPMNDiagram
+	 */
+	SubProcessPlaneBehavior.prototype._removeDiagram = function(rootElement) {
+	  var bpmnjs = this._bpmnjs;
+
+	  var diagrams = bpmnjs.getDefinitions().diagrams;
+
+	  var removedDiagram = find(diagrams, function(diagram) {
+	    return diagram.plane.bpmnElement.id === rootElement.id;
+	  });
+
+	  diagrams.splice(diagrams.indexOf(removedDiagram), 1);
+
+	  return removedDiagram;
+	};
+
+
+	SubProcessPlaneBehavior.$inject = [
+	  'canvas',
+	  'eventBus',
+	  'modeling',
+	  'elementFactory',
+	  'bpmnFactory',
+	  'bpmnjs',
+	  'elementRegistry'
+	];
+
 	/**
 	 * Add start event replacing element with expanded sub process.
 	 *
@@ -42950,7 +45405,7 @@
 	  'modeling'
 	];
 
-	inherits_browser(SubProcessStartEventBehavior, CommandInterceptor);
+	inherits$1(SubProcessStartEventBehavior, CommandInterceptor);
 
 	// helpers //////////
 
@@ -42961,7 +45416,65 @@
 	  };
 	}
 
-	var LOW_PRIORITY$e = 500;
+	function ToggleCollapseConnectionBehaviour(
+	    eventBus, modeling
+	) {
+
+	  CommandInterceptor.call(this, eventBus);
+
+	  this.postExecuted('shape.toggleCollapse', 1500, function(context) {
+
+	    // var shape = context.shape;
+	    var shape = context.shape;
+
+	    // only change connections when collapsing
+	    if (isExpanded(shape)) {
+	      return;
+	    }
+
+	    var allChildren = selfAndAllChildren(shape);
+
+	    allChildren.forEach(function(child) {
+
+	      // Ensure that the connection array is not modified during iteration
+	      var incomingConnections = child.incoming.slice(),
+	          outgoingConnections = child.outgoing.slice();
+
+	      forEach(incomingConnections, function(c) {
+	        handleConnection(c, true);
+	      });
+
+	      forEach(outgoingConnections, function(c) {
+	        handleConnection(c, false);
+	      });
+	    });
+
+
+	    function handleConnection(c, incoming) {
+	      if (allChildren.indexOf(c.source) !== -1 && allChildren.indexOf(c.target) !== -1) {
+	        return;
+	      }
+
+	      if (incoming) {
+	        modeling.reconnectEnd(c, shape, getMid(shape));
+	      } else {
+	        modeling.reconnectStart(c, shape, getMid(shape));
+	      }
+
+	    }
+
+	  }, true);
+
+	}
+
+	inherits$1(ToggleCollapseConnectionBehaviour, CommandInterceptor);
+
+	ToggleCollapseConnectionBehaviour.$inject = [
+	  'eventBus',
+	  'modeling',
+	];
+
+	var LOW_PRIORITY$8 = 500;
 
 
 	function ToggleElementCollapseBehaviour(
@@ -43019,7 +45532,7 @@
 	    };
 	  }
 
-	  this.executed([ 'shape.toggleCollapse' ], LOW_PRIORITY$e, function(e) {
+	  this.executed([ 'shape.toggleCollapse' ], LOW_PRIORITY$8, function(e) {
 
 	    var context = e.context,
 	        shape = context.shape;
@@ -43034,15 +45547,15 @@
 	      hideEmptyLabels(shape.children);
 
 	      // remove collapsed marker
-	      getBusinessObject(shape).di.isExpanded = true;
+	      getDi(shape).isExpanded = true;
 	    } else {
 
 	      // place collapsed marker
-	      getBusinessObject(shape).di.isExpanded = false;
+	      getDi(shape).isExpanded = false;
 	    }
 	  });
 
-	  this.reverted([ 'shape.toggleCollapse' ], LOW_PRIORITY$e, function(e) {
+	  this.reverted([ 'shape.toggleCollapse' ], LOW_PRIORITY$8, function(e) {
 
 	    var context = e.context;
 	    var shape = context.shape;
@@ -43050,16 +45563,16 @@
 
 	    // revert removing/placing collapsed marker
 	    if (!shape.collapsed) {
-	      getBusinessObject(shape).di.isExpanded = true;
+	      getDi(shape).isExpanded = true;
 
 	    } else {
-	      getBusinessObject(shape).di.isExpanded = false;
+	      getDi(shape).isExpanded = false;
 	    }
 	  });
 
-	  this.postExecuted([ 'shape.toggleCollapse' ], LOW_PRIORITY$e, function(e) {
+	  this.postExecuted([ 'shape.toggleCollapse' ], LOW_PRIORITY$8, function(e) {
 	    var shape = e.context.shape,
-	        defaultSize = elementFactory._getDefaultSize(shape),
+	        defaultSize = elementFactory.getDefaultSize(shape),
 	        newBounds;
 
 	    if (shape.collapsed) {
@@ -43080,7 +45593,7 @@
 	}
 
 
-	inherits_browser(ToggleElementCollapseBehaviour, CommandInterceptor);
+	inherits$1(ToggleElementCollapseBehaviour, CommandInterceptor);
 
 	ToggleElementCollapseBehaviour.$inject = [
 	  'eventBus',
@@ -43113,7 +45626,7 @@
 	        shape = context.shape,
 	        shapeBo = shape.businessObject;
 
-	    if (isLabel(shape)) {
+	    if (isLabel$6(shape)) {
 	      return;
 	    }
 
@@ -43137,16 +45650,66 @@
 	    var rootElement = canvas.getRootElement(),
 	        rootElementBo = rootElement.businessObject;
 
-	    moddle.ids.unclaim(rootElementBo.id);
+	    if (is$1(rootElement, 'bpmn:Collaboration')) {
+	      moddle.ids.unclaim(rootElementBo.id);
+	    }
 	  });
 	}
 
-	inherits_browser(UnclaimIdBehavior, CommandInterceptor);
+	inherits$1(UnclaimIdBehavior, CommandInterceptor);
 
 	UnclaimIdBehavior.$inject = [ 'canvas', 'injector', 'moddle', 'modeling' ];
 
-	var LOW_PRIORITY$f = 500,
-	    HIGH_PRIORITY$b = 5000;
+	/**
+	 * A behavior that unsets the Default property of
+	 * sequence flow source on element delete, if the
+	 * removed element is the Gateway or Task's default flow.
+	 *
+	 * @param {EventBus} eventBus
+	 * @param {Modeling} modeling
+	 */
+	function DeleteSequenceFlowBehavior(eventBus, modeling) {
+
+	  CommandInterceptor.call(this, eventBus);
+
+
+	  this.preExecute('connection.delete', function(event) {
+	    var context = event.context,
+	        connection = context.connection,
+	        source = connection.source;
+
+	    if (isDefaultFlow(connection, source)) {
+	      modeling.updateProperties(source, {
+	        'default': null
+	      });
+	    }
+	  });
+	}
+
+	inherits$1(DeleteSequenceFlowBehavior, CommandInterceptor);
+
+	DeleteSequenceFlowBehavior.$inject = [
+	  'eventBus',
+	  'modeling'
+	];
+
+
+	// helpers //////////////////////
+
+	function isDefaultFlow(connection, source) {
+
+	  if (!is$1(connection, 'bpmn:SequenceFlow')) {
+	    return false;
+	  }
+
+	  var sourceBo = getBusinessObject(source),
+	      sequenceFlow = getBusinessObject(connection);
+
+	  return sourceBo.get('default') === sequenceFlow;
+	}
+
+	var LOW_PRIORITY$7 = 500,
+	    HIGH_PRIORITY$7 = 5000;
 
 
 	/**
@@ -43223,11 +45786,11 @@
 
 	  // listen to a lot of stuff to group lane updates
 
-	  this.preExecute(laneRefUpdateEvents, HIGH_PRIORITY$b, function(event) {
+	  this.preExecute(laneRefUpdateEvents, HIGH_PRIORITY$7, function(event) {
 	    initContext();
 	  });
 
-	  this.postExecuted(laneRefUpdateEvents, LOW_PRIORITY$f, function(event) {
+	  this.postExecuted(laneRefUpdateEvents, LOW_PRIORITY$7, function(event) {
 	    releaseContext();
 	  });
 
@@ -43267,7 +45830,7 @@
 	  'translate'
 	];
 
-	inherits_browser(UpdateFlowNodeRefsBehavior, CommandInterceptor);
+	inherits$1(UpdateFlowNodeRefsBehavior, CommandInterceptor);
 
 
 	function UpdateContext() {
@@ -43296,54 +45859,6 @@
 	  };
 	}
 
-	/**
-	 * A behavior that unsets the Default property of
-	 * sequence flow source on element delete, if the
-	 * removed element is the Gateway or Task's default flow.
-	 *
-	 * @param {EventBus} eventBus
-	 * @param {Modeling} modeling
-	 */
-	function DeleteSequenceFlowBehavior(eventBus, modeling) {
-
-	  CommandInterceptor.call(this, eventBus);
-
-
-	  this.preExecute('connection.delete', function(event) {
-	    var context = event.context,
-	        connection = context.connection,
-	        source = connection.source;
-
-	    if (isDefaultFlow(connection, source)) {
-	      modeling.updateProperties(source, {
-	        'default': null
-	      });
-	    }
-	  });
-	}
-
-	inherits_browser(DeleteSequenceFlowBehavior, CommandInterceptor);
-
-	DeleteSequenceFlowBehavior.$inject = [
-	  'eventBus',
-	  'modeling'
-	];
-
-
-	// helpers //////////////////////
-
-	function isDefaultFlow(connection, source) {
-
-	  if (!is$1(connection, 'bpmn:SequenceFlow')) {
-	    return false;
-	  }
-
-	  var sourceBo = getBusinessObject(source),
-	      sequenceFlow = getBusinessObject(connection);
-
-	  return sourceBo.get('default') === sequenceFlow;
-	}
-
 	var BehaviorModule = {
 	  __init__: [
 	    'adaptiveLabelPositioningBehavior',
@@ -43351,68 +45866,76 @@
 	    'associationBehavior',
 	    'attachEventBehavior',
 	    'boundaryEventBehavior',
-	    'rootElementReferenceBehavior',
 	    'createBehavior',
-	    'fixHoverBehavior',
 	    'createDataObjectBehavior',
 	    'createParticipantBehavior',
-	    'dataStoreBehavior',
 	    'dataInputAssociationBehavior',
+	    'dataStoreBehavior',
 	    'deleteLaneBehavior',
 	    'detachEventBehavior',
 	    'dropOnFlowBehavior',
 	    'eventBasedGatewayBehavior',
+	    'fixHoverBehavior',
 	    'groupBehavior',
 	    'importDockingFix',
 	    'isHorizontalFix',
 	    'labelBehavior',
+	    'messageFlowBehavior',
 	    'modelingFeedback',
 	    'removeElementBehavior',
+	    'removeEmbeddedLabelBoundsBehavior',
 	    'removeParticipantBehavior',
 	    'replaceConnectionBehavior',
 	    'replaceElementBehaviour',
 	    'resizeBehavior',
 	    'resizeLaneBehavior',
-	    'toggleElementCollapseBehaviour',
+	    'rootElementReferenceBehavior',
 	    'spaceToolBehavior',
+	    'subProcessPlaneBehavior',
 	    'subProcessStartEventBehavior',
+	    'toggleCollapseConnectionBehaviour',
+	    'toggleElementCollapseBehaviour',
 	    'unclaimIdBehavior',
-	    'unsetDefaultFlowBehavior',
-	    'updateFlowNodeRefsBehavior'
+	    'updateFlowNodeRefsBehavior',
+	    'unsetDefaultFlowBehavior'
 	  ],
 	  adaptiveLabelPositioningBehavior: [ 'type', AdaptiveLabelPositioningBehavior ],
 	  appendBehavior: [ 'type', AppendBehavior ],
 	  associationBehavior: [ 'type', AssociationBehavior ],
 	  attachEventBehavior: [ 'type', AttachEventBehavior ],
 	  boundaryEventBehavior: [ 'type', BoundaryEventBehavior ],
-	  rootElementReferenceBehavior: [ 'type', RootElementReferenceBehavior ],
 	  createBehavior: [ 'type', CreateBehavior ],
-	  fixHoverBehavior: [ 'type', FixHoverBehavior ],
 	  createDataObjectBehavior: [ 'type', CreateDataObjectBehavior ],
-	  createParticipantBehavior: [ 'type', CreateParticipantBehavior$1 ],
+	  createParticipantBehavior: [ 'type', CreateParticipantBehavior ],
 	  dataInputAssociationBehavior: [ 'type', DataInputAssociationBehavior ],
 	  dataStoreBehavior: [ 'type', DataStoreBehavior ],
 	  deleteLaneBehavior: [ 'type', DeleteLaneBehavior ],
 	  detachEventBehavior: [ 'type', DetachEventBehavior ],
 	  dropOnFlowBehavior: [ 'type', DropOnFlowBehavior ],
 	  eventBasedGatewayBehavior: [ 'type', EventBasedGatewayBehavior ],
+	  fixHoverBehavior: [ 'type', FixHoverBehavior ],
 	  groupBehavior: [ 'type', GroupBehavior ],
 	  importDockingFix: [ 'type', ImportDockingFix ],
 	  isHorizontalFix: [ 'type', IsHorizontalFix ],
 	  labelBehavior: [ 'type', LabelBehavior ],
+	  messageFlowBehavior: [ 'type', MessageFlowBehavior ],
 	  modelingFeedback: [ 'type', ModelingFeedback ],
-	  replaceConnectionBehavior: [ 'type', ReplaceConnectionBehavior ],
-	  removeParticipantBehavior: [ 'type', RemoveParticipantBehavior ],
-	  replaceElementBehaviour: [ 'type', ReplaceElementBehaviour ],
-	  resizeBehavior: [ 'type', ResizeBehavior$1 ],
-	  resizeLaneBehavior: [ 'type', ResizeLaneBehavior ],
 	  removeElementBehavior: [ 'type', RemoveElementBehavior ],
-	  toggleElementCollapseBehaviour : [ 'type', ToggleElementCollapseBehaviour ],
-	  spaceToolBehavior: [ 'type', SpaceToolBehavior$1 ],
+	  removeEmbeddedLabelBoundsBehavior: ['type', RemoveEmbeddedLabelBoundsBehavior ],
+	  removeParticipantBehavior: [ 'type', RemoveParticipantBehavior ],
+	  replaceConnectionBehavior: [ 'type', ReplaceConnectionBehavior ],
+	  replaceElementBehaviour: [ 'type', ReplaceElementBehaviour ],
+	  resizeBehavior: [ 'type', ResizeBehavior ],
+	  resizeLaneBehavior: [ 'type', ResizeLaneBehavior ],
+	  rootElementReferenceBehavior: [ 'type', RootElementReferenceBehavior ],
+	  spaceToolBehavior: [ 'type', SpaceToolBehavior ],
+	  subProcessPlaneBehavior: [ 'type', SubProcessPlaneBehavior ],
 	  subProcessStartEventBehavior: [ 'type', SubProcessStartEventBehavior ],
+	  toggleCollapseConnectionBehaviour: [ 'type', ToggleCollapseConnectionBehaviour ],
+	  toggleElementCollapseBehaviour : [ 'type', ToggleElementCollapseBehaviour ],
 	  unclaimIdBehavior: [ 'type', UnclaimIdBehavior ],
-	  updateFlowNodeRefsBehavior: [ 'type', UpdateFlowNodeRefsBehavior ],
-	  unsetDefaultFlowBehavior: [ 'type', DeleteSequenceFlowBehavior ]
+	  unsetDefaultFlowBehavior: [ 'type', DeleteSequenceFlowBehavior ],
+	  updateFlowNodeRefsBehavior: [ 'type', UpdateFlowNodeRefsBehavior ]
 	};
 
 	function getBoundaryAttachment(position, targetBounds) {
@@ -43433,7 +45956,7 @@
 	  RuleProvider.call(this, eventBus);
 	}
 
-	inherits_browser(BpmnRules, RuleProvider);
+	inherits$1(BpmnRules, RuleProvider);
 
 	BpmnRules.$inject = [ 'eventBus' ];
 
@@ -43504,8 +46027,12 @@
 	        position = context.position,
 	        target = context.target;
 
+	    if (isConnection$8(target) && !canInsert(elements, target)) {
+	      return false;
+	    }
+
 	    return every(elements, function(element) {
-	      if (isConnection$3(element)) {
+	      if (isConnection$8(element)) {
 	        return canConnect(element.source, element.target, element);
 	      }
 
@@ -43602,15 +46129,16 @@
 	    'bpmn:InteractionNode',
 	    'bpmn:DataObjectReference',
 	    'bpmn:DataStoreReference',
-	    'bpmn:Group'
+	    'bpmn:Group',
+	    'bpmn:TextAnnotation'
 	  ]);
 	}
 
 	function nonExistingOrLabel(element) {
-	  return !element || isLabel(element);
+	  return !element || isLabel$6(element);
 	}
 
-	function isSame(a, b) {
+	function isSame$1(a, b) {
 	  return a === b;
 	}
 
@@ -43641,7 +46169,7 @@
 
 	function isCompensationBoundary(element) {
 	  return is$1(element, 'bpmn:BoundaryEvent') &&
-	         hasEventDefinition$2(element, 'bpmn:CompensateEventDefinition');
+	         hasEventDefinition(element, 'bpmn:CompensateEventDefinition');
 	}
 
 	function isForCompensation(e) {
@@ -43657,7 +46185,8 @@
 
 	function isMessageFlowSource(element) {
 	  return (
-	    is$1(element, 'bpmn:InteractionNode') && (
+	    is$1(element, 'bpmn:InteractionNode') &&
+	    !is$1(element, 'bpmn:BoundaryEvent') && (
 	      !is$1(element, 'bpmn:Event') || (
 	        is$1(element, 'bpmn:ThrowEvent') &&
 	        hasEventDefinitionOrNone(element, 'bpmn:MessageEventDefinition')
@@ -43674,6 +46203,9 @@
 	        is$1(element, 'bpmn:CatchEvent') &&
 	        hasEventDefinitionOrNone(element, 'bpmn:MessageEventDefinition')
 	      )
+	    ) && !(
+	      is$1(element, 'bpmn:BoundaryEvent') &&
+	      !hasEventDefinition(element, 'bpmn:MessageEventDefinition')
 	    )
 	  );
 	}
@@ -43703,7 +46235,7 @@
 	  return scopeParentA === scopeParentB;
 	}
 
-	function hasEventDefinition$2(element, eventDefinition) {
+	function hasEventDefinition(element, eventDefinition) {
 	  var bo = getBusinessObject(element);
 
 	  return !!find(bo.eventDefinitions || [], function(definition) {
@@ -43725,7 +46257,7 @@
 	    !is$1(element, 'bpmn:EndEvent') &&
 	    !isEventSubProcess(element) &&
 	    !(is$1(element, 'bpmn:IntermediateThrowEvent') &&
-	      hasEventDefinition$2(element, 'bpmn:LinkEventDefinition')
+	      hasEventDefinition(element, 'bpmn:LinkEventDefinition')
 	    ) &&
 	    !isCompensationBoundary(element) &&
 	    !isForCompensation(element)
@@ -43739,7 +46271,7 @@
 	    !is$1(element, 'bpmn:BoundaryEvent') &&
 	    !isEventSubProcess(element) &&
 	    !(is$1(element, 'bpmn:IntermediateCatchEvent') &&
-	      hasEventDefinition$2(element, 'bpmn:LinkEventDefinition')
+	      hasEventDefinition(element, 'bpmn:LinkEventDefinition')
 	    ) &&
 	    !isForCompensation(element)
 	  );
@@ -43749,20 +46281,20 @@
 	  return (
 	    is$1(element, 'bpmn:ReceiveTask') || (
 	      is$1(element, 'bpmn:IntermediateCatchEvent') && (
-	        hasEventDefinition$2(element, 'bpmn:MessageEventDefinition') ||
-	        hasEventDefinition$2(element, 'bpmn:TimerEventDefinition') ||
-	        hasEventDefinition$2(element, 'bpmn:ConditionalEventDefinition') ||
-	        hasEventDefinition$2(element, 'bpmn:SignalEventDefinition')
+	        hasEventDefinition(element, 'bpmn:MessageEventDefinition') ||
+	        hasEventDefinition(element, 'bpmn:TimerEventDefinition') ||
+	        hasEventDefinition(element, 'bpmn:ConditionalEventDefinition') ||
+	        hasEventDefinition(element, 'bpmn:SignalEventDefinition')
 	      )
 	    )
 	  );
 	}
 
-	function isConnection$3(element) {
+	function isConnection$8(element) {
 	  return element.waypoints;
 	}
 
-	function getParents$1(element) {
+	function getParents(element) {
 
 	  var parents = [];
 
@@ -43778,7 +46310,7 @@
 	}
 
 	function isParent(possibleParent, element) {
-	  var allParents = getParents$1(element);
+	  var allParents = getParents(element);
 	  return allParents.indexOf(possibleParent) !== -1;
 	}
 
@@ -43830,7 +46362,7 @@
 	function canDrop(element, target, position) {
 
 	  // can move labels and groups everywhere
-	  if (isLabel(element) || isGroup(element)) {
+	  if (isLabel$6(element) || isGroup(element)) {
 	    return true;
 	  }
 
@@ -43874,6 +46406,13 @@
 	    return isAny(target, [ 'bpmn:Participant', 'bpmn:Lane' ]);
 	  }
 
+	  // disallow dropping data store reference if there is no process to append to
+	  if (is$1(element, 'bpmn:DataStoreReference') && is$1(target, 'bpmn:Collaboration')) {
+	    return some(getBusinessObject(target).get('participants'), function(participant) {
+	      return !!participant.get('processRef');
+	    });
+	  }
+
 	  // account for the fact that data associations are always
 	  // rendered and moved to top (Process or Collaboration level)
 	  //
@@ -43903,7 +46442,7 @@
 	}
 
 	function isBoundaryEvent(element) {
-	  return !isLabel(element) && is$1(element, 'bpmn:BoundaryEvent');
+	  return !isLabel$6(element) && is$1(element, 'bpmn:BoundaryEvent');
 	}
 
 	function isLane(element) {
@@ -43946,7 +46485,7 @@
 
 	function hasOneOfEventDefinitions(element, eventDefinitions) {
 	  return eventDefinitions.some(function(definition) {
-	    return hasEventDefinition$2(element, definition);
+	    return hasEventDefinition(element, definition);
 	  });
 	}
 
@@ -43974,7 +46513,7 @@
 	  var element = elements[0];
 
 	  // do not attach labels
-	  if (isLabel(element)) {
+	  if (isLabel$6(element)) {
 	    return false;
 	  }
 
@@ -44063,11 +46602,27 @@
 	            newElementType: 'bpmn:StartEvent'
 	          });
 	        }
+
+	        // replace a typed start event by a blank interrupting start event
+	        // when the target is a sub process but not an event sub process
+	        if (hasOneOfEventDefinitions(element,
+	          [
+	            'bpmn:MessageEventDefinition',
+	            'bpmn:TimerEventDefinition',
+	            'bpmn:SignalEventDefinition',
+	            'bpmn:ConditionalEventDefinition'
+	          ]) &&
+	            is$1(target, 'bpmn:SubProcess')) {
+	          canExecute.replacements.push({
+	            oldElementId: element.id,
+	            newElementType: 'bpmn:StartEvent'
+	          });
+	        }
 	      }
 	    }
 
 	    if (!is$1(target, 'bpmn:Transaction')) {
-	      if (hasEventDefinition$2(element, 'bpmn:CancelEventDefinition') &&
+	      if (hasEventDefinition(element, 'bpmn:CancelEventDefinition') &&
 	          element.type !== 'label') {
 
 	        if (is$1(element, 'bpmn:EndEvent') && canDrop(element, target)) {
@@ -44113,11 +46668,11 @@
 	    return false;
 	  }
 
-	  if (isLabel(shape) || isGroup(shape)) {
+	  if (isLabel$6(shape) || isGroup(shape)) {
 	    return true;
 	  }
 
-	  if (isSame(source, target)) {
+	  if (isSame$1(source, target)) {
 	    return false;
 	  }
 
@@ -44177,7 +46732,7 @@
 	function canConnectAssociation(source, target) {
 
 	  // do not connect connections
-	  if (isConnection$3(source) || isConnection$3(target)) {
+	  if (isConnection$8(source) || isConnection$8(target)) {
 	    return false;
 	  }
 
@@ -44276,22 +46831,22 @@
 
 	  return (
 	    isAny(flow, [ 'bpmn:SequenceFlow', 'bpmn:MessageFlow' ]) &&
-	    !isLabel(flow) &&
+	    !isLabel$6(flow) &&
 	    is$1(shape, 'bpmn:FlowNode') &&
 	    !is$1(shape, 'bpmn:BoundaryEvent') &&
 	    canDrop(shape, flow.parent));
 	}
 
-	function includes$1(elements, element) {
+	function includes$5(elements, element) {
 	  return (elements && element) && elements.indexOf(element) !== -1;
 	}
 
 	function canCopy(elements, element) {
-	  if (isLabel(element)) {
+	  if (isLabel$6(element)) {
 	    return true;
 	  }
 
-	  if (is$1(element, 'bpmn:Lane') && !includes$1(elements, element.parent)) {
+	  if (is$1(element, 'bpmn:Lane') && !includes$5(elements, element.parent)) {
 	    return false;
 	  }
 
@@ -44312,39 +46867,42 @@
 	}
 
 	function getRootElement(element) {
-	  return getParent$1(element, 'bpmn:Process') || getParent$1(element, 'bpmn:Collaboration');
+	  return getParent(element, 'bpmn:Process') || getParent(element, 'bpmn:Collaboration');
 	}
 
-	var RulesModule$1 = {
+	var RulesModule = {
 	  __depends__: [
-	    RulesModule
+	    RulesModule$1
 	  ],
 	  __init__: [ 'bpmnRules' ],
 	  bpmnRules: [ 'type', BpmnRules ]
 	};
 
-	var HIGH_PRIORITY$c = 2000;
+	var HIGH_PRIORITY$6 = 2000;
 
 	function BpmnDiOrdering(eventBus, canvas) {
 
-	  eventBus.on('saveXML.start', HIGH_PRIORITY$c, orderDi);
+	  eventBus.on('saveXML.start', HIGH_PRIORITY$6, orderDi);
 
 	  function orderDi() {
-	    var root = canvas.getRootElement(),
-	        rootDi = getBusinessObject(root).di,
-	        elements,
-	        diElements;
+	    var rootElements = canvas.getRootElements();
 
-	    elements = selfAndAllChildren([ root ], false);
+	    forEach(rootElements, function(root) {
+	      var rootDi = getDi(root),
+	          elements,
+	          diElements;
 
-	    // only bpmndi:Shape and bpmndi:Edge can be direct children of bpmndi:Plane
-	    elements = filter(elements, function(element) {
-	      return element !== root && !element.labelTarget;
+	      elements = selfAndAllChildren([ root ], false);
+
+	      // only bpmndi:Shape and bpmndi:Edge can be direct children of bpmndi:Plane
+	      elements = filter(elements, function(element) {
+	        return element !== root && !element.labelTarget;
+	      });
+
+	      diElements = map$1(elements, getDi);
+
+	      rootDi.set('planeElement', diElements);
 	    });
-
-	    diElements = map(elements, getDi);
-
-	    rootDi.set('planeElement', diElements);
 	  }
 	}
 
@@ -44446,7 +47004,7 @@
 	  return null;
 	};
 
-	inherits_browser(OrderingProvider, CommandInterceptor);
+	inherits$1(OrderingProvider, CommandInterceptor);
 
 	/**
 	 * a simple ordering provider that makes sure:
@@ -44478,7 +47036,7 @@
 	        level: 9,
 	        containers: [
 	          'bpmn:Collaboration',
-	          'bpmn:Process'
+	          'bpmn:FlowElementsContainer'
 	        ]
 	      }
 	    },
@@ -44506,7 +47064,7 @@
 	        level: 10,
 	        containers: [
 	          'bpmn:Collaboration',
-	          'bpmn:Process'
+	          'bpmn:FlowElementsContainer'
 	        ]
 	      }
 	    },
@@ -44535,6 +47093,10 @@
 	      element.order = order = computeOrder(element);
 	    }
 
+	    if (!order) {
+	      throw new Error('no order for <' + element.id + '>');
+	    }
+
 	    return order;
 	  }
 
@@ -44552,10 +47114,7 @@
 	    }
 
 	    if (!actualParent) {
-	      throw new Error(translate('no parent for {element} in {parent}', {
-	        element: element.id,
-	        parent: newParent.id
-	      }));
+	      throw new Error('no parent for <' + element.id + '> in <' + (newParent && newParent.id) + '>');
 	    }
 
 	    return actualParent;
@@ -44566,18 +47125,16 @@
 	    // render labels always on top
 	    if (element.labelTarget) {
 	      return {
-	        parent: canvas.getRootElement(),
+	        parent: canvas.findRoot(element.labelTarget) || canvas.getRootElement(),
 	        index: -1
 	      };
 	    }
 
 	    var elementOrder = getOrder(element);
 
-
 	    if (elementOrder.containers) {
 	      newParent = findActualParent(element, newParent, elementOrder.containers);
 	    }
-
 
 	    var currentIndex = newParent.children.indexOf(element);
 
@@ -44613,11 +47170,11 @@
 
 	BpmnOrderingProvider.$inject = [ 'eventBus', 'canvas', 'translate' ];
 
-	inherits_browser(BpmnOrderingProvider, OrderingProvider);
+	inherits$1(BpmnOrderingProvider, OrderingProvider);
 
 	var OrderingModule = {
 	  __depends__: [
-	    translate$2
+	    translate
 	  ],
 	  __init__: [ 'bpmnOrderingProvider' ],
 	  bpmnOrderingProvider: [ 'type', BpmnOrderingProvider ]
@@ -44726,10 +47283,14 @@
 	   * Current active commandStack execution
 	   *
 	   * @type {Object}
+	   * @property {Object[]} actions
+	   * @property {Object[]} dirty
+	   * @property { 'undo' | 'redo' | 'clear' | 'execute' | null } trigger the cause of the current excecution
 	   */
 	  this._currentExecution = {
 	    actions: [],
-	    dirty: []
+	    dirty: [],
+	    trigger: null
 	  };
 
 
@@ -44759,6 +47320,8 @@
 	  if (!command) {
 	    throw new Error('command required');
 	  }
+
+	  this._currentExecution.trigger = 'execute';
 
 	  var action = { command: command, context: context };
 
@@ -44820,7 +47383,7 @@
 	  this._stackIdx = -1;
 
 	  if (emit !== false) {
-	    this._fire('changed');
+	    this._fire('changed', { trigger: 'clear' });
 	  }
 	};
 
@@ -44833,6 +47396,8 @@
 	      next;
 
 	  if (action) {
+	    this._currentExecution.trigger = 'undo';
+
 	    this._pushAction(action);
 
 	    while (action) {
@@ -44859,6 +47424,8 @@
 	      next;
 
 	  if (action) {
+	    this._currentExecution.trigger = 'redo';
+
 	    this._pushAction(action);
 
 	    while (action) {
@@ -45065,6 +47632,7 @@
 
 	CommandStack.prototype._popAction = function() {
 	  var execution = this._currentExecution,
+	      trigger = execution.trigger,
 	      actions = execution.actions,
 	      dirty = execution.dirty;
 
@@ -45075,7 +47643,9 @@
 
 	    dirty.length = 0;
 
-	    this._fire('changed');
+	    this._fire('changed', { trigger: trigger });
+
+	    execution.trigger = null;
 	  }
 	};
 
@@ -45087,7 +47657,7 @@
 	    return;
 	  }
 
-	  elements = isArray(elements) ? elements : [ elements ];
+	  elements = isArray$2(elements) ? elements : [ elements ];
 
 	  execution.dirty = execution.dirty.concat(elements);
 	};
@@ -45128,10 +47698,10 @@
 	};
 
 	// document wide unique tooltip ids
-	var ids$1 = new IdGenerator('tt');
+	var ids = new IdGenerator('tt');
 
 
-	function createRoot$1(parentNode) {
+	function createRoot(parentNode) {
 	  var root = domify(
 	    '<div class="djs-tooltip-container" style="position: absolute; width: 0; height: 0;" />'
 	  );
@@ -45142,11 +47712,11 @@
 	}
 
 
-	function setPosition$1(el, x, y) {
+	function setPosition(el, x, y) {
 	  assign(el.style, { left: x + 'px', top: y + 'px' });
 	}
 
-	function setVisible$1(el, visible) {
+	function setVisible(el, visible) {
 	  el.style.display = visible === false ? 'none' : '';
 	}
 
@@ -45196,7 +47766,7 @@
 	  this._eventBus = eventBus;
 	  this._canvas = canvas;
 
-	  this._ids = ids$1;
+	  this._ids = ids;
 
 	  this._tooltipDefaults = {
 	    show: {
@@ -45211,20 +47781,20 @@
 	  this._tooltips = {};
 
 	  // root html element for all tooltips
-	  this._tooltipRoot = createRoot$1(canvas.getContainer());
+	  this._tooltipRoot = createRoot(canvas.getContainer());
 
 
 	  var self = this;
 
-	  delegateEvents.bind(this._tooltipRoot, tooltipSelector, 'mousedown', function(event) {
+	  delegate.bind(this._tooltipRoot, tooltipSelector, 'mousedown', function(event) {
 	    event.stopPropagation();
 	  });
 
-	  delegateEvents.bind(this._tooltipRoot, tooltipSelector, 'mouseover', function(event) {
+	  delegate.bind(this._tooltipRoot, tooltipSelector, 'mouseover', function(event) {
 	    self.trigger('mouseover', event);
 	  });
 
-	  delegateEvents.bind(this._tooltipRoot, tooltipSelector, 'mouseout', function(event) {
+	  delegate.bind(this._tooltipRoot, tooltipSelector, 'mouseout', function(event) {
 	    self.trigger('mouseout', event);
 	  });
 
@@ -45282,7 +47852,7 @@
 
 	  var node = event.delegateTarget || event.target;
 
-	  var tooltip = this.get(attr(node, 'data-tooltip-id'));
+	  var tooltip = this.get(attr$1(node, 'data-tooltip-id'));
 
 	  if (!tooltip) {
 	    return;
@@ -45358,8 +47928,8 @@
 	  var tooltip = this.get(id);
 
 	  if (tooltip) {
-	    remove(tooltip.html);
-	    remove(tooltip.htmlContainer);
+	    remove$2(tooltip.html);
+	    remove$2(tooltip.htmlContainer);
 
 	    delete tooltip.htmlContainer;
 
@@ -45369,12 +47939,12 @@
 
 
 	Tooltips.prototype.show = function() {
-	  setVisible$1(this._tooltipRoot);
+	  setVisible(this._tooltipRoot);
 	};
 
 
 	Tooltips.prototype.hide = function() {
-	  setVisible$1(this._tooltipRoot, false);
+	  setVisible(this._tooltipRoot, false);
 	};
 
 
@@ -45412,11 +47982,11 @@
 	  htmlContainer.appendChild(html);
 
 	  if (tooltip.type) {
-	    classes(htmlContainer).add('djs-tooltip-' + tooltip.type);
+	    classes$1(htmlContainer).add('djs-tooltip-' + tooltip.type);
 	  }
 
 	  if (tooltip.className) {
-	    classes(htmlContainer).add(tooltip.className);
+	    classes$1(htmlContainer).add(tooltip.className);
 	  }
 
 	  tooltip.htmlContainer = htmlContainer;
@@ -45436,7 +48006,7 @@
 
 	  // update overlay html based on tooltip x, y
 
-	  setPosition$1(htmlContainer, position.x, position.y);
+	  setPosition(htmlContainer, position.x, position.y);
 	};
 
 
@@ -45453,7 +48023,7 @@
 	        visible = false;
 	      }
 
-	      setVisible$1(htmlContainer, visible);
+	      setVisible(htmlContainer, visible);
 	    }
 	  });
 	};
@@ -45520,8 +48090,8 @@
 	  return collection;
 	}
 
-	var LOW_PRIORITY$g = 250,
-	    HIGH_PRIORITY$d = 1400;
+	var LOW_PRIORITY$6 = 250,
+	    HIGH_PRIORITY$5 = 1400;
 
 
 	/**
@@ -45540,7 +48110,7 @@
 
 	  // remove labels from the collection that are being
 	  // moved with other elements anyway
-	  eventBus.on('shape.move.start', HIGH_PRIORITY$d, function(e) {
+	  eventBus.on('shape.move.start', HIGH_PRIORITY$5, function(e) {
 
 	    var context = e.context,
 	        shapes = context.shapes,
@@ -45551,7 +48121,7 @@
 	  });
 
 	  // add labels to visual's group
-	  movePreview && eventBus.on('shape.move.start', LOW_PRIORITY$g, function(e) {
+	  movePreview && eventBus.on('shape.move.start', LOW_PRIORITY$6, function(e) {
 
 	    var context = e.context,
 	        shapes = context.shapes;
@@ -45579,7 +48149,7 @@
 	  });
 
 	  // add all labels to move closure
-	  this.preExecuted('elements.move', HIGH_PRIORITY$d, function(e) {
+	  this.preExecuted('elements.move', HIGH_PRIORITY$5, function(e) {
 	    var context = e.context,
 	        closure = context.closure,
 	        enclosedElements = closure.enclosedElements;
@@ -45623,7 +48193,7 @@
 
 	    // unset labelTarget
 	    if (labelTarget) {
-	      context.labelTargetIndex = indexOf$1(labelTarget.labels, shape);
+	      context.labelTargetIndex = indexOf(labelTarget.labels, shape);
 	      context.labelTarget = labelTarget;
 
 	      shape.labelTarget = null;
@@ -45639,7 +48209,7 @@
 
 	    // restore labelTarget
 	    if (labelTarget) {
-	      add$1(labelTarget.labels, shape, labelTargetIndex);
+	      add(labelTarget.labels, shape, labelTargetIndex);
 
 	      shape.labelTarget = labelTarget;
 	    }
@@ -45647,7 +48217,7 @@
 
 	}
 
-	inherits_browser(LabelSupport, CommandInterceptor);
+	inherits$1(LabelSupport, CommandInterceptor);
 
 	LabelSupport.$inject = [
 	  'injector',
@@ -45680,8 +48250,8 @@
 	  labelSupport: [ 'type', LabelSupport ]
 	};
 
-	var LOW_PRIORITY$h = 251,
-	    HIGH_PRIORITY$e = 1401;
+	var LOW_PRIORITY$5 = 251,
+	    HIGH_PRIORITY$4 = 1401;
 
 	var MARKER_ATTACH$1 = 'attach-ok';
 
@@ -45710,7 +48280,7 @@
 
 	  // remove all the attached elements from the shapes to be validated
 	  // add all the attached shapes to the overall list of moved shapes
-	  eventBus.on('shape.move.start', HIGH_PRIORITY$e, function(e) {
+	  eventBus.on('shape.move.start', HIGH_PRIORITY$4, function(e) {
 
 	    var context = e.context,
 	        shapes = context.shapes,
@@ -45722,7 +48292,7 @@
 	  });
 
 	  // add attachers to the visual's group
-	  movePreview && eventBus.on('shape.move.start', LOW_PRIORITY$h, function(e) {
+	  movePreview && eventBus.on('shape.move.start', LOW_PRIORITY$5, function(e) {
 
 	    var context = e.context,
 	        shapes = context.shapes,
@@ -45763,7 +48333,7 @@
 	  });
 
 	  // add all attachers to move closure
-	  this.preExecuted('elements.move', HIGH_PRIORITY$e, function(e) {
+	  this.preExecuted('elements.move', HIGH_PRIORITY$4, function(e) {
 	    var context = e.context,
 	        closure = context.closure,
 	        shapes = context.shapes,
@@ -45796,7 +48366,7 @@
 	      attachers = filter(shapes, function(shape) {
 	        var host = shape.host;
 
-	        return isAttacher$1(shape) && !includes$2(shapes, host);
+	        return isAttacher(shape) && !includes$4(shapes, host);
 	      });
 	    }
 
@@ -45924,7 +48494,7 @@
 	  });
 	}
 
-	inherits_browser(AttachSupport, CommandInterceptor);
+	inherits$1(AttachSupport, CommandInterceptor);
 
 	AttachSupport.$inject = [
 	  'injector',
@@ -45942,7 +48512,7 @@
 	 * @return {Array<djs.model.Base>}
 	 */
 	function getAttachers(shapes) {
-	  return flatten(map(shapes, function(s) {
+	  return flatten(map$1(shapes, function(s) {
 	    return s.attachers || [];
 	  }));
 	}
@@ -45988,23 +48558,23 @@
 	  });
 	}
 
-	function isAttacher$1(shape) {
+	function isAttacher(shape) {
 	  return !!shape.host;
 	}
 
-	function includes$2(array, item) {
+	function includes$4(array, item) {
 	  return array.indexOf(item) !== -1;
 	}
 
 	var AttachSupportModule = {
 	  __depends__: [
-	    RulesModule
+	    RulesModule$1
 	  ],
 	  __init__: [ 'attachSupport' ],
 	  attachSupport: [ 'type', AttachSupport ]
 	};
 
-	var LOW_PRIORITY$i = 250;
+	var LOW_PRIORITY$4 = 250;
 
 	/**
 	 * The tool manager acts as middle-man between the available tool's and the Palette,
@@ -46080,8 +48650,7 @@
 	    eventsToRegister.push(event + '.canceled');
 	  });
 
-	  eventBus.on(eventsToRegister, LOW_PRIORITY$i, function(event) {
-	    var originalEvent = event.originalEvent;
+	  eventBus.on(eventsToRegister, LOW_PRIORITY$4, function(event) {
 
 	    // We defer the de-activation of the tool to the .activate phase,
 	    // so we're able to check if we want to toggle off the current
@@ -46090,13 +48659,30 @@
 	      return;
 	    }
 
-	    if (originalEvent && closest(originalEvent.target, '.group[data-group="tools"]')) {
+	    if (isPaletteClick(event)) {
 	      return;
 	    }
 
 	    this.setActive(null);
 	  }, this);
+
 	};
+
+
+	// helpers ///////////////
+
+	/**
+	 * Check if a given event is a palette click event.
+	 *
+	 * @param {EventBus.Event} event
+	 *
+	 * @return {boolean}
+	 */
+	function isPaletteClick(event) {
+	  var target = event.originalEvent && event.originalEvent.target;
+
+	  return target && closest(target, '.group[data-group="tools"]');
+	}
 
 	var ToolManagerModule = {
 	  __depends__: [
@@ -46193,7 +48779,7 @@
 	 *
 	 * @return {Object}
 	 */
-	function resizeBounds$1(bounds, direction, delta) {
+	function resizeBounds(bounds, direction, delta) {
 	  var x = bounds.x,
 	      y = bounds.y,
 	      width = bounds.width,
@@ -46235,8 +48821,8 @@
 	  }
 	}
 
-	var abs$6 = Math.abs,
-	    round$7 = Math.round;
+	var abs$1 = Math.abs,
+	    round$4 = Math.round;
 
 	var AXIS_TO_DIMENSION = {
 	  x: 'width',
@@ -46252,7 +48838,7 @@
 	  e: 'right'
 	};
 
-	var HIGH_PRIORITY$f = 1500;
+	var HIGH_PRIORITY$3 = 1500;
 
 	var DIRECTION_TO_OPPOSITE = {
 	  n: 's',
@@ -46272,15 +48858,21 @@
 	 * @param {EventBus} eventBus
 	 * @param {Modeling} modeling
 	 * @param {Rules} rules
-	 * @param {toolManager} toolManager
+	 * @param {ToolManager} toolManager
+	 * @param {Mouse} mouse
 	 */
-	function SpaceTool(canvas, dragging, eventBus, modeling, rules, toolManager) {
+	function SpaceTool(
+	    canvas, dragging, eventBus,
+	    modeling, rules, toolManager,
+	    mouse) {
+
 	  this._canvas = canvas;
 	  this._dragging = dragging;
 	  this._eventBus = eventBus;
 	  this._modeling = modeling;
 	  this._rules = rules;
 	  this._toolManager = toolManager;
+	  this._mouse = mouse;
 
 	  var self = this;
 
@@ -46295,7 +48887,7 @@
 	    });
 	  });
 
-	  eventBus.on('spaceTool.move', HIGH_PRIORITY$f , function(event) {
+	  eventBus.on('spaceTool.move', HIGH_PRIORITY$3 , function(event) {
 	    var context = event.context,
 	        initialized = context.initialized;
 
@@ -46304,7 +48896,7 @@
 	    }
 
 	    if (initialized) {
-	      ensureConstraints$2(event);
+	      ensureConstraints(event);
 	    }
 	  });
 
@@ -46320,14 +48912,14 @@
 	      return;
 	    }
 
-	    ensureConstraints$2(event);
+	    ensureConstraints(event);
 
 	    var delta = {
 	      x: 0,
 	      y: 0
 	    };
 
-	    delta[ axis ] = round$7(event[ 'd' + axis ]);
+	    delta[ axis ] = round$4(event[ 'd' + axis ]);
 
 	    self.makeSpace(movingShapes, resizingShapes, delta, direction, start);
 
@@ -46345,7 +48937,8 @@
 	  'eventBus',
 	  'modeling',
 	  'rules',
-	  'toolManager'
+	  'toolManager',
+	  'mouse'
 	];
 
 	/**
@@ -46406,11 +48999,11 @@
 	 * @return {boolean}
 	 */
 	SpaceTool.prototype.init = function(event, context) {
-	  var axis = abs$6(event.dx) > abs$6(event.dy) ? 'x' : 'y',
+	  var axis = abs$1(event.dx) > abs$1(event.dy) ? 'x' : 'y',
 	      delta = event[ 'd' + axis ],
 	      start = event[ axis ] - delta;
 
-	  if (abs$6(delta) < 5) {
+	  if (abs$1(delta) < 5) {
 	    return false;
 	  }
 
@@ -46452,7 +49045,7 @@
 	    }
 	  );
 
-	  set$1('resize-' + (axis === 'x' ? 'ew' : 'ns'));
+	  set('resize-' + (axis === 'x' ? 'ew' : 'ns'));
 
 	  return true;
 	};
@@ -46474,7 +49067,7 @@
 	      resizingShapes = [];
 
 	  forEach(elements, function(element) {
-	    if (!element.parent || isConnection$4(element)) {
+	    if (!element.parent || isConnection$7(element)) {
 	      return;
 	    }
 
@@ -46503,11 +49096,14 @@
 	};
 
 	SpaceTool.prototype.toggle = function() {
+
 	  if (this.isActive()) {
-	    this._dragging.cancel();
-	  } else {
-	    this.activateSelection();
+	    return this._dragging.cancel();
 	  }
+
+	  var mouseEvent = this._mouse.getLastMoveEvent();
+
+	  this.activateSelection(mouseEvent, !!mouseEvent);
 	};
 
 	SpaceTool.prototype.isActive = function() {
@@ -46518,7 +49114,7 @@
 
 	// helpers //////////
 
-	function addPadding$1(trbl) {
+	function addPadding(trbl) {
 	  return {
 	    top: trbl.top - PADDING,
 	    right: trbl.right + PADDING,
@@ -46527,7 +49123,7 @@
 	  };
 	}
 
-	function ensureConstraints$2(event) {
+	function ensureConstraints(event) {
 	  var context = event.context,
 	      spaceToolConstraints = context.spaceToolConstraints;
 
@@ -46583,15 +49179,15 @@
 
 	    // find children that are not moving or resizing
 	    var nonMovingResizingChildren = filter(resizingShape.children, function(child) {
-	      return !isConnection$4(child) &&
-	        !isLabel$4(child) &&
-	        !includes$4(movingShapes, child) &&
-	        !includes$4(resizingShapes, child);
+	      return !isConnection$7(child) &&
+	        !isLabel$2(child) &&
+	        !includes$2(movingShapes, child) &&
+	        !includes$2(resizingShapes, child);
 	    });
 
 	    // find children that are moving
 	    var movingChildren = filter(resizingShape.children, function(child) {
-	      return !isConnection$4(child) && !isLabel$4(child) && includes$4(movingShapes, child);
+	      return !isConnection$7(child) && !isLabel$2(child) && includes$2(movingShapes, child);
 	    });
 
 	    var minOrMax,
@@ -46599,7 +49195,7 @@
 	        movingChildrenBBox;
 
 	    if (nonMovingResizingChildren.length) {
-	      nonMovingResizingChildrenBBox = addPadding$1(asTRBL(getBBox(nonMovingResizingChildren)));
+	      nonMovingResizingChildrenBBox = addPadding(asTRBL(getBBox(nonMovingResizingChildren)));
 
 	      minOrMax = start -
 	        resizingShapeBBox[ DIRECTION_TO_TRBL[ direction ] ] +
@@ -46617,7 +49213,7 @@
 	    }
 
 	    if (movingChildren.length) {
-	      movingChildrenBBox = addPadding$1(asTRBL(getBBox(movingChildren)));
+	      movingChildrenBBox = addPadding(asTRBL(getBBox(movingChildren)));
 
 	      minOrMax = start -
 	        movingChildrenBBox[ DIRECTION_TO_TRBL[ DIRECTION_TO_OPPOSITE[ direction ] ] ] +
@@ -46668,24 +49264,24 @@
 	  return spaceToolConstraints;
 	}
 
-	function includes$4(array, item) {
+	function includes$2(array, item) {
 	  return array.indexOf(item) !== -1;
 	}
 
-	function isConnection$4(element) {
+	function isConnection$7(element) {
 	  return !!element.waypoints;
 	}
 
-	function isLabel$4(element) {
+	function isLabel$2(element) {
 	  return !!element.labelTarget;
 	}
 
-	var MARKER_DRAGGING = 'djs-dragging',
-	    MARKER_RESIZING$1 = 'djs-resizing';
+	var MARKER_DRAGGING$1 = 'djs-dragging',
+	    MARKER_RESIZING = 'djs-resizing';
 
-	var LOW_PRIORITY$j = 250;
+	var LOW_PRIORITY$3 = 250;
 
-	var max$6 = Math.max;
+	var max = Math.max;
 
 
 	/**
@@ -46704,7 +49300,7 @@
 	    forEach(collection, function(element) {
 	      previewSupport.addDragger(element, dragGroup);
 
-	      canvas.addMarker(element, MARKER_DRAGGING);
+	      canvas.addMarker(element, MARKER_DRAGGING$1);
 	    });
 	  }
 
@@ -46718,22 +49314,22 @@
 	      y: 'M -10000,0 L 10000,0'
 	    };
 
-	    var crosshairGroup = create('g');
-	    attr$1(crosshairGroup, styles.cls('djs-crosshair-group', [ 'no-events' ]));
+	    var crosshairGroup = create$1('g');
+	    attr(crosshairGroup, styles.cls('djs-crosshair-group', [ 'no-events' ]));
 
 	    append(space, crosshairGroup);
 
 	    // horizontal path
-	    var pathX = create('path');
-	    attr$1(pathX, 'd', orientation.x);
-	    classes$1(pathX).add('djs-crosshair');
+	    var pathX = create$1('path');
+	    attr(pathX, 'd', orientation.x);
+	    classes(pathX).add('djs-crosshair');
 
 	    append(crosshairGroup, pathX);
 
 	    // vertical path
-	    var pathY = create('path');
-	    attr$1(pathY, 'd', orientation.y);
-	    classes$1(pathY).add('djs-crosshair');
+	    var pathY = create$1('path');
+	    attr(pathY, 'd', orientation.y);
+	    classes(pathY).add('djs-crosshair');
 
 	    append(crosshairGroup, pathY);
 
@@ -46744,7 +49340,7 @@
 	  eventBus.on('spaceTool.selection.move', function(event) {
 	    var crosshairGroup = event.context.crosshairGroup;
 
-	    translate(crosshairGroup, event.x, event.y);
+	    translate$2(crosshairGroup, event.x, event.y);
 	  });
 
 	  // remove crosshair
@@ -46758,7 +49354,7 @@
 	  });
 
 	  // add and update move/resize previews
-	  eventBus.on('spaceTool.move', LOW_PRIORITY$j, function(event) {
+	  eventBus.on('spaceTool.move', LOW_PRIORITY$3, function(event) {
 
 	    var context = event.context,
 	        line = context.line,
@@ -46773,18 +49369,18 @@
 	    if (!context.dragGroup) {
 	      var spaceLayer = canvas.getLayer('space');
 
-	      line = create('path');
-	      attr$1(line, 'd', 'M0,0 L0,0');
-	      classes$1(line).add('djs-crosshair');
+	      line = create$1('path');
+	      attr(line, 'd', 'M0,0 L0,0');
+	      classes(line).add('djs-crosshair');
 
 	      append(spaceLayer, line);
 
 	      context.line = line;
 
-	      var dragGroup = create('g');
-	      attr$1(dragGroup, styles.cls('djs-drag-group', [ 'no-events' ]));
+	      var dragGroup = create$1('g');
+	      attr(dragGroup, styles.cls('djs-drag-group', [ 'no-events' ]));
 
-	      append(canvas.getDefaultLayer(), dragGroup);
+	      append(canvas.getActiveLayer(), dragGroup);
 
 	      // shapes
 	      addPreviewGfx(movingShapes, dragGroup);
@@ -46831,7 +49427,7 @@
 	          });
 	        });
 
-	        return isConnection$5(element)
+	        return isConnection$6(element)
 	          && (sourceIsMoving || sourceIsResizing)
 	          && (targetIsMoving || targetIsResizing);
 	      });
@@ -46843,10 +49439,10 @@
 	    }
 
 	    if (!context.frameGroup) {
-	      var frameGroup = create('g');
-	      attr$1(frameGroup, styles.cls('djs-frame-group', [ 'no-events' ]));
+	      var frameGroup = create$1('g');
+	      attr(frameGroup, styles.cls('djs-frame-group', [ 'no-events' ]));
 
-	      append(canvas.getDefaultLayer(), frameGroup);
+	      append(canvas.getActiveLayer(), frameGroup);
 
 	      var frames = [];
 
@@ -46860,7 +49456,7 @@
 	          initialBounds: initialBounds
 	        });
 
-	        canvas.addMarker(shape, MARKER_RESIZING$1);
+	        canvas.addMarker(shape, MARKER_RESIZING);
 	      });
 
 	      context.frameGroup = frameGroup;
@@ -46872,14 +49468,14 @@
 	      y: 'M -10000, ' + event.y + ' L 10000, ' + event.y
 	    };
 
-	    attr$1(line, { d: orientation[ axis ] });
+	    attr(line, { d: orientation[ axis ] });
 
 	    var opposite = { x: 'y', y: 'x' };
 	    var delta = { x: event.dx, y: event.dy };
 	    delta[ opposite[ context.axis ] ] = 0;
 
 	    // update move previews
-	    translate(context.dragGroup, delta.x, delta.y);
+	    translate$2(context.dragGroup, delta.x, delta.y);
 
 	    // update resize previews
 	    forEach(context.frames, function(frame) {
@@ -46889,26 +49485,26 @@
 	          height;
 
 	      if (context.direction === 'e') {
-	        attr$1(element, {
-	          width: max$6(initialBounds.width + delta.x, 5)
+	        attr(element, {
+	          width: max(initialBounds.width + delta.x, 5)
 	        });
 	      } else {
-	        width = max$6(initialBounds.width - delta.x, 5);
+	        width = max(initialBounds.width - delta.x, 5);
 
-	        attr$1(element, {
+	        attr(element, {
 	          width: width,
 	          x: initialBounds.x + initialBounds.width - width
 	        });
 	      }
 
 	      if (context.direction === 's') {
-	        attr$1(element, {
-	          height: max$6(initialBounds.height + delta.y, 5)
+	        attr(element, {
+	          height: max(initialBounds.height + delta.y, 5)
 	        });
 	      } else {
-	        height = max$6(initialBounds.height - delta.y, 5);
+	        height = max(initialBounds.height - delta.y, 5);
 
-	        attr$1(element, {
+	        attr(element, {
 	          height: height,
 	          y: initialBounds.y + initialBounds.height - height
 	        });
@@ -46930,12 +49526,12 @@
 
 	    // moving shapes
 	    forEach(movingShapes, function(shape) {
-	      canvas.removeMarker(shape, MARKER_DRAGGING);
+	      canvas.removeMarker(shape, MARKER_DRAGGING$1);
 	    });
 
 	    // moving connections
 	    forEach(movingConnections, function(connection) {
-	      canvas.removeMarker(connection, MARKER_DRAGGING);
+	      canvas.removeMarker(connection, MARKER_DRAGGING$1);
 	    });
 
 	    if (dragGroup) {
@@ -46944,7 +49540,7 @@
 	    }
 
 	    forEach(resizingShapes, function(shape) {
-	      canvas.removeMarker(shape, MARKER_RESIZING$1);
+	      canvas.removeMarker(shape, MARKER_RESIZING);
 	    });
 
 	    if (frameGroup) {
@@ -46967,7 +49563,7 @@
 	/**
 	 * Checks if an element is a connection.
 	 */
-	function isConnection$5(element) {
+	function isConnection$6(element) {
 	  return element.waypoints;
 	}
 
@@ -46975,9 +49571,10 @@
 	  __init__: ['spaceToolPreview'],
 	  __depends__: [
 	    DraggingModule,
-	    RulesModule,
+	    RulesModule$1,
 	    ToolManagerModule,
-	    PreviewSupportModule
+	    PreviewSupportModule,
+	    MouseModule
 	  ],
 	  spaceTool: ['type', SpaceTool ],
 	  spaceToolPreview: ['type', SpaceToolPreview ]
@@ -47012,6 +49609,10 @@
 	};
 
 	BpmnFactory.prototype._ensureId = function(element) {
+	  if (element.id) {
+	    this._model.ids.claim(element.id, element);
+	    return;
+	  }
 
 	  // generate semantic ids for elements
 	  // bpmn:SequenceFlow -> SequenceFlow_ID
@@ -47053,11 +49654,10 @@
 	};
 
 
-	BpmnFactory.prototype.createDiShape = function(semantic, bounds, attrs) {
-
+	BpmnFactory.prototype.createDiShape = function(semantic, attrs) {
 	  return this.create('bpmndi:BPMNShape', assign({
 	    bpmnElement: semantic,
-	    bounds: this.createDiBounds(bounds)
+	    bounds: this.createDiBounds()
 	  }, attrs));
 	};
 
@@ -47070,7 +49670,7 @@
 	BpmnFactory.prototype.createDiWaypoints = function(waypoints) {
 	  var self = this;
 
-	  return map(waypoints, function(pos) {
+	  return map$1(waypoints, function(pos) {
 	    return self.createDiWaypoint(pos);
 	  });
 	};
@@ -47080,16 +49680,17 @@
 	};
 
 
-	BpmnFactory.prototype.createDiEdge = function(semantic, waypoints, attrs) {
+	BpmnFactory.prototype.createDiEdge = function(semantic, attrs) {
 	  return this.create('bpmndi:BPMNEdge', assign({
-	    bpmnElement: semantic
+	    bpmnElement: semantic,
+	    waypoint: this.createDiWaypoints([])
 	  }, attrs));
 	};
 
-	BpmnFactory.prototype.createDiPlane = function(semantic) {
-	  return this.create('bpmndi:BPMNPlane', {
+	BpmnFactory.prototype.createDiPlane = function(semantic, attrs) {
+	  return this.create('bpmndi:BPMNPlane', assign({
 	    bpmnElement: semantic
-	  });
+	  }, attrs));
 	};
 
 	/**
@@ -47336,7 +49937,7 @@
 	  this.reverted([ 'element.updateAttachment' ], ifBpmn(updateAttachment));
 	}
 
-	inherits_browser(BpmnUpdater, CommandInterceptor);
+	inherits$1(BpmnUpdater, CommandInterceptor);
 
 	BpmnUpdater.$inject = [
 	  'eventBus',
@@ -47374,8 +49975,9 @@
 	  var parentShape = element.parent;
 
 	  var businessObject = element.businessObject,
+	      di = getDi(element),
 	      parentBusinessObject = parentShape && parentShape.businessObject,
-	      parentDi = parentBusinessObject && parentBusinessObject.di;
+	      parentDi = getDi(parentShape);
 
 	  if (is$1(element, 'bpmn:FlowNode')) {
 	    this.updateFlowNodeRefs(businessObject, parentBusinessObject, oldParent && oldParent.businessObject);
@@ -47403,13 +50005,24 @@
 	    this.updateSemanticParent(businessObject.dataObjectRef, parentBusinessObject);
 	  }
 
-	  this.updateDiParent(businessObject.di, parentDi);
+	  this.updateDiParent(di, parentDi);
 	};
 
 
 	BpmnUpdater.prototype.updateBounds = function(shape) {
 
-	  var di = shape.businessObject.di;
+	  var di = getDi(shape),
+	      embeddedLabelBounds = getEmbeddedLabelBounds(shape);
+
+	  // update embedded label bounds if possible
+	  if (embeddedLabelBounds) {
+	    var embeddedLabelBoundsDelta = delta(embeddedLabelBounds, di.get('bounds'));
+
+	    assign(embeddedLabelBounds, {
+	      x: shape.x + embeddedLabelBoundsDelta.x,
+	      y: shape.y + embeddedLabelBoundsDelta.y
+	    });
+	  }
 
 	  var target = (shape instanceof Label) ? this._getLabel(di) : di;
 
@@ -47438,25 +50051,28 @@
 
 	  if (is$1 (oldContainment, 'bpmn:Lane')) {
 	    oldRefs = oldContainment.get('flowNodeRef');
-	    remove$2(oldRefs, businessObject);
+	    remove(oldRefs, businessObject);
 	  }
 
 	  if (is$1(newContainment, 'bpmn:Lane')) {
 	    newRefs = newContainment.get('flowNodeRef');
-	    add$1(newRefs, businessObject);
+	    add(newRefs, businessObject);
 	  }
 	};
 
 
 	// update existing sourceElement and targetElement di information
-	BpmnUpdater.prototype.updateDiConnection = function(di, newSource, newTarget) {
+	BpmnUpdater.prototype.updateDiConnection = function(connection, newSource, newTarget) {
+	  var connectionDi = getDi(connection),
+	      newSourceDi = getDi(newSource),
+	      newTargetDi = getDi(newTarget);
 
-	  if (di.sourceElement && di.sourceElement.bpmnElement !== newSource) {
-	    di.sourceElement = newSource && newSource.di;
+	  if (connectionDi.sourceElement && connectionDi.sourceElement.bpmnElement !== getBusinessObject(newSource)) {
+	    connectionDi.sourceElement = newSource && newSourceDi;
 	  }
 
-	  if (di.targetElement && di.targetElement.bpmnElement !== newTarget) {
-	    di.targetElement = newTarget && newTarget.di;
+	  if (connectionDi.targetElement && connectionDi.targetElement.bpmnElement !== getBusinessObject(newTarget)) {
+	    connectionDi.targetElement = newTarget && newTargetDi;
 	  }
 
 	};
@@ -47478,7 +50094,7 @@
 	    planeElements.push(di);
 	    di.$parent = parentDi;
 	  } else {
-	    remove$2(planeElements, di);
+	    remove(planeElements, di);
 	    di.$parent = null;
 	  }
 	};
@@ -47614,12 +50230,12 @@
 	      definitions = getDefinitions(businessObject.$parent || newParent);
 
 	      if (businessObject.$parent) {
-	        remove$2(definitions.get('rootElements'), process);
+	        remove(definitions.get('rootElements'), process);
 	        process.$parent = null;
 	      }
 
 	      if (newParent) {
-	        add$1(definitions.get('rootElements'), process);
+	        add(definitions.get('rootElements'), process);
 	        process.$parent = definitions;
 	      }
 	    }
@@ -47649,7 +50265,7 @@
 
 	    // remove from old parent
 	    children = businessObject.$parent.get(containment);
-	    remove$2(children, businessObject);
+	    remove(children, businessObject);
 	  }
 
 	  if (!newParent) {
@@ -47665,7 +50281,7 @@
 	  if (visualParent) {
 	    var diChildren = visualParent.get(containment);
 
-	    remove$2(children, businessObject);
+	    remove(children, businessObject);
 
 	    if (newParent) {
 
@@ -47681,69 +50297,72 @@
 
 
 	BpmnUpdater.prototype.updateConnectionWaypoints = function(connection) {
-	  connection.businessObject.di.set('waypoint', this._bpmnFactory.createDiWaypoints(connection.waypoints));
+	  var di = getDi(connection);
+
+	  di.set('waypoint', this._bpmnFactory.createDiWaypoints(connection.waypoints));
 	};
 
 
 	BpmnUpdater.prototype.updateConnection = function(context) {
-
 	  var connection = context.connection,
 	      businessObject = getBusinessObject(connection),
-	      newSource = getBusinessObject(connection.source),
-	      newTarget = getBusinessObject(connection.target),
+	      newSource = connection.source,
+	      newSourceBo = getBusinessObject(newSource),
+	      newTarget = connection.target,
+	      newTargetBo = getBusinessObject(connection.target),
 	      visualParent;
 
 	  if (!is$1(businessObject, 'bpmn:DataAssociation')) {
 
 	    var inverseSet = is$1(businessObject, 'bpmn:SequenceFlow');
 
-	    if (businessObject.sourceRef !== newSource) {
+	    if (businessObject.sourceRef !== newSourceBo) {
 	      if (inverseSet) {
-	        remove$2(businessObject.sourceRef && businessObject.sourceRef.get('outgoing'), businessObject);
+	        remove(businessObject.sourceRef && businessObject.sourceRef.get('outgoing'), businessObject);
 
-	        if (newSource && newSource.get('outgoing')) {
-	          newSource.get('outgoing').push(businessObject);
+	        if (newSourceBo && newSourceBo.get('outgoing')) {
+	          newSourceBo.get('outgoing').push(businessObject);
 	        }
 	      }
 
-	      businessObject.sourceRef = newSource;
+	      businessObject.sourceRef = newSourceBo;
 	    }
 
-	    if (businessObject.targetRef !== newTarget) {
+	    if (businessObject.targetRef !== newTargetBo) {
 	      if (inverseSet) {
-	        remove$2(businessObject.targetRef && businessObject.targetRef.get('incoming'), businessObject);
+	        remove(businessObject.targetRef && businessObject.targetRef.get('incoming'), businessObject);
 
-	        if (newTarget && newTarget.get('incoming')) {
-	          newTarget.get('incoming').push(businessObject);
+	        if (newTargetBo && newTargetBo.get('incoming')) {
+	          newTargetBo.get('incoming').push(businessObject);
 	        }
 	      }
 
-	      businessObject.targetRef = newTarget;
+	      businessObject.targetRef = newTargetBo;
 	    }
 	  } else
 
 	  if (is$1(businessObject, 'bpmn:DataInputAssociation')) {
 
 	    // handle obnoxious isMsome sourceRef
-	    businessObject.get('sourceRef')[0] = newSource;
+	    businessObject.get('sourceRef')[0] = newSourceBo;
 
-	    visualParent = context.parent || context.newParent || newTarget;
+	    visualParent = context.parent || context.newParent || newTargetBo;
 
-	    this.updateSemanticParent(businessObject, newTarget, visualParent);
+	    this.updateSemanticParent(businessObject, newTargetBo, visualParent);
 	  } else
 
 	  if (is$1(businessObject, 'bpmn:DataOutputAssociation')) {
-	    visualParent = context.parent || context.newParent || newSource;
+	    visualParent = context.parent || context.newParent || newSourceBo;
 
-	    this.updateSemanticParent(businessObject, newSource, visualParent);
+	    this.updateSemanticParent(businessObject, newSourceBo, visualParent);
 
 	    // targetRef = new target
-	    businessObject.targetRef = newTarget;
+	    businessObject.targetRef = newTargetBo;
 	  }
 
 	  this.updateConnectionWaypoints(connection);
 
-	  this.updateDiConnection(businessObject.di, newSource, newTarget);
+	  this.updateDiConnection(connection, newSource, newTarget);
 	};
 
 
@@ -47779,45 +50398,74 @@
 	}
 
 	/**
+	 * Return dc:Bounds of bpmndi:BPMNLabel if exists.
+	 *
+	 * @param {djs.model.shape} shape
+	 *
+	 * @returns {Object|undefined}
+	 */
+	function getEmbeddedLabelBounds(shape) {
+	  if (!is$1(shape, 'bpmn:Activity')) {
+	    return;
+	  }
+
+	  var di = getDi(shape);
+
+	  if (!di) {
+	    return;
+	  }
+
+	  var label = di.get('label');
+
+	  if (!label) {
+	    return;
+	  }
+
+	  return label.get('bounds');
+	}
+
+	/**
 	 * A bpmn-aware factory for diagram-js shapes
 	 */
-	function ElementFactory$1(bpmnFactory, moddle, translate) {
-	  ElementFactory.call(this);
+	function ElementFactory(bpmnFactory, moddle, translate) {
+	  ElementFactory$1.call(this);
 
 	  this._bpmnFactory = bpmnFactory;
 	  this._moddle = moddle;
 	  this._translate = translate;
 	}
 
-	inherits_browser(ElementFactory$1, ElementFactory);
+	inherits$1(ElementFactory, ElementFactory$1);
 
-	ElementFactory$1.$inject = [
+	ElementFactory.$inject = [
 	  'bpmnFactory',
 	  'moddle',
 	  'translate'
 	];
 
-	ElementFactory$1.prototype.baseCreate = ElementFactory.prototype.create;
+	ElementFactory.prototype.baseCreate = ElementFactory$1.prototype.create;
 
-	ElementFactory$1.prototype.create = function(elementType, attrs) {
+	ElementFactory.prototype.create = function(elementType, attrs) {
 
 	  // no special magic for labels,
 	  // we assume their businessObjects have already been created
 	  // and wired via attrs
 	  if (elementType === 'label') {
-	    return this.baseCreate(elementType, assign({ type: 'label' }, DEFAULT_LABEL_SIZE$1, attrs));
+	    var di = attrs.di || this._bpmnFactory.createDiLabel();
+	    return this.baseCreate(elementType, assign({ type: 'label', di: di }, DEFAULT_LABEL_SIZE, attrs));
 	  }
 
 	  return this.createBpmnElement(elementType, attrs);
 	};
 
-	ElementFactory$1.prototype.createBpmnElement = function(elementType, attrs) {
+	ElementFactory.prototype.createBpmnElement = function(elementType, attrs) {
 	  var size,
 	      translate = this._translate;
 
 	  attrs = attrs || {};
 
-	  var businessObject = attrs.businessObject;
+	  var businessObject = attrs.businessObject,
+	      di = attrs.di;
 
 	  if (!businessObject) {
 	    if (!attrs.type) {
@@ -47825,22 +50473,23 @@
 	    }
 
 	    businessObject = this._bpmnFactory.create(attrs.type);
+
+	    ensureCompatDiRef(businessObject);
 	  }
 
-	  if (!businessObject.di) {
+	  if (!isModdleDi(di)) {
+	    var diAttrs = assign(
+	      di || {},
+	      { id: businessObject.id + '_di' }
+	    );
+
 	    if (elementType === 'root') {
-	      businessObject.di = this._bpmnFactory.createDiPlane(businessObject, [], {
-	        id: businessObject.id + '_di'
-	      });
+	      di = this._bpmnFactory.createDiPlane(businessObject, diAttrs);
 	    } else
 	    if (elementType === 'connection') {
-	      businessObject.di = this._bpmnFactory.createDiEdge(businessObject, [], {
-	        id: businessObject.id + '_di'
-	      });
+	      di = this._bpmnFactory.createDiEdge(businessObject, diAttrs);
 	    } else {
-	      businessObject.di = this._bpmnFactory.createDiShape(businessObject, {}, {
-	        id: businessObject.id + '_di'
-	      });
+	      di = this._bpmnFactory.createDiShape(businessObject, diAttrs);
 	    }
 	  }
 
@@ -47848,12 +50497,6 @@
 	    attrs = assign({
 	      isFrame: true
 	    }, attrs);
-	  }
-
-	  if (attrs.di) {
-	    assign(businessObject.di, attrs.di);
-
-	    delete attrs.di;
 	  }
 
 	  applyAttributes(businessObject, attrs, [
@@ -47864,11 +50507,15 @@
 	  ]);
 
 	  if (attrs.isExpanded) {
-	    applyAttribute(businessObject.di, attrs, 'isExpanded');
+	    applyAttribute(di, attrs, 'isExpanded');
+	  }
+
+	  if (is$1(businessObject, 'bpmn:SubProcess')) {
+	    attrs.collapsed = !isExpanded(businessObject, di);
 	  }
 
 	  if (is$1(businessObject, 'bpmn:ExclusiveGateway')) {
-	    businessObject.di.isMarkerVisible = true;
+	    di.isMarkerVisible = true;
 	  }
 
 	  var eventDefinitions,
@@ -47890,65 +50537,69 @@
 	    delete attrs.eventDefinitionType;
 	  }
 
-	  size = this._getDefaultSize(businessObject);
+	  size = this.getDefaultSize(businessObject, di);
 
 	  attrs = assign({
-	    businessObject: businessObject,
 	    id: businessObject.id
-	  }, size, attrs);
+	  }, size, attrs, {
+	    businessObject: businessObject,
+	    di: di
+	  });
 
 	  return this.baseCreate(elementType, attrs);
 	};
 
 
-	ElementFactory$1.prototype._getDefaultSize = function(semantic) {
+	ElementFactory.prototype.getDefaultSize = function(element, di) {
 
-	  if (is$1(semantic, 'bpmn:SubProcess')) {
+	  var bo = getBusinessObject(element);
+	  di = di || getDi(element);
 
-	    if (isExpanded(semantic)) {
+	  if (is$1(bo, 'bpmn:SubProcess')) {
+	    if (isExpanded(bo, di)) {
 	      return { width: 350, height: 200 };
 	    } else {
 	      return { width: 100, height: 80 };
 	    }
 	  }
 
-	  if (is$1(semantic, 'bpmn:Task')) {
+	  if (is$1(bo, 'bpmn:Task')) {
 	    return { width: 100, height: 80 };
 	  }
 
-	  if (is$1(semantic, 'bpmn:Gateway')) {
+	  if (is$1(bo, 'bpmn:Gateway')) {
 	    return { width: 50, height: 50 };
 	  }
 
-	  if (is$1(semantic, 'bpmn:Event')) {
+	  if (is$1(bo, 'bpmn:Event')) {
 	    return { width: 36, height: 36 };
 	  }
 
-	  if (is$1(semantic, 'bpmn:Participant')) {
-	    if (isExpanded(semantic)) {
+	  if (is$1(bo, 'bpmn:Participant')) {
+	    if (isExpanded(bo, di)) {
 	      return { width: 600, height: 250 };
 	    } else {
 	      return { width: 400, height: 60 };
 	    }
 	  }
 
-	  if (is$1(semantic, 'bpmn:Lane')) {
+	  if (is$1(bo, 'bpmn:Lane')) {
 	    return { width: 400, height: 100 };
 	  }
 
-	  if (is$1(semantic, 'bpmn:DataObjectReference')) {
+	  if (is$1(bo, 'bpmn:DataObjectReference')) {
 	    return { width: 36, height: 50 };
 	  }
 
-	  if (is$1(semantic, 'bpmn:DataStoreReference')) {
+	  if (is$1(bo, 'bpmn:DataStoreReference')) {
 	    return { width: 50, height: 50 };
 	  }
 
-	  if (is$1(semantic, 'bpmn:TextAnnotation')) {
+	  if (is$1(bo, 'bpmn:TextAnnotation')) {
 	    return { width: 100, height: 30 };
 	  }
 
-	  if (is$1(semantic, 'bpmn:Group')) {
+	  if (is$1(bo, 'bpmn:Group')) {
 	    return { width: 300, height: 300 };
 	  }
 
@@ -47963,7 +50614,7 @@
 	 *
 	 * @returns {djs.model.Shape}
 	 */
-	ElementFactory$1.prototype.createParticipantShape = function(attrs) {
+	ElementFactory.prototype.createParticipantShape = function(attrs) {
 
 	  if (!isObject(attrs)) {
 	    attrs = { isExpanded: attrs };
@@ -48013,19 +50664,29 @@
 	  delete attrs[attributeName];
 	}
 
+
+	function isModdleDi(element) {
+	  return isAny(element, [
+	    'bpmndi:BPMNShape',
+	    'bpmndi:BPMNEdge',
+	    'bpmndi:BPMNDiagram',
+	    'bpmndi:BPMNPlane',
+	  ]);
+	}
+
 	/**
 	 * A handler that align elements in a certain way.
 	 *
 	 */
-	function AlignElements$1(modeling, canvas) {
+	function AlignElements(modeling, canvas) {
 	  this._modeling = modeling;
 	  this._canvas = canvas;
 	}
 
-	AlignElements$1.$inject = [ 'modeling', 'canvas' ];
+	AlignElements.$inject = [ 'modeling', 'canvas' ];
 
 
-	AlignElements$1.prototype.preExecute = function(context) {
+	AlignElements.prototype.preExecute = function(context) {
 	  var modeling = this._modeling;
 
 	  var elements = context.elements,
@@ -48061,7 +50722,7 @@
 	  });
 	};
 
-	AlignElements$1.prototype.postExecute = function(context) {
+	AlignElements.prototype.postExecute = function(context) {
 
 	};
 
@@ -48194,7 +50855,7 @@
 	  return connection;
 	};
 
-	var round$8 = Math.round;
+	var round$3 = Math.round;
 
 	function CreateElementsHandler(modeling) {
 	  this._modeling = modeling;
@@ -48224,31 +50885,35 @@
 	    }
 	  });
 
-	  var bbox = getBBox(elements);
+	  var visibleElements = filter(elements, function(element) {
+	    return !element.hidden;
+	  });
+
+	  var bbox = getBBox(visibleElements);
 
 	  // center elements around position
 	  forEach(elements, function(element) {
-	    if (isConnection$6(element)) {
-	      element.waypoints = map(element.waypoints, function(waypoint) {
+	    if (isConnection$5(element)) {
+	      element.waypoints = map$1(element.waypoints, function(waypoint) {
 	        return {
-	          x: round$8(waypoint.x - bbox.x - bbox.width / 2 + position.x),
-	          y: round$8(waypoint.y - bbox.y - bbox.height / 2 + position.y)
+	          x: round$3(waypoint.x - bbox.x - bbox.width / 2 + position.x),
+	          y: round$3(waypoint.y - bbox.y - bbox.height / 2 + position.y)
 	        };
 	      });
 	    }
 
 	    assign(element, {
-	      x: round$8(element.x - bbox.x - bbox.width / 2 + position.x),
-	      y: round$8(element.y - bbox.y - bbox.height / 2 + position.y)
+	      x: round$3(element.x - bbox.x - bbox.width / 2 + position.x),
+	      y: round$3(element.y - bbox.y - bbox.height / 2 + position.y)
 	    });
 	  });
 
-	  var parents = getParents(elements);
+	  var parents = getParents$1(elements);
 
 	  var cache = {};
 
 	  forEach(elements, function(element) {
-	    if (isConnection$6(element)) {
+	    if (isConnection$5(element)) {
 	      cache[ element.id ] = isNumber(parentIndex) ?
 	        modeling.createConnection(
 	          cache[ element.source.id ],
@@ -48296,11 +50961,11 @@
 
 	// helpers //////////
 
-	function isConnection$6(element) {
+	function isConnection$5(element) {
 	  return !!element.waypoints;
 	}
 
-	var round$9 = Math.round;
+	var round$2 = Math.round;
 
 
 	/**
@@ -48345,8 +51010,8 @@
 	    assign(shape, positionOrBounds);
 	  } else {
 	    assign(shape, {
-	      x: positionOrBounds.x - round$9(shape.width / 2),
-	      y: positionOrBounds.y - round$9(shape.height / 2)
+	      x: positionOrBounds.x - round$2(shape.width / 2),
+	      y: positionOrBounds.y - round$2(shape.height / 2)
 	    });
 	  }
 
@@ -48379,7 +51044,7 @@
 	  CreateShapeHandler.call(this, canvas);
 	}
 
-	inherits_browser(CreateLabelHandler, CreateShapeHandler);
+	inherits$1(CreateLabelHandler, CreateShapeHandler);
 
 	CreateLabelHandler.$inject = [ 'canvas' ];
 
@@ -48456,7 +51121,7 @@
 	  context.parent = parent;
 
 	  // remember containment
-	  context.parentIndex = indexOf$1(parent.children, connection);
+	  context.parentIndex = indexOf(parent.children, connection);
 
 	  context.source = connection.source;
 	  context.target = connection.target;
@@ -48482,7 +51147,7 @@
 	  connection.target = context.target;
 
 	  // restore containment
-	  add$1(parent.children, connection, parentIndex);
+	  add(parent.children, connection, parentIndex);
 
 	  this._canvas.addConnection(connection, parent);
 
@@ -48558,7 +51223,7 @@
 
 	  // remove child shapes and connections
 	  saveClear(shape.children, function(child) {
-	    if (isConnection$7(child)) {
+	    if (isConnection$4(child)) {
 	      modeling.removeConnection(child, { nested: true });
 	    } else {
 	      modeling.removeShape(child, { nested: true });
@@ -48578,7 +51243,7 @@
 	  context.oldParent = oldParent;
 
 	  // remove containment
-	  context.oldParentIndex = indexOf$1(oldParent.children, shape);
+	  context.oldParentIndex = indexOf(oldParent.children, shape);
 
 	  // remove shape
 	  canvas.removeShape(shape);
@@ -48599,32 +51264,32 @@
 	      oldParentIndex = context.oldParentIndex;
 
 	  // restore containment
-	  add$1(oldParent.children, shape, oldParentIndex);
+	  add(oldParent.children, shape, oldParentIndex);
 
 	  canvas.addShape(shape, oldParent);
 
 	  return shape;
 	};
 
-	function isConnection$7(element) {
+	function isConnection$4(element) {
 	  return element.waypoints;
 	}
 
 	/**
 	 * A handler that distributes elements evenly.
 	 */
-	function DistributeElements$1(modeling) {
+	function DistributeElements(modeling) {
 	  this._modeling = modeling;
 	}
 
-	DistributeElements$1.$inject = [ 'modeling' ];
+	DistributeElements.$inject = [ 'modeling' ];
 
 	var OFF_AXIS = {
 	  x: 'y',
 	  y: 'x'
 	};
 
-	DistributeElements$1.prototype.preExecute = function(context) {
+	DistributeElements.prototype.preExecute = function(context) {
 	  var modeling = this._modeling;
 
 	  var groups = context.groups,
@@ -48755,7 +51420,7 @@
 	  });
 	};
 
-	DistributeElements$1.prototype.postExecute = function(context) {
+	DistributeElements.prototype.postExecute = function(context) {
 
 	};
 
@@ -48813,10 +51478,10 @@
 
 	  // save old parent in context
 	  context.oldParent = oldParent;
-	  context.oldParentIndex = remove$2(oldParent.children, connection);
+	  context.oldParentIndex = remove(oldParent.children, connection);
 
 	  // add to new parent at position
-	  add$1(newParent.children, connection, newParentIndex);
+	  add(newParent.children, connection, newParentIndex);
 
 	  // update parent
 	  connection.parent = newParent;
@@ -48844,10 +51509,10 @@
 	      delta = context.delta;
 
 	  // remove from newParent
-	  remove$2(newParent.children, connection);
+	  remove(newParent.children, connection);
 
 	  // restore previous location in old parent
-	  add$1(oldParent.children, connection, oldParentIndex);
+	  add(oldParent.children, connection, oldParentIndex);
 
 	  // restore parent
 	  connection.parent = oldParent;
@@ -48865,108 +51530,6 @@
 
 	  return connection;
 	};
-
-	function getResizedSourceAnchor(connection, shape, oldBounds) {
-
-	  var waypoints = safeGetWaypoints(connection),
-	      waypointsInsideNewBounds = getWaypointsInsideBounds(waypoints, shape),
-	      oldAnchor = waypoints[0];
-
-	  // new anchor is the last waypoint enclosed be resized source
-	  if (waypointsInsideNewBounds.length) {
-	    return waypointsInsideNewBounds[ waypointsInsideNewBounds.length - 1 ];
-	  }
-
-	  return getNewAttachPoint(oldAnchor.original || oldAnchor, oldBounds, shape);
-	}
-
-
-	function getResizedTargetAnchor(connection, shape, oldBounds) {
-
-	  var waypoints = safeGetWaypoints(connection),
-	      waypointsInsideNewBounds = getWaypointsInsideBounds(waypoints, shape),
-	      oldAnchor = waypoints[waypoints.length - 1];
-
-	  // new anchor is the first waypoint enclosed be resized target
-	  if (waypointsInsideNewBounds.length) {
-	    return waypointsInsideNewBounds[ 0 ];
-	  }
-
-	  return getNewAttachPoint(oldAnchor.original || oldAnchor, oldBounds, shape);
-	}
-
-
-	function getMovedSourceAnchor(connection, source, moveDelta) {
-
-	  var waypoints = safeGetWaypoints(connection),
-	      oldBounds = subtract(source, moveDelta),
-	      oldAnchor = waypoints[ 0 ];
-
-	  return getNewAttachPoint(oldAnchor.original || oldAnchor, oldBounds, source);
-	}
-
-
-	function getMovedTargetAnchor(connection, target, moveDelta) {
-
-	  var waypoints = safeGetWaypoints(connection),
-	      oldBounds = subtract(target, moveDelta),
-	      oldAnchor = waypoints[ waypoints.length - 1 ];
-
-	  return getNewAttachPoint(oldAnchor.original || oldAnchor, oldBounds, target);
-	}
-
-
-	// helpers //////////////////////
-
-	function subtract(bounds, delta) {
-	  return {
-	    x: bounds.x - delta.x,
-	    y: bounds.y - delta.y,
-	    width: bounds.width,
-	    height: bounds.height
-	  };
-	}
-
-
-	/**
-	 * Return waypoints of given connection; throw if non exists (should not happen!!).
-	 *
-	 * @param {Connection} connection
-	 *
-	 * @return {Array<Point>}
-	 */
-	function safeGetWaypoints(connection) {
-
-	  var waypoints = connection.waypoints;
-
-	  if (!waypoints.length) {
-	    throw new Error('connection#' + connection.id + ': no waypoints');
-	  }
-
-	  return waypoints;
-	}
-
-	function getWaypointsInsideBounds(waypoints, bounds) {
-	  var originalWaypoints = map(waypoints, getOriginal$1);
-
-	  return filter(originalWaypoints, function(waypoint) {
-	    return isInsideBounds(waypoint, bounds);
-	  });
-	}
-
-	/**
-	 * Checks if point is inside bounds, incl. edges.
-	 *
-	 * @param {Point} point
-	 * @param {Bounds} bounds
-	 */
-	function isInsideBounds(point, bounds) {
-	  return getOrientation(bounds, point, 1) === 'intersect';
-	}
-
-	function getOriginal$1(point) {
-	  return point.original || point;
-	}
 
 	function MoveClosure() {
 
@@ -49138,10 +51701,10 @@
 
 	  // save old parent in context
 	  context.oldParent = oldParent;
-	  context.oldParentIndex = remove$2(oldParent.children, shape);
+	  context.oldParentIndex = remove(oldParent.children, shape);
 
 	  // add to new parent at position
-	  add$1(newParent.children, shape, newParentIndex);
+	  add(newParent.children, shape, newParentIndex);
 
 	  // update shape parent + position
 	  assign(shape, {
@@ -49189,7 +51752,7 @@
 	      delta = context.delta;
 
 	  // restore previous location in old parent
-	  add$1(oldParent.children, shape, oldParentIndex);
+	  add(oldParent.children, shape, oldParentIndex);
 
 	  // revert to old position and parent
 	  assign(shape, {
@@ -49232,7 +51795,7 @@
 	    throw new Error('newSource or newTarget required');
 	  }
 
-	  if (isArray(dockingOrPoints)) {
+	  if (isArray$2(dockingOrPoints)) {
 	    context.oldWaypoints = connection.waypoints;
 	    connection.waypoints = dockingOrPoints;
 	  }
@@ -49273,12 +51836,12 @@
 
 	  if (newSource && (!newTarget || hints.docking === 'source')) {
 	    layoutConnectionHints.connectionStart = layoutConnectionHints.connectionStart
-	      || getDocking$2(isArray(dockingOrPoints) ? dockingOrPoints[ 0 ] : dockingOrPoints);
+	      || getDocking(isArray$2(dockingOrPoints) ? dockingOrPoints[ 0 ] : dockingOrPoints);
 	  }
 
 	  if (newTarget && (!newSource || hints.docking === 'target')) {
 	    layoutConnectionHints.connectionEnd = layoutConnectionHints.connectionEnd
-	      || getDocking$2(isArray(dockingOrPoints) ? dockingOrPoints[ dockingOrPoints.length - 1 ] : dockingOrPoints);
+	      || getDocking(isArray$2(dockingOrPoints) ? dockingOrPoints[ dockingOrPoints.length - 1 ] : dockingOrPoints);
 	  }
 
 	  if (hints.newWaypoints) {
@@ -49313,7 +51876,7 @@
 
 	// helpers //////////
 
-	function getDocking$2(point) {
+	function getDocking(point) {
 	  return point.original || point;
 	}
 
@@ -49617,7 +52180,7 @@
 	  var self = this;
 
 	  forEach(shapes, function(shape) {
-	    var newBounds = resizeBounds$1(shape, direction, delta);
+	    var newBounds = resizeBounds(shape, direction, delta);
 
 	    self._modeling.resizeShape(shape, newBounds, null, {
 	      attachSupport: false,
@@ -49647,16 +52210,16 @@
 	  forEach(connections, function(connection) {
 	    var source = connection.source,
 	        target = connection.target,
-	        waypoints = copyWaypoints$1(connection),
+	        waypoints = copyWaypoints(connection),
 	        axis = getAxisFromDirection(direction),
 	        layoutHints = {
 	          labelBehavior: false
 	        };
 
-	    if (includes$5(affectedShapes, source) && includes$5(affectedShapes, target)) {
+	    if (includes$1(affectedShapes, source) && includes$1(affectedShapes, target)) {
 
 	      // move waypoints
-	      waypoints = map(waypoints, function(waypoint) {
+	      waypoints = map$1(waypoints, function(waypoint) {
 	        if (shouldMoveWaypoint(waypoint, start, direction)) {
 
 	          // move waypoint
@@ -49675,18 +52238,18 @@
 	      self._modeling.updateWaypoints(connection, waypoints, {
 	        labelBehavior: false
 	      });
-	    } else if (includes$5(affectedShapes, source) || includes$5(affectedShapes, target)) {
+	    } else if (includes$1(affectedShapes, source) || includes$1(affectedShapes, target)) {
 
 	      // re-layout connection with moved start/end
-	      if (includes$5(movingShapes, source)) {
+	      if (includes$1(movingShapes, source)) {
 	        layoutHints.connectionStart = getMovedSourceAnchor(connection, source, delta);
-	      } else if (includes$5(movingShapes, target)) {
+	      } else if (includes$1(movingShapes, target)) {
 	        layoutHints.connectionEnd = getMovedTargetAnchor(connection, target, delta);
-	      } else if (includes$5(resizingShapes, source)) {
+	      } else if (includes$1(resizingShapes, source)) {
 	        layoutHints.connectionStart = getResizedSourceAnchor(
 	          connection, source, oldBounds[source.id]
 	        );
-	      } else if (includes$5(resizingShapes, target)) {
+	      } else if (includes$1(resizingShapes, target)) {
 	        layoutHints.connectionEnd = getResizedTargetAnchor(
 	          connection, target, oldBounds[target.id]
 	        );
@@ -49700,17 +52263,17 @@
 
 	// helpers //////////
 
-	function copyWaypoint$1(waypoint) {
+	function copyWaypoint(waypoint) {
 	  return assign({}, waypoint);
 	}
 
-	function copyWaypoints$1(connection) {
-	  return map(connection.waypoints, function(waypoint) {
+	function copyWaypoints(connection) {
+	  return map$1(connection.waypoints, function(waypoint) {
 
-	    waypoint = copyWaypoint$1(waypoint);
+	    waypoint = copyWaypoint(waypoint);
 
 	    if (waypoint.original) {
-	      waypoint.original = copyWaypoint$1(waypoint.original);
+	      waypoint.original = copyWaypoint(waypoint.original);
 	    }
 
 	    return waypoint;
@@ -49740,7 +52303,7 @@
 	  }
 	}
 
-	function includes$5(array, item) {
+	function includes$1(array, item) {
 	  return array.indexOf(item) !== -1;
 	}
 
@@ -49906,7 +52469,7 @@
 	function removeAttacher(host, attacher) {
 
 	  // remove attacher from host
-	  return remove$2(host && host.attachers, attacher);
+	  return remove(host && host.attachers, attacher);
 	}
 
 	function addAttacher(host, attacher, idx) {
@@ -49921,7 +52484,7 @@
 	    host.attachers = attachers = [];
 	  }
 
-	  add$1(attachers, attacher, idx);
+	  add(attachers, attacher, idx);
 	}
 
 	function UpdateWaypointsHandler() { }
@@ -49955,7 +52518,7 @@
 	 * @param {ElementFactory} elementFactory
 	 * @param {CommandStack} commandStack
 	 */
-	function Modeling(eventBus, elementFactory, commandStack) {
+	function Modeling$1(eventBus, elementFactory, commandStack) {
 	  this._eventBus = eventBus;
 	  this._elementFactory = elementFactory;
 	  this._commandStack = commandStack;
@@ -49969,10 +52532,10 @@
 	  });
 	}
 
-	Modeling.$inject = [ 'eventBus', 'elementFactory', 'commandStack' ];
+	Modeling$1.$inject = [ 'eventBus', 'elementFactory', 'commandStack' ];
 
 
-	Modeling.prototype.getHandlers = function() {
+	Modeling$1.prototype.getHandlers = function() {
 	  return {
 	    'shape.append': AppendShapeHandler,
 	    'shape.create': CreateShapeHandler,
@@ -49999,8 +52562,8 @@
 	    'elements.move': MoveElementsHandler,
 	    'elements.delete': DeleteElementsHandler,
 
-	    'elements.distribute': DistributeElements$1,
-	    'elements.align': AlignElements$1,
+	    'elements.distribute': DistributeElements,
+	    'elements.align': AlignElements,
 
 	    'element.updateAttachment': UpdateAttachmentHandler
 	  };
@@ -50011,7 +52574,7 @@
 	 *
 	 * @param {CommandStack} commandStack
 	 */
-	Modeling.prototype.registerHandlers = function(commandStack) {
+	Modeling$1.prototype.registerHandlers = function(commandStack) {
 	  forEach(this.getHandlers(), function(handler, id) {
 	    commandStack.registerHandler(id, handler);
 	  });
@@ -50020,7 +52583,7 @@
 
 	// modeling helpers //////////////////////
 
-	Modeling.prototype.moveShape = function(shape, delta, newParent, newParentIndex, hints) {
+	Modeling$1.prototype.moveShape = function(shape, delta, newParent, newParentIndex, hints) {
 
 	  if (typeof newParentIndex === 'object') {
 	    hints = newParentIndex;
@@ -50045,7 +52608,7 @@
 	 * @param {djs.mode.Base} shape
 	 * @param {djs.model.Base} [newHost]
 	 */
-	Modeling.prototype.updateAttachment = function(shape, newHost) {
+	Modeling$1.prototype.updateAttachment = function(shape, newHost) {
 	  var context = {
 	    shape: shape,
 	    newHost: newHost
@@ -50065,7 +52628,7 @@
 	 * @param {Object} [hints]
 	 * @param {boolean} [hints.attach=false]
 	 */
-	Modeling.prototype.moveElements = function(shapes, delta, target, hints) {
+	Modeling$1.prototype.moveElements = function(shapes, delta, target, hints) {
 
 	  hints = hints || {};
 
@@ -50095,7 +52658,7 @@
 	};
 
 
-	Modeling.prototype.moveConnection = function(connection, delta, newParent, newParentIndex, hints) {
+	Modeling$1.prototype.moveConnection = function(connection, delta, newParent, newParentIndex, hints) {
 
 	  if (typeof newParentIndex === 'object') {
 	    hints = newParentIndex;
@@ -50114,7 +52677,7 @@
 	};
 
 
-	Modeling.prototype.layoutConnection = function(connection, hints) {
+	Modeling$1.prototype.layoutConnection = function(connection, hints) {
 	  var context = {
 	    connection: connection,
 	    hints: hints || {}
@@ -50136,7 +52699,7 @@
 	 *
 	 * @return {djs.model.Connection} the created connection.
 	 */
-	Modeling.prototype.createConnection = function(source, target, parentIndex, connection, parent, hints) {
+	Modeling$1.prototype.createConnection = function(source, target, parentIndex, connection, parent, hints) {
 
 	  if (typeof parentIndex === 'object') {
 	    hints = parent;
@@ -50174,7 +52737,7 @@
 	 *
 	 * @return {djs.model.Shape} the created shape
 	 */
-	Modeling.prototype.createShape = function(shape, position, target, parentIndex, hints) {
+	Modeling$1.prototype.createShape = function(shape, position, target, parentIndex, hints) {
 
 	  if (typeof parentIndex !== 'number') {
 	    hints = parentIndex;
@@ -50211,8 +52774,8 @@
 	};
 
 
-	Modeling.prototype.createElements = function(elements, position, parent, parentIndex, hints) {
-	  if (!isArray(elements)) {
+	Modeling$1.prototype.createElements = function(elements, position, parent, parentIndex, hints) {
+	  if (!isArray$2(elements)) {
 	    elements = [ elements ];
 	  }
 
@@ -50237,7 +52800,7 @@
 	};
 
 
-	Modeling.prototype.createLabel = function(labelTarget, position, label, parent) {
+	Modeling$1.prototype.createLabel = function(labelTarget, position, label, parent) {
 
 	  label = this._create('label', label);
 
@@ -50269,7 +52832,7 @@
 	 *
 	 * @return {djs.model.Shape} the newly created shape
 	 */
-	Modeling.prototype.appendShape = function(source, shape, position, target, hints) {
+	Modeling$1.prototype.appendShape = function(source, shape, position, target, hints) {
 
 	  hints = hints || {};
 
@@ -50291,7 +52854,7 @@
 	};
 
 
-	Modeling.prototype.removeElements = function(elements) {
+	Modeling$1.prototype.removeElements = function(elements) {
 	  var context = {
 	    elements: elements
 	  };
@@ -50300,7 +52863,7 @@
 	};
 
 
-	Modeling.prototype.distributeElements = function(groups, axis, dimension) {
+	Modeling$1.prototype.distributeElements = function(groups, axis, dimension) {
 	  var context = {
 	    groups: groups,
 	    axis: axis,
@@ -50311,7 +52874,7 @@
 	};
 
 
-	Modeling.prototype.removeShape = function(shape, hints) {
+	Modeling$1.prototype.removeShape = function(shape, hints) {
 	  var context = {
 	    shape: shape,
 	    hints: hints || {}
@@ -50321,7 +52884,7 @@
 	};
 
 
-	Modeling.prototype.removeConnection = function(connection, hints) {
+	Modeling$1.prototype.removeConnection = function(connection, hints) {
 	  var context = {
 	    connection: connection,
 	    hints: hints || {}
@@ -50330,7 +52893,7 @@
 	  this._commandStack.execute('connection.delete', context);
 	};
 
-	Modeling.prototype.replaceShape = function(oldShape, newShape, hints) {
+	Modeling$1.prototype.replaceShape = function(oldShape, newShape, hints) {
 	  var context = {
 	    oldShape: oldShape,
 	    newData: newShape,
@@ -50342,7 +52905,7 @@
 	  return context.newShape;
 	};
 
-	Modeling.prototype.alignElements = function(elements, alignment) {
+	Modeling$1.prototype.alignElements = function(elements, alignment) {
 	  var context = {
 	    elements: elements,
 	    alignment: alignment
@@ -50351,7 +52914,7 @@
 	  this._commandStack.execute('elements.align', context);
 	};
 
-	Modeling.prototype.resizeShape = function(shape, newBounds, minBounds, hints) {
+	Modeling$1.prototype.resizeShape = function(shape, newBounds, minBounds, hints) {
 	  var context = {
 	    shape: shape,
 	    newBounds: newBounds,
@@ -50362,7 +52925,7 @@
 	  this._commandStack.execute('shape.resize', context);
 	};
 
-	Modeling.prototype.createSpace = function(movingShapes, resizingShapes, delta, direction, start) {
+	Modeling$1.prototype.createSpace = function(movingShapes, resizingShapes, delta, direction, start) {
 	  var context = {
 	    delta: delta,
 	    direction: direction,
@@ -50374,7 +52937,7 @@
 	  this._commandStack.execute('spaceTool', context);
 	};
 
-	Modeling.prototype.updateWaypoints = function(connection, newWaypoints, hints) {
+	Modeling$1.prototype.updateWaypoints = function(connection, newWaypoints, hints) {
 	  var context = {
 	    connection: connection,
 	    newWaypoints: newWaypoints,
@@ -50384,7 +52947,7 @@
 	  this._commandStack.execute('connection.updateWaypoints', context);
 	};
 
-	Modeling.prototype.reconnect = function(connection, source, target, dockingOrPoints, hints) {
+	Modeling$1.prototype.reconnect = function(connection, source, target, dockingOrPoints, hints) {
 	  var context = {
 	    connection: connection,
 	    newSource: source,
@@ -50396,7 +52959,7 @@
 	  this._commandStack.execute('connection.reconnect', context);
 	};
 
-	Modeling.prototype.reconnectStart = function(connection, newSource, dockingOrPoints, hints) {
+	Modeling$1.prototype.reconnectStart = function(connection, newSource, dockingOrPoints, hints) {
 	  if (!hints) {
 	    hints = {};
 	  }
@@ -50406,7 +52969,7 @@
 	  }));
 	};
 
-	Modeling.prototype.reconnectEnd = function(connection, newTarget, dockingOrPoints, hints) {
+	Modeling$1.prototype.reconnectEnd = function(connection, newTarget, dockingOrPoints, hints) {
 	  if (!hints) {
 	    hints = {};
 	  }
@@ -50416,19 +52979,19 @@
 	  }));
 	};
 
-	Modeling.prototype.connect = function(source, target, attrs, hints) {
+	Modeling$1.prototype.connect = function(source, target, attrs, hints) {
 	  return this.createConnection(source, target, attrs || {}, source.parent, hints);
 	};
 
-	Modeling.prototype._create = function(type, attrs) {
-	  if (attrs instanceof Base) {
+	Modeling$1.prototype._create = function(type, attrs) {
+	  if (attrs instanceof Base$1) {
 	    return attrs;
 	  } else {
 	    return this._elementFactory.create(type, attrs);
 	  }
 	};
 
-	Modeling.prototype.toggleCollapse = function(shape, hints) {
+	Modeling$1.prototype.toggleCollapse = function(shape, hints) {
 	  var context = {
 	    shape: shape,
 	    hints: hints || {}
@@ -50437,11 +53000,91 @@
 	  this._commandStack.execute('shape.toggleCollapse', context);
 	};
 
+	function UpdateModdlePropertiesHandler(elementRegistry) {
+	  this._elementRegistry = elementRegistry;
+	}
+
+	UpdateModdlePropertiesHandler.$inject = ['elementRegistry'];
+
+	UpdateModdlePropertiesHandler.prototype.execute = function(context) {
+
+	  var element = context.element,
+	      moddleElement = context.moddleElement,
+	      properties = context.properties;
+
+	  if (!moddleElement) {
+	    throw new Error('<moddleElement> required');
+	  }
+
+	  var changed = context.changed || this.getVisualReferences(moddleElement).concat(element);
+	  var oldProperties = context.oldProperties || getModdleProperties(moddleElement, keys(properties));
+
+	  setModdleProperties(moddleElement, properties);
+
+	  context.oldProperties = oldProperties;
+	  context.changed = changed;
+
+	  return changed;
+	};
+
+	UpdateModdlePropertiesHandler.prototype.revert = function(context) {
+	  var oldProperties = context.oldProperties,
+	      moddleElement = context.moddleElement,
+	      changed = context.changed;
+
+	  setModdleProperties(moddleElement, oldProperties);
+
+	  return changed;
+	};
+
+	/**
+	 * Return visual references of given moddle element within the diagram.
+	 *
+	 * @param {ModdleElement} moddleElement
+	 *
+	 * @return {Array<djs.model.Element>}
+	 */
+	UpdateModdlePropertiesHandler.prototype.getVisualReferences = function(moddleElement) {
+
+	  var elementRegistry = this._elementRegistry;
+
+	  if (is$1(moddleElement, 'bpmn:DataObject')) {
+	    return getAllDataObjectReferences(moddleElement, elementRegistry);
+	  }
+
+	  return [];
+	};
+
+
+	// helpers /////////////////
+
+	function getModdleProperties(moddleElement, propertyNames) {
+	  return reduce(propertyNames, function(result, key) {
+	    result[key] = moddleElement.get(key);
+	    return result;
+	  }, {});
+	}
+
+	function setModdleProperties(moddleElement, properties) {
+	  forEach(properties, function(value, key) {
+	    moddleElement.set(key, value);
+	  });
+	}
+
+	function getAllDataObjectReferences(dataObject, elementRegistry) {
+	  return elementRegistry.filter(function(element) {
+	    return (
+	      is$1(element, 'bpmn:DataObjectReference') &&
+	          getBusinessObject(element).dataObjectRef === dataObject
+	    );
+	  });
+	}
+
 	var DEFAULT_FLOW = 'default',
 	    ID = 'id',
 	    DI = 'di';
 
-	var NULL_DIMENSIONS = {
+	var NULL_DIMENSIONS$1 = {
 	  width: 0,
 	  height: 0
 	};
@@ -50502,7 +53145,7 @@
 
 	  var businessObject = element.businessObject,
 	      properties = unwrapBusinessObjects(context.properties),
-	      oldProperties = context.oldProperties || getProperties(businessObject, properties);
+	      oldProperties = context.oldProperties || getProperties(element, properties);
 
 	  if (isIdChange(properties, businessObject)) {
 	    ids.unclaim(businessObject[ID]);
@@ -50525,7 +53168,7 @@
 	  }
 
 	  // update properties
-	  setProperties(businessObject, properties);
+	  setProperties(element, properties);
 
 	  // store old values
 	  context.oldProperties = oldProperties;
@@ -50550,7 +53193,7 @@
 	  // external label accordingly
 	  var newLabelBounds = this._textRenderer.getExternalLabelBounds(label, text);
 
-	  this._modeling.resizeShape(label, newLabelBounds, NULL_DIMENSIONS);
+	  this._modeling.resizeShape(label, newLabelBounds, NULL_DIMENSIONS$1);
 	};
 
 	/**
@@ -50570,7 +53213,7 @@
 	      ids = this._moddle.ids;
 
 	  // update properties
-	  setProperties(businessObject, oldProperties);
+	  setProperties(element, oldProperties);
 
 	  if (isIdChange(properties, businessObject)) {
 	    ids.unclaim(properties[ID]);
@@ -50589,16 +53232,19 @@
 	}
 
 
-	function getProperties(businessObject, properties) {
-	  var propertyNames = keys(properties);
+	function getProperties(element, properties) {
+	  var propertyNames = keys(properties),
+	      businessObject = element.businessObject,
+	      di = getDi(element);
 
 	  return reduce(propertyNames, function(result, key) {
 
 	    // handle DI separately
 	    if (key !== DI) {
 	      result[key] = businessObject.get(key);
+
 	    } else {
-	      result[key] = getDiProperties(businessObject.di, keys(properties.di));
+	      result[key] = getDiProperties(di, keys(properties.di));
 	    }
 
 	    return result;
@@ -50608,23 +53254,26 @@
 
 	function getDiProperties(di, propertyNames) {
 	  return reduce(propertyNames, function(result, key) {
-	    result[key] = di.get(key);
+	    result[key] = di && di.get(key);
 
 	    return result;
 	  }, {});
 	}
 
 
-	function setProperties(businessObject, properties) {
+	function setProperties(element, properties) {
+	  var businessObject = element.businessObject,
+	      di = getDi(element);
+
 	  forEach(properties, function(value, key) {
 
 	    if (key !== DI) {
 	      businessObject.set(key, value);
 	    } else {
 
-	      // only update, if businessObject.di exists
-	      if (businessObject.di) {
-	        setDiProperties(businessObject.di, value);
+	      // only update, if di exists
+	      if (di) {
+	        setDiProperties(di, value);
 	      }
 	    }
 	  });
@@ -50682,23 +53331,24 @@
 	      oldRoot = canvas.getRootElement(),
 	      oldRootBusinessObject = oldRoot.businessObject,
 	      bpmnDefinitions = oldRootBusinessObject.$parent,
-	      diPlane = oldRootBusinessObject.di;
+	      diPlane = getDi(oldRoot);
 
 	  // (1) replace process old <> new root
-	  canvas.setRootElement(newRoot, true);
+	  canvas.setRootElement(newRoot);
+	  canvas.removeRootElement(oldRoot);
 
 	  // (2) update root elements
-	  add$1(bpmnDefinitions.rootElements, newRootBusinessObject);
+	  add(bpmnDefinitions.rootElements, newRootBusinessObject);
 	  newRootBusinessObject.$parent = bpmnDefinitions;
 
-	  remove$2(bpmnDefinitions.rootElements, oldRootBusinessObject);
+	  remove(bpmnDefinitions.rootElements, oldRootBusinessObject);
 	  oldRootBusinessObject.$parent = null;
 
 	  // (3) wire di
-	  oldRootBusinessObject.di = null;
+	  oldRoot.di = null;
 
 	  diPlane.bpmnElement = newRootBusinessObject;
-	  newRootBusinessObject.di = diPlane;
+	  newRoot.di = diPlane;
 
 	  context.oldRoot = oldRoot;
 
@@ -50716,23 +53366,24 @@
 	      oldRoot = context.oldRoot,
 	      oldRootBusinessObject = oldRoot.businessObject,
 	      bpmnDefinitions = newRootBusinessObject.$parent,
-	      diPlane = newRootBusinessObject.di;
+	      diPlane = getDi(newRoot);
 
 	  // (1) replace process old <> new root
-	  canvas.setRootElement(oldRoot, true);
+	  canvas.setRootElement(oldRoot);
+	  canvas.removeRootElement(newRoot);
 
 	  // (2) update root elements
-	  remove$2(bpmnDefinitions.rootElements, newRootBusinessObject);
+	  remove(bpmnDefinitions.rootElements, newRootBusinessObject);
 	  newRootBusinessObject.$parent = null;
 
-	  add$1(bpmnDefinitions.rootElements, oldRootBusinessObject);
+	  add(bpmnDefinitions.rootElements, oldRootBusinessObject);
 	  oldRootBusinessObject.$parent = bpmnDefinitions;
 
 	  // (3) wire di
-	  newRootBusinessObject.di = null;
+	  newRoot.di = null;
 
 	  diPlane.bpmnElement = oldRootBusinessObject;
-	  oldRootBusinessObject.di = diPlane;
+	  oldRoot.di = diPlane;
 
 	  // TODO(nikku): return changed elements?
 	  // return [ newRoot, oldRoot ];
@@ -51154,14 +53805,14 @@
 
 	    // unwire old
 	    update.remove.forEach(function(oldLane) {
-	      remove$2(lanes, oldLane);
-	      remove$2(oldLane.get(FLOW_NODE_REFS_ATTR), flowNode);
+	      remove(lanes, oldLane);
+	      remove(oldLane.get(FLOW_NODE_REFS_ATTR), flowNode);
 	    });
 
 	    // wire new
 	    update.add.forEach(function(newLane) {
-	      add$1(lanes, newLane);
-	      add$1(newLane.get(FLOW_NODE_REFS_ATTR), flowNode);
+	      add(lanes, newLane);
+	      add(newLane.get(FLOW_NODE_REFS_ATTR), flowNode);
 	    });
 	  });
 
@@ -51181,14 +53832,14 @@
 
 	    // unwire new
 	    update.add.forEach(function(newLane) {
-	      remove$2(lanes, newLane);
-	      remove$2(newLane.get(FLOW_NODE_REFS_ATTR), flowNode);
+	      remove(lanes, newLane);
+	      remove(newLane.get(FLOW_NODE_REFS_ATTR), flowNode);
 	    });
 
 	    // wire old
 	    update.remove.forEach(function(oldLane) {
-	      add$1(lanes, oldLane);
-	      add$1(oldLane.get(FLOW_NODE_REFS_ATTR), flowNode);
+	      add(lanes, oldLane);
+	      add(oldLane.get(FLOW_NODE_REFS_ATTR), flowNode);
 	    });
 	  });
 
@@ -51240,6 +53891,24 @@
 
 	function SetColorHandler(commandStack) {
 	  this._commandStack = commandStack;
+
+	  this._normalizeColor = function(color) {
+
+	    // Remove color for falsy values.
+	    if (!color) {
+	      return undefined;
+	    }
+
+	    if (isString(color)) {
+	      var hexColor = colorToHex(color);
+
+	      if (hexColor) {
+	        return hexColor;
+	      }
+	    }
+
+	    throw new Error('invalid color value: ' + color);
+	  };
 	}
 
 	SetColorHandler.$inject = [
@@ -51256,26 +53925,95 @@
 	  var di = {};
 
 	  if ('fill' in colors) {
-	    assign(di, { fill: colors.fill });
+	    assign(di, {
+	      'background-color': this._normalizeColor(colors.fill) });
 	  }
 
 	  if ('stroke' in colors) {
-	    assign(di, { stroke: colors.stroke });
+	    assign(di, {
+	      'border-color': this._normalizeColor(colors.stroke) });
 	  }
 
 	  forEach(elements, function(element) {
+	    var assignedDi = isConnection$3(element) ? pick(di, [ 'border-color' ]) : di;
 
-	    self._commandStack.execute('element.updateProperties', {
-	      element: element,
-	      properties: {
-	        di: di
-	      }
-	    });
+	    // TODO @barmac: remove once we drop bpmn.io properties
+	    ensureLegacySupport(assignedDi);
+
+	    if (element.labelTarget) {
+
+	      // set label colors as bpmndi:BPMNLabel#color
+	      self._commandStack.execute('element.updateModdleProperties', {
+	        element: element,
+	        moddleElement: getDi(element).label,
+	        properties: {
+	          color: di['background-color']
+	        }
+	      });
+	    } else {
+
+	      // set colors bpmndi:BPMNEdge or bpmndi:BPMNShape
+	      self._commandStack.execute('element.updateProperties', {
+	        element: element,
+	        properties: {
+	          di: assignedDi
+	        }
+	      });
+	    }
 	  });
 
 	};
 
-	var NULL_DIMENSIONS$1 = {
+	/**
+	 * Convert color from rgb(a)/hsl to hex. Returns `null` for unknown color names and for colors
+	 * with alpha less than 1.0. This depends on `<canvas>` serialization of the `context.fillStyle`.
+	 * Cf. https://html.spec.whatwg.org/multipage/canvas.html#dom-context-2d-fillstyle
+	 *
+	 * @example
+	 * ```js
+	 * var color = 'fuchsia';
+	 * console.log(colorToHex(color));
+	 * // "#ff00ff"
+	 * color = 'rgba(1,2,3,0.4)';
+	 * console.log(colorToHex(color));
+	 * // null
+	 * ```
+	 *
+	 * @param {string} color
+	 * @returns {string|null}
+	 */
+	function colorToHex(color) {
+	  var context = document.createElement('canvas').getContext('2d');
+
+	  // (0) Start with transparent to account for browser default values.
+	  context.fillStyle = 'transparent';
+
+	  // (1) Assign color so that it's serialized.
+	  context.fillStyle = color;
+
+	  // (2) Return null for non-hex serialization result.
+	  return /^#[0-9a-fA-F]{6}$/.test(context.fillStyle) ? context.fillStyle : null;
+	}
+
+	function isConnection$3(element) {
+	  return !!element.waypoints;
+	}
+
+	/**
+	 * Add legacy properties if required.
+	 * @param {{ 'border-color': string?, 'background-color': string? }} di
+	 */
+	function ensureLegacySupport(di) {
+	  if ('border-color' in di) {
+	    di.stroke = di['border-color'];
+	  }
+
+	  if ('background-color' in di) {
+	    di.fill = di['background-color'];
+	  }
+	}
+
+	var NULL_DIMENSIONS = {
 	  width: 0,
 	  height: 0
 	};
@@ -51284,7 +54022,30 @@
 	/**
 	 * A handler that updates the text of a BPMN element.
 	 */
-	function UpdateLabelHandler(modeling, textRenderer) {
+	function UpdateLabelHandler(modeling, textRenderer, bpmnFactory) {
+
+	  /**
+	   * Creates an empty `diLabel` attribute for embedded labels.
+	   *
+	   * @param {djs.model.Base} element
+	   * @param {string} text
+	   */
+	  function ensureInternalLabelDi(element, text) {
+	    if (isLabelExternal(element)) {
+	      return;
+	    }
+
+	    var di = getDi(element);
+
+	    if (text && !di.label) {
+	      di.label = bpmnFactory.create('bpmndi:BPMNLabel');
+	    }
+
+	    if (!text && di.label) {
+	      di.label = null;
+	    }
+	  }
+
 
 	  /**
 	   * Set the label and return the changed elements.
@@ -51303,6 +54064,8 @@
 
 	    setLabel(label, text);
 
+	    ensureInternalLabelDi(element, text);
+
 	    return [ label, labelTarget ];
 	  }
 
@@ -51311,10 +54074,10 @@
 	        businessObject = element.businessObject,
 	        newLabel = ctx.newLabel;
 
-	    if (!isLabel(element)
+	    if (!isLabel$6(element)
 	        && isLabelExternal(element)
 	        && !hasExternalLabel(element)
-	        && !isEmptyText$1(newLabel)) {
+	        && !isEmptyText(newLabel)) {
 
 	      // create label
 	      var paddingTop = 7;
@@ -51328,7 +54091,8 @@
 
 	      modeling.createLabel(element, labelCenter, {
 	        id: businessObject.id + '_label',
-	        businessObject: businessObject
+	        businessObject: businessObject,
+	        di: element.di
 	      });
 	    }
 	  }
@@ -51350,11 +54114,11 @@
 	        hints = ctx.hints || {};
 
 	    // ignore internal labels for elements except text annotations
-	    if (!isLabel(label) && !is$1(label, 'bpmn:TextAnnotation')) {
+	    if (!isLabel$6(label) && !is$1(label, 'bpmn:TextAnnotation')) {
 	      return;
 	    }
 
-	    if (isLabel(label) && isEmptyText$1(newLabel)) {
+	    if (isLabel$6(label) && isEmptyText(newLabel)) {
 
 	      if (hints.removeShape !== false) {
 	        modeling.removeShape(label, { unsetLabel: false });
@@ -51373,7 +54137,7 @@
 	    // setting newBounds to false or _null_ will
 	    // disable the postExecute resize operation
 	    if (newBounds) {
-	      modeling.resizeShape(label, newBounds, NULL_DIMENSIONS$1);
+	      modeling.resizeShape(label, newBounds, NULL_DIMENSIONS);
 	    }
 	  }
 
@@ -51387,13 +54151,14 @@
 
 	UpdateLabelHandler.$inject = [
 	  'modeling',
-	  'textRenderer'
+	  'textRenderer',
+	  'bpmnFactory'
 	];
 
 
 	// helpers ///////////////////////
 
-	function isEmptyText$1(label) {
+	function isEmptyText(label) {
 	  return !label || !label.trim();
 	}
 
@@ -51405,18 +54170,18 @@
 	 * @param {CommandStack} commandStack
 	 * @param {BpmnRules} bpmnRules
 	 */
-	function Modeling$1(
+	function Modeling(
 	    eventBus, elementFactory, commandStack,
 	    bpmnRules) {
 
-	  Modeling.call(this, eventBus, elementFactory, commandStack);
+	  Modeling$1.call(this, eventBus, elementFactory, commandStack);
 
 	  this._bpmnRules = bpmnRules;
 	}
 
-	inherits_browser(Modeling$1, Modeling);
+	inherits$1(Modeling, Modeling$1);
 
-	Modeling$1.$inject = [
+	Modeling.$inject = [
 	  'eventBus',
 	  'elementFactory',
 	  'commandStack',
@@ -51424,9 +54189,10 @@
 	];
 
 
-	Modeling$1.prototype.getHandlers = function() {
-	  var handlers = Modeling.prototype.getHandlers.call(this);
+	Modeling.prototype.getHandlers = function() {
+	  var handlers = Modeling$1.prototype.getHandlers.call(this);
 
+	  handlers['element.updateModdleProperties'] = UpdateModdlePropertiesHandler;
 	  handlers['element.updateProperties'] = UpdatePropertiesHandler;
 	  handlers['canvas.updateRoot'] = UpdateCanvasRootHandler;
 	  handlers['lane.add'] = AddLaneHandler;
@@ -51441,7 +54207,7 @@
 	};
 
 
-	Modeling$1.prototype.updateLabel = function(element, newLabel, newBounds, hints) {
+	Modeling.prototype.updateLabel = function(element, newLabel, newBounds, hints) {
 	  this._commandStack.execute('element.updateLabel', {
 	    element: element,
 	    newLabel: newLabel,
@@ -51451,7 +54217,7 @@
 	};
 
 
-	Modeling$1.prototype.connect = function(source, target, attrs, hints) {
+	Modeling.prototype.connect = function(source, target, attrs, hints) {
 
 	  var bpmnRules = this._bpmnRules;
 
@@ -51467,14 +54233,22 @@
 	};
 
 
-	Modeling$1.prototype.updateProperties = function(element, properties) {
+	Modeling.prototype.updateModdleProperties = function(element, moddleElement, properties) {
+	  this._commandStack.execute('element.updateModdleProperties', {
+	    element: element,
+	    moddleElement: moddleElement,
+	    properties: properties
+	  });
+	};
+
+	Modeling.prototype.updateProperties = function(element, properties) {
 	  this._commandStack.execute('element.updateProperties', {
 	    element: element,
 	    properties: properties
 	  });
 	};
 
-	Modeling$1.prototype.resizeLane = function(laneShape, newBounds, balanced) {
+	Modeling.prototype.resizeLane = function(laneShape, newBounds, balanced) {
 	  this._commandStack.execute('lane.resize', {
 	    shape: laneShape,
 	    newBounds: newBounds,
@@ -51482,7 +54256,7 @@
 	  });
 	};
 
-	Modeling$1.prototype.addLane = function(targetLaneShape, location) {
+	Modeling.prototype.addLane = function(targetLaneShape, location) {
 	  var context = {
 	    shape: targetLaneShape,
 	    location: location
@@ -51493,7 +54267,7 @@
 	  return context.newLane;
 	};
 
-	Modeling$1.prototype.splitLane = function(targetLane, count) {
+	Modeling.prototype.splitLane = function(targetLane, count) {
 	  this._commandStack.execute('lane.split', {
 	    shape: targetLane,
 	    count: count
@@ -51505,7 +54279,7 @@
 	 *
 	 * @return {djs.model.Root} the new root element
 	 */
-	Modeling$1.prototype.makeCollaboration = function() {
+	Modeling.prototype.makeCollaboration = function() {
 
 	  var collaborationElement = this._create('root', {
 	    type: 'bpmn:Collaboration'
@@ -51520,7 +54294,7 @@
 	  return collaborationElement;
 	};
 
-	Modeling$1.prototype.updateLaneRefs = function(flowNodeShapes, laneShapes) {
+	Modeling.prototype.updateLaneRefs = function(flowNodeShapes, laneShapes) {
 
 	  this._commandStack.execute('lane.updateRefs', {
 	    flowNodeShapes: flowNodeShapes,
@@ -51533,7 +54307,7 @@
 	 *
 	 * @return {djs.model.Root} the new root element
 	 */
-	Modeling$1.prototype.makeProcess = function() {
+	Modeling.prototype.makeProcess = function() {
 
 	  var processElement = this._create('root', {
 	    type: 'bpmn:Process'
@@ -51547,7 +54321,7 @@
 	};
 
 
-	Modeling$1.prototype.claimId = function(id, moddleElement) {
+	Modeling.prototype.claimId = function(id, moddleElement) {
 	  this._commandStack.execute('id.updateClaim', {
 	    id: id,
 	    element: moddleElement,
@@ -51556,14 +54330,14 @@
 	};
 
 
-	Modeling$1.prototype.unclaimId = function(id, moddleElement) {
+	Modeling.prototype.unclaimId = function(id, moddleElement) {
 	  this._commandStack.execute('id.updateClaim', {
 	    id: id,
 	    element: moddleElement
 	  });
 	};
 
-	Modeling$1.prototype.setColor = function(elements, colors) {
+	Modeling.prototype.setColor = function(elements, colors) {
 	  if (!elements.length) {
 	    elements = [ elements ];
 	  }
@@ -51610,9 +54384,9 @@
 	var MIN_SEGMENT_LENGTH = 20,
 	    POINT_ORIENTATION_PADDING = 5;
 
-	var round$a = Math.round;
+	var round$1 = Math.round;
 
-	var INTERSECTION_THRESHOLD$1 = 20,
+	var INTERSECTION_THRESHOLD = 20,
 	    ORIENTATION_THRESHOLD = {
 	      'h:h': 20,
 	      'v:v': 20,
@@ -51647,8 +54421,8 @@
 
 	  var startDirection = directions.split(':')[0];
 
-	  var xmid = round$a((b.x - a.x) / 2 + a.x),
-	      ymid = round$a((b.y - a.y) / 2 + a.y);
+	  var xmid = round$1((b.x - a.x) / 2 + a.x),
+	      ymid = round$1((b.y - a.y) / 2 + a.y);
 
 	  var segmentEnd, segmentDirections;
 
@@ -51750,8 +54524,8 @@
 	 */
 	function getSimpleBendpoints(a, b, directions) {
 
-	  var xmid = round$a((b.x - a.x) / 2 + a.x),
-	      ymid = round$a((b.y - a.y) / 2 + a.y);
+	  var xmid = round$1((b.x - a.x) / 2 + a.x),
+	      ymid = round$1((b.y - a.y) / 2 + a.y);
 
 	  // one point, right or left from a
 	  if (directions === 'h:v') {
@@ -51922,7 +54696,7 @@
 	 */
 	function repairConnection(source, target, start, end, waypoints, hints) {
 
-	  if (isArray(start)) {
+	  if (isArray$2(start)) {
 	    waypoints = start;
 	    hints = end;
 
@@ -52151,8 +54925,8 @@
 	    for (i = points.length - 2; i !== 0; i--) {
 
 	      // intersects (?) break, remove all bendpoints up to this one and relayout
-	      if (pointInRect(points[i], a, INTERSECTION_THRESHOLD$1) ||
-	          pointInRect(points[i], b, INTERSECTION_THRESHOLD$1)) {
+	      if (pointInRect(points[i], a, INTERSECTION_THRESHOLD) ||
+	          pointInRect(points[i], b, INTERSECTION_THRESHOLD)) {
 
 	        // return sliced old connection
 	        return points.slice(i);
@@ -52337,7 +55111,7 @@
 	}
 
 	var ATTACH_ORIENTATION_PADDING = -10,
-	    BOUNDARY_TO_HOST_THRESHOLD = 40;
+	    BOUNDARY_TO_HOST_THRESHOLD$1 = 40;
 
 	var oppositeOrientationMapping = {
 	  'top': 'bottom',
@@ -52360,7 +55134,7 @@
 
 	function BpmnLayouter() {}
 
-	inherits_browser(BpmnLayouter, BaseLayouter);
+	inherits$1(BpmnLayouter, BaseLayouter);
 
 
 	BpmnLayouter.prototype.layoutConnection = function(connection, hints) {
@@ -52412,7 +55186,7 @@
 	      manhattanOptions = {
 	        preferredLayouts: getBoundaryEventPreferredLayouts(source, target, connectionEnd)
 	      };
-	    } else if (isExpandedSubProcess$1(source) || isExpandedSubProcess$1(target)) {
+	    } else if (isExpandedSubProcess(source) || isExpandedSubProcess(target)) {
 	      manhattanOptions = getSubProcessManhattanOptions(source);
 	    } else if (is$1(source, 'bpmn:Gateway')) {
 	      manhattanOptions = {
@@ -52473,11 +55247,11 @@
 	  }
 
 	  // (2) docking element connected to expanded sub-process has precedence
-	  if (isExpandedSubProcess$1(target)) {
+	  if (isExpandedSubProcess(target)) {
 	    return 'source';
 	  }
 
-	  if (isExpandedSubProcess$1(source)) {
+	  if (isExpandedSubProcess(source)) {
 	    return 'target';
 	  }
 
@@ -52501,7 +55275,7 @@
 	}
 
 	function getSubProcessPreserveDocking(source) {
-	  return isExpandedSubProcess$1(source) ? 'target' : 'source';
+	  return isExpandedSubProcess(source) ? 'target' : 'source';
 	}
 
 	function getConnectionDocking(point, shape) {
@@ -52514,11 +55288,11 @@
 	    target.businessObject.isForCompensation;
 	}
 
-	function isExpandedSubProcess$1(element) {
+	function isExpandedSubProcess(element) {
 	  return is$1(element, 'bpmn:SubProcess') && isExpanded(element);
 	}
 
-	function isSame$1(a, b) {
+	function isSame(a, b) {
 	  return a === b;
 	}
 
@@ -52585,7 +55359,7 @@
 	      sourceLayout,
 	      targetLayout;
 
-	  var isLoop = isSame$1(source.host, target);
+	  var isLoop = isSame(source.host, target);
 
 	  var attachedToSide = isAnyOrientation(attachOrientation, [ 'top', 'right', 'bottom', 'left' ]);
 
@@ -52626,7 +55400,7 @@
 	}
 
 	function shouldConnectToSameSide(axis, source, target, end) {
-	  var threshold = BOUNDARY_TO_HOST_THRESHOLD;
+	  var threshold = BOUNDARY_TO_HOST_THRESHOLD$1;
 
 	  return !(
 	    areCloseOnAxis(axis, end, target, threshold) ||
@@ -52652,7 +55426,7 @@
 	  // attached to either top-right, top-left, bottom-right or bottom-left corner
 
 	  // same vertical or opposite horizontal orientation
-	  if (isSame$1(
+	  if (isSame(
 	    getVerticalOrientation(attachOrientation), getVerticalOrientation(targetOrientation)
 	  ) || isOppositeOrientation(
 	    getHorizontalOrientation(attachOrientation), getHorizontalOrientation(targetOrientation)
@@ -52675,7 +55449,7 @@
 	      // opposite horizontal orientation or same orientation
 	      if (
 	        isOppositeHorizontalOrientation(attachOrientation, targetOrientation) ||
-	        isSame$1(attachOrientation, targetOrientation)
+	        isSame(attachOrientation, targetOrientation)
 	      ) {
 	        return 'h';
 	      }
@@ -52689,7 +55463,7 @@
 	      // opposite vertical orientation or same orientation
 	      if (
 	        isOppositeVerticalOrientation(attachOrientation, targetOrientation) ||
-	        isSame$1(attachOrientation, targetOrientation)
+	        isSame(attachOrientation, targetOrientation)
 	      ) {
 	        return 'v';
 	      }
@@ -52704,7 +55478,7 @@
 	  // orientation is right, left
 	  // or same vertical orientation but also right or left
 	  if (isHorizontalOrientation(targetOrientation) ||
-	    (isSame$1(getVerticalOrientation(attachOrientation), getVerticalOrientation(targetOrientation)) &&
+	    (isSame(getVerticalOrientation(attachOrientation), getVerticalOrientation(targetOrientation)) &&
 	      getHorizontalOrientation(targetOrientation))) {
 	    return 'h';
 	  } else {
@@ -52807,10 +55581,10 @@
 	  ],
 	  __depends__: [
 	    BehaviorModule,
-	    RulesModule$1,
+	    RulesModule,
 	    DiOrderingModule,
 	    OrderingModule,
-	    ReplaceModule$1,
+	    ReplaceModule,
 	    CommandModule,
 	    TooltipsModule,
 	    LabelSupportModule,
@@ -52821,22 +55595,22 @@
 	  ],
 	  bpmnFactory: [ 'type', BpmnFactory ],
 	  bpmnUpdater: [ 'type', BpmnUpdater ],
-	  elementFactory: [ 'type', ElementFactory$1 ],
-	  modeling: [ 'type', Modeling$1 ],
+	  elementFactory: [ 'type', ElementFactory ],
+	  modeling: [ 'type', Modeling ],
 	  layouter: [ 'type', BpmnLayouter ],
 	  connectionDocking: [ 'type', CroppingConnectionDocking ]
 	};
 
-	var LOW_PRIORITY$k = 500,
+	var LOW_PRIORITY$2 = 500,
 	    MEDIUM_PRIORITY = 1250,
-	    HIGH_PRIORITY$g = 1500;
+	    HIGH_PRIORITY$2 = 1500;
 
-	var round$b = Math.round;
+	var round = Math.round;
 
-	function mid$2(element) {
+	function mid(element) {
 	  return {
-	    x: element.x + round$b(element.width / 2),
-	    y: element.y + round$b(element.height / 2)
+	    x: element.x + round(element.width / 2),
+	    y: element.y + round(element.height / 2)
 	  };
 	}
 
@@ -52879,7 +55653,7 @@
 	  // * validatedShapes: a list of shapes that are being checked
 	  //                    against the rules before and during move
 	  //
-	  eventBus.on('shape.move.start', HIGH_PRIORITY$g, function(event) {
+	  eventBus.on('shape.move.start', HIGH_PRIORITY$2, function(event) {
 
 	    var context = event.context,
 	        shape = event.shape,
@@ -52926,7 +55700,7 @@
 	  // to let others modify the move event before we update
 	  // the context
 	  //
-	  eventBus.on('shape.move.move', LOW_PRIORITY$k, function(event) {
+	  eventBus.on('shape.move.move', LOW_PRIORITY$2, function(event) {
 
 	    var context = event.context,
 	        validatedShapes = context.validatedShapes,
@@ -52966,8 +55740,8 @@
 
 	    // ensure we have actual pixel values deltas
 	    // (important when zoom level was > 1 during move)
-	    delta.x = round$b(delta.x);
-	    delta.y = round$b(delta.y);
+	    delta.x = round(delta.x);
+	    delta.y = round(delta.y);
 
 	    if (delta.x === 0 && delta.y === 0) {
 
@@ -52986,7 +55760,11 @@
 
 	  eventBus.on('element.mousedown', function(event) {
 
-	    var originalEvent = getOriginal(event);
+	    if (!isPrimaryButton(event)) {
+	      return;
+	    }
+
+	    var originalEvent = getOriginal$1(event);
 
 	    if (!originalEvent) {
 	      throw new Error('must supply DOM mousedown event');
@@ -53014,7 +55792,7 @@
 	      return;
 	    }
 
-	    var referencePoint = mid$2(element);
+	    var referencePoint = mid(element);
 
 	    dragging.init(event, referencePoint, 'shape.move', {
 	      cursor: 'grabbing',
@@ -53068,13 +55846,13 @@
 	  });
 	}
 
-	var LOW_PRIORITY$l = 499;
+	var LOW_PRIORITY$1 = 499;
 
-	var MARKER_DRAGGING$1 = 'djs-dragging',
-	    MARKER_OK$3 = 'drop-ok',
-	    MARKER_NOT_OK$3 = 'drop-not-ok',
-	    MARKER_NEW_PARENT$1 = 'new-parent',
-	    MARKER_ATTACH$2 = 'attach-ok';
+	var MARKER_DRAGGING = 'djs-dragging',
+	    MARKER_OK$1 = 'drop-ok',
+	    MARKER_NOT_OK$1 = 'drop-not-ok',
+	    MARKER_NEW_PARENT = 'new-parent',
+	    MARKER_ATTACH = 'attach-ok';
 
 
 	/**
@@ -53099,7 +55877,7 @@
 	  function getAllDraggedElements(shapes) {
 	    var allShapes = selfAndAllChildren(shapes, true);
 
-	    var allConnections = map(allShapes, function(shape) {
+	    var allConnections = map$1(allShapes, function(shape) {
 	      return (shape.incoming || []).concat(shape.outgoing || []);
 	    });
 
@@ -53111,7 +55889,7 @@
 	   */
 	  function setMarker(element, marker) {
 
-	    [ MARKER_ATTACH$2, MARKER_OK$3, MARKER_NOT_OK$3, MARKER_NEW_PARENT$1 ].forEach(function(m) {
+	    [ MARKER_ATTACH, MARKER_OK$1, MARKER_NOT_OK$1, MARKER_NEW_PARENT ].forEach(function(m) {
 
 	      if (m === marker) {
 	        canvas.addMarker(element, m);
@@ -53133,7 +55911,7 @@
 	    previewSupport.addDragger(element, context.dragGroup);
 
 	    if (addMarker) {
-	      canvas.addMarker(element, MARKER_DRAGGING$1);
+	      canvas.addMarker(element, MARKER_DRAGGING);
 	    }
 
 	    if (context.allDraggedElements) {
@@ -53146,7 +55924,7 @@
 	  // assign a low priority to this handler
 	  // to let others modify the move context before
 	  // we draw things
-	  eventBus.on('shape.move.start', LOW_PRIORITY$l, function(event) {
+	  eventBus.on('shape.move.start', LOW_PRIORITY$1, function(event) {
 	    var context = event.context,
 	        dragShapes = context.shapes,
 	        allDraggedElements = context.allDraggedElements;
@@ -53154,13 +55932,13 @@
 	    var visuallyDraggedShapes = getVisualDragShapes(dragShapes);
 
 	    if (!context.dragGroup) {
-	      var dragGroup = create('g');
+	      var dragGroup = create$1('g');
 
-	      attr$1(dragGroup, styles.cls('djs-drag-group', [ 'no-events' ]));
+	      attr(dragGroup, styles.cls('djs-drag-group', [ 'no-events' ]));
 
-	      var defaultLayer = canvas.getDefaultLayer();
+	      var activeLayer = canvas.getActiveLayer();
 
-	      append(defaultLayer, dragGroup);
+	      append(activeLayer, dragGroup);
 
 	      context.dragGroup = dragGroup;
 	    }
@@ -53183,7 +55961,7 @@
 
 	    // add dragging marker
 	    forEach(allDraggedElements, function(e) {
-	      canvas.addMarker(e, MARKER_DRAGGING$1);
+	      canvas.addMarker(e, MARKER_DRAGGING);
 	    });
 
 	    context.allDraggedElements = allDraggedElements;
@@ -53193,7 +55971,7 @@
 	  });
 
 	  // update previews
-	  eventBus.on('shape.move.move', LOW_PRIORITY$l, function(event) {
+	  eventBus.on('shape.move.move', LOW_PRIORITY$1, function(event) {
 
 	    var context = event.context,
 	        dragGroup = context.dragGroup,
@@ -53203,15 +55981,15 @@
 
 	    if (target) {
 	      if (canExecute === 'attach') {
-	        setMarker(target, MARKER_ATTACH$2);
+	        setMarker(target, MARKER_ATTACH);
 	      } else if (context.canExecute && target && target.id !== parent.id) {
-	        setMarker(target, MARKER_NEW_PARENT$1);
+	        setMarker(target, MARKER_NEW_PARENT);
 	      } else {
-	        setMarker(target, context.canExecute ? MARKER_OK$3 : MARKER_NOT_OK$3);
+	        setMarker(target, context.canExecute ? MARKER_OK$1 : MARKER_NOT_OK$1);
 	      }
 	    }
 
-	    translate(dragGroup, event.dx, event.dy);
+	    translate$2(dragGroup, event.dx, event.dy);
 	  });
 
 	  eventBus.on([ 'shape.move.out', 'shape.move.cleanup' ], function(event) {
@@ -53233,7 +56011,7 @@
 
 	    // remove dragging marker
 	    forEach(allDraggedElements, function(e) {
-	      canvas.removeMarker(e, MARKER_DRAGGING$1);
+	      canvas.removeMarker(e, MARKER_DRAGGING);
 	    });
 
 	    if (dragGroup) {
@@ -53272,7 +56050,7 @@
 
 	  var filteredElements = filter(elements, function(element) {
 
-	    if (!isConnection$8(element)) {
+	    if (!isConnection$2(element)) {
 	      return true;
 	    } else {
 
@@ -53293,16 +56071,16 @@
 	/**
 	 * Checks if an element is a connection.
 	 */
-	function isConnection$8(element) {
+	function isConnection$2(element) {
 	  return element.waypoints;
 	}
 
 	var MoveModule = {
 	  __depends__: [
-	    InteractionEventsModule,
+	    InteractionEventsModule$1,
 	    SelectionModule,
 	    OutlineModule,
-	    RulesModule,
+	    RulesModule$1,
 	    DraggingModule,
 	    PreviewSupportModule
 	  ],
@@ -53318,10 +56096,12 @@
 	    ENTRY_SELECTOR = '.entry',
 	    ELEMENT_SELECTOR = TOGGLE_SELECTOR + ', ' + ENTRY_SELECTOR;
 
-	var PALETTE_OPEN_CLS = 'open',
+	var PALETTE_PREFIX = 'djs-palette-',
+	    PALETTE_SHOWN_CLS = 'shown',
+	    PALETTE_OPEN_CLS = 'open',
 	    PALETTE_TWO_COLUMN_CLS = 'two-column';
 
-	var DEFAULT_PRIORITY$5 = 1000;
+	var DEFAULT_PRIORITY = 1000;
 
 
 	/**
@@ -53381,7 +56161,7 @@
 	Palette.prototype.registerProvider = function(priority, provider) {
 	  if (!provider) {
 	    provider = priority;
-	    priority = DEFAULT_PRIORITY$5;
+	    priority = DEFAULT_PRIORITY;
 	  }
 
 	  this._eventBus.on('palette.getProviders', priority, function(event) {
@@ -53436,8 +56216,9 @@
 	  var container = this._container = domify(Palette.HTML_MARKUP);
 
 	  parentContainer.appendChild(container);
+	  classes$1(parentContainer).add(PALETTE_PREFIX + PALETTE_SHOWN_CLS);
 
-	  delegateEvents.bind(container, ELEMENT_SELECTOR, 'click', function(event) {
+	  delegate.bind(container, ELEMENT_SELECTOR, 'click', function(event) {
 
 	    var target = event.delegateTarget;
 
@@ -53454,7 +56235,7 @@
 	  });
 
 	  // prevent drag propagation
-	  delegateEvents.bind(container, ENTRY_SELECTOR, 'dragstart', function(event) {
+	  delegate.bind(container, ENTRY_SELECTOR, 'dragstart', function(event) {
 	    self.trigger('dragstart', event);
 	  });
 
@@ -53493,7 +56274,8 @@
 
 	  var twoColumn;
 
-	  var cls = classes(container);
+	  var cls = classes$1(container),
+	      parentCls = classes$1(parent);
 
 	  if ('twoColumn' in state) {
 	    twoColumn = state.twoColumn;
@@ -53503,9 +56285,11 @@
 
 	  // always update two column
 	  cls.toggle(PALETTE_TWO_COLUMN_CLS, twoColumn);
+	  parentCls.toggle(PALETTE_PREFIX + PALETTE_TWO_COLUMN_CLS, twoColumn);
 
 	  if ('open' in state) {
 	    cls.toggle(PALETTE_OPEN_CLS, state.open);
+	    parentCls.toggle(PALETTE_PREFIX + PALETTE_OPEN_CLS, state.open);
 	  }
 
 	  eventBus.fire('palette.changed', {
@@ -53519,7 +56303,7 @@
 	  var entriesContainer = query('.djs-palette-entries', this._container),
 	      entries = this._entries = this.getEntries();
 
-	  clear(entriesContainer);
+	  clear$1(entriesContainer);
 
 	  forEach(entries, function(entry, id) {
 
@@ -53541,14 +56325,14 @@
 	    container.appendChild(control);
 
 	    if (!entry.separator) {
-	      attr(control, 'data-action', id);
+	      attr$1(control, 'data-action', id);
 
 	      if (entry.title) {
-	        attr(control, 'title', entry.title);
+	        attr$1(control, 'title', entry.title);
 	      }
 
 	      if (entry.className) {
-	        addClasses$1(control, entry.className);
+	        addClasses(control, entry.className);
 	      }
 
 	      if (entry.imageUrl) {
@@ -53579,7 +56363,7 @@
 	    return event.preventDefault();
 	  }
 
-	  entry = entries[attr(button, 'data-action')];
+	  entry = entries[attr$1(button, 'data-action')];
 
 	  // when user clicks on the palette and not on an action
 	  if (!entry) {
@@ -53680,7 +56464,7 @@
 	      return;
 	    }
 
-	    var toolClasses = classes(tool);
+	    var toolClasses = classes$1(tool);
 
 	    actionName = actionName.replace('-tool', '');
 
@@ -53707,7 +56491,7 @@
 	 * @return {boolean} true if palette is opened
 	 */
 	Palette.prototype.isOpen = function() {
-	  return classes(this._container).has(PALETTE_OPEN_CLS);
+	  return classes$1(this._container).has(PALETTE_OPEN_CLS);
 	};
 
 	/**
@@ -53731,13 +56515,13 @@
 
 	// helpers //////////////////////
 
-	function addClasses$1(element, classNames) {
+	function addClasses(element, classNames) {
 
-	  var classes$1 = classes(element);
+	  var classes = classes$1(element);
 
-	  var actualClassNames = isArray(classNames) ? classNames : classNames.split(/\s+/g);
+	  var actualClassNames = isArray$2(classNames) ? classNames : classNames.split(/\s+/g);
 	  actualClassNames.forEach(function(cls) {
-	    classes$1.add(cls);
+	    classes.add(cls);
 	  });
 	}
 
@@ -53756,7 +56540,7 @@
 	  return entries;
 	}
 
-	var PaletteModule = {
+	var PaletteModule$1 = {
 	  __init__: [ 'palette' ],
 	  palette: [ 'type', Palette ]
 	};
@@ -53766,10 +56550,12 @@
 
 	function LassoTool(
 	    eventBus, canvas, dragging,
-	    elementRegistry, selection, toolManager) {
+	    elementRegistry, selection, toolManager,
+	    mouse) {
 
 	  this._selection = selection;
 	  this._dragging = dragging;
+	  this._mouse = mouse;
 
 	  var self = this;
 
@@ -53781,11 +56567,11 @@
 	  var visuals = {
 
 	    create: function(context) {
-	      var container = canvas.getDefaultLayer(),
+	      var container = canvas.getActiveLayer(),
 	          frame;
 
-	      frame = context.frame = create('rect');
-	      attr$1(frame, {
+	      frame = context.frame = create$1('rect');
+	      attr(frame, {
 	        class: 'djs-lasso-overlay',
 	        width:  1,
 	        height: 1,
@@ -53800,7 +56586,7 @@
 	      var frame = context.frame,
 	          bbox = context.bbox;
 
-	      attr$1(frame, {
+	      attr(frame, {
 	        x: bbox.x,
 	        y: bbox.y,
 	        width: bbox.width,
@@ -53876,12 +56662,14 @@
 
 	  eventBus.on('element.mousedown', 1500, function(event) {
 
-	    if (hasSecondaryModifier(event)) {
-	      self.activateLasso(event.originalEvent);
-
-	      // we've handled the event
-	      return true;
+	    if (!hasSecondaryModifier(event)) {
+	      return;
 	    }
+
+	    self.activateLasso(event.originalEvent);
+
+	    // we've handled the event
+	    return true;
 	  });
 	}
 
@@ -53891,7 +56679,8 @@
 	  'dragging',
 	  'elementRegistry',
 	  'selection',
-	  'toolManager'
+	  'toolManager',
+	  'mouse'
 	];
 
 
@@ -53906,10 +56695,11 @@
 	  });
 	};
 
-	LassoTool.prototype.activateSelection = function(event) {
+	LassoTool.prototype.activateSelection = function(event, autoActivate) {
 
 	  this._dragging.init(event, 'lasso.selection', {
 	    trapClick: false,
+	    autoActivate: autoActivate,
 	    cursor: LASSO_TOOL_CURSOR,
 	    data: {
 	      context: {}
@@ -53925,10 +56715,12 @@
 
 	LassoTool.prototype.toggle = function() {
 	  if (this.isActive()) {
-	    this._dragging.cancel();
-	  } else {
-	    this.activateSelection();
+	    return this._dragging.cancel();
 	  }
+
+	  var mouseEvent = this._mouse.getLastMoveEvent();
+
+	  this.activateSelection(mouseEvent, !!mouseEvent);
 	};
 
 	LassoTool.prototype.isActive = function() {
@@ -54004,18 +56796,23 @@
 
 	var LassoToolModule = {
 	  __depends__: [
-	    ToolManagerModule
+	    ToolManagerModule,
+	    MouseModule
 	  ],
 	  __init__: [ 'lassoTool' ],
 	  lassoTool: [ 'type', LassoTool ]
 	};
 
-	var HIGH_PRIORITY$h = 1500;
+	var HIGH_PRIORITY$1 = 1500;
 	var HAND_CURSOR = 'grab';
 
 
-	function HandTool(eventBus, canvas, dragging, injector, toolManager) {
+	function HandTool(
+	    eventBus, canvas, dragging,
+	    injector, toolManager, mouse) {
+
 	  this._dragging = dragging;
+	  this._mouse = mouse;
 
 	  var self = this,
 	      keyboard = injector.get('keyboard', false);
@@ -54025,45 +56822,34 @@
 	    dragging: 'hand.move'
 	  });
 
-	  eventBus.on('element.mousedown', HIGH_PRIORITY$h, function(event) {
-	    if (hasPrimaryModifier(event)) {
-	      this.activateMove(event.originalEvent);
+	  eventBus.on('element.mousedown', HIGH_PRIORITY$1, function(event) {
 
-	      return false;
-	    }
-	  }, this);
-
-	  keyboard && keyboard.addListener(HIGH_PRIORITY$h, function(e) {
-	    if (!isSpace(e.keyEvent)) {
+	    if (!hasPrimaryModifier(event)) {
 	      return;
 	    }
 
-	    if (self.isActive()) {
+	    self.activateMove(event.originalEvent, true);
+
+	    return false;
+	  });
+
+	  keyboard && keyboard.addListener(HIGH_PRIORITY$1, function(e) {
+	    if (!isSpace(e.keyEvent) || self.isActive()) {
 	      return;
 	    }
 
-	    function activateMove(event) {
-	      self.activateMove(event);
+	    var mouseEvent = self._mouse.getLastMoveEvent();
 
-	      window.removeEventListener('mousemove', activateMove);
-	    }
-
-	    window.addEventListener('mousemove', activateMove);
-
-	    function deactivateMove(e) {
-	      if (!isSpace(e.keyEvent)) {
-	        return;
-	      }
-
-	      window.removeEventListener('mousemove', activateMove);
-
-	      keyboard.removeListener(deactivateMove, 'keyboard.keyup');
-
-	      dragging.cancel();
-	    }
-
-	    keyboard.addListener(HIGH_PRIORITY$h, deactivateMove, 'keyboard.keyup');
+	    self.activateMove(mouseEvent, !!mouseEvent);
 	  }, 'keyboard.keydown');
+
+	  keyboard && keyboard.addListener(HIGH_PRIORITY$1, function(e) {
+	    if (!isSpace(e.keyEvent) || !self.isActive()) {
+	      return;
+	    }
+
+	    self.toggle();
+	  }, 'keyboard.keyup');
 
 	  eventBus.on('hand.end', function(event) {
 	    var target = event.originalEvent.target;
@@ -54075,11 +56861,10 @@
 	    }
 
 	    eventBus.once('hand.ended', function() {
-	      this.activateMove(event.originalEvent, { reactivate: true });
-	    }, this);
+	      self.activateMove(event.originalEvent, { reactivate: true });
+	    });
 
-	  }, this);
-
+	  });
 
 	  eventBus.on('hand.move.move', function(event) {
 	    var scale = canvas.viewbox().scale;
@@ -54098,13 +56883,13 @@
 	    if (!hasPrimaryModifier(event) && reactivate) {
 
 	      eventBus.once('hand.move.ended', function(event) {
-	        this.activateHand(event.originalEvent, true, true);
-	      }, this);
+	        self.activateHand(event.originalEvent, true, true);
+	      });
 
 	    }
 
 	    return false;
-	  }, this);
+	  });
 
 	}
 
@@ -54113,7 +56898,8 @@
 	  'canvas',
 	  'dragging',
 	  'injector',
-	  'toolManager'
+	  'toolManager',
+	  'mouse'
 	];
 
 
@@ -54147,10 +56933,12 @@
 
 	HandTool.prototype.toggle = function() {
 	  if (this.isActive()) {
-	    this._dragging.cancel();
-	  } else {
-	    this.activateHand();
+	    return this._dragging.cancel();
 	  }
+
+	  var mouseEvent = this._mouse.getLastMoveEvent();
+
+	  this.activateHand(mouseEvent, !!mouseEvent);
 	};
 
 	HandTool.prototype.isActive = function() {
@@ -54171,14 +56959,15 @@
 
 	var HandToolModule = {
 	  __depends__: [
-	    ToolManagerModule
+	    ToolManagerModule,
+	    MouseModule
 	  ],
 	  __init__: [ 'handTool' ],
 	  handTool: [ 'type', HandTool ]
 	};
 
-	var MARKER_OK$4 = 'connect-ok',
-	    MARKER_NOT_OK$4 = 'connect-not-ok';
+	var MARKER_OK = 'connect-ok',
+	    MARKER_NOT_OK = 'connect-not-ok';
 
 	/**
 	 * @class
@@ -54190,15 +56979,18 @@
 	 * @param {Canvas} canvas
 	 * @param {ToolManager} toolManager
 	 * @param {Rules} rules
+	 * @param {Mouse} mouse
 	 */
 	function GlobalConnect(
 	    eventBus, dragging, connect,
-	    canvas, toolManager, rules) {
+	    canvas, toolManager, rules,
+	    mouse) {
 
 	  var self = this;
 
 	  this._dragging = dragging;
 	  this._rules = rules;
+	  this._mouse = mouse;
 
 	  toolManager.registerTool('global-connect', {
 	    tool: 'global-connect',
@@ -54218,7 +57010,7 @@
 
 	    context.startTarget = startTarget;
 
-	    canvas.addMarker(startTarget, canStartConnect ? MARKER_OK$4 : MARKER_NOT_OK$4);
+	    canvas.addMarker(startTarget, canStartConnect ? MARKER_OK : MARKER_NOT_OK);
 	  });
 
 
@@ -54227,7 +57019,7 @@
 	        canStartConnect = event.context.canStartConnect;
 
 	    if (startTarget) {
-	      canvas.removeMarker(startTarget, canStartConnect ? MARKER_OK$4 : MARKER_NOT_OK$4);
+	      canvas.removeMarker(startTarget, canStartConnect ? MARKER_OK : MARKER_NOT_OK);
 	    }
 	  });
 
@@ -54264,14 +57056,16 @@
 	  'connect',
 	  'canvas',
 	  'toolManager',
-	  'rules'
+	  'rules',
+	  'mouse'
 	];
 
 	/**
 	 * Initiates tool activity.
 	 */
-	GlobalConnect.prototype.start = function(event) {
+	GlobalConnect.prototype.start = function(event, autoActivate) {
 	  this._dragging.init(event, 'global-connect', {
+	    autoActivate: autoActivate,
 	    trapClick: false,
 	    data: {
 	      context: {}
@@ -54280,11 +57074,14 @@
 	};
 
 	GlobalConnect.prototype.toggle = function() {
+
 	  if (this.isActive()) {
-	    this._dragging.cancel();
-	  } else {
-	    this.start();
+	    return this._dragging.cancel();
 	  }
+
+	  var mouseEvent = this._mouse.getLastMoveEvent();
+
+	  return this.start(mouseEvent, !!mouseEvent);
 	};
 
 	GlobalConnect.prototype.isActive = function() {
@@ -54306,9 +57103,10 @@
 	var GlobalConnectModule = {
 	  __depends__: [
 	    ConnectModule,
-	    RulesModule,
+	    RulesModule$1,
 	    DraggingModule,
-	    ToolManagerModule
+	    ToolManagerModule,
+	    MouseModule
 	  ],
 	  globalConnect: [ 'type', GlobalConnect ]
 	};
@@ -54362,7 +57160,8 @@
 	      var shape = elementFactory.createShape(assign({ type: type }, options));
 
 	      if (options) {
-	        shape.businessObject.di.isExpanded = options.isExpanded;
+	        var di = getDi(shape);
+	        di.isExpanded = options.isExpanded;
 	      }
 
 	      create.start(event, shape);
@@ -54398,7 +57197,7 @@
 
 	    create.start(event, [ subProcess, startEvent ], {
 	      hints: {
-	        autoSelect: [ startEvent ]
+	        autoSelect: [ subProcess ]
 	      }
 	    });
 	  }
@@ -54444,7 +57243,7 @@
 	      title: translate('Activate the global connect tool'),
 	      action: {
 	        click: function(event) {
-	          globalConnect.toggle(event);
+	          globalConnect.start(event);
 	        }
 	      }
 	    },
@@ -54507,21 +57306,21 @@
 	  return actions;
 	};
 
-	var PaletteModule$1 = {
+	var PaletteModule = {
 	  __depends__: [
-	    PaletteModule,
+	    PaletteModule$1,
 	    CreateModule,
 	    SpaceToolModule,
 	    LassoToolModule,
 	    HandToolModule,
 	    GlobalConnectModule,
-	    translate$2
+	    translate
 	  ],
 	  __init__: [ 'paletteProvider' ],
 	  paletteProvider: [ 'type', PaletteProvider ]
 	};
 
-	var LOW_PRIORITY$m = 250;
+	var LOW_PRIORITY = 250;
 
 
 	function BpmnReplacePreview(
@@ -54562,10 +57361,10 @@
 	      canvas.addShape(tempShape, element.parent);
 
 	      // select the original SVG element related to the element and hide it
-	      var gfx = query('[data-element-id="' + css_escape(element.id) + '"]', context.dragGroup);
+	      var gfx = query('[data-element-id="' + cssEscape(element.id) + '"]', context.dragGroup);
 
 	      if (gfx) {
-	        attr$1(gfx, { display: 'none' });
+	        attr(gfx, { display: 'none' });
 	      }
 
 	      // clone the gfx of the temporary shape and add it to the drag group
@@ -54588,10 +57387,10 @@
 
 	    forEach(visualReplacements, function(dragger, id) {
 
-	      var originalGfx = query('[data-element-id="' + css_escape(id) + '"]', context.dragGroup);
+	      var originalGfx = query('[data-element-id="' + cssEscape(id) + '"]', context.dragGroup);
 
 	      if (originalGfx) {
-	        attr$1(originalGfx, { display: 'inline' });
+	        attr(originalGfx, { display: 'inline' });
 	      }
 
 	      dragger.remove();
@@ -54602,7 +57401,7 @@
 	    });
 	  }
 
-	  eventBus.on('shape.move.move', LOW_PRIORITY$m, function(event) {
+	  eventBus.on('shape.move.move', LOW_PRIORITY, function(event) {
 
 	    var context = event.context,
 	        canExecute = context.canExecute;
@@ -54627,7 +57426,7 @@
 	  'previewSupport'
 	];
 
-	inherits_browser(BpmnReplacePreview, CommandInterceptor);
+	inherits$1(BpmnReplacePreview, CommandInterceptor);
 
 	var ReplacePreviewModule = {
 	  __depends__: [
@@ -54639,7 +57438,7 @@
 
 	var HIGHER_PRIORITY$2 = 1250;
 
-	var BOUNDARY_TO_HOST_THRESHOLD$1 = 40;
+	var BOUNDARY_TO_HOST_THRESHOLD = 40;
 
 	var TARGET_BOUNDS_PADDING = 20,
 	    TASK_BOUNDS_PADDING = 10;
@@ -54648,7 +57447,7 @@
 
 	var AXES = [ 'x', 'y' ];
 
-	var abs$7 = Math.abs;
+	var abs = Math.abs;
 
 	/**
 	 * Snap during connect.
@@ -54688,11 +57487,11 @@
 	      'bpmn:DataOutputAssociation',
 	      'bpmn:SequenceFlow'
 	    ])) {
-	      context.connectionStart = mid(start);
+	      context.connectionStart = mid$2(start);
 
 	      // snap hover
 	      if (isAny(hover, [ 'bpmn:Event', 'bpmn:Gateway' ])) {
-	        snapToPosition(event, mid(hover));
+	        snapToPosition(event, mid$2(hover));
 	      }
 
 	      // snap hover
@@ -54710,13 +57509,13 @@
 	      if (is$1(start, 'bpmn:Event')) {
 
 	        // snap start
-	        context.connectionStart = mid(start);
+	        context.connectionStart = mid$2(start);
 	      }
 
 	      if (is$1(hover, 'bpmn:Event')) {
 
 	        // snap hover
-	        snapToPosition(event, mid(hover));
+	        snapToPosition(event, mid$2(hover));
 	      }
 
 	    } else {
@@ -54747,7 +57546,7 @@
 
 	// snap to target mid if event in target mid
 	function snapToTargetMid(event, target) {
-	  var targetMid = mid(target);
+	  var targetMid = mid$2(target);
 
 	  AXES.forEach(function(axis) {
 	    if (isMid(event, target, axis)) {
@@ -54762,11 +57561,11 @@
 	      source = context.source,
 	      target = context.target;
 
-	  if (isReverse$2(context)) {
+	  if (isReverse(context)) {
 	    return;
 	  }
 
-	  var sourceMid = mid(source),
+	  var sourceMid = mid$2(source),
 	      orientation = getOrientation(sourceMid, target, -10),
 	      axes = [];
 
@@ -54781,12 +57580,12 @@
 	  axes.forEach(function(axis) {
 	    var coordinate = event[ axis ], newCoordinate;
 
-	    if (abs$7(coordinate - sourceMid[ axis ]) < BOUNDARY_TO_HOST_THRESHOLD$1) {
+	    if (abs(coordinate - sourceMid[ axis ]) < BOUNDARY_TO_HOST_THRESHOLD) {
 	      if (coordinate > sourceMid[ axis ]) {
-	        newCoordinate = sourceMid[ axis ] + BOUNDARY_TO_HOST_THRESHOLD$1;
+	        newCoordinate = sourceMid[ axis ] + BOUNDARY_TO_HOST_THRESHOLD;
 	      }
 	      else {
-	        newCoordinate = sourceMid[ axis ] - BOUNDARY_TO_HOST_THRESHOLD$1;
+	        newCoordinate = sourceMid[ axis ] - BOUNDARY_TO_HOST_THRESHOLD;
 	      }
 
 	      setSnapped(event, axis, newCoordinate);
@@ -54826,7 +57625,7 @@
 	    && event[ axis ] < target[ axis ] + getDimensionForAxis(axis, target) - TARGET_CENTER_PADDING;
 	}
 
-	function isReverse$2(context) {
+	function isReverse(context) {
 	  var hover = context.hover,
 	      source = context.source;
 
@@ -54995,7 +57794,7 @@
 	  });
 	};
 
-	var HIGHER_PRIORITY$3 = 1250;
+	var HIGHER_PRIORITY$1 = 1250;
 
 
 	/**
@@ -55022,7 +57821,7 @@
 	    'create.end',
 	    'shape.move.move',
 	    'shape.move.end'
-	  ], HIGHER_PRIORITY$3, function(event) {
+	  ], HIGHER_PRIORITY$1, function(event) {
 	    var context = event.context,
 	        shape = context.shape,
 	        snapContext = context.snapContext,
@@ -55077,13 +57876,13 @@
 	  if (elementRegistry.get(shape.id)) {
 
 	    // move
-	    shapeMid = mid(shape, event);
+	    shapeMid = mid$2(shape, event);
 	  } else {
 
 	    // create
 	    shapeMid = {
-	      x: event.x + mid(shape).x,
-	      y: event.y + mid(shape).y
+	      x: event.x + mid$2(shape).x,
+	      y: event.y + mid$2(shape).y
 	    };
 	  }
 
@@ -55102,7 +57901,7 @@
 	  });
 
 	  // snap labels to mid only
-	  if (isLabel$5(shape)) {
+	  if (isLabel$1(shape)) {
 	    return snapContext;
 	  }
 
@@ -55125,17 +57924,17 @@
 	  forEach(snapTargets, function(snapTarget) {
 
 	    // handle labels
-	    if (isLabel$5(snapTarget)) {
+	    if (isLabel$1(snapTarget)) {
 
-	      if (isLabel$5(shape)) {
-	        snapPoints.add('mid', mid(snapTarget));
+	      if (isLabel$1(shape)) {
+	        snapPoints.add('mid', mid$2(snapTarget));
 	      }
 
 	      return;
 	    }
 
 	    // handle connections
-	    if (isConnection$9(snapTarget)) {
+	    if (isConnection$1(snapTarget)) {
 
 	      // ignore single segment connections
 	      if (snapTarget.waypoints.length < 3) {
@@ -55153,7 +57952,7 @@
 	    }
 
 	    // handle shapes
-	    snapPoints.add('mid', mid(snapTarget));
+	    snapPoints.add('mid', mid$2(snapTarget));
 	  });
 
 	  if (!isNumber(shape.x) || !isNumber(shape.y)) {
@@ -55162,33 +57961,33 @@
 
 	  // snap to original position when moving
 	  if (this._elementRegistry.get(shape.id)) {
-	    snapPoints.add('mid', mid(shape));
+	    snapPoints.add('mid', mid$2(shape));
 	  }
 
 	  return snapPoints;
 	};
 
 	CreateMoveSnapping.prototype.getSnapTargets = function(shape, target) {
-	  return getChildren$1(target).filter(function(child) {
-	    return !isHidden(child);
+	  return getChildren(target).filter(function(child) {
+	    return !isHidden$1(child);
 	  });
 	};
 
 	// helpers //////////
 
-	function isConnection$9(element) {
+	function isConnection$1(element) {
 	  return !!element.waypoints;
 	}
 
-	function isHidden(element) {
+	function isHidden$1(element) {
 	  return !!element.hidden;
 	}
 
-	function isLabel$5(element) {
+	function isLabel$1(element) {
 	  return !!element.labelTarget;
 	}
 
-	var HIGH_PRIORITY$i = 1500;
+	var HIGH_PRIORITY = 1500;
 
 
 	/**
@@ -55201,7 +58000,7 @@
 	  injector.invoke(CreateMoveSnapping, this);
 
 	  // creating first participant
-	  eventBus.on([ 'create.move', 'create.end' ], HIGH_PRIORITY$i, setSnappedIfConstrained);
+	  eventBus.on([ 'create.move', 'create.end' ], HIGH_PRIORITY, setSnappedIfConstrained);
 
 	  // snap boundary events
 	  eventBus.on([
@@ -55209,7 +58008,7 @@
 	    'create.end',
 	    'shape.move.move',
 	    'shape.move.end'
-	  ], HIGH_PRIORITY$i, function(event) {
+	  ], HIGH_PRIORITY, function(event) {
 	    var context = event.context,
 	        canExecute = context.canExecute,
 	        target = context.target;
@@ -55222,7 +58021,7 @@
 	  });
 	}
 
-	inherits_browser(BpmnCreateMoveSnapping, CreateMoveSnapping);
+	inherits$1(BpmnCreateMoveSnapping, CreateMoveSnapping);
 
 	BpmnCreateMoveSnapping.$inject = [
 	  'eventBus',
@@ -55285,7 +58084,7 @@
 	  forEach(shape.incoming, function(connection) {
 	    if (elementRegistry.get(shape.id)) {
 
-	      if (!includes$6(snapTargets, connection.source)) {
+	      if (!includes(snapTargets, connection.source)) {
 	        snapPoints.add('mid', getMid(connection.source));
 	      }
 
@@ -55297,7 +58096,7 @@
 	  forEach(shape.outgoing, function(connection) {
 	    if (elementRegistry.get(shape.id)) {
 
-	      if (!includes$6(snapTargets, connection.target)) {
+	      if (!includes(snapTargets, connection.target)) {
 	        snapPoints.add('mid', getMid(connection.target));
 	      }
 
@@ -55392,7 +58191,7 @@
 	  }
 	}
 
-	function includes$6(array, value) {
+	function includes(array, value) {
 	  return array.indexOf(value) !== -1;
 	}
 
@@ -55408,7 +58207,7 @@
 	  };
 	}
 
-	var HIGHER_PRIORITY$4 = 1250;
+	var HIGHER_PRIORITY = 1250;
 
 
 	/**
@@ -55427,7 +58226,7 @@
 	  eventBus.on([
 	    'resize.move',
 	    'resize.end',
-	  ], HIGHER_PRIORITY$4, function(event) {
+	  ], HIGHER_PRIORITY, function(event) {
 	    var context = event.context,
 	        shape = context.shape,
 	        parent = shape.parent,
@@ -55450,7 +58249,7 @@
 	      snapPoints.initialized = true;
 	    }
 
-	    if (isHorizontal$3(direction)) {
+	    if (isHorizontal(direction)) {
 	      setSnapped(event, 'x', event.x);
 	    }
 
@@ -55505,11 +58304,11 @@
 	];
 
 	ResizeSnapping.prototype.getSnapTargets = function(shape, target) {
-	  return getChildren$1(target).filter(function(child) {
+	  return getChildren(target).filter(function(child) {
 	    return !isAttached(child, shape)
-	      && !isConnection$a(child)
-	      && !isHidden$1(child)
-	      && !isLabel$6(child);
+	      && !isConnection(child)
+	      && !isHidden(child)
+	      && !isLabel(child);
 	  });
 	};
 
@@ -55543,19 +58342,19 @@
 	  return element.host === host;
 	}
 
-	function isConnection$a(element) {
+	function isConnection(element) {
 	  return !!element.waypoints;
 	}
 
-	function isHidden$1(element) {
+	function isHidden(element) {
 	  return !!element.hidden;
 	}
 
-	function isLabel$6(element) {
+	function isLabel(element) {
 	  return !!element.labelTarget;
 	}
 
-	function isHorizontal$3(direction) {
+	function isHorizontal(direction) {
 	  return direction === 'n' || direction === 's';
 	}
 
@@ -55578,7 +58377,7 @@
 	  this._canvas = canvas;
 
 	  // delay hide by 1000 seconds since last snap
-	  this._asyncHide = debounce(bind(this.hide, this), SNAP_LINE_HIDE_DELAY);
+	  this._asyncHide = debounce(bind$2(this.hide, this), SNAP_LINE_HIDE_DELAY);
 	}
 
 	Snapping.$inject = [ 'canvas' ];
@@ -55646,11 +58445,11 @@
 	Snapping.prototype._createLine = function(orientation) {
 	  var root = this._canvas.getLayer('snap');
 
-	  var line = create('path');
+	  var line = create$1('path');
 
-	  attr$1(line, { d: 'M0,0 L0,0' });
+	  attr(line, { d: 'M0,0 L0,0' });
 
-	  classes$1(line).add('djs-snap-line');
+	  classes(line).add('djs-snap-line');
 
 	  append(root, line);
 
@@ -55658,15 +58457,15 @@
 	    update: function(position) {
 
 	      if (!isNumber(position)) {
-	        attr$1(line, { display: 'none' });
+	        attr(line, { display: 'none' });
 	      } else {
 	        if (orientation === 'horizontal') {
-	          attr$1(line, {
+	          attr(line, {
 	            d: 'M-100000,' + position + ' L+100000,' + position,
 	            display: ''
 	          });
 	        } else {
-	          attr$1(line, {
+	          attr(line, {
 	            d: 'M ' + position + ',-100000 L ' + position + ', +100000',
 	            display: ''
 	          });
@@ -55708,7 +58507,7 @@
 	  });
 	};
 
-	var SnappingModule = {
+	var SnappingModule$1 = {
 	  __init__: [
 	    'createMoveSnapping',
 	    'resizeSnapping',
@@ -55719,8 +58518,8 @@
 	  snapping: [ 'type', Snapping ]
 	};
 
-	var SnappingModule$1 = {
-	  __depends__: [ SnappingModule ],
+	var SnappingModule = {
+	  __depends__: [ SnappingModule$1 ],
 	  __init__: [
 	    'connectSnapping',
 	    'createMoveSnapping'
@@ -55773,7 +58572,7 @@
 	    self._eventMaps.push({
 	      el: el,
 	      type: type,
-	      listener: delegateEvents.bind(el, selector, type, fn)
+	      listener: delegate.bind(el, selector, type, fn)
 	    });
 	  }
 
@@ -55859,7 +58658,7 @@
 	 */
 	SearchPad.prototype._unbindEvents = function() {
 	  this._eventMaps.forEach(function(m) {
-	    delegateEvents.unbind(m.el, m.type, m.listener);
+	    delegate.unbind(m.el, m.type, m.listener);
 	  });
 	};
 
@@ -55947,7 +58746,7 @@
 	 * Clears all results data.
 	 */
 	SearchPad.prototype._clearResults = function() {
-	  clear(this._resultsContainer);
+	  clear$1(this._resultsContainer);
 
 	  this._results = [];
 
@@ -55990,7 +58789,7 @@
 	  // secondary tokens (represent element ID) are allways available
 	  createInnerTextNode(node, result.secondaryTokens, SearchPad.RESULT_SECONDARY_HTML);
 
-	  attr(node, SearchPad.RESULT_ID_ATTRIBUTE, id);
+	  attr$1(node, SearchPad.RESULT_ID_ATTRIBUTE, id);
 
 	  this._resultsContainer.appendChild(node);
 
@@ -56027,7 +58826,7 @@
 
 	  this._open = true;
 
-	  classes(this._container).add('open');
+	  classes$1(this._container).add('open');
 
 	  this._searchInput.focus();
 
@@ -56047,7 +58846,7 @@
 
 	  this._open = false;
 
-	  classes(this._container).remove('open');
+	  classes$1(this._container).remove('open');
 
 	  this._clearResults();
 
@@ -56091,17 +58890,17 @@
 
 	  // removing preselection from current node
 	  if (selectedNode) {
-	    classes(selectedNode).remove(SearchPad.RESULT_SELECTED_CLASS);
+	    classes$1(selectedNode).remove(SearchPad.RESULT_SELECTED_CLASS);
 	  }
 
-	  var id = attr(node, SearchPad.RESULT_ID_ATTRIBUTE);
+	  var id = attr$1(node, SearchPad.RESULT_ID_ATTRIBUTE);
 	  var element = this._results[id].element;
 
-	  classes(node).add(SearchPad.RESULT_SELECTED_CLASS);
+	  classes$1(node).add(SearchPad.RESULT_SELECTED_CLASS);
 
 	  this._resetOverlay(element);
 
-	  this._centerViewbox(element);
+	  this._canvas.scrollToElement(element, { top: 400 });
 
 	  this._selection.select(element);
 
@@ -56115,41 +58914,18 @@
 	 * @param  {Element} element
 	 */
 	SearchPad.prototype._select = function(node) {
-	  var id = attr(node, SearchPad.RESULT_ID_ATTRIBUTE);
+	  var id = attr$1(node, SearchPad.RESULT_ID_ATTRIBUTE);
 	  var element = this._results[id].element;
 
 	  this.close();
 
 	  this._resetOverlay();
 
-	  this._centerViewbox(element);
+	  this._canvas.scrollToElement(element, { top: 400 });
 
 	  this._selection.select(element);
 
 	  this._eventBus.fire('searchPad.selected', element);
-	};
-
-
-	/**
-	 * Center viewbox on the element middle point.
-	 *
-	 * @param  {Element} element
-	 */
-	SearchPad.prototype._centerViewbox = function(element) {
-	  var viewbox = this._canvas.viewbox();
-
-	  var box = getBBox(element);
-
-	  var newViewbox = {
-	    x: (box.x + box.width/2) - viewbox.outer.width/2,
-	    y: (box.y + box.height/2) - viewbox.outer.height/2,
-	    width: viewbox.outer.width,
-	    height: viewbox.outer.height
-	  };
-
-	  this._canvas.viewbox(newViewbox);
-
-	  this._canvas.zoom(viewbox.scale);
 	};
 
 
@@ -56325,7 +59101,7 @@
 	    return element !== rootElement;
 	  });
 
-	  elements = map(elements, function(element) {
+	  elements = map$1(elements, function(element) {
 	    return {
 	      primaryTokens: matchAndSplit(getLabel(element), pattern),
 	      secondaryTokens: matchAndSplit(element.id, pattern),
@@ -56498,7 +59274,7 @@
 	  BaseModeler.call(this, options);
 	}
 
-	inherits_browser(Modeler, BaseModeler);
+	inherits$1(Modeler, BaseModeler);
 
 
 	Modeler.Viewer = Viewer;
@@ -56535,7 +59311,7 @@
 	  // non-modeling components
 	  KeyboardMoveModule,
 	  MoveCanvasModule,
-	  TouchModule$1,
+	  TouchModule,
 	  ZoomScrollModule
 	];
 
@@ -56543,28 +59319,28 @@
 
 	  // modeling components
 	  AlignElementsModule,
-	  AutoPlaceModule$1,
+	  AutoPlaceModule,
 	  AutoScrollModule,
 	  AutoResizeModule,
 	  BendpointsModule,
 	  ConnectModule,
 	  ConnectionPreviewModule,
-	  ContextPadModule$1,
-	  CopyPasteModule$1,
+	  ContextPadModule,
+	  CopyPasteModule,
 	  CreateModule,
-	  DistributeElementsModule$1,
-	  EditorActionsModule$1,
-	  GridSnappingModule$1,
-	  InteractionEventsModule$1,
-	  KeyboardModule$1,
+	  DistributeElementsModule,
+	  EditorActionsModule,
+	  GridSnappingModule,
+	  InteractionEventsModule,
+	  KeyboardModule,
 	  KeyboardMoveSelectionModule,
 	  LabelEditingModule,
 	  ModelingModule,
 	  MoveModule,
-	  PaletteModule$1,
+	  PaletteModule,
 	  ReplacePreviewModule,
 	  ResizeModule,
-	  SnappingModule$1,
+	  SnappingModule,
 	  SearchModule
 	];
 
@@ -56583,4 +59359,4 @@
 
 	return Modeler;
 
-}));
+})));

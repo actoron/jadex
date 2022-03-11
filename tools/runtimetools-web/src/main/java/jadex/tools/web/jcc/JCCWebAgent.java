@@ -74,7 +74,7 @@ public class JCCWebAgent implements IJCCWebService
 		//getPlatforms();
 		
 		//IWebPublishService wps = agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(IWebPublishService.class));
-		//return wps.publishResources("[http://localhost:8080/]", "META-INF/resources2");
+		//return wps.publishResources("[http://localhost:8080/]", "META-INF/resources");
 	}*/
 	
 	@AgentArgument
@@ -109,7 +109,7 @@ public class JCCWebAgent implements IJCCWebService
 		
 		wps.publishService(sid, new PublishInfo("[http://localhost:"+port+"/]webjcc", IPublishService.PUBLISH_RS, null)).get();
 		
-		wps.publishResources("[http://localhost:"+port+"/]", "META-INF/resources2").get();
+		wps.publishResources("[http://localhost:"+port+"/]", "META-INF/resources").get();
 		
 		if(openbrowser)
 		{
@@ -171,6 +171,8 @@ public class JCCWebAgent implements IJCCWebService
 	 */
 	public ISubscriptionIntermediateFuture<ServiceEvent<IComponentIdentifier>> subscribeToPlatforms()
 	{
+		//System.out.println("subscribeToPlatforms called");
+		
 		ISubscriptionIntermediateFuture<ServiceEvent<IExternalAccess>> net = agent.addQuery(new ServiceQuery<>(IExternalAccess.class, ServiceScope.NETWORK).setEventMode().setServiceTags(IExternalAccess.PLATFORM));
 		ISubscriptionIntermediateFuture<ServiceEvent<IExternalAccess>> glo = agent.addQuery(new ServiceQuery<>(IExternalAccess.class, ServiceScope.GLOBAL).setEventMode().setServiceTags(IExternalAccess.PLATFORM));
 
@@ -179,7 +181,9 @@ public class JCCWebAgent implements IJCCWebService
 			@Override
 			public ServiceEvent<IComponentIdentifier> execute(ServiceEvent<IExternalAccess> res)
 			{
-				return new ServiceEvent<IComponentIdentifier>(res.getService().getId(), res.getType());
+				ServiceEvent<IComponentIdentifier> se = new ServiceEvent<IComponentIdentifier>(res.getService().getId(), res.getType());
+				//System.out.println("subscribeToPlatforms: "+se);
+				return se;
 			}
 		});
 		
