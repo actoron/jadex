@@ -89,63 +89,73 @@ class AppElement extends BaseElement
 		page();
 	}*/
 	
+	
+	
+	static get styles() 
+	{
+	    return css`
+			.grid {
+	    		display: grid;
+				grid-template-rows: auto 1fr auto auto;
+				grid-template-columns: 100%;
+				min-height: 100%;
+			}
+			#content {
+				display: flex;
+			}
+			.borderbottom {
+				border-bottom: 0.5em solid #2a6795;
+			}
+			.borderbottom1 {
+				border-bottom: 1em solid #2a6795;
+			}
+			.minheight {
+				min-height: 3em;
+				height: 3em;
+			}
+			.posrel {
+				position: relative;
+			}
+			.h1px {
+				height: 1px;
+			}
+			.flexmiddle {
+				display: flex;
+  				justify-content: center;
+  				align-content: center;
+  				flex-direction: column;
+			}
+	    `;
+	}
+	
 	asyncRender() 
 	{
 		return html`
-			<div style="height:100%" class="d-flex flex-column">
-			<nav class="navbar navbar-expand-lg navbar-custom navbar-fixed-top">
-				<div class="navbar-brand mr-auto">
-		 			<a class="p-0 m-0" href="#/platforms"><img src="images/jadex_logo_ac_new_webjcc.png" width="200px"/></a>
-					<img class="p-0 m-0" @click="${this.switchLanguage}" src="${this.app.lang.getFlagUrl()}" />
+			<div class="grid h100 margin1">
+				<div class="borderbottom paddingbottom marginbottom1">
+		 			<a href="#/platforms"><img src="images/jadex_logo_ac_new_webjcc.png" width="200px"/></a>
+					<img @click="${this.switchLanguage}" src="${this.app.lang.getFlagUrl()}" />
+					<jadex-login class="right h100"></jadex-login>
 				</div>
-				<!--
-				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-					<span class="navbar-toggler-icon"></span>
-				</button>
-				<div class="collapse navbar-collapse" id="navbarSupportedContent" ref="navcol">
-					<ul class="navbar-nav mr-auto">
-		   				<li class="nav-item">
-		      				<a class="nav-link" href="">${this.app.lang.t("message.home")}</a>
-		    			</li>
-		    			<li class="nav-item">
-		      				<a class="nav-link" href="#about">${this.app.lang.t("message.about")}</a>
-		    			</li>
-		 			</ul>
-		 			<form class="form-inline my-2 my-lg-0"></form>
-				</div>
-				-->		        
-
-				<div class="flexcontainerrow">
-					<jadex-login class="flexcellgrow"></jadex-login>
-				</div>
-			</nav>
 		
-			<div class="flex-grow-1" id="content"></div>
+				<div id="content"></div>
 		
-			<div class="container-fluid pt-0 pl-0 pr-0 pb-0 ${this.message.text!=null? 'visible': 'hidden'}">
-				<div class="row p-0">
-					<div class="col">
-						<div class="alert m-0 p-0 ${(this.message.type=='error'? 'alert-danger': 'alert-info')}">
-							<div class="close absolute" @click="${e => this.clearMessage()}"></div>
-							<div class="row p-1 m-1">
-								<div class="col-12 p-0 align-self-center">
-									${this.message.text}
-								</div>
-							</div>
-						</div>
+				<div class="${this.message.text!=null? 'visible': 'hidden'}">
+					<div class="minheight ${(this.message.type=='error'? 'colorerror': 'colorinfo')}">
+						<div class="close relative right" @click="${e => this.clearMessage()}"></div>
+						<div class="flexmiddle h100 marginleft1">${this.message.text}</div>
 					</div>
 				</div>
-			</div>
 		
-			<footer class="container-fluid footer navbar-light bg-light">
-		        <span class="text-muted">Copyright by <a href="http://www.actoron.com">Actoron GmbH</a> 2017-${new Date().getFullYear()}</span>
-		    	<div class="float-right">
-					<a href="#/about">${this.app.lang.t("About")}</a>
-		    		<a href="#/privacy">${this.app.lang.t("Privacy")}</a>
-		    		<a href="#/imprint">${this.app.lang.t("Imprint")}</a>
-		    	</div>
-		    </footer>
-		    </div>
+				<footer>
+			        <span>Copyright by <a href="http://www.actoron.com">Actoron GmbH</a> 2017-${new Date().getFullYear()}</span>
+			    	<div class="right">
+						<a href="#/about">${this.app.lang.t("About")}</a>
+			    		<a href="#/privacy">${this.app.lang.t("Privacy")}</a>
+			    		<a href="#/imprint">${this.app.lang.t("Imprint")}</a>
+			    	</div>
+			    </footer>
+			</div>
 		`;
 	}
 }

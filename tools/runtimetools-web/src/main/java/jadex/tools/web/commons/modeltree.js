@@ -418,23 +418,21 @@ class ModelTree extends CidElement
 	asyncRender() 
 	{
 		return html`
-			<div class="container-fluid m-0 p-0">
+			<div>
 			
 				${this.progressnow<this.progressmax? html`
-				<div class="row m-0 p-0">
-					<div class="col-12 m-0 p-0">
-						<label for="mpro">Loading models:</label>
-						<!--<progress id="mpro" class="w100" value="${this.progressnow}" max="${this.progressmax}">${this.progressnow}</progress>
-						html progress does not support text in bar :-( -->
-						<div class="progress mb-1">
-  							<div class="progress-bar" style="width:${this.progressnow/this.progressmax*100}%">${Math.trunc(this.progressnow/this.progressmax*100)}%</div>
-						</div> 
-					</div>
+				<div>
+					<label for="mpro">Loading models:</label>
+					<progress id="mpro" class="w100" value="${this.progressnow}" max="${this.progressmax}">${this.progressnow}</progress>
+				
+					<!--<div class="progress mb-1">
+						<div class="progress-bar" style="width:${this.progressnow/this.progressmax*100}%">${Math.trunc(this.progressnow/this.progressmax*100)}%</div>
+					</div>-->
 				</div>
 				`: ''}
 				
-				<div class="row m-0 p-0">
-					<div class="col-12 m-0 p-0">
+				<div>
+					<div>
 						<input id="model" list="models" placeholder="${this.app.lang.t('Search models...')+' ['+this.models.length+']'}" class="w100" type="text" 
 							@input="${(e) => this.select(e)}">
 						</input>
@@ -442,17 +440,13 @@ class ModelTree extends CidElement
 							${this.getModelNames().map((model) => html`<option class="w100" value="${model.name+' ['+model.pck+']'}"></option>`)}
 						</datalist>
 					</div>
-					<div class="col-12 m-0 p-0">
+					<div>
 						<div id="modeltree"></div> <!-- class="scroll" -->
 					</div>
 				</div>
 				
 				<!-- ${this.models.length==0? html`
-				<div class="row m-0 p-0">
-					<div class="col-12 m-0 p-0">
-				 		<div class="loader"></div> 
-				 	</div>
-				</div>
+				<div class="loader"></div> 
 				`: ''} -->
 			</div>
 		`;

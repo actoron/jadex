@@ -532,7 +532,7 @@ public class LeaseTimeSet<E> implements ILeaseTimeSet<E>
 										int sb = entries.size();
 										boolean rem = remove(first);
 										int sa = entries.size();
-										System.out.println("sa/sb: "+sa+" "+sb);
+										//System.out.println("sa/sb: "+sa+" "+sb);
 										if(rem && removecmd!=null)
 											removecmd.execute(new Tuple2<E, Long>(first, lease));
 		//								entryDeleted(first);

@@ -232,11 +232,11 @@ class RegistryViewElement extends CidElement
 	
 	terminateSubscriptionX(x)
 	{
-		var tc = this.getSubscription(x).terminate;
-		if(tc!=null)
+		var callid = this.getSubscription(x).terminate;
+		if(callid!=null)
 		{
 			//console.log("terminate: "+x);
-			tc();
+			jadex.terminateCall(callid);
 		}
 	}
 	

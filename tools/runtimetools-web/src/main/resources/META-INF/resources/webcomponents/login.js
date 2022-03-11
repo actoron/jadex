@@ -164,17 +164,29 @@ export class LoginElement extends BaseElement
 		});
 	}
 	
+	static get styles() 
+	{
+	    return css`
+	    	.flexcenter {
+				display: flex;
+				align-items: center;
+			}
+	    `;
+	}
+	
 	asyncRender() 
 	{
     	return html`
 			<div class="${this.app.login.isLoggedIn()? 'hidden': ''}">
 				<div class="flexcontainerrow">
-					<input class="flexcellgrow m-1" id="pass" name="platformpass" type="text" placeholder="${this.app.lang.t('Platform password')}"></input>
-					<button class="jadexbtn m-1" @click="${e => {this.login(this.shadowRoot.getElementById('pass').value)}}">Login</button>
+					<input class="flexcellgrow marginright" id="pass" name="platformpass" type="text" placeholder="${this.app.lang.t('Platform password')}"></input>
+					<button class="jadexbtn" @click="${e => {this.login(this.shadowRoot.getElementById('pass').value)}}">Login</button>
 				</div>
-				<input class="m-1 flow-right" id="rememberpassword" type="checkbox" >${this.app.lang.t("Remember password")}</input>
+				<input id="rememberpassword" class="margintop" type="checkbox" >${this.app.lang.t("Remember password")}</input>
 			</div>
-			<button class="jadexbtn m-1 flow-right ${this.app.login.isLoggedIn()? '': 'hidden'}" @click="${e => {this.logout()}}">Logout</button>
+			<div class="flexcenter h100 ${this.app.login.isLoggedIn()? '': 'hidden'}">
+				<button class="jadexbtn right vmiddle ${this.app.login.isLoggedIn()? '': 'hidden'}" @click="${e => {this.logout()}}">Logout</button>
+			</div>
     	`;
  	}
 }
