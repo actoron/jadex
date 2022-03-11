@@ -63,8 +63,42 @@ class SecurityElement extends CidElement
 	
 	postInit()
 	{
-		let el = this.shadowRoot.getElementById("panel");
-		el.addEventListener("click", this.collapseOnClick);
+		//let el = this.shadowRoot.getElementById("panel");
+		//el.addEventListener("click", this.collapseOnClick);
+		
+		var self = this;
+		
+		function initAcc(elem, option) 
+		{
+	        self.shadowRoot.addEventListener('click', function (e) 
+			{
+	            if(!e.target.matches(elem+' .a-btn')) 
+				{	
+					return;
+	            }
+				else
+				{
+	                if(!e.target.parentElement.classList.contains('active'))
+					{
+	                    if(option==true)
+						{
+	                        var elems = self.shadowRoot.querySelectorAll(elem +' .a-container');
+	                        Array.prototype.forEach.call(elems, function (e) 
+							{
+	                            e.classList.remove('active');
+	                        });
+	                    }    
+	                   	e.target.parentElement.classList.add('active');
+	                }
+					else
+					{
+	                    e.target.parentElement.classList.remove('active');
+	                }
+	            }
+	        });
+	    }
+     
+	    initAcc('.accordion', true);
 	}
 	
 	getMethodPrefix() 
@@ -74,7 +108,7 @@ class SecurityElement extends CidElement
 	
 	// Bootstrap collapse not working in shadow dom :-(
 	// This method allows for opening closing collapse elements
-	collapseOnClick(e)
+	/*collapseOnClick(e)
 	{
     	var target = e.target.getAttribute("data-target")
 		if(target==null)
@@ -94,304 +128,13 @@ class SecurityElement extends CidElement
 					el.classList.add("show");
 			}
 		}
-    }
+    }*/
 	
 	getMethodPrefix() 
 	{
 		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.myservice;
 	}
 				
-	static get styles() 
-	{
-		var ret = [];
-		if(super.styles!=null)
-			ret.push(super.styles);
-		ret.push(
-		    css`
-	    	table {
-				overflow-wrap: break-word;
-				table-layout: fixed
-			}
-			.w100 {
-				width: 100%;
-			}
-			.h100 {
-				height: 100%;
-			}
-			.selected {
-				background-color: rgba(255,255,0,0.5); 
-			}
-		    `);
-		return ret;
-	}
-	
-	asyncRender() 
-	{
-		return html`
-			<div id="panel" class="container-fluid m-0 p-0">
-				<div id="accordion">
-					<div class="card m-2">
-						<div class="card-header">
-        					<h4 class="card-link" data-toggle="collapse" href="#collapseOne">${this.app.lang.t('General Settings')}</h4>
-    					</div>
-						<div id="collapseOne" class="collapse show" data-parent="#accordion">
-							<div class="card-body">
-								<div class="row m-1">
-									<div class="col-6">
-										<input type="checkbox" id="usesecret" @click="${e => {this.useSecret()}}" .checked="${this.secstate.useSecret}">${this.app.lang.t('Use secret')}</input>
-									</div>
-									<div class="col-6">
-										<input type="checkbox" id="printsecret" @click="${e => {this.printSecret()}}" .checked="${this.secstate.printSecret}">${this.app.lang.t('Print secret')}</input>
-									</div>
-								</div>
-								<div class="row m-1">
-									<div class="col-12">
-										<label for="platformsecret">${this.app.lang.t('Platform Secret (Password, Key, Certificate)')}</label>
-  										<textarea class="form-control rounded-0" id="platformsecret" rows="10" id="platformsecret" disabled="true">${this.secstate.platformSecret}</textarea>
-									</div>
-								</div>
-	      					</div>
-	    				</div>
-	  				</div>
-			
-					<div class="card m-2">
-						<div class="card-header">
-							<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">${this.app.lang.t('Networks')}</h4>
-						</div>
-						<div id="collapseTwo" class="collapse" data-parent="#accordion">
-							<div class="card-body">
-								<div class="row m-1">
-									<div class="col-12">
-										<table class="table">
-											<thead>
-					    						<tr class="d-flex">
-					      							<th class="col-4" scope="col">${this.app.lang.t('Network Name')}</th>
-					      							<th class="col-8" scope="col">${this.app.lang.t('Network Secret')}</th>
-											    </tr>
-					  						</thead>
-					  						<tbody>
-												${this.getNetworks().map((net) => html`
-						    						<tr class="d-flex net" @click="${e => {this.selectNetwork(net, e)}}">
-						      							<td class="col-4">${net[0]}</td>
-						     							<td class="col-8">${net[1]}</td>
-												    </tr>
-												`)}
-											</tbody>
-										</table>
-									</div>
-								</div>
-								<div class="row m-1">
-									<div class="col-9">
-									</div>
-									<div class="col-3">
-										<button type="button" class="btn btn-primary w100" @click="${e => {this.removeNetwork()}}" ?disabled="${this.selnet == null}">${this.app.lang.t('Remove Network')}</button>
-									</div>
-								</div>
-								<div class="row m-1">
-									<div class="col">
-										<input class="w100 h100" type="text" placeholder="Network Name" id="network" @change="${e=> this.netname=e.target.value}" required>
-									</div>
-								</div>
-								<div class="row m-1">
-									<div class="col">
-										<div class="btn-group btn-group-toggle">
-											<label class="btn btn-secondary ${this.nn_option=='option1'? 'active': ''}" @click="${e => this.nn_option='option1'}">
-												<input type="radio" name="options" autocomplete="off" checked> ${this.app.lang.t('Key')}
-											</label>
-											<label class="btn btn-secondary ${this.nn_option=='option2'? 'active': ''}" @click="${e => { console.log('opt2'); this.nn_option='option2'}}">
-												<input type="radio" name="options" autocomplete="off"> ${this.app.lang.t('Password')}
-											</label>
-											<!--<label class="btn btn-secondary ${this.nn_option=='option3'? 'active': ''}" @click="${e => this.nn_option='option3'}">
-												<input type="radio" name="options" autocomplete="off"> ${this.app.lang.t('X509 Certificates')}
-											</label>-->
-											<label class="btn btn-secondary ${this.nn_option=='option4'? 'active': ''}" @click="${e => this.nn_option='option4'}">
-												<input type="radio" name="options" autocomplete="off"> ${this.app.lang.t('Encoded Secret')}
-											</label>
-										</div>
-									</div>
-								</div>
-								<div class="row m-1 p-0 ${this.nn_option==='option1'? 'visible': 'hidden'}">
-									<div class="col m-0 p-0">
-										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
-											<div class="col-9">
-												<input class="w100 h100" type="text" placeholder="${this.app.lang.t('Key')}" id="key" disabled="true">
-											</div>
-											<div class="col-3">
-												<button type="button" class="btn btn-primary w100 h100" @click="${e => this.generateRandom()}">${this.app.lang.t('Generate Key')}</button>
-											</div>
-										</div>
-										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
-											<div class="col-6">
-												<input class="w100 h100" type="text" placeholder="${this.app.lang.t('Password (min. 16 characters, 24 recommended)')}" id="pass">
-											</div>
-											<div class="col-3">
-												<div class="progress w100 h100">
-		  											<div class="progress-bar progress-bar-striped" style="width: ${this.progress}%">${this.progress}%</div>
-												</div> 
-											</div>
-											<div class="col-3">
-												<button type="button" class="btn btn-primary w100 h100" @click="${e => this.generateFromPassword()}">${this.app.lang.t('Derive Key')}</button>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="row m-1 ${this.nn_option==='option2'? 'visible': 'hidden'}">
-									<div class="col m-0 p-0">
-										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
-											<div class="col-12">
-												<input class="w100 h100" type="text" placeholder="${this.app.lang.t('Password (min. 10 characters)')}" id="pass2" @change="${e => this.secret = "pw:"+e.target.value}">
-											</div>
-										</div>
-									</div>
-								</div>
-								<!--<div class="row m-1 ${this.nn_option==='option3'? 'visible': 'hidden'}">
-									<div class="col">
-										Option 3
-									</div>
-								</div>-->
-								<div class="row m-1 ${this.nn_option==='option4'? 'visible': 'hidden'}">
-									<div class="col m-0 p-0">
-										<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
-											<div class="col-12">
-												<label for="rawsecret">${this.app.lang.t('Secret (Password, Key, Certificate) in Jadex format (pw:, key:, pem:)')}</label>
-		  										<textarea class="form-control rounded-0" id="rawsecret" rows="10" @change="${e => this.secret = e.target.value}"></textarea>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="row m-1">
-									<div class="col-9">
-									</div>
-									<div class="col-3">
-										<button type="button" class="btn btn-primary w100" @click="${e => this.addNetwork()}" ?disabled="${this.netname==null || this.secret==null}">${this.app.lang.t('Add Network')}</button>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				
-					<div class="card m-2">
-						<div class="card-header">
-							<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseThree">${this.app.lang.t('Roles')}</h4>
-						</div>
-						<div id="collapseThree" class="collapse" data-parent="#accordion">
-							<div class="card-body">
-								<div class="row m-1">
-									<div class="col-12">
-										<table class="table">
-											<thead>
-					    						<tr>
-					      							<th scope="col">${this.app.lang.t('Entity')}</th>
-					      							<th scope="col">${this.app.lang.t('Role')}</th>
-											    </tr>
-					  						</thead>
-					  						<tbody>
-												${this.getRoles().map((roles) => html`
-						    						<tr class="role" @click="${e => this.selectRole(e)}">
-						      							<td>${roles[0]}</td>
-						     							<td>${roles[1]}</td>
-												    </tr>
-												`)}
-											</tbody>
-										</table>
-									</div>
-								</div>
-								<div class="row m-1">
-									<div class="col-4">
-										<input type="text" placeholder="${this.app.lang.t('Entity')}" id="entity" @change="${this.requestUpdate()}" required>
-										
-									</div>
-									<div class="col-4">
-										<input type="text" placeholder="${this.app.lang.t('Role')}" id="role" @change="${this.requestUpdate()}" required>
-									</div>
-									<div class="col-4">
-										<button type="button" class="btn btn-primary" @click="${e => this.addRole(e)}" disabled="${this.isRoleDisabled()}">${this.app.lang.t('Add')}</button>
-										<button type="button" class="btn btn-primary" @click="${e => this.removeRole(e)}" disabled="${this.isRoleDisabled()}">${this.app.lang.t('Remove')}</button>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					
-					<div class="card m-2">
-						<div class="card-header">
-							<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseFour">${this.app.lang.t('Name Authorities')}</h4>
-						</div>
-						<div id="collapseFour" class="collapse" data-parent="#accordion">
-							<div class="card-body">
-								<div class="row m-1">
-									<div class="col-12">
-										<table class="table">
-											<thead>
-					    						<tr>
-					      							<th scope="col-5">${this.app.lang.t('Subject Common Name')}</th>
-					      							<th scope="col-5">${this.app.lang.t('Subject Distinguished Name')}</th>
-					      							<th scope="col-2">${this.app.lang.t('Type')}</th>
-											    </tr>
-					  						</thead>
-					  						<tbody>
-												${this.getNameAuthorities().map((na) => html`
-						    						<tr class="na" @click="${e => this.selectNameAuthority(e)}">
-						      							<td>{na[0]}</td>
-						     							<td>{na[1]}</td>
-						     							<td>{na[2]}</td>
-												    </tr>
-												`)}
-											</tbody>
-										</table>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				
-					<div class="card m-2">
-						<div class="card-header">
-							<h4 class="collapsed card-link" data-toggle="collapse" href="#collapseFive">${this.app.lang.t('Trusted Platform Names')}</h4>
-						</div>
-						<div id="collapseFive" class="collapse" data-parent="#accordion">
-							<div class="card-body">
-								<div class="row m-1">
-									<div class="col-12">
-										<table class="table">
-											<thead>
-					    						<tr>
-					      							<th scope="col-5">${this.app.lang.t('Trusted Platform Name')}</th>
-											    </tr>
-					  						</thead>
-					  						<tbody>
-												${this.getTrustedPlatformNames().map((tpn) => html`
-						    						<tr class="tpn" @click="${e => this.selectTrustedPlatformName(tpn, e)}">
-					      								<td>${tpn}</td>
-											   		</tr>
-												`)}
-											</tbody>
-										</table>
-									</div>
-								</div>
-								<div class="row m-1">
-									<div class="col-8">
-										<input class="w100 h100" type="text" placeholder="Trusted Platform Name" id="tpn" @change="${this.requestUpdate()}" required>
-									</div>
-									<div class="col-4">
-										<button type="button" class="btn btn-primary" @click="${e => this.addTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">${this.app.lang.t('Add')}</button>
-										<button type="button" class="btn btn-primary" @click="${e => this.removeTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">${this.app.lang.t('Remove')}</button>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			
-				<div class="row m-1">
-					<div class="col">
-						<button type="button" class="btn btn-success" @click="${e => this.refresh()}">${this.app.lang.t('Refresh')}</button>
-					</div>
-				</div>
-			</div>
-		`;
-	}
-	
 	getMethodPrefix()
 	{
 		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.myservice;
@@ -514,7 +257,9 @@ class SecurityElement extends CidElement
 			return true;
 		
 		var ret = this.shadowRoot.getElementById("entity").value.length==0 || this.shadowRoot.getElementById("role").value.length==0;
-		//console.log("isRoleDis: "+ret);
+		
+		console.log("isRoleDis: "+ret);
+		
 		return ret;
 	}
 	
@@ -759,6 +504,192 @@ class SecurityElement extends CidElement
 		}
 		return out;
 	};
+	
+	static get styles() 
+	{
+		var ret = [];
+		if(super.styles!=null)
+			ret.push(super.styles);
+		ret.push(
+		    css`
+	    	table {
+				overflow-wrap: break-word;
+				table-layout: fixed
+			}
+			.selected {
+				background-color: rgba(255,255,0,0.5); 
+			}
+			
+			.flex {
+				display: flex;
+			}
+			.flexgrow {
+				flex-grow: 1;
+			}
+		    `);
+		return ret;
+	}
+	
+	asyncRender() 
+	{
+		return html`
+			<div class="accordion">
+		        <div class="a-container margintop"> 
+		        	<h4 class="a-btn">${this.app.lang.t('General Settings')}</h4>
+		            <div class="a-panel">
+						<input type="checkbox" class="marginright" id="usesecret" @click="${e => {this.useSecret()}}" .checked="${this.secstate.useSecret}">${this.app.lang.t('Use secret')}</input>
+						<input type="checkbox" class="marginright marginleft" id="printsecret" @click="${e => {this.printSecret()}}" .checked="${this.secstate.printSecret}">${this.app.lang.t('Print secret')}</input>
+						<div>
+							<label for="platformsecret">${this.app.lang.t('Platform Secret (Password, Key, Certificate)')}</label>
+							<textarea class="form-control rounded-0" id="platformsecret" rows="10" id="platformsecret" disabled="true">${this.secstate.platformSecret}</textarea>
+						</div>
+					</div>
+		        </div>
+
+ 				<div class="a-container"> 
+		            <h4 class="a-btn">${this.app.lang.t('Networks')}</h4>
+		            <div class="a-panel">
+						<table class="table">
+							<thead>
+								<tr class="d-flex">
+									<th class="col-4" scope="col">${this.app.lang.t('Network Name')}</th>
+									<th class="col-8" scope="col">${this.app.lang.t('Network Secret')}</th>
+							    </tr>
+							</thead>
+							<tbody>
+								${this.getNetworks().map((net) => html`
+									<tr class="d-flex net" @click="${e => {this.selectNetwork(net, e)}}">
+										<td class="col-4">${net[0]}</td>
+										<td class="col-8">${net[1]}</td>
+								    </tr>
+								`)}
+							</tbody>
+						</table>
+						
+						<button type="button" class="jadexbtn right block marginbottom" @click="${e => {this.removeNetwork()}}" ?disabled="${this.selnet == null}">${this.app.lang.t('Remove Network')}</button>
+						
+						<fieldset class="border w100">
+  							<legend>Add Network Settings</legend>
+
+							<input class="w100 h100 marginbottom" type="text" placeholder="Network Name" id="network" @change="${e=> this.netname=e.target.value}" required>
+						
+							<div class="marginbottom">
+								<label class="${this.nn_option=='option1'? 'active': ''}" @click="${e => this.nn_option='option1'}">
+									<input type="radio" name="options" autocomplete="off" checked> ${this.app.lang.t('Key')}
+								</label>
+								<label class="${this.nn_option=='option2'? 'active': ''}" @click="${e => { console.log('opt2'); this.nn_option='option2'}}">
+									<input type="radio" name="options" autocomplete="off"> ${this.app.lang.t('Password')}
+								</label>
+								<!--<label class="${this.nn_option=='option3'? 'active': ''}" @click="${e => this.nn_option='option3'}">
+									<input type="radio" name="options" autocomplete="off"> ${this.app.lang.t('X509 Certificates')}
+								</label>-->
+								<label class="${this.nn_option=='option4'? 'active': ''}" @click="${e => this.nn_option='option4'}">
+									<input type="radio" name="options" autocomplete="off"> ${this.app.lang.t('Encoded Secret')}
+								</label>
+							</div>
+						
+							<div class="${this.nn_option==='option1'? 'visible': 'hidden'}">
+								<input class="w100 h100 marginbottom" type="text" placeholder="${this.app.lang.t('Key')}" id="key" disabled="true">
+								<button type="button" class="marginbottom2 jadexbtn h100" @click="${e => this.generateRandom()}">${this.app.lang.t('Generate Key')}</button>
+								<input class="w100 h100 marginbottom" type="text" placeholder="${this.app.lang.t('Password (min. 16 characters, 24 recommended)')}" id="pass">
+								<progress class="w100" value="${this.progress}" max="100"> ${this.progress}% </progress>
+								<button type="button" class="marginbottom jadexbtn h100" @click="${e => this.generateFromPassword()}">${this.app.lang.t('Derive Key')}</button>
+							</div>
+							
+							<div class="${this.nn_option==='option2'? 'visible': 'hidden'}">
+								<input class="marginbottom w100 h100" type="text" placeholder="${this.app.lang.t('Password (min. 10 characters)')}" id="pass2" @change="${e => this.secret = "pw:"+e.target.value}">
+							</div>
+							
+							<div class="${this.nn_option==='option4'? 'visible': 'hidden'}">
+								<label for="rawsecret">${this.app.lang.t('Secret (Password, Key, Certificate) in Jadex format (pw:, key:, pem:)')}</label>
+		  						<textarea class="marginbottom form-control rounded-0" id="rawsecret" rows="10" @change="${e => this.secret = e.target.value}"></textarea>
+							</div>
+						
+							<button type="button" class="jadexbtn" @click="${e => this.addNetwork()}" ?disabled="${this.netname==null || this.secret==null}">${this.app.lang.t('Add Network')}</button>
+						</fieldset>
+					</div>
+		        </div>
+		
+				<div class="a-container"> 
+		        	<h4 class="a-btn">${this.app.lang.t('Roles')}</h4>
+		            <div class="a-panel">
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col">${this.app.lang.t('Entity')}</th>
+									<th scope="col">${this.app.lang.t('Role')}</th>
+							    </tr>
+							</thead>
+							<tbody>
+								${this.getRoles().map((roles) => html`
+									<tr class="role" @click="${e => this.selectRole(e)}">
+										<td>${roles[0]}</td>
+										<td>${roles[1]}</td>
+								    </tr>
+								`)}
+							</tbody>
+						</table>
+						<div class="flex">
+							<input type="text" class="marginright flexgrow" placeholder="${this.app.lang.t('Entity')}" id="entity" @change="${this.requestUpdate()}" required>
+							<input type="text" class="flexgrow" placeholder="${this.app.lang.t('Role')}" id="role" @change="${this.requestUpdate()}" required>
+						</div>
+						<button type="button" class="jadexbtn right margintop" @click="${e => this.removeRole(e)}" disabled="${this.isRoleDisabled()}">${this.app.lang.t('Remove')}</button>
+						<button type="button" class="jadexbtn right margintop marginright" @click="${e => this.addRole(e)}" disabled="${this.isRoleDisabled()}">${this.app.lang.t('Add')}</button>
+					</div>
+		        </div>
+			
+				<div class="a-container"> 
+		        	<h4 class="a-btn">${this.app.lang.t('Name Authorities')}</h4>
+		            <div class="a-panel">
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col-5">${this.app.lang.t('Subject Common Name')}</th>
+									<th scope="col-5">${this.app.lang.t('Subject Distinguished Name')}</th>
+									<th scope="col-2">${this.app.lang.t('Type')}</th>
+							    </tr>
+							</thead>
+							<tbody>
+								${this.getNameAuthorities().map((na) => html`
+									<tr class="na" @click="${e => this.selectNameAuthority(e)}">
+			  							<td>{na[0]}</td>
+			 							<td>{na[1]}</td>
+			 							<td>{na[2]}</td>
+								    </tr>
+								`)}
+							</tbody>
+						</table>
+		            </div>
+				</div>
+			
+				<div class="a-container"> 
+		        	<h4 class="a-btn">${this.app.lang.t('Trusted Platform Names')}</h4>
+		            <div class="a-panel">
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col-5">${this.app.lang.t('Trusted Platform Name')}</th>
+							    </tr>
+							</thead>
+							<tbody>
+								${this.getTrustedPlatformNames().map((tpn) => html`
+									<tr class="tpn" @click="${e => this.selectTrustedPlatformName(tpn, e)}">
+										<td>${tpn}</td>
+							   		</tr>
+								`)}
+							</tbody>
+						</table>
+						
+						<input class="w100 h100" type="text" placeholder="Trusted Platform Name" id="tpn" @change="${this.requestUpdate()}" required>
+						<button type="button" class="jadexbtn right margintop" @click="${e => this.removeTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">${this.app.lang.t('Remove')}</button>
+						<button type="button" class="jadexbtn right margintop marginright" @click="${e => this.addTrustedPlatformName()}" disabled="${this.isTrustedPlatformNameDisabled()}">${this.app.lang.t('Add')}</button>
+		            </div>
+				</div>
+
+				<!-- <button type="button" class="jadexbtn margintop" @click="${e => this.refresh()}">${this.app.lang.t('Refresh')}</button>-->
+			</div>
+		`;
+	}
 }
 
 if(customElements.get('jadex-security') === undefined)

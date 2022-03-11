@@ -9,11 +9,6 @@
 	background: linear-gradient(to bottom, #ffffff, #ffffff 10%, #ffffff 10%, #ffffff 90%, #2a6699 90%);
 }
 
-#content {
-	padding: 20px;
-	display: flex;
-}
-
 jadex-platform {
 	flex: 1;
 }
@@ -415,6 +410,89 @@ jadex-app {
 	height: 100%;
 }
 
+.margintop {
+	margin-top: 0.5em;
+}
+
+.marginright {
+	margin-right: 0.5em;
+}
+
+.marginleft {
+	margin-left: 0.5em;
+}
+
+.marginbottom {
+	margin-bottom: 0.5em;
+}
+
+.margintop1 {
+	margin-top: 1em;
+}
+
+.marginright1 {
+	margin-right: 1em;
+}
+
+.marginleft1 {
+	margin-left: 1em;
+}
+
+.marginbottom1 {
+	margin-bottom: 1em;
+}
+
+.marginbottom2 {
+	margin-bottom: 1em;
+}
+
+.margin1 {
+	margin: 1em;
+}
+
+.paddingright {
+	padding-right: 0.5em;
+}
+
+.paddingleft {
+	padding-left: 0.5em;
+}
+
+.paddingtop {
+	padding-top: 0.5em;
+}
+
+.paddingbottom {
+	padding-bottom: 0.5em;
+}
+
+.right {
+	float: right;
+}
+
+.vmiddle {
+	vertical-align: middle;
+}
+
+.border {
+	border: solid 1px #DFDFDF
+}
+
+.block {
+	display: block;
+}
+
+.w50 {
+	width: 50%;
+}
+
+.colorerror {
+	background-color: #f8d7da;
+}
+
+.colorinfo {
+	background-color: #cff4fc;
+}
 
 /* Panel style */
 .accordion .a-container .a-panel {
@@ -429,16 +507,16 @@ jadex-app {
    
 /* Panel style when active */
 .accordion .a-container.active .a-panel {
-	padding: 15px 10px 10px 10px;
+	padding: 0.5em 0.4em 0.4em 0.4em;
     opacity: 1;
     height: auto;
-    max-height: 500px;
+    max-height: 10000px;
 }
 
 .a-btn {
 	margin: 0;
     position: relative;
-    padding: 1em 0 1em 0.5em;
+    padding: 0.5em 0 0.5em 0.5em;
     width: 100%;
     font-weight: 400;
     display: block;

@@ -326,30 +326,6 @@ class PlatformElement extends CidElement
 		});
 	}
 	
-	static get styles() 
-	{
-	    return css`
-	    	.navbar-custom {
-	    		background-color: #aaaaaa;
-	    	}
-	    	.navbar-custom .navbar-brand,
-	    	.navbar-custom .navbar-text {
-	    		color: rgba(255,255,255,.8);
-	    	}
-	    	.navbar-custom .navbar-nav .nav-link {
-	    		color: rgba(255,255,255,.5);
-	    	}
-	    	.navbar-custom .nav-item.active .nav-link,
-	    	.navbar-custom .nav-item:focus .nav-link,
-	    	.navbar-custom .nav-item:hover .nav-link {
-	    		color: #ffffff;
-	    	}
-			.overlay {
-				background: rgba(0, 0, 0, 0.1); /* Black see-through */
-			}
-	    `;
-	}
-	
 	getPlugins()
 	{
 		let self = this;
@@ -400,12 +376,36 @@ class PlatformElement extends CidElement
 		return w;
 	}
 	
+	static get styles() 
+	{
+	    return css`
+	    	.navbar-custom {
+	    		background-color: #aaaaaa;
+	    	}
+	    	.navbar-custom .navbar-brand,
+	    	.navbar-custom .navbar-text {
+	    		color: rgba(255,255,255,.8);
+	    	}
+	    	.navbar-custom .navbar-nav .nav-link {
+	    		color: rgba(255,255,255,.5);
+	    	}
+	    	.navbar-custom .nav-item.active .nav-link,
+	    	.navbar-custom .nav-item:focus .nav-link,
+	    	.navbar-custom .nav-item:hover .nav-link {
+	    		color: #ffffff;
+	    	}
+			.overlay {
+				background: rgba(0, 0, 0, 0.1); /* Black see-through */
+			}
+	    `;
+	}
+	
 	asyncRender() 
 	{
 		var self = this;
 		return html`
-			<h1 class="m-0 p-0">Platform ${this.cid}</h1>
-			<div class="container-fluid m-0 p-0" id="plugincont">
+			<h1>Platform ${this.cid}</h1>
+			<div id="plugincont">
 				${this.getPlugins().map((p, index) => html`
 					${!p.unrestricted && !this.app.login.isLoggedIn()? "": p.icon!=null? 
 						html`<img id="${'plugin'+index}" class="${self.plugin===p.name? "overlay": ""}" src="data:image/png;base64,${p.icon.__base64}" alt="Red dot" @click="${(e) => {self.selectPlugin(p.name)}}" data-toggle="tooltip" data-placement="top" title="${p.name}"/>`:

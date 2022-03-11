@@ -1246,13 +1246,7 @@ class ComponentTree extends BaseElement
 	asyncRender() 
 	{
 		return html`
-			<div class="container-fluid m-0 p-0">
-				<div class="row m-0 p-0">
-					<div class="col m-0 p-0">
-						<div id="componenttree"></div>
-					</div>
-				</div>
-			</div>	
+			<div id="componenttree"></div>
 			<div id="details" class="dragable ${this.info!=null? 'visible': 'hidden'}">
 				<div class="close absolute" @click="${e => {this.info=null; this.requestUpdate();}}"></div>
 				<div>
@@ -1265,7 +1259,7 @@ class ComponentTree extends BaseElement
 					`)}
 				</dl>
 				<div class="${this.info?.refreshcmd!=null? 'visible': 'hidden'}">
-					<button type="button" class="btn btn-success" @click="${e => this.info.refreshcmd(this.info.node)}">${this.app.lang.t('Refresh')}</button>
+					<button type="button" class="jadexbtn" @click="${e => this.info.refreshcmd(this.info.node)}">${this.app.lang.t('Refresh')}</button>
 				</div>
 			</div>
 		`;
