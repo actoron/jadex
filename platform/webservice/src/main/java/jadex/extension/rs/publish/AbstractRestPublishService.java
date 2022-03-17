@@ -1002,6 +1002,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				{
 					response.setCharacterEncoding("utf-8");
 					PrintWriter out = response.getWriter();
+					setCORSHeader(response);
+					setNoCachingHeader(response);
 	
 					// setup SSE if requested via header
 					String ah = request.getHeader("Accept");
@@ -1009,6 +1011,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					{
 						// SSE flag in session 
 						getSession(sessionid, true).put("sse", request.getAsyncContext()); 
+											
 						
 						response.setContentType(MediaType.SERVER_SENT_EVENTS+"; charset=utf-8");
 					    response.setCharacterEncoding("UTF-8");
@@ -1033,6 +1036,31 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				}
 			}
 		}
+	}
+	
+	/**
+	 *  Set the cors header in the response.
+	 *  @param response The response.
+	 */
+	protected void setCORSHeader(HttpServletResponse response)
+	{
+		response.addHeader("Access-Control-Allow-Origin", "*");
+		// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
+		response.addHeader("Access-Control-Allow-Credentials", "true ");
+		response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
+	}
+	
+	
+	/**
+	 *  Set the cache header in the response.
+	 *  @param response The response.
+	 */
+	protected void setNoCachingHeader(HttpServletResponse response)
+	{
+		// add header for non-caching
+		response.addHeader("Cache-Control", "no-cache, no-store");
+		response.addHeader("Expires", "-1");
 	}
 	
 	/**
@@ -1926,16 +1954,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					ri.getResponse().addHeader(HEADER_JADEX_MAX, ""+ri.getMax());
 			}
 
-			// todo: add option for CORS
-			ri.getResponse().addHeader("Access-Control-Allow-Origin", "*");
-			// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
-			ri.getResponse().addHeader("Access-Control-Allow-Credentials", "true ");
-			ri.getResponse().addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
-			ri.getResponse().addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
-		
-			// add header for non-caching
-			ri.getResponse().addHeader("Cache-Control", "no-cache, no-store");
-			ri.getResponse().addHeader("Expires", "-1");
+			setCORSHeader(ri.getResponse());
+			
+			setNoCachingHeader(ri.getResponse());
 			
 			// Add Jadex version header, if enabled
 			if(Boolean.TRUE.equals(Starter.getPlatformArgument(component.getId(), "showversion")))
