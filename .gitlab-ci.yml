@@ -176,7 +176,7 @@ releaseStagingRepo:
   script:
     -  ./gradlew -Prepos=central releaseRepository
   rules:
-    - when: manual 
+    - when: on_success
   #only:
   #  variables:
   #    - $UPLOAD == "true"
