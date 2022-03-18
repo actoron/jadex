@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -184,11 +186,23 @@ public class JettyRestPublishService extends AbstractRestPublishService
                 System.out.println("Starting new server: "+uri.getPort());
                 server = new Server(uri.getPort());
                 
+                // Activate forward module
+                // https://stackoverflow.com/questions/26333846/configuring-embedded-jetty-9-for-x-forwarded-proto-with-spring-boot
+                HttpConfiguration httpConfig = new HttpConfiguration();
+                // Add support for X-Forwarded headers
+                httpConfig.addCustomizer(new org.eclipse.jetty.server.ForwardedRequestCustomizer());
+                // Create the http connector
+                HttpConnectionFactory connectionFactory = new HttpConnectionFactory(httpConfig);
+                ServerConnector connector = new ServerConnector(server, connectionFactory);
+                // Make sure you set the port on the connector, the port in the Server constructor is overridden by the new connector
+                connector.setPort(uri.getPort());
+                // Add the connector to the server
+                server.setConnectors(new ServerConnector[]{connector});
+                
                 // todo: http2, browser only support with tls?!
                 //ServerConnector connector = new ServerConnector(server, ssl, alpn, http2, http1);
                 //connector.setPort(webProperties.getPort());
                 //server.addConnector(connector);
-                
                 
                 //server.dumpStdErr();
 
@@ -210,7 +224,8 @@ public class JettyRestPublishService extends AbstractRestPublishService
                 context.setHandler(wsh);
                 //server.addHandler(context);
                 collhandler.addHandler(wsh);
-*/                
+                */
+                              
                 ServletContextHandler ch = new ServletContextHandler(ServletContextHandler.SESSIONS);
                 ch.setContextPath("/wswebapi");
                 ch.setAllowNullPathInfo(true); // disable redirect from /ws to /ws/
