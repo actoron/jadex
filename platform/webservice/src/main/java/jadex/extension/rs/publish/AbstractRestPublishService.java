@@ -1009,10 +1009,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					String ah = request.getHeader("Accept");
 					if(ah!=null && ah.toLowerCase().indexOf(MediaType.SERVER_SENT_EVENTS)!=-1)
 					{
-						// SSE flag in session 
-						getSession(sessionid, true).put("sse", request.getAsyncContext()); 
-											
+						// Session can be null if no header is provided by client
+						String fsessionid = sessionid;
+						if(fsessionid==null)
+							fsessionid = SUtil.createUniqueId();
 						
+						// SSE flag in session 
+						getSession(fsessionid, true).put("sse", request.getAsyncContext()); 
+						response.addHeader(HEADER_JADEX_CALLID, ri.getCallid());
 						response.setContentType(MediaType.SERVER_SENT_EVENTS+"; charset=utf-8");
 					    response.setCharacterEncoding("UTF-8");
 					    response.setStatus(HttpServletResponse.SC_OK);
