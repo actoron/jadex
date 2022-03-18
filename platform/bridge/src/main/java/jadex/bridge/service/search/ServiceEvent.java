@@ -6,6 +6,9 @@ import jadex.bridge.service.IService;
  *  Service event used if the service registry is used in event mode.
  *
  *  @param <T> The service type.
+ *  
+ *  
+ *  todo: make ServiceEvent use either IServiceIdentifier or Proxy, not both
  */
 public class ServiceEvent<T>
 {
@@ -43,8 +46,8 @@ public class ServiceEvent<T>
 		this.service = service;
 		this.type = eventtype;
 		
-		if(eventtype==SERVICE_REMOVED && service instanceof IService)
-			System.out.println("here");
+		//if(eventtype==SERVICE_REMOVED && service instanceof IService)
+		//	System.out.println("here");
 	}
 
 	/**
@@ -85,8 +88,8 @@ public class ServiceEvent<T>
 	public void setService(T service)
 	{
 		this.service = service;
-		if(this.type==SERVICE_REMOVED && service instanceof IService)
-			System.out.println("here");
+		//if(this.type==SERVICE_REMOVED && service instanceof IService)
+		//	System.out.println("here");
 	}
 
 	/**

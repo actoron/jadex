@@ -142,6 +142,11 @@ class RegistryViewElement extends CidElement
 		//this.subscribe();
 	}
 	
+	getServiceIdentifier(event)
+	{
+		return event.service.serviceIdentifier!=null? event.service.serviceIdentifier: event.service;
+	}
+	
 	subscribe()
 	{
 		//console.log("initready: "+this.initready+", concom: "+this.concom);
@@ -155,11 +160,12 @@ class RegistryViewElement extends CidElement
 			this.subscribeToX("Services", wait, 
 				function(elem, event) 
 				{ 
-					return elem.name==event.service.serviceIdentifier.name && elem.providerId.name==event.service.serviceIdentifier.providerId.name;
+					var sid = self.getServiceIdentifier(event);
+					return elem.name==sid.name && elem.providerId.name==sid.providerId.name;
 				}, 
 				function(table, event) 
 				{
-					var elem = event.service.serviceIdentifier!=null? event.service.serviceIdentifier: event.service;
+					var elem = self.getServiceIdentifier(event);
 					self.getSubscription("Services").elements.push(elem);
 					if(self.global? elem.scope.toLowerCase()==="global": true)
 						table.rows().add([elem.type, self.beautifyCid(elem.providerId.name), elem.scope.toLowerCase(), self.beautifyNetworks(elem.networkNames), elem.unrestricted && 'unrestricted' || 'restricted']);
@@ -446,7 +452,7 @@ class RegistryViewElement extends CidElement
 		        <div class="a-container"> 
 		            <h4 class="a-btn">${this.app.lang.t('Platforms')}</h4>
 		            <div class="a-panel">
-						<table id="tableplatforms" class="${this.getSubscription("Platforms").connected?'': 'down'}"></table>
+						<table id="tableplatforms" class="${this.getSubscription("Platforms")?'': 'down'}"></table>
 					</div>
 		        </div>
 		
