@@ -317,10 +317,11 @@ class RegistryViewElement extends CidElement
 		},
 		function(err)
 		{
-			//console.log("Could not reach platform.");
+			console.log("Could not reach platform: "+err);
 			//console.log("Err: "+JSON.stringify(err));
 			self.getSubscription(x).connected = false;
 			self.getSubscription(x).elements = [];
+			this.getSubscription(x).table.rows().remove("all");
 			self.requestUpdate();
 			
 			setTimeout(function()
