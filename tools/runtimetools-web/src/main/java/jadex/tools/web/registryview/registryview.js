@@ -321,7 +321,7 @@ class RegistryViewElement extends CidElement
 			//console.log("Err: "+JSON.stringify(err));
 			self.getSubscription(x).connected = false;
 			self.getSubscription(x).elements = [];
-			this.getSubscription(x).table.rows().remove("all");
+			self.getSubscription(x).table.rows().remove("all");
 			self.requestUpdate();
 			
 			setTimeout(function()
