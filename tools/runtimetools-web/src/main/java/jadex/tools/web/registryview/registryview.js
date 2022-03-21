@@ -87,17 +87,17 @@ class RegistryViewElement extends CidElement
 	{
 		let self = this;
 		
-		let el = this.shadowRoot.getElementById("panel");
-		el.addEventListener("click", this.collapseOnClick);
+		//let el = this.shadowRoot.getElementById("panel");
+		//el.addEventListener("click", this.collapseOnClick);
 		
-		let opts = {perPageSelect: [5,10,15,25,50,100,1000], perPage: 15};
+		let opts = {perPageSelect: [5,10,15,25,50,100,1000], perPage: 1000, sortable: true};
 		self.getSubscription("Services").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableservices'), opts);
 		self.getSubscription("Platforms").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tableplatforms'), opts);
 		self.getSubscription("Queries").table = new simpleDatatables.DataTable(self.shadowRoot.getElementById('tablequeries'), opts);
 		
-		self.getSubscription("Services").table.insert({headings: ["","","","",""]});
-		self.getSubscription("Platforms").table.insert({headings: ["","",""]})
-		self.getSubscription("Queries").table.insert({headings: ["","","",""]})
+		self.getSubscription("Services").table.insert({headings: this.getHeaderServiceTexts()});//["","","","",""]});
+		self.getSubscription("Platforms").table.insert({headings: this.getHeaderPlatformTexts()});
+		self.getSubscription("Queries").table.insert({headings: this.getHeaderQueryTexts()});
 		
 		function initAcc(elem, option) 
 		{
@@ -439,6 +439,36 @@ class RegistryViewElement extends CidElement
 		}
     }
 	
+	getHeaderServiceTexts()
+	{
+		return [
+			this.app.lang.t('Service Type'),
+			this.app.lang.t('Provided By'),
+			this.app.lang.t('Publication Scope'),
+			this.app.lang.t('Networks'),
+			this.app.lang.t('Security')
+		];
+	}
+	
+	getHeaderPlatformTexts()
+	{
+		return [
+			this.app.lang.t('Platform'),
+			this.app.lang.t('Connected'),
+			this.app.lang.t('Protocol')
+		];
+	}
+	
+	getHeaderQueryTexts()
+	{
+		return [
+			this.app.lang.t('Service Type'),
+			this.app.lang.t('Query Owner'),
+			this.app.lang.t('Search Scope'),
+			this.app.lang.t('Networks')
+		];
+	}
+	
 	/*getFilteredElements()
 	{
 		var ret = this.getSubscription("Services").elements.filter(x => this.global? x.scope.toLowerCase()==="global": true)
@@ -450,7 +480,8 @@ class RegistryViewElement extends CidElement
 		// Update table headers according to language 
 		// not possible in HTML as texts are read only once
 		
-		if(this.getSubscription("Services")!=null && this.getSubscription("Services").table!=null)
+		// bug in table lib: looses sorting icons after header text is changed
+		/*if(this.getSubscription("Services")!=null && this.getSubscription("Services").table!=null)
 		{
 			this.getSubscription("Services").table.headings[0].innerText=this.app.lang.t('Service Type');
 			this.getSubscription("Services").table.headings[1].innerText=this.app.lang.t('Provided By');
@@ -458,6 +489,7 @@ class RegistryViewElement extends CidElement
 			this.getSubscription("Services").table.headings[3].innerText=this.app.lang.t('Networks');
 			this.getSubscription("Services").table.headings[4].innerText=this.app.lang.t('Security');
 			
+			this.getSubscription("Platforms").table.headings[0].innerText=this.app.lang.t('Platform');
 			this.getSubscription("Platforms").table.headings[1].innerText=this.app.lang.t('Connected');
 			this.getSubscription("Platforms").table.headings[2].innerText=this.app.lang.t('Protocol');
 			
@@ -465,7 +497,7 @@ class RegistryViewElement extends CidElement
 			this.getSubscription("Queries").table.headings[1].innerText=this.app.lang.t('Query Owner');
 			this.getSubscription("Queries").table.headings[2].innerText=this.app.lang.t('Search Scope');
 			this.getSubscription("Queries").table.headings[3].innerText=this.app.lang.t('Networks');
-		}
+		}*/
 		
 		return super.requestUpdate();
 	}
