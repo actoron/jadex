@@ -97,7 +97,7 @@ class RegistryViewElement extends CidElement
 		
 		self.getSubscription("Services").table.insert({headings: ["","","","",""]});
 		self.getSubscription("Platforms").table.insert({headings: ["","",""]})
-		self.getSubscription("Queries").table.insert({headings: ["","",""]})
+		self.getSubscription("Queries").table.insert({headings: ["","","",""]})
 		
 		function initAcc(elem, option) 
 		{
@@ -164,22 +164,28 @@ class RegistryViewElement extends CidElement
 					return elem.name==sid.name && elem.providerId.name==sid.providerId.name;
 				}, 
 				function(table, event) 
-				{
+				{					
 					var elem = self.getServiceIdentifier(event);
+					
+					//console.log("add: "+elem.name);
+					//console.log(self.getSubscription("Services").elements);
+					
 					self.getSubscription("Services").elements.push(elem);
-					if(self.global? elem.scope.toLowerCase()==="global": true)
-						table.rows().add([elem.type, self.beautifyCid(elem.providerId.name), elem.scope.toLowerCase(), self.beautifyNetworks(elem.networkNames), elem.unrestricted && 'unrestricted' || 'restricted']);
+					if(self.global? self.isGlobalNetwork(elem.scope): true)
+						table.rows().add(self.createServiceTableDesc(elem));
 				}
 			);
 			this.subscribeToX("Platforms", wait, 
 				function(elem, event) 
 				{ 
-					elem.platform.name==event.platform.name && elem.protocol==event.protocol;
+					return elem.platform.name==event.platform.name && elem.protocol==event.protocol;
 				}, 
 				function(table, event) 
 				{
+					console.log("adding: "+event.platform.name+" "+event.protocol);
+					
 					self.getSubscription("Platforms").elements.push(event);
-					table.rows().add([event.platform.name, event.connected, event.protocol]);
+					table.rows().add(self.createPlatformTableDesc(event));
 				}
 			);
 			this.subscribeToX("Queries", wait, 
@@ -190,12 +196,21 @@ class RegistryViewElement extends CidElement
 				function(table, event) 
 				{
 					var elem = event.query;
+					
+					//console.log("add: "+elem.id);
+					//console.log(self.getSubscription("Queries").elements);
+					
 					self.getSubscription("Queries").elements.push(elem);
-					if(self.global? elem.scope.value.toLowerCase()==="global": true)
-						table.rows().add([elem.serviceType!=null? elem.serviceType.value: '', self.beautifyCid(elem.owner.name), elem.scope.value]);
+					if(self.global? self.isGlobalNetwork(elem.scope.value): true)
+						table.rows().add(self.createQueryTableDesc(elem));
 				}
 			);
 		}
+	}
+	
+	isGlobalNetwork(scope)
+	{
+		return scope.toLowerCase()==="global" || scope.toLowerCase()==="network";
 	}
 	
 	updated(props) 
@@ -206,15 +221,45 @@ class RegistryViewElement extends CidElement
 		{
 			this.syncTableDataX("Services", 
 				(x) => this.global? x.scope.toLowerCase()==="global": true, 
-				(x) => [x.type, this.beautifyCid(x.providerId.name), x.scope.toLowerCase(), this.beautifyNetworks(x.networkNames), x.unrestricted && 'unrestricted' || 'restricted']
+				(x) => this.createServiceTableDesc(x)
 			);
 			
 			this.syncTableDataX("Queries", 
 				(x) => this.global? x.scope.value.toLowerCase()==="global": true, 
-				(x) => [x.serviceType!=null? x.serviceType.value: '', this.beautifyCid(x.owner.name), x.scope.value]
+				(x) => this.createQueryTableDesc(x)
 			);
 		}
   	}
+
+	createServiceTableDesc(x)
+	{
+		return [
+			x.type, 
+			this.beautifyCid(x.providerId.name), 
+			x.scope.toLowerCase(), 
+			this.beautifyNetworks(x.networkNames), 
+			x.unrestricted && 'unrestricted' || 'restricted'
+		];
+	}
+	
+	createPlatformTableDesc(x)
+	{
+		return [
+			x.platform.name, 
+			x.connected, 
+			x.protocol
+		];
+	}
+	
+	createQueryTableDesc(x)
+	{
+		return [
+			x.serviceType!=null? x.serviceType.value: '', 
+			this.beautifyCid(x.owner.name), 
+			x.scope.value, 
+			x.networkNames!=null? x.networkNames.join(): ''
+		];
+	}
 	
 	syncTableDataX(x, filter, convert)
 	{
@@ -315,6 +360,7 @@ class RegistryViewElement extends CidElement
 			if(found)
 			{
 				// 0: added, 1: removed, 2: changed
+				
 				if(event.type==1)	// removed
 				{
 					elems.splice(i,1);
@@ -417,6 +463,7 @@ class RegistryViewElement extends CidElement
 			this.getSubscription("Queries").table.headings[0].innerText=this.app.lang.t('Service Type');
 			this.getSubscription("Queries").table.headings[1].innerText=this.app.lang.t('Query Owner');
 			this.getSubscription("Queries").table.headings[2].innerText=this.app.lang.t('Search Scope');
+			this.getSubscription("Queries").table.headings[3].innerText=this.app.lang.t('Networks');
 		}
 		
 		return super.requestUpdate();
