@@ -4,7 +4,7 @@ To quickly get an overview about what Jadex Active Components is about you can h
 The [Quickstart Tutorial](tutorials/quickstart/01%20Introduction.md) guides you through developing your first application with Jadex Active Components.
 The [BDI Quickstart Tutorial](tutorials/quickstart-bdi/01%20Introduction.md) introduces you to the Beliefs-Desire-Intention Agents and their concepts.
 
-For more detailed information about how Jadex Active Components work, we recommend to check out the ~~[Jadex Active Components User Guide](guides/ac/01%20Introduction.md)~~ in the *Advanced Guides* section.
+For more detailed information about how Jadex Active Components work, we recommend to check out the [Jadex Active Components User Guide](guides/ac/01%20Introduction.md)\* in the *Advanced Guides* section.
 
 To see some example programs in action, you can try out some of the online [Java Webstart applications](https://www.activecomponents.org/#/docs/examples) or the [web applications](https://www.activecomponents.org/jadex-applications-web/).
 
