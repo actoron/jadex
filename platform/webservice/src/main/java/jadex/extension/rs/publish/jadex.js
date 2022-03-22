@@ -282,7 +282,7 @@
 			{
 				return new Promise(function(resolve, reject)
 				{
-					reject("Callid unknown: "+callid);
+					reject("Callid unknown callid");
 				});
 			}
 			else
