@@ -9,6 +9,7 @@ import jadex.bridge.service.component.ComponentFutureFunctionality;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.types.registry.SlidingCuckooFilter;
+import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -380,7 +381,7 @@ public class SFuture
 	 */
 	public static <T> ISubscriptionIntermediateFuture<T> combineSubscriptionFutures(IInternalAccess ia, ISubscriptionIntermediateFuture<T> f1, ISubscriptionIntermediateFuture<T> f2)
 	{
-		return combineSubscriptionFutures(ia, f1, f2, null);
+		return combineSubscriptionFutures(ia, f1, f2, null, null);
 	}
 	
 	/**
@@ -390,7 +391,7 @@ public class SFuture
 	 *  @param f2 Future 2.
 	 *  @return A future combining results of f1 and f2.
 	 */
-	public static <T, E> ISubscriptionIntermediateFuture<T> combineSubscriptionFutures(IInternalAccess ia, ISubscriptionIntermediateFuture<E> f1, ISubscriptionIntermediateFuture<E> f2, IResultCommand<T, E> cmd)
+	public static <T, E> ISubscriptionIntermediateFuture<T> combineSubscriptionFutures(IInternalAccess ia, ISubscriptionIntermediateFuture<E> f1, ISubscriptionIntermediateFuture<E> f2, IResultCommand<T, E> cmd, ICommand<Exception> termcom)
 	{
 		final SlidingCuckooFilter scf = new SlidingCuckooFilter();
 	
@@ -456,8 +457,11 @@ public class SFuture
 			public void handleTerminated(Exception reason)
 			{
 				// TODO: multi delegation future with multiple sources but one target?
-				if(f2!=null)
+				if(f2!=null && !f2.isDone())
 					f2.terminate(reason);
+				
+				if(termcom!=null)
+					termcom.execute(reason);
 				
 				super.handleTerminated(reason);
 			}
@@ -471,7 +475,8 @@ public class SFuture
 			f2.next(result-> 
 			{
 				((IntermediateFuture)ret).addIntermediateResult((T)result);
-			}).catchEx(exception -> {}); // Ignore exception (printed when no listener supplied)
+			})
+			.catchEx(exception -> {}); // Ignore exception (printed when no listener supplied)
 		}
 		
 		return ret;

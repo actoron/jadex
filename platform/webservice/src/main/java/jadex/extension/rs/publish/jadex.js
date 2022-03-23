@@ -15,6 +15,7 @@
 {
 	var Jadex = 
 	{
+		baseurl: 'webjcc',
 		source: null,
 		conversations: {},
 	
@@ -33,7 +34,7 @@
 				console.log("created Jadex cookie: "+id);
 			}
 			
-			this.source = new EventSource('webjcc');
+			this.source = new EventSource(this.baseurl);
 			this.source.addEventListener('open', function(e) 
 			{
 				//console.log('con established');
@@ -76,35 +77,73 @@
 			//console.log("message received: "+JSON.stringify(event.data));
 			var self = this;
 			
-			// [callback, errhandler]
-			var cb = self.conversations[event.lastEventId];
-			if(cb!=null)
-			{
-				var event = JSON.parse(event.data);
+			var sseevent = event.data!=null? JSON.parse(event.data): null;
+			var callid = sseevent.callId;
 			
-				if(event?.data?.stackTrace!=null)
-					cb[1](event);
-				else if(event?.max!=null)
-					cb[2](event.max);
+			// check if updatetimer command was received
+			// send alive when callid is still used, otherwise ignore
+			if("updatetimer"===sseevent?.data?.value?.toLowerCase())
+			{
+				var cinfo = self.conversations[callid];
+				if(cinfo==null)
+				{
+					console.log("updatetimer, conversation not found: "+callid);
+					
+					// todo: which path???
+					axios.get(self.baseurl, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': "true", 
+						'cache-control': 'no-cache, no-store'}}, this.transform)
+						.then(x =>
+						{
+							console.log("terminate success: "+callid);
+						}).catch(err =>
+						{
+							console.log("terminate err: "+callid+" "+err);
+						});
+				}
 				else
-					cb[0](event);
+				{
+					//console.log("terminating request sent: "+path);
+					axios.get(cinfo[3], {headers: {'x-jadex-callid': callid, 'x-jadex-alive': "true", 
+						'cache-control': 'no-cache, no-store'}}, this.transform)
+						.then(x =>
+						{
+							console.log("alive success: "+callid);
+						}).catch(err =>
+						{
+							console.log("alive err: "+callid+" "+err);
+						});
+				}
 			}
 			else
 			{
-				// done! todo: refactor id handling and create id on client
-				// problem: order of http and sse answer is undertermined
-				// but currently http answer contains conversation id and is needed before sse event
-				// that must use the id to lookup the handlers
-				
-				/*if(cnt<3)
+				// [callback, errhandler]
+				var cb = self.conversations[event.lastEventId];
+				if(cb!=null)
 				{
-					console.log("retry event: "+JSON.stringify(event)+" "+cnt);
-					setTimeout(() => self.processEvent(event, ++cnt), 1000);
+					if(sseevent?.data?.stackTrace!=null)
+						cb[1](sseevent);
+					else if(sseevent?.max!=null)
+						cb[2](sseevent.max);
+					else
+						cb[0](sseevent);
 				}
 				else
-				{*/
-					console.log("cannot handle event: "+JSON.stringify(event)+" "+cnt);
-				//}
+				{
+					// done! todo: refactor id handling and create id on client
+					// problem: order of http and sse answer is undertermined
+					// but currently http answer contains conversation id and is needed before sse event
+					// that must use the id to lookup the handlers
+					
+					/*if(cnt<3)
+					{
+						console.log("retry event: "+JSON.stringify(event)+" "+cnt);
+						setTimeout(() => self.processEvent(event, ++cnt), 1000);
+					}
+					else
+					{*/
+						console.log("cannot handle event: "+JSON.stringify(event)+" "+cnt);
+					//}
+				}
 			}
 		},
 								
@@ -188,12 +227,39 @@
 				
 				if(!sse)
 				{
-					if(resp.status!=202)	// ignore updatetimer commands
+					if(resp.status!=202)	
 					{
 						if(max!=null)
 							maxhandler(max);
 						else
 							handler(resp);
+					}
+					else // updatetimer (and other) commands
+					{
+						if(resp.data.toLowerCase()==="updatetimer")
+						{
+							if(self.conversations[callid]==null)
+							{
+								console.log("ignoring updatetimer, conversation not found: "+callid);
+							}
+							else
+							{
+								//console.log("terminating request sent: "+path);
+								axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-alive': "alive", 
+									'cache-control': 'no-cache, no-store'}}, this.transform)
+									.then(x =>
+									{
+										console.log("alive success: "+callid);
+									}).catch(err =>
+									{
+										console.log("alive err: "+callid+" "+err);
+									});
+							}
+						}
+						else
+						{
+							console.log("received unknown command: "+resp.data);
+						}
 					}
 				}
 				
@@ -329,11 +395,12 @@
 		
 		createProxy: function(cid, servicetype)
 		{
+			var self = this;
 			let ret = new Proxy({cid: cid, type:servicetype, transform:self.transform},
 			{
 				get: function(service, prop)
 				{
-					let callstrprefix = 'webjcc/invokeServiceMethod?cid='+service.cid+'&servicetype='+service.type+'&methodname='+prop;
+					let callstrprefix = self.baseurl+'/invokeServiceMethod?cid='+service.cid+'&servicetype='+service.type+'&methodname='+prop;
 					return function(...args)
 					{
 						let callstr = callstrprefix;

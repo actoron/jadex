@@ -231,6 +231,37 @@ class RegistryViewElement extends CidElement
 		}
   	}
 
+	getHeaderServiceTexts()
+	{
+		return [
+			this.app.lang.t('Service Type'),
+			this.app.lang.t('Provided By'),
+			this.app.lang.t('Publication Scope'),
+			this.app.lang.t('Networks'),
+			this.app.lang.t('Security')
+		];
+	}
+	
+	getHeaderPlatformTexts()
+	{
+		return [
+			this.app.lang.t('Platform'),
+			this.app.lang.t('Connected'),
+			this.app.lang.t('Protocol')
+		];
+	}
+	
+	getHeaderQueryTexts()
+	{
+		return [
+			this.app.lang.t('Service Type'),
+			this.app.lang.t('Query Owner'),
+			this.app.lang.t('Search Scope'),
+			this.app.lang.t('Networks'),
+			this.app.lang.t('Tags')
+		];
+	}
+
 	createServiceTableDesc(x)
 	{
 		return [
@@ -257,7 +288,8 @@ class RegistryViewElement extends CidElement
 			x.serviceType!=null? x.serviceType.value: '', 
 			this.beautifyCid(x.owner.name), 
 			x.scope.value, 
-			x.networkNames!=null? x.networkNames.join(): ''
+			x.networkNames!=null? x.networkNames.join(): '',
+			x.serviceTags!=null? x.serviceTags.join(): ''
 		];
 	}
 	
@@ -438,36 +470,6 @@ class RegistryViewElement extends CidElement
 			}
 		}
     }
-	
-	getHeaderServiceTexts()
-	{
-		return [
-			this.app.lang.t('Service Type'),
-			this.app.lang.t('Provided By'),
-			this.app.lang.t('Publication Scope'),
-			this.app.lang.t('Networks'),
-			this.app.lang.t('Security')
-		];
-	}
-	
-	getHeaderPlatformTexts()
-	{
-		return [
-			this.app.lang.t('Platform'),
-			this.app.lang.t('Connected'),
-			this.app.lang.t('Protocol')
-		];
-	}
-	
-	getHeaderQueryTexts()
-	{
-		return [
-			this.app.lang.t('Service Type'),
-			this.app.lang.t('Query Owner'),
-			this.app.lang.t('Search Scope'),
-			this.app.lang.t('Networks')
-		];
-	}
 	
 	/*getFilteredElements()
 	{

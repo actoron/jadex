@@ -1,7 +1,7 @@
 package jadex.commons.future;
 
 /**
- * 
+ *  Send a backward command in direction of the source, i.e. the original future emitting value.
  */
 public interface IBackwardCommandFuture
 {
