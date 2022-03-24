@@ -144,7 +144,7 @@ class RegistryViewElement extends CidElement
 	
 	getServiceIdentifier(event)
 	{
-		return event.service.serviceIdentifier!=null? event.service.serviceIdentifier: event.service;
+		return event.service==null? event: event.service.serviceIdentifier!=null? event.service.serviceIdentifier: event.service;
 	}
 	
 	subscribe()
@@ -155,7 +155,7 @@ class RegistryViewElement extends CidElement
 		
 		//if(this.initready && this.concom)
 		{
-			console.log('reg subscribing');
+			//console.log('reg subscribing');
 			var wait = 5000;
 			this.subscribeToX("Services", wait, 
 				function(elem, event) 
@@ -182,7 +182,7 @@ class RegistryViewElement extends CidElement
 				}, 
 				function(table, event) 
 				{
-					console.log("adding: "+event.platform.name+" "+event.protocol);
+					//console.log("adding: "+event.platform.name+" "+event.protocol);
 					
 					self.getSubscription("Platforms").elements.push(event);
 					table.rows().add(self.createPlatformTableDesc(event));
@@ -264,6 +264,7 @@ class RegistryViewElement extends CidElement
 
 	createServiceTableDesc(x)
 	{
+		x = this.getServiceIdentifier(x);
 		return [
 			x.type, 
 			this.beautifyCid(x.providerId.name), 
@@ -284,6 +285,7 @@ class RegistryViewElement extends CidElement
 	
 	createQueryTableDesc(x)
 	{
+		x = x.query!=null? x.query: x;
 		return [
 			x.serviceType!=null? x.serviceType.value: '', 
 			this.beautifyCid(x.owner.name), 
@@ -291,6 +293,18 @@ class RegistryViewElement extends CidElement
 			x.networkNames!=null? x.networkNames.join(): '',
 			x.serviceTags!=null? x.serviceTags.join(): ''
 		];
+	}
+	
+	createTableDescX(x, element)
+	{
+		if("Services"===x)
+			return this.createServiceTableDesc(element);
+		else if("Platforms"===x)
+			return this.createPlatformTableDesc(element);
+		else if("Queries"===x)
+			return this.createQueryTableDesc(element);
+		else
+			throw new Error("unknown x");
 	}
 	
 	syncTableDataX(x, filter, convert)
@@ -382,7 +396,7 @@ class RegistryViewElement extends CidElement
 	{
 		var	found = false;
 		
-	//	alert("Service: "+JSON.stringify(service));
+	//	alert("update: "+JSON.stringify(event));
 	
 		var elems = this.getSubscription(x).elements;
 		var table = this.getSubscription(x).table;
@@ -394,14 +408,18 @@ class RegistryViewElement extends CidElement
 			{
 				// 0: added, 1: removed, 2: changed
 				
-				if(event.type==1)	// removed
+				if(event.type==1) // removed
 				{
 					elems.splice(i,1);
-					table.rows().remove(i);
+					this.removeFromTableX(x, table, event);
 				}
-				else // added / changed
+				else if(event.type==0) // added
 				{
-					table.rows().remove(i);
+					add(table, event);
+				}
+				else // changed
+				{
+					this.removeFromTableX(x, table, event);
 					add(table, event);
 				}
 				break;
@@ -412,6 +430,47 @@ class RegistryViewElement extends CidElement
 			add(table, event);
 			
 		this.requestUpdate();
+	}
+	
+	removeFromTableX(x, table, element)
+	{
+		var target = this.createTableDescX(x, element)
+		var idx = -1;
+		for(var i=0; i<table.data.length; i++)
+		{
+			let row = [].slice.call(table.data[i].cells).map(function(cell){return cell.textContent;});
+			if(this.arrayEquals(row, target))
+			{
+				idx = i;
+				break;
+			}
+		}
+		if(idx!=-1)
+		{
+			table.rows().remove(idx);
+		}
+		else
+		{
+			console.log("Could not remove: "+element);
+		}
+	}
+	
+	arrayEquals(ar1, ar2)
+	{
+		var ret = false;
+		if(ar1.length===ar2.length)
+		{
+			ret = true;
+			for(var i=0; i<ar1.length; i++)
+			{
+				if(ar1[i]!=ar2[i])
+				{
+					ret = false;
+					break;
+				}
+			}
+		}
+		return ret;
 	}
 	
 	// helpers for string representation

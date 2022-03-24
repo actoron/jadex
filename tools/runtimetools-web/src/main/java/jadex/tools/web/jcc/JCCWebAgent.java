@@ -174,12 +174,12 @@ public class JCCWebAgent implements IJCCWebService
 	public ISubscriptionIntermediateFuture<ServiceEvent<IComponentIdentifier>> subscribeToPlatforms()
 	{
 		int fcnt = cnt++;
-		System.out.println("subscribeToPlatforms called: "+fcnt);
+		//System.out.println("subscribeToPlatforms called: "+fcnt);
 		
 		ISubscriptionIntermediateFuture<ServiceEvent<IExternalAccess>> net = agent.addQuery(new ServiceQuery<>(IExternalAccess.class, ServiceScope.NETWORK).setEventMode().setServiceTags(IExternalAccess.PLATFORM));
 		ISubscriptionIntermediateFuture<ServiceEvent<IExternalAccess>> glo = agent.addQuery(new ServiceQuery<>(IExternalAccess.class, ServiceScope.GLOBAL).setEventMode().setServiceTags(IExternalAccess.PLATFORM));
-
-		// creates no timeout future so that subscription will never be closed!
+		//glo.catchEx(ex -> System.out.println("query removed: "+fcnt));
+		
 		ISubscriptionIntermediateFuture<ServiceEvent<IComponentIdentifier>> ret = SFuture.combineSubscriptionFutures(agent, net, glo, new IResultCommand<ServiceEvent<IComponentIdentifier>, ServiceEvent<IExternalAccess>>()
 		{
 			@Override
@@ -194,7 +194,7 @@ public class JCCWebAgent implements IJCCWebService
 			@Override
 			public void execute(Exception ex) 
 			{
-				System.out.println("terminated subscription: "+fcnt);
+				//System.out.println("subscribeToPlatforms terminated: "+fcnt);
 			}
 		});
 		

@@ -551,7 +551,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				boolean aliveb = Boolean.parseBoolean(alive);
 				if(aliveb)
 				{
-					System.out.println("timestamp updated: "+callid);
+					//System.out.println("timestamp updated: "+callid);
 					cinfo.updateTimestamp();
 				}
 				else
@@ -862,7 +862,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 											if(cinfo!=null && cinfo.isTerminated())
 											{
 												// nop -> ignore late results (i.e. when terminated due to browser offline).
-												System.out.println("ignoring late result: "+result);
+												//System.out.println("ignoring late result: "+result);
 											}
 											else
 											{

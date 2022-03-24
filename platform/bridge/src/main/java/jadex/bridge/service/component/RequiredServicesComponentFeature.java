@@ -1071,6 +1071,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		ISubscriptionIntermediateFuture<T> tmpremotes = null;
 		if(isRemote(query))
 		{
+			//System.out.println("remote query: "+query+" "+sqms);
 			if(sqms != null)
 			{
 				tmpremotes = sqms.addQuery(query);
@@ -1098,6 +1099,8 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			@Override
 			public Object handleIntermediateResult(Object result) throws Exception
 			{
+				//System.out.println("local: "+result);
+				
 				// Drop result when already in cuckoo filter
 				if(scf.contains(result.toString()))
 				{

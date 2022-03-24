@@ -441,6 +441,7 @@ public class SFuture
 			
 			protected Object removeValue(Object val)
 			{
+				//System.out.println("remove: "+val);
 				if(scf.contains(val.toString()))
 				{
 					scf.delete(val.toString());
@@ -449,6 +450,7 @@ public class SFuture
 				}
 				else
 				{
+					//System.out.println("dropped: "+val);
 					return DROP_INTERMEDIATE_RESULT;
 				}
 			}

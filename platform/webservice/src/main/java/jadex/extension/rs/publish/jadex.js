@@ -21,7 +21,7 @@
 	
 		init: function()
 		{
-			console.log("jadex init running");
+			//console.log("jadex init running");
 			
 			var self = this;
 			
@@ -94,7 +94,7 @@
 						'cache-control': 'no-cache, no-store'}}, this.transform)
 						.then(x =>
 						{
-							console.log("terminate success: "+callid);
+							//console.log("terminate success: "+callid);
 						}).catch(err =>
 						{
 							console.log("terminate err: "+callid+" "+err);
@@ -107,7 +107,7 @@
 						'cache-control': 'no-cache, no-store'}}, this.transform)
 						.then(x =>
 						{
-							console.log("alive success: "+callid);
+							//console.log("alive success: "+callid);
 						}).catch(err =>
 						{
 							console.log("alive err: "+callid+" "+err);

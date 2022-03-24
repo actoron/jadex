@@ -54,7 +54,9 @@ class PlatformsElement extends BaseElement
 	{
 		var self = this;
 		if(self.callid!=null)
-			jadex.terminateCall(self.callid).then(() => {console.log("Terminated subscription: "+self.callid)})
+			jadex.terminateCall(self.callid).then(() => {
+					//console.log("Terminated subscription: "+self.callid)
+				})
 				.catch(err => {console.log("Could not terminate subscription: "+err+" "+self.callid)});
 	}
 	
@@ -75,7 +77,7 @@ class PlatformsElement extends BaseElement
 					return;
 				}
 					
-				console.log("Set up subscription");
+				//console.log("Set up subscription");
 				self.updatePlatform(resp.data.service.name, resp.data.type);
 			},
 			function(err)
