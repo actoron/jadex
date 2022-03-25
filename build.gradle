@@ -215,13 +215,20 @@ allprojects
 
 // Create version.properties with new timestamp (i.e. after clean)
 task createVersionInfo(type: Copy) {
+	def filename = 'jadexversion.properties'
+	project.ext.versionfile = (new File(project.buildDir, filename)).getCanonicalPath();
 	into project.buildDir.getCanonicalPath()
 	from('src/main/buildutils') {
-		include 'jadexversion.properties'
+		include filename
 		expand(SRCDIST_JADEXVERSION: version.toString(), SRCDIST_PATCH_LEVEL: version.patch ?: '', SRCDIST_TIMESTAMP: project.ext.timestamp)
 	}
 }
-createVersionInfo.mustRunAfter clean
+// In order to run first, needs to depend on these two parallel tasks
+allprojects
+{
+	compileJava.dependsOn(':createVersionInfo')
+	processResources.dependsOn(':createVersionInfo')
+}
 
 subprojects
 {
@@ -231,6 +238,8 @@ subprojects
 
 	apply plugin: 'eclipse' // hack to allow starting web projects in eclipse with correct dependencies
 	apply plugin: 'eclipse-wtp' // hack to allow starting web projects in eclipse with correct dependencies
+	
+	project.ext.jadexVersionFile = propFile.getAbsolutePath();
 	
 	if (getProjectDepth(project) > 1)
 	{
@@ -309,7 +318,6 @@ subprojects
 				filter{String line -> line.replace('${timestamp}', rootProject.ext.timestamp)}
 			}
 		}
-		processResources.dependsOn(":createVersionInfo")
 
         afterEvaluate {
         	// Set correct bootclasspath for each project, depending on sourceCompatibility
@@ -389,7 +397,7 @@ subprojects
 			commercial |= isCommercial(rootProject.ext.subprojectmap.get(artname))
 		}
 
-		task srcZip(type: Zip, dependsOn: rootProject.createVersionInfo) {
+		task srcZip(type: Zip) {
 			destinationDirectory	= new File(getDistsDir(rootProject), "sources")
 			archiveFileName	= 'jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
 			preserveFileTimestamps = false

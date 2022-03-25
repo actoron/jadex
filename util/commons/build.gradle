@@ -8,3 +8,14 @@ javadoc {
 	// Do not include resources dir in javadoc classpath (not needed and generated version.properties breaks caching)
 	classpath =  sourceSets.main.output.classesDirs
 }
+
+tasks.register('includeVersionFile', Copy) {
+	def sourcevfile = new File(versionfile);
+	def tdir = new File(project.getBuildDir(), 'resources/main/jadex/bridge');
+	tdir.mkdirs();
+	into tdir
+	from(sourcevfile.getParentFile().getCanonicalPath()) {
+		include sourcevfile.getName()
+	}
+}
+processResources.dependsOn('includeVersionFile')
