@@ -18,7 +18,7 @@ public interface ITransportInfoService
 	 *  	2: protocol name,
 	 *  	3: ready flag (false=connecting, true=connected, null=disconnected).
 	 */
-	public ISubscriptionIntermediateFuture<PlatformData>	subscribeToConnections();
+	public ISubscriptionIntermediateFuture<PlatformData> subscribeToConnections();
 	
 	/**
 	 *  Get the established connections.
@@ -27,5 +27,5 @@ public interface ITransportInfoService
 	 *  	2: protocol name,
 	 *  	3: ready flag (false=connecting, true=connected).
 	 */
-	public IIntermediateFuture<PlatformData>	getConnections();
+	public IIntermediateFuture<PlatformData> getConnections();
 }

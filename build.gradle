@@ -58,6 +58,7 @@ if(timestamp==null) {
 	project.ext.timestamp	= new Date().format('yyyyMMdd.HHmmss')
 //	println 'timestamp: '+project.ext.timestamp
 }
+println 'build timestamp: '+project.ext.timestamp
 
 System.setOut(new PrintStream(new OutputStream() {
 	private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -222,6 +223,7 @@ task createVersionInfo(type: Copy) {
 		include filename
 		expand(SRCDIST_JADEXVERSION: version.toString(), SRCDIST_PATCH_LEVEL: version.patch ?: '', SRCDIST_TIMESTAMP: project.ext.timestamp)
 	}
+	println 'createVersionInfo: ' + project.buildDir.getCanonicalPath()+" "+version.toString()+" "+version.patch+" "+project.ext.timestamp;
 }
 // In order to run first, needs to depend on these two parallel tasks
 allprojects

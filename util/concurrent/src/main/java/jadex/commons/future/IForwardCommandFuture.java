@@ -1,7 +1,7 @@
 package jadex.commons.future;
 
 /**
- * 
+ *  Send a command from source to listeners (same flow as results).
  */
 public interface IForwardCommandFuture
 {

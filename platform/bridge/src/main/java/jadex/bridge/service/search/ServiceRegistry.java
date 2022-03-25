@@ -573,7 +573,6 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	// write
 	public void removeQuery(final ServiceQuery<?> query)
 	{
-		
 		rwlock.writeLock().lock();
 		try
 		{
@@ -592,6 +591,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			rwlock.writeLock().unlock();
 		}
 		
+		//if(query.getOwner().toString().indexOf("jccweb")!=-1 && !ServiceScope.PLATFORM.equals(query.getScope()))
+		//	System.out.println("query removed: "+query);
 		notifyQueryListeners(new QueryEvent(query, QueryEvent.QUERY_REMOVED));
 	}
 	
@@ -1127,6 +1128,11 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			rwlock.writeLock().unlock();
 		}
 		
+		/*if(!ServiceScope.PLATFORM.equals(event.getQuery().getScope()))
+			if(qis.size()==0)
+				System.out.println("no query listener: "+event);
+			else
+				System.out.println("has query listener"+event);*/
 		for(SubscriptionIntermediateFuture<QueryEvent> fut: qis)
 		{
 			fut.addIntermediateResultIfUndone(event);

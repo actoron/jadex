@@ -28,6 +28,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
@@ -136,6 +137,7 @@ public class JCCRegistryViewAgent extends JCCPluginAgent implements IJCCRegistry
 		final List<ISubscriptionIntermediateFuture<PlatformData>>futs = new ArrayList<ISubscriptionIntermediateFuture<PlatformData>>();
 		final SubscriptionIntermediateFuture<PlatformData>	ret	= new SubscriptionIntermediateFuture<PlatformData>(null, true);
 		SFuture.avoidCallTimeouts(ret, agent);
+		
 		ret.setTerminationCommand(new TerminationCommand()
 		{
 			@Override
@@ -152,7 +154,7 @@ public class JCCRegistryViewAgent extends JCCPluginAgent implements IJCCRegistry
 		// TODO: Use query for dynamically added transports
 		for(final ITransportInfoService tis: agent.getFeature(IRequiredServicesFeature.class).getLocalServices(new ServiceQuery<>(ITransportInfoService.class)))
 		{
-			ISubscriptionIntermediateFuture<PlatformData>	fut	= tis.subscribeToConnections();
+			ISubscriptionIntermediateFuture<PlatformData> fut = tis.subscribeToConnections();
 			fut.addResultListener(new IntermediateEmptyResultListener<PlatformData>()	// Do not use delegation listener (ignore forward commands like update timer)
 			{
 				/*@Override
@@ -214,11 +216,47 @@ public class JCCRegistryViewAgent extends JCCPluginAgent implements IJCCRegistry
 	 *  Subscribe to query changes (query added / removed).
 	 *  @return The subscription future.
 	 */
+	//protected int cnt = 0;
 	public ISubscriptionIntermediateFuture<QueryEvent> subscribeToQueries()
 	{
+		//final int fcnt = cnt++;
+		//System.out.println("subscribe to queries called: "+fcnt);
 		ISubscriptionIntermediateFuture<QueryEvent> ret = ServiceRegistry.getRegistry(agent.getId()).subscribeToQueries();
 		SubscriptionIntermediateDelegationFuture<QueryEvent> fut = new SubscriptionIntermediateDelegationFuture<QueryEvent>(ret);
 		SFuture.avoidCallTimeouts(fut, agent);
+		//fut.next(event -> if(event.get)System.out.println("query sub remove event: "+event));
+		//fut.catchEx(ex -> System.out.println("query subscription ex: "+ex+" "+fcnt));
+		//fut.finished(Void -> System.out.println("query sub finished "+fcnt));
+		
+		/*fut.addQuietListener(new IIntermediateResultListener<QueryEvent>() 
+		{
+			@Override
+			public void exceptionOccurred(Exception exception) 
+			{
+			}
+			
+			@Override
+			public void finished() 
+			{
+			}
+			
+			@Override
+			public void intermediateResultAvailable(QueryEvent event) 
+			{
+				if(event.getType()==1)
+					System.out.println("remove event: "+event);
+			}
+			
+			@Override
+			public void maxResultCountAvailable(int max) 
+			{
+			}
+			
+			@Override
+			public void resultAvailable(Collection<QueryEvent> result) 
+			{
+			}
+		});*/
 		return fut;
 	}
 	
@@ -251,6 +289,8 @@ public class JCCRegistryViewAgent extends JCCPluginAgent implements IJCCRegistry
 	 */
 	public ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>> subscribeToServices()
 	{
+		// Returns the view of the own platform, i.e. the queries managed by this platform
+		
 		ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>> ret;
 		
 		try

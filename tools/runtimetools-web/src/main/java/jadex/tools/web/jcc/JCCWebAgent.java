@@ -30,6 +30,7 @@ import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Boolean3;
+import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
@@ -169,13 +170,16 @@ public class JCCWebAgent implements IJCCWebService
 	 *  Get events about known platforms.
 	 *  @return Events for platforms.
 	 */
+	protected int cnt = 0;
 	public ISubscriptionIntermediateFuture<ServiceEvent<IComponentIdentifier>> subscribeToPlatforms()
 	{
-		//System.out.println("subscribeToPlatforms called");
+		int fcnt = cnt++;
+		//System.out.println("subscribeToPlatforms called: "+fcnt);
 		
 		ISubscriptionIntermediateFuture<ServiceEvent<IExternalAccess>> net = agent.addQuery(new ServiceQuery<>(IExternalAccess.class, ServiceScope.NETWORK).setEventMode().setServiceTags(IExternalAccess.PLATFORM));
 		ISubscriptionIntermediateFuture<ServiceEvent<IExternalAccess>> glo = agent.addQuery(new ServiceQuery<>(IExternalAccess.class, ServiceScope.GLOBAL).setEventMode().setServiceTags(IExternalAccess.PLATFORM));
-
+		//glo.catchEx(ex -> System.out.println("query removed: "+fcnt));
+		
 		ISubscriptionIntermediateFuture<ServiceEvent<IComponentIdentifier>> ret = SFuture.combineSubscriptionFutures(agent, net, glo, new IResultCommand<ServiceEvent<IComponentIdentifier>, ServiceEvent<IExternalAccess>>()
 		{
 			@Override
@@ -184,6 +188,13 @@ public class JCCWebAgent implements IJCCWebService
 				ServiceEvent<IComponentIdentifier> se = new ServiceEvent<IComponentIdentifier>(res.getService().getId(), res.getType());
 				//System.out.println("subscribeToPlatforms: "+se);
 				return se;
+			}
+		}, new ICommand<Exception>() 
+		{
+			@Override
+			public void execute(Exception ex) 
+			{
+				//System.out.println("subscribeToPlatforms terminated: "+fcnt);
 			}
 		});
 		

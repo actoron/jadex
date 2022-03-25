@@ -51,6 +51,7 @@ import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.TimeoutException;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LeaseTimeMap;
 import jadex.commons.collection.MultiCollection;
@@ -129,6 +130,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	
 	/** Http header for the client side timeout of calls (req). */
 	public static final String HEADER_JADEX_CLIENTTIMEOUT = "x-jadex-clienttimeout";
+	
+	/** Http header for the client side to indicate that conversation is still alive/ongoing. */
+	public static final String HEADER_JADEX_ALIVE = "x-jadex-alive";
 	
 	/** Http header to terminate the call (req). */
 	public static final String HEADER_JADEX_TERMINATE = "x-jadex-terminate";
@@ -483,6 +487,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			return;
 		}
 
+		pruneObsoleteConversations();
+		
 		// https://stackoverflow.com/questions/14139753/httpservletrequest-getsessiontrue-thread-safe
 		// solution: always create on container thread and remember
 		//final Map<String, Object> session = getSession(request, true);
@@ -495,6 +501,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		// System.out.println("handler is: "+uri.getPath());
 		String callid = request.getHeader(HEADER_JADEX_CALLID);
 		ri.setCallid(callid);
+		
+		String alive = request.getHeader(HEADER_JADEX_ALIVE);
 		
 		// check if it is a login request
 		String platformsecret = request.getHeader(HEADER_JADEX_LOGIN);
@@ -535,6 +543,29 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			//writeResponse(ret, Response.Status.OK.getStatusCode(), callid, null, request, response, true, null);
 			writeResponse(ri.setResult(ret).setStatus(Response.Status.OK.getStatusCode()).setFinished(true));
 		}
+		else if(alive!=null)
+		{
+			ConversationInfo cinfo = conversationinfos.get(callid);
+			if(cinfo!=null)
+			{
+				boolean aliveb = Boolean.parseBoolean(alive);
+				if(aliveb)
+				{
+					//System.out.println("timestamp updated: "+callid);
+					cinfo.updateTimestamp();
+				}
+				else
+				{
+					terminateConversation(cinfo, new RuntimeException("Terminated from client"));
+				}
+				writeResponse(ri.setStatus(Response.Status.OK.getStatusCode()).setFinished(true));
+			}
+			else
+			{
+				System.out.println("callid not found for alive: "+callid);
+				writeResponse(ri.setStatus(Response.Status.NOT_FOUND.getStatusCode()).setFinished(true));
+			}
+		}
 		else
 		{
 			// check if call is an intermediate result fetch
@@ -560,12 +591,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					//IAsyncContextInfo ctx = getAsyncContextInfo(request);
 					//saveRequestContext(callid, ctx);
 					
-					if(!"true".equals(terminate))
+					terminateConversation(rinfo, null);
+					
+					/*if(!"true".equals(terminate))
 						((ITerminableFuture)rinfo.getFuture()).terminate(new RuntimeException(terminate)); 
 					else
 						((ITerminableFuture)rinfo.getFuture()).terminate();
 					
-					conversationinfos.remove(callid);
+					conversationinfos.remove(callid);*/
 					
 					//if(callid.indexOf("subscribeToPlatforms")!=-1)
 					//	System.out.println("Removed connection: "+callid);
@@ -582,7 +615,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					System.out.println("Future cannot be terminated: "+callid+" "+request);
 					writeResponse(ri.setStatus(Response.Status.NOT_FOUND.getStatusCode()).setFinished(true));
 				}
-				
+							
 				// Result already available?
 				/*else if(rinfo.checkForResult())
 				{
@@ -716,7 +749,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 									// System.out.println("added context: "+fcallid+""+ctx);
 			
 									((IIntermediateFuture<Object>)ret)
-										.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateFutureCommandResultListener<Object>()
+										.addResultListener(component.getFeature(IExecutionFeature.class)
+										.createResultListener(new IIntermediateFutureCommandResultListener<Object>()
 									{
 										public void resultAvailable(Collection<Object> result)
 										{
@@ -770,8 +804,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 											//if(max!=null)
 											//if(command==null)
 											//	System.out.println("handleResult:"+result+", "+exception+", "+command+", sse:"+(session.getAttribute("sse")!=null));
-											if(command!=null)
-												return; // skipping commands (e.g. updatetimer)
+											
+											//if(command!=null)
+											//	return; // skipping commands (e.g. updatetimer)
 											
 											/*if(exception instanceof FutureTerminatedException)
 											{
@@ -794,6 +829,13 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 													rescode = Response.Status.OK.getStatusCode();
 												
 												ri.setStatus(rescode);
+											}
+											else if(command!=null)
+											{
+												// Command is just a enum type for updatetimer in IForwardCommandFuture
+												//System.out.println("received command: "+command);
+												ri.setResult(command);
+												ri.setStatus(202);
 											}
 											else
 											{
@@ -820,7 +862,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 											if(cinfo!=null && cinfo.isTerminated())
 											{
 												// nop -> ignore late results (i.e. when terminated due to browser offline).
-												System.out.println("ignoring late result: "+result);
+												//System.out.println("ignoring late result: "+result);
 											}
 											else
 											{
@@ -1043,6 +1085,62 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	}
 	
 	/**
+	 *  Prune the timeouted conversations.
+	 */
+	protected void pruneObsoleteConversations()
+	{
+		for(Map.Entry<String, ConversationInfo> entry: conversationinfos.entrySet())
+		{
+			// TODO: which timeout? (client vs server).
+			if(System.currentTimeMillis() - entry.getValue().getTimestamp() > Starter.getDefaultTimeout(component.getId()))
+			{
+				// System.out.println("terminating due to timeout: "+exception);
+				//System.out.println("Conversation timed out: "+entry.getKey());
+				
+				terminateConversation(entry.getValue(), null);
+				
+				/*entry.getValue().setTerminated(true);
+				if(entry.getValue().getFuture() instanceof ITerminableFuture<?>)
+				{
+					System.out.println("Conversation timed out, terminated future: "+entry.getKey());
+					((ITerminableFuture<?>)entry.getValue().getFuture()).terminate(new TimeoutException());
+				}
+				else
+				{
+					// TODO: better handling of
+					// non-terminable futures?
+					//throw new TimeoutException();
+					System.out.println("WARNING: Conversation timed out and future cannot be terminated: "+entry.getKey());
+				}*/
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param cinfo
+	 * @param ex
+	 */
+	protected void terminateConversation(ConversationInfo cinfo, Exception ex)
+	{
+		// Terminate the future if requested
+		cinfo.setTerminated(true);
+		if(cinfo.getFuture() instanceof ITerminableFuture)
+		{
+			if(ex!=null)
+				((ITerminableFuture)cinfo.getFuture()).terminate(ex); 
+			else
+				((ITerminableFuture)cinfo.getFuture()).terminate();
+			
+			conversationinfos.remove(cinfo);
+		}
+		else
+		{
+			System.out.println("WARNING: future cannot be terminated: "+cinfo);
+		}
+	}
+	
+	/**
 	 *  Set the cors header in the response.
 	 *  @param response The response.
 	 */
@@ -1054,7 +1152,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
 		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
 	}
-	
 	
 	/**
 	 *  Set the cache header in the response.
@@ -2145,6 +2242,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 */
 	protected SSEEvent createSSEEvent(Object result, boolean finished, String callid, Integer max, String exceptiontype)
 	{
+		if(result!=null && result.toString().indexOf("Mes")!=-1)
+			System.out.println("here");
+		
 		SSEEvent event = new SSEEvent();
 		// Wrap content in SSE event class to add Jadex meta info 
 		event.setData(result).setFinished(finished).setCallId(callid).setMax(max).setExecptionType(exceptiontype);
@@ -3230,7 +3330,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 		// to check time gap between last request from browser and current result
 		// if gap>timeout -> abort future as probably no browser listening any more
-		//protected long lastcheck;
+		protected long lastcheck;
 		
 		protected IFuture<?> future;
 		
@@ -3246,7 +3346,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			this.sessionid = sessionid;
 			//this.mappingInfo = mappingInfo;
 			//this.future = future;
-			//this.lastcheck = System.currentTimeMillis();
+			this.lastcheck = updateTimestamp();
 		}
 
 		/**
@@ -3337,12 +3437,20 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		}*/
 
 		/**
-		 * Get the timestamp of the last check (i.e. last request from browser).
-		 * /
+		 *  Renew the timestamp.
+		 */
+		public long updateTimestamp()
+		{
+			return lastcheck = System.currentTimeMillis();
+		}
+		
+		/**
+		 *  Get the timestamp of the last check (i.e. last request from browser).
+		 */
 		public long getTimestamp()
 		{
 			return lastcheck;
-		}*/
+		}
 
 		/**
 		 *  Get the future.
