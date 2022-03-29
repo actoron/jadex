@@ -3,6 +3,7 @@ package jadex.tools.web.jcc;
 import java.io.InputStream;
 import java.util.Scanner;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -130,6 +131,16 @@ public abstract class JCCPluginAgent
 		{
 			return new Future<byte[]>(e);
 		}
+	}
+	
+	/**
+	 *  Test if the plugin is functional, i.e. if the jcc plugin
+	 *  e.g. finds a domain service to work with.
+	 *  @return True, if plugin can be used.
+	 */
+	public IFuture<Boolean> isAvailable(IComponentIdentifier cid)
+	{
+		return new Future<Boolean>(true);
 	}
 	
 	/**

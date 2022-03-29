@@ -3,7 +3,6 @@ package jadex.tools.web.chat;
 import java.util.Collection;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.chat.ChatEvent;
@@ -28,6 +27,25 @@ import jadex.tools.web.jcc.JCCPluginAgent;
 @Agent(autostart=Boolean3.TRUE)
 public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatService
 {
+	/**
+	 *  Test if the plugin is functional, i.e. if the jcc plugin
+	 *  e.g. finds a domain service to work with.
+	 *  @return True, if plugin can be used.
+	 */
+	public IFuture<Boolean> isAvailable(IComponentIdentifier cid)
+	{
+		final Future<Boolean> ret = new Future<Boolean>();
+		getChatService(cid).then(cs ->
+		{
+			ret.setResult(Boolean.TRUE);
+		}).catchEx(ex ->
+		{
+			ret.setResult(Boolean.FALSE);
+		});
+		
+		return ret;
+	}
+	
 	/**
 	 *  Get the plugin name.
 	 *  @return The plugin name.
@@ -193,8 +211,8 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	 */
 	protected IFuture<IChatGuiService> getChatGuiService(IComponentIdentifier cid)
 	{
-		if(cid==null)
-			Thread.dumpStack();
+		//if(cid==null)
+		//	Thread.dumpStack();
 		if(cid==null || cid.hasSameRoot(getAgent().getId()))
 		{
 			return getAgent().searchService(new ServiceQuery<IChatGuiService>(IChatGuiService.class).setScope(ServiceScope.PLATFORM));
@@ -213,8 +231,8 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	 */
 	protected IFuture<IChatService> getChatService(IComponentIdentifier cid)
 	{
-		if(cid==null)
-			Thread.dumpStack();
+		//if(cid==null)
+		//	Thread.dumpStack();
 		if(cid==null || cid.hasSameRoot(getAgent().getId()))
 		{
 			return getAgent().searchService(new ServiceQuery<IChatService>(IChatService.class).setScope(ServiceScope.PLATFORM));

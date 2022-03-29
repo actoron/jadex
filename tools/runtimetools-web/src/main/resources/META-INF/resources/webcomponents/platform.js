@@ -72,14 +72,15 @@ class PlatformElement extends CidElement
 			self.plugin = self.getUrlHashParam(3);
 
 			let lastplugin = localStorage.getItem("lastplugin")
-    		if (self.plugin != null) {
+    		if(self.plugin != null)
 				localStorage.setItem("lastplugin", self.plugin);
-			}
-    		if (lastplugin != null) {
+    		if(lastplugin != null) 
+			{
 				history.pushState(null, "", "/#/platform/"+self.cid+"/"+lastplugin);
 				self.plugin = lastplugin;
 			}
-    		else if(self.plugin == null || self.plugins.length > 0) {
+    		else if(self.plugin == null || self.plugins.length > 0) 
+			{
 				let name = self.getPlugins()[0].name
 				history.pushState(null, "", "/#/platform/"+self.cid+"/"+name);
 				self.plugin = name;
@@ -257,10 +258,28 @@ class PlatformElement extends CidElement
 				var pis = resp.data;
 				//console.log(map);
 				
+				// todo: check which plugins are active for cid
+				for(var i=0; i<pis.length; i++)
+				{
+					let mypis = pis[i]; // var does not work as it needs to be block scope
+					// invoke isAvailable() on services
+					axios.get('webjcc/invokeServiceMethodBySid?'
+						+'sid='+JSON.stringify(mypis.sid)
+						+'&methodname=isAvailable&args_0='+self.cid
+						+"&argtypes_0=jadex.bridge.IComponentIdentifier"
+						+'&returntype=jadex.commons.IFuture', self.transform).then(function(resp)
+					{
+						console.log("service available: "+mypis.name+" "+resp.data);
+						mypis.available = resp.data;
+					});
+				}
+				
 				var cnt = 0;
 				for(var i=0; i<pis.length; i++)
 				{
+					// assign plugin
 					self.plugins[pis[i].name] = pis[i];
+					
 					pis[i].image = new Image();
 					if (!pis[i].icon)
 					{

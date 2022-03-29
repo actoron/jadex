@@ -1,5 +1,6 @@
 package jadex.tools.web.jcc;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
@@ -44,4 +45,12 @@ public interface IJCCPluginService
 	//public IFuture<String> loadResource(String filename);
 	//public IFuture<Response> loadResource(String filename);
 	public IFuture<byte[]> loadResource(String filename);
+	
+	/**
+	 *  Test if the plugin is functional, i.e. if the jcc plugin
+	 *  e.g. finds a domain service to work with.
+	 *  @param cid The platform id.
+	 *  @return True, if plugin can be used.
+	 */
+	public IFuture<Boolean> isAvailable(IComponentIdentifier cid);
 }

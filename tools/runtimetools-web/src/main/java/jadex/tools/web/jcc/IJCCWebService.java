@@ -16,6 +16,9 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.tools.web.jcc.JCCWebAgent.InvokeServiceMethodMapper;
+import jadex.tools.web.jcc.JCCWebAgent.InvokeServiceMethodMapper2;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 
 /**
@@ -62,8 +65,22 @@ public interface IJCCWebService
 	 *  Invoke a Jadex service on the managed platform.
 	 */
 	@ParametersMapper(@Value(clazz=InvokeServiceMethodMapper.class))
-	public IFuture<Object> invokeServiceMethod(@ParameterInfo("cid") IComponentIdentifier cid, @ParameterInfo("servicetype") ClassInfo servicetype, 
-		@ParameterInfo("methodname") String methodname, @ParameterInfo("args") Object[] args, @ParameterInfo("argtypes") ClassInfo[] argtypes, @QueryParam("returntype") @FutureReturnType ClassInfo rettype);
+	public IFuture<Object> invokeServiceMethod(@ParameterInfo("cid") IComponentIdentifier cid, 
+		@ParameterInfo("servicetype") ClassInfo servicetype, 
+		@ParameterInfo("methodname") String methodname, 
+		@ParameterInfo("args") Object[] args, 
+		@ParameterInfo("argtypes") ClassInfo[] argtypes, 
+		@QueryParam("returntype") @FutureReturnType ClassInfo rettype);
+	
+	/**
+	 *  Access a service method via service id.
+	 */
+	@ParametersMapper(@Value(clazz=InvokeServiceMethodMapper2.class))
+	public IFuture<Object> invokeServiceMethodBySid(@ParameterInfo("sid") IServiceIdentifier sid, 
+		@ParameterInfo("methodname") String methodname, 
+		@ParameterInfo("args") Object[] args, 
+		@ParameterInfo("argtypes") ClassInfo[] argtypes, 
+		@QueryParam("returntype") @FutureReturnType ClassInfo rettype);
 	
 	/**
 	 *  Check if a platform is available.

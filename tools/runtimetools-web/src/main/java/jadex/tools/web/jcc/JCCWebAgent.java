@@ -280,7 +280,7 @@ public class JCCWebAgent implements IJCCWebService
 		Future<JCCWebPluginInfo[]> ret = new Future<>();
 		
 		// search local plugin services
-		List<JCCWebPluginInfo> res = new ArrayList<>();
+		Map<String, JCCWebPluginInfo> res = new HashMap<>();
 		
 		Collection<IJCCPluginService> pluginsers = agent.getLocalServices(new ServiceQuery<IJCCPluginService>(IJCCPluginService.class, ServiceScope.PLATFORM));
 		
@@ -301,10 +301,11 @@ public class JCCWebAgent implements IJCCWebService
 				SUtil.throwUnchecked(e);
 			}
 			JCCWebPluginInfo pi = new JCCWebPluginInfo(name, icon, prio, unres, sid);
-			res.add(pi);
+			res.put(pi.getName(), pi);
 		}
 		
 		// If not local platform
+		
 		if(cid!=null && !cid.hasSameRoot(agent.getId().getRoot()))
 		{
 			agent.searchService(new ServiceQuery<IJCCWebService>(IJCCWebService.class).setSearchStart(cid.getRoot()))
@@ -316,22 +317,24 @@ public class JCCWebAgent implements IJCCWebService
 					{
 						for(JCCWebPluginInfo pi: pis)
 						{
-							res.add(pi);
+							// Only add new plugins?!
+							if(!res.containsKey(pi.getName()))
+								res.put(pi.getName(), pi);
 						}
-						ret.setResult(res.toArray(new JCCWebPluginInfo[res.size()]));
+						ret.setResult(res.values().toArray(new JCCWebPluginInfo[res.size()]));
 					});
 				}
 				
 				public void exceptionOccurred(Exception exception)
 				{
 					System.out.println("Ex: "+exception+" "+cid);
-					ret.setResult(res.toArray(new JCCWebPluginInfo[res.size()]));
+					ret.setResult(res.values().toArray(new JCCWebPluginInfo[res.size()]));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(res.toArray(new JCCWebPluginInfo[res.size()]));
+			ret.setResult(res.values().toArray(new JCCWebPluginInfo[res.size()]));
 		}
 		
 		//System.out.println("fragments: "+ret);
@@ -449,17 +452,38 @@ public class JCCWebAgent implements IJCCWebService
 	}
 	
 	/**
+	 *  Access a service method via service id.
+	 */
+	public IFuture<Object> invokeServiceMethodBySid(IServiceIdentifier sid, final String methodname, final Object[] args, 
+		final ClassInfo[] argtypes, ClassInfo rettype)
+	{
+		Class<?> rtype = rettype!=null? rettype.getType(agent.getClassLoader(), agent.getModel().getAllImports()): null;
+		final Future<Object> ret = (Future<Object>)SFuture.getNoTimeoutFuture(rtype, agent);
+		
+		agent.searchService(new ServiceQuery<IService>((Class)null).setServiceIdentifier(sid))
+			.then(ser ->
+			{
+				IFuture<Object> fut = checkSecurityAndInvoke(ser, null, methodname, args, argtypes, rettype);
+				FutureFunctionality.connectDelegationFuture(ret, fut);
+			})
+			.catchEx(ret);
+		
+		return ret;
+	}
+	
+	/**
 	 *  Check the security level of a service method.
 	 *  Access is granted when:
 	 *  a) method/service is unrestricted
 	 *  b) method/service is restricted and logged in
 	 */
-	protected IFuture<Object> checkSecurityAndInvoke(IService ser, ClassInfo servicetype, final String methodname, final Object[] args, 
+	protected IFuture<Object> checkSecurityAndInvoke(IService ser, ClassInfo servicetypep, final String methodname, final Object[] args, 
 		final ClassInfo[] argtypes, ClassInfo rettype)
 	{
 		Class<?> rtype = rettype!=null? rettype.getType(agent.getClassLoader(), agent.getModel().getAllImports()): null;
 		final Future<Object> ret = (Future<Object>)SFuture.getFuture(rtype);
 		final String callid = ServiceCall.getCurrentInvocation()==null? null: (String)ServiceCall.getCurrentInvocation().getProperty("callid");
+		final ClassInfo servicetype = servicetypep==null? ser.getServiceId().getServiceType(): servicetypep;
 		
 		BasicService.isUnrestricted(ser.getServiceId(), agent,
 			new MethodInfo(methodname, argtypes, servicetype.getTypeName()).getMethod(agent.getClassLoader()))
@@ -605,6 +629,62 @@ public class JCCWebAgent implements IJCCWebService
 			ret[3] = values.get("args");
 			ret[4] = values.get("argtypes");
 			ret[5] = values.get("returntype");
+			
+			return ret;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static class InvokeServiceMethodMapper2 implements IParameterMapper2
+	{
+		/**
+		 *  Convert parameters.
+		 *  @param values The values map to convert.
+		 *  @param pinfos The parameter infos (i.e. annotation meta info). 
+		 *  				List<Tuple2<String, String>>: says "kind of param" name, path form, query, no and name of parameter 
+		 *  				Map<String, Class<?>>: says for this named param use this type (from method param)
+		 *  @param context The context (could be the http servlet request or a custom container request).
+		 *  @return The converted parameters.
+		 */
+		public Object[] convertParameters(Map<String, Object> values, Tuple2<List<Tuple2<String, String>>, Map<String, Class<?>>> pinfos, Object request) throws Exception
+		{
+			List<Object> args = new ArrayList<Object>();
+			for(int i=0; ; i++)
+			{
+				if(values.containsKey("args_"+i))
+				{
+					args.add(values.get("args_"+i));
+				}
+				else
+				{
+					break;
+				}
+			}
+			if(args.size()>0)
+				values.put("args", args);
+			List<Object> argtypes = new ArrayList<Object>();
+			for(int i=0; ; i++)
+			{
+				if(values.containsKey("argtypes_"+i))
+				{
+					argtypes.add(values.get("argtypes_"+i));
+				}
+				else
+				{
+					break;
+				}
+			}
+			if(argtypes.size()>0)
+				values.put("argtypes", argtypes);
+			
+			Object[] ret = new Object[5];
+			ret[0] = values.get("sid");
+			ret[1] = values.get("methodname");
+			ret[2] = values.get("args");
+			ret[3] = values.get("argtypes");
+			ret[4] = values.get("returntype");
 			
 			return ret;
 		}
