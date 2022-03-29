@@ -4,18 +4,44 @@ dependencies
 {
 }
 
+
 javadoc {
 	// Do not include resources dir in javadoc classpath (not needed and generated version.properties breaks caching)
 	classpath =  sourceSets.main.output.classesDirs
 }
 
-tasks.register('includeVersionFile', Copy) {
-	def sourcevfile = new File(versionfile);
-	def tdir = new File(project.getBuildDir(), 'resources/main/jadex/bridge');
-	tdir.mkdirs();
-	into tdir
-	from(sourcevfile.getParentFile().getCanonicalPath()) {
-		include sourcevfile.getName()
+// Do not run during setting/dependency discovery phase, bit of a hack, look for better approach?
+if (!(versionfile instanceof GroovyInterceptable))
+{
+	tasks.register('includeVersionFile', Copy) {
+		def sourcevfile = new File(versionfile);
+		def tdir = new File(project.getBuildDir(), 'resources/main/jadex/bridge');
+		tdir.mkdirs();
+		into tdir
+		from(sourcevfile.getParentFile().getCanonicalPath()) {
+			include sourcevfile.getName()
+		}
+	}
+	
+	tasks.register('includeVersionFileJustForSpecialLittleEclipse', Copy) {
+		def sourcevfile = new File(versionfile)
+		def tdir = project.getBuildDir()
+		tdir = tdir.getParentFile()
+		tdir = new File(tdir, 'bin/main/jadex/bridge')
+		tdir.mkdirs()
+		into tdir
+		from(buildutilsdir) {
+			include sourcevfile.getName()
+			expand(SRCDIST_JADEXVERSION: version.toString(), SRCDIST_PATCH_LEVEL: version.patch ?: '', SRCDIST_TIMESTAMP: rootProject.ext.timestamp)
+		}
+	}
+	
+	processResources.dependsOn('includeVersionFile')
+
+	eclipse {
+		synchronizationTasks includeVersionFileJustForSpecialLittleEclipse
+		autoBuildTasks includeVersionFileJustForSpecialLittleEclipse
 	}
 }
-processResources.dependsOn('includeVersionFile')
+
+
