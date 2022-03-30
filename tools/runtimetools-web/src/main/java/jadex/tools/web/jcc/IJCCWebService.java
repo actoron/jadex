@@ -101,6 +101,13 @@ public interface IJCCWebService
 	public IFuture<IComponentIdentifier> getPlatformId();
 	
 	/**
+	 *  Get the Jadex version of a platform.
+	 *  @param cid The platform id.
+	 *  @return The version.
+	 */
+	public IFuture<String> getVersion(IComponentIdentifier cid);
+	
+	/**
 	 *  Login to the webjcc.
 	 *  @param platformpass The platform password.
 	 *  @return True if logged in.

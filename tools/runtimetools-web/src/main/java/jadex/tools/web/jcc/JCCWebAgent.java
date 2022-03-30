@@ -17,6 +17,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.VersionInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -551,10 +552,32 @@ public class JCCWebAgent implements IJCCWebService
 	public IFuture<Map<String, Object>> getWebClientConfiguration()
 	{
 		Map<String, Object> conf = new HashMap<>();
-		
 		conf.put("footer", footer);
-		
 		return new Future<Map<String, Object>>(conf);
+	}
+	
+	/**
+	 *  Get the Jadex version of a platform.
+	 *  @param cid The platform id.
+	 *  @return The version.
+	 */
+	public IFuture<String> getVersion(IComponentIdentifier cid)
+	{
+		Future<String> ret = new Future<>();
+		if(cid!=null)
+		{
+			agent.getExternalAccess(cid).scheduleStep(ia ->
+			{
+				Future<String> f = new Future<>();
+				f.setResult(VersionInfo.getInstance().getVersion() + " (" + VersionInfo.getInstance().getTextDateString() + ")");
+				return f;
+			}).delegate(ret);
+		}
+		else
+		{
+			ret.setResult(VersionInfo.getInstance().getVersion() + " (" + VersionInfo.getInstance().getTextDateString() + ")");
+		}
+		return ret;
 	}
 	
 	/**

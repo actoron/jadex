@@ -7,6 +7,19 @@ class AppElement extends BaseElement
 	message = {};
 	listener = null;
 	loggedin = false;
+	version = "n/a";
+	
+	static get properties() 
+	{
+		var ret = {};
+		if(super.properties!=null)
+		{
+			for (let key in super.properties)
+				ret[key]=super.properties[key];
+		}
+		ret['version'] = { type: String };
+		return ret;
+	}
 	
 	postInit() 
 	{
@@ -51,6 +64,15 @@ class AppElement extends BaseElement
 	    });*/
 
 		page();
+		
+		this.getVersion().then(v =>
+		{
+			this.version = v;
+		})
+		.catch(err =>
+		{
+			console.log("could not get version: "+err);
+		});
 	}
 	
 	connectedCallback() 
@@ -75,6 +97,24 @@ class AppElement extends BaseElement
 	switchLanguage()
 	{
 		this.app.lang.setLanguage(this.app.lang.getLang()==='en'? 'de' : 'en');
+	}
+	
+	getVersion()
+	{
+		var self = this;
+		return new Promise(function(resolve, reject) 
+		{
+			axios.get('webjcc/getVersion', self.transform).then(function(resp)
+			{
+				console.log("version resolved: "+resp.data);
+				resolve(resp.data);
+			})
+			.catch(function(err) 
+			{
+				//console.log("get version failed: "+err);	
+				reject(err);
+			});
+		});
 	}
 	
 	/*disconnectedCallback()
@@ -148,8 +188,9 @@ class AppElement extends BaseElement
 				</div>
 		
 				<footer>
-			        <span>Copyright by <a href="http://www.actoron.com">Actoron GmbH</a> 2017-${new Date().getFullYear()}</span>
-			    	<div class="right">
+			        <span>Jadex ${this.version}, <a href="http://www.actoron.com">Actoron GmbH</a> 2017-${new Date().getFullYear()}</span>
+			    	
+					<div class="right">
 						<a href="#/about">${this.app.lang.t("About")}</a>
 			    		<a href="#/privacy">${this.app.lang.t("Privacy")}</a>
 			    		<a href="#/imprint">${this.app.lang.t("Imprint")}</a>
