@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1440,17 +1441,41 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			}
 			else
 			{
+				List<Object[]> matches1 = new ArrayList<>(); // by parameter names
+				List<Object[]> matches2 = new ArrayList<>(); // by parameter cnt
+				
 				int psize = inparamsmap.size();
 				Iterator<Map<String, String>> bit = bindings.iterator();
 				for(MappingInfo tst : mis)
 				{
 					Map<String, String> b = bit.next();
+					List<String> declaredparamnames = tst.getParameterNames();
+					Set<String> paramnames = inparamsmap.keySet();
+					
+					if(declaredparamnames.size()>0 && declaredparamnames.containsAll(paramnames))
+					{
+						matches1.add(new Object[]{tst, b, paramnames.size()});
+					}
+					
 					if(psize+b.size() == tst.getMethod().getParameterTypes().length)
 					{
-						mi = tst;
-						binding = b;
-						break;
+						matches2.add(new Object[]{tst, b, psize+b.size()});
 					}
+				}
+				
+				if(matches1.size()>0)
+				{
+					matches1.sort((x,y) -> ((Integer)y[2]).intValue()-((Integer)x[2]).intValue());
+					Object[] res = matches1.get(0);
+					mi = (MappingInfo)res[0];
+					binding = (Map<String, String>)res[1];
+				}
+				else if(matches2.size()>0)
+				{
+					matches2.sort((x,y) -> ((Integer)y[2]).intValue()-((Integer)x[2]).intValue());
+					Object[] res = matches1.get(0);
+					mi = (MappingInfo)res[0];
+					binding = (Map<String, String>)res[1];
 				}
 			}
 
@@ -2500,9 +2525,16 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	
 	public static void main(String[] args) throws Exception
 	{
-		String query = "args_0=a&args_3=c";
-		Map<String, Object> res = splitQueryString(query);
-		System.out.println(query+ " -> "+res);
+		Integer[] vals = new Integer[]{3,5,6,2,9,1};
+		List<Integer> vl = Arrays.asList(vals);
+		
+		vl.sort((x,y) -> ((Integer)y).intValue()-((Integer)x).intValue());
+
+		System.out.println(vl);
+		
+		//String query = "args_0=a&args_3=c";
+		//Map<String, Object> res = splitQueryString(query);
+		//System.out.println(query+ " -> "+res);
 	}
 
 	/**
@@ -2610,8 +2642,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 					if(!mi.isEmpty())
 					{
-						mi.addConsumedMediaTypes();
-						mi.addProducedMediaTypes();
+						//mi.addConsumedMediaTypes();
+						//mi.addProducedMediaTypes();
 						mi.setMethod(m);
 						ret.addPathElement(mi.getPath(), mi);
 						//ret.add(mi.getPath(), mi);
@@ -2619,8 +2651,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 					// Natural mapping using simply all declared methods
 					MappingInfo mi2 = new MappingInfo(null, m, m.getName());
-					mi2.addConsumedMediaTypes();
-					mi2.addProducedMediaTypes();
+					//mi2.addConsumedMediaTypes();
+					//mi2.addProducedMediaTypes();
 					natret.addPathElement(m.getName(), mi2); // httpmethod, method, path
 				}
 
@@ -3148,10 +3180,10 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		protected String path;
 
 		/** The accepted media types for the response. */
-		private List<String> producedtypes = new ArrayList<String>();
+		//private List<String> producedtypes = new ArrayList<String>();
 
 		/** The accepted media types for consumption. */
-		private List<String> consumedtypes = new ArrayList<String>();
+		//private List<String> consumedtypes = new ArrayList<String>();
 
 		/**
 		 * Create a new mapping info.
@@ -3234,25 +3266,25 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		 * Get the respmediatypes.
 		 * 
 		 * @return The respmediatypes
-		 */
+		 * /
 		public List<String> getProducedMediaTypes()
 		{
 			return new ArrayList<String>(producedtypes);
-		}
+		}*/
 
 		/**
 		 * Set the response mediatypes.
 		 * @param respmediatypes The response mediatypes to set
-		 */
+		 * /
 		public void setProducedMediaTypes(List<String> mediatypes)
 		{
 			this.producedtypes = mediatypes;
-		}
+		}*/
 
 		/**
 		 *  Add a produced media type.
 		 *  @param type The type.
-		 */
+		 * /
 		public void addProducedMediaType(String type)
 		{
 			/*if(producedtypes == null)
@@ -3260,38 +3292,38 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				producedtypes = new ArrayList<String>();
 				if(method!=null && method.getParameterCount()==5)
 					System.out.println("prod null");
-			}*/
+			}* /
 			producedtypes.add(type);
-		}
+		}*/
 
 		/**
 		 *  Get the consumedmediatypes.
 		 *  @return The consumedtypes
-		 */
+		 * /
 		public List<String> getConsumedMediaTypes()
 		{
 			return new ArrayList<String>(consumedtypes);
-		}
+		}*/
 
 		/**
 		 *  Set the respmediatypes.
 		 *  @param consumedtypes The consumedtypes to set
-		 */
+		 * /
 		public void setConsumedMediaTypes(List<String> mediatypes)
 		{
 			this.consumedtypes = mediatypes;
-		}
+		}*/
 
 		/**
 		 *  Add a consumed media type.
 		 *  @param type The type.
-		 */
+		 * /
 		public void addConsumedMediaType(String type)
 		{
 			//if(consumedtypes == null)
 			//	consumedtypes = new ArrayList<String>();
 			consumedtypes.add(type);
-		}
+		}*/
 
 		/**
 		 * Test if has no settings.
@@ -3301,30 +3333,86 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			return path == null && method == null && httpmethod == null;
 		}
 		
-		public void addConsumedMediaTypes()
+		/**
+		 *  Get the declared parameter names (via annotation ParameterInfo).
+		 *  @return The parameter names. 
+		 */
+		public List<String> getParameterNames()
+		{
+			List<String> ret = new ArrayList<String>();
+			Annotation[][] anns = method.getParameterAnnotations();
+			for(Annotation[] ans: anns)
+			{
+				for(Annotation an: ans)
+				{
+					if(an instanceof ParameterInfo)
+					{
+						ParameterInfo p = (ParameterInfo)an;
+						String name = p.value();
+						ret.add(name);
+						break;
+					}
+					else if(an instanceof QueryParam)
+					{
+						QueryParam p = (QueryParam)an;
+						String name = p.value();
+						ret.add(name);
+						break;
+					}
+					else if(an instanceof PathParam)
+					{
+						PathParam p = (PathParam)an;
+						String name = p.value();
+						ret.add(name);
+						break;
+					}
+					else if(an instanceof FormParam)
+					{
+						FormParam p = (FormParam)an;
+						String name = p.value();
+						ret.add(name);
+						break;
+					}
+				}
+			}
+			return ret;
+		}
+		
+		/**
+		 *  Get the consumed media types.
+		 *  @return The types.
+		 */
+		//public void addConsumedMediaTypes()
+		public List<String> getConsumedMediaTypes()
 		{
 			if(method.isAnnotationPresent(Consumes.class))
 			{
 				Consumes con = (Consumes)method.getAnnotation(Consumes.class);
-				String[] types = con.value();
-				for(String type : types)
+				return Arrays.asList(con.value());
+				/*for(String type : types)
 				{
 					addConsumedMediaType(type);
-				}
+				}*/
 			}
+			return Collections.EMPTY_LIST;
 		}
 		
-		public void addProducedMediaTypes()
+		/**
+		 *  Get the produced media types.
+		 *  @return The types.
+		 */
+		public List<String> getProducedMediaTypes()
 		{
 			if(method.isAnnotationPresent(Produces.class))
 			{
 				Produces prod = (Produces)method.getAnnotation(Produces.class);
-				String[] types = prod.value();
-				for(String type : types)
+				return Arrays.asList(prod.value());
+				/*for(String type : types)
 				{
 					addProducedMediaType(type);
-				}
+				}*/
 			}
+			return Collections.EMPTY_LIST;
 		}
 	}
 
@@ -3983,5 +4071,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			return "SSEEvent [data=" + data + ", max=" + max + ", finished=" + finished + ", callid=" + callid + "]";
 		}
 	}
+	
 }
 

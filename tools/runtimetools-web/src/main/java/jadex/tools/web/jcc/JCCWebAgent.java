@@ -454,7 +454,7 @@ public class JCCWebAgent implements IJCCWebService
 	/**
 	 *  Access a service method via service id.
 	 */
-	public IFuture<Object> invokeServiceMethodBySid(IServiceIdentifier sid, final String methodname, final Object[] args, 
+	public IFuture<Object> invokeServiceMethod(IServiceIdentifier sid, final String methodname, final Object[] args, 
 		final ClassInfo[] argtypes, ClassInfo rettype)
 	{
 		Class<?> rtype = rettype!=null? rettype.getType(agent.getClassLoader(), agent.getModel().getAllImports()): null;

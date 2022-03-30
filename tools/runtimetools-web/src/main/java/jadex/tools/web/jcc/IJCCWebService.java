@@ -76,7 +76,7 @@ public interface IJCCWebService
 	 *  Access a service method via service id.
 	 */
 	@ParametersMapper(@Value(clazz=InvokeServiceMethodMapper2.class))
-	public IFuture<Object> invokeServiceMethodBySid(@ParameterInfo("sid") IServiceIdentifier sid, 
+	public IFuture<Object> invokeServiceMethod(@ParameterInfo("sid") IServiceIdentifier sid, 
 		@ParameterInfo("methodname") String methodname, 
 		@ParameterInfo("args") Object[] args, 
 		@ParameterInfo("argtypes") ClassInfo[] argtypes, 

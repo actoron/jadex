@@ -35,6 +35,8 @@ public class JCCChatPluginAgent extends JCCPluginAgent implements IJCCChatServic
 	public IFuture<Boolean> isAvailable(IComponentIdentifier cid)
 	{
 		final Future<Boolean> ret = new Future<Boolean>();
+		//ret.setResult(Boolean.FALSE);
+		
 		getChatService(cid).then(cs ->
 		{
 			ret.setResult(Boolean.TRUE);
