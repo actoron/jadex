@@ -13,8 +13,12 @@ dependencies
 	//api 'org.apache.xmlgraphics:xmlgraphics-commons:1.5'
 	//api 'org.apache.xmlgraphics:batik-rasterizer:1.7'
 	//api 'org.apache.xmlgraphics:batik-codec:1.7'
-	api 'org.apache.xmlgraphics:batik-codec:1.14'
-	api 'org.apache.xmlgraphics:xmlgraphics-commons:2.7'
+	api('org.apache.xmlgraphics:batik-codec:1.14') {
+		exclude group:'xml-apis'
+	}
+	api('org.apache.xmlgraphics:xmlgraphics-commons:2.7') {
+		exclude group:'xml-apis'
+	}
 	api 'org.ow2.asm:asm:9.1'
 	//api 'xml-apis:xml-apis:1.4.01'
 }
