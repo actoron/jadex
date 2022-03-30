@@ -60,7 +60,7 @@ public class VersionInfo
 			is.close();
 			
 //			System.out.println(props);
-			String timestamp = props.getProperty("jadex_build_timestamp");
+			String timestamp = props.getProperty("jadextimestamp");
 //			System.out.println("timestamp: "+timestamp);
 			
 			try
