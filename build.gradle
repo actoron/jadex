@@ -6,7 +6,7 @@ import org.gradle.api.artifacts.ProjectDependency
 import org.apache.tools.ant.filters.*
 
 apply plugin: 'java-library' // needed for distsDir on root project level
-
+apply plugin: 'eclipse-wtp'
 def maindistsuffix = ''
 gradle.ext.selecteddists.each { dname ->
 	maindistsuffix += '-' + dname
@@ -43,22 +43,11 @@ project.ext.version = fetchNextBuildNameFromGitTag();
 project.ext.jadex_build_version = project.ext.version.full;
 println "Jadex Build Version " + project.ext.jadex_build_version 
 
-// unix timestamp from git: git log -1 --pretty=format:%ct
-project.ext.timestamp	= null
 // Get timestamp from sources if defined (i.e. build from dist sources)
 project.ext.buildutilsdir = (new File(project.projectDir, 'src/main/buildutils')).getCanonicalPath()
-def propFile = new File(project.projectDir, "src/main/buildutils/jadexversion.properties")
-if (propFile.exists()) {
-	def props = new Properties()
-	props.load(new FileReader(propFile))
-	def	propstamp	= props.getProperty("jadextimestamp")
-	project.ext.timestamp = propstamp.equals('${SRCDIST_TIMESTAMP}') ? null : propstamp
-}
+
 // Generate new timestamp (i.e. build from git sources)
-if(timestamp==null) {
-	project.ext.timestamp	= new Date().format('yyyyMMdd.HHmmss')
-//	println 'timestamp: '+project.ext.timestamp
-}
+project.ext.timestamp	= (long) ((new Date()).getTime() / 1000) // Divide by 1000 to make UNIX time
 
 System.setOut(new PrintStream(new OutputStream() {
 	private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -232,6 +221,7 @@ allprojects
 	processResources.dependsOn(':createVersionInfo')
 }
 
+def versionPropFile = new File(project.projectDir, "src/main/buildutils/jadexversion.properties")
 subprojects
 {
     def mainSrcDir  = 'src/main/java'
@@ -241,7 +231,7 @@ subprojects
 	apply plugin: 'eclipse' // hack to allow starting web projects in eclipse with correct dependencies
 	apply plugin: 'eclipse-wtp' // hack to allow starting web projects in eclipse with correct dependencies
 	
-	project.ext.jadexVersionFile = propFile.getAbsolutePath();
+	project.ext.jadexVersionFile = versionPropFile.getAbsolutePath();
 	
 	if (getProjectDepth(project) > 1)
 	{
