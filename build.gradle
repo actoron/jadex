@@ -6,7 +6,7 @@ import org.gradle.api.artifacts.ProjectDependency
 import org.apache.tools.ant.filters.*
 
 apply plugin: 'java-library' // needed for distsDir on root project level
-
+apply plugin: 'eclipse-wtp'
 def maindistsuffix = ''
 gradle.ext.selecteddists.each { dname ->
 	maindistsuffix += '-' + dname
