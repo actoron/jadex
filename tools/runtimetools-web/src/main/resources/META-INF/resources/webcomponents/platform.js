@@ -72,14 +72,15 @@ class PlatformElement extends CidElement
 			self.plugin = self.getUrlHashParam(3);
 
 			let lastplugin = localStorage.getItem("lastplugin")
-    		if (self.plugin != null) {
+    		if(self.plugin != null)
 				localStorage.setItem("lastplugin", self.plugin);
-			}
-    		if (lastplugin != null) {
+    		if(lastplugin != null) 
+			{
 				history.pushState(null, "", "/#/platform/"+self.cid+"/"+lastplugin);
 				self.plugin = lastplugin;
 			}
-    		else if(self.plugin == null || self.plugins.length > 0) {
+    		else if(self.plugin == null || self.plugins.length > 0) 
+			{
 				let name = self.getPlugins()[0].name
 				history.pushState(null, "", "/#/platform/"+self.cid+"/"+name);
 				self.plugin = name;
@@ -258,9 +259,43 @@ class PlatformElement extends CidElement
 				//console.log(map);
 				
 				var cnt = 0;
+				
+				var cont = () =>
+				{
+					cnt++
+					if(cnt==pis.length*2)
+					{
+						presolve();
+						//console.log("loadPlugs show: "+self.getPlugins()[0].name);
+					}
+				}
+				
+				// todo: check which plugins are active for cid
 				for(var i=0; i<pis.length; i++)
 				{
+					let mypis = pis[i]; // var does not work as it needs to be block scope
+					// invoke isAvailable() on services
+					axios.get('webjcc/invokeServiceMethod?'
+						+'sid='+JSON.stringify(mypis.sid)
+						+'&methodname=isAvailable&args_0='+self.cid
+						+"&argtypes_0=jadex.bridge.IComponentIdentifier"
+						+'&returntype=jadex.commons.IFuture', self.transform).then(function(resp)
+					{
+						console.log("service available: "+mypis.name+" "+resp.data);
+						mypis.available = resp.data;
+						cont();
+					}).catch(err =>
+					{
+						cont();
+					});
+				}
+				
+				
+				for(var i=0; i<pis.length; i++)
+				{
+					// assign plugin
 					self.plugins[pis[i].name] = pis[i];
+					
 					pis[i].image = new Image();
 					if (!pis[i].icon)
 					{
@@ -270,13 +305,7 @@ class PlatformElement extends CidElement
 					pis[i].image.src = 'data:image/png;base64,' + pis[i].icon.__base64;
 					pis[i].image.onload = function()
 					{
-						cnt++;
-						if(cnt==pis.length)
-						{
-							//self.showPlugin2(self.getPlugins()[0].name);
-							presolve();
-							//console.log("loadPlugs show: "+self.getPlugins()[0].name);
-						}
+						cont();
 					}
 				}
 
@@ -329,7 +358,20 @@ class PlatformElement extends CidElement
 	getPlugins()
 	{
 		let self = this;
-		let ret = Object.values(this.plugins).sort(function(p1, p2) 
+		
+		// clone as sort is in place!
+		let myplugins = [...Object.values(this.plugins)];
+		
+		for(var i = myplugins.length - 1; i >= 0; i--) 
+		{
+		    if(!myplugins[i].available) 
+			{
+		        myplugins.splice(i, 1);
+				console.log("removed plugin: "+myplugins[i].name);
+			}
+		}
+		
+		let ret = Object.values(myplugins).sort(function(p1, p2) 
 		{
 			var ret = 0;
 			if(!self.app.login.isLoggedIn())

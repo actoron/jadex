@@ -418,7 +418,7 @@ public class PlatformAgent
 		List<CreationInfo> infos = new ArrayList<>();
 		for(ClassInfo ci : cis)
 		{
-			if(ci.getLastModified() != null && ci.getClassName().startsWith("jadex."))
+			/*if(ci.getLastModified() != null && ci.getClassName().startsWith("jadex."))
 			{
 				VersionInfo vinfo = VersionInfo.getInstance();
 				synchronized(vinfo)
@@ -426,7 +426,7 @@ public class PlatformAgent
 					if(vinfo.getBuildTime().before(ci.getLastModified()))
 						vinfo.setBuildTime(ci.getLastModified());
 				}
-			}
+			}*/
 			//if(ci.getClassName().indexOf("BDI")!=-1)
 			//	System.out.println("hhhfhjsdf");
 			isSystemComponent(ci, PlatformAgent.class.getClassLoader());
