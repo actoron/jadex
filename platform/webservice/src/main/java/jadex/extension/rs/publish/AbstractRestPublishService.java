@@ -1717,7 +1717,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				Object[] inparams = generateInParameters(inparamsmap, pinfos, types);
 				for(int i = 0; i < inparams.length; i++)
 				{
-					inparams[i] = convertParameter(sr, (String)inparams[i], types[i]);
+					inparams[i] = convertParameter(sr, inparams[i], types[i]);
 				}
 				
 				for(int i = 0; i < targetparams.length && i < inparams.length; i++)
@@ -1790,6 +1790,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}

@@ -75,13 +75,16 @@ public class VersionInfo
 			
 			//version	= props.getProperty("jadex_build_version");
 			// Format is yyyyMMdd.HHmmss
-			int	year	= Integer.parseInt(timestamp.substring(0, 4));
-			int	month	= Integer.parseInt(timestamp.substring(4, 6));
-			int	day	= Integer.parseInt(timestamp.substring(6, 8));
-			int	hour	= Integer.parseInt(timestamp.substring(9, 11));
-			int	min	= Integer.parseInt(timestamp.substring(11, 13));
-			int	sec	= 0; // Integer.parseInt(timestamp.substring(13, 15));	// Seconds not present on toaster! why???
-			date = new GregorianCalendar(year, month-1, day, hour, min, sec).getTime();	// month starts with 0 for january, grrr.
+			if(timestamp!=null)
+			{
+				int	year	= Integer.parseInt(timestamp.substring(0, 4));
+				int	month	= Integer.parseInt(timestamp.substring(4, 6));
+				int	day	= Integer.parseInt(timestamp.substring(6, 8));
+				int	hour	= Integer.parseInt(timestamp.substring(9, 11));
+				int	min	= Integer.parseInt(timestamp.substring(11, 13));
+				int	sec	= 0; // Integer.parseInt(timestamp.substring(13, 15));	// Seconds not present on toaster! why???
+				date = new GregorianCalendar(year, month-1, day, hour, min, sec).getTime();	// month starts with 0 for january, grrr.
+			}
 			// System.out.println("build date: "+date);*/
 		}
 		catch(Exception e)
