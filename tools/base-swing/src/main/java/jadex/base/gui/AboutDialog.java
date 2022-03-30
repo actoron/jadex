@@ -8,6 +8,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.util.Calendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -83,8 +84,8 @@ public class AboutDialog extends JAutoPositionDialog
 	 */
 	public String generateText()
 	{
-		infotext = "<head/><body>(c) 2002-2014<br>"
-			+ "Alexander Pokahr, Lars Braubach<br>"
+		infotext = "<head/><body>(c) 2002-"+Calendar.getInstance().get(Calendar.YEAR)
+			+ "Alexander Pokahr, Lars Braubach, Kai Jander<br>"
 			+ "All rights reserved<br>";
 		String rn = VersionInfo.getInstance().getVersion();
 		String rd = VersionInfo.getInstance().getNumberDateString();

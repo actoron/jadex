@@ -1,14 +1,11 @@
 package jadex.bridge;
 
 import java.io.InputStream;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Properties;
-
-import jadex.commons.SUtil;
 
 
 /**
@@ -71,7 +68,7 @@ public class VersionInfo
 			catch (Exception e)
 			{
 			}
-			version	= props.getProperty("jadexversion_major")+ "." + props.getProperty("jadexversion_minor");
+			version	= props.getProperty("jadexversion");
 			
 			//version	= props.getProperty("jadex_build_version");
 			// Format is yyyyMMdd.HHmmss
