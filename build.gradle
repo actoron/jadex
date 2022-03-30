@@ -306,8 +306,8 @@ subprojects
         processResources {
 			filesMatching('**/version.properties')
 			{
-				filter{String line -> line.replace('${jadex_build_version}', project.version.toString())}
-				filter{String line -> line.replace('${timestamp}', rootProject.ext.timestamp)}
+				filter{String line -> line.replace('${jadex_build_version}', "" + project.version.toString())}
+				filter{String line -> line.replace('${timestamp}', "" + rootProject.ext.timestamp)}
 			}
 		}
 
