@@ -16,7 +16,8 @@ if (!(versionfile instanceof GroovyInterceptable))
 	tasks.register('includeVersionFile', Copy) {
 		def sourcevfile = new File(versionfile);
 		def tdir = new File(project.getBuildDir(), 'resources/main/jadex/bridge');
-		tdir.mkdirs();
+		tdir.mkdirs()
+		(new File(tdir, sourcevfile.getName())).delete()
 		into tdir
 		from(sourcevfile.getParentFile().getCanonicalPath()) {
 			include sourcevfile.getName()
@@ -29,6 +30,7 @@ if (!(versionfile instanceof GroovyInterceptable))
 		tdir = tdir.getParentFile()
 		tdir = new File(tdir, 'bin/main/jadex/bridge')
 		tdir.mkdirs()
+		(new File(tdir, sourcevfile.getName())).delete()
 		into tdir
 		from(buildutilsdir) {
 			include sourcevfile.getName()
