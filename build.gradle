@@ -614,8 +614,8 @@ subprojects
 				if(diff.length()!=0)
 				{
 					// jadexversion.properties is now generated and not contained in src
-					if(!(diff.length()==1 && diff[0].indexOf("jadexversion.properties")!=-1))
-						throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);
+					//if(!(diff.length()==1 && diff[0].indexOf("jadexversion.properties")!=-1))
+					throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);
 				}
 //				else
 //					println 'distributions match: '+distzip+', '+distzip2
