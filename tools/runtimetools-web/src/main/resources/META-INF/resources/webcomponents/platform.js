@@ -281,7 +281,7 @@ class PlatformElement extends CidElement
 						+"&argtypes_0=jadex.bridge.IComponentIdentifier"
 						+'&returntype=jadex.commons.IFuture', self.transform).then(function(resp)
 					{
-						console.log("service available: "+mypis.name+" "+resp.data);
+						//console.log("service available: "+mypis.name+" "+resp.data);
 						mypis.available = resp.data;
 						cont();
 					}).catch(err =>

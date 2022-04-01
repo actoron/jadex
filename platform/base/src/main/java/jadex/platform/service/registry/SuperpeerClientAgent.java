@@ -281,6 +281,13 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				public void finished()
 				{
 					ret.setExceptionIfUndone(new ServiceNotFoundException(query));
+					/*{
+						@Override
+						public void printStackTrace() 
+						{
+							super.printStackTrace();
+						}
+					});*/
 				}
 			});
 //			snapshotSearchRemoteServices(query).thenAccept(services ->
