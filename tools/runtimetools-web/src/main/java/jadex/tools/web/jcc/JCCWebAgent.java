@@ -34,6 +34,7 @@ import jadex.commons.Boolean3;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -425,8 +426,11 @@ public class JCCWebAgent implements IJCCWebService
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
+				//exception.printStackTrace();
 				// Did not find the service, so use it locally with cid
+				// This happens also when the platform is shut down but the 
+				// browser sends a request with outdated platform cid
+				
 				// (Allows for resusing (having some webjcc plugins only) on the access platform)
 				//System.out.println("locally with cid: "+ methodname + " " + servicetype);
 				IService ser = (IService)agent.getLocalService(servicetype.getType(agent.getClassLoader()));
@@ -645,12 +649,23 @@ public class JCCWebAgent implements IJCCWebService
 			if(argtypes.size()>0)
 				values.put("argtypes", argtypes);
 			
+			List<ClassInfo> ats = new ArrayList<ClassInfo>();
+			if(values.get("argtypes")!=null)
+			{
+				for(Object at: SReflect.getIterable(values.get("argtypes")))
+				{
+					if(at instanceof String)
+						ats.add(new ClassInfo((String)at));
+				}
+				values.put("argtypes", ats);
+			}
+			
 			Object[] ret = new Object[6];
 			ret[0] = values.get("cid");
 			ret[1] = values.get("servicetype");
 			ret[2] = values.get("methodname");
-			ret[3] = values.get("args");
-			ret[4] = values.get("argtypes");
+			ret[3] = values.get("args") instanceof Collection? ((Collection<Object>)values.get("args")).toArray(): values.get("args");
+			ret[4] = values.get("argtypes") instanceof Collection? ((Collection<Object>)values.get("argtypes")).toArray(new ClassInfo[0]): values.get("argtypes");
 			ret[5] = values.get("returntype");
 			
 			return ret;
@@ -702,11 +717,22 @@ public class JCCWebAgent implements IJCCWebService
 			if(argtypes.size()>0)
 				values.put("argtypes", argtypes);
 			
+			List<ClassInfo> ats = new ArrayList<ClassInfo>();
+			if(values.get("argtypes")!=null)
+			{
+				for(Object at: SReflect.getIterable(values.get("argtypes")))
+				{
+					if(at instanceof String)
+						ats.add(new ClassInfo((String)at));
+				}
+				values.put("argtypes", ats);
+			}
+			
 			Object[] ret = new Object[5];
 			ret[0] = values.get("sid");
 			ret[1] = values.get("methodname");
-			ret[2] = values.get("args");
-			ret[3] = values.get("argtypes");
+			ret[2] = values.get("args") instanceof Collection? ((Collection<Object>)values.get("args")).toArray(): values.get("args");
+			ret[3] = values.get("argtypes") instanceof Collection? ((Collection<Object>)values.get("argtypes")).toArray(new ClassInfo[0]): values.get("argtypes");
 			ret[4] = values.get("returntype");
 			
 			return ret;

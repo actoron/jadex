@@ -687,6 +687,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					
 					//if(mi.getMethod().toString().indexOf("invokeServiceMe")!=-1)
 					//	System.out.println("heeereeee");
+					
+					//if(mi.getMethod().toString().indexOf("isAvailable")!=-1)
+					//	System.out.println("params: "+Arrays.toString(params));
 	
 					// Inject caller meta info
 					Map<String, String> callerinfos = extractCallerValues(request);
@@ -718,6 +721,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 								// *****
 
 								final Method method = mi.getMethod();
+								
 								final Object ret = method.invoke(service, params);
 								ri.setMethod(method);
 
@@ -1730,38 +1734,46 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			for(int i = 0; i < targetparams.length; i++)
 			{
 				Object p = targetparams[i];
+				Object v = null;
 
 				if(p != null)
 				{
-					Object v = convertParameter(sr, p, types[i]);
+					// Only convert if necessary to keep transformed values from mapper
+					if(!SReflect.isSupertype(types[i], p.getClass()))
+					{
+						if(types[i].isArray())
+						{
+							// fill in collection
+							if(p instanceof Collection)
+							{
+								Collection<Object> col = (Collection<Object>)p;
+								Object ar = Array.newInstance(types[i].getComponentType(), col.size());
+								v = ar;
+								Iterator<Object> it = col.iterator();
+								for(int j = 0; j < col.size(); j++)
+								{
+									Object a = convertParameter(sr, it.next(), types[i].getComponentType());
+									if(a != null)
+										Array.set(ar, j, a);
+								}
+							}
+							// varargs support -> convert matching single value
+							// to singleton array
+							else if(SReflect.isSupertype(types[i].getComponentType(), p.getClass()))
+							{
+								v = Array.newInstance(types[i].getComponentType(), 1);
+								Array.set(targetparams[i], 0, p);
+							}
+						}
+						else
+						{
+							v = convertParameter(sr, p, types[i]);
+						}
+					}
 
 					if(v != null)
 					{
 						targetparams[i] = v;
-					}
-					else if(p != null && types[i].isArray())
-					{
-						// fill in collection
-						if(p instanceof Collection)
-						{
-							Collection<Object> col = (Collection<Object>)p;
-							Object ar = Array.newInstance(types[i].getComponentType(), col.size());
-							targetparams[i] = ar;
-							Iterator<Object> it = col.iterator();
-							for(int j = 0; j < col.size(); j++)
-							{
-								v = convertParameter(sr, it.next(), types[i].getComponentType());
-								if(v != null)
-									Array.set(ar, j, v);
-							}
-						}
-						// varargs support -> convert matching single value
-						// to singleton array
-						else if(SReflect.isSupertype(types[i].getComponentType(), p.getClass()))
-						{
-							targetparams[i] = Array.newInstance(types[i].getComponentType(), 1);
-							Array.set(targetparams[i], 0, p);
-						}
 					}
 				}
 			}
@@ -1911,7 +1923,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 * @param val The string value.
 	 * @return The decoded object.
 	 */
-	protected Object convertParameter(List<String> sr, Object val, Class< ? > targetclazz)
+	protected Object convertParameter(List<String> sr, Object val, Class<?> targetclazz)
 	{
 		Object ret = val;
 		boolean done = false;
