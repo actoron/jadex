@@ -310,7 +310,9 @@ def diffZips(zip1, zip2) {
 		return zip2 + " does not exist";
 	def diff	= "";
 	def entries	= new HashMap();
-	new java.util.zip.ZipFile(zip1).stream()
+	
+	// CRC is very fragile
+	/*new java.util.zip.ZipFile(zip1).stream()
 		.forEach {e -> entries.put(e.getName(), e.getCrc()+':'+e.getSize())}
 	new java.util.zip.ZipFile(zip2).stream()
 		.forEach {e ->
@@ -318,10 +320,30 @@ def diffZips(zip1, zip2) {
 			if(e2==null)
 				diff	+= "\nUnexpected entry: "+e;
 			else if(!e2.equals(e.getCrc()+':'+e.getSize()))
-				diff	+= "\nChanged entry (crc:size): "+e+", old="+e2+" new="+e.getCrc()+':'+e.getSize();
-//			else
-//				println 'Matched entry '+zip1.getName()+ '/' +e.getName() + '(' + e2 + ')'
-		}
+			{
+				if (!(e.getName().toLowerCase().endsWith('jar')))
+				{
+					diff += "\nChanged entry (crc:size): "+e+", old="+e2+" new="+e.getCrc()+':'+e.getSize();
+				}
+			}
+	}*/
+	
+	new java.util.zip.ZipFile(zip1).stream()
+		.forEach {e -> entries.put(e.getName(), e.getSize())}
+	new java.util.zip.ZipFile(zip2).stream()
+		.forEach {e ->
+			def e2	= entries.remove(e.getName());
+			if(e2==null)
+				diff	+= "\nUnexpected entry: "+e;
+			else if(!e2.equals(e.getSize()))
+			{
+				if (!(e.getName().toLowerCase().endsWith('jar')))
+				{
+					diff += "\nChanged entry (size): "+e+", old="+e2+" new="+e.getSize();
+				}
+			}
+	}
+	
 	entries.keySet().stream().forEach {e -> diff+="\nMissing entry: "+e}
 	return diff;
 }

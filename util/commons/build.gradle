@@ -4,45 +4,65 @@ dependencies
 {
 }
 
-
 javadoc {
 	// Do not include resources dir in javadoc classpath (not needed and generated version.properties breaks caching)
 	classpath =  sourceSets.main.output.classesDirs
 }
 
-// Do not run during setting/dependency discovery phase, bit of a hack, look for better approach?
-if (!(versionfile instanceof GroovyInterceptable))
-{
-	tasks.register('includeVersionFile', Copy) {
-		def sourcevfile = new File(versionfile);
-		def tdir = new File(project.getBuildDir(), 'resources/main/jadex/bridge');
-		tdir.mkdirs()
-		(new File(tdir, sourcevfile.getName())).delete()
-		into tdir
-		from(sourcevfile.getParentFile().getCanonicalPath()) {
-			include sourcevfile.getName()
-		}
-	}
-	
-	tasks.register('includeVersionFileJustForSpecialLittleEclipse', Copy) {
-		def sourcevfile = new File(versionfile)
-		def tdir = project.getBuildDir()
-		tdir = tdir.getParentFile()
-		tdir = new File(tdir, 'bin/main/jadex/bridge')
-		tdir.mkdirs()
-		(new File(tdir, sourcevfile.getName())).delete()
-		into tdir
-		from(buildutilsdir) {
-			include sourcevfile.getName()
-			expand(SRCDIST_JADEXVERSION: version.toString(), SRCDIST_PATCH_LEVEL: version.patch ?: '', SRCDIST_TIMESTAMP: rootProject.ext.timestamp)
-		}
-	}
-	
-	processResources.dependsOn('includeVersionFile')
+def versionfilename = 'jadexversion.properties'
+def generateJadexVersionFile() {
+	def ret = 'jadexversion_major=' + version.major + '\n';
+	ret += 'jadexversion_minor=' + version.minor + '\n';
+	ret += 'jadexversion_patch=' + version.patch + '\n';
+	ret += 'jadexversion=' + version.toString() + '\n';
+	ret += 'jadextimestamp=' + rootProject.ext.timestamp + '\n';
+	return ret;
+}
 
+def getVersionOutputDir(startdir) {
+	def ret = new File(startdir, 'main');
+	ret = new File(ret, 'jadex');
+	ret = new File(ret, 'bridge');
+	return ret;
+}
+
+// Do not run during setting/dependency discovery phase, bit of a hack, look for better approach?
+if (!(workspaceRootDir instanceof GroovyInterceptable))
+{
+	tasks.register('includeVersionFile') {
+		def tdir = new File(project.getBuildDir(), 'resources');
+		tdir = getVersionOutputDir(tdir);
+		def tfile = new File(tdir, versionfilename);
+		outputs.file(tfile.getCanonicalPath());
+		doLast {
+			println "Executing include Version!"
+			println "Include Version Output: " + tdir.getCanonicalPath();
+			tdir.mkdirs();
+			println "Include Version Output File: " + tfile.getCanonicalPath();
+			tfile.delete();
+			tfile << generateJadexVersionFile();
+			println "Include Version Generated: " + generateJadexVersionFile();
+			println "TFILE EXISTS: " + tfile.exists();
+		}
+	}
+	
+	classes.dependsOn('includeVersionFile')
+	
+	tasks.register('includeVersionFileJustForEclipse') {
+		def tdir = new File(project.getBuildDir(), 'bin');
+		tdir = getVersionOutputDir(tdir);
+		def tfile = new File(tdir, versionfilename);
+		outputs.file(tfile.getCanonicalPath());
+		doLast {
+			tdir.mkdirs();
+			tfile.delete();
+			tfile << generateJadexVersionFile();
+		}
+	}
+	
 	eclipse {
-		synchronizationTasks includeVersionFileJustForSpecialLittleEclipse
-		autoBuildTasks includeVersionFileJustForSpecialLittleEclipse
+		synchronizationTasks includeVersionFileJustForEclipse
+		autoBuildTasks includeVersionFileJustForEclipse
 	}
 }
 

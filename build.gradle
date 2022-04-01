@@ -43,10 +43,10 @@ project.ext.version = fetchNextBuildNameFromGitTag();
 project.ext.jadex_build_version = project.ext.version.full;
 println "Jadex Build Version " + project.ext.jadex_build_version 
 
-// Get timestamp from sources if defined (i.e. build from dist sources)
-project.ext.buildutilsdir = (new File(project.projectDir, 'src/main/buildutils')).getCanonicalPath()
+def buildutilsdirfile = new File(project.projectDir, 'src/main/buildutils');
+project.ext.buildutilsdir = buildutilsdirfile.getCanonicalPath()
 
-// Generate new timestamp (i.e. build from git sources)
+// Generate new timestamp (i.e. build time)
 project.ext.timestamp	= (long) ((new Date()).getTime() / 1000) // Divide by 1000 to make UNIX time
 
 System.setOut(new PrintStream(new OutputStream() {
@@ -203,17 +203,6 @@ allprojects
 	}
 }
 
-// Create version.properties with new timestamp (i.e. after clean)
-task createVersionInfo(type: Copy) {
-	def filename = 'jadexversion.properties'
-	project.ext.versionfile = (new File(project.buildDir, filename)).getCanonicalPath();
-
-	into project.buildDir.getCanonicalPath()
-	from(buildutilsdir) {
-		include filename
-		expand(SRCDIST_JADEXVERSION: version.toString(), SRCDIST_PATCH_LEVEL: version.patch ?: '', SRCDIST_TIMESTAMP: project.ext.timestamp)
-	}
-}
 // In order to run first, needs to depend on these two parallel tasks
 allprojects
 {
@@ -221,7 +210,6 @@ allprojects
 	processResources.dependsOn(':createVersionInfo')
 }
 
-def versionPropFile = new File(project.projectDir, "src/main/buildutils/jadexversion.properties")
 subprojects
 {
     def mainSrcDir  = 'src/main/java'
@@ -230,8 +218,6 @@ subprojects
 
 	apply plugin: 'eclipse' // hack to allow starting web projects in eclipse with correct dependencies
 	apply plugin: 'eclipse-wtp' // hack to allow starting web projects in eclipse with correct dependencies
-	
-	project.ext.jadexVersionFile = versionPropFile.getAbsolutePath();
 	
 	if (getProjectDepth(project) > 1)
 	{
@@ -390,6 +376,7 @@ subprojects
 		}
 
 		task srcZip(type: Zip) {
+			dependsOn build
 			destinationDirectory	= new File(getDistsDir(rootProject), "sources")
 			archiveFileName	= 'jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
 			preserveFileTimestamps = false
@@ -424,14 +411,7 @@ subprojects
 						sp	= sp.parent;
 					}
 				}
-			}
-			if(!isaddon) {
-				// Add preprocessed version properties
-				from(rootProject.buildDir.getCanonicalPath()) {
-					into 'sources/src/main/buildutils'
-					includes = ['jadexversion.properties']
-				}
-			}			
+			}		
 		}
 
 		// Create examplesZip task(s), if any
@@ -602,7 +582,7 @@ subprojects
 			dir	= rebuilddirfile
 			buildFile = new File(rebuilddirfile, 'build.gradle')
 			buildName = 'rebuild-'+distname	// required to avoid name clashes in newer gradle versions, grrr.
-			tasks = ["jadexDistZip"]
+			tasks = ["clean", "jadexDistZip"]
 			startParameter.projectProperties << ["dist": distname]
 			
 			doLast {					
@@ -613,8 +593,6 @@ subprojects
 				def diff	= diffZips(distzip, distzip2)
 				if(diff.length()!=0)
 				{
-					// jadexversion.properties is now generated and not contained in src
-					//if(!(diff.length()==1 && diff[0].indexOf("jadexversion.properties")!=-1))
 					throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);
 				}
 //				else
