@@ -206,8 +206,6 @@ allprojects
 // In order to run first, needs to depend on these two parallel tasks
 allprojects
 {
-	compileJava.dependsOn(':createVersionInfo')
-	processResources.dependsOn(':createVersionInfo')
 }
 
 subprojects
