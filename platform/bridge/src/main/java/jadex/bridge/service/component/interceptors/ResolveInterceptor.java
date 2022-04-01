@@ -189,8 +189,8 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 				
 				//if(methodname.indexOf("postIm")!=-1)
 				//	System.out.println("herere");
-				if(methodname.indexOf("isAvailable")!=-1)
-					System.out.println("isAvailable");
+				//if(methodname.indexOf("isAvailable")!=-1)
+				//	System.out.println("isAvailable");
 				
 				//if(methodname.indexOf("postMes")!=-1)
 				//	System.out.println("herere");
