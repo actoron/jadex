@@ -2,12 +2,12 @@ let { LitElement, html, css } = modLoad('lit-element');
 let { BaseElement } = modLoad('base-element');
 let { CidElement } = modLoad('cid-element');
 
-// Tag name 'jadex-microagentdebugger'
-class MicroAgentDebuggerElement extends CidElement 
+// Tag name 'jadex-bdiagentdebugger'
+class BDIAgentDebuggerElement extends CidElement 
 {
 	init() 
 	{
-		console.log("micro debugger: "+this.cid);
+		console.log("bdi debugger: "+this.cid);
 		this.app.lang.listeners.add(this);
 		this.comp = null; // selected component
 		this.concom = false;
@@ -44,7 +44,7 @@ class MicroAgentDebuggerElement extends CidElement
 
 		var self = this;
 		//console.log("sub at: "+this.cid);
-		self.sub.callid = jadex.getIntermediate(this.getMethodPrefix()+'&methodname=subscribeToComponent&args_0='+this.cid+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
+		self.sub.terminate = jadex.getIntermediate(this.getMethodPrefix()+'&methodname=subscribeToComponent&args_0='+this.cid+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		response =>
 		{
 			//console.log("service sub received: "+response.data);
@@ -255,12 +255,6 @@ class MicroAgentDebuggerElement extends CidElement
 				margin-left: 10px;
 				margin-right: 10px;
 			}
-			.nomargintop {
-				margin-top: 0px;
-			}
-			.nomarginbottom {
-				margin-bottom: 0px;
-			}
 			.selected {
 				background-color: #beebff;
 			}
@@ -273,7 +267,7 @@ class MicroAgentDebuggerElement extends CidElement
 		return html`
 			<div id="panel" class="grid-container">
 				<div id="steps" class="back-lightgray inner">
-					<h4 class="margin nomargintop nomarginbottom">${this.app.lang.t('Steps')}</h4>
+					<h4 class="margin">${this.app.lang.t('Steps')}</h4>
 					<div class="yscrollable h100">
 						<table class="margin">
 							${this.getSteps().map(step => html`
@@ -285,7 +279,7 @@ class MicroAgentDebuggerElement extends CidElement
 					</div>
 				</div>
 				<div id="history" class="back-lightgray inner">
-					<h4 class="margin nomargintop nomarginbottom">${this.app.lang.t('History')}</h4>
+					<h4 class="margin">${this.app.lang.t('History')}</h4>
 					<div class="yscrollable h100">
 						<table class="margin">
 							${this.getHistory().map(step => html`
@@ -301,7 +295,7 @@ class MicroAgentDebuggerElement extends CidElement
 					</div>
 				</div>
 				<div id="details" class="back-lightgray inner">
-					<h4 class="margin nomargintop nomarginbottom">${this.app.lang.t('Step Details')}</h4>
+					<h4 class="margin">${this.app.lang.t('Step Details')}</h4>
 					<div class="yscrollable h100">
 						<table class="margin">
 						${this.getStepDetails(this.selstep).map(prop => html`
@@ -318,5 +312,5 @@ class MicroAgentDebuggerElement extends CidElement
 	}
 }
 
-if(customElements.get('jadex-microagentdebugger') === undefined)
-	customElements.define('jadex-microagentdebugger', MicroAgentDebuggerElement);
+if(customElements.get('jadex-bdiagentdebugger') === undefined)
+	customElements.define('jadex-bdiagentdebugger', MicroAgentDebuggerElement);

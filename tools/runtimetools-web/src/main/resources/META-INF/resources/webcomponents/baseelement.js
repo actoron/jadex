@@ -50,24 +50,38 @@ export class BaseElement extends LitElement
 		    	//console.log('init found, calling...');
 		    	initprom = self.init();
 		    }
-			let callpostinit = function() {
+			let callpostinit = function() 
+			{
 				self.inited = true;
-				self.requestUpdate().then(() => {
+				self.requestUpdate().then(() => 
+				{
 					//console.log("update done, calling postinit");
 					self.postInit();
-				}).catch(err => {
+				}).catch(err => 
+				{
 					console.log("Error updating element: " + self.constructor.name)
 					console.log(err);
 				});
 			};
-			if (typeof initprom === 'object' && typeof initprom.then === 'function')
+			if(typeof initprom === 'object' && typeof initprom.then === 'function')
 			{
-				initprom.then(() => {
+				initprom.then(() => 
+				{
 					callpostinit();
+				}).
+				catch(err =>
+				{
+					console.log("Error on init: " + self.constructor.name)
+					console.log(err);
 				});
 			}
 			else
 				callpostinit();
+		})
+		.catch(err =>
+		{
+			console.log("Error on preinit: " + self.constructor.name)
+			console.log(err);
 		});
 	}
 	
@@ -87,17 +101,17 @@ export class BaseElement extends LitElement
 				
 				// must load sync to ensure that style.css rules are defined and gain precedence		
 				//self.loadStyle("/libs/bootstrap_4.5.0/bootstrap.min.css")
-				self.loadStyle("/libs/bootstrap_5.0.1/css/bootstrap.min.css")
+				/*self.loadStyle("/libs/bootstrap_5.0.1/css/bootstrap.min.css")
 				.then(()=>
-				{
+				{*/
 					//console.log("loaded bootstrap css")
 					//self.loadScript("libs/jquery_3.4.1/jquery.js")
 					//.then(()=>
 					//{
 						//console.log("loaded jquery")
-						self.loadScript("/libs/bootstrap_5.0.1/js/bootstrap.bundle.min.js")
+						/*self.loadScript("/libs/bootstrap_5.0.1/js/bootstrap.bundle.min.js")
 						.then(()=>
-						{
+						{*/
 							//console.log("loaded bootstrap")
 							self.loadStyle("/css/style.css")
 							.then(()=>{
@@ -107,12 +121,12 @@ export class BaseElement extends LitElement
 								
 							})
 							.catch((err)=>rejec(err));
-						})
-						.catch((err)=>rejec(err));
+						/*})
+						.catch((err)=>rejec(err));*/
 					//})
 					//.catch((err)=>rejec(err));
-				})
-				.catch((err)=>rejec(err));
+				//})
+				//.catch((err)=>rejec(err));
 			})
 			.catch((err)=>rejec(err));
 		});
