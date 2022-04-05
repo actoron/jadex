@@ -375,30 +375,11 @@ class ModelTree extends CidElement
 		
 	static get styles() 
 	{
+		// https://stackoverflow.com/questions/18031354/100-width-is-bigger-than-parents-div
 	    return css`
-	    	/* Navbar styling. */
-	    	/* background color. */
-	    	.navbar-custom {
-	    		background-color: #aaaaaa;
-	    	}
-	    	/* brand and text color */
-	    	.navbar-custom .navbar-brand,
-	    	.navbar-custom .navbar-text {
-	    		color: rgba(255,255,255,.8);
-	    	}
-	    	/* link color */
-	    	.navbar-custom .navbar-nav .nav-link {
-	    		color: rgba(255,255,255,.5);
-	    	}
-	    	/* color of active or hovered links */
-	    	.navbar-custom .nav-item.active .nav-link,
-	    	.navbar-custom .nav-item:focus .nav-link,
-	    	.navbar-custom .nav-item:hover .nav-link {
-	    		color: #ffffff;
-	    	}
-	    	
 	    	.w100 {
 				width: 100%;
+				box-sizing: border-box;
 			}
 			.loader {
 				border: 8px solid #f3f3f3;
@@ -419,7 +400,6 @@ class ModelTree extends CidElement
 	{
 		return html`
 			<div>
-			
 				${this.progressnow<this.progressmax? html`
 				<div>
 					<label for="mpro">Loading models:</label>

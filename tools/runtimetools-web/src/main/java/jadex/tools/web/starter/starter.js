@@ -209,6 +209,9 @@ class StarterElement extends CidElement
 			.right { 
 				justify-self: right;
 			}
+			.fullwidth {
+				justify-self: stretch;
+			}
 			.row-flex-container {
 				display: flex;
 				flex-direction: row;
@@ -233,6 +236,9 @@ class StarterElement extends CidElement
 			.alignleft {
 				justify-self: flex-start;
 			}
+			.w100 {
+				width: 100%;
+				box-sizing: border-box;
 		    `);
 		return ret;
 	}
@@ -255,10 +261,10 @@ class StarterElement extends CidElement
 					<h3 class="span">${this.app.lang.t('Settings')}</h3>
 					
 					${this.app.lang.t('Filename')}
-					<input type="text" ref="filename" class="w100" value="${this.model!=null? this.model.filename: ''}">
+					<input class="fullwidth" type="text" ref="filename" value="${this.model!=null? this.model.filename: ''}">
 					
 					${this.app.lang.t('Configuration')}
-					<select id="config" class="w100">
+					<select id="config" class="fullwidth">
 		   				${this.getConfigurationNames().map((c) => html`<option value="${c}"></option>`)}
 		 			</select>
 					
@@ -273,7 +279,7 @@ class StarterElement extends CidElement
 					</div>
 					
 					${this.app.lang.t('Monitoring')}
-					<select id="monitoring" class="w100">
+					<select id="monitoring" class="fullwidth">
 		   				<option value="OFF">OFF</option> 
 		   				<option value="COARSE">${this.app.lang.t('COARSE')}</option> 
 		   				<option value="MEDIUM">${this.app.lang.t('MEDIUM')}</option> 
@@ -289,8 +295,8 @@ class StarterElement extends CidElement
 					<div class="${this.getArguments().length==0? 'hidden': ''}">
 						${this.getArguments().map((arg, i) => html`
 						${"["+arg.clazz.value+"] "+arg.name}
-						<input class="w100" type="text" value="${arg.value!=null? arg.value: ''}" readonly></input>
-						<input class="w100" type="text" id="${'arg_'+i}">
+						<input class="fullwidth" type="text" value="${arg.value!=null? arg.value: ''}" readonly></input>
+						<input class="fullwidth" type="text" id="${'arg_'+i}">
 						`)}
 					</div>
 					

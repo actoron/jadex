@@ -32,7 +32,12 @@ class PlatformsElement extends BaseElement
 	init()
 	{
 		this.app.lang.listeners.add(this);
-		console.log('platforms')
+		console.log('platforms');
+	}
+	
+	postInit()
+	{
+		console.log('platforms postinit');
 	}
 	
 	connectedCallback() 
@@ -48,16 +53,20 @@ class PlatformsElement extends BaseElement
 		//console.log("disconnected platforms: "+this.comconn);
 		this.comconn = false;
 		this.terminateSubscription();
+		super.disconnectedCallback();
 	}
 	
 	terminateSubscription()
 	{
 		var self = this;
 		if(self.callid!=null)
-			jadex.terminateCall(self.callid).then(() => {
+		{
+			jadex.terminateCall(self.callid).then(() => 
+			{
 					//console.log("Terminated subscription: "+self.callid)
-				})
-				.catch(err => {console.log("Could not terminate subscription: "+err+" "+self.callid)});
+			})
+			.catch(err => {console.log("Could not terminate subscription: "+err+" "+self.callid)});
+		}
 	}
 	
 	subscribe(interval)
@@ -187,6 +196,9 @@ class PlatformsElement extends BaseElement
 			.green {
 				background-color: green;
 			}
+			.left {
+				text-align: left;
+			}
 	    `;
 	}
 	
@@ -203,11 +215,11 @@ class PlatformsElement extends BaseElement
 				</p>
 			</div>
 
-			<div class="${this.platforms.length==0? 'hidden': ''}">
+			<div>
 				<table>
 					<tbody>
 						<tr>
-							<th>Name</th>
+							<th class="left">Name</th>
 							<!-- <th>${this.app.lang.t("Connected")}</th> 
 							<th>Protocol</th>-->
 						</tr>

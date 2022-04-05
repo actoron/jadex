@@ -258,7 +258,7 @@ class SecurityElement extends CidElement
 		
 		var ret = this.shadowRoot.getElementById("entity").value.length==0 || this.shadowRoot.getElementById("role").value.length==0;
 		
-		console.log("isRoleDis: "+ret);
+		//console.log("isRoleDis: "+ret);
 		
 		return ret;
 	}
@@ -512,19 +512,46 @@ class SecurityElement extends CidElement
 			ret.push(super.styles);
 		ret.push(
 		    css`
-	    	table {
+	    	.table {
 				overflow-wrap: break-word;
 				table-layout: fixed
 			}
 			.selected {
 				background-color: rgba(255,255,0,0.5); 
 			}
-			
 			.flex {
 				display: flex;
 			}
+			.flexrow {
+				flex-direction: row;
+			}
+			.flexcol {
+				flex-direction: column;
+			}
 			.flexgrow {
 				flex-grow: 1;
+			}
+			.boxfix {
+				box-sizing: border-box;
+			}
+			.wordbreak {
+				word-break: break-all;
+			}
+			.textleft {
+				text-align: left;
+			}
+			.w100 {
+				width: 100%;
+				box-sizing: border-box;
+			}
+			.fullwidth {
+				justify-self: stretch;
+			}
+			.padding1 {
+				padding: 1em;
+			}
+			.floatright {
+				float: right;
 			}
 		    `);
 		return ret;
@@ -533,16 +560,16 @@ class SecurityElement extends CidElement
 	asyncRender() 
 	{
 		return html`
-			<div class="accordion">
+			<div class="accordion boxfix">
 		        <div class="a-container margintop"> 
 		        	<h4 class="a-btn">${this.app.lang.t('General Settings')}</h4>
-		            <div class="a-panel">
-						<input type="checkbox" class="marginright" id="usesecret" @click="${e => {this.useSecret()}}" .checked="${this.secstate.useSecret}">${this.app.lang.t('Use secret')}</input>
-						<input type="checkbox" class="marginright marginleft" id="printsecret" @click="${e => {this.printSecret()}}" .checked="${this.secstate.printSecret}">${this.app.lang.t('Print secret')}</input>
+		            <div class="a-panel flex flexcol">
 						<div>
-							<label for="platformsecret">${this.app.lang.t('Platform Secret (Password, Key, Certificate)')}</label>
-							<textarea class="form-control rounded-0" id="platformsecret" rows="10" id="platformsecret" disabled="true">${this.secstate.platformSecret}</textarea>
+							<input type="checkbox" class="marginright" id="usesecret" @click="${e => {this.useSecret()}}" .checked="${this.secstate.useSecret}">${this.app.lang.t('Use secret')}</input>
+							<input type="checkbox" class="marginright marginleft" id="printsecret" @click="${e => {this.printSecret()}}" .checked="${this.secstate.printSecret}">${this.app.lang.t('Print secret')}</input>
 						</div>
+						<label for="platformsecret">${this.app.lang.t('Platform Secret (Password, Key, Certificate)')}</label>
+						<textarea class="form-control rounded-0" id="platformsecret" rows="10" id="platformsecret" disabled="true">${this.secstate.platformSecret}</textarea>
 					</div>
 		        </div>
 
@@ -551,16 +578,16 @@ class SecurityElement extends CidElement
 		            <div class="a-panel">
 						<table class="table">
 							<thead>
-								<tr class="d-flex">
-									<th class="col-4" scope="col">${this.app.lang.t('Network Name')}</th>
-									<th class="col-8" scope="col">${this.app.lang.t('Network Secret')}</th>
+								<tr>
+									<th class="textleft" scope="col">${this.app.lang.t('Network Name')}</th>
+									<th class="textleft" scope="col">${this.app.lang.t('Network Secret')}</th>
 							    </tr>
 							</thead>
 							<tbody>
 								${this.getNetworks().map((net) => html`
-									<tr class="d-flex net" @click="${e => {this.selectNetwork(net, e)}}">
-										<td class="col-4">${net[0]}</td>
-										<td class="col-8">${net[1]}</td>
+									<tr class="net" @click="${e => {this.selectNetwork(net, e)}}">
+										<td>${net[0]}</td>
+										<td class="wordbreak">${net[1]}</td>
 								    </tr>
 								`)}
 							</tbody>
@@ -568,10 +595,10 @@ class SecurityElement extends CidElement
 						
 						<button type="button" class="jadexbtn right block marginbottom" @click="${e => {this.removeNetwork()}}" ?disabled="${this.selnet == null}">${this.app.lang.t('Remove Network')}</button>
 						
-						<fieldset class="border w100">
+						<fieldset class="flex flexcol border w100 padding1">
   							<legend>Add Network Settings</legend>
 
-							<input class="w100 h100 marginbottom" type="text" placeholder="Network Name" id="network" @change="${e=> this.netname=e.target.value}" required>
+							<input class="h100 marginbottom" type="text" placeholder="Network Name" id="network" @change="${e=> this.netname=e.target.value}" required>
 						
 							<div class="marginbottom">
 								<label class="${this.nn_option=='option1'? 'active': ''}" @click="${e => this.nn_option='option1'}">
@@ -602,14 +629,16 @@ class SecurityElement extends CidElement
 							
 							<div class="${this.nn_option==='option4'? 'visible': 'hidden'}">
 								<label for="rawsecret">${this.app.lang.t('Secret (Password, Key, Certificate) in Jadex format (pw:, key:, pem:)')}</label>
-		  						<textarea class="marginbottom form-control rounded-0" id="rawsecret" rows="10" @change="${e => this.secret = e.target.value}"></textarea>
+		  						<textarea class="w100 marginbottom form-control rounded-0" id="rawsecret" rows="10" @change="${e => this.secret = e.target.value}"></textarea>
 							</div>
 						
-							<button type="button" class="jadexbtn" @click="${e => this.addNetwork()}" ?disabled="${this.netname==null || this.secret==null}">${this.app.lang.t('Add Network')}</button>
+							<div>
+								<button type="button" class="floatright jadexbtn" @click="${e => this.addNetwork()}" ?disabled="${this.netname==null || this.secret==null}">${this.app.lang.t('Add Network')}</button>
+							</div>
 						</fieldset>
 					</div>
 		        </div>
-		
+
 				<div class="a-container"> 
 		        	<h4 class="a-btn">${this.app.lang.t('Roles')}</h4>
 		            <div class="a-panel">
@@ -637,7 +666,7 @@ class SecurityElement extends CidElement
 						<button type="button" class="jadexbtn right margintop marginright" @click="${e => this.addRole(e)}" disabled="${this.isRoleDisabled()}">${this.app.lang.t('Add')}</button>
 					</div>
 		        </div>
-			
+
 				<div class="a-container"> 
 		        	<h4 class="a-btn">${this.app.lang.t('Name Authorities')}</h4>
 		            <div class="a-panel">
@@ -661,7 +690,7 @@ class SecurityElement extends CidElement
 						</table>
 		            </div>
 				</div>
-			
+				
 				<div class="a-container"> 
 		        	<h4 class="a-btn">${this.app.lang.t('Trusted Platform Names')}</h4>
 		            <div class="a-panel">

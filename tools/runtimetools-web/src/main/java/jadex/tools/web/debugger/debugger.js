@@ -137,13 +137,17 @@ class DebuggerElement extends CidElement
 	
 	terminateSubscription()
 	{
-		var tc = this.sub.terminate;
-		if(tc!=null)
+		var callid = this.sub.callid;
+		if(callid!=null)
 		{
-			console.log("terminate sub");
-			tc();
+			this.sub.callid = null;
+			jadex.terminateCall(self.callid).then(() => 
+			{
+				this.sub.connected = false;
+				//console.log("Terminated subscription: "+self.callid)
+			})
+			.catch(err => {console.log("Could not terminate subscription: "+err+" "+callid)});
 		}
-		this.sub.connected = false;
 	}
 	
 	getMethodPrefix() 
@@ -440,6 +444,9 @@ class DebuggerElement extends CidElement
 			.inline {
 				display: inline-block;
 			}
+			.nomarginbottom {
+				margin-bottom: 0px;
+			}
 		    `);
 		return ret;
 	}
@@ -448,17 +455,20 @@ class DebuggerElement extends CidElement
 	{
 		return html`
 			<div id="panel" class="grid-container">
+				
 				<div id="components" class="yscrollable">
 					<h3>${this.app.lang.t('Components')}</h3>
 					<jadex-componenttree id="componenttree" cid='${this.cid}'></jadex-componenttree>
 				</div>
+				
 				<div class="grid-container2">
 					<div class="span ${this.desc!=null? '': 'hidden'}">
-						<h3 class="inline">${this.app.lang.t('Micro Agent Debugger ')}</h3>
+						<h3 class="inline nomarginbottom">${this.desc==null? '': this.app.lang.t(this.desc.type+" Debugger")}</h3>
 						<span class="right w100"> [for ${this.getAgentName()!=null? this.getAgentName().substring(0, this.getAgentName().indexOf('@')): ''}]</span>
 					</div>
 					
 					<div id="debugger" class="yscrollable"></div>
+					
 					<div id="breakpoints">
 						<div class="h100 back-lightgray ${this.getBreakpointNames().length>0? '': 'hidden'}">
 							<div class="back-lightgray">

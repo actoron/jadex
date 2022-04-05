@@ -978,11 +978,16 @@ class ComponentTree extends BaseElement
 		
 		var path = self.getMethodPrefix()+'&methodname=subscribeToComponentChanges&returntype=jadex.commons.future.ISubscriptionIntermediateFuture';
 
-		if(self.termcom!=null)
-			self.termcom().then(done).catch(err);
-			//self.termcom("refreshing").then(done).catch(err);
+		if(self.callid!=null)
+		{
+			jadex.terminateCall(self.callid)
+				.then(() => {done();})
+				.catch(err => {console.log("Could not terminate subscription: "+err+" "+self.callid)});
+		}
 		else
+		{
 			done();
+		}
 		
 		function err(err)
 		{
@@ -992,7 +997,7 @@ class ComponentTree extends BaseElement
 		
 		function done()
 		{
-			self.termcom = jadex.getIntermediate(path,
+			self.callid = jadex.getIntermediate(path,
 				function(resp)
 				{
 					var event = resp.data;
@@ -1193,29 +1198,6 @@ class ComponentTree extends BaseElement
 	static get styles() 
 	{
 	    return css`
-	    	/* Navbar styling. */
-	    	/* background color. */
-	    	.navbar-custom {
-	    		background-color: #aaaaaa;
-	    	}
-	    	/* brand and text color */
-	    	.navbar-custom .navbar-brand,
-	    	.navbar-custom .navbar-text {
-	    		color: rgba(255,255,255,.8);
-	    	}
-	    	/* link color */
-	    	.navbar-custom .navbar-nav .nav-link {
-	    		color: rgba(255,255,255,.5);
-	    	}
-	    	/* color of active or hovered links */
-	    	.navbar-custom .nav-item.active .nav-link,
-	    	.navbar-custom .nav-item:focus .nav-link,
-	    	.navbar-custom .nav-item:hover .nav-link {
-	    		color: #ffffff;
-	    	}
-	    	.w100 {
-				width: 100%;
-			}
 			.loader {
 				border: 8px solid #f3f3f3;
 				border-top: 8px solid #070707; 
