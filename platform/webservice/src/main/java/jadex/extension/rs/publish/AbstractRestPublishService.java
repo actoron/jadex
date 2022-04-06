@@ -688,8 +688,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					//if(mi.getMethod().toString().indexOf("invokeServiceMe")!=-1)
 					//	System.out.println("heeereeee");
 					
-					//if(mi.getMethod().toString().indexOf("isAvailable")!=-1)
-					//	System.out.println("params: "+Arrays.toString(params));
+					if(mi.getMethod().toString().indexOf("isAvailable")!=-1)
+						System.out.println("params: "+Arrays.toString(params));
 	
 					// Inject caller meta info
 					Map<String, String> callerinfos = extractCallerValues(request);

@@ -362,27 +362,29 @@ class PlatformElement extends CidElement
 		// clone as sort is in place!
 		let myplugins = [...Object.values(this.plugins)];
 		
+		let loggedin = self.app.login.isLoggedIn();
+		
 		for(var i = myplugins.length - 1; i >= 0; i--) 
 		{
-		    if(!myplugins[i].available) 
+		    if(!myplugins[i].available || (!loggedin && !myplugins[i].unrestricted)) 
 			{
-		        myplugins.splice(i, 1);
 				console.log("removed plugin: "+myplugins[i].name);
+		        myplugins.splice(i, 1);
 			}
 		}
 		
 		let ret = Object.values(myplugins).sort(function(p1, p2) 
 		{
 			var ret = 0;
-			if(!self.app.login.isLoggedIn())
-				ret = p2.unrestricted - p1.unrestricted;
+			//if(!self.app.login.isLoggedIn())
+			//	ret = p2.unrestricted - p1.unrestricted;
 			
-			if(ret===0)
-			{
+			//if(ret===0)
+			//{
 				ret = p2.priority-p1.priority;
     			if(ret===0)
 					ret = p1.name.toLowerCase().localeCompare(p2.name.toLowerCase());
-			}
+			//}
 			return ret
 		});
 		//console.log("plugins: "+ret);
@@ -449,7 +451,7 @@ class PlatformElement extends CidElement
 			<h1>Platform ${this.cid}</h1>
 			<div id="plugincont">
 				${this.getPlugins().map((p, index) => html`
-					${!p.unrestricted && !this.app.login.isLoggedIn()? "": p.icon!=null? 
+					${p.icon!=null? 
 						html`<img id="${'plugin'+index}" class="${self.plugin===p.name? "overlay": ""}" src="data:image/png;base64,${p.icon.__base64}" alt="Red dot" @click="${(e) => {self.selectPlugin(p.name)}}" data-toggle="tooltip" data-placement="top" title="${p.name}"/>`:
 						html`<span @click="${(e) => {self.selectPlugin(p.name)}}">${p.name}</span>`
 					}
@@ -459,25 +461,6 @@ class PlatformElement extends CidElement
 			<div id="plugin"></div>
 		`;
 	}
-	
-	/*isLoggedIn()
-	{
-		var self = this;
-		return new Promise(function(resolve, reject) 
-		{
-			axios.get('webjcc/isLoggedIn', {headers: {'x-jadex-isloggedin': true}}, self.transform).then(function(resp)
-			{
-				//console.log("is logged in: "+resp);
-				self.loggedin = resp.data;
-				resolve(self.loggedin);
-			})
-			.catch(function(err) 
-			{
-				console.log("check failed: "+err);	
-				reject(err);
-			});
-		});
-	}*/
 }
 
 if(customElements.get('jadex-platform') === undefined)
