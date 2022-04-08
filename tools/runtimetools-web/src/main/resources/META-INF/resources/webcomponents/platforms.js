@@ -85,6 +85,8 @@ class PlatformsElement extends BaseElement
 					console.log("not current subscription (suc): "+callid+" "+self.callid);
 					return;
 				}
+				
+				self.createInfoMessage("Webjcc platform subscription successful");
 					
 				//console.log("Set up subscription");
 				self.updatePlatform(resp.data.service.name, resp.data.type);

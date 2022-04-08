@@ -146,10 +146,12 @@ export class BaseElement extends LitElement
 				var prom = self.app.login.relogin();
 				prom.then(l =>
 				{
+					self.createInfoMessage("login successful");
 					cont();
 				})
 				.catch(err =>
 				{
+					self.createErrorMessage("login failed", err);
 					cont();
 				});
 			})
@@ -436,7 +438,14 @@ export class BaseElement extends LitElement
 	
 	createErrorMessage(text, data) 
 	{
-		var txt = text+(data!=null? ": "+data: "");
+		var txt = text;
+		if(data!=null)
+		{
+			if(data.message!=null)
+				txt += ": "+data.message;
+			else
+				txt += ": "+JSON.stringify(data);
+		}
 		this.dispatchMessageEvent({text: txt, type: "error"});
 	}
 	

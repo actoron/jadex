@@ -420,7 +420,7 @@ class DebuggerElement extends CidElement
 			.grid-container {
 				display: grid;
 				grid-template-columns: 1fr 2fr auto; 
-				grid-template-rows: minmax(30vh, max-content) minmax(min-content, max-content) minmax(min-content, max-content) minmax(min-content, max-content);
+				grid-template-rows: minmax(50vh, max-content) minmax(min-content, max-content) minmax(min-content, max-content) minmax(min-content, max-content);
 				grid-gap: 10px;
 			}
 			.grid-container2 {

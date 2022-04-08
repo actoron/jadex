@@ -105,14 +105,7 @@ export class LoginElement extends BaseElement
 				checkbox.checked = false;
 			}
 			
-			if(l)
-			{
-				self.createInfoMessage("login successful");
-			}
-			else
-			{
-				self.createErrorMessage("login failed");
-			}
+			self.createInfoMessage("login successful");
 		})
 		.catch(err =>
 		{
