@@ -3,7 +3,7 @@ let { BaseElement } = modLoad('base-element');
 let { CidElement } = modLoad('cid-element');
 
 // Tag name 'jadex-bdiagentdebugger'
-class BDIAgentDebuggerElement extends CidElement 
+class BDIV3AgentDebuggerElement extends CidElement 
 {
 	init() 
 	{
@@ -16,7 +16,209 @@ class BDIAgentDebuggerElement extends CidElement
 		this.steps = [];
 		this.history = [];
 		this.selstep = null;
+		this.treedata = {};
+		this.treedata["#"] = {};
+		
 		this.subscribe();
+		this.initGoalbase();
+	}
+	
+	initGoalbase()
+	{
+		var self = this;
+		
+		this.loadJSTree().then(function()
+		{
+			//console.log("jstree");
+			
+			// init tree
+			$(function() 
+			{ 
+				self.getTree("goalbase").jstree(
+				{
+					"plugins": ["sort"]/*, "types", "contextmenu"]*/,
+					"core": 
+					{
+						"check_callback" : true,
+						"data": function(node, cb) 
+						{
+							console.log("data: "+node.id);
+	
+							function getChildData(id)
+							{					
+								var children = self.getChildData(id);
+								// problem: js tree changes data structures :-( give jstree only a clone?
+								//console.log("children of: "+id+" "+children.length);
+								return JSON.parse(JSON.stringify(children));
+							}
+							
+							var data = getChildData(node.id);
+							if(data==null)
+								data = [];
+							cb.call(this, data);
+						}
+					},
+					'sort': function(a, b) 
+					{
+				        var a1 = this.get_node(a);
+				        var b1 = this.get_node(b);
+				        if(a1.icon == b1.icon)
+				        {
+				            return (a1.text > b1.text) ? 1 : -1;
+				        } 
+				        else 
+				        {
+				            return (a1.icon > b1.icon) ? 1 : -1;
+				        }
+					}
+				});
+			});
+		});
+	}
+	
+	loadJSTree()
+	{
+		var self = this;
+		
+		return new Promise(function(resolve, reject) 
+		{
+			var res1 ="jadex/tools/web/commons/libs/jstree_3.3.7.css";
+			var res2 = "jadex/tools/web/commons/libs/jstree_3.3.7.js";
+			var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+			var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
+	
+			//console.log("jstree load files start");
+			
+			var p1 = self.loadStyle(ures1);
+			var p2 = self.loadScript(ures2);
+			
+			Promise.all([p1, p2]).then((values) => 
+			{
+				//console.log("js tree load files ok");
+				resolve();
+			})
+			.catch(err => 
+			{
+				//console.log("js tree load files err: "+err);
+				reject(err);
+			});
+		});
+	}
+	
+	getTree(treeid)
+	{
+		return $("#"+treeid, this.shadowRoot);
+	}
+	
+	getChildData(id)
+	{
+		if(this.treedata[id]==null)
+			console.log("node not found: "+id);
+			
+		var cids = this.treedata[id]?._children;
+		var ret = null;
+		if(cids!=null)
+		{
+			ret = [];
+			for(var cid of cids)
+			{
+				ret.push(this.treedata[cid]);
+			}
+		}
+		return ret;
+	}
+	
+	setChildData(id, data)
+	{
+		if(this.treedata[id]==null)
+			console.log("node not found: "+id);
+		
+		var ids = [];
+		for(var d of data)
+		{
+			c.push(d.id);
+			this.treedata[d.id] = d;
+		}
+		this.treedata[id]._children = ids;
+	}
+	
+	addChildData(id, data)
+	{
+		if(this.treedata[id]==null)
+			console.log("node not found: "+id);
+			
+		var cids = this.treedata[id]._children;
+		if(cids==null)
+		{
+			cids = [];
+			this.treedata[id]._children = cids;
+		}
+		this.treedata[data.id] = data;
+		if(cids.indexOf(data.id)==-1)
+			cids.push(data.id);
+	}
+	
+	createNodeDataForEvent(event)
+	{
+		var id = "bla";
+		var name = "blub";
+		var type = null;
+		var icon = null;
+		var parent = null; 
+		var info = null;
+		
+		self.createNodeData(id, name, type, icon, parent, info);
+	}
+	
+	createNodeData(id, name, type, icon, parent, info)
+	{
+		console.log("create node data: "+id+" "+name+" "+type+" "+parent);
+		var paid = parent==null || parent.length==0? "#": parent;
+		// must use _parent as parent is already used by jstree
+		var node = {"id": id, "text": name, "type": type, "icon": icon, "children": true, "_parent": paid, "info": info}; // "original": {'hello': true}
+		var key = parent==null || parent.length==0? "#": parent;
+		
+		this.addChildData(key, node);
+	}
+		
+	deleteNodeData(nodeid)
+	{
+		//console.log("remove node data: "+nodeid);
+		this.removeChildDataFromParent(nodeid);
+		delete this.treedata[nodeid];
+		//delete this.treedata[nodeid].children;
+
+		/*var ac = this.getChildData("Applications");
+		if(ac==null || ac.length==0)
+		{
+			this.removeChildDataFromParent("Applications");
+			delete this.treedata["Applications"];
+			//delete this.treedata["Applications_children"]
+		}*/
+	}
+	
+	removeChildDataFromParent(nodeid)
+	{
+		var removed = false;
+		var paid = this.treedata[nodeid]?._parent;
+		//this.getTree(treeid).jstree().get_parent(nodeid);
+		if(paid!=null)
+		{
+			var pachilds = this.treedata[paid]?._children
+			if(pachilds!=null)
+			{
+				var i = pachilds.indexOf(nodeid);
+  				if(i!=-1)
+				{
+    				pachilds.splice(i, 1);
+					removed = true;
+					console.log("removed: "+nodeid);
+				}
+			}
+		}
+		
+		if(!removed)
+			console.log("not removed from parent: "+nodeid);
 	}
 	
 	connectedCallback()
@@ -104,6 +306,8 @@ class BDIAgentDebuggerElement extends CidElement
 	
 	updateEvent(event)
 	{
+		console.log("event: "+event.type);
+		
 		if(event.type.startsWith("created") && event.type.endsWith("step"))
 		{
 			//console.log("add step: "+event.properties.id);
@@ -236,12 +440,12 @@ class BDIAgentDebuggerElement extends CidElement
 			}
 			.grid-container {
 				display: grid;
-				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); 
+				grid-template-columns: minmax(auto, 1fr) minmax(0, 1fr); 
 				grid-template-rows: minmax(200px, 30vh) minmax(200px, 30vh);
 				grid-gap: 10px;
 			}
-			#details {
-				grid-column: 1 / span 2;
+			.span {
+				grid-row: 1 / span 2;
 			}
 			.inner {
 				display: flex;
@@ -258,6 +462,12 @@ class BDIAgentDebuggerElement extends CidElement
 			.selected {
 				background-color: #beebff;
 			}
+			.nomargintop {
+				margin-top: 0px;
+			}
+			.nomarginbottom {
+				margin-bottom: 0px;
+			}
 		    `);
 		return ret;
 	}
@@ -266,8 +476,14 @@ class BDIAgentDebuggerElement extends CidElement
 	{
 		return html`
 			<div id="panel" class="grid-container">
+				
+				<div class="back-lightgray span">
+					<h4 class="margin nomargintop nomarginbottom">${this.app.lang.t('Goalbase')}</h4>
+					<div id="goalbase"></div>
+				</div>
+				
 				<div id="steps" class="back-lightgray inner">
-					<h4 class="margin">${this.app.lang.t('Steps')}</h4>
+					<h4 class="margin nomargintop nomarginbottom">${this.app.lang.t('Steps')}</h4>
 					<div class="yscrollable h100">
 						<table class="margin">
 							${this.getSteps().map(step => html`
@@ -278,8 +494,9 @@ class BDIAgentDebuggerElement extends CidElement
 						</table>
 					</div>
 				</div>
+				
 				<div id="history" class="back-lightgray inner">
-					<h4 class="margin">${this.app.lang.t('History')}</h4>
+					<h4 class="margin nomargintop nomarginbottom">${this.app.lang.t('History')}</h4>
 					<div class="yscrollable h100">
 						<table class="margin">
 							${this.getHistory().map(step => html`
@@ -294,23 +511,11 @@ class BDIAgentDebuggerElement extends CidElement
 						<label for="his">History</label>
 					</div>
 				</div>
-				<div id="details" class="back-lightgray inner">
-					<h4 class="margin">${this.app.lang.t('Step Details')}</h4>
-					<div class="yscrollable h100">
-						<table class="margin">
-						${this.getStepDetails(this.selstep).map(prop => html`
-							<tr>
-	  							<td>${prop.name}</td>
-								<td>${prop.value}</td>
-						    </tr>
-						`)}
-						</table>
-					</div>
-				</div>
+			
 			</div>
 		`;
 	}
 }
 
-if(customElements.get('jadex-bdiagentdebugger') === undefined)
-	customElements.define('jadex-bdiagentdebugger', MicroAgentDebuggerElement);
+if(customElements.get('jadex-bdiv3agentdebugger') === undefined)
+	customElements.define('jadex-bdiv3agentdebugger', BDIV3AgentDebuggerElement);

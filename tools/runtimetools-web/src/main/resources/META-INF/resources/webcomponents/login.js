@@ -124,6 +124,7 @@ export class LoginElement extends BaseElement
 	
 	logout()
 	{
+		let self = this;
 		var prom = this.app.login.logout();
 		
 		prom.then(l =>

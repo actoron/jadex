@@ -54,8 +54,8 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		this.args	= args;
 //		System.out.println("created rmi command: "+target+" "+method.getName());
 		
-		if(method.toString().toLowerCase().indexOf("registryv2")!=-1)
-			System.out.println("Creating command for: "+method);
+		//if(method.toString().toLowerCase().indexOf("registryv2")!=-1)
+		//	System.out.println("Creating command for: "+method);
 	}
 	
 	/**

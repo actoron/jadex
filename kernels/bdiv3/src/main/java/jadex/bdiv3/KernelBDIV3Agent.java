@@ -24,7 +24,7 @@ import jadex.micro.annotation.ProvidedServices;
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(
 //	expression="new jadex.bdiv3.BDIAgentFactory($component)"))
-	expression="new jadex.bdiv3.BDIAgentFactory($component, jadex.commons.SUtil.createHashMap(new String[]{\"debugger.panels\"},new Object[]{\"jadex.tools.debugger.bdiv3.BDIViewerDebuggerPanel\"}))"))
+	expression="new jadex.bdiv3.BDIAgentFactory($component, jadex.commons.SUtil.createHashMap(new String[]{\"debugger.panels\", \"debugger.panel_web\"},new Object[]{\"jadex.tools.debugger.bdiv3.BDIViewerDebuggerPanel\", \"jadex/tools/web/debugger/bdidebugger.js\"}))"))
 })
 @Properties(
 {

@@ -688,8 +688,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					//if(mi.getMethod().toString().indexOf("invokeServiceMe")!=-1)
 					//	System.out.println("heeereeee");
 					
-					if(mi.getMethod().toString().indexOf("isAvailable")!=-1)
-						System.out.println("params: "+Arrays.toString(params));
+					//if(mi.getMethod().toString().indexOf("isAvailable")!=-1)
+					//	System.out.println("params: "+Arrays.toString(params));
 	
 					// Inject caller meta info
 					Map<String, String> callerinfos = extractCallerValues(request);
@@ -721,6 +721,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 								// *****
 
 								final Method method = mi.getMethod();
+								
+								//System.out.println("request: "+request.getRequestURL()+" "+fcallid+" "+method.getName()+" "+Arrays.toString(params));
 								
 								final Object ret = method.invoke(service, params);
 								ri.setMethod(method);
@@ -2133,6 +2135,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			//Optional<String> f = ri.getResultTypes().stream().filter(rt -> rt.indexOf("text/event-stream")!=-1).findFirst();
 			//if(f.isPresent())
 		//}
+		
+		if(ri.getException()!=null)
+			System.out.println("timeout ex"+ri);
 			
 		try
 		{

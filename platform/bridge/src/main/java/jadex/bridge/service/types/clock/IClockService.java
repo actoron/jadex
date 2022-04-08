@@ -168,5 +168,4 @@ public interface IClockService //extends IService
 	 */
 	// Hack!!! Remove?
 	public void setClock(String type, IThreadPool tp);
-	
 }

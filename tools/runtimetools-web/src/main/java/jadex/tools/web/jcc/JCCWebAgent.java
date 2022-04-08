@@ -467,11 +467,11 @@ public class JCCWebAgent implements IJCCWebService
 		
 		agent.searchService(new ServiceQuery<IService>((Class)null).setServiceIdentifier(sid))
 			.then(ser ->
-			{
-				IFuture<Object> fut = checkSecurityAndInvoke(ser, null, methodname, args, argtypes, rettype);
-				FutureFunctionality.connectDelegationFuture(ret, fut);
-			})
-			.catchEx(ret);
+		{
+			IFuture<Object> fut = checkSecurityAndInvoke(ser, null, methodname, args, argtypes, rettype);
+			FutureFunctionality.connectDelegationFuture(ret, fut);
+		})
+		.catchEx(ret);
 		
 		return ret;
 	}

@@ -1,15 +1,20 @@
 package jadex.bdiv3.examples.helloworld;
 
+import jadex.base.PlatformConfigurationHandler;
+import jadex.base.Starter;
 import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.examples.hellopure.HelloPureAgent;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.annotation.OnStart;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgentFactory;
@@ -31,6 +36,12 @@ import jadex.micro.annotation.Properties;
 @Properties({@NameValue(name="logging.level", value="Level.INFO")})
 public class HelloWorld
 {
+	// To spot who is loading class first
+	/*static 
+	{
+		Thread.currentThread().dumpStack();
+	}*/
+	
 	/** The bdi agent. */
 	@Agent
 	protected IInternalAccess agent;
@@ -82,6 +93,9 @@ public class HelloWorld
 	@OnStart
 	public void body()
 	{		
+		System.out.println("Hello agent suspend: "+agent.getId());
+		agent.suspendComponent().get();
+		System.out.println("Hello agent continued: "+agent.getId());
 		sayhello = "Hello BDI agent V3.";
 		System.out.println("body end: "+getClass().getName());
 	}
@@ -114,5 +128,15 @@ public class HelloWorld
 	{
 		System.out.println("3: "+goal.getText());
 		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Start a platform and the example.
+	 */
+	public static void main(String[] args) 
+	{
+		IExternalAccess platform = Starter.createPlatform(PlatformConfigurationHandler.getDefaultNoGui()).get();
+		CreationInfo ci = new CreationInfo().setFilenameClass(HelloWorld.class);
+		platform.createComponent(ci).get();
 	}
 }

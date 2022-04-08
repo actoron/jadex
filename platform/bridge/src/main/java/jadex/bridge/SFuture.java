@@ -8,7 +8,9 @@ import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.ComponentFutureFunctionality;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceEvent;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.registry.SlidingCuckooFilter;
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
@@ -153,20 +155,43 @@ public class SFuture
 	{
 		if(to>0)
 		{
+			boolean simul = SSimulation.isSimulating(ia);
+			
 			final long w = (long)(to*factor);
-			IComponentStep<Void> step = new IComponentStep<Void>()
-//			IComponentStep<Void> step = new ImmediateComponentStep<Void>()
+			IComponentStep<Void> step;
+			
+			if(simul)
 			{
-				public IFuture<Void> execute(IInternalAccess ia)
+				step = new IComponentStep<Void>()
 				{
-					if(!ret.isDone())
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ret.sendForwardCommand(IForwardCommandFuture.Type.UPDATETIMER);
-						ia.getFeature(IExecutionFeature.class).waitForDelay(w, this, realtime);
+						if(!ret.isDone())
+						{
+							ret.sendForwardCommand(IForwardCommandFuture.Type.UPDATETIMER);
+							ia.getFeature(IExecutionFeature.class).waitForDelay(w, this, realtime);
+						}
+						return IFuture.DONE;
 					}
-					return IFuture.DONE;
-				}
-			};
+				};
+			}
+			// use immediate steps to avoid timeouts in realtime use
+			else
+			{
+				step = new ImmediateComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						if(!ret.isDone())
+						{
+							ret.sendForwardCommand(IForwardCommandFuture.Type.UPDATETIMER);
+							ia.getFeature(IExecutionFeature.class).waitForDelay(w, this, realtime);
+						}
+						return IFuture.DONE;
+					}
+				};
+			}
+			
 //			ia.getFeature(IExecutionFeature.class).waitForDelay(w, step, realtime);
 			
 			// Send the first update immediately since the avoid is set up at

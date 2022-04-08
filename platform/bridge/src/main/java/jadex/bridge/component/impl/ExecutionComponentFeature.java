@@ -28,6 +28,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.ITypedComponentStep;
+import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.StepAborted;
 import jadex.bridge.StepAbortedException;
@@ -320,6 +321,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	public <T>	IFuture<T> scheduleStep(int priority, IComponentStep<T> step)
 	{
 		final Future<T> ret = createStepFuture(step);
+		
+		/*if(component.getId().toString().indexOf("HelloW")!=-1)
+		{
+			System.out.println("schedule step: "+(step instanceof IPriorityComponentStep)+" "+step);
+			//Thread.currentThread().dumpStack();
+		}*/
 		
 		synchronized(this)
 		{
@@ -1354,9 +1361,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{			
 			if(steps!=null && steps.size()>0) 
 			{				
-//				if(getComponent().getComponentIdentifier().getName().indexOf("Hello")!=-1)
-//					System.out.println("executing");
 				StepInfo si = steps.first();
+				//if(getComponent().getId().getName().indexOf("HelloW")!=-1)
+				//	System.out.println("executing: "+getComponent().getId()+" "+si.getStep());
 				priostep = si.getPriority()>=STEP_PRIORITY_IMMEDIATE;
 		
 				// Suspend when breakpoint is triggered.

@@ -8,6 +8,7 @@ import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
@@ -24,7 +25,7 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 	//-------- attributes --------
 	
 	/** The component adapter. */
-	protected IInternalAccess	agent;
+	protected IInternalAccess agent;
 	
 	/** The current future. */
 	protected Future<?>	future;
@@ -101,43 +102,56 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 	{
 //		System.out.println("ComponentSuspendable.resume "+Thread.currentThread());
 //		Thread.dumpStack();
-		if(!agent.getFeature(IExecutionFeature.class).isComponentThread())
+		
+		// Defer wakeup when suspended
+		if(agent.getDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
 		{
-//			System.out.println("ComponentSuspendable.resume1 "+Thread.currentThread());
-			agent.getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
+			agent.scheduleStep(ia ->
 			{
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-//					System.out.println("ComponentSuspendable.resume2 "+Thread.currentThread());
-					synchronized(ComponentSuspendable.this)
-					{
-//						System.out.println("ComponentSuspendable.resume3 "+Thread.currentThread());
-						// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
-						if(future==ComponentSuspendable.this.future)
-						{
-//							System.out.println("ComponentSuspendable.resume4 "+Thread.currentThread());
-							beforeSwitch();
-							((IInternalExecutionFeature)agent.getFeature(IExecutionFeature.class))
-								.unblock(ComponentSuspendable.this, null);
-						}
-					}
-					return IFuture.DONE;
-				}
+				resume(future);
+				return IFuture.DONE;
 			});
 		}
 		else
 		{
-//			System.out.println("ComponentSuspendable.resume5 "+Thread.currentThread());
-			synchronized(this)
+			if(!agent.getFeature(IExecutionFeature.class).isComponentThread())
 			{
-//				System.out.println("ComponentSuspendable.resume6 "+Thread.currentThread());
-				// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
-				if(future==this.future)
+	//			System.out.println("ComponentSuspendable.resume1 "+Thread.currentThread());
+				agent.getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
 				{
-//					System.out.println("ComponentSuspendable.resume7 "+Thread.currentThread());
-//					beforeSwitch();	// Todo: why not beforeSwitch()?
-					((IInternalExecutionFeature)agent.getFeature(IExecutionFeature.class))
-						.unblock(this, null);
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+	//					System.out.println("ComponentSuspendable.resume2 "+Thread.currentThread());
+						synchronized(ComponentSuspendable.this)
+						{
+	//						System.out.println("ComponentSuspendable.resume3 "+Thread.currentThread());
+							// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
+							if(future==ComponentSuspendable.this.future)
+							{
+	//							System.out.println("ComponentSuspendable.resume4 "+Thread.currentThread());
+								beforeSwitch();
+								((IInternalExecutionFeature)agent.getFeature(IExecutionFeature.class))
+									.unblock(ComponentSuspendable.this, null);
+							}
+						}
+						return IFuture.DONE;
+					}
+				});
+			}
+			else
+			{
+	//			System.out.println("ComponentSuspendable.resume5 "+Thread.currentThread());
+				synchronized(this)
+				{
+	//				System.out.println("ComponentSuspendable.resume6 "+Thread.currentThread());
+					// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
+					if(future==this.future)
+					{
+	//					System.out.println("ComponentSuspendable.resume7 "+Thread.currentThread());
+	//					beforeSwitch();	// Todo: why not beforeSwitch()?
+						((IInternalExecutionFeature)agent.getFeature(IExecutionFeature.class))
+							.unblock(this, null);
+					}
 				}
 			}
 		}

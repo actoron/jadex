@@ -1490,7 +1490,7 @@ public class SComponentManagementService
 			}
 		}
 		
-		if (notifylisteners)
+		if(notifylisteners)
 			SComponentManagementService.notifyListenersChanged(desc);
 		
 		return ret;

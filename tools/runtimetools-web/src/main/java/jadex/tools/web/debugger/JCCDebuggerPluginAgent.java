@@ -1,6 +1,9 @@
 package jadex.tools.web.debugger;
 
+import java.util.Collection;
+
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -12,7 +15,9 @@ import jadex.commons.Boolean3;
 import jadex.commons.IFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -115,7 +120,7 @@ public class JCCDebuggerPluginAgent extends JCCPluginAgent implements IJCCDebugg
 		agent.getDescription(compo).then(desc ->
 		{
 			SComponentFactory.getProperty(agent.getExternalAccess(compo), desc.getType(), "debugger.panel_web")
-			.then(filename ->
+				.then(filename ->
 			{
 				if(filename!=null)
 					loadResource((String)filename).delegate(ret);
@@ -172,13 +177,15 @@ public class JCCDebuggerPluginAgent extends JCCPluginAgent implements IJCCDebugg
 	 */
 	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToComponent(IComponentIdentifier compo)
 	{
-		return agent.getExternalAccess(compo).subscribeToEvents(new IFilter<IMonitoringEvent>()
+		ISubscriptionIntermediateFuture<IMonitoringEvent> fut = agent.getExternalAccess(compo).subscribeToEvents(new IFilter<IMonitoringEvent>()
 		{
 			public boolean filter(IMonitoringEvent ev)
 			{
 				return ev.getType().endsWith("step");//MicroAgentInterpreter.TYPE_STEP);	
 			}
 		}, true, PublishEventLevel.FINE);
+		
+		return fut;
 	}
 	
 	

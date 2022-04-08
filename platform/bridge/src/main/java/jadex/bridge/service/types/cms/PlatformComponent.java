@@ -110,6 +110,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		tmp.add("killComponent");
 		tmp.add("killComponents");
 		tmp.add("stepComponent");
+		tmp.add("subscribeToEvents");
 		SUSPEND_METHOD_EXEMPTIONS = Collections.unmodifiableSet(tmp);
 	}
 	
@@ -1475,7 +1476,18 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 */
 	public IFuture<Void> suspendComponent(IComponentIdentifier componentid)
 	{
-		return SComponentManagementService.suspendComponent(componentid, getInternalAccess());
+		// if suspends itself do it in a step to allow suspension on suspendComponent().get()
+		if(componentid.equals(ia.getId()))
+		{
+			return ia.scheduleStep(ia ->
+			{
+				return SComponentManagementService.suspendComponent(componentid, getInternalAccess());
+			});
+		}
+		else
+		{
+			return SComponentManagementService.suspendComponent(componentid, getInternalAccess());
+		}
 	}
 	
 	/**
@@ -1568,8 +1580,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			if(shutdown && debug)
 				PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.invoke(): "+cid+", "+method+", "+SUtil.arrayToString(args));
 
-//			if(method.getName().indexOf("searchService")!=-1)
-//				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+			//if(method.getName().indexOf("invoke")!=-1)
+			//	System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 			
 			Class<?> rettype = method.getReturnType();
 			

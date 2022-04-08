@@ -424,7 +424,7 @@ public class Starter
 		
 		// Make all argument keys lower case.
 		final Map<String, Object> args = pargs != null ? new HashMap<>() : null;
-		if (args != null)
+		if(args != null)
 		{
 			for (Map.Entry<String, Object> entry : pargs.entrySet())
 				args.put(entry.getKey() != null ? entry.getKey().toLowerCase() : null, entry.getValue()); 

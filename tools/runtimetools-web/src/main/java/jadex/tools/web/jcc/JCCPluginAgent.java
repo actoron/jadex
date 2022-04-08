@@ -12,7 +12,6 @@ import jadex.micro.annotation.Agent;
 
 /**
  *  Abstract base class for plugin agents.
- *  
  *  Supports UI code loading. 
  */
 @Agent
