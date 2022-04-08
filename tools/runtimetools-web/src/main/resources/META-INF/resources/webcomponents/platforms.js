@@ -35,10 +35,10 @@ class PlatformsElement extends BaseElement
 		console.log('platforms');
 	}
 	
-	postInit()
+	/*postInit()
 	{
 		console.log('platforms postinit');
-	}
+	}*/
 	
 	connectedCallback() 
 	{

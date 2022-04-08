@@ -92,76 +92,64 @@ export class LoginElement extends BaseElement
 	login(pass)
 	{
 		let self = this;
-		axios.get('webjcc/login?pass='+pass, {headers: {'x-jadex-login': pass}}, self.transform).then(function(resp)
-		//axios.get('webjcc/login?pass='+pass, self.transform).then(function(resp)
+		let checkbox = self.shadowRoot.getElementById("rememberpassword");
+		var store = checkbox.checked; 
+		
+		var prom = this.app.login.login(pass, store);
+		
+		prom.then(l =>
 		{
-			//console.log("logged in: "+resp);
-			//self.loggedin = true;
-			self.app.login.setLogin(true);
-			
 			if(typeof(Storage) !== undefined) 
 			{
-				let checkbox = self.shadowRoot.getElementById("rememberpassword");
-				if(checkbox.checked) 
-				{
-					localStorage.setItem("platformpassword", pass);
-					checkbox.checked = false
-				}
+				localStorage.setItem("platformpassword", pass);
+				checkbox.checked = false;
 			}
 			
-			//window.location.href = "/#/platforms";
-			self.createInfoMessage("logged in");
+			if(l)
+			{
+				self.createInfoMessage("login successful");
+			}
+			else
+			{
+				self.createErrorMessage("login failed");
+			}
 		})
-		.catch(function(err) 
+		.catch(err =>
 		{
-			//console.log("login failed: "+err);	
 			self.createErrorMessage("login failed", err);
-			//self.loggedin = false;
-			self.app.login.setLogin(false);
 		});
+		
+		return prom;
 	}
 	
 	logout()
 	{
-		let self = this;
-		axios.get('webjcc/logout', {headers: {'x-jadex-logout': true}}, self.transform).then(function(resp)
-		//axios.get('webjcc/login?pass='+pass, self.transform).then(function(resp)
+		var prom = this.app.login.logout();
+		
+		prom.then(l =>
 		{
-			//console.log("logged out: "+resp);
-			//self.loggedin = false;
-			self.app.login.setLogin(false);
 			self.createInfoMessage("logged out");
 		})
-		.catch(function(err) 
+		.catch(err =>
 		{
-			//console.log("logout failed: "+err);	
-			//self.loggedin = false;
-			self.app.login.setLogin(false);
 			self.createErrorMessage("logout failed", err);
 		});
-		localStorage.removeItem("platformpassword");
+		
+		return prom;
 	}
 	
 	isLoggedIn()
 	{
 		let self = this;
-		return new Promise(function(resolve, reject) 
+		
+		var prom = this.app.login.checkLoggedIn();
+		
+		prom.catch(err =>
 		{
-			axios.get('webjcc/isLoggedIn', {headers: {'x-jadex-isloggedin': true}}, self.transform).then(function(resp)
-			{
-				//console.log("is logged in: "+resp);
-				//self.loggedin = resp.data;
-				self.app.login.setLogin(resp.data);
-				resolve(self.loggedin);
-			})
-			.catch(function(err) 
-			{
-				//console.log("check failed: "+err);
-				self.createErrorMessage("check failed", err);
-				//this.app.login.setLogin(false);	
-				reject(err);
-			});
+			self.createErrorMessage("check failed", err);
 		});
+		
+		return prom;
 	}
 	
 	static get styles() 

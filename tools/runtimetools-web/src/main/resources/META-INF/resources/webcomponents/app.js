@@ -120,7 +120,7 @@
 			}
 			//console.log("loggedin is: "+this.loggedin);
 		},
-		isLoggedIn: function()
+		isLoggedIn()
 		{
 			return this.loggedin;
 		},
@@ -141,7 +141,140 @@
 					reject(err);
 				});
 			});
+		},
+		relogin(store)
+		{
+			return new Promise((resolve, reject) =>
+			{
+				let pass = localStorage.getItem("platformpassword")
+				//console.log("session store pass " + pass);
+				if(pass)
+				{
+					this.checkLoggedIn().then(l =>
+					{
+						//console.log("check result: "+l);
+						if(!l)
+						{
+							this.login(pass, store).then(l =>
+							{
+								resolve(l);
+							})
+							.catch(err =>
+							{
+								reject(err);
+							});
+						}
+						else
+						{
+							resolve(true);
+						}
+					})
+					.catch(err =>
+					{
+						this.login(pass, store).then(l =>
+						{
+							resolve(l);
+						})
+						.catch(err =>
+						{
+							reject(err);
+						});
+					});
+				}
+				else
+				{
+					resolve(false);
+				}
+			});
+		},
+		login(pass, store)
+		{
+			let self = this;
+			
+			return new Promise((resolve, reject) => 
+			{
+				axios.get('webjcc/login?pass='+pass, {headers: {'x-jadex-login': pass}}).then(function(resp)
+				//axios.get('webjcc/login?pass='+pass, self.transform).then(function(resp)
+				{
+					//console.log("logged in: "+resp);
+					//self.loggedin = true;
+					self.setLogin(true);
+					
+					if(typeof(Storage) !== undefined) 
+					{
+						if(store) 
+						{
+							localStorage.setItem("platformpassword", pass);
+						}
+					}
+					
+					//window.location.href = "/#/platforms";
+					resolve();
+				})
+				.catch(function(err) 
+				{
+					//console.log("login failed: "+err);	
+					//self.loggedin = false;
+					self.setLogin(false);
+					reject(err);
+				});
+			});
+		},
+		checkLoggedIn()
+		{
+			let self = this;
+			return new Promise((resolve, reject) => 
+			{
+				axios.get('webjcc/isLoggedIn', {headers: {'x-jadex-isloggedin': true}}).then(function(resp)
+				{
+					//console.log("is logged in: "+resp);
+					//self.loggedin = resp.data;
+					self.setLogin(resp.data);
+					resolve(self.loggedin);
+				})
+				.catch(function(err) 
+				{
+					self.setLogin(false);
+					//console.log("check failed: "+err);
+					//this.app.login.setLogin(false);	
+					resolve(false);
+				});
+			});
+		},
+		logout()
+		{
+			let self = this;
+			return new Promise((resolve, reject) => 
+			{
+				axios.get('webjcc/logout', {headers: {'x-jadex-logout': true}}).then(function(resp)
+				{
+					//console.log("logged out: "+resp);
+					//self.loggedin = false;
+					self.setLogin(false);
+					resolve();
+				})
+				.catch(function(err) 
+				{
+					//console.log("logout failed: "+err);	
+					//self.loggedin = false;
+					self.setLogin(false);
+					reject(err);
+				});
+				localStorage.removeItem("platformpassword");
+			});
 		}
+	}
+	console.log("app loaded/inited");
+	if(window.jadexapp==null)
+	{
+		window.jadexapp = new Promise(function(resolve, reject) 
+		{
+			resolve(app);	
+		});
+	}
+	else
+	{
+		window.jadexapp.resolve(app);
 	}
 	
 	return app;
