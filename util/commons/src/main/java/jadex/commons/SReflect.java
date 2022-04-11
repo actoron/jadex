@@ -2303,9 +2303,10 @@ public class SReflect
 			//if(fi.getName().endsWith(".class") && filter.filter(fi))
 			if(filter.filter(fi))
 			{
-				String fn = SUtil.convertPathToPackage(fi.getAbsolutePath(), urls);
+				//String fn = SUtil.convertPathToPackage(fi.getAbsolutePath(), urls);
 //				System.out.println("fn: "+fi.getName());
-				results.add(fn+"."+fi.getName());
+				//results.add(fn+"."+fi.getName());
+				results.add(fi.getAbsolutePath());
 			}
 		}
 		
