@@ -1081,7 +1081,7 @@ public class SClassReader
 		 *  Get the package name of the class.
 		 *  @return Package name.
 		 */
-		public String getPackage()
+		public String getPackageName()
 		{
 			return classname.substring(0, classname.lastIndexOf('.'));
 		}
