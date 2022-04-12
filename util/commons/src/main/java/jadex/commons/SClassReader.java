@@ -1076,6 +1076,15 @@ public class SClassReader
 			this.classname = classname;
 			this.annotations = annotations;
 		}
+		
+		/**
+		 *  Get the package name of the class.
+		 *  @return Package name.
+		 */
+		public String getPackage()
+		{
+			return classname.substring(0, classname.lastIndexOf('.'));
+		}
 
 		/**
 		 *  Get the classname.
