@@ -52,7 +52,7 @@ class ModelTree extends CidElement
 			{ 
 				self.getTree(self.treeid).jstree(
 				{
-					"core" : {"check_callback" : true},
+					"core" : {"check_callback" : true, "multiple": false},
 					"plugins" : ["sort", "types"],
 					'sort': function(a, b) 
 					{
@@ -72,7 +72,7 @@ class ModelTree extends CidElement
 				
 				self.getTree(self.treeid).on('select_node.jstree', function (e, data) 
 				{
-					console.log("tree select: "+data.node.id);
+					//console.log("tree select: "+data.node.id);
 					self.select(data.instance.get_path(data.node.id, '.'));
 				});
 				
@@ -253,7 +253,7 @@ class ModelTree extends CidElement
 		return ret;
 	}
 	
-	getModelName(name)
+	/*getModelName(name)
 	{
 		var ret = null;
 		var n = name.lastIndexOf(".");
@@ -268,13 +268,13 @@ class ModelTree extends CidElement
 		}
 		
 		return ret;
-	}
+	}*/
 		
 	selectModel(filename)
 	{
 		var self = this;
 		
-		console.log("selected: "+filename);
+		//console.log("selected: "+filename);
 		
 		axios.get(this.getMethodPrefix()+'&methodname=loadComponentModel&args_0='+filename+"&argtypes_0=java.lang.String", this.transform).then(function(resp)
 		{
@@ -316,7 +316,10 @@ class ModelTree extends CidElement
 			
 			if(idx>-1)
 			{
+				this.getTree(this.treeid).jstree('close_all');
 				filename = this.models[idx][0];
+				this.openPath(this.treeid, this.models[idx]);
+				this.getTree(this.treeid).jstree('activate_node', filename);
 			}
 		}
 		// called from tree
@@ -378,7 +381,21 @@ class ModelTree extends CidElement
 			sep = "\\";
 		return sep;
 	}
+	
+	openPath(treeid, model)
+	{
+		var filename = model[0];
+		var pack = model[1];
 		
+		var nodeid = filename;
+		while(nodeid != '#') 
+		{
+        	this.getTree(treeid).jstree('open_node', nodeid);
+        	var node = this.getTree(treeid).jstree("get_node", nodeid);
+        	nodeid = this.getTree(treeid).jstree("get_parent", node);
+		}
+	}
+	
 	createNodes(treeid, model)
 	{
 		var filename = model[0];

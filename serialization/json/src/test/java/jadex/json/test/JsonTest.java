@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.transformation.A;
 import jadex.commons.transformation.B;
 import jadex.transformation.jsonserializer.JsonString;
@@ -36,14 +37,18 @@ public class JsonTest extends jadex.commons.transformation.Test
 
 	/**
 	 * Main for testing single methods.
-	 */
+	 * /
 	public static void main(String[] args)
 	{
 		JsonTest t = new JsonTest();
-		t.performTests(1);
+		UnparsedExpression ue = new UnparsedExpression("name", "new String[]{'a', 'b'}");
+		
+		System.out.println(new String((byte[])t.doWrite(ue)));
+		
+		/*t.performTests(1);
 		t.testExcludes();
-		t.testRawJson();
-	}
+		t.testRawJson();* /
+	}*/
 	
 	/**
 	 *  Test raw JSON handling.

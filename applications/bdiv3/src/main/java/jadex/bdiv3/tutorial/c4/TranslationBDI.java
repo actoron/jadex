@@ -21,8 +21,10 @@ import jadex.micro.annotation.Description;
 @Description("The clock agent C4. <br>  This translation agent uses an argument.")
 @Agent(type=BDIAgentFactory.TYPE)
 @Service
-@Arguments(@Argument(name="wordpair", clazz=String[].class, 
-	defaultvalue="new String[]{\"bugger\", \"Flegel\"}"))
+@Arguments({
+	@Argument(name="wordpair", clazz=String[].class,  defaultvalue="new String[]{\"bugger\", \"Flegel\"}")//,
+	//@Argument(name="test", clazz=int.class,  defaultvalue="23")
+})
 public class TranslationBDI
 {
 	/** The current time. */

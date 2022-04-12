@@ -23,6 +23,7 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.wrappers.MapWrapper;
 import jadex.commons.future.Future;
@@ -149,6 +150,20 @@ public class ArgumentsResultsComponentFeature extends AbstractComponentFeature	i
 		}
 		
 		initDefaultArguments();
+		
+		// Convert unparsed expressions to real object via parser
+		if(arguments!=null)
+		{
+			for(Map.Entry<String, Object> entry: arguments.entrySet())
+			{
+				if(entry.getValue() instanceof UnparsedExpression)
+				{
+					Object newval = SJavaParser.parseExpression((UnparsedExpression)entry.getValue(), component.getModel().getAllImports(), component.getClassLoader()).getValue(getValueFetcher());
+					arguments.put(entry.getKey(), newval);
+					//System.out.println("evaluating argument expression: "+entry.getKey());
+				}
+			}
+		}
 		
 		// Hack?! add component identifier to result as long as we don't have better future type for results
 		// could one somehow use the CallLocal for that purpose instead?

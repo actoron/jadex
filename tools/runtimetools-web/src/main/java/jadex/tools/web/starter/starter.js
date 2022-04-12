@@ -42,7 +42,7 @@ class StarterElement extends CidElement
 		{
 			this.listener = (e) => 
 			{
-				console.log("received jadex model event: "+e)
+				//console.log("received jadex model event: "+e)
 				self.model = e.detail.model;
 				self.requestUpdate();
 			}
@@ -125,7 +125,14 @@ class StarterElement extends CidElement
 					var el = this.shadowRoot.getElementById('arg_'+i);
 					var argval = el.value;
 					//console.log('arg_'+i+": "+argval);
-					args[this.model.arguments[i].name] = argval;
+					if(argval!=null && argval.length>0)
+					{
+						var name = this.model.arguments[i].name;
+						var ue = {"__classname": "jadex.bridge.modelinfo.UnparsedExpression",
+									"name": name, 
+									"value": argval}
+						args[name] = ue; // set as expressions to let agent evaluate the strings
+					}
 				}
 			}
 			
@@ -221,6 +228,14 @@ class StarterElement extends CidElement
 			.flexgrow {
 				flex-grow: 1;
 			}
+			.grid-container-args {
+				display: grid;
+				grid-template-columns: min-content min-content auto auto; 
+				grid-template-rows: minmax(min-content, max-content);
+				grid-auto-flow: row;
+				grid-gap: 10px;
+				align-items: center;
+			}
 			.yscrollable {
 				overflow-y: auto;
 			}
@@ -239,6 +254,10 @@ class StarterElement extends CidElement
 			.w100 {
 				width: 100%;
 				box-sizing: border-box;
+			}
+			.padding1 {
+				padding: 1em;
+			}
 		    `);
 		return ret;
 	}
@@ -292,13 +311,15 @@ class StarterElement extends CidElement
 					${this.app.lang.t('Synchronous')}
 					<input type="checkbox" class="alignleft" id="synchronous"></input>
 					
-					<div class="${this.getArguments().length==0? 'hidden': ''}">
+					<fieldset class="padding1 grid-container-args span ${this.getArguments().length==0? 'hidden': ''}">
+  						<legend>Parameters</legend>
 						${this.getArguments().map((arg, i) => html`
-						${"["+arg.clazz.value+"] "+arg.name}
-						<input class="fullwidth" type="text" value="${arg.value!=null? arg.value: ''}" readonly></input>
-						<input class="fullwidth" type="text" id="${'arg_'+i}">
+							<div>${arg.name}</div>
+							<div>${arg.clazz.value}</div>
+							<input class="fullwidth" type="text" value="${arg.value!=null? arg.value: ''}" readonly></input>
+							<input class="fullwidth" type="text" id="${'arg_'+i}">
 						`)}
-					</div>
+					</fieldset>
 					
 					<div class="span right">
 						<button class="jadexbtn" @click="${e => this.start(e)}">Start</button>
