@@ -20,7 +20,7 @@ class ModelTree extends CidElement
 	
 	init()
 	{
-		//console.log("modetree init");
+		console.log("modetree init");
 		
 		let self = this;
 		this.app.lang.listeners.add(this);
@@ -33,6 +33,15 @@ class ModelTree extends CidElement
 		this.progressnow = 0;
 		this.progressmax = 100;
 		
+		var model = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/applications.png';
+		
+		this.types =
+		{
+			//"default" : {"icon": b},
+		    "model" : {"icon": model}
+		}
+		
+		
 		//console.log("modeltree");
 		this.loadJSTree().then(function()
 		{
@@ -44,7 +53,7 @@ class ModelTree extends CidElement
 				self.getTree(self.treeid).jstree(
 				{
 					"core" : {"check_callback" : true},
-					"plugins" : ["sort"],
+					"plugins" : ["sort", "types"],
 					'sort': function(a, b) 
 					{
 				        var a1 = this.get_node(a);
@@ -57,7 +66,14 @@ class ModelTree extends CidElement
 				        {
 				            return (a1.icon > b1.icon) ? 1 : -1;
 				        }
-					}
+					},
+			    	"types": self.types
+				});
+				
+				self.getTree(self.treeid).on('select_node.jstree', function (e, data) 
+				{
+					console.log("tree select: "+data.node.id);
+					self.select(data.instance.get_path(data.node.id, '.'));
 				});
 				
 				// no args here
@@ -82,7 +98,7 @@ class ModelTree extends CidElement
 						{
 							changed = true;
 							//self.createModelTree(self.treeid);
-							self.createNodes(self.treeid, response.data[i][1]);
+							self.createNodes(self.treeid, response.data[i]);
 						}
 					}
 					
@@ -205,7 +221,9 @@ class ModelTree extends CidElement
 		{
 			for(var i=0; i<this.models.length; i++)
 			{
-				ret.push(this.getModelName(this.models[i][1]));
+				var sep = this.getFilenameSeparator(this.models[i][0]);
+				var name = this.models[i][0].substring(this.models[i][0].lastIndexOf(sep)+1);
+				ret.push({name: name, pck: this.models[i][1]});
 			}
 		}
 		
@@ -256,7 +274,7 @@ class ModelTree extends CidElement
 	{
 		var self = this;
 		
-		//console.log("selected: "+filename);
+		console.log("selected: "+filename);
 		
 		axios.get(this.getMethodPrefix()+'&methodname=loadComponentModel&args_0='+filename+"&argtypes_0=java.lang.String", this.transform).then(function(resp)
 		{
@@ -277,34 +295,43 @@ class ModelTree extends CidElement
 	select(name)
 	{
 		var sel;
+		var filename;
 		// called from input box
 		if(typeof name!="string")
 		{
 			sel = this.shadowRoot.getElementById("model").value;
+			
+			var opts = this.shadowRoot.getElementById("models").options;
+			var idx = -1;
+	
+			for(var i=0; i<opts.length; i++)
+			{
+				if(opts[i].value==sel)
+				{
+					idx = i;
+					break;
+				}
+			}
+			//console.log(idx);
+			
+			if(idx>-1)
+			{
+				filename = this.models[idx][0];
+			}
 		}
 		// called from tree
 		else
 		{
-			var m = this.getModelName(name);
-			sel = m.name+" ["+m.pck+"]";
+			filename = name;
 		}
-		var opts = this.shadowRoot.getElementById("models").options;
-		var idx = -1;
-
-		for(var i=0; i<opts.length; i++)
-		{
-			if(opts[i].value==sel)
-			{
-				idx = i;
-				break;
-			}
-		}
-		//console.log(idx);
 		
-		if(idx>-1)
+		if(filename)
 		{
-			var filename = this.models[idx][0];
 			this.selectModel(filename);
+		}
+		else
+		{
+			console.log("selected element not found: "+filename);
 		}
 	}
 		
@@ -320,7 +347,7 @@ class ModelTree extends CidElement
 		for(var i=0; i<this.models.length; i++)
 		{
 			//console.log(self.models[i]);
-			this.createNodes(treeid, this.models[i][1]);
+			this.createNodes(treeid, this.models[i]);
 		}
 	}
 	
@@ -329,7 +356,7 @@ class ModelTree extends CidElement
 		for(var i=0; i<this.models.length; i++)
 		{
 			//console.log(self.models[i]);
-			this.createNodes(treeid, this.models[i][1]);
+			this.createNodes(treeid, this.models[i]);
 		}
 	}
 		
@@ -344,33 +371,49 @@ class ModelTree extends CidElement
 		}
 	}
 		
+	getFilenameSeparator(filename)
+	{
+		var sep = "/";
+		if(filename.indexOf("\\")!=-1)
+			sep = "\\";
+		return sep;
+	}
+		
 	createNodes(treeid, model)
 	{
-		var sep = ".";
-		//var sep = "/";
-		//if(model.indexOf("\\")!=-1)
-		//	sep = "\\";
-		var parts = model.split(sep);
+		var filename = model[0];
+		var pack = model[1];
+		
+		var sep = this.getFilenameSeparator(filename);
+		
+		var name = filename.substring(filename.lastIndexOf(sep)+1);
+		
+		var parts = pack.split(".");
 		
 		var lastprefix = '';
 		var prefix = parts[0];
 		
 		for(var i=0; i<parts.length; i++)
 		{
-			prefix = !lastprefix? parts[i]: lastprefix+sep+parts[i];
+			prefix = !lastprefix? parts[i]: lastprefix+"."+parts[i];
+			
+			// if node not already exists, create it
 			if(!this.getTree(treeid).jstree('get_node', prefix))
-				this.createNode(treeid, lastprefix, prefix, parts[i], 'last');
+				this.createNode(treeid, lastprefix, prefix, parts[i], 'last', "package");
 			//else
 			//	console.log("not creating: "+prefix);
 			lastprefix = prefix;
 		}
+		
+		if(!this.getTree(treeid).jstree('get_node', filename))
+			this.createNode(treeid, lastprefix, filename, name, 'last', "model");
 	}
 		
 	// createNode(parent, id, text, position), position 'first' or 'last'
-	createNode(treeid, parent_node_id, new_node_id, new_node_text, position)//, donefunc) 
+	createNode(treeid, parent_node_id, new_node_id, new_node_text, position, type)//, donefunc) 
 	{
 		//console.log("parent="+parent_node_id+" child="+new_node_id+" childtext="+new_node_text);
-		this.getTree(treeid).jstree('create_node', '#'+parent_node_id, {"text": new_node_text, "id": new_node_id }, 'last');	
+		this.getTree(treeid).jstree('create_node', '#'+parent_node_id, {"text": new_node_text, "id": new_node_id, "type": type}, position);	
 	}
 		
 	static get styles() 

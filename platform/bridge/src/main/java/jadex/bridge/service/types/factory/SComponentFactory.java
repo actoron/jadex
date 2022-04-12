@@ -1006,6 +1006,7 @@ public class SComponentFactory
 	 */
 	public static ISubscriptionIntermediateFuture<Collection<String[]>> getComponentModelsAsStream(IInternalAccess component)
 	{
+		// return cached models if already scanned and no changes
 		Object models = (Collection<Collection<String[]>>)Starter.getPlatformValue(component.getId().getRoot(), Starter.DATA_COMPONENTMODELS);
 		if(models instanceof Collection)
 		{
@@ -1064,11 +1065,11 @@ public class SComponentFactory
 	 *  Scans for component models and returns them as stream.
 	 *  @return Collection<String[](filename, classname)>>
 	 */
-	public static ISubscriptionIntermediateFuture<Collection<String[]>> getComponentModelsAsStream(IInternalAccess component, URL[] urls)
+	public static ISubscriptionIntermediateFuture<Collection<String[]>> getComponentModelsAsStream(IInternalAccess component, URL[] purls)
 	{
 		SubscriptionIntermediateFuture<Collection<String[]>> ret = new SubscriptionIntermediateFuture<>();
 		
-		urls = SUtil.removeSystemUrls(urls);	
+		final URL[] urls = SUtil.removeSystemUrls(purls);	
 		final List<URL> urllist = SUtil.arrayToList(urls);
 		final Iterator<URL> it = (Iterator<URL>)urllist.iterator();
 		//System.out.println("getComponentModelsAsStream: "+l.size());
@@ -1097,13 +1098,18 @@ public class SComponentFactory
 				try
 				{
 					Set<SClassReader.ClassFileInfo> cis = SReflect.scanForClassFileInfos(url, null, fil);
-					res = cis.stream().map(a -> new String[]{a.getFilename(), a.getClassInfo().getClassName()}).collect(Collectors.toList());
+					// todo: use getPackage()
+					res = cis.stream().map(a -> new String[]{a.getFilename(), 
+						a.getClassInfo().getClassName().substring(0, a.getClassInfo().getClassName().lastIndexOf("."))}).collect(Collectors.toList());
 				}
 				catch(Exception e)
 				{
 					System.out.println("scan class file infos: "+e);
 				}
-					
+
+				//if(res.size()>0)
+				//	System.out.println("found: "+res.size());
+				
 				//IIntermediateFuture<String> fut = scanForFilesAsync(url[0], mff);
 				//fut.next(er -> res.add(new String[]{er, er}))
 				//	.finished(v -> ret.setResult(res))
@@ -1124,17 +1130,17 @@ public class SComponentFactory
 				
 				for(String r: res2)
 				{
-					// strip suffix for name
-					String name = r;
-					int idx = r.lastIndexOf(".");
-					if(idx!=-1)
-						name = r.substring(0, idx);
-					res.add(new String[]{r, name});
+					String pname = SUtil.convertPathToPackage(r, urls);
+					//String mname = r.substring(r.lastIndexOf(File.separator)+1);
+					res.add(new String[]{r, pname});//+"."+mname});
 				}
 				
 				//if(url[0].toString().indexOf("applications")!=-1 && url[0].toString().indexOf("bpmn")!=-1)
-				//if(res.size()>0)
-				//System.out.println("found for: "+url[0]+" "+res.size());
+				/*if(res.size()>0)
+				{
+					System.out.println("found for: "+url[0]+" "+res.size());
+					res.stream().forEach(a -> System.out.println(Arrays.toString(a)));
+				}*/
 				
 				ret.setResult(res);
 				
