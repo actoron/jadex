@@ -36,7 +36,7 @@ public interface ISuspendable
 	 *  Resume the execution of the suspendable.
 	 *  @param future The future that issues the resume.
 	 */
-	public void resume(Future<?> future);
+	public void resume(Future<?> future);//, boolean force);
 	
 	/**
 	 *  Get the monitor for waiting.

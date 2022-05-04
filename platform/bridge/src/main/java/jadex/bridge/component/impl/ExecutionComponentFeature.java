@@ -1472,6 +1472,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					
 					try
 					{
+						//!!!!!!!!! execute the step !!!!!!!!!!!!!!
+						
 						stepfut	= step.getStep().execute(component);
 
 						
@@ -2210,6 +2212,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	public IFuture<Void> resumeComponent()
 	{
 		return getComponent().resumeComponent(component.getId());
+	}
+	
+	/**
+	 *  Check if component is in stepped execution.
+	 *  @return True, if is in stepped execution.
+	 */
+	public boolean isStepped()
+	{
+		return stepfuture!=null;
 	}
 	
 //	/**

@@ -73,5 +73,5 @@ public interface IJCCDebuggerService extends IJCCPluginService
 	 *  Subscribe to a component for monitoring events.
 	 *  @param compo The component cid.
 	 */
-	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToComponent(IComponentIdentifier compo);
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToComponent(IComponentIdentifier compo, String[] types);
 }

@@ -140,7 +140,7 @@ public class BDIViewerPanel extends JPanel
 		
 		JPanel	beliefpanel	= new JPanel(new BorderLayout());
 		beliefpanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Beliefs"));
-		final AbstractTableModel beliefmodel	= new AbstractTableModel()
+		final AbstractTableModel beliefmodel = new AbstractTableModel()
 		{
 			protected String[]	columnames	= new String[]{"Name", "Type", "Value"};
 			

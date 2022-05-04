@@ -246,7 +246,11 @@ class BDIV3AgentDebuggerElement extends CidElement
 
 		var self = this;
 		//console.log("sub at: "+this.cid);
-		self.sub.terminate = jadex.getIntermediate(this.getMethodPrefix()+'&methodname=subscribeToComponent&args_0='+this.cid+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
+		var types = ["goal", "plan", "fact", "step"];
+			self.sub.callid = jadex.getIntermediate(this.getMethodPrefix()+'&methodname=subscribeToComponent'
+			+'&args_0='+this.cid+'&args_1='+JSON.stringify(types)
+			+'&argtypes_0=jadex.bridge.IComponentIdentifier&argtypes_1=java.lang.String[]'
+			+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		response =>
 		{
 			//console.log("service sub received: "+response.data);
@@ -295,7 +299,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 		if(callid!=null)
 		{
 			this.sub.callid = null;
-			jadex.terminateCall(self.callid).then(() => 
+			jadex.terminateCall(callid).then(() => 
 			{
 				this.sub.connected = false;
 				//console.log("Terminated subscription: "+self.callid)
@@ -337,6 +341,96 @@ class BDIV3AgentDebuggerElement extends CidElement
 			{
 				this.history.push(event);
 				//hl.ensureIndexIsVisible(history.size()-1);
+			}
+		}
+		
+		if(event.type.endsWith("Fact"))
+		{
+			console.log("fact event: "+event);
+			/*
+			// Hack!!! create/disposal only for facts, not for beliefs, just check for changes, removal not supported.
+			int	index	= allbeliefs.indexOf(event.getProperty("details"));
+			if(index!=-1)
+			{
+				BeliefInfo	newinfo	= (BeliefInfo)event.getProperty("details");
+				BeliefInfo	oldinfo	= (BeliefInfo)allbeliefs.remove(index);
+				beliefs.remove(newinfo);
+				newinfo.setType(oldinfo.getType());	// Hack!!! Keep capability information which is unavailable for modified events.
+				allbeliefs.add(newinfo);
+				if(checkCapa(newinfo.getType()))
+					beliefs.add(newinfo);								
+			}
+			else
+			{
+				BeliefInfo bi = (BeliefInfo)event.getProperty("details");
+				allbeliefs.add(bi);
+				if(checkCapa(bi.getType()))
+					beliefs.add(bi);
+			}*/
+		}
+		else if(event.type.endsWith("Goal"))
+		{
+			if(event.type.startsWith("created"))
+			{
+				console.log("created goal");
+				/*GoalInfo gi = (GoalInfo)event.getProperty("details");
+				allgoals.add(gi);
+				if(checkCapa(gi.getType()))
+					goals.add(gi);*/
+			}
+			else if(event.type.startsWith("disposed"))
+			{
+				console.log("disposed goal");
+				/*allgoals.remove(event.getProperty("details"));
+				goals.remove(event.getProperty("details"));*/
+			}
+			else if(event.type.startsWith("modified"))
+			{
+				console.log("modified goal");
+				/*int	index	= allgoals.indexOf(event.getProperty("details"));
+				if(index!=-1)
+				{
+					GoalInfo	newinfo	= (GoalInfo)event.getProperty("details");
+					GoalInfo	oldinfo	= (GoalInfo)allgoals.remove(index);
+					goals.remove(newinfo);
+					newinfo.setType(oldinfo.getType());	// Hack!!! Keep capability information which is unavailable for modified events.
+					allgoals.add(newinfo);
+					if(checkCapa(newinfo.getType()))
+						goals.add(newinfo);
+				}*/
+			}
+		}
+				
+		else if(event.type.endsWith("Plan"))
+		{
+			if(event.type.startsWith("created"))
+			{
+				console.log("created plan");
+				/*PlanInfo pi = (PlanInfo)event.getProperty("details");
+				allplans.add(pi);
+				if(checkCapa(pi.getType()))
+					plans.add(pi);*/
+			}
+			else if(event.type.startsWith("disposed"))
+			{
+				console.log("disposed plan");
+				/*allplans.remove(event.getProperty("details"));
+				plans.remove(event.getProperty("details"));*/
+			}
+			else if(event.type.startsWith("modified"))
+			{
+				console.log("modified plan");
+				/*int	index	= allplans.indexOf(event.getProperty("details"));
+				if(index!=-1)
+				{
+					PlanInfo	newinfo	= (PlanInfo)event.getProperty("details");
+					PlanInfo	oldinfo	= (PlanInfo)allplans.remove(index);
+					plans.remove(newinfo);
+					newinfo.setType(oldinfo.getType());	// Hack!!! Keep capability information which is unavailable for modified events.
+					allplans.add(newinfo);
+					if(checkCapa(newinfo.getType()))
+						plans.add(newinfo);
+				}*/
 			}
 		}
 		

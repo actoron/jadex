@@ -92,6 +92,12 @@ public interface IExecutionFeature extends IExternalExecutionFeature
 	public boolean isComponentThread();
 
 	/**
+	 *  Check if component is in stepped execution.
+	 *  @return True, if is in stepped execution.
+	 */
+	public boolean isStepped();
+	
+	/**
 	 *  Create a result listener that is executed on the
 	 *  component thread.
 	 */

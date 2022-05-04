@@ -111,6 +111,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		tmp.add("killComponents");
 		tmp.add("stepComponent");
 		tmp.add("subscribeToEvents");
+		tmp.add("isStepped");
 		SUSPEND_METHOD_EXEMPTIONS = Collections.unmodifiableSet(tmp);
 	}
 	
@@ -1539,6 +1540,15 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	{
 		return SComponentManagementService.searchComponents(adesc, con, getInternalAccess());//, sid);
 	}
+	
+	/**
+	 *  Check if component is in stepped execution.
+	 *  @return True, if is in stepped execution.
+	 * /
+	public boolean isStepped()
+	{
+		
+	}*/
 	
 	/**
 	 *  Get the platform component.
