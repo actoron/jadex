@@ -112,6 +112,12 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		tmp.add("stepComponent");
 		tmp.add("subscribeToEvents");
 		tmp.add("isStepped");
+		//tmp.add("getDescription");
+		/*tmp.add("getRequiredMethodNFPropertyMetaInfos");
+		tmp.add("getRequiredNFPropertyMetaInfos");
+		tmp.add("getMethodNFPropertyMetaInfos");	
+		tmp.add("getNFPropertyMetaInfos");	
+		tmp.add("getChildren");*/
 		SUSPEND_METHOD_EXEMPTIONS = Collections.unmodifiableSet(tmp);
 	}
 	
@@ -1540,15 +1546,6 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	{
 		return SComponentManagementService.searchComponents(adesc, con, getInternalAccess());//, sid);
 	}
-	
-	/**
-	 *  Check if component is in stepped execution.
-	 *  @return True, if is in stepped execution.
-	 * /
-	public boolean isStepped()
-	{
-		
-	}*/
 	
 	/**
 	 *  Get the platform component.

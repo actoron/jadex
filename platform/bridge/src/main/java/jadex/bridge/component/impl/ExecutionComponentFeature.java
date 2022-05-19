@@ -332,6 +332,22 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			// Todo: synchronize with last step!
 			int prio = step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).getPriority(): priority;
+
+			// inherit priority in case of immediate steps
+			if(prio==STEP_PRIORITY_NORMAL)
+			{
+				StepInfo context = step.getCurrentStep();
+				if(context!=null)
+				{
+					int cprio = context.getPriority();
+					if(cprio==STEP_PRIORITY_IMMEDIATE)
+					{
+						prio = STEP_PRIORITY_IMMEDIATE;
+						//System.out.println("prio inherited: "+step);
+					}
+				}
+			}
+			
 //			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
 			if(endagenda.isDone() && prio<STEP_PRIORITY_IMMEDIATE)
 			{
@@ -1473,9 +1489,18 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					try
 					{
 						//!!!!!!!!! execute the step !!!!!!!!!!!!!!
+						IComponentStep<?> exstep = step.getStep();
 						
-						stepfut	= step.getStep().execute(component);
+						Thread tbefore = Thread.currentThread();
+						
+						exstep.setCurrentStep(step);
+						stepfut	= exstep.execute(component);
+						exstep.setCurrentStep(null);
+						
+						Thread tafter = Thread.currentThread();
 
+						if(!tbefore.equals(tafter))
+							System.out.println("switched thread: "+tbefore+" "+tafter);
 						
 						if(endstepcnt!=-1 && debug)
 							getComponent().getLogger().severe("execute()5: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState());

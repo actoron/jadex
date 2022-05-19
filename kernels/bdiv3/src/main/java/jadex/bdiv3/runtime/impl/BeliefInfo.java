@@ -17,10 +17,10 @@ public class BeliefInfo	extends AbstractBDIInfo
 	//-------- attributes --------
 	
 	/** The belief kind (belief or beliefset). */
-	protected String	kind;
+	protected String kind;
 	
 	/** The belief value type (e.g. int). */
-	protected String	valuetype;
+	protected String valuetype;
 	
 	/** The value(s) (string for belief or array of strings for belief set). */
 	protected Object value;
@@ -37,14 +37,14 @@ public class BeliefInfo	extends AbstractBDIInfo
 
 	/**
 	 *  Create a new belief info.
-	 */
+	 * /
 	public BeliefInfo(Object id, String kind, String type, String valuetype, Object value)
 	{
 		super(id, type);
 		this.kind	= kind;
 		this.valuetype	= valuetype;
 		this.value	= value;
-	}
+	}*/
 	
 	//--------- methods ---------
 	
@@ -59,9 +59,10 @@ public class BeliefInfo	extends AbstractBDIInfo
 	/**
 	 *  Set the kind.
 	 */
-	public void setKind(String kind)
+	public BeliefInfo setKind(String kind)
 	{
 		this.kind = kind;
+		return this;
 	}
 
 	/**
@@ -75,9 +76,10 @@ public class BeliefInfo	extends AbstractBDIInfo
 	/**
 	 *  Set the value type.
 	 */
-	public void setValueType(String valuetype)
+	public BeliefInfo setValueType(String valuetype)
 	{
 		this.valuetype = valuetype;
+		return this;
 	}
 
 	/**
@@ -93,9 +95,10 @@ public class BeliefInfo	extends AbstractBDIInfo
 	 *  Set the value.
 	 *  (string for belief or array of strings for belief set)
 	 */
-	public void setValue(Object value)
+	public BeliefInfo setValue(Object value)
 	{
 		this.value = value;
+		return this;
 	}
 
 	/**
@@ -157,7 +160,9 @@ public class BeliefInfo	extends AbstractBDIInfo
 			value = "null";
 		}
 		
-		return new BeliefInfo(id, kind, type, valuetype, value);
+		return (BeliefInfo)new BeliefInfo().setKind(kind).setValueType(valuetype).setValue(value).setId(id).setType(type);
+		
+		//return new BeliefInfo(id, kind, type, valuetype, value);
 	}
 	
 //	/**

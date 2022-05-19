@@ -528,18 +528,21 @@ class ComponentTree extends BaseElement
 							}
 						}
 						
-						menu.Details = 
-	        			{
-                            'label': "Details",
-                            'action': function(obj) 
-                            {
-								//console.log(obj);
-                            	//console.log("kill me: "+node.id);
-                            	//self.killComponent(node.id);
-								self.refreshDetails(node);
-                            },
-                            'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/details.png'
-	        			};
+						if(menu!=null)
+						{
+							menu.Details = 
+		        			{
+	                            'label': "Details",
+	                            'action': function(obj) 
+	                            {
+									//console.log(obj);
+	                            	//console.log("kill me: "+node.id);
+	                            	//self.killComponent(node.id);
+									self.refreshDetails(node);
+	                            },
+	                            'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/details.png'
+		        			};
+						}
 
 			        	return menu;
 					}
@@ -553,7 +556,7 @@ class ComponentTree extends BaseElement
 			
 			self.getTree(self.treeid).bind("dblclick.jstree", function (event) 
 			{
-				console.log("double");
+				//console.log("double");
 				var node = self.getTree(self.treeid).jstree("get_selected", true)[0];
 				self.refreshDetails(node);
 			});
@@ -643,10 +646,10 @@ class ComponentTree extends BaseElement
 				self.info.name = info.name.name;
 				self.info.ctype = info.type;
 				self.info.model = info.modelName;
-				self.info.creator = info.creator.name;
+				self.info.creator = info.creator?.name;
 				self.info.system = info.systemComponent;
 				self.info.state = info.state;
-				self.info.monitoring = info.monitoring.value;
+				self.info.monitoring = info.monitoring?.value;
 			}
 			cci(info);
 			created = true;
@@ -1092,7 +1095,8 @@ class ComponentTree extends BaseElement
 			console.log("node not found: "+id);
 			
 		var cids = this.treedata[id]?._children;
-		var ret = null;
+		var ret = [];
+		
 		if(cids!=null)
 		{
 			ret = [];
@@ -1101,6 +1105,7 @@ class ComponentTree extends BaseElement
 				ret.push(this.treedata[cid]);
 			}
 		}
+		
 		return ret;
 	}
 	
@@ -1222,6 +1227,17 @@ class ComponentTree extends BaseElement
 		 		resize: both;
     			overflow: hidden;
 			}
+			.grid {
+				display: grid;
+				grid-template-columns: auto 1fr;
+				grid-gap: 10px;
+			}
+			.marginbottom {
+				margin-top: 0px;
+				margin-left: 0px;
+				margin-right: 0px;
+				margin-bottom: 0.5em;
+			}
 	    `;
 	}
 	
@@ -1231,15 +1247,13 @@ class ComponentTree extends BaseElement
 			<div id="componenttree"></div>
 			<div id="details" class="dragable ${this.info!=null? 'visible': 'hidden'}">
 				<div class="close absolute" @click="${e => {this.info=null; this.requestUpdate();}}"></div>
-				<div>
-					<h4>${this.info!=null? this.info.heading: ""}</h4>
-				</div>
-				<dl class="row">
+				<h4 class="marginbottom">${this.info!=null? this.info.heading: ""}</h4>
+				<div class="grid marginbottom">
 					${this.getProps().map(propname => html`
-						<dt class="col-5">${propname.charAt(0).toUpperCase() + propname.slice(1)}</dt>
-						<dd class="col-7 text-wrap text-break">${this.info[propname]}</dd>
+						<div>${propname.charAt(0).toUpperCase() + propname.slice(1)}</div>
+						<div text-wrap text-break">${this.info[propname]}</div>
 					`)}
-				</dl>
+				</div>
 				<div class="${this.info?.refreshcmd!=null? 'visible': 'hidden'}">
 					<button type="button" class="jadexbtn" @click="${e => this.info.refreshcmd(this.info.node)}">${this.app.lang.t('Refresh')}</button>
 				</div>

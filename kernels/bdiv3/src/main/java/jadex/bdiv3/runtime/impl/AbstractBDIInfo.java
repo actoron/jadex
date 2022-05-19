@@ -10,10 +10,13 @@ public class AbstractBDIInfo
 	//-------- attributes --------
 	
 	/** The belief id. */
-	protected Object	id;
+	protected String id;
 	
 	/** The element type. */
-	protected String	type;
+	protected String type;
+	
+	/** The parent element id. */
+	protected String parentid;
 		
 	//-------- constructors --------
 	
@@ -27,19 +30,19 @@ public class AbstractBDIInfo
 
 	/**
 	 *  Create a new info.
-	 */
-	public AbstractBDIInfo(Object id, String type)
+	 * /
+	public AbstractBDIInfo(String id, String type)
 	{
 		this.id	= id;
 		this.type	= type;
-	}
+	}*/
 	
 	//--------- methods ---------
 	
 	/**
 	 *  Return the id.
 	 */
-	public Object getId()
+	public String getId()
 	{
 		return id;
 	}
@@ -47,9 +50,10 @@ public class AbstractBDIInfo
 	/**
 	 *  Set the id.
 	 */
-	public void setId(Object id)
+	public AbstractBDIInfo setId(String id)
 	{
 		this.id = id;
+		return this;
 	}
 
 	/**
@@ -63,9 +67,27 @@ public class AbstractBDIInfo
 	/**
 	 *  Set the type.
 	 */
-	public void setType(String type)
+	public AbstractBDIInfo setType(String type)
 	{
 		this.type = type;
+		return this;
+	}
+	
+	/**
+	 * @return the parentid
+	 */
+	public String getParentId() 
+	{
+		return parentid;
+	}
+
+	/**
+	 * @param parentid the parentid to set
+	 */
+	public AbstractBDIInfo setParentId(String parentid) 
+	{
+		this.parentid = parentid;
+		return this;
 	}
 
 	/**

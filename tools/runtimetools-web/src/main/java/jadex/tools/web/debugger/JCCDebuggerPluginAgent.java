@@ -181,6 +181,8 @@ public class JCCDebuggerPluginAgent extends JCCPluginAgent implements IJCCDebugg
 		{
 			public boolean filter(IMonitoringEvent ev)
 			{
+				//System.out.println("received event: "+ev);
+				
 				boolean ret = false;
 				
 				if(types!=null && types.length>0)
@@ -198,6 +200,9 @@ public class JCCDebuggerPluginAgent extends JCCPluginAgent implements IJCCDebugg
 				{
 					ret = true;
 				}
+				
+				//if(!ret)
+				//	System.out.println("ignoring: "+ev);
 				
 				return ret;
 				//return ev.getType().endsWith("step");//MicroAgentInterpreter.TYPE_STEP);	

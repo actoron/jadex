@@ -18,12 +18,31 @@ class BDIV3AgentDebuggerElement extends CidElement
 		this.selstep = null;
 		this.treedata = {};
 		this.treedata["#"] = {};
+		this.treeopens = {};
+		
+		this.allgoals = [];
+		this.allplans = [];
+		this.allbeliefs = {}; // id -> belief
+		
+		var agent = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/debugger/images/agent.png';
+		var goal = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/debugger/images/goal.png';
+		var plan = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/debugger/images/plan.png';
+		var belief = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/debugger/images/belief.png';
+
+		this.types =
+		{
+			//"default" : {"icon": b},
+		    "agent" : {"icon": agent},
+ 			"goal" : {"icon": goal},
+ 			"plan" : {"icon": plan},
+			"belief" : {"icon": belief}
+		}
 		
 		this.subscribe();
-		this.initGoalbase();
+		this.initTree();
 	}
 	
-	initGoalbase()
+	initTree()
 	{
 		var self = this;
 		
@@ -34,15 +53,16 @@ class BDIV3AgentDebuggerElement extends CidElement
 			// init tree
 			$(function() 
 			{ 
-				self.getTree("goalbase").jstree(
+				self.getTree("agent").jstree(
 				{
-					"plugins": ["sort"]/*, "types", "contextmenu"]*/,
+					"plugins": ["sort", "types"],
+					"types": self.types,
 					"core": 
 					{
 						"check_callback" : true,
 						"data": function(node, cb) 
 						{
-							console.log("data: "+node.id);
+							//console.log("data: "+node.id);
 	
 							function getChildData(id)
 							{					
@@ -72,6 +92,45 @@ class BDIV3AgentDebuggerElement extends CidElement
 				        }
 					}
 				});
+				
+				self.getTree("agent").on("open_node.jstree", (e, data) => 
+				{
+					//console.log("node open: "+data.node.id);
+					self.treeopens[data.node.id] = [data.node.id];
+					//self.openChildren(data.node.id);
+					self.reopenChildren(data.node.id);
+				});
+				self.getTree("agent").on("close_node.jstree", (e, data) => 
+				{
+					//console.log("node close: "+data.node.id);
+					delete self.treeopens[data.node.id];
+				});
+				
+				// Open nodes after node has been loaded asyncronously
+				self.getTree("agent").on('refresh.jstree.jstree', function (event, args) 
+				{
+					//console.log("refresh event: "+event+" "+args);
+					//if(args.node.id==="#")
+					//{
+					self.reopenNode("#");
+					//}
+				});
+				/*self.getTree("agent").on('create_node.jstree', function (event, args) 
+				{
+					console.log("create node event: "+event+" "+args.node.id);
+					//if(args.node.id==="#")
+					//{
+					self.reopenNode(args.node.id);
+					//}
+				});*/
+				/*self.getTree("agent").on('show_node.jstree.jstree', function (event, args) 
+				{
+					console.log("show node event: "+event+" "+args.node.id);
+					//if(args.node.id==="#")
+					//{
+					self.reopenNode(args.node.id);
+					//}
+				});*/
 			});
 		});
 	}
@@ -158,21 +217,99 @@ class BDIV3AgentDebuggerElement extends CidElement
 			cids.push(data.id);
 	}
 	
+	getParentId(id)
+	{
+		var paid = this.treedata[nodeid]?._parent;
+		return paid;
+	}
+	
 	createNodeDataForEvent(event)
 	{
-		var id = "bla";
-		var name = "blub";
+		var self = this;
+		var info = event.properties.details;
+				
+		var name = info.type;
 		var type = null;
 		var icon = null;
-		var parent = null; 
-		var info = null;
+		var myinfo = null;
+		var id = null;
+		var ret = null;
+
+		var parts = name.split(".");
+		parts.unshift("<agent>");
 		
-		self.createNodeData(id, name, type, icon, parent, info);
+		if(info.parentId!=null && self.treedata[info.parentId]!=null)
+		{
+			ret = info.parentId;
+			id = info.id;
+			myinfo = info;
+			type = info.element;  
+			var nodename = parts[parts.length-1];
+			if(info.valinfo!=null)
+				nodename += info.valinfo;
+			self.createNodeData(id, nodename, type, icon, info.parentId, myinfo);
+			self.treeopens[id]=id; // auto open
+		}
+		else
+		{
+			var myname = "";
+			var lastname = null;
+			for(var i=0; i<parts.length; i++)
+			{
+				var part = parts[i];
+				if(myname.length>0)
+					myname +=".";
+				myname += part;
+				var nodename = part;
+				
+				// todo: check id not myname in every case
+				if(self.treedata[myname]==null)
+				{
+					//var type = self.typemap[names[i]];
+					//var icon = null;
+					
+					//console.log(cid+" "+type+" "+icon);
+					if(part==="<agent>")
+					{
+						type = "agent";
+						var anames = this.cid.split("@");
+						//part = anames[0];
+						nodename = anames[0];
+					}
+					else
+					{
+						type = null;
+					}
+	
+					// Last path element				
+					if(i==parts.length-1)
+					{
+						id = info.id;
+						myinfo = info;
+						type = info.element; 
+						if(info.valinfo!=null)
+							nodename += info.valinfo;		
+					}
+					else
+					{
+						id = myname;
+					}
+					
+					self.createNodeData(id, nodename, type, icon, lastname, myinfo);
+					self.treeopens[id]=id; // auto open
+				}
+				lastname = myname;
+			}
+		}
+		//else
+		//	console.log("not creating: "+names[i]);
+		
+		return ret;
 	}
 	
 	createNodeData(id, name, type, icon, parent, info)
 	{
-		console.log("create node data: "+id+" "+name+" "+type+" "+parent);
+		//console.log("create node data: "+id+" "+name+" "+type+" "+parent);
 		var paid = parent==null || parent.length==0? "#": parent;
 		// must use _parent as parent is already used by jstree
 		var node = {"id": id, "text": name, "type": type, "icon": icon, "children": true, "_parent": paid, "info": info}; // "original": {'hello': true}
@@ -180,28 +317,28 @@ class BDIV3AgentDebuggerElement extends CidElement
 		
 		this.addChildData(key, node);
 	}
-		
+	
 	deleteNodeData(nodeid)
 	{
 		//console.log("remove node data: "+nodeid);
+		//var paid = this.treedata[nodeid]?._parent;
+
 		this.removeChildDataFromParent(nodeid);
 		delete this.treedata[nodeid];
 		//delete this.treedata[nodeid].children;
 
-		/*var ac = this.getChildData("Applications");
-		if(ac==null || ac.length==0)
+		// recursively delete parents when it was last child
+		/*var pcs = this.getChildData(paid);
+		if(pcs==null || pcs.length==0)
 		{
-			this.removeChildDataFromParent("Applications");
-			delete this.treedata["Applications"];
-			//delete this.treedata["Applications_children"]
+			this.deleteNodeData(paid);
 		}*/
 	}
 	
 	removeChildDataFromParent(nodeid)
 	{
 		var removed = false;
-		var paid = this.treedata[nodeid]?._parent;
-		//this.getTree(treeid).jstree().get_parent(nodeid);
+		var paid = this.getParentId(nodeid);
 		if(paid!=null)
 		{
 			var pachilds = this.treedata[paid]?._children
@@ -219,6 +356,46 @@ class BDIV3AgentDebuggerElement extends CidElement
 		
 		if(!removed)
 			console.log("not removed from parent: "+nodeid);
+	}
+	
+	openNode(id)
+	{
+		var self = this;
+		//console.log("open called: "+id);
+		var node = self.getTree("agent").jstree("get_node", id);
+		self.getTree("agent").jstree("open_node", node);
+	}
+	
+	reopenChildren(id)
+	{
+		//console.log("open children called: "+id);
+		var self = this;
+		
+		var childs = this.treedata[id]?._children;
+		if(childs!=null)
+		{
+			for(var i=0; i<childs.length; i++)
+			{
+				if(self.treeopens[childs[i]]!=null) 
+				{
+					console.log("reopen child node: "+childs[i]);
+					self.openNode(childs[i]);
+				}
+			}
+		}
+	}
+	
+	reopenNode(id)
+	{
+		//console.log("reopen called: "+id);
+		var self = this;
+		
+		if(self.treeopens[id]!=null || id==="#")
+		{
+			//console.log("reopen node: "+id);
+			self.openNode(id);
+			self.reopenChildren(id);
+		}
 	}
 	
 	connectedCallback()
@@ -310,29 +487,22 @@ class BDIV3AgentDebuggerElement extends CidElement
 	
 	updateEvent(event)
 	{
-		console.log("event: "+event.type);
+		//console.log("event: "+event.type);
 		
-		if(event.type.startsWith("created") && event.type.endsWith("step"))
+		var type = event.type.toLowerCase();
+		var info = event.properties.details;
+		var refresh = null;
+		
+		if(type.startsWith("created") && type.endsWith("step"))
 		{
 			//console.log("add step: "+event.properties.id);
 			this.steps.push(event);
 			//if(laststep==null && steps.size()==1)
 			//	sl.setSelectedIndex(0);
 		}
-		else if(event.type.startsWith("disposed") && event.type.endsWith("step"))
+		else if(type.startsWith("disposed") && type.endsWith("step"))
 		{
-			for(var i=0; i<this.steps.length; i++)
-			{
-				var tmp = this.steps[i];
-				if(event.properties.id===tmp.properties.id)
-				{
-					//console.log("remove step: "+event.properties.id);
-					this.steps.splice(i, 1);
-					//if(laststep!=null && laststep.getProperty("id").equals(tmp.getProperty("id")))
-					//	laststep = null;
-					break;
-				}
-			}
+			this.removeElement(info, this.steps);
 			
 			//if(laststep==null)
 			//	sl.setSelectedIndex(0);
@@ -343,10 +513,41 @@ class BDIV3AgentDebuggerElement extends CidElement
 				//hl.ensureIndexIsVisible(history.size()-1);
 			}
 		}
-		
-		if(event.type.endsWith("Fact"))
+		else if(type.endsWith("fact"))
 		{
-			console.log("fact event: "+event);
+			//console.log("fact event: "+event);
+			
+			info.element = "belief";
+			
+			var oldbel = this.allbeliefs[info.id];
+			if(oldbel)
+				info.type = oldbel.type; // Hack!!! Keep capability information which is unavailable for modified events.
+			this.allbeliefs[info.id] = info;
+			
+			var valinfo = ":"+info.valueType;
+			//if(kind.toLowerCase().indexof("beliefset")!=-1)
+			//	valinfo = " : beliefset : "+valinfo;
+			if(Array.isArray(info.value))
+			{
+				valinfo += " [";
+				for(var i=0; i<Math.max(2, info.value.length); i++)
+				{
+					if(i>0)
+						valifo += " ,";
+					valinfo += info.value[i];
+				}
+				if(info.value.length>2)
+					valinfo += ", ...";
+				valinfo += "]";
+			}
+			else
+			{
+				valinfo += " "+info.value;
+			}
+			info.valinfo = valinfo;
+			
+			refresh = this.createNodeDataForEvent(event);
+			
 			/*
 			// Hack!!! create/disposal only for facts, not for beliefs, just check for changes, removal not supported.
 			int	index	= allbeliefs.indexOf(event.getProperty("details"));
@@ -368,25 +569,36 @@ class BDIV3AgentDebuggerElement extends CidElement
 					beliefs.add(bi);
 			}*/
 		}
-		else if(event.type.endsWith("Goal"))
+		else if(type.endsWith("goal"))
 		{
-			if(event.type.startsWith("created"))
+			info.element = "goal";
+			
+			if(type.startsWith("created"))
 			{
-				console.log("created goal");
+				//console.log("created goal");
+				this.allgoals.push(info);
+				refresh = this.createNodeDataForEvent(event);
+				
 				/*GoalInfo gi = (GoalInfo)event.getProperty("details");
 				allgoals.add(gi);
 				if(checkCapa(gi.getType()))
 					goals.add(gi);*/
 			}
-			else if(event.type.startsWith("disposed"))
+			else if(type.startsWith("disposed"))
 			{
-				console.log("disposed goal");
+				//console.log("disposed goal");
+				refresh = this.getParentId(info.id);
+				this.removeElement(info, this.allgoals);
+				this.deleteNodeData(info.id);
+				
+				// todo remove tree node
+				
 				/*allgoals.remove(event.getProperty("details"));
 				goals.remove(event.getProperty("details"));*/
 			}
-			else if(event.type.startsWith("modified"))
+			else if(type.startsWith("modified"))
 			{
-				console.log("modified goal");
+				//console.log("modified goal");
 				/*int	index	= allgoals.indexOf(event.getProperty("details"));
 				if(index!=-1)
 				{
@@ -400,26 +612,34 @@ class BDIV3AgentDebuggerElement extends CidElement
 				}*/
 			}
 		}
-				
-		else if(event.type.endsWith("Plan"))
+		else if(type.endsWith("plan"))
 		{
-			if(event.type.startsWith("created"))
+			refresh = true;
+			info.element = "plan";
+			
+			if(type.startsWith("created"))
 			{
-				console.log("created plan");
+				//console.log("created plan");
+				this.allplans.push(info);
+				refresh = this.createNodeDataForEvent(event);
+				
 				/*PlanInfo pi = (PlanInfo)event.getProperty("details");
 				allplans.add(pi);
 				if(checkCapa(pi.getType()))
 					plans.add(pi);*/
 			}
-			else if(event.type.startsWith("disposed"))
+			else if(type.startsWith("disposed"))
 			{
-				console.log("disposed plan");
+				//console.log("disposed plan");
+				refresh = this.getParentId(info.id);
+				this.removeElement(info, this.allplans);
+				this.deleteNodeData(info.id);
 				/*allplans.remove(event.getProperty("details"));
 				plans.remove(event.getProperty("details"));*/
 			}
-			else if(event.type.startsWith("modified"))
+			else if(type.startsWith("modified"))
 			{
-				console.log("modified plan");
+				//console.log("modified plan");
 				/*int	index	= allplans.indexOf(event.getProperty("details"));
 				if(index!=-1)
 				{
@@ -434,7 +654,29 @@ class BDIV3AgentDebuggerElement extends CidElement
 			}
 		}
 		
+		if(refresh!=null)
+		{
+			//console.log("refresh");
+			this.getTree("agent").jstree().refresh_node(refresh);
+		}
+		else
+		{
+			this.getTree("agent").jstree("refresh");
+		}
+		
 		this.requestUpdate();
+	}
+	
+	removeElement(info, ar)
+	{
+		for(var i=0; i<ar.length; i++)
+		{
+			if(info.id===ar[i].id)
+			{
+				ar.splice(i, 1);
+				break;
+			}
+		}
 	}
 	
 	getMethodPrefix() 
@@ -560,7 +802,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 				margin-top: 0px;
 			}
 			.nomarginbottom {
-				margin-bottom: 0px;
+				margin-bottom: 0.5em;
 			}
 		    `);
 		return ret;
@@ -572,8 +814,8 @@ class BDIV3AgentDebuggerElement extends CidElement
 			<div id="panel" class="grid-container">
 				
 				<div class="back-lightgray span">
-					<h4 class="margin nomargintop nomarginbottom">${this.app.lang.t('Goalbase')}</h4>
-					<div id="goalbase"></div>
+					<h4 class="margin nomargintop nomarginbottom">${this.app.lang.t('BDI')}</h4>
+					<div id="agent"></div>
 				</div>
 				
 				<div id="steps" class="back-lightgray inner">

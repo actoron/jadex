@@ -31,7 +31,7 @@ public class GoalInfo	extends AbstractBDIInfo
 
 	/**
 	 *  Create a new goal info.
-	 */
+	 * /
 	public GoalInfo(Object id, String kind, String type, String lifecyclestate, String processingstate)
 	{
 		super(id, type);
@@ -53,9 +53,10 @@ public class GoalInfo	extends AbstractBDIInfo
 	/**
 	 *  Set the kind.
 	 */
-	public void setKind(String kind)
+	public GoalInfo setKind(String kind)
 	{
 		this.kind = kind;
+		return this;
 	}
 
 	/**
@@ -69,9 +70,10 @@ public class GoalInfo	extends AbstractBDIInfo
 	/**
 	 *  Set the life cycle state.
 	 */
-	public void setLifecycleState(String lifecyclestate)
+	public GoalInfo setLifecycleState(String lifecyclestate)
 	{
 		this.lifecyclestate = lifecyclestate;
+		return this;
 	}
 
 	/**
@@ -85,9 +87,10 @@ public class GoalInfo	extends AbstractBDIInfo
 	/**
 	 *  Set the processing state.
 	 */
-	public void setProcessingState(String processingstate)
+	public GoalInfo setProcessingState(String processingstate)
 	{
 		this.processingstate = processingstate;
+		return this;
 	}
 
 	/**
@@ -126,6 +129,7 @@ public class GoalInfo	extends AbstractBDIInfo
 		String kind = "unknown";
 //		String type	= mgoal.getName();
 		String type	= RCapability.getBeautifiedName(mgoal.getName());
+		String paid = goal.getParent()!=null? ""+goal.getParent().hashCode(): null;
 //		if(scope!=null)
 //		{
 //			BDIInterpreter interpreter	= BDIInterpreter.getInterpreter(state);
@@ -138,6 +142,13 @@ public class GoalInfo	extends AbstractBDIInfo
 //				}
 //			}
 //		}
-		return new GoalInfo(id, kind, type, goal.getLifecycleState().toString(), goal.getProcessingState().toString());
+		//return new GoalInfo(id, kind, type, goal.getLifecycleState().toString(), goal.getProcessingState().toString());
+		return (GoalInfo)new GoalInfo()
+			.setLifecycleState(goal.getLifecycleState().toString())
+			.setProcessingState(goal.getProcessingState().toString())
+			.setKind(kind)
+			.setId(id)
+			.setParentId(paid)
+			.setType(type);
 	}
 }
