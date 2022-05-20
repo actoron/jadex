@@ -759,8 +759,8 @@ class ComponentTree extends BaseElement
 		
 		return new Promise(function(resolve, reject) 
 		{
-			var res1 ="jadex/tools/web/commons/libs/jstree_3.3.7.css";
-			var res2 = "jadex/tools/web/commons/libs/jstree_3.3.7.js";
+			var res1 ="jadex/tools/web/commons/libs/jstree-3.3.12/themes/default/style.css";
+			var res2 = "jadex/tools/web/commons/libs/jstree-3.3.12/jstree.js";
 			var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
 			var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 	

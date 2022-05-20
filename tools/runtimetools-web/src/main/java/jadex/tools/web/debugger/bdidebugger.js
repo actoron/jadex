@@ -38,100 +38,111 @@ class BDIV3AgentDebuggerElement extends CidElement
 			"belief" : {"icon": belief}
 		}
 		
-		this.subscribe();
-		this.initTree();
+		this.initTree()
+			.then(() => this.subscribe())
+			.catch(err => console.log(err));
 	}
 	
 	initTree()
 	{
 		var self = this;
 		
-		this.loadJSTree().then(function()
+		return new Promise(function(resolve, reject) 
 		{
-			//console.log("jstree");
-			
-			// init tree
-			$(function() 
-			{ 
-				self.getTree("agent").jstree(
-				{
-					"plugins": ["sort", "types"],
-					"types": self.types,
-					"core": 
+			self.loadJSTree().then(function()
+			{
+				//console.log("jstree");
+				
+				// init tree
+				$(function() 
+				{ 
+					self.getTree("agent").jstree(
 					{
-						"check_callback" : true,
-						"data": function(node, cb) 
+						"plugins": ["sort", "types"],
+						"types": self.types,
+						"core": 
 						{
-							//console.log("data: "+node.id);
-	
-							function getChildData(id)
-							{					
-								var children = self.getChildData(id);
-								// problem: js tree changes data structures :-( give jstree only a clone?
-								//console.log("children of: "+id+" "+children.length);
-								return JSON.parse(JSON.stringify(children));
+							"animation": false,
+							"check_callback" : true,
+							"data": function(node, cb) 
+							{
+								//console.log("data: "+node.id);
+		
+								function getChildData(id)
+								{					
+									var children = self.getChildData(id);
+									// problem: js tree changes data structures :-( give jstree only a clone?
+									//console.log("children of: "+id+" "+children.length);
+									return JSON.parse(JSON.stringify(children));
+								}
+								
+								var data = getChildData(node.id);
+								if(data==null)
+									data = [];
+								cb.call(this, data);
 							}
-							
-							var data = getChildData(node.id);
-							if(data==null)
-								data = [];
-							cb.call(this, data);
+						},
+						'sort': function(a, b) 
+						{
+					        var a1 = this.get_node(a);
+					        var b1 = this.get_node(b);
+					        if(a1.icon == b1.icon)
+					        {
+					            return (a1.text > b1.text) ? 1 : -1;
+					        } 
+					        else 
+					        {
+					            return (a1.icon > b1.icon) ? 1 : -1;
+					        }
 						}
-					},
-					'sort': function(a, b) 
+					});
+					
+					self.getTree("agent").on("open_node.jstree", (e, data) => 
 					{
-				        var a1 = this.get_node(a);
-				        var b1 = this.get_node(b);
-				        if(a1.icon == b1.icon)
-				        {
-				            return (a1.text > b1.text) ? 1 : -1;
-				        } 
-				        else 
-				        {
-				            return (a1.icon > b1.icon) ? 1 : -1;
-				        }
-					}
+						//console.log("node open: "+data.node.id);
+						self.treeopens[data.node.id] = [data.node.id];
+						//self.openChildren(data.node.id);
+						//console.log("trigger open children of: "+data.node.id);
+						self.reopenChildren(data.node.id);
+					});
+					self.getTree("agent").on("close_node.jstree", (e, data) => 
+					{
+						//console.log("node close: "+data.node.id);
+						delete self.treeopens[data.node.id];
+					});
+					
+					// Open nodes after node has been loaded asyncronously
+					self.getTree("agent").on('refresh.jstree.jstree', function (event, args) 
+					{
+						//console.log("refresh tree event: ");
+						self.reopenNode("#");
+					});
+					self.getTree("agent").on('refresh_node.jstree.jstree', function (event, args) 
+					{
+						var nodeid = args.node?.id;
+						//console.log("refresh node event: "+nodeid);
+						self.reopenNode(nodeid? nodeid: "#");
+					});
+					/*self.getTree("agent").on('create_node.jstree', function (event, args) 
+					{
+						console.log("create node event: "+event+" "+args.node.id);
+						//if(args.node.id==="#")
+						//{
+						self.reopenNode(args.node.id);
+						//}
+					});*/
+					/*self.getTree("agent").on('show_node.jstree.jstree', function (event, args) 
+					{
+						console.log("show node event: "+event+" "+args.node.id);
+						//if(args.node.id==="#")
+						//{
+						self.reopenNode(args.node.id);
+						//}
+					});*/
 				});
 				
-				self.getTree("agent").on("open_node.jstree", (e, data) => 
-				{
-					//console.log("node open: "+data.node.id);
-					self.treeopens[data.node.id] = [data.node.id];
-					//self.openChildren(data.node.id);
-					self.reopenChildren(data.node.id);
-				});
-				self.getTree("agent").on("close_node.jstree", (e, data) => 
-				{
-					//console.log("node close: "+data.node.id);
-					delete self.treeopens[data.node.id];
-				});
-				
-				// Open nodes after node has been loaded asyncronously
-				self.getTree("agent").on('refresh.jstree.jstree', function (event, args) 
-				{
-					//console.log("refresh event: "+event+" "+args);
-					//if(args.node.id==="#")
-					//{
-					self.reopenNode("#");
-					//}
-				});
-				/*self.getTree("agent").on('create_node.jstree', function (event, args) 
-				{
-					console.log("create node event: "+event+" "+args.node.id);
-					//if(args.node.id==="#")
-					//{
-					self.reopenNode(args.node.id);
-					//}
-				});*/
-				/*self.getTree("agent").on('show_node.jstree.jstree', function (event, args) 
-				{
-					console.log("show node event: "+event+" "+args.node.id);
-					//if(args.node.id==="#")
-					//{
-					self.reopenNode(args.node.id);
-					//}
-				});*/
-			});
+				resolve();
+			}).catch(err => reject(err));
 		});
 	}
 	
@@ -141,8 +152,10 @@ class BDIV3AgentDebuggerElement extends CidElement
 		
 		return new Promise(function(resolve, reject) 
 		{
-			var res1 ="jadex/tools/web/commons/libs/jstree_3.3.7.css";
-			var res2 = "jadex/tools/web/commons/libs/jstree_3.3.7.js";
+			//var res1 ="jadex/tools/web/commons/libs/jstree_3.3.7.css";
+			//var res2 = "jadex/tools/web/commons/libs/jstree_3.3.7.js";
+			var res1 ="jadex/tools/web/commons/libs/jstree-3.3.12/themes/default/style.css";
+			var res2 = "jadex/tools/web/commons/libs/jstree-3.3.12/jstree.js";
 			var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
 			var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 	
@@ -254,6 +267,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 		{
 			var myname = "";
 			var lastname = null;
+			//ret = "#";
 			for(var i=0; i<parts.length; i++)
 			{
 				var part = parts[i];
@@ -275,6 +289,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 						var anames = this.cid.split("@");
 						//part = anames[0];
 						nodename = anames[0];
+						ret = myname;
 					}
 					else
 					{
@@ -349,7 +364,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 				{
     				pachilds.splice(i, 1);
 					removed = true;
-					console.log("removed: "+nodeid);
+					//console.log("removed: "+nodeid);
 				}
 			}
 		}
@@ -378,7 +393,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 			{
 				if(self.treeopens[childs[i]]!=null) 
 				{
-					console.log("reopen child node: "+childs[i]);
+					//console.log("reopen child node: "+childs[i]);
 					self.openNode(childs[i]);
 				}
 			}
@@ -614,7 +629,6 @@ class BDIV3AgentDebuggerElement extends CidElement
 		}
 		else if(type.endsWith("plan"))
 		{
-			refresh = true;
 			info.element = "plan";
 			
 			if(type.startsWith("created"))
@@ -656,11 +670,22 @@ class BDIV3AgentDebuggerElement extends CidElement
 		
 		if(refresh!=null)
 		{
-			//console.log("refresh");
-			this.getTree("agent").jstree().refresh_node(refresh);
+			//console.log("refresh entered: "+this.getTree("agent").jstree());
+			var hasnode = this.getTree("agent").jstree().get_node(refresh)!=false;
+			if(hasnode)
+			{
+				//console.log("refresh node: "+refresh);
+				this.getTree("agent").jstree().refresh_node(refresh);
+			}
+			else
+			{
+				//console.log("refresh all, node not in tree: "+refresh);
+				this.getTree("agent").jstree("refresh");
+			}
 		}
-		else
+		else if(refresh==="all")
 		{
+			//console.log("refresh all: "+refresh);
 			this.getTree("agent").jstree("refresh");
 		}
 		
