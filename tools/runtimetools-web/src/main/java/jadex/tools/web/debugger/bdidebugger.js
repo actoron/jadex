@@ -219,7 +219,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 	
 	getParentId(id)
 	{
-		var paid = this.treedata[nodeid]?._parent;
+		var paid = this.treedata[id]?._parent;
 		return paid;
 	}
 	

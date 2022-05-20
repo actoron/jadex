@@ -173,7 +173,9 @@ class PlatformElement extends CidElement
 					//console.log("Insert plugin element: " + p.name);
 					self.shadowRoot.getElementById("plugin").innerHTML = html;
 					//console.log("Req update: " + p.name);
-					self.requestUpdate().then(() => 
+					self.requestUpdate();//.then(() => 
+					self.updateComplete.then(() =>
+					//self.requestUpdate().then(() => 
 					{
 						done();
 					});
@@ -190,7 +192,9 @@ class PlatformElement extends CidElement
 				//console.log("Insert plugin element: " + p.name);
 				this.shadowRoot.getElementById("plugin").innerHTML = html;
 				//console.log("Req update: " + p.name);
-				self.requestUpdate().then(() => 
+				self.requestUpdate();//.then(() => 
+				self.updateComplete.then(() =>
+				//self.requestUpdate().then(() => 
 				{
 					done();
 				});

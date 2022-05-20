@@ -507,6 +507,7 @@ jadex-app {
     max-height: 0;
     overflow: hidden;
     padding: 0px 10px;
+    margin-bottom: 0.5em;
 }
    
 /* Panel style when active */

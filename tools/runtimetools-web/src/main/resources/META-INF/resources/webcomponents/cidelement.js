@@ -1,4 +1,4 @@
-import {LitElement, html, css} from '../libs/lit/lit-element.js';
+import {LitElement, html, css} from '../libs/lit-3.2.0/lit-element.js';
 import { BaseElement } from "../webcomponents/baseelement.js"
 
 /**

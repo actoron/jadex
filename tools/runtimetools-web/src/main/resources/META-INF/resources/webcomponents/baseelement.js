@@ -1,4 +1,4 @@
-import {LitElement, html, css} from '../libs/lit/lit-element.js';
+import {LitElement, html, css} from '../libs/lit-3.2.0/lit-element.js';
 
 export class BaseElement extends LitElement 
 {
@@ -78,7 +78,8 @@ export class BaseElement extends LitElement
 			let callpostinit = function() 
 			{
 				self.inited = true;
-				self.requestUpdate().then(() => 
+				self.requestUpdate();//.then(() => 
+				self.updateComplete.then(() =>
 				{
 					//console.log("update done, calling postinit");
 					self.postInit();

@@ -1,4 +1,4 @@
-import * as litelement from "./lit/lit-element.js"
+import * as litelement from "./lit-3.2.0/lit-element.js"
 import * as baseelement from "../webcomponents/baseelement.js"
 import * as cidelement from "../webcomponents/cidelement.js"
 
