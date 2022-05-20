@@ -25,12 +25,12 @@ public class PlanInfo	extends AbstractBDIInfo
 
 	/**
 	 *  Create a new info.
-	 */
+	 * /
 	public PlanInfo(Object id, String type, String state)
 	{
 		super(id, type);
 		this.state	= state;
-	}
+	}*/
 	
 	//--------- methods ---------
 	
@@ -45,9 +45,10 @@ public class PlanInfo	extends AbstractBDIInfo
 	/**
 	 *  Set the state.
 	 */
-	public void setState(String state)
+	public PlanInfo setState(String state)
 	{
 		this.state = state;
+		return this;
 	}
 
 
@@ -82,6 +83,7 @@ public class PlanInfo	extends AbstractBDIInfo
 		MPlan mplan	= (MPlan)plan.getModelElement();
 //		String type	= mplan.getName();
 		String type	= RCapability.getBeautifiedName(mplan.getName());
+		String paid = plan.getReason()!=null && plan.getReason() instanceof RParameterElement? ""+plan.getReason().hashCode(): null;
 //		if(scope!=null)
 //		{
 //			BDIInterpreter interpreter	= BDIInterpreter.getInterpreter(state);
@@ -94,6 +96,11 @@ public class PlanInfo	extends AbstractBDIInfo
 //				}
 //			}
 //		}
-		return new PlanInfo(id, type, plan.getLifecycleState().toString());
+		//return new PlanInfo(id, type, plan.getLifecycleState().toString());
+		return (PlanInfo)new PlanInfo()
+			.setState(plan.getLifecycleState().toString())
+			.setType(type)
+			.setId(id)
+			.setParentId(paid);
 	}
 }

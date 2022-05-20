@@ -111,6 +111,13 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		tmp.add("killComponents");
 		tmp.add("stepComponent");
 		tmp.add("subscribeToEvents");
+		tmp.add("isStepped");
+		//tmp.add("getDescription");
+		/*tmp.add("getRequiredMethodNFPropertyMetaInfos");
+		tmp.add("getRequiredNFPropertyMetaInfos");
+		tmp.add("getMethodNFPropertyMetaInfos");	
+		tmp.add("getNFPropertyMetaInfos");	
+		tmp.add("getChildren");*/
 		SUSPEND_METHOD_EXEMPTIONS = Collections.unmodifiableSet(tmp);
 	}
 	

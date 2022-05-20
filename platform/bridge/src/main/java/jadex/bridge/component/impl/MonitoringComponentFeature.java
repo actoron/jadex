@@ -28,7 +28,7 @@ import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
 /**
- * 
+ *  Implementation of the monitoring feature.
  */
 public class MonitoringComponentFeature extends AbstractComponentFeature implements IMonitoringComponentFeature
 {

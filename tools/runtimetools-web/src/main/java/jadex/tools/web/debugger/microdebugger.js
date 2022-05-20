@@ -44,7 +44,11 @@ class MicroAgentDebuggerElement extends CidElement
 
 		var self = this;
 		//console.log("sub at: "+this.cid);
-		self.sub.callid = jadex.getIntermediate(this.getMethodPrefix()+'&methodname=subscribeToComponent&args_0='+this.cid+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
+		var types = ["step"];
+		self.sub.callid = jadex.getIntermediate(this.getMethodPrefix()+'&methodname=subscribeToComponent'
+			+'&args_0='+this.cid+'&args_1='+JSON.stringify(types)
+			+'&argtypes_0=jadex.bridge.IComponentIdentifier&argtypes_1=java.lang.String[]'
+			+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		response =>
 		{
 			//console.log("service sub received: "+response.data);
@@ -93,7 +97,7 @@ class MicroAgentDebuggerElement extends CidElement
 		if(callid!=null)
 		{
 			this.sub.callid = null;
-			jadex.terminateCall(self.callid).then(() => 
+			jadex.terminateCall(callid).then(() => 
 			{
 				this.sub.connected = false;
 				//console.log("Terminated subscription: "+self.callid)

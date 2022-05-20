@@ -175,13 +175,37 @@ public class JCCDebuggerPluginAgent extends JCCPluginAgent implements IJCCDebugg
 	 *  Subscribe to a component for update events.
 	 *  @param compo The component cid.
 	 */
-	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToComponent(IComponentIdentifier compo)
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToComponent(IComponentIdentifier compo, String[] types)
 	{
 		ISubscriptionIntermediateFuture<IMonitoringEvent> fut = agent.getExternalAccess(compo).subscribeToEvents(new IFilter<IMonitoringEvent>()
 		{
 			public boolean filter(IMonitoringEvent ev)
 			{
-				return ev.getType().endsWith("step");//MicroAgentInterpreter.TYPE_STEP);	
+				//System.out.println("received event: "+ev);
+				
+				boolean ret = false;
+				
+				if(types!=null && types.length>0)
+				{
+					for(String type: types)
+					{
+						if(ev.getType().toLowerCase().indexOf(type.toLowerCase())!=-1)
+						{
+							ret = true;
+							break;
+						}
+					}
+				}
+				else
+				{
+					ret = true;
+				}
+				
+				//if(!ret)
+				//	System.out.println("ignoring: "+ev);
+				
+				return ret;
+				//return ev.getType().endsWith("step");//MicroAgentInterpreter.TYPE_STEP);	
 			}
 		}, true, PublishEventLevel.FINE);
 		

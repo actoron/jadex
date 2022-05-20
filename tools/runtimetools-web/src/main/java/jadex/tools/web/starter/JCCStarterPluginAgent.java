@@ -1,5 +1,6 @@
 package jadex.tools.web.starter;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,16 +9,14 @@ import jadex.base.SRemoteGui;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.ServiceScope;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.SComponentFactory;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Boolean3;
 import jadex.commons.ICommand;
 import jadex.commons.MethodInfo;
@@ -284,9 +283,20 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	 */
 	public IFuture<IComponentDescription[]> getComponentDescriptions(IComponentIdentifier cid)
 	{
+		Future<IComponentDescription[]> ret = new Future<>();
 		//System.out.println("getCompDescs start");
 		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
-		return ea.getDescriptions();
+		
+		// must immediate step in case of suspended components
+		ea.scheduleStep(new ImmediateComponentStep<IComponentDescription[]>() 
+		{
+			public IFuture<IComponentDescription[]> execute(IInternalAccess ia) 
+			{
+				return ia.getDescriptions();
+			}
+		}).delegate(ret);
+		
+		return ret;
 	}
 	
 	/**
@@ -295,16 +305,27 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	 */
 	public IFuture<IComponentDescription> getComponentDescription(IComponentIdentifier cid)
 	{
+		Future<IComponentDescription> ret = new Future<IComponentDescription>();
 		//System.out.println("getCompDescs start");
 		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
-		return ea.getDescriptionAsync();
+		
+		// must immediate step in case of suspended components
+		ea.scheduleStep(new ImmediateComponentStep<IComponentDescription>() 
+		{
+			public IFuture<IComponentDescription> execute(IInternalAccess ia) 
+			{
+				return new Future<IComponentDescription>(ia.getDescription());
+			}
+		}).delegate(ret);
+		
+		return ret;
 	}
 	
 	/**
 	 *  Get the child component descriptions.
 	 *  @param parent The component id of the parent.
 	 *  @return The component descriptions.
-	 */
+	 * /
 	public IFuture<IComponentDescription[]> getChildComponentDescriptions(IComponentIdentifier cid, IComponentIdentifier parent)
 	{
 		final Future<IComponentDescription[]> ret = new Future<IComponentDescription[]>();
@@ -321,8 +342,40 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 				.catchEx(ex -> ret.setException(ex));
 		});
 		return ret;
-	}
+	}*/
 
+	public IFuture<IComponentDescription[]> getChildComponentDescriptions(IComponentIdentifier cid, IComponentIdentifier parent)
+	{
+		final Future<IComponentDescription[]> ret = new Future<IComponentDescription[]>();
+		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
+		
+		// must immediate step in case of suspended components
+		ea.scheduleStep(new ImmediateComponentStep<IComponentDescription[]>() 
+		{
+			public IFuture<IComponentDescription[]> execute(IInternalAccess ia) 
+			{
+				final Future<IComponentDescription[]> ret = new Future<IComponentDescription[]>();
+				ia.getChildren(null, parent).then(cids -> 
+				{
+					//System.out.println("found: "+Arrays.toString(cids));
+					FutureBarrier<IComponentDescription> barrier = new FutureBarrier<IComponentDescription>();
+					for(int i=0; i<cids.length; i++)
+					{
+						IFuture<IComponentDescription>fut = ia.getDescription(cids[i]);
+						barrier.addFuture(fut);
+						final String n = cids[i].toString();
+						//fut.then(x -> System.out.println("jo: "+n));
+					}
+					barrier.waitForResults()
+						.then(descs -> ret.setResult(descs==null? null: descs.toArray(new IComponentDescription[cids.length])))
+						.catchEx(ex -> ret.setException(ex));
+				});
+				return ret;
+			}
+		}).delegate(ret);
+		
+		return ret;
+	}
 	
 	/**
 	 * Get a default icon for a file type.
@@ -365,34 +418,49 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		
 		IExternalAccess ea = cid!=null? agent.getExternalAccess(cid): sid!=null? agent.getExternalAccess(sid.getProviderId()): null;
 		
-		// required services and methods
-		if(req!=null && req.booleanValue())
+		if(ea!=null)
 		{
-			if(mi!=null)
+			ea.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>() 
 			{
-				ea.getRequiredMethodNFPropertyMetaInfos(sid, mi).delegate(ret);
-			}
-			else
-			{
-				ea.getRequiredNFPropertyMetaInfos(sid).delegate(ret);
-			}
-		}
-		// provided services and methods
-		else if(sid!=null)
-		{
-			if(mi!=null)
-			{
-				ea.getMethodNFPropertyMetaInfos(sid, mi).delegate(ret);
-			}
-			else
-			{
-				ea.getNFPropertyMetaInfos(sid).delegate(ret);
-			}
-		}
-		// components
-		else if(ea!=null)
-		{
-			ea.getNFPropertyMetaInfos().delegate(ret);
+				public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia) 
+				{
+					final Future<Map<String, INFPropertyMetaInfo>> ret = new Future<>();
+					// required services and methods
+					if(req!=null && req.booleanValue())
+					{
+						if(mi!=null)
+						{
+							ia.getRequiredMethodNFPropertyMetaInfos(sid, mi).delegate(ret);
+						}
+						else
+						{
+							ia.getRequiredNFPropertyMetaInfos(sid).delegate(ret);
+						}
+					}
+					// provided services and methods
+					else if(sid!=null)
+					{
+						if(mi!=null)
+						{
+							ia.getMethodNFPropertyMetaInfos(sid, mi).delegate(ret);
+						}
+						else
+						{
+							ia.getNFPropertyMetaInfos(sid).delegate(ret);
+						}
+					}
+					// components
+					else //if(ea!=null)
+					{
+						ia.getNFPropertyMetaInfos().delegate(ret);
+					}
+					/*else
+					{
+						ret.setException(new RuntimeException("Provider not set."));
+					}*/
+					return ret;
+				}
+			}).delegate(ret);
 		}
 		else
 		{
@@ -409,47 +477,62 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	 */
 	public IFuture<Object> getNFValue(IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req, String name)
 	{
-		IFuture<Object> ret = null;
+		Future<Object> ret = new Future<>();
 		
 		IExternalAccess ea = cid!=null? agent.getExternalAccess(cid): sid!=null? agent.getExternalAccess(sid.getProviderId()): null;
 		
-		if(req!=null && req.booleanValue())
+		if(ea!=null)
 		{
-			if(mi!=null)
+			ea.scheduleStep(new ImmediateComponentStep<Object>() 
 			{
-				//ret = ea.getRequiredMethodNFPropertyValue(sid, mi, name);
-				ret = (Future)ea.getRequiredMethodNFPropertyPrettyPrintValue(sid, mi, name);
-			}
-			else
-			{
-				//ret = ea.getRequiredNFPropertyValue(sid, name);
-				ret = (Future)ea.getRequiredNFPropertyPrettyPrintValue(sid, name);
-			}
-		}
-		// provided services and methods
-		else if(sid!=null)
-		{
-			if(mi!=null)
-			{
-				//ret = ea.getMethodNFPropertyValue(sid, mi, name);
-				ret = (Future)ea.getMethodNFPropertyPrettyPrintValue(sid, mi, name);
-			}
-			else
-			{
-				//ret = ea.getNFPropertyValue(sid, name);
-				ret = (Future)ea.getNFPropertyPrettyPrintValue(sid, name);
-			}
-		}
-		// components
-		else if(ea!=null)
-		{
-			//ret = ea.getNFPropertyValue(name);
-			ret = (Future)ea.getNFPropertyPrettyPrintValue(name);
+				public IFuture<Object> execute(IInternalAccess ia) 
+				{
+					IFuture<Object> ret = null;
+					if(req!=null && req.booleanValue())
+					{
+						if(mi!=null)
+						{
+							//ret = ea.getRequiredMethodNFPropertyValue(sid, mi, name);
+							ret = (Future)ia.getRequiredMethodNFPropertyPrettyPrintValue(sid, mi, name);
+						}
+						else
+						{
+							//ret = ea.getRequiredNFPropertyValue(sid, name);
+							ret = (Future)ia.getRequiredNFPropertyPrettyPrintValue(sid, name);
+						}
+					}
+					// provided services and methods
+					else if(sid!=null)
+					{
+						if(mi!=null)
+						{
+							//ret = ea.getMethodNFPropertyValue(sid, mi, name);
+							ret = (Future)ia.getMethodNFPropertyPrettyPrintValue(sid, mi, name);
+						}
+						else
+						{
+							//ret = ea.getNFPropertyValue(sid, name);
+							ret = (Future)ia.getNFPropertyPrettyPrintValue(sid, name);
+						}
+					}
+					// components
+					else //if(ea!=null)
+					{
+						//ret = ea.getNFPropertyValue(name);
+						ret = (Future)ia.getNFPropertyPrettyPrintValue(name);
+					}
+					/*else
+					{
+						ret = new Future<>(new RuntimeException("No provider set"));
+					}	*/
+					return ret;
+				}
+			}).delegate(ret);
 		}
 		else
 		{
 			ret = new Future<>(new RuntimeException("No provider set"));
-		}		
+		}
 		
 		return ret;
 	}
@@ -523,11 +606,24 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 			{
 				if(mi!=null)
 				{
-					ea.getRequiredMethodNFPropertyMetaInfos(sid, mi).then(mis -> getvals.execute(mis));
+					ea.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>() 
+					{
+						public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia) 
+						{
+							return ia.getRequiredMethodNFPropertyMetaInfos(sid, mi);
+						}
+					}).then(mis -> getvals.execute(mis));
 				}
 				else
 				{
-					ea.getRequiredNFPropertyMetaInfos(sid).then(mis -> getvals.execute(mis));
+					ea.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>() 
+					{
+						public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia) 
+						{
+							return ia.getRequiredNFPropertyMetaInfos(sid);
+						}
+					}).then(mis -> getvals.execute(mis));
+					//ea.getRequiredNFPropertyMetaInfos(sid).then(mis -> getvals.execute(mis));
 				}
 			}
 			// provided services and methods
@@ -535,17 +631,38 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 			{
 				if(mi!=null)
 				{
-					ea.getMethodNFPropertyMetaInfos(sid, mi).then(mis -> getvals.execute(mis));
+					ea.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>() 
+					{
+						public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia) 
+						{
+							return ia.getMethodNFPropertyMetaInfos(sid, mi);
+						}
+					}).then(mis -> getvals.execute(mis));
+					//ea.getMethodNFPropertyMetaInfos(sid, mi).then(mis -> getvals.execute(mis));
 				}
 				else
 				{
-					ea.getNFPropertyMetaInfos(sid).then(mis -> getvals.execute(mis));
+					ea.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>() 
+					{
+						public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia) 
+						{
+							return ia.getNFPropertyMetaInfos(sid);
+						}
+					}).then(mis -> getvals.execute(mis));
+					//ea.getNFPropertyMetaInfos(sid).then(mis -> getvals.execute(mis));
 				}
 			}
 			// components
 			else if(ea!=null)
 			{
-				ea.getNFPropertyMetaInfos().then(mis -> getvals.execute(mis));
+				ea.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>() 
+				{
+					public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia) 
+					{
+						return ia.getNFPropertyMetaInfos();
+					}
+				}).then(mis -> getvals.execute(mis));
+				//ea.getNFPropertyMetaInfos().then(mis -> getvals.execute(mis));
 			}
 			else
 			{

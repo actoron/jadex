@@ -100,15 +100,15 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 	 */
 	public void resume(final Future<?> future)
 	{
-//		System.out.println("ComponentSuspendable.resume "+Thread.currentThread());
-//		Thread.dumpStack();
+		//System.out.println("ComponentSuspendable.resume "+Thread.currentThread());
+		//Thread.dumpStack();
 		
-		// Defer wakeup when suspended
-		if(agent.getDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
+		// Defer wakeup when suspended and not forced
+		if(!agent.isStepped() && agent.getDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
 		{
 			agent.scheduleStep(ia ->
 			{
-				resume(future);
+				resume(future);//, force);
 				return IFuture.DONE;
 			});
 		}

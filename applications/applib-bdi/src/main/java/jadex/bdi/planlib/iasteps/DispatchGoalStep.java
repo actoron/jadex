@@ -17,7 +17,7 @@ import jadex.commons.future.IResultListener;
 public class DispatchGoalStep implements IComponentStep<Map<String, Object>>
 {
 	protected String goaltype;
-	protected Map parameters;
+	protected Map<String, Object> parameters;
 	
 	/**
 	 *  Dispatches a goal.
@@ -34,11 +34,14 @@ public class DispatchGoalStep implements IComponentStep<Map<String, Object>>
 	 *  @param parameterName Name of a goal parameter.
 	 *  @param parameterValue Value of the goal parameter.
 	 */
-	public DispatchGoalStep(String goal, final String parameterName, final Object parameterValue)
+	public DispatchGoalStep(String goal, final String name, final Object value)
 	{
-		this(goal, new HashMap() {{
-			put(parameterName, parameterValue);
-		}});
+		this(goal, new HashMap<String, Object>() 
+		{
+			{
+				put(name, value);
+			}
+		});
 	}
 	
 	/**
@@ -46,7 +49,7 @@ public class DispatchGoalStep implements IComponentStep<Map<String, Object>>
 	 *  @param goal The goal.
 	 *  @param parameters The goal parameters.
 	 */
-	public DispatchGoalStep(String goal, Map parameters)
+	public DispatchGoalStep(String goal, Map<String, Object> parameters)
 	{
 		this.goaltype = goal;
 		this.parameters = parameters;
@@ -57,9 +60,9 @@ public class DispatchGoalStep implements IComponentStep<Map<String, Object>>
 		final IGoal goal = ia.getFeature(IBDIXAgentFeature.class).getGoalbase().createGoal(goaltype);
 		if(parameters != null)
 		{
-			for(Iterator it = parameters.entrySet().iterator(); it.hasNext(); )
+			for(Iterator<Map.Entry<String, Object>> it = parameters.entrySet().iterator(); it.hasNext(); )
 			{
-				Map.Entry paramEntry = (Map.Entry) it.next();
+				Map.Entry<String, Object> paramEntry = (Map.Entry<String, Object>) it.next();
 				goal.getParameter((String) paramEntry.getKey()).setValue(paramEntry.getValue());
 			}
 		}

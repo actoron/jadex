@@ -6,12 +6,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 import jadex.base.Starter;
@@ -1071,12 +1074,23 @@ public class SComponentFactory
 		
 		final URL[] urls = SUtil.removeSystemUrls(purls);	
 		final List<URL> urllist = SUtil.arrayToList(urls);
-		final Iterator<URL> it = (Iterator<URL>)urllist.iterator();
 		//System.out.println("getComponentModelsAsStream: "+l.size());
 		final int cnt[] = new int[1];
 		
-		//System.out.println("max to: "+urllist.size()+" "+urllist);
-		ret.setMaxResultCount(urllist.size());
+		final List<URL> modelurllist = new ArrayList<URL>();
+		for(URL u: urls)
+		{
+			//if(u.toString().indexOf("micro")!=-1 && u.toString().indexOf("application")!=-1)
+			//	System.out.println("here");
+			//System.out.println(u+" "+existsFile("jadexscan.txt", u));
+			if(existsFile("jadexscan", u))
+				modelurllist.add(u);
+		}
+
+		final Iterator<URL> it = (Iterator<URL>)modelurllist.iterator();
+		
+		//System.out.println("max to: "+modelurllist.size()+" "+modelurllist);
+		ret.setMaxResultCount(modelurllist.size());
 		
 		IComponentStep<List<String[]>> step = new IComponentStep<List<String[]>>()
 		{
@@ -1136,11 +1150,11 @@ public class SComponentFactory
 				}
 				
 				//if(url[0].toString().indexOf("applications")!=-1 && url[0].toString().indexOf("bpmn")!=-1)
-				/*if(res.size()>0)
-				{
-					System.out.println("found for: "+url[0]+" "+res.size());
-					res.stream().forEach(a -> System.out.println(Arrays.toString(a)));
-				}*/
+				//if(res.size()>0)
+				//{
+					//System.out.println("found for: "+url[0]+" "+res.size());
+					//res.stream().forEach(a -> System.out.println(Arrays.toString(a)));
+				//}
 				
 				ret.setResult(res);
 				
@@ -1214,5 +1228,58 @@ public class SComponentFactory
 			}).catchEx(ex -> ex.printStackTrace());
 		}
 		return kernelfilters;
+	}
+	
+	/**
+	 *  Check if a file exists in a dir or jar.
+	 *  @param name The name.
+	 *  @param url The url.
+	 *  @return True, if file exists.
+	 */
+	public static boolean existsFile(String name, URL url)
+	{
+		boolean ret = false;
+		try
+		{
+//			System.out.println("url: "+urls[i].toURI());
+			File f = new File(url.toURI());
+			if(f.getName().endsWith(".jar"))
+			{
+				JarFile	jar = null;
+				try
+				{
+					jar	= new JarFile(f);
+					JarEntry entry = jar.getJarEntry(name);
+					if(entry!=null)
+						ret = true;
+					jar.close();
+				}
+				catch(Exception e)
+				{
+//					System.out.println("Error opening jar: "+urls[i]+" "+e.getMessage());
+				}
+				finally
+				{
+					if(jar!=null)
+					{
+						jar.close();
+					}
+				}
+			}
+			else if(f.isDirectory())
+			{
+				File entry = new File(f, name);
+				if(entry.exists())
+					ret = true;
+//				throw new UnsupportedOperationException("Currently only jar files supported: "+f);
+			}
+		}
+		catch(Exception e)
+		{
+			System.out.println("problem with: "+url);
+//			e.printStackTrace();
+		}
+		
+		return ret;
 	}
 }
