@@ -8,8 +8,13 @@ clean();
 def file = new File('lit-element.js');
 file.delete();
 
+def sep = File.separator;
+
 println 'Installing node packages, this make take a while...';
-def npmcmd = 'npm i --save-dev rollup ';
+def npmcmd = 'npm';
+if (System.properties['os.name'].toLowerCase().contains('windows'))
+	npmcmd +='.cmd';
+npmcmd += ' i --save-dev rollup ';
 npmcmd += '@web/rollup-plugin-html ';
 npmcmd += '@web/rollup-plugin-copy ';
 npmcmd += '@rollup/plugin-node-resolve ';
@@ -27,7 +32,7 @@ rufile << '''
 import resolve from '@rollup/plugin-node-resolve';
 
 export default {
-  input: 'node_modules/lit-element/lit-element.js',
+  input: 'node_modules' + sep +'lit-element' + sep + 'lit-element.js',
   output: {
     file: 'lit-element.js',
     format: 'es'
@@ -38,7 +43,11 @@ export default {
 };
 ''';
 
-def rucmd = 'node_modules/.bin/rollup -c'.execute();
+def rucmd = 'node_modules'+sep+'.bin'+sep+'rollup';
+if (System.properties['os.name'].toLowerCase().contains('windows'))
+	rucmd +='.cmd';
+rucmd += ' -c';
+rucmd = rucmd.execute();
 rucmd.waitForOrKill(120000);
 
 clean();
