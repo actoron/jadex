@@ -1587,8 +1587,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			if(shutdown && debug)
 				PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.invoke(): "+cid+", "+method+", "+SUtil.arrayToString(args));
 
-			//if(method.getName().indexOf("invoke")!=-1)
-			//	System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+			if(method.getName().indexOf("stepCom")!=-1)
+				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 			
 			Class<?> rettype = method.getReturnType();
 			
@@ -1841,8 +1841,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		{
 			if(shutdown && debug)
 				PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doInvoke1: "+cid+", "+method+", "+SUtil.arrayToString(args));
-//				if(method.getName().indexOf("createCompo")!=-1)
-//					System.out.println("call");
+				if(method.getName().indexOf("stepComp")!=-1)
+					System.out.println("call");
 			
 //				Future<Object> ret = new Future<>();
 			IFuture<Object> ret = null;

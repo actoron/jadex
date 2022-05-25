@@ -19,7 +19,9 @@ import jadex.bdiv3x.runtime.CapabilityWrapper;
 import jadex.bdiv3x.runtime.IParameter;
 import jadex.bdiv3x.runtime.IParameterElement;
 import jadex.bdiv3x.runtime.IParameterSet;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.impl.ExecutionComponentFeature.StepInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
@@ -719,4 +721,5 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 	{
 		return getModelElement().getElementName();
 	}
+
 }

@@ -37,7 +37,7 @@ public interface IComponentStep<T>
 	 *  Set the current step.
 	 *  @param step The step.
 	 */
-	public default void setCurrentStep(StepInfo step)
+	public static void setCurrentStep(StepInfo step)
 	{
 		CURRENT_STEP.set(step);
 	}
@@ -46,7 +46,7 @@ public interface IComponentStep<T>
 	 *  Get the current step.
 	 *  @return The step.
 	 */
-	public default StepInfo getCurrentStep()
+	public static StepInfo getCurrentStep()
 	{
 		return CURRENT_STEP.get();
 	}

@@ -125,11 +125,16 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/** The blocked threads by monitor. */
 	protected Map<Object, Executor>	blocked; 
 	
+	
 	/** The flag for a requested step (true when a step is allowed in stepwise execution). */
 	protected String stepinfo;
 	
 	/** The future to be informed, when the requested step is finished. */
 	protected Future<Void> stepfuture;
+	
+	/** Flag if a semantic step (consisting of 1-n technical steps) should be executed. */
+	protected boolean semanticstep = true;
+	
 	
 	/** The parent adapter (cached for speed). */
 	protected IInternalExecutionFeature parenta;
@@ -336,7 +341,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			// inherit priority in case of immediate steps
 			if(prio==STEP_PRIORITY_NORMAL)
 			{
-				StepInfo context = step.getCurrentStep();
+				StepInfo context = IComponentStep.getCurrentStep();
 				if(context!=null)
 				{
 					int cprio = context.getPriority();
@@ -1402,10 +1407,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				}
 				else if(!breakpoint_triggered)
 				{
+					// Just next step when normal execution
 					if((IComponentDescription.STATE_ACTIVE.equals(getComponent().getDescription().getState())))
 					{
 						stepi = removeStep();
 					}
+					// In debug mode find named step
 					else if(stepfuture!=null)
 					{
 						boolean found = false;
@@ -1432,11 +1439,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						if(!found)
 							stepi = removeStep();
 					}
+					// else do not fetch a step
 				}
 			}
 		}
 		final StepInfo step = stepi;
 		
+		// Suspend when breakpoint triggered
 		if(breakpoint_triggered)
 		{
 //			IComponentManagementService	cms	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
@@ -1493,9 +1502,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						
 						Thread tbefore = Thread.currentThread();
 						
-						exstep.setCurrentStep(step);
+						IComponentStep.setCurrentStep(step);
 						stepfut	= exstep.execute(component);
-						exstep.setCurrentStep(null);
+						IComponentStep.setCurrentStep(null);
 						
 						Thread tafter = Thread.currentThread();
 
@@ -1759,7 +1768,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			try
 			{
-				cycle	= executeCycle();
+				cycle = executeCycle();
 			}
 			catch(Exception e)
 			{
@@ -1771,23 +1780,30 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			}				
 		}
 		
-		if(!priostep)
+		if(!priostep) // priostep do not count as real step
 		{
 			// In step mode, notify done step, if any.
-			Future<Void> stepfut = null;
-			synchronized(this)
+			
+			if(stepfuture!=null)
+				System.out.println(step+" "+step.hasSemanticEffect()+IComponentStep.getCurrentStep());
+			
+			// When semantic step mode execute as long steps until a semantic effect has occurred
+			if(!semanticstep || (step!=null && step.hasSemanticEffect()))
 			{
-				
-				if(stepfuture!=null && stepinfo==null)
+				Future<Void> stepfut = null;
+				synchronized(this)
 				{
-					stepfut	= stepfuture;
-					stepfuture = null;
-					//System.out.println("stepfuture null");
+			
+					if(stepfuture!=null && stepinfo==null)
+					{
+						stepfut	= stepfuture;
+						stepfuture = null;
+						//System.out.println("stepfuture null");
+					}
 				}
-			}
-			if(stepfut!=null)
-			{
-				stepfut.setResult(null);
+				
+				if(stepfut!=null)
+					stepfut.setResult(null);
 			}
 		}
 
@@ -1840,11 +1856,17 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		// Stop executing again on exe service when switched to rescue thread in mean time.
 		return ret && (!isonrescue || Thread.currentThread()==rescuethread);
 		
-		} catch(Throwable t) {
+		} 
+		catch(Throwable t) 
+		{
 			if(executing)
 				new RuntimeException("dreck").initCause(t).printStackTrace();
 			throw SUtil.throwUnchecked(t);
 		}
+		/*finally
+		{
+			IComponentStep.setCurrentStep(null);
+		}*/
 	}
 
 	
@@ -2523,6 +2545,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		/** The number of the step (preserve insert order of same prio). */
 		protected int stepcnt;
 		
+		/** Has the step triggered a semantic effect. */
+		protected boolean semanticeffect;
+		
 //		/** The component state (create, init, body, end). */
 //		protected ComponentLifecycleState state;
 		
@@ -2664,6 +2689,25 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			if(ret==0)
 				ret = getStepCount()-o.getStepCount();
 			return ret;
+		}
+		
+		/**
+		 *  Get the effect.
+		 *  @return The semantic effect.
+		 */
+		public boolean hasSemanticEffect() 
+		{
+			return semanticeffect;
+		}
+
+		/**
+		 * Set the effect.
+		 * @param effect the semanticEffect to set
+		 */
+		public void setSemanticEffect(boolean semanticeffect) 
+		{
+			System.out.println("set sem effect: "+step);
+			this.semanticeffect = semanticeffect;
 		}
 
 		/**

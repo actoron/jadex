@@ -63,6 +63,7 @@ import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
+import jadex.bridge.component.impl.ExecutionComponentFeature.StepInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.component.IProvidedServicesFeature;
@@ -967,6 +968,21 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	}
 	
 	/**
+	 *  Set the semantic effect on the step.
+	 */
+	public static void setSemanticEffect(boolean effect)
+	{
+		StepInfo si = IComponentStep.getCurrentStep();
+		if(si!=null)
+			si.setSemanticEffect(true);
+		else
+		{
+			Thread.dumpStack();
+			System.out.println("step context unavailable");
+		}
+	}
+	
+	/**
 	 * 
 	 */
 	public static void publishToolBeliefEvent(IInternalAccess ia, MBelief mbel)//, String evtype)
@@ -986,6 +1002,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			mev.setProperty("sourcetype", info.getType());
 			mev.setProperty("details", info);
 			mev.setLevel(PublishEventLevel.FINE);
+			
+			setSemanticEffect(true);
 			
 			ia.getFeature(IMonitoringComponentFeature.class).publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}
