@@ -47,7 +47,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ImmediateComponentStep;
+import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -617,7 +617,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 		{
 			try
 			{
-				getComponent().getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
+				getComponent().getFeature(IExecutionFeature.class).scheduleStep(new IPriorityComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{

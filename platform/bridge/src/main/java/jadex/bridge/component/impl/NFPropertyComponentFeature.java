@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ImmediateComponentStep;
+import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.INFPropertyComponentFeature;
@@ -549,7 +549,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<String[]>()
+					result.scheduleStep(new IPriorityComponentStep<String[]>()
 					{
 						@Classname("getNFPropertyNames9")
 						public IFuture<String[]> execute(IInternalAccess ia)
@@ -582,7 +582,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<String[]>()
+					result.scheduleStep(new IPriorityComponentStep<String[]>()
 					{
 						@Classname("getNFAllPropertyNames10")
 						public IFuture<String[]> execute(IInternalAccess ia)
@@ -624,7 +624,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>()
+					result.scheduleStep(new IPriorityComponentStep<Map<String, INFPropertyMetaInfo>>()
 					{
 						@Classname("getNFPropertyMetaInfos11")
 						public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
@@ -666,7 +666,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<INFPropertyMetaInfo>()
+					result.scheduleStep(new IPriorityComponentStep<INFPropertyMetaInfo>()
 					{
 						@Classname("getNFPropertyMetaInfo12")
 						public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
@@ -700,7 +700,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<T>()
+					result.scheduleStep(new IPriorityComponentStep<T>()
 					{
 						@Classname("getNFPropertyValue13")
 						public IFuture<T> execute(IInternalAccess ia)
@@ -735,7 +735,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<T>()
+					result.scheduleStep(new IPriorityComponentStep<T>()
 					{
 						@Classname("getNFPropertyValue14")
 						public IFuture<T> execute(IInternalAccess ia)
@@ -770,7 +770,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<String>()
+					result.scheduleStep(new IPriorityComponentStep<String>()
 					{
 						@Classname("getNFPropertyValue14+1")
 						public IFuture<String> execute(IInternalAccess ia)
@@ -802,7 +802,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<Void>()
+					result.scheduleStep(new IPriorityComponentStep<Void>()
 					{
 						@Classname("addNFProperty15")
 						public IFuture<Void> execute(IInternalAccess ia)
@@ -834,7 +834,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<Void>()
+					result.scheduleStep(new IPriorityComponentStep<Void>()
 					{
 						@Classname("removeNFProperty16")
 						public IFuture<Void> execute(IInternalAccess ia)
@@ -865,7 +865,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<Void>()
+					result.scheduleStep(new IPriorityComponentStep<Void>()
 					{
 						@Classname("shutdownNFPropertyProvider17")
 						public IFuture<Void> execute(IInternalAccess ia)
@@ -900,7 +900,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>()
+					result.scheduleStep(new IPriorityComponentStep<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>()
 					{
 						@Classname("getMethodNFPropertyMetaInfos18")
 						public IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> execute(IInternalAccess ia)
@@ -933,7 +933,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<String[]>()
+					result.scheduleStep(new IPriorityComponentStep<String[]>()
 					{
 						@Classname("getMethodNFPropertyNames19")
 						public IFuture<String[]> execute(IInternalAccess ia)
@@ -966,7 +966,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<String[]>()
+					result.scheduleStep(new IPriorityComponentStep<String[]>()
 					{
 						@Classname("getMethodNFAllPropertyNames20")
 						public IFuture<String[]> execute(IInternalAccess ia)
@@ -998,7 +998,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>()
+					result.scheduleStep(new IPriorityComponentStep<Map<String, INFPropertyMetaInfo>>()
 					{
 						@Classname("getMethodNFPropertyMetaInfos21")
 						public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
@@ -1035,7 +1035,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<INFPropertyMetaInfo>()
+					result.scheduleStep(new IPriorityComponentStep<INFPropertyMetaInfo>()
 					{
 						@Classname("getMethodNFPropertyMetaInfo22")
 						public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
@@ -1070,7 +1070,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<T>()
+					result.scheduleStep(new IPriorityComponentStep<T>()
 					{
 						@Classname("getMethodNFPropertyValue23")
 						public IFuture<T> execute(IInternalAccess ia)
@@ -1120,7 +1120,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<T>()
+					result.scheduleStep(new IPriorityComponentStep<T>()
 					{
 						@Classname("getMethodNFPropertyValue24")
 						public IFuture<T> execute(IInternalAccess ia)
@@ -1149,7 +1149,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<String>()
+					result.scheduleStep(new IPriorityComponentStep<String>()
 					{
 						@Classname("getMethodNFPropertyPrettyPrintValue24+1")
 						public IFuture<String> execute(IInternalAccess ia)
@@ -1182,7 +1182,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<Void>()
+					result.scheduleStep(new IPriorityComponentStep<Void>()
 					{
 						@Classname("addMethodNFProperty25")
 						public IFuture<Void> execute(IInternalAccess ia)
@@ -1215,7 +1215,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
-					result.scheduleStep(new ImmediateComponentStep<Void>()
+					result.scheduleStep(new IPriorityComponentStep<Void>()
 					{
 						@Classname("removeMethodNFProperty26")
 						public IFuture<Void> execute(IInternalAccess ia)

@@ -180,6 +180,11 @@ class MicroAgentDebuggerElement extends CidElement
 		return this.selstep==null? null: this.selstep.properties.id;
 	}
 	
+	hasSteps()
+	{
+		return this.steps!=null? this.steps.length>0: false;
+	}
+	
 	stepToString(step)
 	{
 		var ret = "";

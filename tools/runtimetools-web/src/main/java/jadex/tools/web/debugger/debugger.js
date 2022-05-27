@@ -59,16 +59,41 @@ class DebuggerElement extends CidElement
 	
 	connectedCallback()
 	{
+		//console.log("con");
 		super.connectedCallback();
 		this.concom = true;	
+		this.startUpdater();
 		//this.subscribe();
 	}
 	
 	disconnectedCallback()
 	{
+		//console.log("discon");
 		super.disconnectedCallback();
 		this.concom = false;	
+		this.stopUpdater();
 		this.terminateSubscription();
+	}
+	
+	// todo: better debugger / subdebugger
+	startUpdater()
+	{
+		this.updater = setInterval(() =>
+		{
+			//console.log("Update buttons");
+			this.updateButtons();
+		}, 1000);
+		//console.log("updater: "+this.updater);
+	}
+	
+	stopUpdater()
+	{
+		//console.log("stop updater: "+this.updater);
+		if(this.updater!=null)
+		{
+			clearInterval(this.updater);
+			this.updater = null;
+		}
 	}
 	
 	subscribe(interval)
@@ -279,12 +304,7 @@ class DebuggerElement extends CidElement
 		
 		this.setEnabled("step", false);
 
-		// internal debugger panel must have function getStepInfo()
-		var md = this.shadowRoot.getElementById("debugger");
-		var stepinfo = null;
-		if(md.children[0].getStepInfo!=null)
-			stepinfo = md.children[0].getStepInfo();
-		//console.log("dostep with: "+stepinfo);
+		var stepinfo = this.getStepInfo();
 		
 		return new Promise(function(resolve, reject) 
 		{
@@ -326,10 +346,30 @@ class DebuggerElement extends CidElement
 		});		
 	}
 	
+	getStepInfo()
+	{
+		// internal debugger panel must have function getStepInfo()
+		var md = this.shadowRoot.getElementById("debugger");
+		var ret = null;
+		if(md.children[0].getStepInfo!=null)
+			ret = md.children[0].getStepInfo();
+		return ret;
+	}
+	
+	hasSteps()
+	{
+		// internal debugger panel must have function hasSteps()
+		var md = this.shadowRoot.getElementById("debugger");
+		var ret = false;
+		if(md.children[0].getStepInfo!=null)
+			ret = md.children[0].hasSteps();
+		return ret;
+	}
+	
 	updateButtons()
 	{
 		this.setEnabled("pause", "suspended"!==this.desc?.state);
-		this.setEnabled("step", "suspended"===this.desc?.state);
+		this.setEnabled("step", "suspended"===this.desc?.state && this.hasSteps());
 		this.setEnabled("run", "suspended"===this.desc?.state); 
 	}
 	

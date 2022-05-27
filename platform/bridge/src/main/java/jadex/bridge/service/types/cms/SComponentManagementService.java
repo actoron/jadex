@@ -23,6 +23,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.ProxyFactory;
@@ -1299,7 +1300,21 @@ public class SComponentManagementService
 		if(adapter!=null)
 		{
 			((IInternalExecutionFeature)adapter.getInternalAccess().getFeature(IExecutionFeature.class)).doStep(stepinfo)
-				.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+				.then(Void -> agent.scheduleStep(new IPriorityComponentStep<Void>() {
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						ret.setResult(null);
+						return ret;
+					}
+				}))
+				.catchEx(ex -> agent.scheduleStep(new IPriorityComponentStep<Void>() {
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						ret.setException(ex);
+						return ret;
+					}
+				}));
+				//.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 		}
 		else
 		{

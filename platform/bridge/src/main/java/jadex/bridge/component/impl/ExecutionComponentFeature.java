@@ -28,7 +28,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.ITypedComponentStep;
-import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.StepAborted;
 import jadex.bridge.StepAbortedException;
@@ -315,7 +314,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public <T>	IFuture<T> scheduleStep(IComponentStep<T> step)
 	{
-		return scheduleStep(IExecutionFeature.STEP_PRIORITY_NORMAL, step);
+		return scheduleStep(IExecutionFeature.STEP_PRIORITY_UNSET, false, step);
 	}
 	
 	/**
@@ -323,13 +322,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 *  @param step The component step.
 	 *  @param priority The step priority (0 is default).
 	 */
-	public <T>	IFuture<T> scheduleStep(int priority, IComponentStep<T> step)
+	public <T>	IFuture<T> scheduleStep(int priority, boolean inherit, IComponentStep<T> step)
 	{
 		final Future<T> ret = createStepFuture(step);
 		
-		/*if(component.getId().toString().indexOf("HelloW")!=-1)
+		/*if(component.getId().toString().indexOf("HelloW")!=-1 && priority==STEP_PRIORITY_IMMEDIATE)
 		{
-			System.out.println("schedule step: "+(step instanceof IPriorityComponentStep)+" "+step);
+			System.out.println("schedule step: "+(step instanceof IPriorityComponentStep)+" "+step+" "+priority);
 			//Thread.currentThread().dumpStack();
 		}*/
 		
@@ -337,21 +336,25 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			// Todo: synchronize with last step!
 			int prio = step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).getPriority(): priority;
+			boolean inh = step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).isInherit(): inherit;
 
 			// inherit priority in case of immediate steps
-			if(prio==STEP_PRIORITY_NORMAL)
+			if(prio==STEP_PRIORITY_UNSET && inh)
 			{
 				StepInfo context = IComponentStep.getCurrentStep();
 				if(context!=null)
 				{
 					int cprio = context.getPriority();
-					if(cprio==STEP_PRIORITY_IMMEDIATE)
-					{
-						prio = STEP_PRIORITY_IMMEDIATE;
-						//System.out.println("prio inherited: "+step);
-					}
+					//if(cprio==STEP_PRIORITY_IMMEDIATE)
+					//{
+						prio = cprio;
+						if(component.getId().toString().indexOf("HelloW")!=-1)
+							System.out.println("prio immediate inherited: "+step);
+					//}
 				}
 			}
+			//if(prio==STEP_PRIORITY_UNSET)
+			//	prio = STEP_PRIORITY_NORMAL;
 			
 //			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
 			if(endagenda.isDone() && prio<STEP_PRIORITY_IMMEDIATE)
@@ -374,7 +377,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					ret.setException(new ComponentTerminatedException(getComponent().getId()));
 					return ret;
 				}
-				addStep(new StepInfo(step, ret, new ThreadLocalTransferHelper(true), prio, stepcnt++));
+				addStep(new StepInfo(step, ret, new ThreadLocalTransferHelper(true), prio, stepcnt++, inherit));
 				
 //				System.out.println("steps: "+steps);
 				
@@ -1378,6 +1381,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		boolean priostep = false;
 		boolean	breakpoint_triggered = false;
 		
+		//if(getComponent().getId().toString().toLowerCase().indexOf("hello")!=-1)
+		//	System.out.println("step enter: "+stepfuture);
+		
 		synchronized(this)
 		{			
 			if(steps!=null && steps.size()>0) 
@@ -1504,7 +1510,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						
 						IComponentStep.setCurrentStep(step);
 						stepfut	= exstep.execute(component);
-						IComponentStep.setCurrentStep(null);
+						//IComponentStep.setCurrentStep(null);
 						
 						Thread tafter = Thread.currentThread();
 
@@ -1780,32 +1786,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			}				
 		}
 		
-		if(!priostep) // priostep do not count as real step
-		{
-			// In step mode, notify done step, if any.
-			
-			if(stepfuture!=null)
-				System.out.println(step+" "+step.hasSemanticEffect()+IComponentStep.getCurrentStep());
-			
-			// When semantic step mode execute as long steps until a semantic effect has occurred
-			if(!semanticstep || (step!=null && step.hasSemanticEffect()))
-			{
-				Future<Void> stepfut = null;
-				synchronized(this)
-				{
-			
-					if(stepfuture!=null && stepinfo==null)
-					{
-						stepfut	= stepfuture;
-						stepfuture = null;
-						//System.out.println("stepfuture null");
-					}
-				}
-				
-				if(stepfut!=null)
-					stepfut.setResult(null);
-			}
-		}
+		
 
 		resetExecutionState(cl);
 
@@ -1853,6 +1834,48 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //		if(endstepcnt!=-1 && getComponent().getComponentIdentifier().equals(getComponent().getComponentIdentifier().getRoot()))
 //			System.out.println("platform: "+steps.size());
 		
+		if(stepfuture!=null && !priostep || !ret) // priostep do not count as real step
+		{
+			// In step mode, notify done step, if any.
+			
+			//if(stepfuture!=null)
+			//if(getComponent().getId().toString().toLowerCase().indexOf("hello")!=-1)
+			//	System.out.println("stepfuture: "+step+" "+stepfuture);
+			
+			// When semantic step mode execute as long steps until a semantic effect has occurred
+			if(!semanticstep || (step!=null && step.hasSemanticEffect()) || !ret)
+			{
+				Future<Void> stepfut = null;
+				synchronized(this)
+				{
+			
+					if(stepfuture!=null && stepinfo==null)
+					{
+						stepfut	= stepfuture;
+						stepfuture = null;
+						//System.out.println("stepfuture null");
+					}
+				}
+				
+				if(stepfut!=null)
+				{
+					//if(getComponent().getId().toString().toLowerCase().indexOf("hello")!=-1)
+					//	System.out.println("stepfuture notified: "+stepfut+" "+ret+" "+step.hasSemanticEffect());
+					stepfut.setResult(null);
+				}
+			}
+			else
+			{
+				if(getComponent().getId().toString().toLowerCase().indexOf("hello")!=-1)
+					System.out.println("not resetted stepfuture: "+stepfuture+" "+ret+" "+step);
+			}
+		}
+		/*else
+		{
+			if(getComponent().getId().toString().toLowerCase().indexOf("hello")!=-1)
+				System.out.println("step cont: "+stepfuture+" "+priostep+" "+ret);
+		}*/
+		
 		// Stop executing again on exe service when switched to rescue thread in mean time.
 		return ret && (!isonrescue || Thread.currentThread()==rescuethread);
 		
@@ -1863,10 +1886,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				new RuntimeException("dreck").initCause(t).printStackTrace();
 			throw SUtil.throwUnchecked(t);
 		}
-		/*finally
+		finally
 		{
 			IComponentStep.setCurrentStep(null);
-		}*/
+			
+			//if(getComponent().getId().toString().toLowerCase().indexOf("hello")!=-1)
+			//	System.out.println("step exit: "+stepfuture+" "+stepinfo);
+		}
 	}
 
 	
@@ -2548,6 +2574,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		/** Has the step triggered a semantic effect. */
 		protected boolean semanticeffect;
 		
+		/** Boolean flag for inheritance of priority. */
+		protected boolean inherit;
+		
 //		/** The component state (create, init, body, end). */
 //		protected ComponentLifecycleState state;
 		
@@ -2563,13 +2592,14 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		 *  Create a new StepInfo. 
 		 */
 		public StepInfo(IComponentStep<?> step, Future<?> future, ThreadLocalTransferHelper transfer, 
-			int priority, int stepcnt)
+			int priority, int stepcnt, boolean inherit)
 		{
 			this.step = step;
 			this.future = future;
 			this.transfer = transfer;
 			this.priority = priority;
 			this.stepcnt = stepcnt;
+			this.inherit = inherit;
 		}
 
 		/**
@@ -2662,6 +2692,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			this.stepcnt = stepcnt;
 		}
 		
+		
+		
 //		/**
 //		 *  Get the state. 
 //		 *  @return The state
@@ -2680,6 +2712,24 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //			this.state = state;
 //		}
 		
+		/**
+		 *  Get the inherit flag.
+		 *  @return The inherit flag.
+		 */
+		public boolean isInherit() 
+		{
+			return inherit;
+		}
+
+		/**
+		 *  Set the inherit flag.
+		 *  @param inherit The inherit to set.
+		 */
+		public void setInherit(boolean inherit) 
+		{
+			this.inherit = inherit;
+		}
+
 		/**
 		 *  Compare two steps.
 		 */
@@ -2706,7 +2756,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		 */
 		public void setSemanticEffect(boolean semanticeffect) 
 		{
-			System.out.println("set sem effect: "+step);
+			//System.out.println("set sem effect: "+step);
 			this.semanticeffect = semanticeffect;
 		}
 

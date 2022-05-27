@@ -4,7 +4,7 @@ import java.util.Map;
 
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ImmediateComponentStep;
+import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.service.annotation.Timeout;
@@ -106,7 +106,7 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 		// Defer wakeup when suspended and not forced
 		if(!agent.isStepped() && agent.getDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
 		{
-			agent.scheduleStep(ia ->
+			agent.scheduleStep(IExecutionFeature.STEP_PRIORITY_NORMAL, false, ia ->
 			{
 				resume(future);//, force);
 				return IFuture.DONE;
@@ -117,7 +117,7 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 			if(!agent.getFeature(IExecutionFeature.class).isComponentThread())
 			{
 	//			System.out.println("ComponentSuspendable.resume1 "+Thread.currentThread());
-				agent.getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
+				agent.getFeature(IExecutionFeature.class).scheduleStep(new IPriorityComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{

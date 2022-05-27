@@ -8,7 +8,6 @@ import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.ComponentFutureFunctionality;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceEvent;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.registry.SlidingCuckooFilter;
 import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.ICommand;
@@ -178,7 +177,7 @@ public class SFuture
 			// use immediate steps to avoid timeouts in realtime use
 			else
 			{
-				step = new ImmediateComponentStep<Void>()
+				step = new IPriorityComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -216,7 +215,7 @@ public class SFuture
 	{
 		if(to>0)
 		{
-			ea.scheduleStep(new ImmediateComponentStep<Void>()
+			ea.scheduleStep(new IPriorityComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

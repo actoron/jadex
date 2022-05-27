@@ -276,8 +276,12 @@ class BDIV3AgentDebuggerElement extends CidElement
 				myname += part;
 				var nodename = part;
 				
-				// todo: check id not myname in every case
-				if(self.treedata[myname]==null)
+				// ret must be last existing parent
+				if(self.treedata[i==parts.length-1? info.id: myname]!=null)
+				{
+					ret = i==parts.length-1? info.id: myname;
+				}
+				else
 				{
 					//var type = self.typemap[names[i]];
 					//var icon = null;
@@ -502,7 +506,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 	
 	updateEvent(event)
 	{
-		//console.log("event: "+event.type);
+		console.log("event: "+event.type);
 		
 		var type = event.type.toLowerCase();
 		var info = event.properties.details;
@@ -739,6 +743,11 @@ class BDIV3AgentDebuggerElement extends CidElement
 	getStepInfo()
 	{
 		return this.selstep==null? null: this.selstep.properties.id;
+	}
+	
+	hasSteps()
+	{
+		return this.steps!=null? this.steps.length>0: false;
 	}
 	
 	stepToString(step)

@@ -248,7 +248,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 	public IFuture<Void> setProperties(final Properties props)
 	{
 		// Hack!!! Should be decoupled by platform automatically
-		return exta.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Void>()
+		return exta.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, false, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -273,7 +273,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 	public IFuture<Properties> getProperties()
 	{
 		// Hack!!! Should be decoupled by platform automatically
-		return exta.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new IComponentStep<Properties>()
+		return exta.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, false, new IComponentStep<Properties>()
 		{
 			public IFuture<Properties> execute(IInternalAccess ia)
 			{

@@ -3,12 +3,9 @@ package jadex.bridge.service.types.factory;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +21,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -671,7 +668,7 @@ public class SComponentFactory
 	{
 		final Future<Object> ret = new Future<Object>();
 		
-		exta.scheduleStep(new ImmediateComponentStep<Object>()
+		exta.scheduleStep(new IPriorityComponentStep<Object>()
 		{
 			@Classname("getProperty")
 			public IFuture<Object> execute(final IInternalAccess ia)

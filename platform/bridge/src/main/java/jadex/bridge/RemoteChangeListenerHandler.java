@@ -187,7 +187,7 @@ public abstract class RemoteChangeListenerHandler
 				public void run()
 				{
 					// Local step: no XML classname required.
-					access.scheduleStep(new ImmediateComponentStep<Void>()
+					access.scheduleStep(new IPriorityComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{

@@ -10,6 +10,9 @@ import jadex.commons.future.IResultListener;
  */
 public interface IExecutionFeature extends IExternalExecutionFeature
 {
+	/** Constant for unset step level. */
+	public static final int STEP_PRIORITY_UNSET = -1;
+	
 	/** Constant for first normal step level. */
 	public static final int STEP_PRIORITY_NORMAL = 0;
 

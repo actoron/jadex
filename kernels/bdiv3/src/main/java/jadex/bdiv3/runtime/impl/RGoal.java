@@ -1419,7 +1419,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			mev.setProperty("details", info);
 			mev.setLevel(PublishEventLevel.FINE);
 			
-			BDIAgentFeature.setSemanticEffect(true);
+			BDIAgentFeature.setSemanticEffect(true, mev);
 			
 			getAgent().getFeature(IMonitoringComponentFeature.class).publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}

@@ -34,7 +34,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.ISearchConstraints;
-import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.SFuture;
 import jadex.bridge.StepAbortedException;
@@ -112,6 +111,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		tmp.add("stepComponent");
 		tmp.add("subscribeToEvents");
 		tmp.add("isStepped");
+		tmp.add("getChildren");
 		//tmp.add("getDescription");
 		/*tmp.add("getRequiredMethodNFPropertyMetaInfos");
 		tmp.add("getRequiredNFPropertyMetaInfos");
@@ -237,7 +237,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		
 		// Run init on component thread (hack!!! requires that execution feature works before its init)
 		IExecutionFeature exe = getFeature(IExecutionFeature.class);
-		return exe.scheduleStep(new ImmediateComponentStep<Void>()
+		return exe.scheduleStep(new IPriorityComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -286,7 +286,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		if(shutdown && debug)
 			getLogger().severe("shutdown component features start: "+getId());
 		IExecutionFeature exe	= getFeature(IExecutionFeature.class);
-		return exe.scheduleStep(new ImmediateComponentStep<Void>()
+		return exe.scheduleStep(new IPriorityComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1592,7 +1592,9 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			
 			Class<?> rettype = method.getReturnType();
 			
-			int prio = IExecutionFeature.STEP_PRIORITY_NORMAL; 
+			int prio = IExecutionFeature.STEP_PRIORITY_UNSET; 
+			boolean inherit = false;
+			
 			// Hack, use step return type
 			if("scheduleStep".equals(method.getName()))
 			{
@@ -1603,7 +1605,10 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					{
 						step = (IComponentStep<?>)args[i];
 						if(step instanceof IPriorityComponentStep)
+						{
 							prio = ((IPriorityComponentStep)step).getPriority();
+							inherit = ((IPriorityComponentStep)step).isInherit();
+						}
 						break;
 					}
 				}
@@ -1700,7 +1705,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				if(SUSPEND_METHOD_EXEMPTIONS.contains(method.getName()))
 				{
 					// Only when running?
-					if (!shutdown)
+					if(!shutdown)
 						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
 				}
 				
@@ -1710,7 +1715,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 //						System.out.println("scheduleStep: "+method.getName()+" "+method.getReturnType());
 					final Exception ex	= Future.DEBUG ? new DebugException() : null;
 					
-					getInternalAccess().scheduleStep(prio, new IComponentStep<Void>()
+					getInternalAccess().scheduleStep(prio, inherit, new IComponentStep<Void>()
 					{
 						@Override
 						public IFuture<Void> execute(IInternalAccess ia)
@@ -1841,8 +1846,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		{
 			if(shutdown && debug)
 				PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doInvoke1: "+cid+", "+method+", "+SUtil.arrayToString(args));
-				if(method.getName().indexOf("stepComp")!=-1)
-					System.out.println("call");
+				//if(method.getName().indexOf("stepComp")!=-1)
+				//	System.out.println("call");
 			
 //				Future<Object> ret = new Future<>();
 			IFuture<Object> ret = null;

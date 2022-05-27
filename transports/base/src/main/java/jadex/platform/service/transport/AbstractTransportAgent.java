@@ -23,7 +23,7 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ImmediateComponentStep;
+import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
@@ -1037,7 +1037,7 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 					
 					// Cannot use agent/cms.getExternalAccess(cid) because when remote call
 					// is in init the call will be delayed after init has finished (deadlock)
-					SComponentManagementService.scheduleStep(rec, new ImmediateComponentStep<Void>()
+					SComponentManagementService.scheduleStep(rec, new IPriorityComponentStep<Void>()
 					{
 						@Override
 						public IFuture<Void> execute(IInternalAccess ia)
@@ -1076,7 +1076,7 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 							if((header.getProperty(IMsgHeader.CONVERSATION_ID)!=null || header.getProperty(RemoteExecutionComponentFeature.RX_ID)!=null)
 								&& header.getProperty(MessageComponentFeature.EXCEPTION)==null)
 							{
-								agent.getExternalAccess().scheduleStep(new ImmediateComponentStep<Void>()
+								agent.getExternalAccess().scheduleStep(new IPriorityComponentStep<Void>()
 								{
 									@Override
 									public IFuture<Void> execute(IInternalAccess ia)

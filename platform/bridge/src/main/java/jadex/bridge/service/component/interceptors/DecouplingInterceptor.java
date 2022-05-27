@@ -256,7 +256,9 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //					System.out.println("getExternalAccess: "+provider+", "+sic.getArguments());
 //				}
 //			}				
-			ea.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new InvokeMethodStep(sic))
+			
+			// todo: why immediate? keep services responsive during suspend?
+			ea.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, false, new InvokeMethodStep(sic))
 				.addResultListener(new CopyReturnValueResultListener(ret, sic));
 		}
 		

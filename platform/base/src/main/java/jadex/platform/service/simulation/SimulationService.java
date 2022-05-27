@@ -9,7 +9,7 @@ import java.util.Map;
 import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ImmediateComponentStep;
+import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.OnEnd;
@@ -485,11 +485,11 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 		ex.fillInStackTrace();
 		String debug0	= InvokeMethodStep.DEBUG.get();	// Stack trace from caller thread, if other component
 		
-		access.waitForDelay(frttimeout, new ImmediateComponentStep<Void>()
+		access.waitForDelay(frttimeout, new IPriorityComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				if (!toblocker.isDone())
+				if(!toblocker.isDone())
 				{
 					String	debug	= openfuts.get(toblocker);
 					access.getLogger().severe((debug!=null?debug+", ":"") + SUtil.getExceptionStacktrace(ex) + (debug0!=null?"\n caused by "+debug0:""));
@@ -760,7 +760,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	public IFuture<Void> setProperties(Properties props)
 	{
 		final boolean	exe	= props.getBooleanProperty("executing");
-		return access.getExternalAccess().scheduleStep(new ImmediateComponentStep<Void>()
+		return access.getExternalAccess().scheduleStep(new IPriorityComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{

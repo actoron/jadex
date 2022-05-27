@@ -5,7 +5,7 @@ import java.util.Map;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ImmediateComponentStep;
+import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.MethodInfo;
@@ -27,7 +27,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<String[]> getNFPropertyNames(IExternalAccess component)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<String[]>()
+		return component.scheduleStep(new IPriorityComponentStep<String[]>()
 		{
 			@Classname("getNFPropertyNames0")
 			public IFuture<String[]> execute(IInternalAccess ia)
@@ -44,7 +44,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<String[]> getNFAllPropertyNames(IExternalAccess component)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<String[]>()
+		return component.scheduleStep(new IPriorityComponentStep<String[]>()
 		{
 			@Classname("getNFAllPropertyName1")
 			public IFuture<String[]> execute(IInternalAccess ia)
@@ -62,7 +62,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<Map<String, INFPropertyMetaInfo>> getNFPropertyMetaInfos(IExternalAccess component)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>()
+		return component.scheduleStep(new IPriorityComponentStep<Map<String, INFPropertyMetaInfo>>()
 		{
 			@Classname("getNFPropertyMetaInfos2")
 			public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
@@ -80,7 +80,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<INFPropertyMetaInfo> getNFPropertyMetaInfo(IExternalAccess component, final String name)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<INFPropertyMetaInfo>()
+		return component.scheduleStep(new IPriorityComponentStep<INFPropertyMetaInfo>()
 		{
 			@Classname("getNFPropertyMetaInfo3")
 			public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
@@ -99,7 +99,7 @@ public class SNFPropertyProvider
 	 */
 	public static <T> IFuture<T> getNFPropertyValue(IExternalAccess component, final String name)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<T>()
+		return component.scheduleStep(new IPriorityComponentStep<T>()
 		{
 			@Classname("getNFPropertyValue4")
 			public IFuture<T> execute(IInternalAccess ia)
@@ -120,7 +120,7 @@ public class SNFPropertyProvider
 //	public <T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit);
 	public static <T, U> IFuture<T> getNFPropertyValue(IExternalAccess component, final String name, final U unit)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<T>()
+		return component.scheduleStep(new IPriorityComponentStep<T>()
 		{
 			@Classname("getNFPropertyValue5")
 			public IFuture<T> execute(IInternalAccess ia)
@@ -137,7 +137,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<Void> addNFProperty(IExternalAccess component, final INFProperty<?, ?> nfprop)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<Void>()
+		return component.scheduleStep(new IPriorityComponentStep<Void>()
 		{
 			@Classname("addNFProperty6")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -154,7 +154,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<Void> removeNFProperty(IExternalAccess component, final String name)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<Void>()
+		return component.scheduleStep(new IPriorityComponentStep<Void>()
 		{
 			@Classname("removeNFProperty7")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -170,7 +170,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<Void> shutdownNFPropertyProvider(IExternalAccess component)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<Void>()
+		return component.scheduleStep(new IPriorityComponentStep<Void>()
 		{
 			@Classname("shutdownNFPropertyProvider8")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -195,7 +195,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<String[]>()
+				result.scheduleStep(new IPriorityComponentStep<String[]>()
 				{
 					@Classname("getNFPropertyNames9")
 					public IFuture<String[]> execute(IInternalAccess ia)
@@ -222,7 +222,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<String[]>()
+				result.scheduleStep(new IPriorityComponentStep<String[]>()
 				{
 					@Classname("getNFAllPropertyNames10")
 					public IFuture<String[]> execute(IInternalAccess ia)
@@ -250,7 +250,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>()
+				result.scheduleStep(new IPriorityComponentStep<Map<String, INFPropertyMetaInfo>>()
 				{
 					@Classname("getNFPropertyMetaInfos11")
 					public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
@@ -290,7 +290,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<INFPropertyMetaInfo>()
+				result.scheduleStep(new IPriorityComponentStep<INFPropertyMetaInfo>()
 				{
 					@Classname("getNFPropertyMetaInfo12")
 					public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
@@ -319,7 +319,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<T>()
+				result.scheduleStep(new IPriorityComponentStep<T>()
 				{
 					@Classname("getNFPropertyValue13")
 					public IFuture<T> execute(IInternalAccess ia)
@@ -350,7 +350,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<T>()
+				result.scheduleStep(new IPriorityComponentStep<T>()
 				{
 					@Classname("getNFPropertyValue14")
 					public IFuture<T> execute(IInternalAccess ia)
@@ -377,7 +377,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<Void>()
+				result.scheduleStep(new IPriorityComponentStep<Void>()
 				{
 					@Classname("addNFProperty15")
 					public IFuture<Void> execute(IInternalAccess ia)
@@ -404,7 +404,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<Void>()
+				result.scheduleStep(new IPriorityComponentStep<Void>()
 				{
 					@Classname("removeNFProperty16")
 					public IFuture<Void> execute(IInternalAccess ia)
@@ -430,7 +430,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<Void>()
+				result.scheduleStep(new IPriorityComponentStep<Void>()
 				{
 					@Classname("shutdownNFPropertyProvider17")
 					public IFuture<Void> execute(IInternalAccess ia)
@@ -459,7 +459,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>()
+				result.scheduleStep(new IPriorityComponentStep<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>()
 				{
 					@Classname("getMethodNFPropertyMetaInfos18")
 					public IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> execute(IInternalAccess ia)
@@ -487,7 +487,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<String[]>()
+				result.scheduleStep(new IPriorityComponentStep<String[]>()
 				{
 					@Classname("getMethodNFPropertyNames19")
 					public IFuture<String[]> execute(IInternalAccess ia)
@@ -515,7 +515,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<String[]>()
+				result.scheduleStep(new IPriorityComponentStep<String[]>()
 				{
 					@Classname("getMethodNFAllPropertyNames20")
 					public IFuture<String[]> execute(IInternalAccess ia)
@@ -542,7 +542,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>()
+				result.scheduleStep(new IPriorityComponentStep<Map<String, INFPropertyMetaInfo>>()
 				{
 					@Classname("getMethodNFPropertyMetaInfos21")
 					public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
@@ -571,7 +571,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<INFPropertyMetaInfo>()
+				result.scheduleStep(new IPriorityComponentStep<INFPropertyMetaInfo>()
 				{
 					@Classname("getMethodNFPropertyMetaInfo22")
 					public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
@@ -601,7 +601,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<T>()
+				result.scheduleStep(new IPriorityComponentStep<T>()
 				{
 					@Classname("getMethodNFPropertyValue23")
 					public IFuture<T> execute(IInternalAccess ia)
@@ -646,7 +646,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<T>()
+				result.scheduleStep(new IPriorityComponentStep<T>()
 				{
 					@Classname("getMethodNFPropertyValue24")
 					public IFuture<T> execute(IInternalAccess ia)
@@ -674,7 +674,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<Void>()
+				result.scheduleStep(new IPriorityComponentStep<Void>()
 				{
 					@Classname("addMethodNFProperty25")
 					public IFuture<Void> execute(IInternalAccess ia)
@@ -702,7 +702,7 @@ public class SNFPropertyProvider
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.scheduleStep(new ImmediateComponentStep<Void>()
+				result.scheduleStep(new IPriorityComponentStep<Void>()
 				{
 					@Classname("removeMethodNFProperty26")
 					public IFuture<Void> execute(IInternalAccess ia)
@@ -725,7 +725,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<String[]> getRequiredNFPropertyNames(IExternalAccess component, final IServiceIdentifier sid)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<String[]>()
+		return component.scheduleStep(new IPriorityComponentStep<String[]>()
 		{
 			@Classname("getRequiredNFPropertyNames27")
 			public IFuture<String[]> execute(IInternalAccess ia)
@@ -742,7 +742,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<String[]> getRequiredNFAllPropertyNames(IExternalAccess component, final IServiceIdentifier sid)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<String[]>()
+		return component.scheduleStep(new IPriorityComponentStep<String[]>()
 		{
 			@Classname("getRequiredNFAllPropertyNames28")
 			public IFuture<String[]> execute(IInternalAccess ia)
@@ -760,7 +760,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<Map<String, INFPropertyMetaInfo>> getRequiredNFPropertyMetaInfos(IExternalAccess component, final IServiceIdentifier sid)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>()
+		return component.scheduleStep(new IPriorityComponentStep<Map<String, INFPropertyMetaInfo>>()
 		{
 			@Classname("getRequiredNFPropertyMetaInfos29")
 			public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
@@ -778,7 +778,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<INFPropertyMetaInfo> getRequiredNFPropertyMetaInfo(IExternalAccess component, final IServiceIdentifier sid, final String name)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<INFPropertyMetaInfo>()
+		return component.scheduleStep(new IPriorityComponentStep<INFPropertyMetaInfo>()
 		{
 			@Classname("getRequiredNFPropertyMetaInfo30")
 			public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
@@ -797,7 +797,7 @@ public class SNFPropertyProvider
 	 */
 	public static <T> IFuture<T> getRequiredNFPropertyValue(IExternalAccess component, final IServiceIdentifier sid, final String name)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<T>()
+		return component.scheduleStep(new IPriorityComponentStep<T>()
 		{
 			@Classname("getRequiredNFPropertyValue31")
 			public IFuture<T> execute(IInternalAccess ia)
@@ -818,7 +818,7 @@ public class SNFPropertyProvider
 //	public <T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit);
 	public static <T, U> IFuture<T> getRequiredNFPropertyValue(IExternalAccess component, final IServiceIdentifier sid, final String name, final U unit)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<T>()
+		return component.scheduleStep(new IPriorityComponentStep<T>()
 		{
 			@Classname("getRequiredNFPropertyValue32")
 			public IFuture<T> execute(IInternalAccess ia)
@@ -835,7 +835,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<Void> addRequiredNFProperty(IExternalAccess component, final IServiceIdentifier sid, final INFProperty<?, ?> nfprop)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<Void>()
+		return component.scheduleStep(new IPriorityComponentStep<Void>()
 		{
 			@Classname("addRequiredNFProperty33")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -852,7 +852,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<Void> removeRequiredNFProperty(IExternalAccess component, final IServiceIdentifier sid, final String name)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<Void>()
+		return component.scheduleStep(new IPriorityComponentStep<Void>()
 		{
 			@Classname("removeRequiredNFProperty34")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -868,7 +868,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<Void> shutdownRequiredNFPropertyProvider(IExternalAccess component, final IServiceIdentifier sid)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<Void>()
+		return component.scheduleStep(new IPriorityComponentStep<Void>()
 		{
 			@Classname("shutdownRequiredNFPropertyProvider35")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -885,7 +885,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> getRequiredMethodNFPropertyMetaInfos(IExternalAccess component, final IServiceIdentifier sid)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>()
+		return component.scheduleStep(new IPriorityComponentStep<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>()
 		{
 			@Classname("getRequiredMethodNFPropertyMetaInfos36")
 			public IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> execute(IInternalAccess ia)
@@ -903,7 +903,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<String[]> getRequiredMethodNFPropertyNames(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<String[]>()
+		return component.scheduleStep(new IPriorityComponentStep<String[]>()
 		{
 			@Classname("getRequiredMethodNFPropertyNames37")
 			public IFuture<String[]> execute(IInternalAccess ia)
@@ -921,7 +921,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<String[]> getRequiredMethodNFAllPropertyNames(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<String[]>()
+		return component.scheduleStep(new IPriorityComponentStep<String[]>()
 		{
 			@Classname("getRequiredMethodNFAllPropertyNames38")
 			public IFuture<String[]> execute(IInternalAccess ia)
@@ -938,7 +938,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<Map<String, INFPropertyMetaInfo>> getRequiredMethodNFPropertyMetaInfos(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>()
+		return component.scheduleStep(new IPriorityComponentStep<Map<String, INFPropertyMetaInfo>>()
 		{
 			@Classname("getRequiredMethodNFPropertyMetaInfos39")
 			public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
@@ -957,7 +957,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<INFPropertyMetaInfo> getRequiredMethodNFPropertyMetaInfo(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method, final String name)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<INFPropertyMetaInfo>()
+		return component.scheduleStep(new IPriorityComponentStep<INFPropertyMetaInfo>()
 		{
 			@Classname("getRequiredMethodNFPropertyMetaInfo40")
 			public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
@@ -977,7 +977,7 @@ public class SNFPropertyProvider
 	 */
 	public static <T> IFuture<T> getRequiredMethodNFPropertyValue(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method, final String name)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<T>()
+		return component.scheduleStep(new IPriorityComponentStep<T>()
 		{
 			@Classname("getRequiredMethodNFPropertyValue41")
 			public IFuture<T> execute(IInternalAccess ia)
@@ -999,7 +999,7 @@ public class SNFPropertyProvider
 //	public <T, U> IFuture<T> getNFPropertyValue(Method method, String name, Class<U> unit);
 	public static <T, U> IFuture<T> getRequiredMethodNFPropertyValue(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method, final String name, final U unit)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<T>()
+		return component.scheduleStep(new IPriorityComponentStep<T>()
 		{
 			@Classname("getRequiredMethodNFPropertyValue42")
 			public IFuture<T> execute(IInternalAccess ia)
@@ -1017,7 +1017,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<Void> addRequiredMethodNFProperty(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method, final INFProperty<?, ?> nfprop)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<Void>()
+		return component.scheduleStep(new IPriorityComponentStep<Void>()
 		{
 			@Classname("addRequiredMethodNFProperty43")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -1035,7 +1035,7 @@ public class SNFPropertyProvider
 	 */
 	public static IFuture<Void> removeRequiredMethodNFProperty(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method, final String name)
 	{
-		return component.scheduleStep(new ImmediateComponentStep<Void>()
+		return component.scheduleStep(new IPriorityComponentStep<Void>()
 		{
 			@Classname("removeRequiredMethodNFProperty44")
 			public IFuture<Void> execute(IInternalAccess ia)

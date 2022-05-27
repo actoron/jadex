@@ -501,7 +501,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //		}
 		this.processingstate = processingstate;
 		
-		publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION);
+		if(!PlanLifecycleState.NEW.equals(lifecyclestate))
+			publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION);
 	}
 
 	/**
@@ -548,7 +549,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		}
 		else
 		{
-			publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION);
+			if(!PlanLifecycleState.NEW.equals(lifecyclestate))
+				publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION);
 		}
 		
 		if(PlanLifecycleState.PASSED.equals(lifecyclestate)
@@ -1997,7 +1999,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			mev.setProperty("details", info);
 			mev.setLevel(PublishEventLevel.FINE);
 			
-			BDIAgentFeature.setSemanticEffect(true);
+			BDIAgentFeature.setSemanticEffect(true, mev);
 			
 			getAgent().getFeature(IMonitoringComponentFeature.class).publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}

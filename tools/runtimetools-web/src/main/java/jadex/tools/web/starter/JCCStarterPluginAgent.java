@@ -9,7 +9,7 @@ import jadex.base.SRemoteGui;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ImmediateComponentStep;
+import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IServiceIdentifier;
@@ -288,8 +288,14 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
 		
 		// must immediate step in case of suspended components
-		ea.scheduleStep(new ImmediateComponentStep<IComponentDescription[]>() 
+		ea.scheduleStep(new IPriorityComponentStep<IComponentDescription[]>() 
 		{
+			@Override
+			public boolean isInherit() 
+			{
+				return true;
+			}
+			
 			public IFuture<IComponentDescription[]> execute(IInternalAccess ia) 
 			{
 				return ia.getDescriptions();
@@ -310,8 +316,14 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
 		
 		// must immediate step in case of suspended components
-		ea.scheduleStep(new ImmediateComponentStep<IComponentDescription>() 
+		ea.scheduleStep(new IPriorityComponentStep<IComponentDescription>() 
 		{
+			@Override
+			public boolean isInherit() 
+			{
+				return true;
+			}
+			
 			public IFuture<IComponentDescription> execute(IInternalAccess ia) 
 			{
 				return new Future<IComponentDescription>(ia.getDescription());
@@ -350,24 +362,37 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
 		
 		// must immediate step in case of suspended components
-		ea.scheduleStep(new ImmediateComponentStep<IComponentDescription[]>() 
+		ea.scheduleStep(new IPriorityComponentStep<IComponentDescription[]>() 
 		{
+			@Override
+			public boolean isInherit() 
+			{
+				return true;
+			}
+			
 			public IFuture<IComponentDescription[]> execute(IInternalAccess ia) 
 			{
+				//System.out.println("before getChildren");
 				final Future<IComponentDescription[]> ret = new Future<IComponentDescription[]>();
 				ia.getChildren(null, parent).then(cids -> 
 				{
-					//System.out.println("found: "+Arrays.toString(cids));
+					//System.out.println("after getChildren: "+Arrays.toString(cids));
 					FutureBarrier<IComponentDescription> barrier = new FutureBarrier<IComponentDescription>();
+					
 					for(int i=0; i<cids.length; i++)
 					{
+						//System.out.println("before getDesc: "+cids[i]);
 						IFuture<IComponentDescription>fut = ia.getDescription(cids[i]);
 						barrier.addFuture(fut);
 						final String n = cids[i].toString();
 						//fut.then(x -> System.out.println("jo: "+n));
 					}
 					barrier.waitForResults()
-						.then(descs -> ret.setResult(descs==null? null: descs.toArray(new IComponentDescription[cids.length])))
+						.then(descs -> 
+						{
+							//System.out.println("after getDescs: "); 
+							ret.setResult(descs==null? null: descs.toArray(new IComponentDescription[cids.length]));
+						})
 						.catchEx(ex -> ret.setException(ex));
 				});
 				return ret;
@@ -420,8 +445,14 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		
 		if(ea!=null)
 		{
-			ea.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>() 
+			ea.scheduleStep(new IPriorityComponentStep<Map<String, INFPropertyMetaInfo>>() 
 			{
+				@Override
+				public boolean isInherit() 
+				{
+					return true;
+				}
+				
 				public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia) 
 				{
 					final Future<Map<String, INFPropertyMetaInfo>> ret = new Future<>();
@@ -483,8 +514,14 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		
 		if(ea!=null)
 		{
-			ea.scheduleStep(new ImmediateComponentStep<Object>() 
+			ea.scheduleStep(new IPriorityComponentStep<Object>() 
 			{
+				@Override
+				public boolean isInherit() 
+				{
+					return true;
+				}
+				
 				public IFuture<Object> execute(IInternalAccess ia) 
 				{
 					IFuture<Object> ret = null;
@@ -606,8 +643,14 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 			{
 				if(mi!=null)
 				{
-					ea.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>() 
+					ea.scheduleStep(new IPriorityComponentStep<Map<String, INFPropertyMetaInfo>>() 
 					{
+						@Override
+						public boolean isInherit() 
+						{
+							return true;
+						}
+						
 						public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia) 
 						{
 							return ia.getRequiredMethodNFPropertyMetaInfos(sid, mi);
@@ -616,8 +659,14 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 				}
 				else
 				{
-					ea.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>() 
+					ea.scheduleStep(new IPriorityComponentStep<Map<String, INFPropertyMetaInfo>>() 
 					{
+						@Override
+						public boolean isInherit() 
+						{
+							return true;
+						}
+						
 						public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia) 
 						{
 							return ia.getRequiredNFPropertyMetaInfos(sid);
@@ -631,8 +680,14 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 			{
 				if(mi!=null)
 				{
-					ea.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>() 
+					ea.scheduleStep(new IPriorityComponentStep<Map<String, INFPropertyMetaInfo>>() 
 					{
+						@Override
+						public boolean isInherit() 
+						{
+							return true;
+						}
+						
 						public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia) 
 						{
 							return ia.getMethodNFPropertyMetaInfos(sid, mi);
@@ -642,8 +697,14 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 				}
 				else
 				{
-					ea.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>() 
+					ea.scheduleStep(new IPriorityComponentStep<Map<String, INFPropertyMetaInfo>>() 
 					{
+						@Override
+						public boolean isInherit() 
+						{
+							return true;
+						}
+						
 						public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia) 
 						{
 							return ia.getNFPropertyMetaInfos(sid);
@@ -655,8 +716,14 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 			// components
 			else if(ea!=null)
 			{
-				ea.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>() 
+				ea.scheduleStep(new IPriorityComponentStep<Map<String, INFPropertyMetaInfo>>() 
 				{
+					@Override
+					public boolean isInherit() 
+					{
+						return true;
+					}
+					
 					public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia) 
 					{
 						return ia.getNFPropertyMetaInfos();

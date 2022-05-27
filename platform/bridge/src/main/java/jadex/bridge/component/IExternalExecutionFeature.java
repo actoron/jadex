@@ -40,7 +40,7 @@ public interface IExternalExecutionFeature extends IExternalComponentFeature
 	 *  i.e. all steps with prio x>=STEP_PRIORITY_IMMEDIATE are always executed (even when suspended).
 	 *  Default steps get prio STEP_PRIORITY_NOMRAL (not immediate). 
 	 */
-	public <T> IFuture<T> scheduleStep(int priority, IComponentStep<T> step);
+	public <T> IFuture<T> scheduleStep(int priority, boolean inherit, IComponentStep<T> step);
 	
 //	/**
 //	 *  Execute an immediate component step,

@@ -36,6 +36,7 @@ import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
 import jadex.bdiv3.runtime.impl.APL.CandidateInfoMPlan;
 import jadex.bdiv3.runtime.impl.APL.CandidateInfoPojoPlan;
 import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
+import jadex.bdiv3.runtime.impl.AbstractBDIInfo;
 import jadex.bdiv3.runtime.impl.BeliefInfo;
 import jadex.bdiv3.runtime.impl.BodyAborted;
 import jadex.bdiv3.runtime.impl.CapabilityPojoWrapper;
@@ -970,11 +971,14 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/**
 	 *  Set the semantic effect on the step.
 	 */
-	public static void setSemanticEffect(boolean effect)
+	public static void setSemanticEffect(boolean effect, MonitoringEvent mev)
 	{
 		StepInfo si = IComponentStep.getCurrentStep();
 		if(si!=null)
+		{
+			System.out.println("set sem effect: "+mev);
 			si.setSemanticEffect(true);
+		}
 		else
 		{
 			Thread.dumpStack();
@@ -1003,7 +1007,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			mev.setProperty("details", info);
 			mev.setLevel(PublishEventLevel.FINE);
 			
-			setSemanticEffect(true);
+			setSemanticEffect(true, mev);
 			
 			ia.getFeature(IMonitoringComponentFeature.class).publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}

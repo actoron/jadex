@@ -199,7 +199,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 		// Initialize timeout
 		final Exception ex	= Future.DEBUG ? new DebugException() : null;
 		
-		exta.scheduleStep(new ImmediateComponentStep<Void>()
+		exta.scheduleStep(new IPriorityComponentStep<Void>()
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{

@@ -15,8 +15,8 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.ISearchConstraints;
-import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -1297,7 +1297,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		final IMonitoringComponentFeature	mon	= getComponent().getFeature0(IMonitoringComponentFeature.class);
 		if(mon!=null)
 		{
-			return getComponent().getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
+			return getComponent().getFeature(IExecutionFeature.class).scheduleStep(new IPriorityComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -1334,7 +1334,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		final IMonitoringComponentFeature	mon	= getComponent().getFeature0(IMonitoringComponentFeature.class);
 		if(mon!=null)
 		{
-			return getComponent().getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
+			return getComponent().getFeature(IExecutionFeature.class).scheduleStep(new IPriorityComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

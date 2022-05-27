@@ -15,7 +15,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -64,7 +63,7 @@ import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ImmediateComponentStep;
+import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -77,7 +76,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -536,7 +534,7 @@ public class VisualProcessViewPanel extends JPanel
 			add(sp, BorderLayout.CENTER);
 			
 			// Asynchronously load the visual model (maybe from remote).
-			access.scheduleStep(new ImmediateComponentStep<String>()
+			access.scheduleStep(new IPriorityComponentStep<String>()
 			{
 				@Classname("loadModel")
 				public IFuture<String> execute(IInternalAccess ia)

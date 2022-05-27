@@ -19,8 +19,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.RemoteChangeListenerHandler;
 import jadex.bridge.ResourceIdentifier;
@@ -95,8 +95,14 @@ public class SRemoteGui
 //		{
 //			System.err.println("ea is null in remote gui!!!");
 //		}
-		return ea.scheduleStep(new ImmediateComponentStep<Object[]>()
+		return ea.scheduleStep(new IPriorityComponentStep<Object[]>()
 		{
+			@Override
+			public boolean isInherit() 
+			{
+				return true;
+			}
+			
 			@Classname("getServiceInfos")
 			public IFuture<Object[]> execute(final IInternalAccess ia)
 			{
@@ -1061,8 +1067,14 @@ public class SRemoteGui
 	 */
 	public static IFuture<Boolean>	isTestcase(final String model, IExternalAccess access, final IResourceIdentifier rid)
 	{
-		return access.scheduleStep(new ImmediateComponentStep<Boolean>()
+		return access.scheduleStep(new IPriorityComponentStep<Boolean>()
 		{
+			@Override
+			public boolean isInherit() 
+			{
+				return true;
+			}
+			
 			@Classname("isTestcase")
 			public IFuture<Boolean> execute(final IInternalAccess ia)
 			{
@@ -1354,8 +1366,14 @@ public class SRemoteGui
 	 */
 	public static IFuture<Boolean>	matchModel(final String path, final String model, IExternalAccess exta)
 	{
-		return exta.scheduleStep(new ImmediateComponentStep<Boolean>()
+		return exta.scheduleStep(new IPriorityComponentStep<Boolean>()
 		{
+			@Override
+			public boolean isInherit() 
+			{
+				return true;
+			}
+			
 			@Classname("matchModel")
 			public IFuture<Boolean> execute(IInternalAccess ia)
 			{
@@ -1379,8 +1397,14 @@ public class SRemoteGui
 	 */
 	public static IFuture<Void>	logWarning(final String msg, IExternalAccess exta)
 	{
-		return exta.scheduleStep(new ImmediateComponentStep<Void>()
+		return exta.scheduleStep(new IPriorityComponentStep<Void>()
 		{
+			@Override
+			public boolean isInherit() 
+			{
+				return true;
+			}
+			
 			@Classname("logWarning")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1395,8 +1419,14 @@ public class SRemoteGui
 	 */
 	public static void redirectInput(IExternalAccess access, final String txt)
 	{
-		access.scheduleStep(new ImmediateComponentStep<Void>()
+		access.scheduleStep(new IPriorityComponentStep<Void>()
 		{
+			@Override
+			public boolean isInherit() 
+			{
+				return true;
+			}
+			
 			@Classname("redir")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1414,8 +1444,14 @@ public class SRemoteGui
 	
 	public static void addConsoleListener(IExternalAccess platformaccess, final String id, final IRemoteChangeListener rcl)
 	{
-		platformaccess.scheduleStep(new ImmediateComponentStep<Void>()
+		platformaccess.scheduleStep(new IPriorityComponentStep<Void>()
 		{
+			@Override
+			public boolean isInherit() 
+			{
+				return true;
+			}
+			
 			@Classname("installListener")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1429,8 +1465,14 @@ public class SRemoteGui
 	
 	public static void removeConsoleListener(IExternalAccess platformaccess, final String id)
 	{
-		platformaccess.scheduleStep(new ImmediateComponentStep<Void>()
+		platformaccess.scheduleStep(new IPriorityComponentStep<Void>()
 		{
+			@Override
+			public boolean isInherit() 
+			{
+				return true;
+			}
+			
 			@Classname("removeListener")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1469,8 +1511,14 @@ public class SRemoteGui
 		 */
 		public void changeOccurred(final ChangeEvent event)
 		{
-			instance.getExternalAccess().scheduleStep(new ImmediateComponentStep<Void>()
+			instance.getExternalAccess().scheduleStep(new IPriorityComponentStep<Void>()
 			{
+				@Override
+				public boolean isInherit() 
+				{
+					return true;
+				}
+				
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					// Merge new output with last output, if not yet sent.
