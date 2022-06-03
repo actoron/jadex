@@ -96,7 +96,8 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 		catch (Exception e)
 		{
 //			e.printStackTrace();
-			ret.setException(e);
+			IOException e1 = new IOException("Websocket transport failed to connect to ws://" + address, e);
+			ret.setException(e1);
 			return ret;
 		}
 		
