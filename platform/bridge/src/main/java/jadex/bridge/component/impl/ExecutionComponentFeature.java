@@ -130,9 +130,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	
 	/** The future to be informed, when the requested step is finished. */
 	protected Future<Void> stepfuture;
-	
-	/** Flag if a semantic step (consisting of 1-n technical steps) should be executed. */
-	protected boolean semanticstep = true;
+	protected StepInfo debugstep;
 	
 	
 	/** The parent adapter (cached for speed). */
@@ -1381,8 +1379,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		boolean priostep = false;
 		boolean	breakpoint_triggered = false;
 		
-		//if(getComponent().getId().toString().toLowerCase().indexOf("hello")!=-1)
-		//	System.out.println("step enter: "+stepfuture);
+		if(getComponent().getId().toString().toLowerCase().indexOf("uni")!=-1)
+			System.out.println("step enter: "+stepfuture);
 		
 		synchronized(this)
 		{			
@@ -1418,32 +1416,57 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					{
 						stepi = removeStep();
 					}
-					// In debug mode find named step
+					// In debug mode find named step.  
 					else if(stepfuture!=null)
 					{
-						boolean found = false;
-						if(stepinfo!=null)
+						if(getComponent().getId().toString().toLowerCase().indexOf("uni")!=-1)
+							System.out.println("enter with stepfuture set");
+						
+						// Only execute another step when step is pressed again -> release current step
+						if(isSemanticStepped() && debugstep!=null && debugstep.hasSemanticEffect())
 						{
-							// search for right step via stepinfo
-							for(StepInfo sti: steps)
+							System.out.println("new step entered, currrent step already had effect");
+							Future<Void> stepfut = null;
+							synchronized(this)
 							{
-								if(stepinfo.equals(""+sti.getStepCount()))
+								if(stepfuture!=null && stepinfo==null)
 								{
-									stepi = sti;
-									steps.remove(sti);
-									publishStepEvent(sti, IMonitoringEvent.EVENT_TYPE_DISPOSAL);
-									found = true;
-									break;
+									stepfut	= stepfuture;
+									stepfuture = null;
+									debugstep = null;
+									//System.out.println("stepfuture null");
 								}
 							}
-							if(!found)
-								getComponent().getLogger().warning("Step not found with id: "+stepinfo+"\n");
 							
-							stepinfo = null;
+							if(stepfut!=null)
+								stepfut.setResult(null);
 						}
+						else
+						{
+							boolean found = false;
+							if(stepinfo!=null)
+							{
+								// search for right step via stepinfo
+								for(StepInfo sti: steps)
+								{
+									if(stepinfo.equals(""+sti.getStepCount()))
+									{
+										stepi = sti;
+										steps.remove(sti);
+										publishStepEvent(sti, IMonitoringEvent.EVENT_TYPE_DISPOSAL);
+										found = true;
+										break;
+									}
+								}
+								if(!found)
+									getComponent().getLogger().warning("Step not found with id: "+stepinfo+"\n");
+								
+								stepinfo = null;
+							}
 						
-						if(!found)
-							stepi = removeStep();
+							if(!found)
+								stepi = removeStep();
+						}
 					}
 					// else do not fetch a step
 				}
@@ -1509,6 +1532,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						Thread tbefore = Thread.currentThread();
 						
 						IComponentStep.setCurrentStep(step);
+						debugstep = step;
+						
 						stepfut	= exstep.execute(component);
 						//IComponentStep.setCurrentStep(null);
 						
@@ -1843,7 +1868,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			//	System.out.println("stepfuture: "+step+" "+stepfuture);
 			
 			// When semantic step mode execute as long steps until a semantic effect has occurred
-			if(!semanticstep || (step!=null && step.hasSemanticEffect()) || !ret)
+			if(!isSemanticStepped() || (step!=null && step.hasSemanticEffect()) || !ret)
 			{
 				Future<Void> stepfut = null;
 				synchronized(this)
@@ -1853,20 +1878,21 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					{
 						stepfut	= stepfuture;
 						stepfuture = null;
+						debugstep = null;
 						//System.out.println("stepfuture null");
 					}
 				}
 				
 				if(stepfut!=null)
 				{
-					//if(getComponent().getId().toString().toLowerCase().indexOf("hello")!=-1)
-					//	System.out.println("stepfuture notified: "+stepfut+" "+ret+" "+step.hasSemanticEffect());
+					if(getComponent().getId().toString().toLowerCase().indexOf("uni")!=-1)
+						System.out.println("stepfuture notified: "+stepfut+" "+ret+" "+step.hasSemanticEffect());
 					stepfut.setResult(null);
 				}
 			}
 			else
 			{
-				if(getComponent().getId().toString().toLowerCase().indexOf("hello")!=-1)
+				if(getComponent().getId().toString().toLowerCase().indexOf("uni")!=-1)
 					System.out.println("not resetted stepfuture: "+stepfuture+" "+ret+" "+step);
 			}
 		}
@@ -2294,6 +2320,16 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	public boolean isStepped()
 	{
 		return stepfuture!=null;
+	}
+	
+	/**
+	 *  Check if the execution kernel supports semantic steps.
+	 *  @return True, if semantic steps are supported and the kernel
+	 *  uses events to setSemanticEffect on current steps.
+	 */
+	public boolean isSemanticStepped()
+	{
+		return false;
 	}
 	
 //	/**

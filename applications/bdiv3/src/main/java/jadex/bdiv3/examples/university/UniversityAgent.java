@@ -150,7 +150,8 @@ public class UniversityAgent
 	{
 		System.out.println("Walking to station.");
 		System.out.println("Checking time table.");
-		if(Math.random()>0.5)
+		//if(Math.random()>0.5)
+		if(true)
 		{
 			System.out.println("Wait time is too long, failed.");
 			throw new PlanFailureException();

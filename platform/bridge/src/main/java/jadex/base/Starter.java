@@ -884,6 +884,7 @@ public class Starter
 	}
 	
 	/**
+	 *  [<name>:]<type>[!flags][(<config>[:<args>])]
 	 *  Loop for starting components.
 	 *  @param i Number to start.
 	 *  @param components The list of components.
@@ -899,29 +900,52 @@ public class Starter
 //			IComponentManagementService cms = instance.getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
 			String name	= null;
 			String config	= null;
+			String flags = null;
 			String args = null;
 			String comp	= components.get(i);
 			Map<String, Object> oargs = null;
+			Map<String, Object> pflags = new HashMap<String, Object>();
 			
 			// check if name:type are both present (to not find last : check that no ( before)
 			int	i1	= comp.indexOf(':');
 			int i11 = comp.indexOf('(');
 			if(i1!=-1 && (i11==-1 || i11>i1))
 			{
-				name	= comp.substring(0, i1);
-				comp	= comp.substring(i1+1);
+				name = comp.substring(0, i1);
+				comp = comp.substring(i1+1);
+			}
+			
+			// check for flags
+			int	i2 = comp.indexOf('(');
+			int iflags = comp.indexOf("?");
+			if(iflags!=-1)
+			{
+				flags = comp.substring(iflags+1, i2!=-1? i2+1: comp.length());
+				String[] pairs = flags.split("&");
+				for(String pair : pairs)
+				{
+					int idx = pair.indexOf("=");
+					String key = pair.substring(0, idx);
+					String val = pair.substring(idx + 1);
+					try
+					{
+						Object o = SJavaParser.evaluateExpression(val, null);
+						pflags.put(key, o);
+					}
+					catch(Exception e)
+					{
+						System.out.println("Flag parse exception: "+key+" "+val);
+					}
+				}
 			}
 			
 			// check if (config:args) part is present
-			int	i2	= comp.indexOf('(');
 			if(i2!=-1)
 			{
 				// must end with )
 				// must have : if both are presents otherwise all is configname
 				if(!comp.endsWith(")"))
-				{
-					throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>[:<args>])] : "+components.get(i));
-				}
+					throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[!flags][(<config>[:<args>])] : "+components.get(i));
 
 				int i3 = comp.indexOf(":");
 				if(i3!=-1)
@@ -935,9 +959,13 @@ public class Starter
 				{
 					config = comp.substring(i2+1, comp.length()-1);
 				}
-				
-				comp = comp.substring(0, i2);	
 			}
+			
+			if(iflags!=-1)
+				comp = comp.substring(0, iflags);
+			else if(i2!=-1)
+				comp = comp.substring(0, i2);	
+			
 //			System.out.println("comp: "+comp+" config: "+config+" args: "+args);
 			
 			if(args!=null)
@@ -963,6 +991,12 @@ public class Starter
 			CreationInfo ci = new CreationInfo(config, oargs);
 			ci.setName(name);
 			ci.setFilename(comp);
+			if(pflags.containsKey("suspend"))
+				ci.setSuspend((Boolean)pflags.get("suspend"));
+			if(pflags.containsKey("synchronous"))
+				ci.setSuspend((Boolean)pflags.get("synchronous"));
+			if(pflags.containsKey("monitoring"))
+				ci.setSuspend((Boolean)pflags.get("monitoring"));
 			
 			instance.createComponent(ci)
 				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)

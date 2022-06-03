@@ -1109,7 +1109,13 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //		setResumeCommand(rescom);
 		addResumeCommand(rescom);
 
-		getAgent().getFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
+		getAgent().getFeature(IExecutionFeature.class).waitForDelay(delay, ia ->
+		{
+			rescom.execute(null);
+			return IFuture.DONE;
+		}, false);
+		
+		/*getAgent().getFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1131,6 +1137,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 				return IFuture.DONE;
 			}
 		}, false);//.addResultListener(new DelegationResultListener<Void>(ret, true));
+		*/
 		
 		return ret;
 	}
@@ -1215,17 +1222,9 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	
 					addSubgoal(rgoal);
 					
-					AdoptGoalAction.adoptGoal(getAgent(), rgoal);
-//					getAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(new AdoptGoalAction(rgoal))
-//						.addResultListener(new IResultListener<Void>()
-//					{
-//						public void resultAvailable(Void result)
-//						{
-//						}
-//						public void exceptionOccurred(Exception exception)
-//						{
-//						}
-//					});
+					//AdoptGoalAction.adoptGoal(getAgent(), rgoal);
+					getAgent().scheduleStep(new AdoptGoalAction(rgoal))
+					.catchEx(ex -> ex.printStackTrace());
 				}
 			}
 		});
@@ -1279,6 +1278,22 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public IFuture<ChangeInfo<?>> waitForFactRemoved(String belname, long timeout)
 	{
 		return waitForFactX(belname, new String[]{ChangeEvent.FACTREMOVED}, timeout, null);
+	}
+	
+	/**
+	 *  Wait for a belief change.
+	 */
+	public IFuture<ChangeInfo<?>> waitForBeliefChanged(String belname)
+	{
+		return waitForFactX(belname, new String[]{ChangeEvent.BELIEFCHANGED}, -1, null);
+	}
+	
+	/**
+	 *  Wait for a belief change.
+	 */
+	public IFuture<ChangeInfo<?>> waitForBeliefChanged(String belname, long timeout)
+	{
+		return waitForFactX(belname, new String[]{ChangeEvent.BELIEFCHANGED}, timeout, null);
 	}
 	
 	/**
@@ -1818,7 +1833,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			
 			if(rulename!=null)
 			{
-//				System.out.println("rem rule: "+rulename);
+				//System.out.println("rem rule: "+rulename);
 //				BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 				getRuleSystem().getRulebase().removeRule(rulename);
 			}
