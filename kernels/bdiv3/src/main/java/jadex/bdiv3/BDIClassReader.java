@@ -953,7 +953,7 @@ public class BDIClassReader extends MicroClassReader
 					srmappings.put(gsm.name(), new MethodInfo(m));
 				}
 			}
-			mdel = new MDeliberation(inhnames, inhms.isEmpty()? null: inhms, cardinalityone);
+			mdel = new MDeliberation(inhnames, inhms.isEmpty()? null: inhms, cardinalityone, del.droponinhibit());
 		}
 		
 		List<MParameter> params = new ArrayList<MParameter>();

@@ -346,8 +346,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					//if(cprio==STEP_PRIORITY_IMMEDIATE)
 					//{
 						prio = cprio;
-						if(component.getId().toString().indexOf("HelloW")!=-1)
-							System.out.println("prio immediate inherited: "+step);
+						//if(component.getId().toString().indexOf("HelloW")!=-1)
+						//	System.out.println("prio immediate inherited: "+step);
 					//}
 				}
 			}
@@ -1433,7 +1433,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						// Only execute another step when step is pressed again -> release current step
 						if(isSemanticStepped() && debugstep!=null && debugstep.hasSemanticEffect())
 						{
-							System.out.println("new step entered, currrent step already had effect");
+							//System.out.println("new step entered, currrent step already had effect");
 							Future<Void> stepfut = null;
 							synchronized(this)
 							{

@@ -59,4 +59,22 @@ public class ExpressionbaseWrapper implements IExpressionbase
 	{
 		return expressionbase.createExpression(expression);
 	}
+	
+	/**
+	 *  Get the element count.
+	 *  @return The element count.
+	 */
+	public long getCount() 
+	{
+		return expressionbase.getCount();
+	}
+	
+	/**
+	 *  Get the id.
+	 *  @return The id.
+	 */
+	public String getId()
+	{
+		return expressionbase.getId();
+	}
 }

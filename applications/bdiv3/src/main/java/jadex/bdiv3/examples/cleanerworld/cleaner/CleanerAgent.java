@@ -16,6 +16,7 @@ import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.ExcludeMode;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.GoalAPI;
 import jadex.bdiv3.annotation.GoalContextCondition;
 import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalDropCondition;
@@ -36,6 +37,7 @@ import jadex.bdiv3.examples.cleanerworld.world.Vision;
 import jadex.bdiv3.examples.cleanerworld.world.Waste;
 import jadex.bdiv3.examples.cleanerworld.world.Wastebin;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.CheckNotNull;
@@ -641,7 +643,30 @@ public class CleanerAgent
 	{
 	}
 	
-	@Plan(trigger=@Trigger(factchanged={"environment", "my_location"}))
+	@Goal(deliberation=@Deliberation(cardinalityone = true, droponinhibit = true))
+	public class UpdateVisionGoal
+	{
+		@GoalAPI
+		protected IGoal goal;
+		
+		@GoalCreationCondition(beliefs={"environment", "my_location"})
+		public UpdateVisionGoal()
+		{
+		}
+		
+		public IGoal getGoal() 
+		{
+			return goal;
+		}
+		
+		@GoalInhibit(UpdateVisionGoal.class)
+		protected boolean inhibitAchieveCleanUp(UpdateVisionGoal other)
+		{
+			return goal.getCount()<other.getGoal().getCount();
+		}
+	}
+	
+	@Plan(trigger=@Trigger(goals = UpdateVisionGoal.class))
 	protected IFuture<Void> updateVision(IPlan rplan)
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -653,135 +678,132 @@ public class CleanerAgent
 			getMyChargestate());
 
 		IFuture<GetVisionAction> fut = rplan.dispatchSubgoal(new GetVisionAction());
-		fut.addResultListener(new ExceptionDelegationResultListener<CleanerAgent.GetVisionAction, Void>(ret)
+		fut.then(gva ->
 		{
-			public void customResultAvailable(GetVisionAction gva)
-			{
-				Vision vi = gva.getVision();
+			Vision vi = gva.getVision();
 			
-				if(vi!=null)
+			if(vi!=null)
+			{
+				setDaytime(vi.isDaytime());
+				
+				Waste[] ws = vi.getWastes();
+				Wastebin[] wbs = vi.getWastebins();
+				Chargingstation[] cs = vi.getStations();
+				Cleaner[] cls = vi.getCleaners();
+	
+				// When an object is not seen any longer (not
+				// in actualvision, but in (near) beliefs), remove it.
+//				List known = (List)getExpression("query_in_vision_objects").execute();
+				List<LocationObject> known = getInVisionObjects();
+				
+				for(int i=0; i<known.size(); i++)
 				{
-					setDaytime(vi.isDaytime());
-					
-					Waste[] ws = vi.getWastes();
-					Wastebin[] wbs = vi.getWastebins();
-					Chargingstation[] cs = vi.getStations();
-					Cleaner[] cls = vi.getCleaners();
-		
-					// When an object is not seen any longer (not
-					// in actualvision, but in (near) beliefs), remove it.
-	//				List known = (List)getExpression("query_in_vision_objects").execute();
-					List<LocationObject> known = getInVisionObjects();
-					
-					for(int i=0; i<known.size(); i++)
+					Object object = known.get(i);
+					if(object instanceof Waste)
 					{
-						Object object = known.get(i);
-						if(object instanceof Waste)
-						{
-							List tmp = SUtil.arrayToList(ws);
-							if(!tmp.contains(object))
-								getWastes().remove(object);
-						}
-						else if(object instanceof Wastebin)
-						{
-							List tmp = SUtil.arrayToList(wbs);
-							if(!tmp.contains(object))
-								getWastebins().remove(object);
-						}
-						else if(object instanceof Chargingstation)
-						{
-							List tmp = SUtil.arrayToList(cs);
-							if(!tmp.contains(object))
-								getChargingStations().remove(object);
-						}
-						else if(object instanceof Cleaner)
-						{
-							List tmp = SUtil.arrayToList(cls);
-							if(!tmp.contains(object))
-								getCleaners().remove(object);
-						}
+						List tmp = SUtil.arrayToList(ws);
+						if(!tmp.contains(object))
+							getWastes().remove(object);
 					}
-		
-					// Add new or changed objects to beliefs.
-					for(int i=0; i<ws.length; i++)
+					else if(object instanceof Wastebin)
 					{
-						if(!getWastes().contains(ws[i]))
-							getWastes().add(ws[i]);
+						List tmp = SUtil.arrayToList(wbs);
+						if(!tmp.contains(object))
+							getWastebins().remove(object);
 					}
-					for(int i=0; i<wbs.length; i++)
+					else if(object instanceof Chargingstation)
 					{
-						// Remove contained wastes from knowledge.
-						// Otherwise the agent might think that the waste is still
-						// somewhere (outside its vision) and then it creates lots of
-						// cleanup goals, that are instantly achieved because the
-						// target condition (waste in wastebin) holds.
-						Waste[]	wastes	= wbs[i].getWastes();
-						for(int j=0; j<wastes.length; j++)
+						List tmp = SUtil.arrayToList(cs);
+						if(!tmp.contains(object))
+							getChargingStations().remove(object);
+					}
+					else if(object instanceof Cleaner)
+					{
+						List tmp = SUtil.arrayToList(cls);
+						if(!tmp.contains(object))
+							getCleaners().remove(object);
+					}
+				}
+	
+				// Add new or changed objects to beliefs.
+				for(int i=0; i<ws.length; i++)
+				{
+					if(!getWastes().contains(ws[i]))
+						getWastes().add(ws[i]);
+				}
+				for(int i=0; i<wbs.length; i++)
+				{
+					// Remove contained wastes from knowledge.
+					// Otherwise the agent might think that the waste is still
+					// somewhere (outside its vision) and then it creates lots of
+					// cleanup goals, that are instantly achieved because the
+					// target condition (waste in wastebin) holds.
+					Waste[]	wastes	= wbs[i].getWastes();
+					for(int j=0; j<wastes.length; j++)
+					{
+						if(getWastes().contains(wastes[j]))
+							getWastes().remove(wastes[j]);
+					}
+	
+					// Now its safe to add wastebin to beliefs.
+					if(getWastebins().contains(wbs[i]))
+					{
+						getWastebins().remove(wbs[i]);
+						getWastebins().add(wbs[i]);
+//						bs.updateFact(wbs[i]);
+//						Wastebin wb = (Wastebin)bs.getFact(wbs[i]);
+//						wb.update(wbs[i]);
+					}
+					else
+					{
+						getWastebins().add(wbs[i]);
+					}
+					//getBeliefbase().getBeliefSet("wastebins").updateOrAddFact(wbs[i]);
+				}
+				for(int i=0; i<cs.length; i++)
+				{
+					if(getChargingStations().contains(cs[i]))
+					{
+//							bs.updateFact(cs[i]);
+//						Chargingstation stat = (Chargingstation)bs.getFact(cs[i]);
+//						stat.update(cs[i]);
+						getChargingStations().remove(cs[i]);
+						getChargingStations().add(cs[i]);
+					}
+					else
+					{
+						getChargingStations().add(cs[i]);
+					}
+					//getBeliefbase().getBeliefSet("chargingstations").updateOrAddFact(cs[i]);
+				}
+				for(int i=0; i<cls.length; i++)
+				{
+					if(!cls[i].equals(cl))
+					{
+						if(getCleaners().contains(cls[i]))
 						{
-							if(getWastes().contains(wastes[j]))
-								getWastes().remove(wastes[j]);
-						}
-		
-						// Now its safe to add wastebin to beliefs.
-						if(getWastebins().contains(wbs[i]))
-						{
-							getWastebins().remove(wbs[i]);
-							getWastebins().add(wbs[i]);
-	//						bs.updateFact(wbs[i]);
-	//						Wastebin wb = (Wastebin)bs.getFact(wbs[i]);
-	//						wb.update(wbs[i]);
+//								bs.updateFact(cls[i]);
+//							Cleaner clea = (Cleaner)bs.getFact(cls[i]);
+//							clea.update(cls[i]);
+							getCleaners().remove(cls[i]);
+							getCleaners().add(cls[i]);
 						}
 						else
 						{
-							getWastebins().add(wbs[i]);
+							getCleaners().add(cls[i]);
 						}
-						//getBeliefbase().getBeliefSet("wastebins").updateOrAddFact(wbs[i]);
+						//getBeliefbase().getBeliefSet("cleaners").updateOrAddFact(cls[i]);
 					}
-					for(int i=0; i<cs.length; i++)
-					{
-						if(getChargingStations().contains(cs[i]))
-						{
-	//							bs.updateFact(cs[i]);
-	//						Chargingstation stat = (Chargingstation)bs.getFact(cs[i]);
-	//						stat.update(cs[i]);
-							getChargingStations().remove(cs[i]);
-							getChargingStations().add(cs[i]);
-						}
-						else
-						{
-							getChargingStations().add(cs[i]);
-						}
-						//getBeliefbase().getBeliefSet("chargingstations").updateOrAddFact(cs[i]);
-					}
-					for(int i=0; i<cls.length; i++)
-					{
-						if(!cls[i].equals(cl))
-						{
-							if(getCleaners().contains(cls[i]))
-							{
-	//								bs.updateFact(cls[i]);
-	//							Cleaner clea = (Cleaner)bs.getFact(cls[i]);
-	//							clea.update(cls[i]);
-								getCleaners().remove(cls[i]);
-								getCleaners().add(cls[i]);
-							}
-							else
-							{
-								getCleaners().add(cls[i]);
-							}
-							//getBeliefbase().getBeliefSet("cleaners").updateOrAddFact(cls[i]);
-						}
-					}
-		
-					//getBeliefbase().getBelief("???").setFact("allowed_to_move", new Boolean(true));
 				}
-				else
-				{
-	//				System.out.println("Error when updating vision! "+event.getGoal());
-				}
-				ret.setResult(null);
+	
+				//getBeliefbase().getBelief("???").setFact("allowed_to_move", new Boolean(true));
 			}
-		});
+			else
+			{
+//				System.out.println("Error when updating vision! "+event.getGoal());
+			}
+			ret.setResult(null);
+		}).catchEx(ret);
 		
 		return ret;
 	}

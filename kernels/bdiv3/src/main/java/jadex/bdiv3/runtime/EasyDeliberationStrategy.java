@@ -192,7 +192,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	{		
 		Set<RGoal> inhibitors = getInhibitions(goal, true);
 
-		if(inhibitors.add(inhibitor) && inhibitors.size()==1)
+		if(inhibitors.add(inhibitor) && inhibitors.size()==1) // inhibit on first inhibitor
 		{
 			inhibitGoal(goal);
 //			getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALINHIBITED, goal.getMGoal().getName()}), this));
@@ -207,8 +207,17 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	 */
 	protected void inhibitGoal(RGoal goal)
 	{
-		if(IGoal.GoalLifecycleState.ACTIVE.equals(goal.getLifecycleState()))
-			goal.setLifecycleState(agent, RGoal.GoalLifecycleState.OPTION);
+		MGoal mgoal = (MGoal)goal.getModelElement();
+		if(mgoal!=null && mgoal.getDeliberation()!=null && mgoal.getDeliberation().isDropOnInhibit())
+		{
+			//System.out.println("drop goal: "+goal);
+			goal.drop();
+		}
+		else
+		{
+			if(IGoal.GoalLifecycleState.ACTIVE.equals(goal.getLifecycleState()))
+				goal.setLifecycleState(agent, RGoal.GoalLifecycleState.OPTION);
+		}
 	}
 	
 	/**
@@ -241,7 +250,9 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	 */
 	protected void reactivateGoal(RGoal goal)
 	{
-		goal.setLifecycleState(agent, RGoal.GoalLifecycleState.ACTIVE);
+		// Only reactivate when not dropping/dropped
+		if(!GoalLifecycleState.DROPPED.equals(goal.getLifecycleState()) && !GoalLifecycleState.DROPPING.equals(goal.getLifecycleState()))
+			goal.setLifecycleState(agent, RGoal.GoalLifecycleState.ACTIVE);
 	}
 	
 	/**

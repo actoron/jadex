@@ -16,6 +16,9 @@ public class MDeliberation
 	/** The cardinality. */
 	protected boolean cardinalityone;
 	
+	/** The drop on inhibit flag. */
+	protected boolean droponinhibit;
+	
 	/** The inhibited goal types. */
 	protected Set<MGoal> inhibitions;
 
@@ -41,11 +44,12 @@ public class MDeliberation
 	/**
 	 *  Create a new deliberation.
 	 */
-	public MDeliberation(Set<String> inhnames, Map<String, MethodInfo> inhmethods, boolean cardinalityone)
+	public MDeliberation(Set<String> inhnames, Map<String, MethodInfo> inhmethods, boolean cardinalityone, boolean droponinhibit)
 	{
 		this.cardinalityone = cardinalityone;
 		this.inhnames = inhnames;
 		this.inhmethods = inhmethods;
+		this.droponinhibit = droponinhibit;
 	}
 	
 //	/**
@@ -79,6 +83,24 @@ public class MDeliberation
 	public void setCardinalityOne(boolean cardinalityone)
 	{
 		this.cardinalityone = cardinalityone;
+	}
+	
+	/**
+	 *  Get the drop on inhibit flag.
+	 *  @return the droponinhibit flag.
+	 */
+	public boolean isDropOnInhibit() 
+	{
+		return droponinhibit;
+	}
+
+	/**
+	 *  Set the drop on inhibit flag.
+	 *  @param droponinhibit The droponinhibit to set.
+	 */
+	public void setDropOnInhibit(boolean droponinhibit) 
+	{
+		this.droponinhibit = droponinhibit;
 	}
 
 	/**

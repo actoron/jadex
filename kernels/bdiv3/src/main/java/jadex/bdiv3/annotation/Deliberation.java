@@ -6,7 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
+ *  Deliberation settings.
+ *  Instance level inhibitions are defined as method using the @GoalInhibit annotation.
  */
 @Target(ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -22,4 +23,10 @@ public @interface Deliberation
 	 *  The inhibited goal.
 	 */
 	public Class<?>[] inhibits() default {};
+	
+	/**
+	 *  Suspend or drop on inhibition.
+	 *  @return True, if goal should be dropped.
+	 */
+	public boolean droponinhibit() default false;
 }

@@ -976,7 +976,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		StepInfo si = IComponentStep.getCurrentStep();
 		if(si!=null)
 		{
-			System.out.println("set sem effect: "+mev);
+			//System.out.println("set sem effect: "+mev);
 			si.setSemanticEffect(true);
 		}
 		else
