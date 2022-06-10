@@ -1,51 +1,85 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_-wEWEUJVEd-lXM2_JTGF5Q" iD="_-wEWEEJVEd-lXM2_JTGF5Q">
-  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__GHekEJVEd-lXM2_JTGF5Q" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__GHekUJVEd-lXM2_JTGF5Q" key="Description" value="&lt;h1>Message Receival&lt;/h1> This process waits for a request message and then prints the content."/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__GHekkJVEd-lXM2_JTGF5Q" key="Package" value="jadex.bpmn.tutorial"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4owRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
-  </eAnnotations>
-  <pools xmi:type="bpmn:Pool" xmi:id="_-wEWF0JVEd-lXM2_JTGF5Q" iD="_-wEWFkJVEd-lXM2_JTGF5Q" name="Pool">
-    <vertices xmi:type="bpmn:Activity" xmi:id="_-wEWGUJVEd-lXM2_JTGF5Q" iD="_-wEWGEJVEd-lXM2_JTGF5Q" outgoingEdges="_GvBwukJWEd-lXM2_JTGF5Q" name="Preparation" activityType="Task">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__VBdQEJVEd-lXM2_JTGF5Q" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__VBdQUJVEd-lXM2_JTGF5Q" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
-      </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wAU4kARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AyagwOE-EeCaWpd5N4uTqA" key="dimension" value="1:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AyagweE-EeCaWpd5N4uTqA" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AyagwuE-EeCaWpd5N4uTqA" key="complexColumns" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AybH0OE-EeCaWpd5N4uTqA" key="0:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AybH0eE-EeCaWpd5N4uTqA" key="0:1" value="text"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AybH0uE-EeCaWpd5N4uTqA" key="0:2" value="java.lang.String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AybH0-E-EeCaWpd5N4uTqA" key="0:3" value="&quot;Send this process a message with performative 'request' using the conversation center.&quot;"/>
-      </eAnnotations>
-    </vertices>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_GvBwsUJWEd-lXM2_JTGF5Q" iD="_GvBwsEJWEd-lXM2_JTGF5Q" outgoingEdges="_WoxQmkJWEd-lXM2_JTGF5Q" incomingEdges="_GvBwukJWEd-lXM2_JTGF5Q" activityType="EventIntermediateMessage">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_HjxnYEJWEd-lXM2_JTGF5Q" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HjxnYUJWEd-lXM2_JTGF5Q" key="mode" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HjxnZEJWEd-lXM2_JTGF5Q" key="filter" value=""/>
-      </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wAU4lwRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4mARPEeCnwcpWvxOwkg" key="dimension" value="1:2"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4mQRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4mgRPEeCnwcpWvxOwkg" key="0:0" value="filter"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4mwRPEeCnwcpWvxOwkg" key="0:1" value="new jadex.bridge.fipa.FipaMessage(null, jadex.bridge.fipa.FipaMessage.Performative.REQUEST, null)"/>
-      </eAnnotations>
-    </vertices>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_WoxQkUJWEd-lXM2_JTGF5Q" iD="_WoxQkEJWEd-lXM2_JTGF5Q" incomingEdges="_WoxQmkJWEd-lXM2_JTGF5Q" name="Order Received" activityType="Task">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WxkAMEJWEd-lXM2_JTGF5Q" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WxkAMUJWEd-lXM2_JTGF5Q" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
-      </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wAU4nARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4nQRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4ngRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4nwRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4oARPEeCnwcpWvxOwkg" key="0:1" value="text"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4oQRPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4ogRPEeCnwcpWvxOwkg" key="0:3" value="&quot;Received order: &quot;+$event.content"/>
-      </eAnnotations>
-    </vertices>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_GvBwukJWEd-lXM2_JTGF5Q" iD="_GvBwuUJWEd-lXM2_JTGF5Q"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_WoxQmkJWEd-lXM2_JTGF5Q" iD="_WoxQmUJWEd-lXM2_JTGF5Q"/>
-  </pools>
-</bpmn:BpmnDiagram>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>D3_MessageReceival</jadex:modelname>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+  </semantic:extension>
+  <semantic:process name="Pool" id="X9il1f1dIc+YBBQB">
+    <semantic:startEvent id="NxpfTt2yxn/zHny6">
+      <semantic:outgoing>fiesGHKiK5MDZaBn</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:task name="Preparation" id="RCZZv1xTmRInW60g">
+      <semantic:incoming>fiesGHKiK5MDZaBn</semantic:incoming>
+      <semantic:outgoing>lSi1bxw6Lc7Xkesn</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Preparation&quot;</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:intermediateCatchEvent id="y/n13eFeekb+IlVE">
+      <semantic:incoming>lSi1bxw6Lc7Xkesn</semantic:incoming>
+      <semantic:outgoing>HOZCycpU9tKRmK+I</semantic:outgoing>
+      <semantic:messageEventDefinition/>
+    </semantic:intermediateCatchEvent>
+    <semantic:task name="Order Received" id="J6lYjfFxOIdFqQYz">
+      <semantic:incoming>HOZCycpU9tKRmK+I</semantic:incoming>
+      <semantic:outgoing>7+4lTkgNzBBhbaJO</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Received order: &quot;+$event.content</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:endEvent id="oHKxJzKCuS/T6sej">
+      <semantic:incoming>7+4lTkgNzBBhbaJO</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:sequenceFlow sourceRef="NxpfTt2yxn/zHny6" targetRef="RCZZv1xTmRInW60g" id="fiesGHKiK5MDZaBn">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="RCZZv1xTmRInW60g" targetRef="y/n13eFeekb+IlVE" id="lSi1bxw6Lc7Xkesn">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="y/n13eFeekb+IlVE" targetRef="J6lYjfFxOIdFqQYz" id="HOZCycpU9tKRmK+I">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="J6lYjfFxOIdFqQYz" targetRef="oHKxJzKCuS/T6sej" id="7+4lTkgNzBBhbaJO">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="X9il1f1dIc+YBBQB">
+        <dc:Bounds height="310.0" width="920.0" x="50.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="NxpfTt2yxn/zHny6">
+        <dc:Bounds height="40.0" width="40.0" x="100.0" y="140.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="RCZZv1xTmRInW60g">
+        <dc:Bounds height="100.0" width="160.0" x="210.0" y="110.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="y/n13eFeekb+IlVE">
+        <dc:Bounds height="40.0" width="40.0" x="440.0" y="140.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="J6lYjfFxOIdFqQYz">
+        <dc:Bounds height="100.0" width="160.0" x="560.0" y="110.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="oHKxJzKCuS/T6sej">
+        <dc:Bounds height="40.0" width="40.0" x="790.0" y="140.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="fiesGHKiK5MDZaBn">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="lSi1bxw6Lc7Xkesn">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="HOZCycpU9tKRmK+I">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="7+4lTkgNzBBhbaJO">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+
