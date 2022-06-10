@@ -24,7 +24,7 @@ public class BpmnModelLoader extends AbstractModelLoader
 	/** The BPMN file extension. */
 	public static final String	FILE_EXTENSION_BPMN	= ".bpmn";
 	
-	/** The BPMN 2 file extension. */
+	/** The BPMN 2 file extension (legacy, deprecated). */
 	public static final String	FILE_EXTENSION_BPMN2	= ".bpmn2";
 	
 	//-------- constructors --------
@@ -66,22 +66,17 @@ public class BpmnModelLoader extends AbstractModelLoader
 	protected ICacheableModel doLoadModel(String name, Object pojo, String[] imports, ResourceInfo info, 
 		ClassLoader classloader, Object context) throws Exception
 	{	
-		if (name != null && name.endsWith(".bpmn2"))
+		MBpmnModel model = SBpmnModelReader.readModel(info.getInputStream(), info.getFilename(), null, classloader);
+		IResourceIdentifier rid = (IResourceIdentifier)((Object[])context)[0];
+		if(rid==null)
 		{
-			MBpmnModel model = SBpmnModelReader.readModel(info.getInputStream(), info.getFilename(), null, classloader);
-			IResourceIdentifier rid = (IResourceIdentifier)((Object[])context)[0];
-			if(rid==null)
-			{
-				String src = SUtil.getCodeSource(info.getFilename(), ((ModelInfo)model.getModelInfo()).getPackage());
-				URL url = SUtil.toURL(src);
-				rid = new ResourceIdentifier(new LocalResourceIdentifier((IComponentIdentifier)((Object[])context)[1], url), null);
-			}
-			model.setResourceIdentifier(rid);
-			model.initModelInfo(classloader);
-			((ModelInfo)model.getModelInfo()).setType(BpmnFactory.FILETYPE_BPMNPROCESS);
-			return model;
+			String src = SUtil.getCodeSource(info.getFilename(), ((ModelInfo)model.getModelInfo()).getPackage());
+			URL url = SUtil.toURL(src);
+			rid = new ResourceIdentifier(new LocalResourceIdentifier((IComponentIdentifier)((Object[])context)[1], url), null);
 		}
-		return (ICacheableModel)BpmnXMLReader.read(info, classloader, (IResourceIdentifier)((Object[])context)[0],
-			(IComponentIdentifier)((Object[])context)[1]);
+		model.setResourceIdentifier(rid);
+		model.initModelInfo(classloader);
+		((ModelInfo)model.getModelInfo()).setType(BpmnFactory.FILETYPE_BPMNPROCESS);
+		return model;
 	}
 }
