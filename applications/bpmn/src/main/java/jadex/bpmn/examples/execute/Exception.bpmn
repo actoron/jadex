@@ -1,143 +1,68 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
-    <jadex:modelname>Exception</jadex:modelname>
-    <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_y65Nd2pBEd6JtKkNrnCCNQ">
-    <semantic:subProcess name="Exception Process" id="_2BX2MWpBEd6JtKkNrnCCNQ">
-      <semantic:incoming>_2BrYOGpBEd6JtKkNrnCCNQ</semantic:incoming>
-      <semantic:outgoing>_B9XHGGpCEd6JtKkNrnCCNQ</semantic:outgoing>
-      <semantic:task name="Sub 1" id="_DQcV0WyCEd63w-5MJLkKtQ">
-        <semantic:outgoing>_D8Zc4WyCEd63w-5MJLkKtQ</semantic:outgoing>
-      </semantic:task>
-      <semantic:task name="Sub 2" id="_2lI-cWrtEd6CydnA5mdgEg">
-        <semantic:incoming>_D8Zc4WyCEd63w-5MJLkKtQ</semantic:incoming>
-        <semantic:outgoing>_6y2VAWrtEd6CydnA5mdgEg</semantic:outgoing>
-        <semantic:extensionElements>
-          <jadex:class>jadex.bpmn.runtime.task.UserInteractionTask</jadex:class>
-        </semantic:extensionElements>
-      </semantic:task>
-      <semantic:task name="Sub 3" id="_6yskAWrtEd6CydnA5mdgEg">
-        <semantic:incoming>_6y2VAWrtEd6CydnA5mdgEg</semantic:incoming>
-      </semantic:task>
-    </semantic:subProcess>
-    <semantic:boundaryEvent id="_9_cgAWpBEd6JtKkNrnCCNQ" attachedToRef="_2BX2MWpBEd6JtKkNrnCCNQ">
-      <semantic:outgoing>__U0-mmpBEd6JtKkNrnCCNQ</semantic:outgoing>
-      <semantic:errorEventDefinition/>
-    </semantic:boundaryEvent>
-    <semantic:endEvent id="_YI1qwWpCEd6JtKkNrnCCNQ">
-      <semantic:incoming>_YI_byGpCEd6JtKkNrnCCNQ</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:task name="No Exception" id="_B9NWEWpCEd6JtKkNrnCCNQ">
-      <semantic:incoming>_B9XHGGpCEd6JtKkNrnCCNQ</semantic:incoming>
-      <semantic:outgoing>_YI_byGpCEd6JtKkNrnCCNQ</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:class>jadex.bpmn.runtime.task.LoggerTask</jadex:class>
-        <jadex:parameter direction="in" name="text" type="String">&quot;No Exception&quot;</jadex:parameter>
-        <jadex:parameter direction="in" name="level" type="java.util.logging.Level">java.util.logging.Level.INFO</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Exception\nOccurred" id="__U0-kWpBEd6JtKkNrnCCNQ">
-      <semantic:incoming>__U0-mmpBEd6JtKkNrnCCNQ</semantic:incoming>
-      <semantic:outgoing>_W1ZF4WpCEd6JtKkNrnCCNQ</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:class>jadex.bpmn.runtime.task.LoggerTask</jadex:class>
-        <jadex:parameter direction="in" name="text" type="String">&quot;Exception Occurred&quot;</jadex:parameter>
-        <jadex:parameter direction="in" name="level" type="java.util.logging.Level">java.util.logging.Level.WARNING</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:endEvent id="_W1P78WpCEd6JtKkNrnCCNQ">
-      <semantic:incoming>_W1ZF4WpCEd6JtKkNrnCCNQ</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:startEvent id="_0vuBEWpBEd6JtKkNrnCCNQ">
-      <semantic:outgoing>_2BrYOGpBEd6JtKkNrnCCNQ</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:sequenceFlow sourceRef="_2BX2MWpBEd6JtKkNrnCCNQ" targetRef="_B9NWEWpCEd6JtKkNrnCCNQ" id="_B9XHGGpCEd6JtKkNrnCCNQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_DQcV0WyCEd63w-5MJLkKtQ" targetRef="_2lI-cWrtEd6CydnA5mdgEg" id="_D8Zc4WyCEd63w-5MJLkKtQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_2lI-cWrtEd6CydnA5mdgEg" targetRef="_6yskAWrtEd6CydnA5mdgEg" id="_6y2VAWrtEd6CydnA5mdgEg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_9_cgAWpBEd6JtKkNrnCCNQ" targetRef="__U0-kWpBEd6JtKkNrnCCNQ" id="__U0-mmpBEd6JtKkNrnCCNQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_B9NWEWpCEd6JtKkNrnCCNQ" targetRef="_YI1qwWpCEd6JtKkNrnCCNQ" id="_YI_byGpCEd6JtKkNrnCCNQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="__U0-kWpBEd6JtKkNrnCCNQ" targetRef="_W1P78WpCEd6JtKkNrnCCNQ" id="_W1ZF4WpCEd6JtKkNrnCCNQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_0vuBEWpBEd6JtKkNrnCCNQ" targetRef="_2BX2MWpBEd6JtKkNrnCCNQ" id="_2BrYOGpBEd6JtKkNrnCCNQ">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
-  <bpmndi:BPMNDiagram>
-    <bpmndi:BPMNPlane>
-      <bpmndi:BPMNShape bpmnElement="_y65Nd2pBEd6JtKkNrnCCNQ">
-        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_2BX2MWpBEd6JtKkNrnCCNQ" isExpanded="true">
-        <dc:Bounds height="260.0" width="620.0" x="300.0" y="30.0"/>
-        <dc:Bounds height="100.0" width="160.0" x="0.0" y="0.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_9_cgAWpBEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_DQcV0WyCEd63w-5MJLkKtQ">
-        <dc:Bounds height="100.0" width="160.0" x="20.0" y="70.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_2lI-cWrtEd6CydnA5mdgEg">
-        <dc:Bounds height="100.0" width="160.0" x="230.0" y="70.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_6yskAWrtEd6CydnA5mdgEg">
-        <dc:Bounds height="100.0" width="160.0" x="430.0" y="70.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_YI1qwWpCEd6JtKkNrnCCNQ">
-        <dc:Bounds height="40.0" width="40.0" x="1240.0" y="140.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_B9NWEWpCEd6JtKkNrnCCNQ">
-        <dc:Bounds height="100.0" width="160.0" x="980.0" y="110.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="__U0-kWpBEd6JtKkNrnCCNQ">
-        <dc:Bounds height="100.0" width="160.0" x="440.0" y="320.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_W1P78WpCEd6JtKkNrnCCNQ">
-        <dc:Bounds height="40.0" width="40.0" x="660.0" y="350.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_0vuBEWpBEd6JtKkNrnCCNQ">
-        <dc:Bounds height="40.0" width="40.0" x="120.0" y="140.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge bpmnElement="_2BrYOGpBEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_2BrYOGpBEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_B9XHGGpCEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_B9XHGGpCEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_W1ZF4WpCEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_W1ZF4WpCEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_YI_byGpCEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_YI_byGpCEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_6y2VAWrtEd6CydnA5mdgEg">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_D8Zc4WyCEd63w-5MJLkKtQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="__U0-mmpBEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="__U0-mmpBEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-    </bpmndi:BPMNPlane>
-  </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_y65NcWpBEd6JtKkNrnCCNQ" iD="_y65NcGpBEd6JtKkNrnCCNQ">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_sHjrAEcEEd-qm5VDdIP35A" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sHjrAUcEEd-qm5VDdIP35A" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sHs08EcEEd-qm5VDdIP35A" key="Package" value="jadex.bpmn.examples.execute"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFJgRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_y65Nd2pBEd6JtKkNrnCCNQ" iD="_y65NdmpBEd6JtKkNrnCCNQ" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_0vuBEWpBEd6JtKkNrnCCNQ" iD="_0vuBEGpBEd6JtKkNrnCCNQ" outgoingEdges="_2BrYOGpBEd6JtKkNrnCCNQ" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_2BX2MWpBEd6JtKkNrnCCNQ" iD="_2BX2MGpBEd6JtKkNrnCCNQ" outgoingEdges="_B9XHGGpCEd6JtKkNrnCCNQ" incomingEdges="_2BrYOGpBEd6JtKkNrnCCNQ" name="Exception Process&#xD;&#xA;" activityType="SubProcess">
+      <vertices xmi:type="bpmn:Activity" xmi:id="_2lI-cWrtEd6CydnA5mdgEg" iD="_2lI-cGrtEd6CydnA5mdgEg" outgoingEdges="_6y2VAWrtEd6CydnA5mdgEg" incomingEdges="_D8Zc4WyCEd63w-5MJLkKtQ" name="Sub 2" activityType="Task">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_uDOGcEcEEd-qm5VDdIP35A" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uDOGcUcEEd-qm5VDdIP35A" key="class" value="jadex.bpmn.runtime.task.UserInteractionTask"/>
+        </eAnnotations>
+      </vertices>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_6yskAWrtEd6CydnA5mdgEg" iD="_6yskAGrtEd6CydnA5mdgEg" incomingEdges="_6y2VAWrtEd6CydnA5mdgEg" name="Sub 3" activityType="Task"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_DQcV0WyCEd63w-5MJLkKtQ" iD="_DQcV0GyCEd63w-5MJLkKtQ" outgoingEdges="_D8Zc4WyCEd63w-5MJLkKtQ" name="Sub 1" activityType="Task" looping="false">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_y1_48EcEEd-qm5VDdIP35A" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_y1_48UcEEd-qm5VDdIP35A" key="class" value=""/>
+        </eAnnotations>
+      </vertices>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="__U0-mmpBEd6JtKkNrnCCNQ" iD="__U0-mWpBEd6JtKkNrnCCNQ"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_6y2VAWrtEd6CydnA5mdgEg" iD="_6y2VAGrtEd6CydnA5mdgEg"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_D8Zc4WyCEd63w-5MJLkKtQ" iD="_D8Zc4GyCEd63w-5MJLkKtQ"/>
+      <eventHandlers xmi:type="bpmn:Activity" xmi:id="_9_cgAWpBEd6JtKkNrnCCNQ" iD="_9_cgAGpBEd6JtKkNrnCCNQ" outgoingEdges="__U0-mmpBEd6JtKkNrnCCNQ" activityType="EventIntermediateError"/>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="__U0-kWpBEd6JtKkNrnCCNQ" iD="__U0-kGpBEd6JtKkNrnCCNQ" outgoingEdges="_W1ZF4WpCEd6JtKkNrnCCNQ" incomingEdges="__U0-mmpBEd6JtKkNrnCCNQ" name="Exception Occurred" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-yVvIEcEEd-qm5VDdIP35A" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-yVvIUcEEd-qm5VDdIP35A" key="class" value="jadex.bpmn.runtime.task.LoggerTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_gCEFEARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFEQRPEeCnwcpWvxOwkg" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFEgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFEwRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFFARPEeCnwcpWvxOwkg" key="0:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFFQRPEeCnwcpWvxOwkg" key="0:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFFgRPEeCnwcpWvxOwkg" key="0:3" value="&quot;Exception Occurred&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFFwRPEeCnwcpWvxOwkg" key="1:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFGARPEeCnwcpWvxOwkg" key="1:1" value="level"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFGQRPEeCnwcpWvxOwkg" key="1:2" value="java.util.logging.Level"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFGgRPEeCnwcpWvxOwkg" key="1:3" value="java.util.logging.Level.WARNING"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_B9NWEWpCEd6JtKkNrnCCNQ" iD="_B9NWEGpCEd6JtKkNrnCCNQ" outgoingEdges="_YI_byGpCEd6JtKkNrnCCNQ" incomingEdges="_B9XHGGpCEd6JtKkNrnCCNQ" name="No Exception" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_syA9QEcEEd-qm5VDdIP35A" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_syA9QUcEEd-qm5VDdIP35A" key="class" value="jadex.bpmn.runtime.task.LoggerTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_gCEFGwRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFHARPEeCnwcpWvxOwkg" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFHQRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFHgRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFHwRPEeCnwcpWvxOwkg" key="0:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFIARPEeCnwcpWvxOwkg" key="0:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFIQRPEeCnwcpWvxOwkg" key="0:3" value="&quot;No Exception&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFIgRPEeCnwcpWvxOwkg" key="1:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFIwRPEeCnwcpWvxOwkg" key="1:1" value="level"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFJARPEeCnwcpWvxOwkg" key="1:2" value="java.util.logging.Level"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gCEFJQRPEeCnwcpWvxOwkg" key="1:3" value="java.util.logging.Level.INFO"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_W1P78WpCEd6JtKkNrnCCNQ" iD="_W1P78GpCEd6JtKkNrnCCNQ" incomingEdges="_W1ZF4WpCEd6JtKkNrnCCNQ" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_YI1qwWpCEd6JtKkNrnCCNQ" iD="_YI1qwGpCEd6JtKkNrnCCNQ" incomingEdges="_YI_byGpCEd6JtKkNrnCCNQ" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_2BrYOGpBEd6JtKkNrnCCNQ" iD="_2BrYN2pBEd6JtKkNrnCCNQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_B9XHGGpCEd6JtKkNrnCCNQ" iD="_B9XHF2pCEd6JtKkNrnCCNQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_W1ZF4WpCEd6JtKkNrnCCNQ" iD="_W1ZF4GpCEd6JtKkNrnCCNQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_YI_byGpCEd6JtKkNrnCCNQ" iD="_YI_bx2pCEd6JtKkNrnCCNQ"/>
+  </pools>
+</bpmn:BpmnDiagram>

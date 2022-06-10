@@ -1,117 +1,80 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
-    <jadex:modelname>SubWorkflowParameter</jadex:modelname>
-    <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_z0QmIVdZEd-gpfWhYqU7MQ">
-    <semantic:subProcess id="_X4dNIVdaEd-gpfWhYqU7MQ">
-      <semantic:incoming>_X5M0AVdaEd-gpfWhYqU7MQ</semantic:incoming>
-      <semantic:outgoing>u0PjhP4W4MYSIdgn</semantic:outgoing>
-      <semantic:startEvent id="_ZT-TcVdbEd-gpfWhYqU7MQ">
-        <semantic:outgoing>_aBIUYVdbEd-gpfWhYqU7MQ</semantic:outgoing>
-      </semantic:startEvent>
-      <semantic:endEvent id="ktVR4MYPnntS6SZU">
-        <semantic:incoming>UpNgZmfVPxnwdmqS</semantic:incoming>
-      </semantic:endEvent>
-      <semantic:task name="B" id="_X4dNI1daEd-gpfWhYqU7MQ">
-        <semantic:incoming>_aBIUYVdbEd-gpfWhYqU7MQ</semantic:incoming>
-        <semantic:outgoing>UpNgZmfVPxnwdmqS</semantic:outgoing>
-        <semantic:extensionElements>
-          <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
-          <jadex:parameter direction="inout" name="c" type="int"/>
-          <jadex:parameter direction="in" name="text" type="String">&quot;&quot;+c</jadex:parameter>
-        </semantic:extensionElements>
-      </semantic:task>
-      <semantic:extensionElements>
-        <jadex:parameter direction="inout" name="b" type="int"/>
-      </semantic:extensionElements>
-    </semantic:subProcess>
-    <semantic:task name="A" id="_z0QmI1dZEd-gpfWhYqU7MQ">
-      <semantic:incoming>LcL9Eevjw30Vktl6</semantic:incoming>
-      <semantic:outgoing>_X5M0AVdaEd-gpfWhYqU7MQ</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
-        <jadex:parameter direction="inout" name="a" type="int">1</jadex:parameter>
-        <jadex:parameter direction="in" name="text" type="String">&quot;&quot;+a</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:startEvent id="uxOGR+mJjiLoZlLj">
-      <semantic:outgoing>LcL9Eevjw30Vktl6</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:endEvent id="66iNiWlhavuBIyj3">
-      <semantic:incoming>u0PjhP4W4MYSIdgn</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:sequenceFlow sourceRef="_X4dNIVdaEd-gpfWhYqU7MQ" targetRef="66iNiWlhavuBIyj3" id="u0PjhP4W4MYSIdgn">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_ZT-TcVdbEd-gpfWhYqU7MQ" targetRef="_X4dNI1daEd-gpfWhYqU7MQ" id="_aBIUYVdbEd-gpfWhYqU7MQ">
-      <semantic:extensionElements>
-        <jadex:parametermapping name="c">b</jadex:parametermapping>
-      </semantic:extensionElements>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_X4dNI1daEd-gpfWhYqU7MQ" targetRef="ktVR4MYPnntS6SZU" id="UpNgZmfVPxnwdmqS">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_z0QmI1dZEd-gpfWhYqU7MQ" targetRef="_X4dNIVdaEd-gpfWhYqU7MQ" id="_X5M0AVdaEd-gpfWhYqU7MQ">
-      <semantic:extensionElements>
-        <jadex:parametermapping name="b">a</jadex:parametermapping>
-      </semantic:extensionElements>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="uxOGR+mJjiLoZlLj" targetRef="_z0QmI1dZEd-gpfWhYqU7MQ" id="LcL9Eevjw30Vktl6">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-      <jadex:dataFlow id="EuFBUrYlm6oqCVkl" sourceRef="_z0QmI1dZEd-gpfWhYqU7MQ" sourceParam="a" targetRef="_X4dNIVdaEd-gpfWhYqU7MQ" targetParam="b"/>
-    </semantic:extensionElements>
-  </semantic:process>
-  <bpmndi:BPMNDiagram>
-    <bpmndi:BPMNPlane>
-      <bpmndi:BPMNShape bpmnElement="_z0QmIVdZEd-gpfWhYqU7MQ">
-        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_X4dNIVdaEd-gpfWhYqU7MQ" isExpanded="true">
-        <dc:Bounds height="200.0" width="500.0" x="490.0" y="110.0"/>
-        <dc:Bounds height="100.0" width="160.0" x="0.0" y="0.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_ZT-TcVdbEd-gpfWhYqU7MQ">
-        <dc:Bounds height="40.0" width="40.0" x="50.0" y="80.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="ktVR4MYPnntS6SZU">
-        <dc:Bounds height="40.0" width="40.0" x="390.0" y="80.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_X4dNI1daEd-gpfWhYqU7MQ">
-        <dc:Bounds height="100.0" width="160.0" x="170.0" y="50.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_z0QmI1dZEd-gpfWhYqU7MQ">
-        <dc:Bounds height="100.0" width="160.0" x="220.0" y="160.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="uxOGR+mJjiLoZlLj">
-        <dc:Bounds height="40.0" width="40.0" x="100.0" y="190.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="66iNiWlhavuBIyj3">
-        <dc:Bounds height="40.0" width="40.0" x="1080.0" y="190.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge bpmnElement="_X5M0AVdaEd-gpfWhYqU7MQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_X5M0AVdaEd-gpfWhYqU7MQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_aBIUYVdbEd-gpfWhYqU7MQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="UpNgZmfVPxnwdmqS">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="LcL9Eevjw30Vktl6">
-      </bpmndi:BPMNEdge>
-      <di:Edge type="data" jadexElement="EuFBUrYlm6oqCVkl">
-      </di:Edge>
-      <bpmndi:BPMNEdge bpmnElement="u0PjhP4W4MYSIdgn">
-      </bpmndi:BPMNEdge>
-    </bpmndi:BPMNPlane>
-  </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_zz0hQVdZEd-gpfWhYqU7MQ" iD="_zz0hQFdZEd-gpfWhYqU7MQ">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Vp_xgFdaEd-gpfWhYqU7MQ" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Vp_xgldaEd-gpfWhYqU7MQ" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Vp_xg1daEd-gpfWhYqU7MQ" key="Package" value="jadex.bpmn.examples.execute"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjvgRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_z0QmIVdZEd-gpfWhYqU7MQ" iD="_z0QmIFdZEd-gpfWhYqU7MQ" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_z0QmI1dZEd-gpfWhYqU7MQ" iD="_z0QmIldZEd-gpfWhYqU7MQ" outgoingEdges="_X5M0AVdaEd-gpfWhYqU7MQ" name="A" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WNT58FdaEd-gpfWhYqU7MQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WNT58VdaEd-gpfWhYqU7MQ" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_h0lyoARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0lyoQRPEeCnwcpWvxOwkg" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0lyogRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0lyowRPEeCnwcpWvxOwkg" key="0:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0lypARPEeCnwcpWvxOwkg" key="0:1" value="a"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0lypQRPEeCnwcpWvxOwkg" key="0:2" value="int"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0lypgRPEeCnwcpWvxOwkg" key="0:3" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0lypwRPEeCnwcpWvxOwkg" key="1:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0lyqARPEeCnwcpWvxOwkg" key="1:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0lyqQRPEeCnwcpWvxOwkg" key="1:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0lyqgRPEeCnwcpWvxOwkg" key="1:3" value="&quot;&quot;+a"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_X4dNIVdaEd-gpfWhYqU7MQ" iD="_X4dNIFdaEd-gpfWhYqU7MQ" incomingEdges="_X5M0AVdaEd-gpfWhYqU7MQ" activityType="SubProcess">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YZrq4FdaEd-gpfWhYqU7MQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YZrq4VdaEd-gpfWhYqU7MQ" key="class" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_h0vjoARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjoQRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjogRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjowRPEeCnwcpWvxOwkg" key="0:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjpARPEeCnwcpWvxOwkg" key="0:1" value="b"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjpQRPEeCnwcpWvxOwkg" key="0:2" value="int"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjpgRPEeCnwcpWvxOwkg" key="0:3" value=""/>
+      </eAnnotations>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_X4dNI1daEd-gpfWhYqU7MQ" iD="_X4dNIldaEd-gpfWhYqU7MQ" incomingEdges="_aBIUYVdbEd-gpfWhYqU7MQ" name="B">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YyIAEFdaEd-gpfWhYqU7MQ" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YyIAEVdaEd-gpfWhYqU7MQ" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        </eAnnotations>
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_h0vjpwRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjqARPEeCnwcpWvxOwkg" key="dimension" value="2:4"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjqQRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjqgRPEeCnwcpWvxOwkg" key="0:0" value="inout"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjqwRPEeCnwcpWvxOwkg" key="0:1" value="c"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjrARPEeCnwcpWvxOwkg" key="0:2" value="int"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjrQRPEeCnwcpWvxOwkg" key="0:3" value=""/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjrgRPEeCnwcpWvxOwkg" key="1:0" value="in"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjrwRPEeCnwcpWvxOwkg" key="1:1" value="text"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjsARPEeCnwcpWvxOwkg" key="1:2" value="String"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjsQRPEeCnwcpWvxOwkg" key="1:3" value="&quot;&quot;+c"/>
+        </eAnnotations>
+      </vertices>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_ZT-TcVdbEd-gpfWhYqU7MQ" iD="_ZT-TcFdbEd-gpfWhYqU7MQ" outgoingEdges="_aBIUYVdbEd-gpfWhYqU7MQ" activityType="EventStartEmpty"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_aBIUYVdbEd-gpfWhYqU7MQ" iD="_aBIUYFdbEd-gpfWhYqU7MQ">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_oH1wYFdbEd-gpfWhYqU7MQ" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oH1wYldbEd-gpfWhYqU7MQ" key="condition" value=""/>
+        </eAnnotations>
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_h0vjswRPEeCnwcpWvxOwkg" source="jadex_mappings_table">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjtARPEeCnwcpWvxOwkg" key="dimension" value="1:2"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjtQRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjtgRPEeCnwcpWvxOwkg" key="0:0" value="c"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjtwRPEeCnwcpWvxOwkg" key="0:1" value="b"/>
+        </eAnnotations>
+      </sequenceEdges>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_X5M0AVdaEd-gpfWhYqU7MQ" iD="_X5M0AFdaEd-gpfWhYqU7MQ">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_OsL1YFdbEd-gpfWhYqU7MQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OsVmYFdbEd-gpfWhYqU7MQ" key="condition" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_h0vjuQRPEeCnwcpWvxOwkg" source="jadex_mappings_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjugRPEeCnwcpWvxOwkg" key="dimension" value="1:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjuwRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjvARPEeCnwcpWvxOwkg" key="0:0" value="b"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h0vjvQRPEeCnwcpWvxOwkg" key="0:1" value="a"/>
+      </eAnnotations>
+    </sequenceEdges>
+  </pools>
+</bpmn:BpmnDiagram>

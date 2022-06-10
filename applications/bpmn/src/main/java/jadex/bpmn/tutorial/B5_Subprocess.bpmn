@@ -1,73 +1,36 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
-    <jadex:modelname>B5_Subprocess</jadex:modelname>
-    <jadex:package>jadex.bpmn.tutorial</jadex:package>
-    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
-  </semantic:extension>
-  <semantic:process name="Pool" id="yT7Z17sIj8orYBB4">
-    <semantic:startEvent id="Bayb7QE3Dv2flSRh">
-      <semantic:outgoing>lmuFPs+QotE5fSye</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:endEvent id="i+Qc1NVz98+2Ek3v">
-      <semantic:incoming>dhLt6TdDi7DsruJu</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:subProcess name="Ext. Sub-Process" id="hCAhYniK5ZBpAcjw">
-      <semantic:incoming>lmuFPs+QotE5fSye</semantic:incoming>
-      <semantic:outgoing>iT1wEz//018T4WWv</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:property name="filename" type="java.lang.String">&quot;B2_Sequence.bpmn2&quot;</jadex:property>
-        <jadex:subprocessref>B2_Sequence.bpmn2</jadex:subprocessref>
-      </semantic:extensionElements>
-    </semantic:subProcess>
-    <semantic:task name="Print Finished" id="u37TeMH5zZXinNGQ">
-      <semantic:incoming>iT1wEz//018T4WWv</semantic:incoming>
-      <semantic:outgoing>dhLt6TdDi7DsruJu</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
-        <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Subprocess finished&quot;</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:sequenceFlow sourceRef="Bayb7QE3Dv2flSRh" targetRef="hCAhYniK5ZBpAcjw" id="lmuFPs+QotE5fSye">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="hCAhYniK5ZBpAcjw" targetRef="u37TeMH5zZXinNGQ" id="iT1wEz//018T4WWv">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="u37TeMH5zZXinNGQ" targetRef="i+Qc1NVz98+2Ek3v" id="dhLt6TdDi7DsruJu">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
-  <bpmndi:BPMNDiagram>
-    <bpmndi:BPMNPlane>
-      <bpmndi:BPMNShape bpmnElement="yT7Z17sIj8orYBB4">
-        <dc:Bounds height="360.0" width="680.0" x="50.0" y="210.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="Bayb7QE3Dv2flSRh">
-        <dc:Bounds height="40.0" width="40.0" x="70.0" y="170.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="i+Qc1NVz98+2Ek3v">
-        <dc:Bounds height="40.0" width="40.0" x="610.0" y="170.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="hCAhYniK5ZBpAcjw">
-        <dc:Bounds height="100.0" width="160.0" x="170.0" y="140.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="u37TeMH5zZXinNGQ">
-        <dc:Bounds height="100.0" width="160.0" x="390.0" y="140.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge bpmnElement="lmuFPs+QotE5fSye">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="iT1wEz//018T4WWv">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="dhLt6TdDi7DsruJu">
-      </bpmndi:BPMNEdge>
-    </bpmndi:BPMNPlane>
-  </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_hNORIUIyEd-lXM2_JTGF5Q" iD="_hNORIEIyEd-lXM2_JTGF5Q">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_lJy0YEIyEd-lXM2_JTGF5Q" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lJy0YUIyEd-lXM2_JTGF5Q" key="Description" value="&lt;h1>External Subprocess&lt;/h1> This example shows how to invoke an external process as a subprocess."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lJy0YkIyEd-lXM2_JTGF5Q" key="Package" value="jadex.bpmn.tutorial"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tYeslwRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_hOaj8UIyEd-lXM2_JTGF5Q" iD="_hOaj8EIyEd-lXM2_JTGF5Q" name="Pool">
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_jX9DUUIyEd-lXM2_JTGF5Q" iD="_jX9DUEIyEd-lXM2_JTGF5Q" outgoingEdges="_2Qg9YUI1Ed-Y29i2KJopdA" name="Subprocess">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_lpr1YEIyEd-lXM2_JTGF5Q" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lpr1YUIyEd-lXM2_JTGF5Q" key="class" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O_Rn0WKQEd-Q9q1HfsZXQw" key="file" value="&quot;B2_Sequence.bpmn&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O_Rn0mKQEd-Q9q1HfsZXQw" key="parallel" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O_Rn02KQEd-Q9q1HfsZXQw" key="items" value=""/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_2PebkUI1Ed-Y29i2KJopdA" iD="_2PebkEI1Ed-Y29i2KJopdA" incomingEdges="_2Qg9YUI1Ed-Y29i2KJopdA" name="Subprocess Finished" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_IjTYQEI2Ed-Y29i2KJopdA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IjTYQUI2Ed-Y29i2KJopdA" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_tYeskARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tYeskQRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tYeskgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tYeskwRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tYeslARPEeCnwcpWvxOwkg" key="0:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tYeslQRPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tYeslgRPEeCnwcpWvxOwkg" key="0:3" value="&quot;Subprocess has finished.&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_2Qg9YUI1Ed-Y29i2KJopdA" iD="_2Qg9YEI1Ed-Y29i2KJopdA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_3Wb6QEJOEd-lXM2_JTGF5Q" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3Wb6QUJOEd-lXM2_JTGF5Q" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+  </pools>
+</bpmn:BpmnDiagram>

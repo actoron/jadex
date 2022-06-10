@@ -1,177 +1,34 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
-    <jadex:modelname>SubProcess</jadex:modelname>
-    <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_I49DIW1WEd6B3oAuT8wltw">
-    <semantic:startEvent id="_I49DI21WEd6B3oAuT8wltw">
-      <semantic:outgoing>_Kx9MNm1WEd6B3oAuT8wltw</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:subProcess id="_KxzbIW1WEd6B3oAuT8wltw">
-      <semantic:incoming>_Kx9MNm1WEd6B3oAuT8wltw</semantic:incoming>
-      <semantic:outgoing>_TGq0Wm1WEd6B3oAuT8wltw</semantic:outgoing>
-      <semantic:task name="Sub 1b" id="_2v4vgW1WEd6B3oAuT8wltw">
-        <semantic:outgoing>_S4sNSm1XEd6B3oAuT8wltw</semantic:outgoing>
-      </semantic:task>
-      <semantic:intermediateCatchEvent id="_fEULsW-_Ed6gyNniPBNmMQ">
-        <semantic:incoming>_fEdVqG-_Ed6gyNniPBNmMQ</semantic:incoming>
-        <semantic:outgoing>_jOcp2m-_Ed6gyNniPBNmMQ</semantic:outgoing>
-        <semantic:timerEventDefinition>
-          <semantic:timeDuration>2500</semantic:timeDuration>
-        </semantic:timerEventDefinition>
-        <semantic:extensionElements>
-          <jadex:property name="duration">2500</jadex:property>
-        </semantic:extensionElements>
-      </semantic:intermediateCatchEvent>
-      <semantic:task name="Sub 3b" id="_jOcp0W-_Ed6gyNniPBNmMQ">
-        <semantic:incoming>_jOcp2m-_Ed6gyNniPBNmMQ</semantic:incoming>
-      </semantic:task>
-      <semantic:task name="Sub 2b" id="_S4sNQW1XEd6B3oAuT8wltw">
-        <semantic:incoming>_S4sNSm1XEd6B3oAuT8wltw</semantic:incoming>
-        <semantic:outgoing>_fEdVqG-_Ed6gyNniPBNmMQ</semantic:outgoing>
-      </semantic:task>
-      <semantic:task name="Sub 3a" id="_oGxqsW-_Ed6gyNniPBNmMQ">
-        <semantic:incoming>_oGxqum-_Ed6gyNniPBNmMQ</semantic:incoming>
-      </semantic:task>
-      <semantic:intermediateCatchEvent id="_k1HssW-_Ed6gyNniPBNmMQ">
-        <semantic:incoming>_k1Hsum-_Ed6gyNniPBNmMQ</semantic:incoming>
-        <semantic:outgoing>_oGxqum-_Ed6gyNniPBNmMQ</semantic:outgoing>
-        <semantic:timerEventDefinition>
-          <semantic:timeDuration>1000</semantic:timeDuration>
-        </semantic:timerEventDefinition>
-        <semantic:extensionElements>
-          <jadex:property name="duration">1000</jadex:property>
-        </semantic:extensionElements>
-      </semantic:intermediateCatchEvent>
-      <semantic:task name="Sub 2a" id="_M5_2sW1WEd6B3oAuT8wltw">
-        <semantic:incoming>_eUVxMW1XEd6B3oAuT8wltw</semantic:incoming>
-        <semantic:outgoing>_k1Hsum-_Ed6gyNniPBNmMQ</semantic:outgoing>
-      </semantic:task>
-      <semantic:task name="Sub 1a" id="_KxzbI21WEd6B3oAuT8wltw">
-        <semantic:outgoing>_M5_2um1WEd6B3oAuT8wltw</semantic:outgoing>
-      </semantic:task>
-      <semantic:intermediateCatchEvent id="_dPpaAW1XEd6B3oAuT8wltw">
-        <semantic:incoming>_M5_2um1WEd6B3oAuT8wltw</semantic:incoming>
-        <semantic:outgoing>_eUVxMW1XEd6B3oAuT8wltw</semantic:outgoing>
-        <semantic:timerEventDefinition>
-          <semantic:timeDuration>2000</semantic:timeDuration>
-        </semantic:timerEventDefinition>
-        <semantic:extensionElements>
-          <jadex:property name="duration">2000</jadex:property>
-        </semantic:extensionElements>
-      </semantic:intermediateCatchEvent>
-    </semantic:subProcess>
-    <semantic:task name="Outer" id="_TGq0UW1WEd6B3oAuT8wltw">
-      <semantic:incoming>_TGq0Wm1WEd6B3oAuT8wltw</semantic:incoming>
-      <semantic:outgoing>_Xs0gGm1WEd6B3oAuT8wltw</semantic:outgoing>
-    </semantic:task>
-    <semantic:endEvent id="_Xs0gEW1WEd6B3oAuT8wltw">
-      <semantic:incoming>_Xs0gGm1WEd6B3oAuT8wltw</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:sequenceFlow sourceRef="_I49DI21WEd6B3oAuT8wltw" targetRef="_KxzbIW1WEd6B3oAuT8wltw" id="_Kx9MNm1WEd6B3oAuT8wltw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_KxzbIW1WEd6B3oAuT8wltw" targetRef="_TGq0UW1WEd6B3oAuT8wltw" id="_TGq0Wm1WEd6B3oAuT8wltw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_2v4vgW1WEd6B3oAuT8wltw" targetRef="_S4sNQW1XEd6B3oAuT8wltw" id="_S4sNSm1XEd6B3oAuT8wltw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_fEULsW-_Ed6gyNniPBNmMQ" targetRef="_jOcp0W-_Ed6gyNniPBNmMQ" id="_jOcp2m-_Ed6gyNniPBNmMQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_S4sNQW1XEd6B3oAuT8wltw" targetRef="_fEULsW-_Ed6gyNniPBNmMQ" id="_fEdVqG-_Ed6gyNniPBNmMQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_k1HssW-_Ed6gyNniPBNmMQ" targetRef="_oGxqsW-_Ed6gyNniPBNmMQ" id="_oGxqum-_Ed6gyNniPBNmMQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_M5_2sW1WEd6B3oAuT8wltw" targetRef="_k1HssW-_Ed6gyNniPBNmMQ" id="_k1Hsum-_Ed6gyNniPBNmMQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_KxzbI21WEd6B3oAuT8wltw" targetRef="_dPpaAW1XEd6B3oAuT8wltw" id="_M5_2um1WEd6B3oAuT8wltw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_dPpaAW1XEd6B3oAuT8wltw" targetRef="_M5_2sW1WEd6B3oAuT8wltw" id="_eUVxMW1XEd6B3oAuT8wltw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_TGq0UW1WEd6B3oAuT8wltw" targetRef="_Xs0gEW1WEd6B3oAuT8wltw" id="_Xs0gGm1WEd6B3oAuT8wltw">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
-  <bpmndi:BPMNDiagram>
-    <bpmndi:BPMNPlane>
-      <bpmndi:BPMNShape bpmnElement="_I49DIW1WEd6B3oAuT8wltw">
-        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_I49DI21WEd6B3oAuT8wltw">
-        <dc:Bounds height="40.0" width="40.0" x="120.0" y="250.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_KxzbIW1WEd6B3oAuT8wltw" isExpanded="true">
-        <dc:Bounds height="380.0" width="940.0" x="290.0" y="80.0"/>
-        <dc:Bounds height="100.0" width="160.0" x="0.0" y="0.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_2v4vgW1WEd6B3oAuT8wltw">
-        <dc:Bounds height="100.0" width="160.0" x="80.0" y="50.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_fEULsW-_Ed6gyNniPBNmMQ">
-        <dc:Bounds height="40.0" width="40.0" x="620.0" y="80.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_jOcp0W-_Ed6gyNniPBNmMQ">
-        <dc:Bounds height="100.0" width="160.0" x="730.0" y="50.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_S4sNQW1XEd6B3oAuT8wltw">
-        <dc:Bounds height="100.0" width="160.0" x="380.0" y="50.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_oGxqsW-_Ed6gyNniPBNmMQ">
-        <dc:Bounds height="100.0" width="160.0" x="730.0" y="220.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_k1HssW-_Ed6gyNniPBNmMQ">
-        <dc:Bounds height="40.0" width="40.0" x="620.0" y="250.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_M5_2sW1WEd6B3oAuT8wltw">
-        <dc:Bounds height="100.0" width="160.0" x="380.0" y="220.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_KxzbI21WEd6B3oAuT8wltw">
-        <dc:Bounds height="100.0" width="160.0" x="80.0" y="220.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_dPpaAW1XEd6B3oAuT8wltw">
-        <dc:Bounds height="40.0" width="40.0" x="290.0" y="250.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_TGq0UW1WEd6B3oAuT8wltw">
-        <dc:Bounds height="100.0" width="160.0" x="1290.0" y="220.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_Xs0gEW1WEd6B3oAuT8wltw">
-        <dc:Bounds height="40.0" width="40.0" x="1510.0" y="250.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge bpmnElement="_Kx9MNm1WEd6B3oAuT8wltw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_Kx9MNm1WEd6B3oAuT8wltw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_TGq0Wm1WEd6B3oAuT8wltw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_TGq0Wm1WEd6B3oAuT8wltw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_Xs0gGm1WEd6B3oAuT8wltw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_Xs0gGm1WEd6B3oAuT8wltw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_M5_2um1WEd6B3oAuT8wltw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_k1Hsum-_Ed6gyNniPBNmMQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_S4sNSm1XEd6B3oAuT8wltw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_fEdVqG-_Ed6gyNniPBNmMQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_eUVxMW1XEd6B3oAuT8wltw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_jOcp2m-_Ed6gyNniPBNmMQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_oGxqum-_Ed6gyNniPBNmMQ">
-      </bpmndi:BPMNEdge>
-    </bpmndi:BPMNPlane>
-  </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_I4gXMW1WEd6B3oAuT8wltw" iD="_I4gXMG1WEd6B3oAuT8wltw">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_j4KuIFdfEd-gpfWhYqU7MQ" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_j4KuIldfEd-gpfWhYqU7MQ" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_j4KuI1dfEd-gpfWhYqU7MQ" key="Package" value="jadex.bpmn.examples.execute"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hik1kARPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_I49DIW1WEd6B3oAuT8wltw" iD="_I49DIG1WEd6B3oAuT8wltw" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_I49DI21WEd6B3oAuT8wltw" iD="_I49DIm1WEd6B3oAuT8wltw" outgoingEdges="_Kx9MNm1WEd6B3oAuT8wltw" name="" activityType="EventStartEmpty" looping="false"/>
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_KxzbIW1WEd6B3oAuT8wltw" iD="_KxzbIG1WEd6B3oAuT8wltw" outgoingEdges="_TGq0Wm1WEd6B3oAuT8wltw" incomingEdges="_Kx9MNm1WEd6B3oAuT8wltw" activityType="SubProcess">
+      <vertices xmi:type="bpmn:Activity" xmi:id="_KxzbI21WEd6B3oAuT8wltw" iD="_KxzbIm1WEd6B3oAuT8wltw" outgoingEdges="_M5_2um1WEd6B3oAuT8wltw" name="Sub 1a"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_M5_2sW1WEd6B3oAuT8wltw" iD="_M5_2sG1WEd6B3oAuT8wltw" outgoingEdges="_k1Hsum-_Ed6gyNniPBNmMQ" incomingEdges="_eUVxMW1XEd6B3oAuT8wltw" name="Sub 2a" activityType="Task"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_2v4vgW1WEd6B3oAuT8wltw" iD="_2v4vgG1WEd6B3oAuT8wltw" outgoingEdges="_S4sNSm1XEd6B3oAuT8wltw" name="Sub 1b"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_S4sNQW1XEd6B3oAuT8wltw" iD="_S4sNQG1XEd6B3oAuT8wltw" outgoingEdges="_fEdVqG-_Ed6gyNniPBNmMQ" incomingEdges="_S4sNSm1XEd6B3oAuT8wltw" name="Sub 2b" activityType="Task"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_dPpaAW1XEd6B3oAuT8wltw" iD="_dPpaAG1XEd6B3oAuT8wltw" outgoingEdges="_eUVxMW1XEd6B3oAuT8wltw" incomingEdges="_M5_2um1WEd6B3oAuT8wltw" name="duration = 2000" activityType="EventIntermediateTimer"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_fEULsW-_Ed6gyNniPBNmMQ" iD="_fEULsG-_Ed6gyNniPBNmMQ" outgoingEdges="_jOcp2m-_Ed6gyNniPBNmMQ" incomingEdges="_fEdVqG-_Ed6gyNniPBNmMQ" name="duration = 2500" activityType="EventIntermediateTimer"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_jOcp0W-_Ed6gyNniPBNmMQ" iD="_jOcp0G-_Ed6gyNniPBNmMQ" incomingEdges="_jOcp2m-_Ed6gyNniPBNmMQ" name="Sub 3b" activityType="Task"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_k1HssW-_Ed6gyNniPBNmMQ" iD="_k1HssG-_Ed6gyNniPBNmMQ" outgoingEdges="_oGxqum-_Ed6gyNniPBNmMQ" incomingEdges="_k1Hsum-_Ed6gyNniPBNmMQ" name="duration = 1000" activityType="EventIntermediateTimer"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_oGxqsW-_Ed6gyNniPBNmMQ" iD="_oGxqsG-_Ed6gyNniPBNmMQ" incomingEdges="_oGxqum-_Ed6gyNniPBNmMQ" name="Sub 3a" activityType="Task"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_M5_2um1WEd6B3oAuT8wltw" iD="_M5_2uW1WEd6B3oAuT8wltw"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_S4sNSm1XEd6B3oAuT8wltw" iD="_S4sNSW1XEd6B3oAuT8wltw"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_eUVxMW1XEd6B3oAuT8wltw" iD="_eUVxMG1XEd6B3oAuT8wltw"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_fEdVqG-_Ed6gyNniPBNmMQ" iD="_fEdVp2-_Ed6gyNniPBNmMQ"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_jOcp2m-_Ed6gyNniPBNmMQ" iD="_jOcp2W-_Ed6gyNniPBNmMQ"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_k1Hsum-_Ed6gyNniPBNmMQ" iD="_k1HsuW-_Ed6gyNniPBNmMQ"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_oGxqum-_Ed6gyNniPBNmMQ" iD="_oGxquW-_Ed6gyNniPBNmMQ"/>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_TGq0UW1WEd6B3oAuT8wltw" iD="_TGq0UG1WEd6B3oAuT8wltw" outgoingEdges="_Xs0gGm1WEd6B3oAuT8wltw" incomingEdges="_TGq0Wm1WEd6B3oAuT8wltw" name="Outer" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Xs0gEW1WEd6B3oAuT8wltw" iD="_Xs0gEG1WEd6B3oAuT8wltw" incomingEdges="_Xs0gGm1WEd6B3oAuT8wltw" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Kx9MNm1WEd6B3oAuT8wltw" iD="_Kx9MNW1WEd6B3oAuT8wltw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_TGq0Wm1WEd6B3oAuT8wltw" iD="_TGq0WW1WEd6B3oAuT8wltw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Xs0gGm1WEd6B3oAuT8wltw" iD="_Xs0gGW1WEd6B3oAuT8wltw"/>
+  </pools>
+</bpmn:BpmnDiagram>
