@@ -109,6 +109,15 @@ public interface IPlan extends IParameterElement, IFinishableElement<Object>  //
 	 */
 	public <T> IFuture<ChangeInfo<T>> waitForCollectionChange(String belname, long timeout, Object id);
 
+	/**
+	 *  Wait for change of a belief.
+	 */
+	public IFuture<ChangeInfo<?>> waitForBeliefChanged(String belname);
+	
+	/**
+	 *  Wait for change of a belief.
+	 */
+	public IFuture<ChangeInfo<?>> waitForBeliefChanged(String belname, long timeout);
 	
 	/**
 	 *  Wait for a condition.

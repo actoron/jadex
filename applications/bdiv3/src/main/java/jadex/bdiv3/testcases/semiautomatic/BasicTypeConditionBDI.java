@@ -4,7 +4,9 @@ import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.IFuture;
@@ -44,8 +46,11 @@ public class BasicTypeConditionBDI
 	protected void wait(IPlan plan)
 	{
 		System.out.println("waiting for notification");
-		plan.waitForFactChanged("mybel").get();
+		//plan.waitForFactChanged("mybel").get();
+		plan.waitForBeliefChanged("mybel").get();
+		//((RPlan)plan).waitForFactX("mybel", new String[]{ChangeEvent.BELIEFCHANGED}, -1, null).get();
 		System.out.println("received notification");
+		agent.killComponent().get();
 	}
 	
 	@Plan

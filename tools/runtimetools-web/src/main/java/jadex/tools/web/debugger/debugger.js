@@ -361,7 +361,7 @@ class DebuggerElement extends CidElement
 		// internal debugger panel must have function hasSteps()
 		var md = this.shadowRoot.getElementById("debugger");
 		var ret = false;
-		if(md.children[0].getStepInfo!=null)
+		if(md?.children[0]?.getStepInfo)
 			ret = md.children[0].hasSteps();
 		return ret;
 	}

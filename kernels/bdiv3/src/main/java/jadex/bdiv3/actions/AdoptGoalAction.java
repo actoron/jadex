@@ -79,7 +79,7 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 	}
 	
 	/**
-	 * 
+	 *  Adopt a goal.
 	 */
 	public static void adoptGoal(IInternalAccess agent, RGoal goal)
 	{

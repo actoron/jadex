@@ -93,9 +93,9 @@ public class HelloWorld
 	@OnStart
 	public void body()
 	{		
-		System.out.println("Hello agent suspend: "+agent.getId());
-		agent.suspendComponent().get();
-		System.out.println("Hello agent continued: "+agent.getId());
+		//System.out.println("Hello agent suspend: "+agent.getId());
+		//agent.suspendComponent().get();
+		//System.out.println("Hello agent continued: "+agent.getId());
 		sayhello = "Hello BDI agent V3.";
 		System.out.println("body end: "+getClass().getName());
 	}

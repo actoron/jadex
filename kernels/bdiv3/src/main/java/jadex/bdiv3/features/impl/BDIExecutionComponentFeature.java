@@ -77,6 +77,16 @@ public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 		}
 	}
 	
+	/**
+	 *  Check if the execution kernel supports semantic steps.
+	 *  @return True, if semantic steps are supported and the kernel
+	 *  uses events to setSemanticEffect on current steps.
+	 */
+	public boolean isSemanticStepped()
+	{
+		return true;
+	}
+	
 //	/**
 //	 *  Execute a component step.
 //	 */

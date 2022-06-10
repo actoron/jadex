@@ -354,6 +354,20 @@ class BDIV3AgentDebuggerElement extends CidElement
 		}*/
 	}
 	
+	updateNodeData(nodeid, name, info)
+	{
+		var data = this.treedata[nodeid];
+		if(data!=null)
+		{
+			data.text = name;
+			data.info = info;
+		}
+		else
+		{
+			console.log("node not found: "+nodeid);
+		}
+	}
+	
 	removeChildDataFromParent(nodeid)
 	{
 		var removed = false;
@@ -543,7 +557,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 				info.type = oldbel.type; // Hack!!! Keep capability information which is unavailable for modified events.
 			this.allbeliefs[info.id] = info;
 			
-			var valinfo = ":"+info.valueType;
+			var valinfo = " : "+info.valueType;
 			//if(kind.toLowerCase().indexof("beliefset")!=-1)
 			//	valinfo = " : beliefset : "+valinfo;
 			if(Array.isArray(info.value))
@@ -596,6 +610,8 @@ class BDIV3AgentDebuggerElement extends CidElement
 			{
 				//console.log("created goal");
 				this.allgoals.push(info);
+				var valinfo = " : "+info.lifecycleState.toLowerCase()+" "+info.processingState.toLowerCase();
+				info.valinfo = valinfo;
 				refresh = this.createNodeDataForEvent(event);
 				
 				/*GoalInfo gi = (GoalInfo)event.getProperty("details");
@@ -617,6 +633,11 @@ class BDIV3AgentDebuggerElement extends CidElement
 			}
 			else if(type.startsWith("modified"))
 			{
+				var name = info.type;
+				var parts = name.split(".");
+				var text = parts[parts.length-1]+" : "+info.lifecycleState.toLowerCase()+" "+info.processingState.toLowerCase();
+				this.updateNodeData(info.id, text, info);
+				refresh = this.getParentId(info.id);
 				//console.log("modified goal");
 				/*int	index	= allgoals.indexOf(event.getProperty("details"));
 				if(index!=-1)
@@ -639,6 +660,8 @@ class BDIV3AgentDebuggerElement extends CidElement
 			{
 				//console.log("created plan");
 				this.allplans.push(info);
+				var valinfo = " : "+info.state.toLowerCase();
+				info.valinfo = valinfo;
 				refresh = this.createNodeDataForEvent(event);
 				
 				/*PlanInfo pi = (PlanInfo)event.getProperty("details");
@@ -657,6 +680,13 @@ class BDIV3AgentDebuggerElement extends CidElement
 			}
 			else if(type.startsWith("modified"))
 			{
+				var name = info.type;
+				var parts = name.split(".");
+				var text = parts[parts.length-1]+" : "+info.state.toLowerCase();
+				this.updateNodeData(info.id, text, info);
+				refresh = this.getParentId(info.id);
+				//console.log("modified goal");
+				
 				//console.log("modified plan");
 				/*int	index	= allplans.indexOf(event.getProperty("details"));
 				if(index!=-1)
@@ -678,18 +708,20 @@ class BDIV3AgentDebuggerElement extends CidElement
 			var hasnode = this.getTree("agent").jstree().get_node(refresh)!=false;
 			if(hasnode)
 			{
-				//console.log("refresh node: "+refresh);
+				console.log("refresh node: "+refresh);
 				this.getTree("agent").jstree().refresh_node(refresh);
 			}
 			else
 			{
-				//console.log("refresh all, node not in tree: "+refresh);
+				console.log("refresh all, node not in tree: "+refresh);
 				this.getTree("agent").jstree("refresh");
 			}
+			
+			this.getTree("agent").jstree("refresh");
 		}
 		else if(refresh==="all")
 		{
-			//console.log("refresh all: "+refresh);
+			console.log("refresh all: "+refresh);
 			this.getTree("agent").jstree("refresh");
 		}
 		
