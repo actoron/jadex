@@ -320,6 +320,9 @@ public class MCapability extends MElement
 			{
 				public int compare(MPlan p1, MPlan p2)
 				{
+					int ret = 0;
+					boolean ok = true;
+					
 					int ln1 = p1.getBody().getLineNumber(cl);
 					int ln2 = p2.getBody().getLineNumber(cl);
 					
@@ -328,18 +331,56 @@ public class MCapability extends MElement
 						if(order.containsKey(p1.getName()))
 							ln1 = order.get(p1.getName());
 						else
-							System.out.println("found no plan order for: "+p1.getName());
+							ok = false;
 					}
 					if(ln2==-1)
 					{
 						if(order.containsKey(p2.getName()))
 							ln2 = order.get(p2.getName());
 						else
-							System.out.println("found no plan order for: "+p2.getName());
+							ok = false;
 					}
-					return ln1-ln2;
+					
+					if(ok)
+					{
+						ret = ln1-ln2;
+					}
+					if(!ok)
+					{
+						// Try to find annotation order
+						int or1 = p1.getOrder();
+						int or2 = p2.getOrder();
+						
+						/*if(or1==-1 || or2==-1)
+						{
+							System.out.println("found no plan order for: "+p1.getName()+" "+p2.getName());
+						}*/
+						
+						// Assumes that external plans have precedence in declaration order over
+						// inline plans due to line number - is that ok?!
+						if(or1!=-1 && or2!=-1)
+						{
+							ret = or1-or2;
+						}
+						else if(ln1!=-1 && or2!=-1)
+						{
+							ret = ln1-or2;
+						}
+						else if(or1!=-1 && ln2!=-1)
+						{
+							ret = or1-ln2;
+						}
+						else
+						{
+							System.out.println("found no plan order for: "+p1.getName()+" "+p2.getName());
+						}
+					}
+					
+					return ret;
 				}
 			});
+			
+			//System.out.println("Sorted plans: "+plans);
 		}
 	}
 	

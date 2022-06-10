@@ -218,7 +218,7 @@ public class SBDIModel
 				MPlan plan2	= new MPlan(capaname+MElement.CAPABILITY_SEPARATOR+plan.getName(), plan.getBody(),
 					convertTrigger(bdimodel, capaname, plan.getTrigger(), true),
 					convertTrigger(bdimodel, capaname, plan.getWaitqueue(), true),
-					plan.getPriority());
+					plan.getPriority(), plan.getOrder());
 				
 				// Copy parameters and convert events of dynamic parameters.
 				if(plan.getParameters()!=null)

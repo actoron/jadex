@@ -20,6 +20,9 @@ public class MPlan extends MParameterElement
 	/** The plan priority. */
 	protected int priority;
 	
+	/** The declaration order for external plans in annotations. */
+	protected int order;
+	
 	//-------- additional xml properties --------
 
 	// pojo pre- and contextcondition are in body
@@ -40,13 +43,14 @@ public class MPlan extends MParameterElement
 	/**
 	 *  Create a new belief.
 	 */
-	public MPlan(String name, MBody body, MTrigger trigger, MTrigger waitqueue, int priority)
+	public MPlan(String name, MBody body, MTrigger trigger, MTrigger waitqueue, int priority, int order)
 	{
 		super(name);
 		this.body = body;
 		this.trigger = trigger;
 		this.waitqueue = waitqueue;
 		this.priority = priority;
+		this.order = order;
 	}
 
 	/**
@@ -153,5 +157,23 @@ public class MPlan extends MParameterElement
 	public void setContextCondition(MCondition contextcondition)
 	{
 		this.contextcondition = contextcondition;
+	}
+
+	/**
+	 *  Get the declaration order.
+	 *  @return the order
+	 */
+	public int getOrder() 
+	{
+		return order;
+	}
+
+	/**
+	 *  Set the declaration order
+	 *  @param order the order to set.
+	 */
+	public void setOrder(int order) 
+	{
+		this.order = order;
 	}
 }

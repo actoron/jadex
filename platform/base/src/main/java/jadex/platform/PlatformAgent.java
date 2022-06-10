@@ -534,9 +534,9 @@ public class PlatformAgent
 		{
 			public void intermediateResultAvailable(IExternalAccess result)
 			{
+				IComponentIdentifier cid = result!=null && result.getId()!=null? result.getId(): null;
 				try
 				{
-					IComponentIdentifier cid = result!=null && result.getId()!=null? result.getId(): null;
 					if(cid!=null && !agent.getId().getRoot().equals(cid.getRoot()))
 					{
 						//System.out.println("found platform: "+result.getId());//+" "+SComponentManagementService.containsComponent(result.getId()));
@@ -548,7 +548,8 @@ public class PlatformAgent
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+					System.out.println("Could not create proxy agent for: "+cid+", reason: "+e.getMessage());
+					//e.printStackTrace();
 				}
 			}
 

@@ -75,7 +75,14 @@ import jadex.rules.eca.Rule;
 public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 {
 	/** The rplans for plan threads. */
-	public static final ThreadLocal<RPlan>	RPLANS	= new ThreadLocal<RPlan>();
+	public static final ThreadLocal<RPlan>	RPLANS	= new ThreadLocal<RPlan>()
+	{
+		/*public void set(RPlan value) 
+		{
+			System.out.println("RPLANS: "+Thread.currentThread()+" "+value);
+			super.set(value);
+		}*/
+	};
 	
 	//-------- plan states --------
 	

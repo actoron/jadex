@@ -1,5 +1,8 @@
 package jadex.bridge;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
@@ -30,6 +33,8 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 	/** The undone flag. */
 	protected boolean undone;
 	
+	//protected Exception e;
+	
 	//-------- constructors --------
 	
 	/**
@@ -43,6 +48,8 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 			throw new NullPointerException("Listener must not be null.");
 		this.listener = listener;
 		this.component = component;
+		//e = new RuntimeException();
+		//e.printStackTrace(new PrintStream(new ByteArrayOutputStream()));
 	}
 	
 	/**
@@ -56,6 +63,8 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 			throw new NullPointerException("Listener must not be null.");
 		this.listener = listener;
 		this.access = access;
+		//e = new RuntimeException();
+		//e.printStackTrace(new PrintStream(new ByteArrayOutputStream()));
 	}
 	
 	//-------- methods --------
@@ -174,7 +183,7 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 		else
 		{
 			// Debug caller thread
-			//String	trace	= "Component("+IComponentIdentifier.LOCAL.get()+") "; // SUtil.getExceptionStacktrace(new RuntimeException("stack trace").fillInStackTrace());
+			String	trace	= "Component("+IComponentIdentifier.LOCAL.get()+") "; // SUtil.getExceptionStacktrace(new RuntimeException("stack trace").fillInStackTrace());
 			
 			// Differentiate between exception in listener (true) and exception before invocation (false)
 			// to avoid double listener invocation, but invoke listener, when scheduling step fails.
@@ -208,6 +217,7 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 					{
 						if(!invoked[0])
 						{
+							//ex0.printStackTrace();
 							//System.out.println("schedule forward2: "+notification+"\n"+trace);
 							Starter.scheduleRescueStep(component.getId(), () -> invocation.get());
 						}

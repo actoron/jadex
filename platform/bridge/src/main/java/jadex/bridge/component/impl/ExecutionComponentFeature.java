@@ -372,7 +372,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				// events to be reported etc...
 				if((STEP_PRIORITY_IMMEDIATE > prio && endstepcnt != -1))
 				{
-					ret.setException(new ComponentTerminatedException(getComponent().getId()));
+					ret.setException(new ComponentTerminatedException(getComponent().getId())
+					{
+						@Override
+						public void printStackTrace() 
+						{
+							Thread.dumpStack();
+							super.printStackTrace();
+						}
+					});
 					return ret;
 				}
 				addStep(new StepInfo(step, ret, new ThreadLocalTransferHelper(true), prio, stepcnt++, inherit));
@@ -1379,8 +1387,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		boolean priostep = false;
 		boolean	breakpoint_triggered = false;
 		
-		if(getComponent().getId().toString().toLowerCase().indexOf("uni")!=-1)
-			System.out.println("step enter: "+stepfuture);
+		//if(getComponent().getId().toString().toLowerCase().indexOf("uni")!=-1)
+		//	System.out.println("step enter: "+stepfuture);
 		
 		synchronized(this)
 		{			
@@ -1419,8 +1427,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					// In debug mode find named step.  
 					else if(stepfuture!=null)
 					{
-						if(getComponent().getId().toString().toLowerCase().indexOf("uni")!=-1)
-							System.out.println("enter with stepfuture set");
+						//if(getComponent().getId().toString().toLowerCase().indexOf("uni")!=-1)
+						//	System.out.println("enter with stepfuture set");
 						
 						// Only execute another step when step is pressed again -> release current step
 						if(isSemanticStepped() && debugstep!=null && debugstep.hasSemanticEffect())
@@ -1885,15 +1893,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				
 				if(stepfut!=null)
 				{
-					if(getComponent().getId().toString().toLowerCase().indexOf("uni")!=-1)
-						System.out.println("stepfuture notified: "+stepfut+" "+ret+" "+step.hasSemanticEffect());
+					//if(getComponent().getId().toString().toLowerCase().indexOf("uni")!=-1)
+					//	System.out.println("stepfuture notified: "+stepfut+" "+ret+" "+step.hasSemanticEffect());
 					stepfut.setResult(null);
 				}
 			}
 			else
 			{
-				if(getComponent().getId().toString().toLowerCase().indexOf("uni")!=-1)
-					System.out.println("not resetted stepfuture: "+stepfuture+" "+ret+" "+step);
+				//if(getComponent().getId().toString().toLowerCase().indexOf("uni")!=-1)
+				//	System.out.println("not resetted stepfuture: "+stepfuture+" "+ret+" "+step);
 			}
 		}
 		/*else

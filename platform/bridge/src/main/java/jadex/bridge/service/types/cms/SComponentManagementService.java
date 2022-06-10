@@ -2379,7 +2379,7 @@ public class SComponentManagementService
 					}));
 					
 					// Create component and init.
-					component.init().addResultListener(createResultListener(agent, new DelegationResultListener<Void>(resfut)));
+					component.init().addResultListener(createResultListener(agent, new DelegationResultListener<Void>(resfut, true)));
 				}
 			}));
 		}
