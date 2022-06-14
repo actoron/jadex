@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>C5_ResultUsage</jadex:modelname>
+    <jadex:description>&lt;h1&gt;Pizza Counter&lt;/h1&gt;The process usages the external inventory process to count tomatoes and cheese and prints out how many pizzas can be made.</jadex:description>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_BaQP10ZFEd-3iKqz0F2Flw">
+    <semantic:subProcess name="Count Tomatoes" id="_F972YUZFEd-3iKqz0F2Flw">
+      <semantic:incoming>_F-PYYUZFEd-3iKqz0F2Flw</semantic:incoming>
+      <semantic:outgoing>_Q836wWKBEd-Q9q1HfsZXQw</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:parameter direction="in" name="item_type" type="String">&quot;Tomatoes&quot;</jadex:parameter>
+        <jadex:parameter direction="out" name="item_count" type="int"/>
+        <jadex:property name="file">&quot;C4_Arguments.bpmn&quot;</jadex:property>
+        <jadex:subprocessexpressionref>&quot;C4_Arguments.bpmn&quot;</jadex:subprocessexpressionref>
+      </semantic:extensionElements>
+    </semantic:subProcess>
+    <semantic:parallelGateway id="_E94HkUZFEd-3iKqz0F2Flw">
+      <semantic:incoming>_E94HmkZFEd-3iKqz0F2Flw</semantic:incoming>
+      <semantic:outgoing>_F-PYYUZFEd-3iKqz0F2Flw</semantic:outgoing>
+      <semantic:outgoing>_KBJ0SkZFEd-3iKqz0F2Flw</semantic:outgoing>
+    </semantic:parallelGateway>
+    <semantic:startEvent id="_D-kmsUZFEd-3iKqz0F2Flw">
+      <semantic:outgoing>_E94HmkZFEd-3iKqz0F2Flw</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:task name="Map result" id="_Q8uJwWKBEd-Q9q1HfsZXQw">
+      <semantic:incoming>_Q836wWKBEd-Q9q1HfsZXQw</semantic:incoming>
+      <semantic:outgoing>_OwKhCkZFEd-3iKqz0F2Flw</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:parameter direction="out" name="tomatoe_count" type="Object">item_count</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:subProcess name="Count Cheese" id="_KBJ0MUZFEd-3iKqz0F2Flw">
+      <semantic:incoming>_KBJ0SkZFEd-3iKqz0F2Flw</semantic:incoming>
+      <semantic:outgoing>_WOryqmKBEd-Q9q1HfsZXQw</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:parameter direction="in" name="item_type" type="String">&quot;Cheese&quot;</jadex:parameter>
+        <jadex:parameter direction="out" name="item_count" type="int"/>
+        <jadex:property name="file">&quot;C4_Arguments.bpmn&quot;</jadex:property>
+        <jadex:subprocessexpressionref>&quot;C4_Arguments.bpmn&quot;</jadex:subprocessexpressionref>
+      </semantic:extensionElements>
+    </semantic:subProcess>
+    <semantic:task name="Map result" id="_WOryoWKBEd-Q9q1HfsZXQw">
+      <semantic:incoming>_WOryqmKBEd-Q9q1HfsZXQw</semantic:incoming>
+      <semantic:outgoing>_PFnMkUZFEd-3iKqz0F2Flw</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:parameter direction="out" name="cheese_count" type="Object">item_count</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:parallelGateway id="_OwKhAUZFEd-3iKqz0F2Flw">
+      <semantic:incoming>_OwKhCkZFEd-3iKqz0F2Flw</semantic:incoming>
+      <semantic:incoming>_PFnMkUZFEd-3iKqz0F2Flw</semantic:incoming>
+      <semantic:outgoing>_Q3uqekZFEd-3iKqz0F2Flw</semantic:outgoing>
+    </semantic:parallelGateway>
+    <semantic:task name="Print Pizza Count" id="_Q3uqcUZFEd-3iKqz0F2Flw">
+      <semantic:incoming>_Q3uqekZFEd-3iKqz0F2Flw</semantic:incoming>
+      <semantic:outgoing>zusLr6V90Jz7LpQR</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Ingredients available for &quot;+Math.min(tomatoe_count, cheese_count)+&quot; pizzas.&quot;</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:endEvent id="JQGlWcs51OwOryFf">
+      <semantic:incoming>zusLr6V90Jz7LpQR</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:sequenceFlow sourceRef="_F972YUZFEd-3iKqz0F2Flw" targetRef="_Q8uJwWKBEd-Q9q1HfsZXQw" id="_Q836wWKBEd-Q9q1HfsZXQw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_E94HkUZFEd-3iKqz0F2Flw" targetRef="_F972YUZFEd-3iKqz0F2Flw" id="_F-PYYUZFEd-3iKqz0F2Flw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_E94HkUZFEd-3iKqz0F2Flw" targetRef="_KBJ0MUZFEd-3iKqz0F2Flw" id="_KBJ0SkZFEd-3iKqz0F2Flw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_D-kmsUZFEd-3iKqz0F2Flw" targetRef="_E94HkUZFEd-3iKqz0F2Flw" id="_E94HmkZFEd-3iKqz0F2Flw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_Q8uJwWKBEd-Q9q1HfsZXQw" targetRef="_OwKhAUZFEd-3iKqz0F2Flw" id="_OwKhCkZFEd-3iKqz0F2Flw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_KBJ0MUZFEd-3iKqz0F2Flw" targetRef="_WOryoWKBEd-Q9q1HfsZXQw" id="_WOryqmKBEd-Q9q1HfsZXQw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_WOryoWKBEd-Q9q1HfsZXQw" targetRef="_OwKhAUZFEd-3iKqz0F2Flw" id="_PFnMkUZFEd-3iKqz0F2Flw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_OwKhAUZFEd-3iKqz0F2Flw" targetRef="_Q3uqcUZFEd-3iKqz0F2Flw" id="_Q3uqekZFEd-3iKqz0F2Flw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_Q3uqcUZFEd-3iKqz0F2Flw" targetRef="JQGlWcs51OwOryFf" id="zusLr6V90Jz7LpQR">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_BaQP10ZFEd-3iKqz0F2Flw">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_F972YUZFEd-3iKqz0F2Flw">
+        <dc:Bounds height="100.0" width="160.0" x="410.0" y="160.0"/>
+        <dc:Bounds height="100.0" width="160.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_E94HkUZFEd-3iKqz0F2Flw">
+        <dc:Bounds height="60.0" width="60.0" x="270.0" y="250.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_D-kmsUZFEd-3iKqz0F2Flw">
+        <dc:Bounds height="40.0" width="40.0" x="80.0" y="260.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_Q8uJwWKBEd-Q9q1HfsZXQw">
+        <dc:Bounds height="100.0" width="160.0" x="670.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_KBJ0MUZFEd-3iKqz0F2Flw">
+        <dc:Bounds height="100.0" width="160.0" x="410.0" y="280.0"/>
+        <dc:Bounds height="100.0" width="160.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_WOryoWKBEd-Q9q1HfsZXQw">
+        <dc:Bounds height="100.0" width="160.0" x="670.0" y="280.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_OwKhAUZFEd-3iKqz0F2Flw">
+        <dc:Bounds height="60.0" width="60.0" x="950.0" y="240.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_Q3uqcUZFEd-3iKqz0F2Flw">
+        <dc:Bounds height="100.0" width="160.0" x="1100.0" y="220.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="JQGlWcs51OwOryFf">
+        <dc:Bounds height="40.0" width="40.0" x="1380.0" y="250.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_E94HmkZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_E94HmkZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_F-PYYUZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_KBJ0SkZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_F-PYYUZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_KBJ0SkZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_Q836wWKBEd-Q9q1HfsZXQw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_Q836wWKBEd-Q9q1HfsZXQw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_WOryqmKBEd-Q9q1HfsZXQw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_WOryqmKBEd-Q9q1HfsZXQw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_Q3uqekZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_Q3uqekZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_OwKhCkZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_OwKhCkZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_PFnMkUZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_PFnMkUZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="zusLr6V90Jz7LpQR">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

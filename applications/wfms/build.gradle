@@ -1,5 +1,0 @@
-description 'The Jadex wfms applications package contains several example applications, benchmarks and testcases using workflows.'
-
-dependencies
-{
-}

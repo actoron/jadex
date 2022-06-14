@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>C4_Arguments</jadex:modelname>
+    <jadex:description>&lt;h1&gt;Inventory Process&lt;/h1&gt; The process counts items. The item type is supplied as arguments. The item count is provided as return value.</jadex:description>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
+    <jadex:arguments>
+      <jadex:argument name="item_type" type="String">
+        <jadex:description>The type of items to be counted.</jadex:description>
+        <jadex:value>&quot;all&quot;</jadex:value>
+      </jadex:argument>
+    </jadex:arguments>
+    <jadex:results>
+      <jadex:result name="item_count" type="int">
+        <jadex:description>The number of items.</jadex:description>
+      </jadex:result>
+    </jadex:results>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_VqUXF0ZCEd-3iKqz0F2Flw">
+    <semantic:task name="Write Item Count" id="_6-oscUbiEd-qm5VDdIP35A">
+      <semantic:incoming>_6-8OckbiEd-qm5VDdIP35A</semantic:incoming>
+      <semantic:outgoing>5U2r/FlxcCFRAsR4</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
+        <jadex:parameter direction="inout" name="name" type="String">&quot;item_count&quot;</jadex:parameter>
+        <jadex:parameter direction="inout" name="value" type="Object">count</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Count Items" id="_VqUXGUZCEd-3iKqz0F2Flw">
+      <semantic:incoming>y68vJLEKcDeY4FJK</semantic:incoming>
+      <semantic:outgoing>_6-8OckbiEd-qm5VDdIP35A</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="inout" name="count" type="int">(int)(Math.random()*100)</jadex:parameter>
+        <jadex:parameter direction="in" name="text" type="String">&quot;Counting &quot;+item_type+&quot;: &quot;+count</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:startEvent id="/ZFMz2Stiyad7a7h">
+      <semantic:outgoing>y68vJLEKcDeY4FJK</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:endEvent id="8b9DDrojvMI26dI5">
+      <semantic:incoming>5U2r/FlxcCFRAsR4</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:sequenceFlow sourceRef="_6-oscUbiEd-qm5VDdIP35A" targetRef="8b9DDrojvMI26dI5" id="5U2r/FlxcCFRAsR4">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_VqUXGUZCEd-3iKqz0F2Flw" targetRef="_6-oscUbiEd-qm5VDdIP35A" id="_6-8OckbiEd-qm5VDdIP35A">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="/ZFMz2Stiyad7a7h" targetRef="_VqUXGUZCEd-3iKqz0F2Flw" id="y68vJLEKcDeY4FJK">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_VqUXF0ZCEd-3iKqz0F2Flw">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_6-oscUbiEd-qm5VDdIP35A">
+        <dc:Bounds height="100.0" width="160.0" x="850.0" y="140.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_VqUXGUZCEd-3iKqz0F2Flw">
+        <dc:Bounds height="100.0" width="160.0" x="520.0" y="140.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="/ZFMz2Stiyad7a7h">
+        <dc:Bounds height="40.0" width="40.0" x="290.0" y="170.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="8b9DDrojvMI26dI5">
+        <dc:Bounds height="40.0" width="40.0" x="1130.0" y="170.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_6-8OckbiEd-qm5VDdIP35A">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_6-8OckbiEd-qm5VDdIP35A">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="y68vJLEKcDeY4FJK">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="5U2r/FlxcCFRAsR4">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

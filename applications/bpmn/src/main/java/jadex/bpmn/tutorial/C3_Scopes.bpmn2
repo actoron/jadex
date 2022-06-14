@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>C3_Scopes</jadex:modelname>
+    <jadex:description>&lt;h1&gt;Scopes&lt;/h1&gt; Process showing how to use a sub process for parameter scoping.</jadex:description>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_qiZkdzaEEd-TIJeIzj-S2A">
+    <semantic:subProcess name="Handle Shipping" id="_sMyCoTaEEd-TIJeIzj-S2A">
+      <semantic:task name="Start Shipping" id="_w3NxlzaEEd-TIJeIzj-S2A">
+        <semantic:incoming>_w3NxoDaEEd-TIJeIzj-S2A</semantic:incoming>
+        <semantic:outgoing>_w3NxrzaEEd-TIJeIzj-S2A</semantic:outgoing>
+        <semantic:extensionElements>
+          <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+          <jadex:parameter direction="inout" name="text" type="String">&quot;Shipping to: &quot;+shipto</jadex:parameter>
+        </semantic:extensionElements>
+      </semantic:task>
+      <semantic:task name="Enter Address" id="_w3NxkzaEEd-TIJeIzj-S2A">
+        <semantic:outgoing>_w3NxoDaEEd-TIJeIzj-S2A</semantic:outgoing>
+        <semantic:extensionElements>
+          <jadex:class>jadex.bpmn.runtime.task.UserInteractionTask</jadex:class>
+          <jadex:parameter direction="inout" name="address" type="String">shipto</jadex:parameter>
+        </semantic:extensionElements>
+      </semantic:task>
+      <semantic:task name="Finished" id="_w3NxmzaEEd-TIJeIzj-S2A">
+        <semantic:incoming>_w3NxrzaEEd-TIJeIzj-S2A</semantic:incoming>
+        <semantic:extensionElements>
+          <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Arrived at: &quot;+shipto</jadex:parameter>
+        </semantic:extensionElements>
+      </semantic:task>
+      <semantic:extensionElements>
+        <jadex:parameter direction="inout" name="shipto" type="String">&quot;Default Address&quot;</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:subProcess>
+    <semantic:sequenceFlow sourceRef="_w3NxlzaEEd-TIJeIzj-S2A" targetRef="_w3NxmzaEEd-TIJeIzj-S2A" id="_w3NxrzaEEd-TIJeIzj-S2A">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_w3NxkzaEEd-TIJeIzj-S2A" targetRef="_w3NxlzaEEd-TIJeIzj-S2A" id="_w3NxoDaEEd-TIJeIzj-S2A">
+      <semantic:extensionElements>
+        <jadex:parametermapping name="shipto">address</jadex:parametermapping>
+      </semantic:extensionElements>
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_qiZkdzaEEd-TIJeIzj-S2A">
+        <dc:Bounds height="600.0" width="3000.0" x="181.35159620534537" y="263.0875268894444"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_sMyCoTaEEd-TIJeIzj-S2A" isExpanded="true">
+        <dc:Bounds height="520.0" width="1210.0" x="870.0" y="40.0"/>
+        <dc:Bounds height="100.0" width="160.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_w3NxlzaEEd-TIJeIzj-S2A">
+        <dc:Bounds height="100.0" width="160.0" x="519.0" y="197.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_w3NxkzaEEd-TIJeIzj-S2A">
+        <dc:Bounds height="100.0" width="160.0" x="269.0" y="197.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_w3NxmzaEEd-TIJeIzj-S2A">
+        <dc:Bounds height="100.0" width="160.0" x="759.0" y="197.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_w3NxoDaEEd-TIJeIzj-S2A">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_w3NxrzaEEd-TIJeIzj-S2A">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

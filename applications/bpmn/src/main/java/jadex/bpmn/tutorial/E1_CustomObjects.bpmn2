@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>E1_CustomObjects</jadex:modelname>
+    <jadex:description>&lt;h1&gt;Insurance Contract&lt;/h1&gt; The process sells an insurance contract based on a business rule encoded in a custom Java object.&lt;br/&gt; High risk contracts are sold to single males of age below 40.</jadex:description>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
+    <jadex:contextvariables>
+      <jadex:contextvariable name="customer" type="Customer"/>
+    </jadex:contextvariables>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_UdVXwUcMEd-EYsKM4dybJQ">
+    <semantic:exclusiveGateway id="_5yScAUcMEd-EYsKM4dybJQ" default="_7BZ6ikcMEd-EYsKM4dybJQ">
+      <semantic:incoming>_5yScCkcMEd-EYsKM4dybJQ</semantic:incoming>
+      <semantic:outgoing>_6jTpQUcMEd-EYsKM4dybJQ</semantic:outgoing>
+      <semantic:outgoing>_7BZ6ikcMEd-EYsKM4dybJQ</semantic:outgoing>
+    </semantic:exclusiveGateway>
+    <semantic:task name="Create Customer Object" id="_s--hkUcMEd-EYsKM4dybJQ">
+      <semantic:incoming>_s--hmkcMEd-EYsKM4dybJQ</semantic:incoming>
+      <semantic:outgoing>_5yScCkcMEd-EYsKM4dybJQ</semantic:outgoing>
+    </semantic:task>
+    <semantic:task name="Input Customer Data" id="_UdVXw0cMEd-EYsKM4dybJQ">
+      <semantic:outgoing>_s--hmkcMEd-EYsKM4dybJQ</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.UserInteractionTask</jadex:class>
+        <jadex:parameter direction="out" name="name" type="String">&quot;Hans Wurst&quot;</jadex:parameter>
+        <jadex:parameter direction="out" name="gender" type="String">&quot;male&quot;</jadex:parameter>
+        <jadex:parameter direction="out" name="age" type="int">43</jadex:parameter>
+        <jadex:parameter direction="out" name="married" type="boolean">false</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Sell High Risk Contract" id="_6jKfUUcMEd-EYsKM4dybJQ">
+      <semantic:incoming>_6jTpQUcMEd-EYsKM4dybJQ</semantic:incoming>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.UserInteractionTask</jadex:class>
+        <jadex:parameter direction="in" name="customer" type="Object">customer</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Sell Standard Contract" id="_7BZ6gUcMEd-EYsKM4dybJQ">
+      <semantic:incoming>_7BZ6ikcMEd-EYsKM4dybJQ</semantic:incoming>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.UserInteractionTask</jadex:class>
+        <jadex:parameter direction="in" name="customer" type="Object">customer</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:sequenceFlow sourceRef="_5yScAUcMEd-EYsKM4dybJQ" targetRef="_6jKfUUcMEd-EYsKM4dybJQ" id="_6jTpQUcMEd-EYsKM4dybJQ">
+      <semantic:conditionExpression>customer.isRiskTaking()</semantic:conditionExpression>
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_5yScAUcMEd-EYsKM4dybJQ" targetRef="_7BZ6gUcMEd-EYsKM4dybJQ" id="_7BZ6ikcMEd-EYsKM4dybJQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_s--hkUcMEd-EYsKM4dybJQ" targetRef="_5yScAUcMEd-EYsKM4dybJQ" id="_5yScCkcMEd-EYsKM4dybJQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_UdVXw0cMEd-EYsKM4dybJQ" targetRef="_s--hkUcMEd-EYsKM4dybJQ" id="_s--hmkcMEd-EYsKM4dybJQ">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_UdVXwUcMEd-EYsKM4dybJQ">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_5yScAUcMEd-EYsKM4dybJQ">
+        <dc:Bounds height="60.0" width="60.0" x="810.0" y="280.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_s--hkUcMEd-EYsKM4dybJQ">
+        <dc:Bounds height="100.0" width="220.0" x="530.0" y="260.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_UdVXw0cMEd-EYsKM4dybJQ">
+        <dc:Bounds height="100.0" width="190.0" x="120.0" y="260.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_6jKfUUcMEd-EYsKM4dybJQ">
+        <dc:Bounds height="100.0" width="210.0" x="1100.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_7BZ6gUcMEd-EYsKM4dybJQ">
+        <dc:Bounds height="100.0" width="210.0" x="1100.0" y="380.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_s--hmkcMEd-EYsKM4dybJQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_s--hmkcMEd-EYsKM4dybJQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_5yScCkcMEd-EYsKM4dybJQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_5yScCkcMEd-EYsKM4dybJQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_6jTpQUcMEd-EYsKM4dybJQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_7BZ6ikcMEd-EYsKM4dybJQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_6jTpQUcMEd-EYsKM4dybJQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_7BZ6ikcMEd-EYsKM4dybJQ">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

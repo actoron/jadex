@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>E3_AsynchronousTask</jadex:modelname>
+    <jadex:description>&lt;h1&gt;Asynchronous checklist process&lt;/h1&gt; The process shows some parallel information requesters.&lt;br/&gt; The process terminates after all requesters have been closed.</jadex:description>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_VEGsZ04pEd-h4K8oRzpwEg">
+    <semantic:task name="Music" id="_XpCuUU4pEd-h4K8oRzpwEg">
+      <semantic:incoming>5Rjet/AaYp88zfq3</semantic:incoming>
+      <semantic:outgoing>pqmswoUKYjhG4sbL</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>AsynchronousOKTask</jadex:class>
+        <jadex:parameter direction="inout" name="message" type="String">&quot;Remember to have some good music at your party.&quot;</jadex:parameter>
+        <jadex:parameter direction="inout" name="title" type="String">&quot;Party Planner&quot;</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Drinks" id="_VEGsaU4pEd-h4K8oRzpwEg">
+      <semantic:incoming>Bx44YhIOrrqiUAQO</semantic:incoming>
+      <semantic:outgoing>8SfdvFZ3nogzDpDo</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>AsynchronousOKTask</jadex:class>
+        <jadex:parameter direction="inout" name="message" type="String">&quot;Remember to get drinks for your party.&quot;</jadex:parameter>
+        <jadex:parameter direction="inout" name="title" type="String">&quot;Party Planner&quot;</jadex:parameter>
+        <jadex:parameter direction="inout" name="y_offset" type="int">-200</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="People" id="_X53_oU4pEd-h4K8oRzpwEg">
+      <semantic:incoming>I4g9PTd1j65KjADH</semantic:incoming>
+      <semantic:outgoing>0Vr9lzDTb72lvhb4</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>AsynchronousOKTask</jadex:class>
+        <jadex:parameter direction="inout" name="message" type="String">&quot;Remember to invite nice people to your party.&quot;</jadex:parameter>
+        <jadex:parameter direction="inout" name="title" type="String">&quot;Party Planner&quot;</jadex:parameter>
+        <jadex:parameter direction="inout" name="y_offset" type="int">200</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:endEvent id="awvwFWSxBZDKhWgX">
+      <semantic:incoming>pqmswoUKYjhG4sbL</semantic:incoming>
+      <semantic:incoming>8SfdvFZ3nogzDpDo</semantic:incoming>
+      <semantic:incoming>0Vr9lzDTb72lvhb4</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:startEvent id="TssgksEhNJ32lV7/">
+      <semantic:outgoing>5Rjet/AaYp88zfq3</semantic:outgoing>
+      <semantic:outgoing>Bx44YhIOrrqiUAQO</semantic:outgoing>
+      <semantic:outgoing>I4g9PTd1j65KjADH</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:sequenceFlow sourceRef="_XpCuUU4pEd-h4K8oRzpwEg" targetRef="awvwFWSxBZDKhWgX" id="pqmswoUKYjhG4sbL">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_VEGsaU4pEd-h4K8oRzpwEg" targetRef="awvwFWSxBZDKhWgX" id="8SfdvFZ3nogzDpDo">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_X53_oU4pEd-h4K8oRzpwEg" targetRef="awvwFWSxBZDKhWgX" id="0Vr9lzDTb72lvhb4">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="TssgksEhNJ32lV7/" targetRef="_XpCuUU4pEd-h4K8oRzpwEg" id="5Rjet/AaYp88zfq3">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="TssgksEhNJ32lV7/" targetRef="_VEGsaU4pEd-h4K8oRzpwEg" id="Bx44YhIOrrqiUAQO">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="TssgksEhNJ32lV7/" targetRef="_X53_oU4pEd-h4K8oRzpwEg" id="I4g9PTd1j65KjADH">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_VEGsZ04pEd-h4K8oRzpwEg">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_XpCuUU4pEd-h4K8oRzpwEg">
+        <dc:Bounds height="100.0" width="160.0" x="590.0" y="30.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_VEGsaU4pEd-h4K8oRzpwEg">
+        <dc:Bounds height="100.0" width="160.0" x="590.0" y="140.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_X53_oU4pEd-h4K8oRzpwEg">
+        <dc:Bounds height="100.0" width="160.0" x="590.0" y="250.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="awvwFWSxBZDKhWgX">
+        <dc:Bounds height="40.0" width="40.0" x="910.0" y="170.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="TssgksEhNJ32lV7/">
+        <dc:Bounds height="40.0" width="40.0" x="340.0" y="170.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="pqmswoUKYjhG4sbL">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="8SfdvFZ3nogzDpDo">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="0Vr9lzDTb72lvhb4">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="5Rjet/AaYp88zfq3">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="Bx44YhIOrrqiUAQO">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="I4g9PTd1j65KjADH">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+
