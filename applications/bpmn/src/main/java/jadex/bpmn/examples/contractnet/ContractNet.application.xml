@@ -14,7 +14,7 @@
 	name="ContractNet" package="jadex.bpmn.examples.contractnet">
 	
 	<componenttypes>
-		<componenttype name="CNPProtocol" filename="jadex/bpmn/examples/contractnet/ContractNet.bpmn2"/>
+		<componenttype name="CNPProtocol" filename="jadex/bpmn/examples/contractnet/ContractNet.bpmn"/>
 	</componenttypes>
 	
 	<configurations>

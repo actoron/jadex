@@ -66,8 +66,8 @@ public class BpmnModelLoader extends AbstractModelLoader
 	protected ICacheableModel doLoadModel(String name, Object pojo, String[] imports, ResourceInfo info, 
 		ClassLoader classloader, Object context) throws Exception
 	{	
-		if (name != null && name.endsWith(".bpmn2"))
-		{
+//		if (name != null && name.endsWith(".bpmn2"))
+//		{
 			MBpmnModel model = SBpmnModelReader.readModel(info.getInputStream(), info.getFilename(), null, classloader);
 			IResourceIdentifier rid = (IResourceIdentifier)((Object[])context)[0];
 			if(rid==null)
@@ -80,8 +80,8 @@ public class BpmnModelLoader extends AbstractModelLoader
 			model.initModelInfo(classloader);
 			((ModelInfo)model.getModelInfo()).setType(BpmnFactory.FILETYPE_BPMNPROCESS);
 			return model;
-		}
-		return (ICacheableModel)BpmnXMLReader.read(info, classloader, (IResourceIdentifier)((Object[])context)[0],
-			(IComponentIdentifier)((Object[])context)[1]);
+//		}
+//		return (ICacheableModel)BpmnXMLReader.read(info, classloader, (IResourceIdentifier)((Object[])context)[0],
+//			(IComponentIdentifier)((Object[])context)[1]);
 	}
 }
