@@ -20,4 +20,16 @@ public interface IElement
 	 *  @return The model element.
 	 */
 	public MElement getModelElement();
+	
+	/**
+	 *  Get the id.
+	 *  @return The id.
+	 */
+	public String getId();
+	
+	/**
+	 *  Get the element count.
+	 *  @return The element count.
+	 */
+	public long getCount();
 }

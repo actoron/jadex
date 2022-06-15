@@ -156,4 +156,22 @@ public class BeliefbaseWrapper implements IMapAccess, IBeliefbase
 		
 		return setnames;
 	}
+	
+	/**
+	 *  Get the element count.
+	 *  @return The element count.
+	 */
+	public long getCount() 
+	{
+		return beliefbase.getCount();
+	}
+	
+	/**
+	 *  Get the id.
+	 *  @return The id.
+	 */
+	public String getId()
+	{
+		return beliefbase.getId();
+	}
 }

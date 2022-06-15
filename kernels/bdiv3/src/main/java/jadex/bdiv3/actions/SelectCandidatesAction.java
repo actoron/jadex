@@ -170,6 +170,16 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 							{
 								return ca;
 							}
+							
+							public long getCount() 
+							{
+								return -1;
+							}
+							
+							public String getId() 
+							{
+								return null;
+							}
 						});
 					}
 				}

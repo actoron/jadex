@@ -1,11 +1,9 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.IUndoneResultListener;
 
 /**
  *  This listener has the purpose to keep the current plan
@@ -28,7 +26,9 @@ public class BDIComponentResultListener<E>	extends ComponentResultListener<E>
 	public BDIComponentResultListener(IResultListener<E> listener, IInternalAccess component)
 	{
 		super(listener, component);
-		this.rplan = RPlan.RPLANS.get();
+		//this.rplan = RPlan.RPLANS.get();
+		//System.out.println("rplan set to: "+rplan);
+		//Thread.dumpStack();
 //		if(rplan==null)
 //			System.out.println("ash");
 	}
@@ -44,9 +44,11 @@ public class BDIComponentResultListener<E>	extends ComponentResultListener<E>
 			{
 				try
 				{
-	//				System.out.println("plan state was: "+rplan.getProcessingState());
+					//System.out.println("in plan state was: "+rplan.getProcessingState()+" "+rplan);
 					rplan.setProcessingState(PlanProcessingState.RUNNING);
-					assert RPlan.RPLANS.get()==null : RPlan.RPLANS.get()+", "+rplan;
+					if(RPlan.RPLANS.get()!=null)
+						System.out.println("bug1: "+ RPlan.RPLANS.get()+" "+rplan);
+					//assert RPlan.RPLANS.get()==null : RPlan.RPLANS.get()+", "+rplan;
 					RPlan.RPLANS.set(rplan);
 					
 					// TODO: Change to exception when aborted in mean time.
@@ -66,11 +68,18 @@ public class BDIComponentResultListener<E>	extends ComponentResultListener<E>
 						notification.run();
 					}
 				}
+				catch(Error e)
+				{
+					System.out.println("exception in bdi scheduleForward: "+ e);
+					//e.printStackTrace();
+				}
 				finally
 				{
-					//				System.out.println("setting to null "+this+" "+Thread.currentThread());
+					//System.out.println("out, setting to null "+this+" "+Thread.currentThread()+" "+rplan);
 					rplan.setProcessingState(PlanProcessingState.WAITING);
-					assert RPlan.RPLANS.get()==rplan : RPlan.RPLANS.get()+", "+rplan;
+					if(RPlan.RPLANS.get()!=rplan)
+						System.out.println("bug2: "+ RPlan.RPLANS.get()+" "+rplan);
+					//assert RPlan.RPLANS.get()==rplan : RPlan.RPLANS.get()+", "+rplan+" "+notification;
 					RPlan.RPLANS.set(null);
 				}
 			}

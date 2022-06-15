@@ -398,7 +398,7 @@ public class BDIClassReader extends MicroClassReader
 				{
 //					System.out.println("found belief: "+fields[i].getName());
 					Plan plan = getAnnotation(cls[i], Plan.class, cl);
-					getMPlan(bdimodel, plan, null, new ClassInfo(cls[i].getName()), cl, pubs);
+					getMPlan(bdimodel, plan, null, new ClassInfo(cls[i].getName()), cl, pubs, -1);
 				}
 			}
 			
@@ -409,7 +409,7 @@ public class BDIClassReader extends MicroClassReader
 				{
 //					System.out.println("found plan: "+methods[i].getName());
 					Plan p = getAnnotation(methods[i], Plan.class, cl);
-					getMPlan(bdimodel, p, new MethodInfo(methods[i]), null, cl, pubs);
+					getMPlan(bdimodel, p, new MethodInfo(methods[i]), null, cl, pubs, -1);
 				}
 			}
 			
@@ -417,9 +417,10 @@ public class BDIClassReader extends MicroClassReader
 			if(isAnnotationPresent(clazz, Plans.class, cl))
 			{
 				Plan[] plans = getAnnotation(clazz, Plans.class, cl).value();
+				int cnt = 0;
 				for(Plan p: plans)
 				{
-					getMPlan(bdimodel, p, null, null, cl, pubs);
+					getMPlan(bdimodel, p, null, null, cl, pubs, cnt++);
 				}
 			}
 			
@@ -747,7 +748,7 @@ public class BDIClassReader extends MicroClassReader
 	 * 
 	 */
 	protected MPlan getMPlan(BDIModel bdimodel, Plan p, MethodInfo mi, ClassInfo ci,
-		ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
+		ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs, int order)
 	{
 		String name = null;
 		Body body = p.body();
@@ -799,7 +800,7 @@ public class BDIClassReader extends MicroClassReader
 		
 		if(mplan==null)
 		{
-			mplan = createMPlan(bdimodel, p, mi, name, ci, cl, pubs);
+			mplan = createMPlan(bdimodel, p, mi, name, ci, cl, pubs, order);
 			bdimodel.getCapability().addPlan(mplan);
 		}
 		
@@ -807,10 +808,10 @@ public class BDIClassReader extends MicroClassReader
 	}
 	
 	/**
-	 * 
+	 *  Create a plan model.
 	 */
 	protected MPlan createMPlan(BDIModel bdimodel, Plan p, MethodInfo mi, String name,
-		ClassInfo ci, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
+		ClassInfo ci, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs, int order)
 	{		
 		Body body = p.body();
 		ServicePlan sp = body.service();
@@ -841,7 +842,7 @@ public class BDIClassReader extends MicroClassReader
 			Class<? extends IServiceParameterMapper<Object>> mapperclass = (Class<? extends IServiceParameterMapper<Object>>)(IServiceParameterMapper.class.getName().equals(sp.mapper().getName())? null: sp.mapper());
 			MBody mbody = new MBody(mi, ci, sp.name().length()==0? null: sp.name(), sp.method().length()==0? null: sp.method(), 
 				mapperclass==null? null: new ClassInfo(mapperclass), body.component().length()==0 ? null : body.component());
-			mplan = new MPlan(name, mbody, mtr, wmtr, p.priority());
+			mplan = new MPlan(name, mbody, mtr, wmtr, p.priority(), order);
 			
 			MethodInfo ccm = mbody.getContextConditionMethod(cl);
 			if(ccm!=null)
@@ -850,6 +851,7 @@ public class BDIClassReader extends MicroClassReader
 				MCondition mcond = createMethodCondition(mplan, "context", c.beliefs(), c.rawevents(), null, bdimodel, ccm.getMethod(cl), cl);
 				mplan.setContextCondition(mcond);
 			}
+			
 		}
 		
 		return mplan;
@@ -951,7 +953,7 @@ public class BDIClassReader extends MicroClassReader
 					srmappings.put(gsm.name(), new MethodInfo(m));
 				}
 			}
-			mdel = new MDeliberation(inhnames, inhms.isEmpty()? null: inhms, cardinalityone);
+			mdel = new MDeliberation(inhnames, inhms.isEmpty()? null: inhms, cardinalityone, del.droponinhibit());
 		}
 		
 		List<MParameter> params = new ArrayList<MParameter>();

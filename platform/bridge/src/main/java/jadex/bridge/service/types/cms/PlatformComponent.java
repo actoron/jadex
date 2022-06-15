@@ -1587,8 +1587,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			if(shutdown && debug)
 				PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.invoke(): "+cid+", "+method+", "+SUtil.arrayToString(args));
 
-			if(method.getName().indexOf("stepCom")!=-1)
-				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+			//if(method.getName().indexOf("stepCom")!=-1)
+			//	System.out.println("stepComponent: "+method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 			
 			Class<?> rettype = method.getReturnType();
 			

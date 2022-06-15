@@ -135,6 +135,21 @@ public abstract class RElement
 		return agent.getFeature(IInternalBDIAgentFeature.class).getRuleSystem();
 	}
 	
+	/**
+	 *  Get the element count.
+	 *  @return The element count.
+	 */
+	public long getCount()
+	{
+		long ret = -1;
+		int idx = id.indexOf("#");
+		if(idx!=-1)
+		{
+			ret = Long.parseLong(id.substring(idx+1));
+		}
+		return ret;
+	}
+	
 	/** 
 	 *  Get the string representation.
 	 */

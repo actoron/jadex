@@ -78,4 +78,22 @@ public class PlanbaseWrapper implements IPlanbase
 	{
 		return planbase.createPlan(mplan);
 	}
+	
+	/**
+	 *  Get the element count.
+	 *  @return The element count.
+	 */
+	public long getCount() 
+	{
+		return planbase.getCount();
+	}
+	
+	/**
+	 *  Get the id.
+	 *  @return The id.
+	 */
+	public String getId()
+	{
+		return planbase.getId();
+	}
 }

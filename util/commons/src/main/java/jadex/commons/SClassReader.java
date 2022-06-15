@@ -621,8 +621,6 @@ public class SClassReader
     
     /**
      *  Entity with optional annotations 
-     * @author jander
-     *
      */
     public static class AnnotatedEntity
     {
