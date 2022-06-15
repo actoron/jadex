@@ -1,66 +1,58 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>E1_CustomObjects</jadex:modelname>
     <jadex:description>&lt;h1&gt;Insurance Contract&lt;/h1&gt; The process sells an insurance contract based on a business rule encoded in a custom Java object.&lt;br/&gt; High risk contracts are sold to single males of age below 40.</jadex:description>
     <jadex:package>jadex.bpmn.tutorial</jadex:package>
     <jadex:contextvariables>
       <jadex:contextvariable name="customer" type="Customer"/>
     </jadex:contextvariables>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_UdVXwUcMEd-EYsKM4dybJQ">
-    <semantic:exclusiveGateway id="_5yScAUcMEd-EYsKM4dybJQ" default="_7BZ6ikcMEd-EYsKM4dybJQ">
-      <semantic:incoming>_5yScCkcMEd-EYsKM4dybJQ</semantic:incoming>
-      <semantic:outgoing>_6jTpQUcMEd-EYsKM4dybJQ</semantic:outgoing>
-      <semantic:outgoing>_7BZ6ikcMEd-EYsKM4dybJQ</semantic:outgoing>
-    </semantic:exclusiveGateway>
-    <semantic:task name="Create Customer Object" id="_s--hkUcMEd-EYsKM4dybJQ">
-      <semantic:incoming>_s--hmkcMEd-EYsKM4dybJQ</semantic:incoming>
-      <semantic:outgoing>_5yScCkcMEd-EYsKM4dybJQ</semantic:outgoing>
-    </semantic:task>
-    <semantic:task name="Input Customer Data" id="_UdVXw0cMEd-EYsKM4dybJQ">
-      <semantic:outgoing>_s--hmkcMEd-EYsKM4dybJQ</semantic:outgoing>
-      <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_UdVXwUcMEd-EYsKM4dybJQ" name="Pool">
+    <bpmn:exclusiveGateway default="_7BZ6ikcMEd-EYsKM4dybJQ" id="_5yScAUcMEd-EYsKM4dybJQ">
+      <bpmn:incoming>_5yScCkcMEd-EYsKM4dybJQ</bpmn:incoming>
+      <bpmn:outgoing>_6jTpQUcMEd-EYsKM4dybJQ</bpmn:outgoing>
+      <bpmn:outgoing>_7BZ6ikcMEd-EYsKM4dybJQ</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="_s--hkUcMEd-EYsKM4dybJQ" name="Create Customer Object">
+      <bpmn:incoming>_s--hmkcMEd-EYsKM4dybJQ</bpmn:incoming>
+      <bpmn:outgoing>_5yScCkcMEd-EYsKM4dybJQ</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="_UdVXw0cMEd-EYsKM4dybJQ" name="Input Customer Data">
+      <bpmn:outgoing>_s--hmkcMEd-EYsKM4dybJQ</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.UserInteractionTask</jadex:class>
         <jadex:parameter direction="out" name="name" type="String">&quot;Hans Wurst&quot;</jadex:parameter>
         <jadex:parameter direction="out" name="gender" type="String">&quot;male&quot;</jadex:parameter>
         <jadex:parameter direction="out" name="age" type="int">43</jadex:parameter>
         <jadex:parameter direction="out" name="married" type="boolean">false</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Sell High Risk Contract" id="_6jKfUUcMEd-EYsKM4dybJQ">
-      <semantic:incoming>_6jTpQUcMEd-EYsKM4dybJQ</semantic:incoming>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_6jKfUUcMEd-EYsKM4dybJQ" name="Sell High Risk Contract">
+      <bpmn:incoming>_6jTpQUcMEd-EYsKM4dybJQ</bpmn:incoming>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.UserInteractionTask</jadex:class>
         <jadex:parameter direction="in" name="customer" type="Object">customer</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Sell Standard Contract" id="_7BZ6gUcMEd-EYsKM4dybJQ">
-      <semantic:incoming>_7BZ6ikcMEd-EYsKM4dybJQ</semantic:incoming>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_7BZ6gUcMEd-EYsKM4dybJQ" name="Sell Standard Contract">
+      <bpmn:incoming>_7BZ6ikcMEd-EYsKM4dybJQ</bpmn:incoming>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.UserInteractionTask</jadex:class>
         <jadex:parameter direction="in" name="customer" type="Object">customer</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:sequenceFlow sourceRef="_5yScAUcMEd-EYsKM4dybJQ" targetRef="_6jKfUUcMEd-EYsKM4dybJQ" id="_6jTpQUcMEd-EYsKM4dybJQ">
-      <semantic:conditionExpression>customer.isRiskTaking()</semantic:conditionExpression>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_5yScAUcMEd-EYsKM4dybJQ" targetRef="_7BZ6gUcMEd-EYsKM4dybJQ" id="_7BZ6ikcMEd-EYsKM4dybJQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_s--hkUcMEd-EYsKM4dybJQ" targetRef="_5yScAUcMEd-EYsKM4dybJQ" id="_5yScCkcMEd-EYsKM4dybJQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_UdVXw0cMEd-EYsKM4dybJQ" targetRef="_s--hkUcMEd-EYsKM4dybJQ" id="_s--hmkcMEd-EYsKM4dybJQ">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="_6jTpQUcMEd-EYsKM4dybJQ" sourceRef="_5yScAUcMEd-EYsKM4dybJQ" targetRef="_6jKfUUcMEd-EYsKM4dybJQ">
+      <bpmn:conditionExpression>customer.isRiskTaking()</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_7BZ6ikcMEd-EYsKM4dybJQ" sourceRef="_5yScAUcMEd-EYsKM4dybJQ" targetRef="_7BZ6gUcMEd-EYsKM4dybJQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_5yScCkcMEd-EYsKM4dybJQ" sourceRef="_s--hkUcMEd-EYsKM4dybJQ" targetRef="_5yScAUcMEd-EYsKM4dybJQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_s--hmkcMEd-EYsKM4dybJQ" sourceRef="_UdVXw0cMEd-EYsKM4dybJQ" targetRef="_s--hkUcMEd-EYsKM4dybJQ">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_UdVXwUcMEd-EYsKM4dybJQ">
@@ -83,15 +75,7 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_s--hmkcMEd-EYsKM4dybJQ">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_s--hmkcMEd-EYsKM4dybJQ">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_5yScCkcMEd-EYsKM4dybJQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_5yScCkcMEd-EYsKM4dybJQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_6jTpQUcMEd-EYsKM4dybJQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_7BZ6ikcMEd-EYsKM4dybJQ">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_6jTpQUcMEd-EYsKM4dybJQ">
       </bpmndi:BPMNEdge>
@@ -99,5 +83,4 @@
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

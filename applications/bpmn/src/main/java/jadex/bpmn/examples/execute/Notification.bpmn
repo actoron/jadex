@@ -1,51 +1,43 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>Notification</jadex:modelname>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_H3j4B9XXEd6ZgonVFJzeWg">
-    <semantic:task name="Before Wait" id="_H3j4CdXXEd6ZgonVFJzeWg">
-      <semantic:incoming>_Dw4jQdXnEd6ZgonVFJzeWg</semantic:incoming>
-      <semantic:outgoing>_MdF4t9XXEd6ZgonVFJzeWg</semantic:outgoing>
-    </semantic:task>
-    <semantic:task name="After Wait" id="_PHtE0dXXEd6ZgonVFJzeWg">
-      <semantic:incoming>_PH2OwdXXEd6ZgonVFJzeWg</semantic:incoming>
-      <semantic:outgoing>_E5Jy4dXnEd6ZgonVFJzeWg</semantic:outgoing>
-    </semantic:task>
-    <semantic:startEvent id="_DNIV8dXnEd6ZgonVFJzeWg">
-      <semantic:outgoing>_Dw4jQdXnEd6ZgonVFJzeWg</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:intermediateCatchEvent name="Wait for Signal" id="_Mc8uwdXXEd6ZgonVFJzeWg">
-      <semantic:incoming>_MdF4t9XXEd6ZgonVFJzeWg</semantic:incoming>
-      <semantic:outgoing>_PH2OwdXXEd6ZgonVFJzeWg</semantic:outgoing>
-      <semantic:signalEventDefinition/>
-      <semantic:extensionElements>
+    <jadex:componentflags keepalive="false" monitoring="OFF" suspend="false" synchronous="false"/>
+  </bpmn:extension>
+  <bpmn:process id="_H3j4B9XXEd6ZgonVFJzeWg" name="Pool">
+    <bpmn:task id="_H3j4CdXXEd6ZgonVFJzeWg" name="Before Wait">
+      <bpmn:incoming>_Dw4jQdXnEd6ZgonVFJzeWg</bpmn:incoming>
+      <bpmn:outgoing>_MdF4t9XXEd6ZgonVFJzeWg</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="_PHtE0dXXEd6ZgonVFJzeWg" name="After Wait">
+      <bpmn:incoming>_PH2OwdXXEd6ZgonVFJzeWg</bpmn:incoming>
+      <bpmn:outgoing>_E5Jy4dXnEd6ZgonVFJzeWg</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:startEvent id="_DNIV8dXnEd6ZgonVFJzeWg">
+      <bpmn:outgoing>_Dw4jQdXnEd6ZgonVFJzeWg</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:intermediateCatchEvent id="_Mc8uwdXXEd6ZgonVFJzeWg" name="Wait for Signal">
+      <bpmn:incoming>_MdF4t9XXEd6ZgonVFJzeWg</bpmn:incoming>
+      <bpmn:outgoing>_PH2OwdXXEd6ZgonVFJzeWg</bpmn:outgoing>
+      <bpmn:signalEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="externalnotifier">new NotifierFrame()</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateCatchEvent>
-    <semantic:endEvent id="_E5AB4dXnEd6ZgonVFJzeWg">
-      <semantic:incoming>_E5Jy4dXnEd6ZgonVFJzeWg</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:sequenceFlow sourceRef="_H3j4CdXXEd6ZgonVFJzeWg" targetRef="_Mc8uwdXXEd6ZgonVFJzeWg" id="_MdF4t9XXEd6ZgonVFJzeWg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_PHtE0dXXEd6ZgonVFJzeWg" targetRef="_E5AB4dXnEd6ZgonVFJzeWg" id="_E5Jy4dXnEd6ZgonVFJzeWg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_DNIV8dXnEd6ZgonVFJzeWg" targetRef="_H3j4CdXXEd6ZgonVFJzeWg" id="_Dw4jQdXnEd6ZgonVFJzeWg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_Mc8uwdXXEd6ZgonVFJzeWg" targetRef="_PHtE0dXXEd6ZgonVFJzeWg" id="_PH2OwdXXEd6ZgonVFJzeWg">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="_E5AB4dXnEd6ZgonVFJzeWg">
+      <bpmn:incoming>_E5Jy4dXnEd6ZgonVFJzeWg</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="_MdF4t9XXEd6ZgonVFJzeWg" sourceRef="_H3j4CdXXEd6ZgonVFJzeWg" targetRef="_Mc8uwdXXEd6ZgonVFJzeWg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_E5Jy4dXnEd6ZgonVFJzeWg" sourceRef="_PHtE0dXXEd6ZgonVFJzeWg" targetRef="_E5AB4dXnEd6ZgonVFJzeWg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_Dw4jQdXnEd6ZgonVFJzeWg" sourceRef="_DNIV8dXnEd6ZgonVFJzeWg" targetRef="_H3j4CdXXEd6ZgonVFJzeWg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_PH2OwdXXEd6ZgonVFJzeWg" sourceRef="_Mc8uwdXXEd6ZgonVFJzeWg" targetRef="_PHtE0dXXEd6ZgonVFJzeWg">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_H3j4B9XXEd6ZgonVFJzeWg">
@@ -68,21 +60,12 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_MdF4t9XXEd6ZgonVFJzeWg">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_MdF4t9XXEd6ZgonVFJzeWg">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_PH2OwdXXEd6ZgonVFJzeWg">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_PH2OwdXXEd6ZgonVFJzeWg">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_E5Jy4dXnEd6ZgonVFJzeWg">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_E5Jy4dXnEd6ZgonVFJzeWg">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_Dw4jQdXnEd6ZgonVFJzeWg">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_Dw4jQdXnEd6ZgonVFJzeWg">
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

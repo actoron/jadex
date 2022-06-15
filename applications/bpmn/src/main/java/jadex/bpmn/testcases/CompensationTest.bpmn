@@ -1,13 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>CompensationTest</jadex:modelname>
     <jadex:description>Task compensation after component kill</jadex:description>
     <jadex:package>jadex.bpmn.testcases</jadex:package>
@@ -20,28 +12,28 @@
       <jadex:configuration name="Pool">
       </jadex:configuration>
     </jadex:configurations>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_ARn8UZgKEeChsdIjfm9JaA">
-    <semantic:startEvent id="_Hc0iQZgLEeChsdIjfm9JaA">
-      <semantic:outgoing>_KKY7wZgLEeChsdIjfm9JaA</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:endEvent id="_JjKjsZgLEeChsdIjfm9JaA">
-      <semantic:incoming>_KlF6wZgLEeChsdIjfm9JaA</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:task name="Compensation Task" id="_ARojYZgKEeChsdIjfm9JaA">
-      <semantic:incoming>_KKY7wZgLEeChsdIjfm9JaA</semantic:incoming>
-      <semantic:outgoing>_KlF6wZgLEeChsdIjfm9JaA</semantic:outgoing>
-      <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_ARn8UZgKEeChsdIjfm9JaA" name="Pool">
+    <bpmn:startEvent id="_Hc0iQZgLEeChsdIjfm9JaA">
+      <bpmn:outgoing>_KKY7wZgLEeChsdIjfm9JaA</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="_JjKjsZgLEeChsdIjfm9JaA">
+      <bpmn:incoming>_KlF6wZgLEeChsdIjfm9JaA</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="_ARojYZgKEeChsdIjfm9JaA" name="Compensation Task">
+      <bpmn:incoming>_KKY7wZgLEeChsdIjfm9JaA</bpmn:incoming>
+      <bpmn:outgoing>_KlF6wZgLEeChsdIjfm9JaA</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.testcases.CompensationTestTask</jadex:class>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:sequenceFlow sourceRef="_Hc0iQZgLEeChsdIjfm9JaA" targetRef="_ARojYZgKEeChsdIjfm9JaA" id="_KKY7wZgLEeChsdIjfm9JaA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_ARojYZgKEeChsdIjfm9JaA" targetRef="_JjKjsZgLEeChsdIjfm9JaA" id="_KlF6wZgLEeChsdIjfm9JaA">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="_KKY7wZgLEeChsdIjfm9JaA" sourceRef="_Hc0iQZgLEeChsdIjfm9JaA" targetRef="_ARojYZgKEeChsdIjfm9JaA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_KlF6wZgLEeChsdIjfm9JaA" sourceRef="_ARojYZgKEeChsdIjfm9JaA" targetRef="_JjKjsZgLEeChsdIjfm9JaA">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_ARn8UZgKEeChsdIjfm9JaA">
@@ -58,13 +50,8 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_KlF6wZgLEeChsdIjfm9JaA">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_KlF6wZgLEeChsdIjfm9JaA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_KKY7wZgLEeChsdIjfm9JaA">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_KKY7wZgLEeChsdIjfm9JaA">
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

@@ -1,131 +1,123 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>ConditionEventStart</jadex:modelname>
     <jadex:package>jadex.platform.service.processengine</jadex:package>
-    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags keepalive="false" monitoring="OFF" suspend="false" synchronous="false"/>
     <jadex:results>
       <jadex:result name="result" type="String">
         <jadex:description>&quot;The result&quot;</jadex:description>
       </jadex:result>
     </jadex:results>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_BlPWQScvEeKSvNRxWcVdjQ">
-    <semantic:task name="B1" id="_9UeqoSf9EeKVjbAWuDmuDw">
-      <semantic:incoming>_9Ul_YSf9EeKVjbAWuDmuDw</semantic:incoming>
-      <semantic:outgoing>_Gh4vMSgbEeK-VrV1qXeZuQ</semantic:outgoing>
-      <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_BlPWQScvEeKSvNRxWcVdjQ" name="Pool">
+    <bpmn:task id="_9UeqoSf9EeKVjbAWuDmuDw" name="B1">
+      <bpmn:incoming>_9Ul_YSf9EeKVjbAWuDmuDw</bpmn:incoming>
+      <bpmn:outgoing>_Gh4vMSgbEeK-VrV1qXeZuQ</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="String">&quot;Process started B1: &quot;+$event+&quot; &quot;+$component.getId()</jadex:parameter>
         <jadex:parameter direction="out" name="act" type="String">&quot;b1&quot;</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="B2" id="_NoymoSf-EeKVjbAWuDmuDw">
-      <semantic:incoming>_No57YSf-EeKVjbAWuDmuDw</semantic:incoming>
-      <semantic:outgoing>_G1uRMSgbEeK-VrV1qXeZuQ</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_NoymoSf-EeKVjbAWuDmuDw" name="B2">
+      <bpmn:incoming>_No57YSf-EeKVjbAWuDmuDw</bpmn:incoming>
+      <bpmn:outgoing>_G1uRMSgbEeK-VrV1qXeZuQ</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="String">&quot;Process started B2: &quot;+$event+&quot; &quot;+$component.getId()</jadex:parameter>
         <jadex:parameter direction="out" name="act" type="String">&quot;b2&quot;</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="A1" id="_BlP9UScvEeKSvNRxWcVdjQ">
-      <semantic:incoming>_FPokYScvEeKSvNRxWcVdjQ</semantic:incoming>
-      <semantic:outgoing>_MEdcYSgaEeKVjbAWuDmuDw</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_BlP9UScvEeKSvNRxWcVdjQ" name="A1">
+      <bpmn:incoming>_FPokYScvEeKSvNRxWcVdjQ</bpmn:incoming>
+      <bpmn:outgoing>_MEdcYSgaEeKVjbAWuDmuDw</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="String">&quot;Process started A1: &quot;+$event+&quot; &quot;+$component.getId()</jadex:parameter>
         <jadex:parameter direction="out" name="act" type="String">&quot;a1&quot;</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="A2" id="_XRD1wSdsEeKVjbAWuDmuDw">
-      <semantic:incoming>_XRLxkSdsEeKVjbAWuDmuDw</semantic:incoming>
-      <semantic:outgoing>_GI4ZUCgbEeK-VrV1qXeZuQ</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_XRD1wSdsEeKVjbAWuDmuDw" name="A2">
+      <bpmn:incoming>_XRLxkSdsEeKVjbAWuDmuDw</bpmn:incoming>
+      <bpmn:outgoing>_GI4ZUCgbEeK-VrV1qXeZuQ</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="String">&quot;Process started A2: &quot;+$event+&quot; &quot;+$component.getId()</jadex:parameter>
         <jadex:parameter direction="out" name="act" type="String">&quot;a2&quot;</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:startEvent id="_EnQ80ScvEeKSvNRxWcVdjQ">
-      <semantic:outgoing>_FPokYScvEeKSvNRxWcVdjQ</semantic:outgoing>
-      <semantic:conditionalEventDefinition/>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:startEvent id="_EnQ80ScvEeKSvNRxWcVdjQ">
+      <bpmn:outgoing>_FPokYScvEeKSvNRxWcVdjQ</bpmn:outgoing>
+      <bpmn:conditionalEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="notifier">&quot;file_added; $event.getContent()&quot;</jadex:property>
         <jadex:property name="eventtypes">new java.lang.String[]{&quot;file_added&quot;}</jadex:property>
         <jadex:property name="condition">$event.getContent()</jadex:property>
-      </semantic:extensionElements>
-    </semantic:startEvent>
-    <semantic:startEvent id="_VBdxsSdsEeKVjbAWuDmuDw">
-      <semantic:outgoing>_XRLxkSdsEeKVjbAWuDmuDw</semantic:outgoing>
-      <semantic:conditionalEventDefinition/>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:startEvent>
+    <bpmn:startEvent id="_VBdxsSdsEeKVjbAWuDmuDw">
+      <bpmn:outgoing>_XRLxkSdsEeKVjbAWuDmuDw</bpmn:outgoing>
+      <bpmn:conditionalEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="notifier">&quot;file_added; !$event.getContent()&quot;</jadex:property>
         <jadex:property name="eventtypes">new java.lang.String[]{&quot;file_added&quot;}</jadex:property>
         <jadex:property name="condition">!$event.getContent()</jadex:property>
-      </semantic:extensionElements>
-    </semantic:startEvent>
-    <semantic:startEvent id="_7aMIMSf9EeKVjbAWuDmuDw">
-      <semantic:outgoing>_9Ul_YSf9EeKVjbAWuDmuDw</semantic:outgoing>
-      <semantic:conditionalEventDefinition/>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:startEvent>
+    <bpmn:startEvent id="_7aMIMSf9EeKVjbAWuDmuDw">
+      <bpmn:outgoing>_9Ul_YSf9EeKVjbAWuDmuDw</bpmn:outgoing>
+      <bpmn:conditionalEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="notifier">&quot;file_removed; $event.getContent()&quot;</jadex:property>
         <jadex:property name="eventtypes">new java.lang.String[]{&quot;file_removed&quot;}</jadex:property>
         <jadex:property name="condition">$event.getContent()</jadex:property>
-      </semantic:extensionElements>
-    </semantic:startEvent>
-    <semantic:startEvent id="_NOFnoCf-EeKVjbAWuDmuDw">
-      <semantic:outgoing>_No57YSf-EeKVjbAWuDmuDw</semantic:outgoing>
-      <semantic:conditionalEventDefinition/>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:startEvent>
+    <bpmn:startEvent id="_NOFnoCf-EeKVjbAWuDmuDw">
+      <bpmn:outgoing>_No57YSf-EeKVjbAWuDmuDw</bpmn:outgoing>
+      <bpmn:conditionalEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="notifier">&quot;file_removed; !$event.getContent()&quot;</jadex:property>
         <jadex:property name="eventtypes">new java.lang.String[]{&quot;file_removed&quot;}</jadex:property>
         <jadex:property name="condition">!$event.getContent()</jadex:property>
-      </semantic:extensionElements>
-    </semantic:startEvent>
-    <semantic:endEvent id="_GFQk0ScvEeKSvNRxWcVdjQ">
-      <semantic:incoming>_lRaCgSdVEeKVjbAWuDmuDw</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:task name="Write" id="_KNFEASgaEeKVjbAWuDmuDw">
-      <semantic:incoming>_MEdcYSgaEeKVjbAWuDmuDw</semantic:incoming>
-      <semantic:incoming>_GI4ZUCgbEeK-VrV1qXeZuQ</semantic:incoming>
-      <semantic:incoming>_Gh4vMSgbEeK-VrV1qXeZuQ</semantic:incoming>
-      <semantic:incoming>_G1uRMSgbEeK-VrV1qXeZuQ</semantic:incoming>
-      <semantic:outgoing>_lRaCgSdVEeKVjbAWuDmuDw</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="_GFQk0ScvEeKSvNRxWcVdjQ">
+      <bpmn:incoming>_lRaCgSdVEeKVjbAWuDmuDw</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="_KNFEASgaEeKVjbAWuDmuDw" name="Write">
+      <bpmn:incoming>_MEdcYSgaEeKVjbAWuDmuDw</bpmn:incoming>
+      <bpmn:incoming>_GI4ZUCgbEeK-VrV1qXeZuQ</bpmn:incoming>
+      <bpmn:incoming>_Gh4vMSgbEeK-VrV1qXeZuQ</bpmn:incoming>
+      <bpmn:incoming>_G1uRMSgbEeK-VrV1qXeZuQ</bpmn:incoming>
+      <bpmn:outgoing>_lRaCgSdVEeKVjbAWuDmuDw</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
         <jadex:parameter direction="in" name="name" type="String">&quot;result&quot;</jadex:parameter>
         <jadex:parameter direction="in" name="value" type="String">act</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:sequenceFlow sourceRef="_9UeqoSf9EeKVjbAWuDmuDw" targetRef="_KNFEASgaEeKVjbAWuDmuDw" id="_Gh4vMSgbEeK-VrV1qXeZuQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_NoymoSf-EeKVjbAWuDmuDw" targetRef="_KNFEASgaEeKVjbAWuDmuDw" id="_G1uRMSgbEeK-VrV1qXeZuQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_BlP9UScvEeKSvNRxWcVdjQ" targetRef="_KNFEASgaEeKVjbAWuDmuDw" id="_MEdcYSgaEeKVjbAWuDmuDw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_XRD1wSdsEeKVjbAWuDmuDw" targetRef="_KNFEASgaEeKVjbAWuDmuDw" id="_GI4ZUCgbEeK-VrV1qXeZuQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_EnQ80ScvEeKSvNRxWcVdjQ" targetRef="_BlP9UScvEeKSvNRxWcVdjQ" id="_FPokYScvEeKSvNRxWcVdjQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_VBdxsSdsEeKVjbAWuDmuDw" targetRef="_XRD1wSdsEeKVjbAWuDmuDw" id="_XRLxkSdsEeKVjbAWuDmuDw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_7aMIMSf9EeKVjbAWuDmuDw" targetRef="_9UeqoSf9EeKVjbAWuDmuDw" id="_9Ul_YSf9EeKVjbAWuDmuDw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_NOFnoCf-EeKVjbAWuDmuDw" targetRef="_NoymoSf-EeKVjbAWuDmuDw" id="_No57YSf-EeKVjbAWuDmuDw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_KNFEASgaEeKVjbAWuDmuDw" targetRef="_GFQk0ScvEeKSvNRxWcVdjQ" id="_lRaCgSdVEeKVjbAWuDmuDw">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="_Gh4vMSgbEeK-VrV1qXeZuQ" sourceRef="_9UeqoSf9EeKVjbAWuDmuDw" targetRef="_KNFEASgaEeKVjbAWuDmuDw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_G1uRMSgbEeK-VrV1qXeZuQ" sourceRef="_NoymoSf-EeKVjbAWuDmuDw" targetRef="_KNFEASgaEeKVjbAWuDmuDw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_MEdcYSgaEeKVjbAWuDmuDw" sourceRef="_BlP9UScvEeKSvNRxWcVdjQ" targetRef="_KNFEASgaEeKVjbAWuDmuDw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_GI4ZUCgbEeK-VrV1qXeZuQ" sourceRef="_XRD1wSdsEeKVjbAWuDmuDw" targetRef="_KNFEASgaEeKVjbAWuDmuDw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_FPokYScvEeKSvNRxWcVdjQ" sourceRef="_EnQ80ScvEeKSvNRxWcVdjQ" targetRef="_BlP9UScvEeKSvNRxWcVdjQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_XRLxkSdsEeKVjbAWuDmuDw" sourceRef="_VBdxsSdsEeKVjbAWuDmuDw" targetRef="_XRD1wSdsEeKVjbAWuDmuDw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_9Ul_YSf9EeKVjbAWuDmuDw" sourceRef="_7aMIMSf9EeKVjbAWuDmuDw" targetRef="_9UeqoSf9EeKVjbAWuDmuDw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_No57YSf-EeKVjbAWuDmuDw" sourceRef="_NOFnoCf-EeKVjbAWuDmuDw" targetRef="_NoymoSf-EeKVjbAWuDmuDw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_lRaCgSdVEeKVjbAWuDmuDw" sourceRef="_KNFEASgaEeKVjbAWuDmuDw" targetRef="_GFQk0ScvEeKSvNRxWcVdjQ">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_BlPWQScvEeKSvNRxWcVdjQ">
@@ -163,41 +155,22 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_MEdcYSgaEeKVjbAWuDmuDw">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_MEdcYSgaEeKVjbAWuDmuDw">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_FPokYScvEeKSvNRxWcVdjQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_FPokYScvEeKSvNRxWcVdjQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_XRLxkSdsEeKVjbAWuDmuDw">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_XRLxkSdsEeKVjbAWuDmuDw">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_GI4ZUCgbEeK-VrV1qXeZuQ">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_GI4ZUCgbEeK-VrV1qXeZuQ">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_9Ul_YSf9EeKVjbAWuDmuDw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_9Ul_YSf9EeKVjbAWuDmuDw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_Gh4vMSgbEeK-VrV1qXeZuQ">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_Gh4vMSgbEeK-VrV1qXeZuQ">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_No57YSf-EeKVjbAWuDmuDw">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_No57YSf-EeKVjbAWuDmuDw">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_G1uRMSgbEeK-VrV1qXeZuQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_G1uRMSgbEeK-VrV1qXeZuQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_lRaCgSdVEeKVjbAWuDmuDw">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_lRaCgSdVEeKVjbAWuDmuDw">
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

@@ -1,49 +1,41 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>E4_AsynchronousResultTask</jadex:modelname>
     <jadex:description>&lt;h1&gt;Example of an asynchronous task with result&lt;/h1&gt; The first task asynchronously obtains the platform time. The second task prints the time value.</jadex:description>
     <jadex:package>jadex.bpmn.tutorial</jadex:package>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_6jEJkezMEd-WKtPyeGR0pg">
-    <semantic:task name="Print Time" id="_QxsH4ezNEd-WKtPyeGR0pg">
-      <semantic:incoming>_Qx1R0ezNEd-WKtPyeGR0pg</semantic:incoming>
-      <semantic:outgoing>qsYO6oeTj9pbqWyp</semantic:outgoing>
-      <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_6jEJkezMEd-WKtPyeGR0pg" name="Pool">
+    <bpmn:task id="_QxsH4ezNEd-WKtPyeGR0pg" name="Print Time">
+      <bpmn:incoming>_Qx1R0ezNEd-WKtPyeGR0pg</bpmn:incoming>
+      <bpmn:outgoing>qsYO6oeTj9pbqWyp</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Time is: &quot;+time</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Get Time" id="_6jg1gezMEd-WKtPyeGR0pg">
-      <semantic:incoming>+sVE/dU8vmSnm33F</semantic:incoming>
-      <semantic:outgoing>_Qx1R0ezNEd-WKtPyeGR0pg</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_6jg1gezMEd-WKtPyeGR0pg" name="Get Time">
+      <bpmn:incoming>+sVE/dU8vmSnm33F</bpmn:incoming>
+      <bpmn:outgoing>_Qx1R0ezNEd-WKtPyeGR0pg</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>GetTimeTask</jadex:class>
         <jadex:parameter direction="out" name="time" type="long"/>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:startEvent id="GrJ9/eXU054UJBIU">
-      <semantic:outgoing>+sVE/dU8vmSnm33F</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:endEvent id="icgLoFZQ+DgK/bQy">
-      <semantic:incoming>qsYO6oeTj9pbqWyp</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:sequenceFlow sourceRef="_QxsH4ezNEd-WKtPyeGR0pg" targetRef="icgLoFZQ+DgK/bQy" id="qsYO6oeTj9pbqWyp">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_6jg1gezMEd-WKtPyeGR0pg" targetRef="_QxsH4ezNEd-WKtPyeGR0pg" id="_Qx1R0ezNEd-WKtPyeGR0pg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="GrJ9/eXU054UJBIU" targetRef="_6jg1gezMEd-WKtPyeGR0pg" id="+sVE/dU8vmSnm33F">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:startEvent id="GrJ9/eXU054UJBIU">
+      <bpmn:outgoing>+sVE/dU8vmSnm33F</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="icgLoFZQ+DgK/bQy">
+      <bpmn:incoming>qsYO6oeTj9pbqWyp</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="qsYO6oeTj9pbqWyp" sourceRef="_QxsH4ezNEd-WKtPyeGR0pg" targetRef="icgLoFZQ+DgK/bQy">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_Qx1R0ezNEd-WKtPyeGR0pg" sourceRef="_6jg1gezMEd-WKtPyeGR0pg" targetRef="_QxsH4ezNEd-WKtPyeGR0pg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="+sVE/dU8vmSnm33F" sourceRef="GrJ9/eXU054UJBIU" targetRef="_6jg1gezMEd-WKtPyeGR0pg">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_6jEJkezMEd-WKtPyeGR0pg">
@@ -63,13 +55,10 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_Qx1R0ezNEd-WKtPyeGR0pg">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_Qx1R0ezNEd-WKtPyeGR0pg">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="+sVE/dU8vmSnm33F">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="qsYO6oeTj9pbqWyp">
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

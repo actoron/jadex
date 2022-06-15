@@ -541,14 +541,14 @@ public class BpmnEditorWindow extends JFrame
 		if (!file.getName().endsWith(".bpmn2") &&
 				!file.getName().endsWith(".bpmn"))
 		{
-			File tmpfile = new File(file.getAbsolutePath() + ".bpmn2");
+			File tmpfile = new File(file.getAbsolutePath() + ".bpmn");
 			if (tmpfile.exists())
 			{
 				file = tmpfile;
 			}
 			else
 			{
-				file = new File(file.getAbsolutePath() + ".bpmn");
+				file = new File(file.getAbsolutePath() + ".bpmn2");
 			}
 		}
 		
@@ -566,7 +566,7 @@ public class BpmnEditorWindow extends JFrame
 		BpmnGraph graph = new BpmnGraph(modelcontainer, sheet);
 		
 		MBpmnModel mmodel = null;
-		if (file.getName().endsWith("bpmn2"))
+//		if (file.getName().endsWith("bpmn2"))
 		{
 			BpmnVisualModelReader vreader = new BpmnVisualModelReader(graph);
 			graph.deactivate();
@@ -577,14 +577,14 @@ public class BpmnEditorWindow extends JFrame
 			graph.setEventsEnabled(true);
 			graph.activate();
 		}
-		else
-		{
-			try(ResourceInfo rinfo = new ResourceInfo(file.getAbsolutePath(), new FileInputStream(file), file.lastModified()))
-			{
-				mmodel = BpmnXMLReader.read(rinfo, BpmnMenuBar.class.getClassLoader(), new ResourceIdentifier(), null);
-				(new BpmnVisualModelGenerator(mmodel)).generateModel(graph);
-			}
-		}
+//		else
+//		{
+//			try(ResourceInfo rinfo = new ResourceInfo(file.getAbsolutePath(), new FileInputStream(file), file.lastModified()))
+//			{
+//				mmodel = BpmnXMLReader.read(rinfo, BpmnMenuBar.class.getClassLoader(), new ResourceIdentifier(), null);
+//				(new BpmnVisualModelGenerator(mmodel)).generateModel(graph);
+//			}
+//		}
 		
 		modelcontainer.setGraph(graph);
 		modelcontainer.setBpmnModel(mmodel);

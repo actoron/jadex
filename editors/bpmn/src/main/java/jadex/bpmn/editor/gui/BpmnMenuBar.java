@@ -475,10 +475,12 @@ public class BpmnMenuBar extends JMenuBar
 				}
 				
 				BetterFileChooser fc = new BetterFileChooser(curfile);
-				FileFilter filter2 = new FileNameExtensionFilter(BpmnEditor.getString("BPMN model file"), "bpmn2");
+				FileFilter filter2 = new FileNameExtensionFilter(BpmnEditor.getString("BPMN model file"), "bpmn");
 				fc.addChoosableFileFilter(filter2);
-				FileFilter filter = new FileNameExtensionFilter(BpmnEditor.getString("Legacy BPMN model file"), "bpmn");
+				FileFilter filter = new FileNameExtensionFilter(BpmnEditor.getString("BPMN model file"), "bpmn2");
 				fc.addChoosableFileFilter(filter);
+//				FileFilter filter = new FileNameExtensionFilter(BpmnEditor.getString("Legacy BPMN model file"), "bpmn");
+//				fc.addChoosableFileFilter(filter);
 				fc.setFileFilter(filter2);
 				int result = fc.showOpenDialog(getParent());
 				if (JFileChooser.APPROVE_OPTION == result)
@@ -526,7 +528,7 @@ public class BpmnMenuBar extends JMenuBar
 				ModelContainer modelcontainer = editorwindow.getSelectedModelContainer();
 				if (modelcontainer != null)
 				{
-					if (modelcontainer.getFile() != null && modelcontainer.getFile().getName().endsWith(".bpmn2"))
+					if (modelcontainer.getFile() != null && modelcontainer.getFile().getName().endsWith(".bpmn"))
 					{
 						try
 						{
@@ -747,7 +749,7 @@ public class BpmnMenuBar extends JMenuBar
 			((BasePropertyPanel) modelcontainer.getPropertyPanel()).terminate();
 			
 			BetterFileChooser fc = new BetterFileChooser(modelcontainer.getFile());
-			FileFilter filter = new FileNameExtensionFilter("BPMN model file (*.bpmn2)", "bpmn2");
+			FileFilter filter = new FileNameExtensionFilter("BPMN model file (*.bpmn)", "bpmn");
 			fc.addChoosableFileFilter(filter);
 			fc.setFileFilter(filter);
 			fc.setAcceptAllFileFilterUsed(false);

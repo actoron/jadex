@@ -1,19 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>NFServiceFlow</jadex:modelname>
     <jadex:providedservices>
-      <jadex:providedservice name="aser" interface="jadex.bpmn.examples.nfprops.IAService" class="jadex.bpmn.examples.nfprops.AService" proxytype="decoupled"/>
+      <jadex:providedservice class="jadex.bpmn.examples.nfprops.AService" interface="jadex.bpmn.examples.nfprops.IAService" name="aser" proxytype="decoupled"/>
     </jadex:providedservices>
     <jadex:requiredservices>
-      <jadex:requiredservice name="aser" interface="jadex.bpmn.examples.nfprops.IAService" multi="true" scope="platform" dynamic="true" create="false"/>
+      <jadex:requiredservice create="false" dynamic="true" interface="jadex.bpmn.examples.nfprops.IAService" multi="true" name="aser" scope="platform"/>
     </jadex:requiredservices>
     <jadex:configurations>
       <jadex:configuration name="default">
@@ -21,62 +13,62 @@
       <jadex:configuration name="only service user">
       </jadex:configuration>
     </jadex:configurations>
-  </semantic:extension>
-  <semantic:process name="Pool" id="qem4RVqaTvHARCR2">
-    <semantic:startEvent id="zait5KWxNKxr6m2U">
-      <semantic:outgoing>KmJy/PwMDTQOJSmG</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:intermediateCatchEvent id="hTVbHWUJszFCG4cS">
-      <semantic:incoming>EZtVjFUlhql3UeS+</semantic:incoming>
-      <semantic:outgoing>HahXfefD1HgdKs55</semantic:outgoing>
-      <semantic:timerEventDefinition>
-        <semantic:timeDuration>1000</semantic:timeDuration>
-      </semantic:timerEventDefinition>
-      <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="qem4RVqaTvHARCR2" name="Pool">
+    <bpmn:startEvent id="zait5KWxNKxr6m2U">
+      <bpmn:outgoing>KmJy/PwMDTQOJSmG</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:intermediateCatchEvent id="hTVbHWUJszFCG4cS">
+      <bpmn:incoming>EZtVjFUlhql3UeS+</bpmn:incoming>
+      <bpmn:outgoing>HahXfefD1HgdKs55</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration>1000</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+      <bpmn:extensionElements>
         <jadex:property name="duration" type="java.lang.Number">1000</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateCatchEvent>
-    <semantic:task name="Invoke fastest\nService" id="0Iqn/r/XXotuw4WK">
-      <semantic:incoming>KmJy/PwMDTQOJSmG</semantic:incoming>
-      <semantic:incoming>HahXfefD1HgdKs55</semantic:incoming>
-      <semantic:outgoing>EZtVjFUlhql3UeS+</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="0Iqn/r/XXotuw4WK" name="Invoke fastest\nService">
+      <bpmn:incoming>KmJy/PwMDTQOJSmG</bpmn:incoming>
+      <bpmn:incoming>HahXfefD1HgdKs55</bpmn:incoming>
+      <bpmn:outgoing>EZtVjFUlhql3UeS+</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.ServiceCallTask</jadex:class>
         <jadex:property name="service" type="java.lang.String">&quot;aser&quot;</jadex:property>
         <jadex:property name="method" type="java.lang.String">&quot;public abstract jadex.commons.future.IFuture jadex.bpmn.examples.nfprops.IAService.test()&quot;</jadex:property>
         <jadex:property name="ranking" type="java.lang.String">&quot;jadex.bridge.sensor.service.ExecutionTimeEvaluator&quot;</jadex:property>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:startEvent id="d/CEoMXJOn0USTdr">
-      <semantic:outgoing>GgaNzTkwlNO0gU9e</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:intermediateCatchEvent id="ucgekNINCyn1C2Ug">
-      <semantic:incoming>GgaNzTkwlNO0gU9e</semantic:incoming>
-      <semantic:outgoing>pt+amtcEhq3bRWar</semantic:outgoing>
-      <semantic:timerEventDefinition>
-        <semantic:timeDuration>5000</semantic:timeDuration>
-      </semantic:timerEventDefinition>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:startEvent id="d/CEoMXJOn0USTdr">
+      <bpmn:outgoing>GgaNzTkwlNO0gU9e</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:intermediateCatchEvent id="ucgekNINCyn1C2Ug">
+      <bpmn:incoming>GgaNzTkwlNO0gU9e</bpmn:incoming>
+      <bpmn:outgoing>pt+amtcEhq3bRWar</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration>5000</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+      <bpmn:extensionElements>
         <jadex:property name="duration">5000</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateCatchEvent>
-    <semantic:endEvent id="sKYTAmvsGlGmxt0y">
-      <semantic:incoming>pt+amtcEhq3bRWar</semantic:incoming>
-      <semantic:terminateEventDefinition/>
-    </semantic:endEvent>
-    <semantic:sequenceFlow sourceRef="zait5KWxNKxr6m2U" targetRef="0Iqn/r/XXotuw4WK" id="KmJy/PwMDTQOJSmG">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="hTVbHWUJszFCG4cS" targetRef="0Iqn/r/XXotuw4WK" id="HahXfefD1HgdKs55">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="0Iqn/r/XXotuw4WK" targetRef="hTVbHWUJszFCG4cS" id="EZtVjFUlhql3UeS+">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="d/CEoMXJOn0USTdr" targetRef="ucgekNINCyn1C2Ug" id="GgaNzTkwlNO0gU9e">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="ucgekNINCyn1C2Ug" targetRef="sKYTAmvsGlGmxt0y" id="pt+amtcEhq3bRWar">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="sKYTAmvsGlGmxt0y">
+      <bpmn:incoming>pt+amtcEhq3bRWar</bpmn:incoming>
+      <bpmn:terminateEventDefinition/>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="KmJy/PwMDTQOJSmG" sourceRef="zait5KWxNKxr6m2U" targetRef="0Iqn/r/XXotuw4WK">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="HahXfefD1HgdKs55" sourceRef="hTVbHWUJszFCG4cS" targetRef="0Iqn/r/XXotuw4WK">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="EZtVjFUlhql3UeS+" sourceRef="0Iqn/r/XXotuw4WK" targetRef="hTVbHWUJszFCG4cS">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="GgaNzTkwlNO0gU9e" sourceRef="d/CEoMXJOn0USTdr" targetRef="ucgekNINCyn1C2Ug">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="pt+amtcEhq3bRWar" sourceRef="ucgekNINCyn1C2Ug" targetRef="sKYTAmvsGlGmxt0y">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="qem4RVqaTvHARCR2">
@@ -112,5 +104,4 @@
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

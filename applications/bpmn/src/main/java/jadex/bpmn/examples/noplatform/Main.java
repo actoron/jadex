@@ -25,7 +25,7 @@ public class Main
 		afac.setFeatures(BpmnFactory.NOPLATFORM_DEFAULT_FEATURES);
 		
 		// "jadex.bdiv3.examples.helloworld.HelloWorld.class"
-		IExternalAccess agent = Starter.createAgent("jadex.bpmn.examples.helloworld.HelloWorld.bpmn2", afac, tup.getFirstEntity(), tup.getSecondEntity()).get();
+		IExternalAccess agent = Starter.createAgent("jadex.bpmn.examples.helloworld.HelloWorld.bpmn", afac, tup.getFirstEntity(), tup.getSecondEntity()).get();
 		agent.waitForTermination().get();
 		
 		//SUtil.sleep(10000);

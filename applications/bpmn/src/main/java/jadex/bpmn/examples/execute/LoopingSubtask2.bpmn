@@ -1,60 +1,52 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>test</jadex:modelname>
-    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
-  </semantic:extension>
-  <semantic:process name="Pool" id="ikaHuqJC7mJkadPs">
-    <semantic:subProcess id="FdPJqNLord1NCWgZ">
-      <semantic:incoming>sYhXOTrz8bzCfQ7l</semantic:incoming>
-      <semantic:outgoing>59Hry1UazW3hemRo</semantic:outgoing>
-      <semantic:multiInstanceLoopCharacteristics isSequential="true" />
-      <semantic:startEvent id="jUFr7QC7A6tJG5Tl">
-        <semantic:outgoing>GY9MM1gw6djVs3tR</semantic:outgoing>
-      </semantic:startEvent>
-      <semantic:endEvent id="Cbe/BCJWRSamYkjK">
-        <semantic:incoming>BaEO3WSBInJE5AbD</semantic:incoming>
-      </semantic:endEvent>
-      <semantic:task name="Task" id="9HnZj/kA98jczshE">
-        <semantic:incoming>GY9MM1gw6djVs3tR</semantic:incoming>
-        <semantic:outgoing>BaEO3WSBInJE5AbD</semantic:outgoing>
-        <semantic:extensionElements>
+    <jadex:componentflags keepalive="false" monitoring="OFF" persistable="false" suspend="false" synchronous="false"/>
+  </bpmn:extension>
+  <bpmn:process id="ikaHuqJC7mJkadPs" name="Pool">
+    <bpmn:subProcess id="FdPJqNLord1NCWgZ">
+      <bpmn:incoming>sYhXOTrz8bzCfQ7l</bpmn:incoming>
+      <bpmn:outgoing>59Hry1UazW3hemRo</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics isSequential="true"/>
+      <bpmn:startEvent id="jUFr7QC7A6tJG5Tl">
+        <bpmn:outgoing>GY9MM1gw6djVs3tR</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:endEvent id="Cbe/BCJWRSamYkjK">
+        <bpmn:incoming>BaEO3WSBInJE5AbD</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:task id="9HnZj/kA98jczshE" name="Task">
+        <bpmn:incoming>GY9MM1gw6djVs3tR</bpmn:incoming>
+        <bpmn:outgoing>BaEO3WSBInJE5AbD</bpmn:outgoing>
+        <bpmn:extensionElements>
           <jadex:class>jadex.bpmn.testcases.pojobpmn.PrintTask</jadex:class>
           <jadex:parameter direction="in" name="text" type="java.lang.String">c</jadex:parameter>
-        </semantic:extensionElements>
-      </semantic:task>
-      <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:task>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bdibpmn.task.WriteParameterTask</jadex:class>
         <jadex:parameter direction="inout" name="a" type="java.lang.String"/>
         <jadex:parameter direction="inout" name="b" type="java.lang.String"/>
         <jadex:parameter direction="inout" name="c" type="String[]">new String[]{&quot;1&quot;, &quot;2&quot;, &quot;3&quot;}</jadex:parameter>
         <jadex:property name="iterator">c</jadex:property>
-      </semantic:extensionElements>
-    </semantic:subProcess>
-    <semantic:startEvent id="9j3SXgJNy9CbWAW3">
-      <semantic:outgoing>sYhXOTrz8bzCfQ7l</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:endEvent id="nNdcedyDE0gTqSqv">
-      <semantic:incoming>59Hry1UazW3hemRo</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:sequenceFlow sourceRef="FdPJqNLord1NCWgZ" targetRef="nNdcedyDE0gTqSqv" id="59Hry1UazW3hemRo">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="jUFr7QC7A6tJG5Tl" targetRef="9HnZj/kA98jczshE" id="GY9MM1gw6djVs3tR">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="9HnZj/kA98jczshE" targetRef="Cbe/BCJWRSamYkjK" id="BaEO3WSBInJE5AbD">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="9j3SXgJNy9CbWAW3" targetRef="FdPJqNLord1NCWgZ" id="sYhXOTrz8bzCfQ7l">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:subProcess>
+    <bpmn:startEvent id="9j3SXgJNy9CbWAW3">
+      <bpmn:outgoing>sYhXOTrz8bzCfQ7l</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="nNdcedyDE0gTqSqv">
+      <bpmn:incoming>59Hry1UazW3hemRo</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="59Hry1UazW3hemRo" sourceRef="FdPJqNLord1NCWgZ" targetRef="nNdcedyDE0gTqSqv">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="GY9MM1gw6djVs3tR" sourceRef="jUFr7QC7A6tJG5Tl" targetRef="9HnZj/kA98jczshE">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="BaEO3WSBInJE5AbD" sourceRef="9HnZj/kA98jczshE" targetRef="Cbe/BCJWRSamYkjK">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="sYhXOTrz8bzCfQ7l" sourceRef="9j3SXgJNy9CbWAW3" targetRef="FdPJqNLord1NCWgZ">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="ikaHuqJC7mJkadPs">
@@ -89,5 +81,4 @@
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

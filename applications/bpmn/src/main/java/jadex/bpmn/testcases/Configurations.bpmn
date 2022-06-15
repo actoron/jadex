@@ -1,16 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>Configurations</jadex:modelname>
     <jadex:package>jadex.bpmn.testcases</jadex:package>
-    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="true"/>
+    <jadex:componentflags keepalive="true" monitoring="OFF" suspend="false" synchronous="false"/>
     <jadex:imports>
       <jadex:import>jadex.commons.*</jadex:import>
     </jadex:imports>
@@ -21,7 +13,7 @@
       </jadex:argument>
     </jadex:arguments>
     <jadex:providedservices>
-      <jadex:providedservice name="proser" interface="jadex.bpmn.testcases.IAService"/>
+      <jadex:providedservice interface="jadex.bpmn.testcases.IAService" name="proser"/>
     </jadex:providedservices>
     <jadex:configurations>
       <jadex:configuration name="a">
@@ -29,7 +21,7 @@
           <jadex:value name="param">&quot;initial a&quot;</jadex:value>
         </jadex:argumentvalues>
         <jadex:providedserviceconfigurations>
-          <jadex:providedserviceconfiguration name="proser" proxytype="decoupled" implementation="new AService(&quot;a&quot;)"/>
+          <jadex:providedserviceconfiguration implementation="new AService(&quot;a&quot;)" name="proser" proxytype="decoupled"/>
         </jadex:providedserviceconfigurations>
       </jadex:configuration>
       <jadex:configuration name="b">
@@ -37,25 +29,25 @@
           <jadex:value name="param">&quot;initial b&quot;</jadex:value>
         </jadex:argumentvalues>
         <jadex:providedserviceconfigurations>
-          <jadex:providedserviceconfiguration name="proser" proxytype="decoupled" implementation="new AService(&quot;b&quot;)"/>
+          <jadex:providedserviceconfiguration implementation="new AService(&quot;b&quot;)" name="proser" proxytype="decoupled"/>
         </jadex:providedserviceconfigurations>
       </jadex:configuration>
       <jadex:configuration name="c">
       </jadex:configuration>
     </jadex:configurations>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_xP5y0ZvpEeCjj9yzP5OiyQ">
-    <semantic:task name="Invoke own service" id="_xP5y05vpEeCjj9yzP5OiyQ">
-      <semantic:incoming>_mxp5AZvuEeCt9a2MpUzG-A</semantic:incoming>
-    </semantic:task>
-    <semantic:startEvent id="_mZHdMZvuEeCt9a2MpUzG-A">
-      <semantic:outgoing>_mxp5AZvuEeCt9a2MpUzG-A</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:sequenceFlow sourceRef="_mZHdMZvuEeCt9a2MpUzG-A" targetRef="_xP5y05vpEeCjj9yzP5OiyQ" id="_mxp5AZvuEeCt9a2MpUzG-A">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+  </bpmn:extension>
+  <bpmn:process id="_xP5y0ZvpEeCjj9yzP5OiyQ" name="Pool">
+    <bpmn:task id="_xP5y05vpEeCjj9yzP5OiyQ" name="Invoke own service">
+      <bpmn:incoming>_mxp5AZvuEeCt9a2MpUzG-A</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:startEvent id="_mZHdMZvuEeCt9a2MpUzG-A">
+      <bpmn:outgoing>_mxp5AZvuEeCt9a2MpUzG-A</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="_mxp5AZvuEeCt9a2MpUzG-A" sourceRef="_mZHdMZvuEeCt9a2MpUzG-A" targetRef="_xP5y05vpEeCjj9yzP5OiyQ">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_xP5y0ZvpEeCjj9yzP5OiyQ">
@@ -69,9 +61,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_mxp5AZvuEeCt9a2MpUzG-A">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_mxp5AZvuEeCt9a2MpUzG-A">
-      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

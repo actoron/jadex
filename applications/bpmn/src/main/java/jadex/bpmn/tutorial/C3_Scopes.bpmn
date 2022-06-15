@@ -1,55 +1,47 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>C3_Scopes</jadex:modelname>
     <jadex:description>&lt;h1&gt;Scopes&lt;/h1&gt; Process showing how to use a sub process for parameter scoping.</jadex:description>
     <jadex:package>jadex.bpmn.tutorial</jadex:package>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_qiZkdzaEEd-TIJeIzj-S2A">
-    <semantic:subProcess name="Handle Shipping" id="_sMyCoTaEEd-TIJeIzj-S2A">
-      <semantic:task name="Start Shipping" id="_w3NxlzaEEd-TIJeIzj-S2A">
-        <semantic:incoming>_w3NxoDaEEd-TIJeIzj-S2A</semantic:incoming>
-        <semantic:outgoing>_w3NxrzaEEd-TIJeIzj-S2A</semantic:outgoing>
-        <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_qiZkdzaEEd-TIJeIzj-S2A" name="Pool">
+    <bpmn:subProcess id="_sMyCoTaEEd-TIJeIzj-S2A" name="Handle Shipping">
+      <bpmn:task id="_w3NxlzaEEd-TIJeIzj-S2A" name="Start Shipping">
+        <bpmn:incoming>_w3NxoDaEEd-TIJeIzj-S2A</bpmn:incoming>
+        <bpmn:outgoing>_w3NxrzaEEd-TIJeIzj-S2A</bpmn:outgoing>
+        <bpmn:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
           <jadex:parameter direction="inout" name="text" type="String">&quot;Shipping to: &quot;+shipto</jadex:parameter>
-        </semantic:extensionElements>
-      </semantic:task>
-      <semantic:task name="Enter Address" id="_w3NxkzaEEd-TIJeIzj-S2A">
-        <semantic:outgoing>_w3NxoDaEEd-TIJeIzj-S2A</semantic:outgoing>
-        <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:task>
+      <bpmn:task id="_w3NxkzaEEd-TIJeIzj-S2A" name="Enter Address">
+        <bpmn:outgoing>_w3NxoDaEEd-TIJeIzj-S2A</bpmn:outgoing>
+        <bpmn:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.UserInteractionTask</jadex:class>
           <jadex:parameter direction="inout" name="address" type="String">shipto</jadex:parameter>
-        </semantic:extensionElements>
-      </semantic:task>
-      <semantic:task name="Finished" id="_w3NxmzaEEd-TIJeIzj-S2A">
-        <semantic:incoming>_w3NxrzaEEd-TIJeIzj-S2A</semantic:incoming>
-        <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:task>
+      <bpmn:task id="_w3NxmzaEEd-TIJeIzj-S2A" name="Finished">
+        <bpmn:incoming>_w3NxrzaEEd-TIJeIzj-S2A</bpmn:incoming>
+        <bpmn:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
           <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Arrived at: &quot;+shipto</jadex:parameter>
-        </semantic:extensionElements>
-      </semantic:task>
-      <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:task>
+      <bpmn:extensionElements>
         <jadex:parameter direction="inout" name="shipto" type="String">&quot;Default Address&quot;</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:subProcess>
-    <semantic:sequenceFlow sourceRef="_w3NxlzaEEd-TIJeIzj-S2A" targetRef="_w3NxmzaEEd-TIJeIzj-S2A" id="_w3NxrzaEEd-TIJeIzj-S2A">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_w3NxkzaEEd-TIJeIzj-S2A" targetRef="_w3NxlzaEEd-TIJeIzj-S2A" id="_w3NxoDaEEd-TIJeIzj-S2A">
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="_w3NxrzaEEd-TIJeIzj-S2A" sourceRef="_w3NxlzaEEd-TIJeIzj-S2A" targetRef="_w3NxmzaEEd-TIJeIzj-S2A">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_w3NxoDaEEd-TIJeIzj-S2A" sourceRef="_w3NxkzaEEd-TIJeIzj-S2A" targetRef="_w3NxlzaEEd-TIJeIzj-S2A">
+      <bpmn:extensionElements>
         <jadex:parametermapping name="shipto">address</jadex:parametermapping>
-      </semantic:extensionElements>
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_qiZkdzaEEd-TIJeIzj-S2A">
@@ -74,5 +66,4 @@
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

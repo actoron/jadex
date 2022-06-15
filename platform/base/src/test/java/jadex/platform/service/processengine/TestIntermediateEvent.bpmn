@@ -1,54 +1,46 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>TestIntermediateEvent</jadex:modelname>
-    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
-  </semantic:extension>
-  <semantic:process name="Pool" id="mXGzRdvHUI25sRaq">
-    <semantic:startEvent id="mLR+eRTFPqwse2ET">
-      <semantic:outgoing>lVGrbSa5270++aH7</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:task name="Task" id="j3TO7R2uWjWqewLp">
-      <semantic:incoming>lVGrbSa5270++aH7</semantic:incoming>
-      <semantic:outgoing>5YpLb/SmFg/mBVEg</semantic:outgoing>
-      <semantic:extensionElements>
+    <jadex:componentflags keepalive="false" monitoring="OFF" suspend="false" synchronous="false"/>
+  </bpmn:extension>
+  <bpmn:process id="mXGzRdvHUI25sRaq" name="Pool">
+    <bpmn:startEvent id="mLR+eRTFPqwse2ET">
+      <bpmn:outgoing>lVGrbSa5270++aH7</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="j3TO7R2uWjWqewLp" name="Task">
+      <bpmn:incoming>lVGrbSa5270++aH7</bpmn:incoming>
+      <bpmn:outgoing>5YpLb/SmFg/mBVEg</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;before event&quot;</jadex:parameter>
         <jadex:parameter direction="out" name="value" type="int">7</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:intermediateCatchEvent id="z5CP/CF3O5zCvQ2w">
-      <semantic:incoming>5YpLb/SmFg/mBVEg</semantic:incoming>
-      <semantic:outgoing>ntHZacf11GLSZAC8</semantic:outgoing>
-      <semantic:conditionalEventDefinition/>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:intermediateCatchEvent id="z5CP/CF3O5zCvQ2w">
+      <bpmn:incoming>5YpLb/SmFg/mBVEg</bpmn:incoming>
+      <bpmn:outgoing>ntHZacf11GLSZAC8</bpmn:outgoing>
+      <bpmn:conditionalEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="eventtypes">new java.lang.String[]{&quot;Intermediate&quot;}</jadex:property>
         <jadex:property name="condition">value==$event.value</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateCatchEvent>
-    <semantic:task name="Task" id="yAMNau1/DbrnVBzw">
-      <semantic:incoming>ntHZacf11GLSZAC8</semantic:incoming>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="yAMNau1/DbrnVBzw" name="Task">
+      <bpmn:incoming>ntHZacf11GLSZAC8</bpmn:incoming>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;after event: &quot;+$event</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:sequenceFlow sourceRef="mLR+eRTFPqwse2ET" targetRef="j3TO7R2uWjWqewLp" id="lVGrbSa5270++aH7">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="j3TO7R2uWjWqewLp" targetRef="z5CP/CF3O5zCvQ2w" id="5YpLb/SmFg/mBVEg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="z5CP/CF3O5zCvQ2w" targetRef="yAMNau1/DbrnVBzw" id="ntHZacf11GLSZAC8">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="lVGrbSa5270++aH7" sourceRef="mLR+eRTFPqwse2ET" targetRef="j3TO7R2uWjWqewLp">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="5YpLb/SmFg/mBVEg" sourceRef="j3TO7R2uWjWqewLp" targetRef="z5CP/CF3O5zCvQ2w">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ntHZacf11GLSZAC8" sourceRef="z5CP/CF3O5zCvQ2w" targetRef="yAMNau1/DbrnVBzw">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="mXGzRdvHUI25sRaq">
@@ -74,5 +66,4 @@
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

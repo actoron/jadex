@@ -1,13 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>AgentCreation2</jadex:modelname>
     <jadex:description>&lt;h3&gt;Creation Benchmark&lt;/h3&gt;This benchmark measures the time for starting and killing a number of processes.</jadex:description>
     <jadex:package>jadex.bpmn.benchmarks</jadex:package>
@@ -37,19 +29,19 @@
         <jadex:value>System.currentTimeMillis()</jadex:value>
       </jadex:argument>
     </jadex:arguments>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_fZ7WEdkMEd6KRaQAf_IpCg">
-    <semantic:task name="Print Creation Notice" id="_fZ7WE9kMEd6KRaQAf_IpCg">
-      <semantic:outgoing>_6dcU2tkOEd6KRaQAf_IpCg</semantic:outgoing>
-      <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_fZ7WEdkMEd6KRaQAf_IpCg" name="Pool">
+    <bpmn:task id="_fZ7WE9kMEd6KRaQAf_IpCg" name="Print Creation Notice">
+      <bpmn:outgoing>_6dcU2tkOEd6KRaQAf_IpCg</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="String">&quot;Created peer: &quot;+num</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Print Kill Results" id="_ZoQ_0dkUEd6KRaQAf_IpCg">
-      <semantic:incoming>_Zokh0dkUEd6KRaQAf_IpCg</semantic:incoming>
-      <semantic:outgoing>_j7yeEdkUEd6KRaQAf_IpCg</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_ZoQ_0dkUEd6KRaQAf_IpCg" name="Print Kill Results">
+      <bpmn:incoming>_Zokh0dkUEd6KRaQAf_IpCg</bpmn:incoming>
+      <bpmn:outgoing>_j7yeEdkUEd6KRaQAf_IpCg</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="killdur" type="double">((double)System.currentTimeMillis()-killstarttime)/1000.0</jadex:parameter>
         <jadex:parameter direction="in" name="stillused" type="long">(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024</jadex:parameter>
@@ -59,13 +51,13 @@
         <jadex:parameter direction="in" name="pera" type="double">pera</jadex:parameter>
         <jadex:parameter direction="in" name="omem" type="long">omem</jadex:parameter>
         <jadex:parameter direction="in" name="upera" type="double">upera</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Delete Processes" id="_YrA_UdkSEd6KRaQAf_IpCg">
-      <semantic:incoming>_YrA_WtkSEd6KRaQAf_IpCg</semantic:incoming>
-      <semantic:incoming>_ecaWMdkSEd6KRaQAf_IpCg</semantic:incoming>
-      <semantic:outgoing>_cVaNcdkSEd6KRaQAf_IpCg</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_YrA_UdkSEd6KRaQAf_IpCg" name="Delete Processes">
+      <bpmn:incoming>_YrA_WtkSEd6KRaQAf_IpCg</bpmn:incoming>
+      <bpmn:incoming>_ecaWMdkSEd6KRaQAf_IpCg</bpmn:incoming>
+      <bpmn:outgoing>_cVaNcdkSEd6KRaQAf_IpCg</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.DestroyComponentTask</jadex:class>
         <jadex:parameter direction="inout" name="i" type="int">max-1</jadex:parameter>
         <jadex:parameter direction="inout" name="name" type="String">i==1? $component.getId().getLocalName().substring(0, $component.getId().getLocalName().indexOf(&quot;#&quot;)-1): $component.getId().getLocalName().substring(0, $component.getId().getLocalName().indexOf(&quot;#&quot;)+1)+i</jadex:parameter>
@@ -74,12 +66,12 @@
         <jadex:parameter direction="inout" name="pera" type="double">pera</jadex:parameter>
         <jadex:parameter direction="inout" name="omem" type="long">omem</jadex:parameter>
         <jadex:parameter direction="inout" name="upera" type="double">upera</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Print Kill" id="_eGC10RblEd-yC473XtaJZQ">
-      <semantic:incoming>_cVaNcdkSEd6KRaQAf_IpCg</semantic:incoming>
-      <semantic:outgoing>_e4HL8RblEd-yC473XtaJZQ</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_eGC10RblEd-yC473XtaJZQ" name="Print Kill">
+      <bpmn:incoming>_cVaNcdkSEd6KRaQAf_IpCg</bpmn:incoming>
+      <bpmn:outgoing>_e4HL8RblEd-yC473XtaJZQ</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="String">&quot;Successfully destroyed peer: &quot;+name</jadex:parameter>
         <jadex:parameter direction="inout" name="i" type="int">i</jadex:parameter>
@@ -88,17 +80,17 @@
         <jadex:parameter direction="inout" name="pera" type="double">pera</jadex:parameter>
         <jadex:parameter direction="inout" name="omem" type="long">omem</jadex:parameter>
         <jadex:parameter direction="inout" name="upera" type="double">upera</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:exclusiveGateway id="_cVQccdkSEd6KRaQAf_IpCg" default="_Zokh0dkUEd6KRaQAf_IpCg">
-      <semantic:incoming>_e4HL8RblEd-yC473XtaJZQ</semantic:incoming>
-      <semantic:outgoing>_ecaWMdkSEd6KRaQAf_IpCg</semantic:outgoing>
-      <semantic:outgoing>_Zokh0dkUEd6KRaQAf_IpCg</semantic:outgoing>
-    </semantic:exclusiveGateway>
-    <semantic:task name="Results" id="_TQjzsdkQEd6KRaQAf_IpCg">
-      <semantic:incoming>_TQs9otkQEd6KRaQAf_IpCg</semantic:incoming>
-      <semantic:outgoing>_YrA_WtkSEd6KRaQAf_IpCg</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:exclusiveGateway default="_Zokh0dkUEd6KRaQAf_IpCg" id="_cVQccdkSEd6KRaQAf_IpCg">
+      <bpmn:incoming>_e4HL8RblEd-yC473XtaJZQ</bpmn:incoming>
+      <bpmn:outgoing>_ecaWMdkSEd6KRaQAf_IpCg</bpmn:outgoing>
+      <bpmn:outgoing>_Zokh0dkUEd6KRaQAf_IpCg</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="_TQjzsdkQEd6KRaQAf_IpCg" name="Results">
+      <bpmn:incoming>_TQs9otkQEd6KRaQAf_IpCg</bpmn:incoming>
+      <bpmn:outgoing>_YrA_WtkSEd6KRaQAf_IpCg</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="used" type="long">Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory()</jadex:parameter>
         <jadex:parameter direction="inout" name="omem" type="long">(used-startmem)/1024</jadex:parameter>
@@ -109,17 +101,17 @@
         <jadex:parameter direction="inout" name="max" type="int">max</jadex:parameter>
         <jadex:parameter direction="in" name="text" type="String">&quot;Overall memory usage: &quot;+omem+&quot;kB. Per process: &quot;+upera+&quot; kB.\\nLast peer created. &quot;+max+&quot; processes started.\\nNeeded: &quot;+dur+&quot; secs. Per process: &quot;+pera+&quot; sec. Corresponds to &quot;+(1/pera)+&quot; processes per sec.&quot;</jadex:parameter>
         <jadex:parameter direction="inout" name="killstarttime" type="long">System.currentTimeMillis()</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:exclusiveGateway id="_6dcU0dkOEd6KRaQAf_IpCg" default="_TQs9otkQEd6KRaQAf_IpCg">
-      <semantic:incoming>_6dcU2tkOEd6KRaQAf_IpCg</semantic:incoming>
-      <semantic:outgoing>_7yYHcdkOEd6KRaQAf_IpCg</semantic:outgoing>
-      <semantic:outgoing>_TQs9otkQEd6KRaQAf_IpCg</semantic:outgoing>
-    </semantic:exclusiveGateway>
-    <semantic:task name="Create Process" id="_7yOWcdkOEd6KRaQAf_IpCg">
-      <semantic:incoming>_7yYHcdkOEd6KRaQAf_IpCg</semantic:incoming>
-      <semantic:outgoing>_Ue8niNkSEd6KRaQAf_IpCg</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:exclusiveGateway default="_TQs9otkQEd6KRaQAf_IpCg" id="_6dcU0dkOEd6KRaQAf_IpCg">
+      <bpmn:incoming>_6dcU2tkOEd6KRaQAf_IpCg</bpmn:incoming>
+      <bpmn:outgoing>_7yYHcdkOEd6KRaQAf_IpCg</bpmn:outgoing>
+      <bpmn:outgoing>_TQs9otkQEd6KRaQAf_IpCg</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="_7yOWcdkOEd6KRaQAf_IpCg" name="Create Process">
+      <bpmn:incoming>_7yYHcdkOEd6KRaQAf_IpCg</bpmn:incoming>
+      <bpmn:outgoing>_Ue8niNkSEd6KRaQAf_IpCg</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.CreateComponentTask</jadex:class>
         <jadex:parameter direction="in" name="model" type="String">&quot;/jadex/bpmn/benchmarks/AgentCreation2.bpmn&quot;</jadex:parameter>
         <jadex:parameter direction="in" name="name" type="String">$component.getId().getLocalName().indexOf(&quot;#&quot;)==-1? $component.getId().getLocalName()+&quot;_#&quot;+(num+1): $component.getId().getLocalName().substring(0, $component.getId().getLocalName().indexOf(&quot;#&quot;)+1)+(num+1)</jadex:parameter>
@@ -127,43 +119,43 @@
         <jadex:parameter direction="in" name="startmem" type="Long">startmem</jadex:parameter>
         <jadex:parameter direction="in" name="starttime" type="Long">starttime</jadex:parameter>
         <jadex:parameter direction="in" name="max" type="Long">max</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:intermediateCatchEvent name="Wait For Ever" id="_Uey2gdkSEd6KRaQAf_IpCg">
-      <semantic:incoming>_Ue8niNkSEd6KRaQAf_IpCg</semantic:incoming>
-      <semantic:signalEventDefinition/>
-    </semantic:intermediateCatchEvent>
-    <semantic:endEvent id="_j7pUIdkUEd6KRaQAf_IpCg">
-      <semantic:incoming>_j7yeEdkUEd6KRaQAf_IpCg</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:sequenceFlow sourceRef="_fZ7WE9kMEd6KRaQAf_IpCg" targetRef="_6dcU0dkOEd6KRaQAf_IpCg" id="_6dcU2tkOEd6KRaQAf_IpCg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_ZoQ_0dkUEd6KRaQAf_IpCg" targetRef="_j7pUIdkUEd6KRaQAf_IpCg" id="_j7yeEdkUEd6KRaQAf_IpCg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_YrA_UdkSEd6KRaQAf_IpCg" targetRef="_eGC10RblEd-yC473XtaJZQ" id="_cVaNcdkSEd6KRaQAf_IpCg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_eGC10RblEd-yC473XtaJZQ" targetRef="_cVQccdkSEd6KRaQAf_IpCg" id="_e4HL8RblEd-yC473XtaJZQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_cVQccdkSEd6KRaQAf_IpCg" targetRef="_YrA_UdkSEd6KRaQAf_IpCg" id="_ecaWMdkSEd6KRaQAf_IpCg">
-      <semantic:conditionExpression>i &gt; 1</semantic:conditionExpression>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:intermediateCatchEvent id="_Uey2gdkSEd6KRaQAf_IpCg" name="Wait For Ever">
+      <bpmn:incoming>_Ue8niNkSEd6KRaQAf_IpCg</bpmn:incoming>
+      <bpmn:signalEventDefinition/>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="_j7pUIdkUEd6KRaQAf_IpCg">
+      <bpmn:incoming>_j7yeEdkUEd6KRaQAf_IpCg</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="_6dcU2tkOEd6KRaQAf_IpCg" sourceRef="_fZ7WE9kMEd6KRaQAf_IpCg" targetRef="_6dcU0dkOEd6KRaQAf_IpCg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_j7yeEdkUEd6KRaQAf_IpCg" sourceRef="_ZoQ_0dkUEd6KRaQAf_IpCg" targetRef="_j7pUIdkUEd6KRaQAf_IpCg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_cVaNcdkSEd6KRaQAf_IpCg" sourceRef="_YrA_UdkSEd6KRaQAf_IpCg" targetRef="_eGC10RblEd-yC473XtaJZQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_e4HL8RblEd-yC473XtaJZQ" sourceRef="_eGC10RblEd-yC473XtaJZQ" targetRef="_cVQccdkSEd6KRaQAf_IpCg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_ecaWMdkSEd6KRaQAf_IpCg" sourceRef="_cVQccdkSEd6KRaQAf_IpCg" targetRef="_YrA_UdkSEd6KRaQAf_IpCg">
+      <bpmn:conditionExpression>i &gt; 1</bpmn:conditionExpression>
+      <bpmn:extensionElements>
         <jadex:parametermapping name="i">i-1</jadex:parametermapping>
-      </semantic:extensionElements>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_cVQccdkSEd6KRaQAf_IpCg" targetRef="_ZoQ_0dkUEd6KRaQAf_IpCg" id="_Zokh0dkUEd6KRaQAf_IpCg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_TQjzsdkQEd6KRaQAf_IpCg" targetRef="_YrA_UdkSEd6KRaQAf_IpCg" id="_YrA_WtkSEd6KRaQAf_IpCg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_6dcU0dkOEd6KRaQAf_IpCg" targetRef="_7yOWcdkOEd6KRaQAf_IpCg" id="_7yYHcdkOEd6KRaQAf_IpCg">
-      <semantic:conditionExpression>num.intValue()&lt;max</semantic:conditionExpression>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_6dcU0dkOEd6KRaQAf_IpCg" targetRef="_TQjzsdkQEd6KRaQAf_IpCg" id="_TQs9otkQEd6KRaQAf_IpCg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_7yOWcdkOEd6KRaQAf_IpCg" targetRef="_Uey2gdkSEd6KRaQAf_IpCg" id="_Ue8niNkSEd6KRaQAf_IpCg">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_Zokh0dkUEd6KRaQAf_IpCg" sourceRef="_cVQccdkSEd6KRaQAf_IpCg" targetRef="_ZoQ_0dkUEd6KRaQAf_IpCg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_YrA_WtkSEd6KRaQAf_IpCg" sourceRef="_TQjzsdkQEd6KRaQAf_IpCg" targetRef="_YrA_UdkSEd6KRaQAf_IpCg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_7yYHcdkOEd6KRaQAf_IpCg" sourceRef="_6dcU0dkOEd6KRaQAf_IpCg" targetRef="_7yOWcdkOEd6KRaQAf_IpCg">
+      <bpmn:conditionExpression>num.intValue()&lt;max</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_TQs9otkQEd6KRaQAf_IpCg" sourceRef="_6dcU0dkOEd6KRaQAf_IpCg" targetRef="_TQjzsdkQEd6KRaQAf_IpCg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_Ue8niNkSEd6KRaQAf_IpCg" sourceRef="_7yOWcdkOEd6KRaQAf_IpCg" targetRef="_Uey2gdkSEd6KRaQAf_IpCg">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_fZ7WEdkMEd6KRaQAf_IpCg">
@@ -201,25 +193,13 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_6dcU2tkOEd6KRaQAf_IpCg">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_6dcU2tkOEd6KRaQAf_IpCg">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_7yYHcdkOEd6KRaQAf_IpCg">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_TQs9otkQEd6KRaQAf_IpCg">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_7yYHcdkOEd6KRaQAf_IpCg">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_TQs9otkQEd6KRaQAf_IpCg">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_Ue8niNkSEd6KRaQAf_IpCg">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_Ue8niNkSEd6KRaQAf_IpCg">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_YrA_WtkSEd6KRaQAf_IpCg">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_YrA_WtkSEd6KRaQAf_IpCg">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_cVaNcdkSEd6KRaQAf_IpCg">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_cVaNcdkSEd6KRaQAf_IpCg">
       </bpmndi:BPMNEdge>
@@ -227,19 +207,10 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_Zokh0dkUEd6KRaQAf_IpCg">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_ecaWMdkSEd6KRaQAf_IpCg">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_Zokh0dkUEd6KRaQAf_IpCg">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_j7yeEdkUEd6KRaQAf_IpCg">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_j7yeEdkUEd6KRaQAf_IpCg">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_e4HL8RblEd-yC473XtaJZQ">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_e4HL8RblEd-yC473XtaJZQ">
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

@@ -1,35 +1,27 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>D5_MessageSending</jadex:modelname>
     <jadex:description>&lt;h1&gt;Message Sending Process&lt;/h1&gt; This process sends a message as expected by process D3.</jadex:description>
     <jadex:package>jadex.bpmn.tutorial</jadex:package>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_-KYIYUYhEd-3iKqz0F2Flw">
-    <semantic:intermediateCatchEvent name="Send Order" id="_q6FG8UYiEd-3iKqz0F2Flw">
-      <semantic:incoming>_q6FG-kYiEd-3iKqz0F2Flw</semantic:incoming>
-      <semantic:messageEventDefinition/>
-      <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_-KYIYUYhEd-3iKqz0F2Flw" name="Pool">
+    <bpmn:intermediateCatchEvent id="_q6FG8UYiEd-3iKqz0F2Flw" name="Send Order">
+      <bpmn:incoming>_q6FG-kYiEd-3iKqz0F2Flw</bpmn:incoming>
+      <bpmn:messageEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="isThrowing">true</jadex:property>
         <jadex:property name="message">new jadex.bridge.fipa.FipaMessage(jadex.bridge.fipa.FipaMessage.Performative.REQUEST, &quot;Order sent by D5&quot;, null)</jadex:property>
         <jadex:property name="receiver">&quot;D3_MessageReceival&quot;</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateCatchEvent>
-    <semantic:startEvent id="_p4OoYUYiEd-3iKqz0F2Flw">
-      <semantic:outgoing>_q6FG-kYiEd-3iKqz0F2Flw</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:sequenceFlow sourceRef="_p4OoYUYiEd-3iKqz0F2Flw" targetRef="_q6FG8UYiEd-3iKqz0F2Flw" id="_q6FG-kYiEd-3iKqz0F2Flw">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:startEvent id="_p4OoYUYiEd-3iKqz0F2Flw">
+      <bpmn:outgoing>_q6FG-kYiEd-3iKqz0F2Flw</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="_q6FG-kYiEd-3iKqz0F2Flw" sourceRef="_p4OoYUYiEd-3iKqz0F2Flw" targetRef="_q6FG8UYiEd-3iKqz0F2Flw">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_-KYIYUYhEd-3iKqz0F2Flw">
@@ -43,9 +35,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_q6FG-kYiEd-3iKqz0F2Flw">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_q6FG-kYiEd-3iKqz0F2Flw">
-      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

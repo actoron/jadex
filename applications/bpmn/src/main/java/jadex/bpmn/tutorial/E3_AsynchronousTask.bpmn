@@ -1,72 +1,64 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>E3_AsynchronousTask</jadex:modelname>
     <jadex:description>&lt;h1&gt;Asynchronous checklist process&lt;/h1&gt; The process shows some parallel information requesters.&lt;br/&gt; The process terminates after all requesters have been closed.</jadex:description>
     <jadex:package>jadex.bpmn.tutorial</jadex:package>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_VEGsZ04pEd-h4K8oRzpwEg">
-    <semantic:task name="Music" id="_XpCuUU4pEd-h4K8oRzpwEg">
-      <semantic:incoming>5Rjet/AaYp88zfq3</semantic:incoming>
-      <semantic:outgoing>pqmswoUKYjhG4sbL</semantic:outgoing>
-      <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_VEGsZ04pEd-h4K8oRzpwEg" name="Pool">
+    <bpmn:task id="_XpCuUU4pEd-h4K8oRzpwEg" name="Music">
+      <bpmn:incoming>5Rjet/AaYp88zfq3</bpmn:incoming>
+      <bpmn:outgoing>pqmswoUKYjhG4sbL</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>AsynchronousOKTask</jadex:class>
         <jadex:parameter direction="inout" name="message" type="String">&quot;Remember to have some good music at your party.&quot;</jadex:parameter>
         <jadex:parameter direction="inout" name="title" type="String">&quot;Party Planner&quot;</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Drinks" id="_VEGsaU4pEd-h4K8oRzpwEg">
-      <semantic:incoming>Bx44YhIOrrqiUAQO</semantic:incoming>
-      <semantic:outgoing>8SfdvFZ3nogzDpDo</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_VEGsaU4pEd-h4K8oRzpwEg" name="Drinks">
+      <bpmn:incoming>Bx44YhIOrrqiUAQO</bpmn:incoming>
+      <bpmn:outgoing>8SfdvFZ3nogzDpDo</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>AsynchronousOKTask</jadex:class>
         <jadex:parameter direction="inout" name="message" type="String">&quot;Remember to get drinks for your party.&quot;</jadex:parameter>
         <jadex:parameter direction="inout" name="title" type="String">&quot;Party Planner&quot;</jadex:parameter>
         <jadex:parameter direction="inout" name="y_offset" type="int">-200</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="People" id="_X53_oU4pEd-h4K8oRzpwEg">
-      <semantic:incoming>I4g9PTd1j65KjADH</semantic:incoming>
-      <semantic:outgoing>0Vr9lzDTb72lvhb4</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_X53_oU4pEd-h4K8oRzpwEg" name="People">
+      <bpmn:incoming>I4g9PTd1j65KjADH</bpmn:incoming>
+      <bpmn:outgoing>0Vr9lzDTb72lvhb4</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>AsynchronousOKTask</jadex:class>
         <jadex:parameter direction="inout" name="message" type="String">&quot;Remember to invite nice people to your party.&quot;</jadex:parameter>
         <jadex:parameter direction="inout" name="title" type="String">&quot;Party Planner&quot;</jadex:parameter>
         <jadex:parameter direction="inout" name="y_offset" type="int">200</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:endEvent id="awvwFWSxBZDKhWgX">
-      <semantic:incoming>pqmswoUKYjhG4sbL</semantic:incoming>
-      <semantic:incoming>8SfdvFZ3nogzDpDo</semantic:incoming>
-      <semantic:incoming>0Vr9lzDTb72lvhb4</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:startEvent id="TssgksEhNJ32lV7/">
-      <semantic:outgoing>5Rjet/AaYp88zfq3</semantic:outgoing>
-      <semantic:outgoing>Bx44YhIOrrqiUAQO</semantic:outgoing>
-      <semantic:outgoing>I4g9PTd1j65KjADH</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:sequenceFlow sourceRef="_XpCuUU4pEd-h4K8oRzpwEg" targetRef="awvwFWSxBZDKhWgX" id="pqmswoUKYjhG4sbL">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_VEGsaU4pEd-h4K8oRzpwEg" targetRef="awvwFWSxBZDKhWgX" id="8SfdvFZ3nogzDpDo">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_X53_oU4pEd-h4K8oRzpwEg" targetRef="awvwFWSxBZDKhWgX" id="0Vr9lzDTb72lvhb4">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="TssgksEhNJ32lV7/" targetRef="_XpCuUU4pEd-h4K8oRzpwEg" id="5Rjet/AaYp88zfq3">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="TssgksEhNJ32lV7/" targetRef="_VEGsaU4pEd-h4K8oRzpwEg" id="Bx44YhIOrrqiUAQO">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="TssgksEhNJ32lV7/" targetRef="_X53_oU4pEd-h4K8oRzpwEg" id="I4g9PTd1j65KjADH">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:endEvent id="awvwFWSxBZDKhWgX">
+      <bpmn:incoming>pqmswoUKYjhG4sbL</bpmn:incoming>
+      <bpmn:incoming>8SfdvFZ3nogzDpDo</bpmn:incoming>
+      <bpmn:incoming>0Vr9lzDTb72lvhb4</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:startEvent id="TssgksEhNJ32lV7/">
+      <bpmn:outgoing>5Rjet/AaYp88zfq3</bpmn:outgoing>
+      <bpmn:outgoing>Bx44YhIOrrqiUAQO</bpmn:outgoing>
+      <bpmn:outgoing>I4g9PTd1j65KjADH</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="pqmswoUKYjhG4sbL" sourceRef="_XpCuUU4pEd-h4K8oRzpwEg" targetRef="awvwFWSxBZDKhWgX">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="8SfdvFZ3nogzDpDo" sourceRef="_VEGsaU4pEd-h4K8oRzpwEg" targetRef="awvwFWSxBZDKhWgX">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="0Vr9lzDTb72lvhb4" sourceRef="_X53_oU4pEd-h4K8oRzpwEg" targetRef="awvwFWSxBZDKhWgX">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="5Rjet/AaYp88zfq3" sourceRef="TssgksEhNJ32lV7/" targetRef="_XpCuUU4pEd-h4K8oRzpwEg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Bx44YhIOrrqiUAQO" sourceRef="TssgksEhNJ32lV7/" targetRef="_VEGsaU4pEd-h4K8oRzpwEg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="I4g9PTd1j65KjADH" sourceRef="TssgksEhNJ32lV7/" targetRef="_X53_oU4pEd-h4K8oRzpwEg">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_VEGsZ04pEd-h4K8oRzpwEg">
@@ -101,5 +93,4 @@
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

@@ -55,7 +55,7 @@ public class BPMNRecoveryTestAgent
 		
 		final List<TestReport> trs = new ArrayList<TestReport>();
 		
-		runTests("jadex.platform.persistence.SimplePersistence.bpmn2")
+		runTests("jadex.platform.persistence.SimplePersistence.bpmn")
 			.addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)

@@ -1,83 +1,75 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>Exception</jadex:modelname>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_y65Nd2pBEd6JtKkNrnCCNQ">
-    <semantic:subProcess name="Exception Process" id="_2BX2MWpBEd6JtKkNrnCCNQ">
-      <semantic:incoming>_2BrYOGpBEd6JtKkNrnCCNQ</semantic:incoming>
-      <semantic:outgoing>_B9XHGGpCEd6JtKkNrnCCNQ</semantic:outgoing>
-      <semantic:task name="Sub 1" id="_DQcV0WyCEd63w-5MJLkKtQ">
-        <semantic:outgoing>_D8Zc4WyCEd63w-5MJLkKtQ</semantic:outgoing>
-      </semantic:task>
-      <semantic:task name="Sub 2" id="_2lI-cWrtEd6CydnA5mdgEg">
-        <semantic:incoming>_D8Zc4WyCEd63w-5MJLkKtQ</semantic:incoming>
-        <semantic:outgoing>_6y2VAWrtEd6CydnA5mdgEg</semantic:outgoing>
-        <semantic:extensionElements>
+    <jadex:componentflags keepalive="false" monitoring="OFF" suspend="false" synchronous="false"/>
+  </bpmn:extension>
+  <bpmn:process id="_y65Nd2pBEd6JtKkNrnCCNQ" name="Pool">
+    <bpmn:subProcess id="_2BX2MWpBEd6JtKkNrnCCNQ" name="Exception Process">
+      <bpmn:incoming>_2BrYOGpBEd6JtKkNrnCCNQ</bpmn:incoming>
+      <bpmn:outgoing>_B9XHGGpCEd6JtKkNrnCCNQ</bpmn:outgoing>
+      <bpmn:task id="_DQcV0WyCEd63w-5MJLkKtQ" name="Sub 1">
+        <bpmn:outgoing>_D8Zc4WyCEd63w-5MJLkKtQ</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:task id="_2lI-cWrtEd6CydnA5mdgEg" name="Sub 2">
+        <bpmn:incoming>_D8Zc4WyCEd63w-5MJLkKtQ</bpmn:incoming>
+        <bpmn:outgoing>_6y2VAWrtEd6CydnA5mdgEg</bpmn:outgoing>
+        <bpmn:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.UserInteractionTask</jadex:class>
-        </semantic:extensionElements>
-      </semantic:task>
-      <semantic:task name="Sub 3" id="_6yskAWrtEd6CydnA5mdgEg">
-        <semantic:incoming>_6y2VAWrtEd6CydnA5mdgEg</semantic:incoming>
-      </semantic:task>
-    </semantic:subProcess>
-    <semantic:boundaryEvent id="_9_cgAWpBEd6JtKkNrnCCNQ" attachedToRef="_2BX2MWpBEd6JtKkNrnCCNQ">
-      <semantic:outgoing>__U0-mmpBEd6JtKkNrnCCNQ</semantic:outgoing>
-      <semantic:errorEventDefinition/>
-    </semantic:boundaryEvent>
-    <semantic:endEvent id="_YI1qwWpCEd6JtKkNrnCCNQ">
-      <semantic:incoming>_YI_byGpCEd6JtKkNrnCCNQ</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:task name="No Exception" id="_B9NWEWpCEd6JtKkNrnCCNQ">
-      <semantic:incoming>_B9XHGGpCEd6JtKkNrnCCNQ</semantic:incoming>
-      <semantic:outgoing>_YI_byGpCEd6JtKkNrnCCNQ</semantic:outgoing>
-      <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:task>
+      <bpmn:task id="_6yskAWrtEd6CydnA5mdgEg" name="Sub 3">
+        <bpmn:incoming>_6y2VAWrtEd6CydnA5mdgEg</bpmn:incoming>
+      </bpmn:task>
+    </bpmn:subProcess>
+    <bpmn:boundaryEvent attachedToRef="_2BX2MWpBEd6JtKkNrnCCNQ" id="_9_cgAWpBEd6JtKkNrnCCNQ">
+      <bpmn:outgoing>__U0-mmpBEd6JtKkNrnCCNQ</bpmn:outgoing>
+      <bpmn:errorEventDefinition/>
+    </bpmn:boundaryEvent>
+    <bpmn:endEvent id="_YI1qwWpCEd6JtKkNrnCCNQ">
+      <bpmn:incoming>_YI_byGpCEd6JtKkNrnCCNQ</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="_B9NWEWpCEd6JtKkNrnCCNQ" name="No Exception">
+      <bpmn:incoming>_B9XHGGpCEd6JtKkNrnCCNQ</bpmn:incoming>
+      <bpmn:outgoing>_YI_byGpCEd6JtKkNrnCCNQ</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.LoggerTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="String">&quot;No Exception&quot;</jadex:parameter>
         <jadex:parameter direction="in" name="level" type="java.util.logging.Level">java.util.logging.Level.INFO</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Exception\nOccurred" id="__U0-kWpBEd6JtKkNrnCCNQ">
-      <semantic:incoming>__U0-mmpBEd6JtKkNrnCCNQ</semantic:incoming>
-      <semantic:outgoing>_W1ZF4WpCEd6JtKkNrnCCNQ</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="__U0-kWpBEd6JtKkNrnCCNQ" name="Exception\nOccurred">
+      <bpmn:incoming>__U0-mmpBEd6JtKkNrnCCNQ</bpmn:incoming>
+      <bpmn:outgoing>_W1ZF4WpCEd6JtKkNrnCCNQ</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.LoggerTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="String">&quot;Exception Occurred&quot;</jadex:parameter>
         <jadex:parameter direction="in" name="level" type="java.util.logging.Level">java.util.logging.Level.WARNING</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:endEvent id="_W1P78WpCEd6JtKkNrnCCNQ">
-      <semantic:incoming>_W1ZF4WpCEd6JtKkNrnCCNQ</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:startEvent id="_0vuBEWpBEd6JtKkNrnCCNQ">
-      <semantic:outgoing>_2BrYOGpBEd6JtKkNrnCCNQ</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:sequenceFlow sourceRef="_2BX2MWpBEd6JtKkNrnCCNQ" targetRef="_B9NWEWpCEd6JtKkNrnCCNQ" id="_B9XHGGpCEd6JtKkNrnCCNQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_DQcV0WyCEd63w-5MJLkKtQ" targetRef="_2lI-cWrtEd6CydnA5mdgEg" id="_D8Zc4WyCEd63w-5MJLkKtQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_2lI-cWrtEd6CydnA5mdgEg" targetRef="_6yskAWrtEd6CydnA5mdgEg" id="_6y2VAWrtEd6CydnA5mdgEg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_9_cgAWpBEd6JtKkNrnCCNQ" targetRef="__U0-kWpBEd6JtKkNrnCCNQ" id="__U0-mmpBEd6JtKkNrnCCNQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_B9NWEWpCEd6JtKkNrnCCNQ" targetRef="_YI1qwWpCEd6JtKkNrnCCNQ" id="_YI_byGpCEd6JtKkNrnCCNQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="__U0-kWpBEd6JtKkNrnCCNQ" targetRef="_W1P78WpCEd6JtKkNrnCCNQ" id="_W1ZF4WpCEd6JtKkNrnCCNQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_0vuBEWpBEd6JtKkNrnCCNQ" targetRef="_2BX2MWpBEd6JtKkNrnCCNQ" id="_2BrYOGpBEd6JtKkNrnCCNQ">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:endEvent id="_W1P78WpCEd6JtKkNrnCCNQ">
+      <bpmn:incoming>_W1ZF4WpCEd6JtKkNrnCCNQ</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:startEvent id="_0vuBEWpBEd6JtKkNrnCCNQ">
+      <bpmn:outgoing>_2BrYOGpBEd6JtKkNrnCCNQ</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="_B9XHGGpCEd6JtKkNrnCCNQ" sourceRef="_2BX2MWpBEd6JtKkNrnCCNQ" targetRef="_B9NWEWpCEd6JtKkNrnCCNQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_D8Zc4WyCEd63w-5MJLkKtQ" sourceRef="_DQcV0WyCEd63w-5MJLkKtQ" targetRef="_2lI-cWrtEd6CydnA5mdgEg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_6y2VAWrtEd6CydnA5mdgEg" sourceRef="_2lI-cWrtEd6CydnA5mdgEg" targetRef="_6yskAWrtEd6CydnA5mdgEg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="__U0-mmpBEd6JtKkNrnCCNQ" sourceRef="_9_cgAWpBEd6JtKkNrnCCNQ" targetRef="__U0-kWpBEd6JtKkNrnCCNQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_YI_byGpCEd6JtKkNrnCCNQ" sourceRef="_B9NWEWpCEd6JtKkNrnCCNQ" targetRef="_YI1qwWpCEd6JtKkNrnCCNQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_W1ZF4WpCEd6JtKkNrnCCNQ" sourceRef="__U0-kWpBEd6JtKkNrnCCNQ" targetRef="_W1P78WpCEd6JtKkNrnCCNQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_2BrYOGpBEd6JtKkNrnCCNQ" sourceRef="_0vuBEWpBEd6JtKkNrnCCNQ" targetRef="_2BX2MWpBEd6JtKkNrnCCNQ">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_y65Nd2pBEd6JtKkNrnCCNQ">
@@ -115,17 +107,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_2BrYOGpBEd6JtKkNrnCCNQ">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_2BrYOGpBEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_B9XHGGpCEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_B9XHGGpCEd6JtKkNrnCCNQ">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_W1ZF4WpCEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_W1ZF4WpCEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_YI_byGpCEd6JtKkNrnCCNQ">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_YI_byGpCEd6JtKkNrnCCNQ">
       </bpmndi:BPMNEdge>
@@ -135,9 +119,6 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="__U0-mmpBEd6JtKkNrnCCNQ">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="__U0-mmpBEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

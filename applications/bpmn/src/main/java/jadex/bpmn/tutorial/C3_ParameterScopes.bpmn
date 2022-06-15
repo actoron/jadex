@@ -1,75 +1,67 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>C3_ParameterScopes</jadex:modelname>
     <jadex:package>jadex.bpmn.tutorial</jadex:package>
-    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
-  </semantic:extension>
-  <semantic:process name="Pool" id="2RbJFnzUiSilPFbW">
-    <semantic:subProcess id="s/AZCBoqBWctZ+/0">
-      <semantic:incoming>YsV28BPT9RJt03ft</semantic:incoming>
-      <semantic:outgoing>HakJpo0AxxWeMxrK</semantic:outgoing>
-      <semantic:startEvent id="9z9dehmHXlGFD4gS">
-        <semantic:outgoing>uV2zwDUJFho2SZuS</semantic:outgoing>
-      </semantic:startEvent>
-      <semantic:task name="Enter Address" id="Xi66YKSWMuqB/NJC">
-        <semantic:incoming>uV2zwDUJFho2SZuS</semantic:incoming>
-        <semantic:outgoing>Gr2TDocT2Zd+DBpF</semantic:outgoing>
-        <semantic:extensionElements>
+    <jadex:componentflags keepalive="false" monitoring="OFF" persistable="false" suspend="false" synchronous="false"/>
+  </bpmn:extension>
+  <bpmn:process id="2RbJFnzUiSilPFbW" name="Pool">
+    <bpmn:subProcess id="s/AZCBoqBWctZ+/0">
+      <bpmn:incoming>YsV28BPT9RJt03ft</bpmn:incoming>
+      <bpmn:outgoing>HakJpo0AxxWeMxrK</bpmn:outgoing>
+      <bpmn:startEvent id="9z9dehmHXlGFD4gS">
+        <bpmn:outgoing>uV2zwDUJFho2SZuS</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:task id="Xi66YKSWMuqB/NJC" name="Enter Address">
+        <bpmn:incoming>uV2zwDUJFho2SZuS</bpmn:incoming>
+        <bpmn:outgoing>Gr2TDocT2Zd+DBpF</bpmn:outgoing>
+        <bpmn:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.UserInteractionTask</jadex:class>
-        </semantic:extensionElements>
-      </semantic:task>
-      <semantic:task name="Start Shipping" id="dDIbBTrs9IMTAZg1">
-        <semantic:incoming>Gr2TDocT2Zd+DBpF</semantic:incoming>
-        <semantic:outgoing>Mv9z5jshw8c3K0vs</semantic:outgoing>
-        <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:task>
+      <bpmn:task id="dDIbBTrs9IMTAZg1" name="Start Shipping">
+        <bpmn:incoming>Gr2TDocT2Zd+DBpF</bpmn:incoming>
+        <bpmn:outgoing>Mv9z5jshw8c3K0vs</bpmn:outgoing>
+        <bpmn:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
           <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Shipping to: &quot;+address</jadex:parameter>
-        </semantic:extensionElements>
-      </semantic:task>
-      <semantic:task name="Shipping Finished" id="aKaGmvdz7qJ4sUEv">
-        <semantic:incoming>Mv9z5jshw8c3K0vs</semantic:incoming>
-        <semantic:outgoing>xu/h5yLBzb2+N6Ml</semantic:outgoing>
-        <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:task>
+      <bpmn:task id="aKaGmvdz7qJ4sUEv" name="Shipping Finished">
+        <bpmn:incoming>Mv9z5jshw8c3K0vs</bpmn:incoming>
+        <bpmn:outgoing>xu/h5yLBzb2+N6Ml</bpmn:outgoing>
+        <bpmn:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
           <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Arrived at: &quot;+address</jadex:parameter>
-        </semantic:extensionElements>
-      </semantic:task>
-      <semantic:endEvent id="XkhW0lsJ7+aCicu2">
-        <semantic:incoming>xu/h5yLBzb2+N6Ml</semantic:incoming>
-      </semantic:endEvent>
-      <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:task>
+      <bpmn:endEvent id="XkhW0lsJ7+aCicu2">
+        <bpmn:incoming>xu/h5yLBzb2+N6Ml</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:extensionElements>
         <jadex:parameter direction="inout" name="address" type="java.lang.String"/>
-      </semantic:extensionElements>
-    </semantic:subProcess>
-    <semantic:startEvent id="gnQjqJrwcaty5unp">
-      <semantic:outgoing>YsV28BPT9RJt03ft</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:endEvent id="Yd11gU7eozBINupU">
-      <semantic:incoming>HakJpo0AxxWeMxrK</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:sequenceFlow sourceRef="s/AZCBoqBWctZ+/0" targetRef="Yd11gU7eozBINupU" id="HakJpo0AxxWeMxrK">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="9z9dehmHXlGFD4gS" targetRef="Xi66YKSWMuqB/NJC" id="uV2zwDUJFho2SZuS">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="Xi66YKSWMuqB/NJC" targetRef="dDIbBTrs9IMTAZg1" id="Gr2TDocT2Zd+DBpF">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="dDIbBTrs9IMTAZg1" targetRef="aKaGmvdz7qJ4sUEv" id="Mv9z5jshw8c3K0vs">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="aKaGmvdz7qJ4sUEv" targetRef="XkhW0lsJ7+aCicu2" id="xu/h5yLBzb2+N6Ml">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="gnQjqJrwcaty5unp" targetRef="s/AZCBoqBWctZ+/0" id="YsV28BPT9RJt03ft">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:subProcess>
+    <bpmn:startEvent id="gnQjqJrwcaty5unp">
+      <bpmn:outgoing>YsV28BPT9RJt03ft</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Yd11gU7eozBINupU">
+      <bpmn:incoming>HakJpo0AxxWeMxrK</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="HakJpo0AxxWeMxrK" sourceRef="s/AZCBoqBWctZ+/0" targetRef="Yd11gU7eozBINupU">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="uV2zwDUJFho2SZuS" sourceRef="9z9dehmHXlGFD4gS" targetRef="Xi66YKSWMuqB/NJC">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Gr2TDocT2Zd+DBpF" sourceRef="Xi66YKSWMuqB/NJC" targetRef="dDIbBTrs9IMTAZg1">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Mv9z5jshw8c3K0vs" sourceRef="dDIbBTrs9IMTAZg1" targetRef="aKaGmvdz7qJ4sUEv">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="xu/h5yLBzb2+N6Ml" sourceRef="aKaGmvdz7qJ4sUEv" targetRef="XkhW0lsJ7+aCicu2">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="YsV28BPT9RJt03ft" sourceRef="gnQjqJrwcaty5unp" targetRef="s/AZCBoqBWctZ+/0">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="2RbJFnzUiSilPFbW">
@@ -119,5 +111,4 @@
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

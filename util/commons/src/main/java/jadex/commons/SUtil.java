@@ -2761,7 +2761,7 @@ public class SUtil
 //		System.out.println(res);
 		
 //		String tst = "jar:file:/C:/projects/jadexgit/jadex-platform-standalone-launch/../../inno/vemaproda-eventsystem/target/vemaproda-eventsystem-0.5-SNAPSHOT.jar!/org/codehaus/plexus/context/ContextMapAdapter.class";
-		String tst = "C:\\Users\\Lars\\bpmntutorial2\\bpmntutorial\\target\\classes\\B1_simple.bpmn2";
+		String tst = "C:\\Users\\Lars\\bpmntutorial2\\bpmntutorial\\target\\classes\\B1_simple.bpmn";
 		
 		long start = System.currentTimeMillis();
 		

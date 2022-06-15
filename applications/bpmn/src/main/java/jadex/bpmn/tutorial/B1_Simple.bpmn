@@ -1,43 +1,35 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>B1_simple</jadex:modelname>
     <jadex:package>jadex.bpmn.tutorial</jadex:package>
-    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags keepalive="false" monitoring="OFF" persistable="false" suspend="false" synchronous="false"/>
     <jadex:configurations>
       <jadex:configuration name="name">
       </jadex:configuration>
     </jadex:configurations>
-  </semantic:extension>
-  <semantic:process name="Pool" id="tDCmz3ohVjhMuuJR">
-    <semantic:task name="Print Message" id="iOjLbKVRDuni5lO+">
-      <semantic:incoming>2NxQ+lTl16lIU0bi</semantic:incoming>
-      <semantic:outgoing>q02LbhVtOE60Tm8o</semantic:outgoing>
-      <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="tDCmz3ohVjhMuuJR" name="Pool">
+    <bpmn:task id="iOjLbKVRDuni5lO+" name="Print Message">
+      <bpmn:incoming>2NxQ+lTl16lIU0bi</bpmn:incoming>
+      <bpmn:outgoing>q02LbhVtOE60Tm8o</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;The task has been executed&quot;</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:endEvent id="7/Aam5FPKdQIjnli">
-      <semantic:incoming>q02LbhVtOE60Tm8o</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:startEvent id="R9JhsYF5P/06y2ND">
-      <semantic:outgoing>2NxQ+lTl16lIU0bi</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:sequenceFlow sourceRef="iOjLbKVRDuni5lO+" targetRef="7/Aam5FPKdQIjnli" id="q02LbhVtOE60Tm8o">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="R9JhsYF5P/06y2ND" targetRef="iOjLbKVRDuni5lO+" id="2NxQ+lTl16lIU0bi">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:endEvent id="7/Aam5FPKdQIjnli">
+      <bpmn:incoming>q02LbhVtOE60Tm8o</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:startEvent id="R9JhsYF5P/06y2ND">
+      <bpmn:outgoing>2NxQ+lTl16lIU0bi</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="q02LbhVtOE60Tm8o" sourceRef="iOjLbKVRDuni5lO+" targetRef="7/Aam5FPKdQIjnli">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="2NxQ+lTl16lIU0bi" sourceRef="R9JhsYF5P/06y2ND" targetRef="iOjLbKVRDuni5lO+">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="tDCmz3ohVjhMuuJR">
@@ -58,5 +50,4 @@
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>
