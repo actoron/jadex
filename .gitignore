@@ -12,6 +12,7 @@ platform_auto.conf
 *.settings.xml
 settings_*
 alarmclock_settings.ser
+**/workflows
 **/testkeystore
 jadex-platform-standalone-launch/highscore.dmp
 /jadex-editor-bpmn/config/classes.cache
