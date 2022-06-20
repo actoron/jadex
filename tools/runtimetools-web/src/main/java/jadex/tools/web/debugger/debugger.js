@@ -473,7 +473,7 @@ class DebuggerElement extends CidElement
 				grid-column: 1 / span 2;
 			}
 			.yscrollable {
-				overflow-y: auto;
+				overflow: auto;
 			}
 			.flex-container {
 				display: flex;

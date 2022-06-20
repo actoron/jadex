@@ -1,23 +1,62 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_gn7W8TJ0Ed-MwJoRTfcdNQ" iD="_gn7W8DJ0Ed-MwJoRTfcdNQ">
-  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_S423gDJ3Ed-MwJoRTfcdNQ" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_S423gTJ3Ed-MwJoRTfcdNQ" key="Description" value="&lt;h1>A Simple Process&lt;/h1> This simple process has only one task.&lt;br/> It is the first example of the Jadex BPMN tutorial."/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_S423gjJ3Ed-MwJoRTfcdNQ" key="Package" value="jadex.bpmn.tutorial"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sAnhxwRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
-  </eAnnotations>
-  <pools xmi:type="bpmn:Pool" xmi:id="_gpRawTJ0Ed-MwJoRTfcdNQ" iD="_gpRawDJ0Ed-MwJoRTfcdNQ" name="Pool">
-    <vertices xmi:type="bpmn:Activity" xmi:id="_gqdtkTJ0Ed-MwJoRTfcdNQ" iD="_gqdtkDJ0Ed-MwJoRTfcdNQ" name="Task" activityType="Task">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__UlKIDJ3Ed-MwJoRTfcdNQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__UlKITJ3Ed-MwJoRTfcdNQ" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
-      </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_sAnhwARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sAnhwQRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sAnhwgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sAnhwwRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sAnhxARPEeCnwcpWvxOwkg" key="0:1" value="text"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sAnhxQRPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sAnhxgRPEeCnwcpWvxOwkg" key="0:3" value="&quot;The task has been executed.&quot;"/>
-      </eAnnotations>
-    </vertices>
-  </pools>
-</bpmn:BpmnDiagram>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>B1_simple</jadex:modelname>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:configurations>
+      <jadex:configuration name="name">
+      </jadex:configuration>
+    </jadex:configurations>
+  </semantic:extension>
+  <semantic:process name="Pool" id="tDCmz3ohVjhMuuJR">
+    <semantic:task name="Print Message" id="iOjLbKVRDuni5lO+">
+      <semantic:incoming>2NxQ+lTl16lIU0bi</semantic:incoming>
+      <semantic:outgoing>q02LbhVtOE60Tm8o</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;The task has been executed&quot;</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:endEvent id="7/Aam5FPKdQIjnli">
+      <semantic:incoming>q02LbhVtOE60Tm8o</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:startEvent id="R9JhsYF5P/06y2ND">
+      <semantic:outgoing>2NxQ+lTl16lIU0bi</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:sequenceFlow sourceRef="iOjLbKVRDuni5lO+" targetRef="7/Aam5FPKdQIjnli" id="q02LbhVtOE60Tm8o">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="R9JhsYF5P/06y2ND" targetRef="iOjLbKVRDuni5lO+" id="2NxQ+lTl16lIU0bi">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="tDCmz3ohVjhMuuJR">
+        <dc:Bounds height="600.0" width="3000.0" x="50.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="iOjLbKVRDuni5lO+">
+        <dc:Bounds height="100.0" width="160.0" x="220.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="7/Aam5FPKdQIjnli">
+        <dc:Bounds height="40.0" width="40.0" x="460.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="R9JhsYF5P/06y2ND">
+        <dc:Bounds height="40.0" width="40.0" x="100.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="2NxQ+lTl16lIU0bi">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="q02LbhVtOE60Tm8o">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

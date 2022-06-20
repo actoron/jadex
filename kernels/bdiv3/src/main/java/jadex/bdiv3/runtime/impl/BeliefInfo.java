@@ -138,7 +138,7 @@ public class BeliefInfo	extends AbstractBDIInfo
 		
 //		Object	mbelief	= state.getAttributeValue(belief, OAVBDIRuntimeModel.element_has_model);
 		String kind	= "belief"; 
-		String type	= mbel.getName();
+		String type	= RCapability.getBeautifiedName(mbel.getName());
 		String valuetype	= SReflect.getInnerClassName(mbel.getType(cl));
 		Object value = mbel.getValue(agent);
 		
@@ -160,7 +160,12 @@ public class BeliefInfo	extends AbstractBDIInfo
 			value = "null";
 		}
 		
-		return (BeliefInfo)new BeliefInfo().setKind(kind).setValueType(valuetype).setValue(value).setId(id).setType(type);
+		return (BeliefInfo)new BeliefInfo()
+			.setKind(kind)
+			.setValueType(valuetype)
+			.setValue(value)
+			.setId(id)
+			.setType(type);
 		
 		//return new BeliefInfo(id, kind, type, valuetype, value);
 	}

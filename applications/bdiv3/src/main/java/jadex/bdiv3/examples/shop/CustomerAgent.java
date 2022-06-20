@@ -16,11 +16,11 @@ public class CustomerAgent
 
 	/** The customer capability. */
 	@Capability(beliefmapping=@Mapping("money"))
-	protected CustomerCapability	cap	= new CustomerCapability();
+	protected CustomerCapability cap = new CustomerCapability();
 	
 	/** The money. */
 	@Belief
-	protected double	money	= 100;
+	protected double money = 100;
 
 	/**
 	 *  Get the capability.

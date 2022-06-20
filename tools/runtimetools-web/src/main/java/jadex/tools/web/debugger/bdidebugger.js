@@ -19,28 +19,50 @@ class BDIV3AgentDebuggerElement extends CidElement
 		this.treedata = {};
 		this.treedata["#"] = {};
 		this.treeopens = {};
+		this.treerefreshtimer = null;
 		
 		this.allgoals = [];
 		this.allplans = [];
 		this.allbeliefs = {}; // id -> belief
 		
 		var agent = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/debugger/images/agent.png';
+		var capability = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/debugger/images/capability.png';
 		var goal = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/debugger/images/goal.png';
 		var plan = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/debugger/images/plan.png';
 		var belief = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/debugger/images/belief.png';
+		var beliefbase = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/debugger/images/beliefbase.png';
+		var goalbase = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/debugger/images/goalbase.png';
+		var planbase = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/debugger/images/planbase.png';
 
 		this.types =
 		{
 			//"default" : {"icon": b},
 		    "agent" : {"icon": agent},
+			"capability" : {"icon": capability},
  			"goal" : {"icon": goal},
  			"plan" : {"icon": plan},
-			"belief" : {"icon": belief}
+			"belief" : {"icon": belief},
+			"beliefbase" : {"icon": beliefbase},
+			"goalbase" : {"icon": goalbase},
+			"planbase": {"icon": planbase}
 		}
 		
-		this.initTree()
-			.then(() => this.subscribe())
-			.catch(err => console.log(err));
+		var res = "jadex/tools/web/commons/detailsview.js";
+		var ures = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String";
+
+		var self = this;
+		return new Promise((resolve, reject) =>
+		{
+			// load subcomponents
+			this.loadSubmodule(ures)
+			.then(() =>
+			{ 
+				this.initTree()
+				.then(() => {self.subscribe(); resolve()})
+				.catch(err => reject(err));
+			})
+			.catch(err => reject(err));
+		});
 	}
 	
 	initTree()
@@ -58,11 +80,11 @@ class BDIV3AgentDebuggerElement extends CidElement
 				{ 
 					self.getTree("agent").jstree(
 					{
-						"plugins": ["sort", "types"],
+						"plugins": ["sort", "types", "contextmenu"],
 						"types": self.types,
 						"core": 
 						{
-							"animation": false,
+							"animation": 0,
 							"check_callback" : true,
 							"data": function(node, cb) 
 							{
@@ -94,7 +116,32 @@ class BDIV3AgentDebuggerElement extends CidElement
 					        {
 					            return (a1.icon > b1.icon) ? 1 : -1;
 					        }
-						}
+						},
+						'contextmenu' : 
+						{
+					        'items': function menu(node) 
+							{
+								var menu = null;
+								
+								if(node.type==="belief" || node.type==="goal" || node.type==="plan")
+					        	{
+									if(menu==null)
+										menu = {};
+									
+					        		menu.Details = 
+				        			{
+		                                'label': "Details",
+		                                'action': function() 
+		                                {
+											self.refreshDetails(node);
+		                                },
+		                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/details.png'
+				        			};
+					        	}
+		
+					        	return menu;
+							}
+					    }
 					});
 					
 					self.getTree("agent").on("open_node.jstree", (e, data) => 
@@ -115,6 +162,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 					self.getTree("agent").on('refresh.jstree.jstree', function (event, args) 
 					{
 						//console.log("refresh tree event: ");
+						self.treerefreshtimer = null;
 						self.reopenNode("#");
 					});
 					self.getTree("agent").on('refresh_node.jstree.jstree', function (event, args) 
@@ -240,6 +288,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 	{
 		var self = this;
 		var info = event.properties.details;
+		var eventtype = event.type.toLowerCase();		
 				
 		var name = info.type;
 		var type = null;
@@ -249,7 +298,17 @@ class BDIV3AgentDebuggerElement extends CidElement
 		var ret = null;
 
 		var parts = name.split(".");
-		parts.unshift("<agent>");
+		if(eventtype.endsWith("goal") || eventtype.endsWith("plan"))
+		{
+			parts.splice(parts.length-1, 0, "goalbase");
+			//parts.unshift("<goalbase>");
+		}
+		else if(eventtype.endsWith("fact"))
+		{
+			parts.splice(parts.length-1, 0, "beliefbase");
+			//parts.unshift("<beliefbase>");
+		}
+		parts.unshift("agent");
 		
 		if(info.parentId!=null && self.treedata[info.parentId]!=null)
 		{
@@ -287,9 +346,19 @@ class BDIV3AgentDebuggerElement extends CidElement
 					//var icon = null;
 					
 					//console.log(cid+" "+type+" "+icon);
-					if(part==="<agent>")
+					type = part;
+					if(part==="goalbase")
 					{
-						type = "agent";
+						nodename = "goal-plan view";
+						ret = myname;
+					}
+					else if(part==="beliefbase")
+					{
+						nodename = "beliefbase";
+						ret = myname;
+					}
+					else if(part==="agent")
+					{
 						var anames = this.cid.split("@");
 						//part = anames[0];
 						nodename = anames[0];
@@ -297,7 +366,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 					}
 					else
 					{
-						type = null;
+						type = "capability";
 					}
 	
 					// Last path element				
@@ -329,9 +398,10 @@ class BDIV3AgentDebuggerElement extends CidElement
 	createNodeData(id, name, type, icon, parent, info)
 	{
 		//console.log("create node data: "+id+" "+name+" "+type+" "+parent);
+		var text = this.truncate(name);
 		var paid = parent==null || parent.length==0? "#": parent;
 		// must use _parent as parent is already used by jstree
-		var node = {"id": id, "text": name, "type": type, "icon": icon, "children": true, "_parent": paid, "info": info}; // "original": {'hello': true}
+		var node = {"id": id, "text": text, "type": type, "icon": icon, "children": true, "_parent": paid, "info": info}; // "original": {'hello': true}
 		var key = parent==null || parent.length==0? "#": parent;
 		
 		this.addChildData(key, node);
@@ -520,7 +590,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 	
 	updateEvent(event)
 	{
-		console.log("event: "+event.type);
+		//console.log("event: "+event.type);
 		
 		var type = event.type.toLowerCase();
 		var info = event.properties.details;
@@ -563,10 +633,10 @@ class BDIV3AgentDebuggerElement extends CidElement
 			if(Array.isArray(info.value))
 			{
 				valinfo += " [";
-				for(var i=0; i<Math.max(2, info.value.length); i++)
+				for(var i=0; i<Math.min(2, info.value.length); i++)
 				{
 					if(i>0)
-						valifo += " ,";
+						valinfo += " ,";
 					valinfo += info.value[i];
 				}
 				if(info.value.length>2)
@@ -705,27 +775,37 @@ class BDIV3AgentDebuggerElement extends CidElement
 		if(refresh!=null)
 		{
 			//console.log("refresh entered: "+this.getTree("agent").jstree());
-			var hasnode = this.getTree("agent").jstree().get_node(refresh)!=false;
-			if(hasnode)
-			{
-				console.log("refresh node: "+refresh);
-				this.getTree("agent").jstree().refresh_node(refresh);
-			}
-			else
-			{
-				console.log("refresh all, node not in tree: "+refresh);
-				this.getTree("agent").jstree("refresh");
-			}
-			
-			this.getTree("agent").jstree("refresh");
+			this.refreshTree(refresh);
 		}
 		else if(refresh==="all")
 		{
-			console.log("refresh all: "+refresh);
-			this.getTree("agent").jstree("refresh");
+			this.refreshTree(null);
 		}
 		
 		this.requestUpdate();
+	}
+	
+	refreshTree(nodeid)
+	{
+		if(this.treerefreshtimer!=null)
+			return;
+		
+		var self = this;
+		var hasnode = this.getTree("agent").jstree().get_node(nodeid)!=false;
+		hasnode = false;
+		if(hasnode)
+		{
+			console.log("refresh node: "+nodeid);
+			this.getTree("agent").jstree().refresh_node(nodeid);
+		}
+		else
+		{
+			this.treerefreshtimer = setTimeout(function()
+			{
+				console.log("refresh all, node not in tree: "+nodeid);
+				self.getTree("agent").jstree(true).refresh(true, false);
+			}, 1000);
+		}
 	}
 	
 	removeElement(info, ar)
@@ -826,6 +906,81 @@ class BDIV3AgentDebuggerElement extends CidElement
 	{
 		return step1?.properties?.details?.Id === step2?.properties?.details?.Id;
 	}
+	
+	truncate(str, len)
+	{
+		var ret = str;
+		if(!len)
+			len = 50;
+		if(str.length>len)
+		{
+			ret = str.substring(0, len);
+			ret += " ...";
+		}
+		return ret;	
+	}
+	
+		// when node is selected
+	// creates a 'global' info object from node details as saved in treedata
+	// jstree node data cannot contain user data
+	// the info object is then read by the details/property panel
+	refreshDetails(node)
+	{
+		var self = this;
+		
+		console.log("selected: "+node+" "+node.type);
+		if(self.treedata[node.id]==null)
+		{
+			this.shadowRoot.getElementById("details").setInfo(null);
+			return;
+		}	
+		
+		var type = node.type;
+		var info = self.treedata[node.id].info;
+		var myinfo = null;
+		
+		if(type=="belief") 
+		{
+			var myinfo = {type: type};
+			myinfo.heading = "Belief Details";
+			myinfo.name = info.type;
+			myinfo.value = info.value;
+			myinfo.valueType = info.valueType;
+		}
+		else if(type=="goal") 
+		{
+			var myinfo = {};
+			myinfo.heading = "Goal Details";
+			myinfo.name = info.type;
+			myinfo.kind = info.kind;
+			myinfo.lifecyclestate = info.lifecycleState.toLowerCase();
+			myinfo.processingstate = info.processingState.toLowerCase();
+			if(info.parameterInfos)
+			{
+				for(var i=0; i<info.parameterInfos.length; i++)
+				{
+					myinfo["parameter "+info.parameterInfos[i].name] = info.parameterInfos[i].type+" : "+info.parameterInfos[i].value; 
+				}
+			}
+		}
+		else if(type=="plan") 
+		{
+			var myinfo = {};
+			myinfo.heading = "Plan Details";
+			myinfo.name = info.type;
+			myinfo.state = info.state;
+			if(myinfo.parameterInfos)
+			{
+				for(var i=0; i<info.parameterInfos.length; i++)
+				{
+					myinfo["parameter "+info.parameterInfos[i].name] = info.parameterInfos[i].type+" : "+info.parameterInfos[i].value; 
+				}
+			}
+		}
+		
+		if(myinfo!=null)
+			this.shadowRoot.getElementById("details").setInfo(myinfo);
+	}
 		
 	static get styles() 
 	{
@@ -842,12 +997,12 @@ class BDIV3AgentDebuggerElement extends CidElement
 			}
 			.grid-container {
 				display: grid;
-				grid-template-columns: minmax(auto, 1fr) minmax(0, 1fr); 
+				grid-template-columns: minmax(auto, 1fr) minmax(auto, 1fr); 
 				grid-template-rows: minmax(200px, 30vh) minmax(200px, 30vh);
 				grid-gap: 10px;
 			}
 			.span {
-				grid-row: 1 / span 2;
+				grid-row: 1 / 4;
 			}
 			.inner {
 				display: flex;
@@ -914,6 +1069,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 					</div>
 				</div>
 			
+				<jadex-detailsview id="details"></jadex-detailsview>
 			</div>
 		`;
 	}

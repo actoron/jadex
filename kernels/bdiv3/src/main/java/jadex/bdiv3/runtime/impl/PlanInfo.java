@@ -1,6 +1,10 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3x.runtime.IParameter;
 
 
 /**
@@ -12,6 +16,9 @@ public class PlanInfo	extends AbstractBDIInfo
 	
 	/** The plan state (body, passed, failed, aborted). */
 	protected String state;
+	
+	/** The parameter (array of strings parameters). */
+	protected List<ParameterInfo> paraminfos;
 	
 	//-------- constructors --------
 	
@@ -48,6 +55,40 @@ public class PlanInfo	extends AbstractBDIInfo
 	public PlanInfo setState(String state)
 	{
 		this.state = state;
+		return this;
+	}
+	
+	/**
+	 * @return the paraminfos
+	 */
+	public ParameterInfo[] getParameterInfos() 
+	{
+		return paraminfos==null? new ParameterInfo[0]: paraminfos.toArray(new ParameterInfo[0]);
+	}
+
+	/**
+	 *  Set the parameters 
+	 *  @param paraminfos the paraminfos to set
+	 */
+	public PlanInfo setParameterInfos(ParameterInfo[] paraminfos) 
+	{
+		this.paraminfos = new ArrayList<ParameterInfo>();
+		if(paraminfos!=null)
+		{
+			for(int i=0; i<paraminfos.length; i++)
+				this.paraminfos.add(paraminfos[i]);
+		}
+		return this;
+	}
+	
+	/**
+	 *  Add a parameter.
+	 */
+	public PlanInfo addParameterInfo(ParameterInfo paraminfo)
+	{
+		if(this.paraminfos==null)
+			this.paraminfos = new ArrayList<ParameterInfo>();
+		this.paraminfos.add(paraminfo);
 		return this;
 	}
 
@@ -97,10 +138,21 @@ public class PlanInfo	extends AbstractBDIInfo
 //			}
 //		}
 		//return new PlanInfo(id, type, plan.getLifecycleState().toString());
-		return (PlanInfo)new PlanInfo()
+		PlanInfo pi = (PlanInfo)new PlanInfo()
 			.setState(plan.getLifecycleState().toString())
 			.setType(type)
 			.setId(id)
 			.setParentId(paid);
+		
+		IParameter[] ps = plan.getParameters();
+		if(ps!=null)
+		{
+			for(IParameter p: ps)
+			{
+				pi.addParameterInfo(ParameterInfo.createParameterInfo(p, plan.getAgent().getClassLoader()));
+			}
+		}
+		
+		return pi;
 	}
 }

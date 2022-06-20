@@ -1,6 +1,13 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3x.runtime.IParameter;
+import jadex.bridge.ClassInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 
 
 /**
@@ -18,6 +25,9 @@ public class GoalInfo	extends AbstractBDIInfo
 	
 	/** The processing state. */
 	protected String processingstate;
+	
+	/** The parameter (array of strings parameters). */
+	protected List<ParameterInfo> paraminfos;
 	
 	//-------- constructors --------
 	
@@ -92,6 +102,40 @@ public class GoalInfo	extends AbstractBDIInfo
 		this.processingstate = processingstate;
 		return this;
 	}
+	
+	/**
+	 * @return the paraminfos
+	 */
+	public ParameterInfo[] getParameterInfos() 
+	{
+		return paraminfos==null? new ParameterInfo[0]: paraminfos.toArray(new ParameterInfo[0]);
+	}
+
+	/**
+	 *  Set the parameters 
+	 *  @param paraminfos the paraminfos to set
+	 */
+	public GoalInfo setParameterInfos(ParameterInfo[] paraminfos) 
+	{
+		this.paraminfos = new ArrayList<ParameterInfo>();
+		if(paraminfos!=null)
+		{
+			for(int i=0; i<paraminfos.length; i++)
+				this.paraminfos.add(paraminfos[i]);
+		}
+		return this;
+	}
+	
+	/**
+	 *  Add a parameter.
+	 */
+	public GoalInfo addParameterInfo(ParameterInfo paraminfo)
+	{
+		if(this.paraminfos==null)
+			this.paraminfos = new ArrayList<ParameterInfo>();
+		this.paraminfos.add(paraminfo);
+		return this;
+	}
 
 	/**
 	 *  Get the string representation.
@@ -143,12 +187,23 @@ public class GoalInfo	extends AbstractBDIInfo
 //			}
 //		}
 		//return new GoalInfo(id, kind, type, goal.getLifecycleState().toString(), goal.getProcessingState().toString());
-		return (GoalInfo)new GoalInfo()
+		GoalInfo gi = (GoalInfo)new GoalInfo()
 			.setLifecycleState(goal.getLifecycleState().toString())
 			.setProcessingState(goal.getProcessingState().toString())
 			.setKind(kind)
 			.setId(id)
 			.setParentId(paid)
 			.setType(type);
+	
+		IParameter[] ps = goal.getParameters();
+		if(ps!=null)
+		{
+			for(IParameter p: ps)
+			{
+				gi.addParameterInfo(ParameterInfo.createParameterInfo(p, goal.getAgent().getClassLoader()));
+			}
+		}
+		
+		return gi;
 	}
 }

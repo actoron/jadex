@@ -71,6 +71,10 @@ import jadex.rules.eca.Rule;
 
 /**
  *  Runtime element of a plan.
+ *  
+ *  todo: Currently we do not have @PlanParameter. Do we need them?
+ *  They are only visible as long as the plan lives, so only plan
+ *  conditions could use them.
  */
 public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 {

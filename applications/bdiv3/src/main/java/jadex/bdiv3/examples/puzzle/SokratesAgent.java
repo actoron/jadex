@@ -6,12 +6,15 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import org.junit.runners.Parameterized.Parameter;
+
 import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalAPLBuild;
+import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
@@ -136,7 +139,7 @@ public class SokratesAgent
 		 *  Sorts moves according to strategy.
 		 */
 		@GoalAPLBuild
-		public List<MovePlan>	buildAPL()
+		public List<MovePlan> buildAPL()
 		{
 			List<MovePlan>	ret	= new ArrayList<MovePlan>();
 			List<Move>	moves	= board.getPossibleMoves();
@@ -162,7 +165,7 @@ public class SokratesAgent
 		//-------- attributes --------
 		
 		/** The move. */
-		protected Move	move;
+		protected Move move;
 		
 		//-------- constructors --------
 		
@@ -171,7 +174,7 @@ public class SokratesAgent
 		 */
 		public MovePlan(Move move)
 		{
-			this.move	= move;
+			this.move = move;
 		}
 		
 		//-------- methods --------

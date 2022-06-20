@@ -8,16 +8,10 @@ class ComponentTree extends BaseElement
 	{ 
 		return { cid: { type: String }};
 	}
-	
-	postInit()
-	{
-		// make details dragable
-		this.dragElement(this.shadowRoot.getElementById("details"));
-	}
-	
+		
 	init() 
 	{
-		//console.log("component tree");
+		console.log("component tree");
 		
 		this.typemap = null;
 		this.treedata = {};
@@ -57,563 +51,579 @@ class ComponentTree extends BaseElement
 
 		//console.log("components");
 		
+		var res = "jadex/tools/web/commons/detailsview.js";
+		var ures = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String";
+
 		var self = this;
-		
-		this.loadJSTree().then(function()
+		return new Promise((resolve, reject) =>
 		{
-			//console.log("jstree");
-			
-			// init tree
-			var types = self.types;
-			$(function() { self.getTree(self.treeid).jstree(
-			{
-				"plugins": ["sort", "types", "contextmenu"],
-				"core": 
+			// load subcomponents
+			this.loadSubmodule(ures)
+			.then(() =>
+			{ 
+				self.loadJSTree().then(function()
 				{
-					"check_callback" : true,
-					"data": function(node, cb) 
-					{
-						//console.log("in: "+node+" "+mycnt);
-						
-						function getChildData(id)
-						{					
-							var children = self.getChildData(id);
-							// problem: js tree changes data structures :-( give jstree only a clone?
-							//console.log("children of: "+id+" "+children.length);
-							return JSON.parse(JSON.stringify(children));
-						}
-						
-						function loadComponentChildData(cid)
+					//console.log("jstree");
+					
+					// init tree
+					var types = self.types;
+					$(function() 
+					{ 
+						/*self.getTree(self.treeid).on("select_node.jstree", function(evt, data)
 						{
-							return new Promise(function(r, e)
-							{
-								var url = self.getMethodPrefix()+'&methodname=getChildComponentDescriptions&args_0=null&args_1='+cid;
-								//console.log("fetching: "+url);
-								axios.get(url, self.transform).then(function(resp)
-								{
-									//console.log("descs are: "+resp.data);
-									var components = resp.data;
-									
-									self.typemap = {};
-									for(var i=0; i<components.length; i++)
-										self.typemap[components[i].name.name] = components[i].type;
-	
-									self.createTree(self.treeid, components);
-									r();
-								}).catch(err => e(err));
-							});
-						}
+							self.refreshDetails(data.node);
+						});*/
 						
-						// cont() fetches the child data and calls the jstree callback that fetching is finished for this node 
-						function cont()
+						self.getTree(self.treeid).bind("dblclick.jstree", function (event) 
 						{
-							var data = getChildData(node.id);
-							//console.log("out3: "+node+" "+mycnt);
-							cb.call(this, data);
-						}
+							//console.log("double");
+							var node = self.getTree(self.treeid).jstree("get_selected", true)[0];
+							self.refreshDetails(node);
+						});
 						
-						//console.log("loading node: "+node.id);
-						// create nfproperty container nodes with nfproperty children
-						function createNFChildren(node, res, vals, refreshcmd)
+						/*self.getTree(self.treeid).bind("dblclick.jstree", function (event) 
 						{
-							//console.log("createNFChildren: "+node.id+" "+(refreshcmd!=null));
+			   				var node = $(event.target).closest("li");
+			  				var data = node.data("jstree");
+							console.log("dclick: "+data);
+						});*/
+						
+						/*self.getTree(self.treeid).on('refresh.jstree', function (event) 
+						{
+							console.log("refreshed tree: "+event);
+						});*/
+						
+						// Open root node after node has been loaded asyncronously
+						console.log("adding load_node listener");
+						self.getTree(self.treeid).on('load_node.jstree', function (event, args) 
+						{
+							console.log("loaded node: "+event+" "+args);
 							
-							if(res!=null && Object.keys(res).length>0)
+							if(args.node.id==="#")
 							{
-								var nfid = node.id+"_nfprops";
-								//var ch = [];
-								
-								// parent node nfprops
-								var nfpropsnode =  {"id": nfid, "text": "Non-functional Properties", "type": "nfproperties", "children": true};
-								self.addChildData(node.id, nfpropsnode)
-								
-								for(var nfname in res)
+								var childs = self.getTree(self.treeid).jstree('get_node', '#').children;
+								for(var i=0; i<childs.length; i++)
 								{
-									var nfprop = res[nfname];
-									var val = vals!=null? vals[nfname]: null;
-									nfprop.val = val;
-									if(nfprop.dynamic && refreshcmd)
-										nfprop.refreshcmd = refreshcmd;
-									var txt = val!=null? nfprop.name+": "+val: nfprop.name;
-									var nfnode = {"id": nfid+"_"+nfprop.name, "text": txt, 
-										"type": nfprop.dynamic? "nfproperty_dynamic": "nfproperty", "children": false,
-										"refreshcmd": nfprop.dynamic? refreshcmd: null, "propname": nfprop.name, info: nfprop};
-									//ch.push(nfnode);
-									self.addChildData(nfid, nfnode);
-									//console.log("nfprop: "+nfname+" "+nfprop.dynamic+" "+nfnode.refreshcmd);
+									self.getTree(self.treeid).jstree("open_node", childs[i]);
 								}
 							}
-						}
+						});
 						
-						// load initial state via component descriptions
-						if("#"===node.id)
+					    //console.log("adding listener");
+						/*$('#'+treeid).on('select_node.jstree', function (e, data) 
 						{
-							loadComponentChildData(self.cid).then(()=>
-							{
-								self.refreshCMSSubscription();
-								self.requestUpdate();
-								
-								var data = getChildData(node.id);
-								//console.log("out1: "+node+" "+mycnt);
-								
-								cb.call(this, data);
-							}).catch(err=>
-							{
-								console.log(err);
-								var data = getChildData(node.id);
-								//console.log("out2: "+node+" "+mycnt);
-								cb.call(this, data);
-							});
-						}
-						// provided service node
-						else if(node.type==="provided")
+							console.log("select: "+data.node.id);
+							//self.selectModel(data.instance.get_path(data.node,'/'));
+						});
+						
+						$('#'+treeid).on('open_node.jstree', function (e, data) 
 						{
-							// look for nf props (only possible children)
-							// sid is saved in node data 
-							
-							// args IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req
-							var sid = encodeURIComponent(JSON.stringify(node.original.sid));
-							//console.log("SID: "+sid);
-							axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0=null&args_1='+sid, self.transform)
-							.then(function(resp)
-							{
-								//console.log("nf prov props:"+resp.data);		
-							
-								var res = resp.data;
-								
-								if(res!=null && Object.keys(res).length>0)
-								{
-									axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0=null&args_1='+JSON.stringify(node.original.sid), self.transform)
-									.then(function(resp)
-									{
-										function refresh(node) 
-										{
-											axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0=null'
-												+"&args_1="+JSON.stringify(node.original.sid)+"&args_2=null&args_3=null&args_4="+node.original.propname, self.transform)
-											.then(function(resp)
-											{
-												//console.log("refresh nfnode: "+node);
-												var res = resp.data;
-												var val = res[node.original.propname];
-												var txt = node.original.propname+": "+val;
-												
-												//console.log("refresh nfnode: "+node+" "+val);
-												
-												// store new data also in node info
-												self.treedata[node.id].info.val = res[node.original.propname];
-												
-												self.getTree(self.treeid).jstree('rename_node', node, txt);
-												self.refreshDetails(node);
-											})
-											.catch(function(e)
-											{
-												console.log("err in refresh nfnode: "+node);
-											});
-										}
-										
-										var vals = resp.data;
-										createNFChildren(node, res, vals, refresh);	
-										cont();
-									})
-									.catch(function(e)
-									{
-										console.log("getNFProps err: "+e);
-										createNFChildren(node, res);	
-										cont();
-									});
-								}
-								else
-								{
-									console.log("nonfprops");
-									cont();
-								}
-							})
-							.catch(function(e)
-							{
-								console.log("getNF exception: "+e);
-								cont();
-							});
-						}
-						// required service node
-						else if(node.type==="required")
+							console.log("open: "+data.node.id);
+							//self.selectModel(data.instance.get_path(data.node,'/'));
+						});*/
+						
+						/*$('#'+treeid).on('load_node.jstree', function(event, data) 
 						{
-							// look for nf props (only possible children)
-							// cid is saved in node data 
-							
-							// args IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req
-							axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
-							.then(function(resp)
-							{
-								//console.log("nf req props:"+resp.data);		
-								
-								var res = resp.data;
-								
-								if(res!=null && Object.keys(res).length>0)
-								{
-									axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
-									.then(function(resp)
-									{
-										function refresh(node) 
-										{
-											axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.original.cid
-												+"&args_1=null&args_2=null&args_3=true&args_4="+node.original.propname, self.transform)
-											.then(function(resp)
-											{
-												//console.log("refresh nfnode: "+node);
-												var res = resp.data;
-												var val = res[node.original.propname];
-												var txt = node.original.propname+": "+val;
-												
-												console.log("refresh nfnode: "+node+" "+val);
-												
-												// store new data also in node info
-												self.treedata[node.id].info.val = res[node.original.propname];
-
-												self.getTree(self.treeid).jstree('rename_node', node, txt);
-												self.refreshDetails(node);
-											})
-											.catch(function(e)
-											{
-												console.log("err in refresh nfnode: "+node);
-											});
-										}
-										
-										var vals = resp.data;
-										createNFChildren(node, res, vals, refresh);	
-										cont();
-									})
-									.catch(function(e)
-									{
-										createNFChildren(node, res);	
-										cont();
-									});
-								}
-								else
-								{
-									cont();
-								}
-							})
-							.catch(function(e)
-							{
-								console.log("getNF exception: "+e);
-								cont();
-							});
-						}
-						// component nodes 
-						else if(node.type==="default" || node.type==="platform")
-						//else if(node.type!=="system" && node.type!=="applications" && node.type!=="cloud")
+							console.log("load node: "+data.node.id);
+						    var treeNode = data.node;
+						    if(treeNode.type === NODE_TYPE_FOLDER) 
+						    {
+						        domNode = fileTree.get_node(treeNode.id, true);
+						        domNode.addClass('jstree-open').removeClass('jstree-leaf');
+						        //data.node.state.loaded = false;
+						    }
+						});*/ 
+						
+						self.getTree(self.treeid).jstree(
 						{
-							//console.log("loading comp node: "+node.type+" "+node.id);
-							// possible children are
-							// a) nfprops
-							// b) services
-							// c) subcomponents
-							// searches parallel and waits for barrier via Promise.all()
-							
-							// https://stackoverflow.com/questions/31069453/creating-a-es6-promise-without-starting-to-resolve-it
-							// can fail
-							var promc = loadComponentChildData(node.id);
-
-							// nfresolve and serresolve are always called (also on err)
-							var nfresolve = null;
-							var promnf = new Promise(function(r, e)
+							"plugins": ["sort", "types", "contextmenu"],
+							"core": 
 							{
-								nfresolve = r;
-							});
-							
-							var serresolve = null;
-							var promser = new Promise(function(r, e)
-							{
-								serresolve = r;
-							});
-							
-							Promise.all([promnf, promser, promc]).then(function(res)
-							{
-								cont();
-							})
-							.catch(e => 
-							{
-								console.log("err: "+e);
-								cont();	
-							});
-							
-							axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.id, self.transform)
-							.then(function(resp)
-							{
-								//console.log("nf props:"+resp.data);	
-
-								var res = resp.data;
-								
-								if(res!=null && Object.keys(res).length>0)
+								"check_callback" : true,
+								"data": function(node, cb) 
 								{
-									var cid = node.id;
-									axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.id, self.transform)
-									.then(function(resp)
-									{
-										var vals = resp.data;
-										
-										function refresh(node) 
-										{
-											axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+cid
-												+"&args_1=null&args_2=null&args_3=null&args_4="+node.original.propname, self.transform)
-											.then(function(resp)
-											{
-												var res = resp.data;
-												var val = res[node.original.propname];
-												var txt = node.original.propname+": "+val;
-												
-												console.log("refresh nfnode: "+node+" "+val);
-
-												// store new data also in node info
-												self.treedata[node.id].info.val = res[node.original.propname];
-
-												self.getTree(self.treeid).jstree('rename_node', node, txt);
-												self.refreshDetails(node);
-											})
-											.catch(function(e)
-											{
-												console.log("err in refresh nfnode: "+e);
-											});
-										}
-										
-										createNFChildren(node, res, vals, refresh);	
-										nfresolve(null);
-									})
-									.catch(function(e)
-									{
-										console.log("err is: "+e);
-										createNFChildren(node, res);	
-										nfresolve(null);
-									});
-								}
-								else
-								{
-									nfresolve(null);
-								}
-							})
-							.catch(function(e)
-							{
-								console.log("getNF exception: "+e);
-								//promnf.resolve(null);
-								nfresolve(null);
-							});
-							
-							axios.get(self.getMethodPrefix()+'&methodname=getServiceInfos&args_0='+node.id, self.transform)
-							.then(function(resp)
-							{
-								//console.log("service infos: "+resp.data);
-								
-								var res = resp.data;
-								
-								if(res[0].length>0 || res[1].length>0)
-								{
-									var serid = node.id+"_services";
-	
-									var sernode = {"id": serid, "text": "Services", "type": "services", "children": true};
-									self.addChildData(node.id, sernode);
+									//console.log("in: "+node+" "+mycnt);
 									
-									// provided
-									for(var i=0; i<res[0].length; i++)
-									{
-										var psid = serid+"_"+res[0][i].name;
-										var txt = res[0][i].type.value.split(".");
-										txt = txt[txt.length-1];
-										//console.log("sid: "+res[2][i]);
-										var psnode = {"id": psid, "text": txt, "type": "provided", "children": true, "sid": res[2][i], "info": res[0][i]};
-										self.addChildData(serid, psnode);
+									function getChildData(id)
+									{					
+										var children = self.getChildData(id);
+										// problem: js tree changes data structures :-( give jstree only a clone?
+										//console.log("children of: "+id+" "+children.length);
+										return JSON.parse(JSON.stringify(children));
 									}
 									
-									// required
-									for(var i=0; i<res[1].length; i++)
+									function loadComponentChildData(cid)
 									{
-										var rsid = serid+"_"+res[1].name;
-										var txt = res[1][i].type.value.split(".");
-										var mult = res[1][i].multiple;
-										txt = txt[txt.length-1];
-										var rsnode = {"id": rsid, "text": txt, "type": mult? "required_multiple": "required", "children": true, "cid": node.id, "info": res[1][i]};
-										self.addChildData(serid, rsnode);
-									}
-								}
-								
-								serresolve(null);
-								//promser.resolve(null);
-							})
-							.catch(function(e)
-							{
-								console.log("Err loading services for: "+node.id);
-								serresolve(null);
-								//promser.resolve(null);
-							});
-						}
-						else
-						{
-							cont();									
-						}
-					}
-				},
-				'sort': function(a, b) 
-				{
-			        var a1 = this.get_node(a);
-			        var b1 = this.get_node(b);
-			  		var ret = 0;   
-					if(a1.icon == b1.icon)
-			        {
-			            ret = (a1.text > b1.text) ? 1 : -1;
-			        } 
-			        else 
-			        {
-			            ret = (a1.icon > b1.icon) ? 1 : -1;
-			        }
-					//if((a.text!=null && a.text.indexOf("App")!=-1) || (b.text!=null && b.text.indexOf("App")!=-1))
-					//	console.log("sort: "+a+" "+b+" "+ret);
-					return ret;
-				},
-				types,
-				'contextmenu' : 
-				{
-			        'items': function menu(node) 
-					{
-						var menu = null;
-						
-						if(self.treedata[node.id].refreshcmd!=null)
-			        	//if(node.original.refreshcmd!=null)
-			        	{
-							if(menu==null)
-								menu = {};
-							
-			        		menu.Refresh = 
-		        			{
-                                'label': "Refresh",
-                                'action': function() 
-                                {
-                                	// todo: fix subscription refresh!
-                                	
-                                	// self.refreshCMSSubscription();
-									self.treedata[node.id].refreshcmd(node);
-                                	//if(node.original.refreshcmd!=null)
-                                	//{
-                                		//console.log("refresh cmd for: "+node.id);
-                                	//	node.original.refreshcmd(node);
-                                	//}
-                                },
-                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/refresh.png'
-		        			};
-			        	}
-
-						if(self.isComponentNode(node.type))
-						{
-							if(menu==null)
-								menu = {};
-							
-			        		menu.Kill = 
-		        			{
-                                'label': "Kill",
-                                'action': function(obj) 
-                                {
-									//console.log(obj);
-                                	//console.log("kill me: "+node.id);
-                                	self.killComponent(node.id);
-                                },
-                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/kill.png'
-		        			};
-
-							if(self.commands!=null)
-							{
-								for(const command of self.commands) 
-								{ 
-									const cmd = Object.assign({}, command);
-									cmd.node = node;
-									menu[command.label] = cmd;
-								}
-							}
-						}
-						
-						if(menu!=null)
-						{
-							menu.Details = 
-		        			{
-	                            'label': "Details",
-	                            'action': function(obj) 
-	                            {
-									//console.log(obj);
-	                            	//console.log("kill me: "+node.id);
-	                            	//self.killComponent(node.id);
-									self.refreshDetails(node);
-	                            },
-	                            'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/details.png'
-		        			};
-						}
-
-			        	return menu;
-					}
-			    }
-			})});
-			
-			/*self.getTree(self.treeid).on("select_node.jstree", function(evt, data)
-			{
-				self.refreshDetails(data.node);
-			});*/
-			
-			self.getTree(self.treeid).bind("dblclick.jstree", function (event) 
-			{
-				//console.log("double");
-				var node = self.getTree(self.treeid).jstree("get_selected", true)[0];
-				self.refreshDetails(node);
-			});
-			
-			/*self.getTree(self.treeid).bind("dblclick.jstree", function (event) 
-			{
-   				var node = $(event.target).closest("li");
-  				var data = node.data("jstree");
-				console.log("dclick: "+data);
-			});*/
-			
-			/*self.getTree(self.treeid).on('refresh.jstree', function (event) 
-			{
-				console.log("refreshed tree: "+event);
-			});*/
-			
-			// Open root node after node has been loaded asyncronously
-			self.getTree(self.treeid).on('load_node.jstree', function (event, args) 
-			{
-				//console.log("loaded node: "+event+" "+args);
+										return new Promise(function(r, e)
+										{
+											console.log("loadComponentChildData: "+cid);
+											var url = self.getMethodPrefix()+'&methodname=getChildComponentDescriptions&args_0=null&args_1='+cid;
+											//console.log("fetching: "+url);
+											axios.get(url, self.transform).then(function(resp)
+											{
+												//console.log("descs are: "+resp.data);
+												var components = resp.data;
+												
+												self.typemap = {};
+												for(var i=0; i<components.length; i++)
+													self.typemap[components[i].name.name] = components[i].type;
 				
-				if(args.node.id==="#")
-				{
-					var childs = self.getTree(self.treeid).jstree('get_node', '#').children;
-					for(var i=0; i<childs.length; i++)
-					{
-						self.getTree(self.treeid).jstree("open_node", childs[i]);
-					}
-				}
-			});
+												self.createTree(self.treeid, components);
+												r();
+											}).catch(err => e(err));
+										});
+									}
+									
+									// cont() fetches the child data and calls the jstree callback that fetching is finished for this node 
+									function cont()
+									{
+										var data = getChildData(node.id);
+										//console.log("out3: "+node+" "+mycnt);
+										cb.call(this, data);
+									}
+									
+									//console.log("loading node: "+node.id);
+									// create nfproperty container nodes with nfproperty children
+									function createNFChildren(node, res, vals, refreshcmd)
+									{
+										//console.log("createNFChildren: "+node.id+" "+(refreshcmd!=null));
+										
+										if(res!=null && Object.keys(res).length>0)
+										{
+											var nfid = node.id+"_nfprops";
+											//var ch = [];
+											
+											// parent node nfprops
+											var nfpropsnode =  {"id": nfid, "text": "Non-functional Properties", "type": "nfproperties", "children": true};
+											self.addChildData(node.id, nfpropsnode)
+											
+											for(var nfname in res)
+											{
+												var nfprop = res[nfname];
+												var val = vals!=null? vals[nfname]: null;
+												nfprop.val = val;
+												if(nfprop.dynamic && refreshcmd)
+													nfprop.refreshcmd = refreshcmd;
+												var txt = val!=null? nfprop.name+": "+val: nfprop.name;
+												var nfnode = {"id": nfid+"_"+nfprop.name, "text": txt, 
+													"type": nfprop.dynamic? "nfproperty_dynamic": "nfproperty", "children": false,
+													"refreshcmd": nfprop.dynamic? refreshcmd: null, "propname": nfprop.name, info: nfprop};
+												//ch.push(nfnode);
+												self.addChildData(nfid, nfnode);
+												//console.log("nfprop: "+nfname+" "+nfprop.dynamic+" "+nfnode.refreshcmd);
+											}
+										}
+									}
+									
+									// load initial state via component descriptions
+									if("#"===node.id)
+									{
+										loadComponentChildData(self.cid).then(()=>
+										{
+											self.refreshCMSSubscription();
+											self.requestUpdate();
+											
+											var data = getChildData(node.id);
+											//console.log("out1: "+node+" "+data);
+											
+											cb.call(this, data);
+										}).catch(err=>
+										{
+											console.log(err);
+											var data = getChildData(node.id);
+											//console.log("out2: "+node+" "+mycnt);
+											cb.call(this, data);
+										});
+									}
+									// provided service node
+									else if(node.type==="provided")
+									{
+										// look for nf props (only possible children)
+										// sid is saved in node data 
+										
+										// args IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req
+										var sid = encodeURIComponent(JSON.stringify(node.original.sid));
+										//console.log("SID: "+sid);
+										axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0=null&args_1='+sid, self.transform)
+										.then(function(resp)
+										{
+											//console.log("nf prov props:"+resp.data);		
+										
+											var res = resp.data;
+											
+											if(res!=null && Object.keys(res).length>0)
+											{
+												axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0=null&args_1='+JSON.stringify(node.original.sid), self.transform)
+												.then(function(resp)
+												{
+													function refresh(node) 
+													{
+														axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0=null'
+															+"&args_1="+JSON.stringify(node.original.sid)+"&args_2=null&args_3=null&args_4="+node.original.propname, self.transform)
+														.then(function(resp)
+														{
+															//console.log("refresh nfnode: "+node);
+															var res = resp.data;
+															var val = res[node.original.propname];
+															var txt = node.original.propname+": "+val;
+															
+															//console.log("refresh nfnode: "+node+" "+val);
+															
+															// store new data also in node info
+															self.treedata[node.id].info.val = res[node.original.propname];
+															
+															self.getTree(self.treeid).jstree('rename_node', node, txt);
+															self.refreshDetails(node);
+														})
+														.catch(function(e)
+														{
+															console.log("err in refresh nfnode: "+node);
+														});
+													}
+													
+													var vals = resp.data;
+													createNFChildren(node, res, vals, refresh);	
+													cont();
+												})
+												.catch(function(e)
+												{
+													console.log("getNFProps err: "+e);
+													createNFChildren(node, res);	
+													cont();
+												});
+											}
+											else
+											{
+												console.log("nonfprops");
+												cont();
+											}
+										})
+										.catch(function(e)
+										{
+											console.log("getNF exception: "+e);
+											cont();
+										});
+									}
+									// required service node
+									else if(node.type==="required")
+									{
+										// look for nf props (only possible children)
+										// cid is saved in node data 
+										
+										// args IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req
+										axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
+										.then(function(resp)
+										{
+											//console.log("nf req props:"+resp.data);		
+											
+											var res = resp.data;
+											
+											if(res!=null && Object.keys(res).length>0)
+											{
+												axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
+												.then(function(resp)
+												{
+													function refresh(node) 
+													{
+														axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.original.cid
+															+"&args_1=null&args_2=null&args_3=true&args_4="+node.original.propname, self.transform)
+														.then(function(resp)
+														{
+															//console.log("refresh nfnode: "+node);
+															var res = resp.data;
+															var val = res[node.original.propname];
+															var txt = node.original.propname+": "+val;
+															
+															console.log("refresh nfnode: "+node+" "+val);
+															
+															// store new data also in node info
+															self.treedata[node.id].info.val = res[node.original.propname];
 			
-		    //console.log("adding listener");
-			/*$('#'+treeid).on('select_node.jstree', function (e, data) 
-			{
-				console.log("select: "+data.node.id);
-				//self.selectModel(data.instance.get_path(data.node,'/'));
-			});
+															self.getTree(self.treeid).jstree('rename_node', node, txt);
+															self.refreshDetails(node);
+														})
+														.catch(function(e)
+														{
+															console.log("err in refresh nfnode: "+node);
+														});
+													}
+													
+													var vals = resp.data;
+													createNFChildren(node, res, vals, refresh);	
+													cont();
+												})
+												.catch(function(e)
+												{
+													createNFChildren(node, res);	
+													cont();
+												});
+											}
+											else
+											{
+												cont();
+											}
+										})
+										.catch(function(e)
+										{
+											console.log("getNF exception: "+e);
+											cont();
+										});
+									}
+									// component nodes 
+									else if(node.type==="default" || node.type==="platform")
+									//else if(node.type!=="system" && node.type!=="applications" && node.type!=="cloud")
+									{
+										//console.log("loading comp node: "+node.type+" "+node.id);
+										// possible children are
+										// a) nfprops
+										// b) services
+										// c) subcomponents
+										// searches parallel and waits for barrier via Promise.all()
+										
+										// https://stackoverflow.com/questions/31069453/creating-a-es6-promise-without-starting-to-resolve-it
+										// can fail
+										var promc = loadComponentChildData(node.id);
 			
-			$('#'+treeid).on('open_node.jstree', function (e, data) 
-			{
-				console.log("open: "+data.node.id);
-				//self.selectModel(data.instance.get_path(data.node,'/'));
-			});*/
+										// nfresolve and serresolve are always called (also on err)
+										var nfresolve = null;
+										var promnf = new Promise(function(r, e)
+										{
+											nfresolve = r;
+										});
+										
+										var serresolve = null;
+										var promser = new Promise(function(r, e)
+										{
+											serresolve = r;
+										});
+										
+										Promise.all([promnf, promser, promc]).then(function(res)
+										{
+											cont();
+										})
+										.catch(e => 
+										{
+											console.log("err: "+e);
+											cont();	
+										});
+										
+										axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.id, self.transform)
+										.then(function(resp)
+										{
+											//console.log("nf props:"+resp.data);	
 			
-			/*$('#'+treeid).on('load_node.jstree', function(event, data) 
-			{
-				console.log("load node: "+data.node.id);
-			    var treeNode = data.node;
-			    if(treeNode.type === NODE_TYPE_FOLDER) 
-			    {
-			        domNode = fileTree.get_node(treeNode.id, true);
-			        domNode.addClass('jstree-open').removeClass('jstree-leaf');
-			        //data.node.state.loaded = false;
-			    }
-			});*/ 
+											var res = resp.data;
+											
+											if(res!=null && Object.keys(res).length>0)
+											{
+												var cid = node.id;
+												axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.id, self.transform)
+												.then(function(resp)
+												{
+													var vals = resp.data;
+													
+													function refresh(node) 
+													{
+														axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+cid
+															+"&args_1=null&args_2=null&args_3=null&args_4="+node.original.propname, self.transform)
+														.then(function(resp)
+														{
+															var res = resp.data;
+															var val = res[node.original.propname];
+															var txt = node.original.propname+": "+val;
+															
+															console.log("refresh nfnode: "+node+" "+val);
 			
-			//self.refresh();
+															// store new data also in node info
+															self.treedata[node.id].info.val = res[node.original.propname];
+			
+															self.getTree(self.treeid).jstree('rename_node', node, txt);
+															self.refreshDetails(node);
+														})
+														.catch(function(e)
+														{
+															console.log("err in refresh nfnode: "+e);
+														});
+													}
+													
+													createNFChildren(node, res, vals, refresh);	
+													nfresolve(null);
+												})
+												.catch(function(e)
+												{
+													console.log("err is: "+e);
+													createNFChildren(node, res);	
+													nfresolve(null);
+												});
+											}
+											else
+											{
+												nfresolve(null);
+											}
+										})
+										.catch(function(e)
+										{
+											console.log("getNF exception: "+e);
+											//promnf.resolve(null);
+											nfresolve(null);
+										});
+										
+										axios.get(self.getMethodPrefix()+'&methodname=getServiceInfos&args_0='+node.id, self.transform)
+										.then(function(resp)
+										{
+											//console.log("service infos: "+resp.data);
+											
+											var res = resp.data;
+											
+											if(res[0].length>0 || res[1].length>0)
+											{
+												var serid = node.id+"_services";
+				
+												var sernode = {"id": serid, "text": "Services", "type": "services", "children": true};
+												self.addChildData(node.id, sernode);
+												
+												// provided
+												for(var i=0; i<res[0].length; i++)
+												{
+													var psid = serid+"_"+res[0][i].name;
+													var txt = res[0][i].type.value.split(".");
+													txt = txt[txt.length-1];
+													//console.log("sid: "+res[2][i]);
+													var psnode = {"id": psid, "text": txt, "type": "provided", "children": true, "sid": res[2][i], "info": res[0][i]};
+													self.addChildData(serid, psnode);
+												}
+												
+												// required
+												for(var i=0; i<res[1].length; i++)
+												{
+													var rsid = serid+"_"+res[1].name;
+													var txt = res[1][i].type.value.split(".");
+													var mult = res[1][i].multiple;
+													txt = txt[txt.length-1];
+													var rsnode = {"id": rsid, "text": txt, "type": mult? "required_multiple": "required", "children": true, "cid": node.id, "info": res[1][i]};
+													self.addChildData(serid, rsnode);
+												}
+											}
+											
+											serresolve(null);
+											//promser.resolve(null);
+										})
+										.catch(function(e)
+										{
+											console.log("Err loading services for: "+node.id);
+											serresolve(null);
+											//promser.resolve(null);
+										});
+									}
+									else
+									{
+										cont();									
+									}
+								}
+							},
+							'sort': function(a, b) 
+							{
+						        var a1 = this.get_node(a);
+						        var b1 = this.get_node(b);
+						  		var ret = 0;   
+								if(a1.icon == b1.icon)
+						        {
+						            ret = (a1.text > b1.text) ? 1 : -1;
+						        } 
+						        else 
+						        {
+						            ret = (a1.icon > b1.icon) ? 1 : -1;
+						        }
+								//if((a.text!=null && a.text.indexOf("App")!=-1) || (b.text!=null && b.text.indexOf("App")!=-1))
+								//	console.log("sort: "+a+" "+b+" "+ret);
+								return ret;
+							},
+							types,
+							'contextmenu' : 
+							{
+						        'items': function menu(node) 
+								{
+									var menu = null;
+									
+									if(self.treedata[node.id].refreshcmd!=null)
+						        	//if(node.original.refreshcmd!=null)
+						        	{
+										if(menu==null)
+											menu = {};
+										
+						        		menu.Refresh = 
+					        			{
+			                                'label': "Refresh",
+			                                'action': function() 
+			                                {
+			                                	// todo: fix subscription refresh!
+			                                	
+			                                	// self.refreshCMSSubscription();
+												self.treedata[node.id].refreshcmd(node);
+			                                	//if(node.original.refreshcmd!=null)
+			                                	//{
+			                                		//console.log("refresh cmd for: "+node.id);
+			                                	//	node.original.refreshcmd(node);
+			                                	//}
+			                                },
+			                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/refresh.png'
+					        			};
+						        	}
+			
+									if(self.isComponentNode(node.type))
+									{
+										if(menu==null)
+											menu = {};
+										
+						        		menu.Kill = 
+					        			{
+			                                'label': "Kill",
+			                                'action': function(obj) 
+			                                {
+												//console.log(obj);
+			                                	//console.log("kill me: "+node.id);
+			                                	self.killComponent(node.id);
+			                                },
+			                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/kill.png'
+					        			};
+			
+										if(self.commands!=null)
+										{
+											for(const command of self.commands) 
+											{ 
+												const cmd = Object.assign({}, command);
+												cmd.node = node;
+												menu[command.label] = cmd;
+											}
+										}
+									}
+									
+									if(menu!=null)
+									{
+										menu.Details = 
+					        			{
+				                            'label': "Details",
+				                            'action': function(obj) 
+				                            {
+												//console.log(obj);
+				                            	//console.log("kill me: "+node.id);
+				                            	//self.killComponent(node.id);
+												self.refreshDetails(node);
+				                            },
+				                            'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/details.png'
+					        			};
+									}
+			
+						        	return menu;
+								}
+						    }
+						})
+					});
+					
+					resolve();
+				})
+			})
+			.catch(err => reject(err));
 		});
 	}
 	
@@ -629,7 +639,7 @@ class ComponentTree extends BaseElement
 		if(self.treedata[node.id]==null)
 		{
 			self.info=null;
-			self.requestUpdate();
+			this.shadowRoot.getElementById("details").setInfo(null);
 			return;
 		}	
 		
@@ -660,7 +670,7 @@ class ComponentTree extends BaseElement
 				return new Promise(function(r, e)
 				{
 					//console.log("refresh: "+info.name.name);
-					axios.get(self.getMethodPrefix()+'&methodname=getComponentDescription&arg0='+info.name.name, self.transform).then(function(resp)
+					axios.get(self.getMethodPrefix()+'&methodname=getComponentDescription&args_0='+info.name.name, self.transform).then(function(resp)
 					{
 						//console.log("desc is: "+resp.data);
 						var oldcmd = self.info.refreshcmd;
@@ -725,7 +735,7 @@ class ComponentTree extends BaseElement
 				self.info.node = node;
 		}
 		
-		self.requestUpdate();
+		this.shadowRoot.getElementById("details").setInfo(self.info);
 	}
 	
 	killComponent(cid)
@@ -736,7 +746,7 @@ class ComponentTree extends BaseElement
 		
 		return new Promise(function(r, e)
 		{
-			axios.get(self.getMethodPrefix()+'&methodname=killComponent&arg0='+cid, self.transform).then(function(resp)
+			axios.get(self.getMethodPrefix()+'&methodname=killComponent&args_0='+cid, self.transform).then(function(resp)
 			{
 				//console.log("killed: "+cid);
 				self.createInfoMessage("Killed component "+cid); 
@@ -1145,61 +1155,6 @@ class ComponentTree extends BaseElement
 		this.commands = commands;
 	}
 	
-	// methods for making dragable an element
-	dragElement(element) 
-	{
-		var x1 = 0;
-		var y1 = 0;
-		var x2 = 0; 
-		var y2 = 0;
-
-		var moved = e =>
-		{
-			e = e || window.event;
-	    	e.preventDefault();
-	    	x1 = x2 - e.clientX;
-	    	y1 = y2 - e.clientY;
-	    	x2 = e.clientX;
-	    	y2 = e.clientY;
-			//console.log("to: "+x2+" "+y2);
-	    	// set the element's new position:
-			//var y = parseInt(element.style.top) || 0;
-	    	//var x = parseInt(element.style.left) || 0;
-			element.style.top = element.offsetTop-y1+"px";
-	    	element.style.left = element.offsetLeft-x1+"px";
-		}
-
-		var md = e => 
-		{
-			//console.log("offsetx: "+e.offsetX+" "+e.clientX);
-			
-			if(element.offsetWidth-e.offsetX < 20 && element.offsetHeight-e.offsetY < 20)
-			{
-				//console.log("at resize border");
-				return;
-	    	}
-
-			e = e || window.event;
-	    	e.preventDefault();
-			x2 = e.clientX;
-	    	y2 = e.clientY;
-			//console.log("from: "+x2+" "+y2);
-			
-			// clean up document mouse listeners after mouse released
-			document.addEventListener("mouseup", e =>
-			{
-				document.removeEventListener("mouseup", this);
-				document.removeEventListener("mousemove", moved);
-			});
-			
-			// watch now for movements
-			document.addEventListener("mousemove", moved);
-	  	}
-
-		// listen on mouse clicks on that element
-		element.addEventListener("mousedown", md);
-	}
-	
 	static get styles() 
 	{
 	    return css`
@@ -1215,29 +1170,6 @@ class ComponentTree extends BaseElement
 	  			0% { transform: rotate(0deg); }
 	  			100% { transform: rotate(360deg); }
 			}
-			.dragable {
-				padding: 10px;
-				position: absolute;
-				top: 0px;
-				left: 70%;
-				width: 30%;
-			  	background-color: #00000011;
-			  	border: 1px solid #d3d3d3;
-				z-axis: 1;
-		 		resize: both;
-    			overflow: hidden;
-			}
-			.grid {
-				display: grid;
-				grid-template-columns: auto 1fr;
-				grid-gap: 10px;
-			}
-			.marginbottom {
-				margin-top: 0px;
-				margin-left: 0px;
-				margin-right: 0px;
-				margin-bottom: 0.5em;
-			}
 	    `;
 	}
 	
@@ -1245,19 +1177,7 @@ class ComponentTree extends BaseElement
 	{
 		return html`
 			<div id="componenttree"></div>
-			<div id="details" class="dragable ${this.info!=null? 'visible': 'hidden'}">
-				<div class="close absolute" @click="${e => {this.info=null; this.requestUpdate();}}"></div>
-				<h4 class="marginbottom">${this.info!=null? this.info.heading: ""}</h4>
-				<div class="grid marginbottom">
-					${this.getProps().map(propname => html`
-						<div>${propname.charAt(0).toUpperCase() + propname.slice(1)}</div>
-						<div text-wrap text-break">${this.info[propname]}</div>
-					`)}
-				</div>
-				<div class="${this.info?.refreshcmd!=null? 'visible': 'hidden'}">
-					<button type="button" class="jadexbtn" @click="${e => this.info.refreshcmd(this.info.node)}">${this.app.lang.t('Refresh')}</button>
-				</div>
-			</div>
+			<jadex-detailsview id="details"></jadex-detailsview>
 		`;
 	}
 }

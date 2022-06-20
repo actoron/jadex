@@ -128,7 +128,8 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 				
 			    public void finished()
 			    {
-			    	ret.setFinished();
+			    	// setMaxResultCount sets finished when all results received
+			    	ret.setFinishedIfUndone();
 			    }
 			    
 			    public void maxResultCountAvailable(int max)

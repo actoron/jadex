@@ -490,6 +490,15 @@ jadex-app {
 	width: 50%;
 }
 
+.breakall {
+  word-break: break-all;
+}
+
+.breakword {
+  overflow-wrap: break-word; 
+}
+    
+
 .colorerror {
 	background-color: #f8d7da;
 }

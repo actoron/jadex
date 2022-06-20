@@ -18,7 +18,7 @@ public interface IParameter extends IElement
 	 *  Get the value of a parameter.
 	 *  @return The value.
 	 */
-	public Object	getValue();
+	public Object getValue();
 
 	/**
 	 *  Get the name.
