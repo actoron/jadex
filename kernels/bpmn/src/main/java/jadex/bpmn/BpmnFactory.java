@@ -332,7 +332,8 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 */
 	public IFuture<String> getComponentType(String model, String[] imports, IResourceIdentifier rid)
 	{
-		return new Future<String>(model.endsWith(".bpmn") ? FILETYPE_BPMNLEGACYPROCESS : model.endsWith(".bpmn2") ? FILETYPE_BPMNPROCESS : null);
+		//return new Future<String>(model.endsWith(".bpmn") ? FILETYPE_BPMNLEGACYPROCESS : model.endsWith(".bpmn2") ? FILETYPE_BPMNPROCESS : null);
+		return new Future<String>(model.endsWith(".bpmn") || model.endsWith(".bpmn2") ? FILETYPE_BPMNPROCESS : null);
 	}
 		
 	/**

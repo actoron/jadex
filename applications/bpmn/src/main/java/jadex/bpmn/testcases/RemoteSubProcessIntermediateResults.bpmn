@@ -1,13 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>RemoteSubProcessIntermediateResults</jadex:modelname>
     <jadex:description>&lt;H1&gt;Intermediate Result Events&lt;/H1&gt; Tests if a subprocess can be started that produces intermediate results. These intermediate results will be received by the parent process and can be handled by an activity signal handler.</jadex:description>
     <jadex:package>jadex.bpmn.testcases</jadex:package>
@@ -33,111 +25,111 @@
       <jadex:configuration name="Pool">
       </jadex:configuration>
     </jadex:configurations>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_dQi2YUEGEeGYyvkANn-TCw">
-    <semantic:startEvent id="_hdNEEUEGEeGYyvkANn-TCw">
-      <semantic:outgoing>_h7uMEUEGEeGYyvkANn-TCw</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:task name="Create remote \nplatform" id="_dQkEgUEGEeGYyvkANn-TCw">
-      <semantic:incoming>_h7uMEUEGEeGYyvkANn-TCw</semantic:incoming>
-      <semantic:outgoing>_f17AYUEKEeGYyvkANn-TCw</semantic:outgoing>
-      <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_dQi2YUEGEeGYyvkANn-TCw" name="Pool">
+    <bpmn:startEvent id="_hdNEEUEGEeGYyvkANn-TCw">
+      <bpmn:outgoing>_h7uMEUEGEeGYyvkANn-TCw</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="_dQkEgUEGEeGYyvkANn-TCw" name="Create remote \nplatform">
+      <bpmn:incoming>_h7uMEUEGEeGYyvkANn-TCw</bpmn:incoming>
+      <bpmn:outgoing>_f17AYUEKEeGYyvkANn-TCw</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>CreatePlatformTask</jadex:class>
         <jadex:parameter direction="out" name="cid" type="jadex.bridge.IComponentIdentifier"/>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:exclusiveGateway id="_USp0sUEOEeGYyvkANn-TCw" default="_XDJmYUEOEeGYyvkANn-TCw">
-      <semantic:incoming>_US5FQUEOEeGYyvkANn-TCw</semantic:incoming>
-      <semantic:outgoing>_VFaHUUEOEeGYyvkANn-TCw</semantic:outgoing>
-      <semantic:outgoing>_XDJmYUEOEeGYyvkANn-TCw</semantic:outgoing>
-    </semantic:exclusiveGateway>
-    <semantic:task name="Failure" id="_XC7j8UEOEeGYyvkANn-TCw">
-      <semantic:incoming>_XDJmYUEOEeGYyvkANn-TCw</semantic:incoming>
-      <semantic:outgoing>_ZGbFsUEOEeGYyvkANn-TCw</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:exclusiveGateway default="_XDJmYUEOEeGYyvkANn-TCw" id="_USp0sUEOEeGYyvkANn-TCw">
+      <bpmn:incoming>_US5FQUEOEeGYyvkANn-TCw</bpmn:incoming>
+      <bpmn:outgoing>_VFaHUUEOEeGYyvkANn-TCw</bpmn:outgoing>
+      <bpmn:outgoing>_XDJmYUEOEeGYyvkANn-TCw</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="_XC7j8UEOEeGYyvkANn-TCw" name="Failure">
+      <bpmn:incoming>_XDJmYUEOEeGYyvkANn-TCw</bpmn:incoming>
+      <bpmn:outgoing>_ZGbFsUEOEeGYyvkANn-TCw</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
         <jadex:parameter direction="in" name="name" type="java.lang.String">&quot;testresults&quot;</jadex:parameter>
         <jadex:parameter direction="in" name="value" type="java.lang.Object">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Test intermediate results processing.&quot;, false, &quot;Wrong number of results.&quot;)})</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Success" id="_VFMr8UEOEeGYyvkANn-TCw">
-      <semantic:incoming>_VFaHUUEOEeGYyvkANn-TCw</semantic:incoming>
-      <semantic:outgoing>_YvX3oUEOEeGYyvkANn-TCw</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_VFMr8UEOEeGYyvkANn-TCw" name="Success">
+      <bpmn:incoming>_VFaHUUEOEeGYyvkANn-TCw</bpmn:incoming>
+      <bpmn:outgoing>_YvX3oUEOEeGYyvkANn-TCw</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
         <jadex:parameter direction="in" name="name" type="java.lang.String">&quot;testresults&quot;</jadex:parameter>
         <jadex:parameter direction="in" name="value" type="java.lang.Object">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Test intermediate results processing.&quot;, true, null)})</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:exclusiveGateway id="_YvJOIUEOEeGYyvkANn-TCw">
-      <semantic:incoming>_YvX3oUEOEeGYyvkANn-TCw</semantic:incoming>
-      <semantic:incoming>_ZGbFsUEOEeGYyvkANn-TCw</semantic:incoming>
-      <semantic:outgoing>_aJUGEUEOEeGYyvkANn-TCw</semantic:outgoing>
-    </semantic:exclusiveGateway>
-    <semantic:endEvent id="_aJHRwUEOEeGYyvkANn-TCw">
-      <semantic:incoming>_aJUGEUEOEeGYyvkANn-TCw</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:task name="Save platform cid" id="_f1tlAUEKEeGYyvkANn-TCw">
-      <semantic:incoming>_f17AYUEKEeGYyvkANn-TCw</semantic:incoming>
-      <semantic:outgoing>_7xR4AUEKEeGYyvkANn-TCw</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="_YvJOIUEOEeGYyvkANn-TCw">
+      <bpmn:incoming>_YvX3oUEOEeGYyvkANn-TCw</bpmn:incoming>
+      <bpmn:incoming>_ZGbFsUEOEeGYyvkANn-TCw</bpmn:incoming>
+      <bpmn:outgoing>_aJUGEUEOEeGYyvkANn-TCw</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="_aJHRwUEOEeGYyvkANn-TCw">
+      <bpmn:incoming>_aJUGEUEOEeGYyvkANn-TCw</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="_f1tlAUEKEeGYyvkANn-TCw" name="Save platform cid">
+      <bpmn:incoming>_f17AYUEKEeGYyvkANn-TCw</bpmn:incoming>
+      <bpmn:outgoing>_7xR4AUEKEeGYyvkANn-TCw</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
         <jadex:parameter direction="in" name="name" type="java.lang.String">&quot;cid&quot;</jadex:parameter>
         <jadex:parameter direction="in" name="value" type="java.lang.Object">cid</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:subProcess name="SubProcess" id="_7wemwUEKEeGYyvkANn-TCw">
-      <semantic:incoming>_7xR4AUEKEeGYyvkANn-TCw</semantic:incoming>
-      <semantic:outgoing>_US5FQUEOEeGYyvkANn-TCw</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:subProcess id="_7wemwUEKEeGYyvkANn-TCw" name="SubProcess">
+      <bpmn:incoming>_7xR4AUEKEeGYyvkANn-TCw</bpmn:incoming>
+      <bpmn:outgoing>_US5FQUEOEeGYyvkANn-TCw</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:parameter direction="out" name="out" type="Object"/>
         <jadex:property name="creation info">new CreationInfo(cid)</jadex:property>
-        <jadex:property name="file" type="java.lang.String">&quot;IntermediateResultProducer.bpmn2&quot;</jadex:property>
-        <jadex:subprocessexpressionref>&quot;IntermediateResultProducer.bpmn2&quot;</jadex:subprocessexpressionref>
-      </semantic:extensionElements>
-    </semantic:subProcess>
-    <semantic:boundaryEvent id="_GK3aoUEOEeGYyvkANn-TCw" attachedToRef="_7wemwUEKEeGYyvkANn-TCw">
-      <semantic:outgoing>_LRk1wEEOEeGYyvkANn-TCw</semantic:outgoing>
-      <semantic:signalEventDefinition/>
-      <semantic:extensionElements>
+        <jadex:property name="file" type="java.lang.String">&quot;IntermediateResultProducer.bpmn&quot;</jadex:property>
+        <jadex:subprocessexpressionref>&quot;IntermediateResultProducer.bpmn&quot;</jadex:subprocessexpressionref>
+      </bpmn:extensionElements>
+    </bpmn:subProcess>
+    <bpmn:boundaryEvent attachedToRef="_7wemwUEKEeGYyvkANn-TCw" id="_GK3aoUEOEeGYyvkANn-TCw">
+      <bpmn:outgoing>_LRk1wEEOEeGYyvkANn-TCw</bpmn:outgoing>
+      <bpmn:signalEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="signal_trigger">&quot;out&quot;</jadex:property>
-      </semantic:extensionElements>
-    </semantic:boundaryEvent>
-    <semantic:task name="result" id="_JQERAUEOEeGYyvkANn-TCw">
-      <semantic:incoming>_LRk1wEEOEeGYyvkANn-TCw</semantic:incoming>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:boundaryEvent>
+    <bpmn:task id="_JQERAUEOEeGYyvkANn-TCw" name="result">
+      <bpmn:incoming>_LRk1wEEOEeGYyvkANn-TCw</bpmn:incoming>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
         <jadex:parameter direction="in" name="name" type="String">&quot;results&quot;</jadex:parameter>
         <jadex:parameter direction="in" name="value" type="Object"/>
         <jadex:parameter direction="in" name="key" type="String">results.size()</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:sequenceFlow sourceRef="_hdNEEUEGEeGYyvkANn-TCw" targetRef="_dQkEgUEGEeGYyvkANn-TCw" id="_h7uMEUEGEeGYyvkANn-TCw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_dQkEgUEGEeGYyvkANn-TCw" targetRef="_f1tlAUEKEeGYyvkANn-TCw" id="_f17AYUEKEeGYyvkANn-TCw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_USp0sUEOEeGYyvkANn-TCw" targetRef="_VFMr8UEOEeGYyvkANn-TCw" id="_VFaHUUEOEeGYyvkANn-TCw">
-      <semantic:conditionExpression>results.size()==6</semantic:conditionExpression>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_USp0sUEOEeGYyvkANn-TCw" targetRef="_XC7j8UEOEeGYyvkANn-TCw" id="_XDJmYUEOEeGYyvkANn-TCw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_XC7j8UEOEeGYyvkANn-TCw" targetRef="_YvJOIUEOEeGYyvkANn-TCw" id="_ZGbFsUEOEeGYyvkANn-TCw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_VFMr8UEOEeGYyvkANn-TCw" targetRef="_YvJOIUEOEeGYyvkANn-TCw" id="_YvX3oUEOEeGYyvkANn-TCw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_YvJOIUEOEeGYyvkANn-TCw" targetRef="_aJHRwUEOEeGYyvkANn-TCw" id="_aJUGEUEOEeGYyvkANn-TCw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_f1tlAUEKEeGYyvkANn-TCw" targetRef="_7wemwUEKEeGYyvkANn-TCw" id="_7xR4AUEKEeGYyvkANn-TCw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_7wemwUEKEeGYyvkANn-TCw" targetRef="_USp0sUEOEeGYyvkANn-TCw" id="_US5FQUEOEeGYyvkANn-TCw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_GK3aoUEOEeGYyvkANn-TCw" targetRef="_JQERAUEOEeGYyvkANn-TCw" id="_LRk1wEEOEeGYyvkANn-TCw">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-      <jadex:dataFlow id="uT1lKiSiQoSKJU5u" sourceRef="_dQkEgUEGEeGYyvkANn-TCw" sourceParam="cid" targetRef="_f1tlAUEKEeGYyvkANn-TCw" targetParam="value"/>
-      <jadex:dataFlow id="DSX1cP8H4JK0AXoq" sourceRef="_7wemwUEKEeGYyvkANn-TCw" sourceParam="out" targetRef="_JQERAUEOEeGYyvkANn-TCw" targetParam="value"/>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="_h7uMEUEGEeGYyvkANn-TCw" sourceRef="_hdNEEUEGEeGYyvkANn-TCw" targetRef="_dQkEgUEGEeGYyvkANn-TCw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_f17AYUEKEeGYyvkANn-TCw" sourceRef="_dQkEgUEGEeGYyvkANn-TCw" targetRef="_f1tlAUEKEeGYyvkANn-TCw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_VFaHUUEOEeGYyvkANn-TCw" sourceRef="_USp0sUEOEeGYyvkANn-TCw" targetRef="_VFMr8UEOEeGYyvkANn-TCw">
+      <bpmn:conditionExpression>results.size()==6</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_XDJmYUEOEeGYyvkANn-TCw" sourceRef="_USp0sUEOEeGYyvkANn-TCw" targetRef="_XC7j8UEOEeGYyvkANn-TCw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_ZGbFsUEOEeGYyvkANn-TCw" sourceRef="_XC7j8UEOEeGYyvkANn-TCw" targetRef="_YvJOIUEOEeGYyvkANn-TCw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_YvX3oUEOEeGYyvkANn-TCw" sourceRef="_VFMr8UEOEeGYyvkANn-TCw" targetRef="_YvJOIUEOEeGYyvkANn-TCw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_aJUGEUEOEeGYyvkANn-TCw" sourceRef="_YvJOIUEOEeGYyvkANn-TCw" targetRef="_aJHRwUEOEeGYyvkANn-TCw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_7xR4AUEKEeGYyvkANn-TCw" sourceRef="_f1tlAUEKEeGYyvkANn-TCw" targetRef="_7wemwUEKEeGYyvkANn-TCw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_US5FQUEOEeGYyvkANn-TCw" sourceRef="_7wemwUEKEeGYyvkANn-TCw" targetRef="_USp0sUEOEeGYyvkANn-TCw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_LRk1wEEOEeGYyvkANn-TCw" sourceRef="_GK3aoUEOEeGYyvkANn-TCw" targetRef="_JQERAUEOEeGYyvkANn-TCw">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+      <jadex:dataFlow id="uT1lKiSiQoSKJU5u" sourceParam="cid" sourceRef="_dQkEgUEGEeGYyvkANn-TCw" targetParam="value" targetRef="_f1tlAUEKEeGYyvkANn-TCw"/>
+      <jadex:dataFlow id="DSX1cP8H4JK0AXoq" sourceParam="out" sourceRef="_7wemwUEKEeGYyvkANn-TCw" targetParam="value" targetRef="_JQERAUEOEeGYyvkANn-TCw"/>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_dQi2YUEGEeGYyvkANn-TCw">
@@ -194,13 +186,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_f17AYUEKEeGYyvkANn-TCw">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_f17AYUEKEeGYyvkANn-TCw">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_h7uMEUEGEeGYyvkANn-TCw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_h7uMEUEGEeGYyvkANn-TCw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_7xR4AUEKEeGYyvkANn-TCw">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_7xR4AUEKEeGYyvkANn-TCw">
       </bpmndi:BPMNEdge>
@@ -210,29 +196,18 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_XDJmYUEOEeGYyvkANn-TCw">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_VFaHUUEOEeGYyvkANn-TCw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_XDJmYUEOEeGYyvkANn-TCw">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_YvX3oUEOEeGYyvkANn-TCw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_YvX3oUEOEeGYyvkANn-TCw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_ZGbFsUEOEeGYyvkANn-TCw">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_ZGbFsUEOEeGYyvkANn-TCw">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_aJUGEUEOEeGYyvkANn-TCw">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_aJUGEUEOEeGYyvkANn-TCw">
-      </bpmndi:BPMNEdge>
-      <di:Edge type="data" jadexElement="uT1lKiSiQoSKJU5u">
+      <di:Edge jadexElement="uT1lKiSiQoSKJU5u" type="data">
       </di:Edge>
-      <di:Edge type="data" jadexElement="DSX1cP8H4JK0AXoq">
+      <di:Edge jadexElement="DSX1cP8H4JK0AXoq" type="data">
         <di:waypoint x="865.3333333333334" y="125.33333333333333"/>
         <di:waypoint x="869.3333333333334" y="334.6666666666667"/>
       </di:Edge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

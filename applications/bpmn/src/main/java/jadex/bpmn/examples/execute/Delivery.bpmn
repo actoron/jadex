@@ -1,163 +1,155 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>Delivery</jadex:modelname>
-    <jadex:description>&lt;h1&gt;Simple Delivery Process&lt;/h1&gt; This process sends payment reminders to the JCC. Try sending the process an &apos;inform(payment)&apos;.</jadex:description>
+    <jadex:description>&lt;h1&gt;Simple Delivery Process&lt;/h1&gt; This process sends payment reminders to the JCC. Try sending the process an 'inform(payment)'.</jadex:description>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags keepalive="false" monitoring="OFF" persistable="false" suspend="false" synchronous="false"/>
     <jadex:contextvariables>
       <jadex:contextvariable name="dunnings" type="int">
         <jadex:value>0</jadex:value>
       </jadex:contextvariable>
     </jadex:contextvariables>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_P3gE1XLtEd-fEqakq96uUw">
-    <semantic:startEvent id="_9RNiUXLwEd-fEqakq96uUw">
-      <semantic:outgoing>T1MMz8mlZfQJn7w/</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:intermediateCatchEvent name="Item returned" id="_1t1X0HLtEd-fEqakq96uUw">
-      <semantic:incoming>4q+RcyMKFkDpAG1d</semantic:incoming>
-      <semantic:outgoing>vuYa2rONQ8lIWit1</semantic:outgoing>
-      <semantic:messageEventDefinition/>
-      <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_P3gE1XLtEd-fEqakq96uUw" name="Pool">
+    <bpmn:startEvent id="_9RNiUXLwEd-fEqakq96uUw">
+      <bpmn:outgoing>T1MMz8mlZfQJn7w/</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:intermediateCatchEvent id="_1t1X0HLtEd-fEqakq96uUw" name="Item returned">
+      <bpmn:incoming>4q+RcyMKFkDpAG1d</bpmn:incoming>
+      <bpmn:outgoing>vuYa2rONQ8lIWit1</bpmn:outgoing>
+      <bpmn:messageEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="performative">&quot;inform&quot;</jadex:property>
         <jadex:property name="content">&quot;item&quot;</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateCatchEvent>
-    <semantic:task name="Ship  Items" id="_P3gr4XLtEd-fEqakq96uUw">
-      <semantic:incoming>T1MMz8mlZfQJn7w/</semantic:incoming>
-      <semantic:incoming>VnrnERY8wbtq4UQL</semantic:incoming>
-      <semantic:outgoing>tGNXwRkmcZUwTOHt</semantic:outgoing>
-    </semantic:task>
-    <semantic:intermediateCatchEvent name="Payment arrived" id="_xrVywXLtEd-fEqakq96uUw">
-      <semantic:incoming>18a4b/0lnaAjXVAh</semantic:incoming>
-      <semantic:outgoing>Sz62Fsl8jQ0vOcF7</semantic:outgoing>
-      <semantic:messageEventDefinition/>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="_P3gr4XLtEd-fEqakq96uUw" name="Ship  Items">
+      <bpmn:incoming>T1MMz8mlZfQJn7w/</bpmn:incoming>
+      <bpmn:incoming>VnrnERY8wbtq4UQL</bpmn:incoming>
+      <bpmn:outgoing>tGNXwRkmcZUwTOHt</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:intermediateCatchEvent id="_xrVywXLtEd-fEqakq96uUw" name="Payment arrived">
+      <bpmn:incoming>18a4b/0lnaAjXVAh</bpmn:incoming>
+      <bpmn:outgoing>Sz62Fsl8jQ0vOcF7</bpmn:outgoing>
+      <bpmn:messageEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="performative">&quot;inform&quot;</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateCatchEvent>
-    <semantic:intermediateCatchEvent name="multi" id="_wLDrwXLtEd-fEqakq96uUw">
-      <semantic:incoming>XiLtq9AqSLQmMGfr</semantic:incoming>
-      <semantic:incoming>e/KJRC2bddG6BwCK</semantic:incoming>
-      <semantic:outgoing>18a4b/0lnaAjXVAh</semantic:outgoing>
-      <semantic:outgoing>4q+RcyMKFkDpAG1d</semantic:outgoing>
-      <semantic:outgoing>Lq6GY475gS/uIF0I</semantic:outgoing>
-      <semantic:multipleEventDefinition/>
-    </semantic:intermediateCatchEvent>
-    <semantic:task name="Enter Payment" id="_QIeDkXLuEd-fEqakq96uUw">
-      <semantic:incoming>Sz62Fsl8jQ0vOcF7</semantic:incoming>
-      <semantic:outgoing>ZPmEzoWynwKwxH9M</semantic:outgoing>
-    </semantic:task>
-    <semantic:subProcess id="_6m8wUdVFEeC_1bBivy-cGg">
-      <semantic:incoming>t3uQo+cy+Ztve6oT</semantic:incoming>
-      <semantic:outgoing>e/KJRC2bddG6BwCK</semantic:outgoing>
-      <semantic:intermediateThrowEvent name="Send Dunning" id="_WdGX0dVGEeC_1bBivy-cGg">
-        <semantic:messageEventDefinition/>
-        <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="_wLDrwXLtEd-fEqakq96uUw" name="multi">
+      <bpmn:incoming>XiLtq9AqSLQmMGfr</bpmn:incoming>
+      <bpmn:incoming>e/KJRC2bddG6BwCK</bpmn:incoming>
+      <bpmn:outgoing>18a4b/0lnaAjXVAh</bpmn:outgoing>
+      <bpmn:outgoing>4q+RcyMKFkDpAG1d</bpmn:outgoing>
+      <bpmn:outgoing>Lq6GY475gS/uIF0I</bpmn:outgoing>
+      <bpmn:multipleEventDefinition/>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="_QIeDkXLuEd-fEqakq96uUw" name="Enter Payment">
+      <bpmn:incoming>Sz62Fsl8jQ0vOcF7</bpmn:incoming>
+      <bpmn:outgoing>ZPmEzoWynwKwxH9M</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:subProcess id="_6m8wUdVFEeC_1bBivy-cGg">
+      <bpmn:incoming>t3uQo+cy+Ztve6oT</bpmn:incoming>
+      <bpmn:outgoing>e/KJRC2bddG6BwCK</bpmn:outgoing>
+      <bpmn:intermediateThrowEvent id="_WdGX0dVGEeC_1bBivy-cGg" name="Send Dunning">
+        <bpmn:messageEventDefinition/>
+        <bpmn:extensionElements>
 	        <jadex:property name="message">new jadex.bridge.fipa.FipaMessage(jadex.bridge.fipa.FipaMessage.Performative.REQUEST, &quot;Payment late!&quot;, $component.getId().getRoot())</jadex:property>
-        </semantic:extensionElements>
-      </semantic:intermediateThrowEvent>
-      <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:intermediateThrowEvent>
+      <bpmn:extensionElements>
         <jadex:parameter direction="inout" name="dunnings" type="int">dunnings+1</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:subProcess>
-    <semantic:intermediateCatchEvent name="exceeded" id="_9KQtIXLtEd-fEqakq96uUw">
-      <semantic:incoming>Lq6GY475gS/uIF0I</semantic:incoming>
-      <semantic:outgoing>WAhDZ8l28AJPZ4bh</semantic:outgoing>
-      <semantic:timerEventDefinition>
-        <semantic:timeDuration>10000</semantic:timeDuration>
-      </semantic:timerEventDefinition>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:subProcess>
+    <bpmn:intermediateCatchEvent id="_9KQtIXLtEd-fEqakq96uUw" name="exceeded">
+      <bpmn:incoming>Lq6GY475gS/uIF0I</bpmn:incoming>
+      <bpmn:outgoing>WAhDZ8l28AJPZ4bh</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration>10000</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+      <bpmn:extensionElements>
         <jadex:property name="duration">10000</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateCatchEvent>
-    <semantic:exclusiveGateway name="dunnings sent &lt; 3" id="_xZ1hIXLvEd-fEqakq96uUw" default="o4Ub/2u8InjlX68I">
-      <semantic:incoming>WAhDZ8l28AJPZ4bh</semantic:incoming>
-      <semantic:outgoing>t3uQo+cy+Ztve6oT</semantic:outgoing>
-      <semantic:outgoing>o4Ub/2u8InjlX68I</semantic:outgoing>
-    </semantic:exclusiveGateway>
-    <semantic:task name="Blacklist\nCustomer" id="_EEvroXLxEd-fEqakq96uUw">
-      <semantic:incoming>o4Ub/2u8InjlX68I</semantic:incoming>
-      <semantic:outgoing>lxKKFqMZgl/4Xclr</semantic:outgoing>
-    </semantic:task>
-    <semantic:task name="Instruct Debt \nCollecting" id="_J4-UEXLxEd-fEqakq96uUw">
-      <semantic:incoming>lxKKFqMZgl/4Xclr</semantic:incoming>
-      <semantic:outgoing>n1xZ4tLaFls+0idd</semantic:outgoing>
-    </semantic:task>
-    <semantic:intermediateThrowEvent name="Send Invoice" id="R7e3jRHACQQyyVuU">
-      <semantic:incoming>tGNXwRkmcZUwTOHt</semantic:incoming>
-      <semantic:outgoing>XiLtq9AqSLQmMGfr</semantic:outgoing>
-      <semantic:messageEventDefinition/>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:exclusiveGateway default="o4Ub/2u8InjlX68I" id="_xZ1hIXLvEd-fEqakq96uUw" name="dunnings sent &lt; 3">
+      <bpmn:incoming>WAhDZ8l28AJPZ4bh</bpmn:incoming>
+      <bpmn:outgoing>t3uQo+cy+Ztve6oT</bpmn:outgoing>
+      <bpmn:outgoing>o4Ub/2u8InjlX68I</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="_EEvroXLxEd-fEqakq96uUw" name="Blacklist\nCustomer">
+      <bpmn:incoming>o4Ub/2u8InjlX68I</bpmn:incoming>
+      <bpmn:outgoing>lxKKFqMZgl/4Xclr</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="_J4-UEXLxEd-fEqakq96uUw" name="Instruct Debt \nCollecting">
+      <bpmn:incoming>lxKKFqMZgl/4Xclr</bpmn:incoming>
+      <bpmn:outgoing>n1xZ4tLaFls+0idd</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:intermediateThrowEvent id="R7e3jRHACQQyyVuU" name="Send Invoice">
+      <bpmn:incoming>tGNXwRkmcZUwTOHt</bpmn:incoming>
+      <bpmn:outgoing>XiLtq9AqSLQmMGfr</bpmn:outgoing>
+      <bpmn:messageEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="message">new jadex.bridge.fipa.FipaMessage(jadex.bridge.fipa.FipaMessage.Performative.REQUEST, &quot;Please pay.&quot;, $component.getId().getRoot())</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateThrowEvent>
-    <semantic:endEvent id="_TXPssXLuEd-fEqakq96uUw">
-      <semantic:incoming>ZPmEzoWynwKwxH9M</semantic:incoming>
-      <semantic:incoming>Xz56KIP6yebPnGQN</semantic:incoming>
-      <semantic:incoming>n1xZ4tLaFls+0idd</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:exclusiveGateway name="solved?" id="_4db8MXLuEd-fEqakq96uUw" default="Xz56KIP6yebPnGQN">
-      <semantic:incoming>hs2tjgbYekGmr420</semantic:incoming>
-      <semantic:outgoing>Xz56KIP6yebPnGQN</semantic:outgoing>
-      <semantic:outgoing>VnrnERY8wbtq4UQL</semantic:outgoing>
-    </semantic:exclusiveGateway>
-    <semantic:subProcess name="Complaint\nSubprocess" id="DQs4YaybLLq1kMcu">
-      <semantic:incoming>vuYa2rONQ8lIWit1</semantic:incoming>
-      <semantic:outgoing>hs2tjgbYekGmr420</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:endEvent id="_TXPssXLuEd-fEqakq96uUw">
+      <bpmn:incoming>ZPmEzoWynwKwxH9M</bpmn:incoming>
+      <bpmn:incoming>Xz56KIP6yebPnGQN</bpmn:incoming>
+      <bpmn:incoming>n1xZ4tLaFls+0idd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway default="Xz56KIP6yebPnGQN" id="_4db8MXLuEd-fEqakq96uUw" name="solved?">
+      <bpmn:incoming>hs2tjgbYekGmr420</bpmn:incoming>
+      <bpmn:outgoing>Xz56KIP6yebPnGQN</bpmn:outgoing>
+      <bpmn:outgoing>VnrnERY8wbtq4UQL</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:subProcess id="DQs4YaybLLq1kMcu" name="Complaint\nSubprocess">
+      <bpmn:incoming>vuYa2rONQ8lIWit1</bpmn:incoming>
+      <bpmn:outgoing>hs2tjgbYekGmr420</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:parameter direction="out" name="repaired" type="java.lang.Boolean">Math.random() &lt; 0.5</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:subProcess>
-    <semantic:sequenceFlow sourceRef="_9RNiUXLwEd-fEqakq96uUw" targetRef="_P3gr4XLtEd-fEqakq96uUw" id="T1MMz8mlZfQJn7w/">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_1t1X0HLtEd-fEqakq96uUw" targetRef="DQs4YaybLLq1kMcu" id="vuYa2rONQ8lIWit1">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_P3gr4XLtEd-fEqakq96uUw" targetRef="R7e3jRHACQQyyVuU" id="tGNXwRkmcZUwTOHt">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_xrVywXLtEd-fEqakq96uUw" targetRef="_QIeDkXLuEd-fEqakq96uUw" id="Sz62Fsl8jQ0vOcF7">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_wLDrwXLtEd-fEqakq96uUw" targetRef="_xrVywXLtEd-fEqakq96uUw" id="18a4b/0lnaAjXVAh">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_wLDrwXLtEd-fEqakq96uUw" targetRef="_1t1X0HLtEd-fEqakq96uUw" id="4q+RcyMKFkDpAG1d">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_wLDrwXLtEd-fEqakq96uUw" targetRef="_9KQtIXLtEd-fEqakq96uUw" id="Lq6GY475gS/uIF0I">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_QIeDkXLuEd-fEqakq96uUw" targetRef="_TXPssXLuEd-fEqakq96uUw" id="ZPmEzoWynwKwxH9M">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_6m8wUdVFEeC_1bBivy-cGg" targetRef="_wLDrwXLtEd-fEqakq96uUw" id="e/KJRC2bddG6BwCK">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_9KQtIXLtEd-fEqakq96uUw" targetRef="_xZ1hIXLvEd-fEqakq96uUw" id="WAhDZ8l28AJPZ4bh">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_xZ1hIXLvEd-fEqakq96uUw" targetRef="_6m8wUdVFEeC_1bBivy-cGg" id="t3uQo+cy+Ztve6oT">
-      <semantic:conditionExpression>dunnings&lt;3</semantic:conditionExpression>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_xZ1hIXLvEd-fEqakq96uUw" targetRef="_EEvroXLxEd-fEqakq96uUw" id="o4Ub/2u8InjlX68I">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_EEvroXLxEd-fEqakq96uUw" targetRef="_J4-UEXLxEd-fEqakq96uUw" id="lxKKFqMZgl/4Xclr">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_J4-UEXLxEd-fEqakq96uUw" targetRef="_TXPssXLuEd-fEqakq96uUw" id="n1xZ4tLaFls+0idd">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="R7e3jRHACQQyyVuU" targetRef="_wLDrwXLtEd-fEqakq96uUw" id="XiLtq9AqSLQmMGfr">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_4db8MXLuEd-fEqakq96uUw" targetRef="_TXPssXLuEd-fEqakq96uUw" id="Xz56KIP6yebPnGQN">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_4db8MXLuEd-fEqakq96uUw" targetRef="_P3gr4XLtEd-fEqakq96uUw" id="VnrnERY8wbtq4UQL">
-      <semantic:conditionExpression>repaired</semantic:conditionExpression>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="DQs4YaybLLq1kMcu" targetRef="_4db8MXLuEd-fEqakq96uUw" id="hs2tjgbYekGmr420">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="T1MMz8mlZfQJn7w/" sourceRef="_9RNiUXLwEd-fEqakq96uUw" targetRef="_P3gr4XLtEd-fEqakq96uUw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="vuYa2rONQ8lIWit1" sourceRef="_1t1X0HLtEd-fEqakq96uUw" targetRef="DQs4YaybLLq1kMcu">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="tGNXwRkmcZUwTOHt" sourceRef="_P3gr4XLtEd-fEqakq96uUw" targetRef="R7e3jRHACQQyyVuU">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Sz62Fsl8jQ0vOcF7" sourceRef="_xrVywXLtEd-fEqakq96uUw" targetRef="_QIeDkXLuEd-fEqakq96uUw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="18a4b/0lnaAjXVAh" sourceRef="_wLDrwXLtEd-fEqakq96uUw" targetRef="_xrVywXLtEd-fEqakq96uUw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="4q+RcyMKFkDpAG1d" sourceRef="_wLDrwXLtEd-fEqakq96uUw" targetRef="_1t1X0HLtEd-fEqakq96uUw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Lq6GY475gS/uIF0I" sourceRef="_wLDrwXLtEd-fEqakq96uUw" targetRef="_9KQtIXLtEd-fEqakq96uUw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ZPmEzoWynwKwxH9M" sourceRef="_QIeDkXLuEd-fEqakq96uUw" targetRef="_TXPssXLuEd-fEqakq96uUw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="e/KJRC2bddG6BwCK" sourceRef="_6m8wUdVFEeC_1bBivy-cGg" targetRef="_wLDrwXLtEd-fEqakq96uUw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="WAhDZ8l28AJPZ4bh" sourceRef="_9KQtIXLtEd-fEqakq96uUw" targetRef="_xZ1hIXLvEd-fEqakq96uUw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="t3uQo+cy+Ztve6oT" sourceRef="_xZ1hIXLvEd-fEqakq96uUw" targetRef="_6m8wUdVFEeC_1bBivy-cGg">
+      <bpmn:conditionExpression>dunnings&lt;3</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="o4Ub/2u8InjlX68I" sourceRef="_xZ1hIXLvEd-fEqakq96uUw" targetRef="_EEvroXLxEd-fEqakq96uUw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="lxKKFqMZgl/4Xclr" sourceRef="_EEvroXLxEd-fEqakq96uUw" targetRef="_J4-UEXLxEd-fEqakq96uUw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="n1xZ4tLaFls+0idd" sourceRef="_J4-UEXLxEd-fEqakq96uUw" targetRef="_TXPssXLuEd-fEqakq96uUw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="XiLtq9AqSLQmMGfr" sourceRef="R7e3jRHACQQyyVuU" targetRef="_wLDrwXLtEd-fEqakq96uUw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Xz56KIP6yebPnGQN" sourceRef="_4db8MXLuEd-fEqakq96uUw" targetRef="_TXPssXLuEd-fEqakq96uUw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="VnrnERY8wbtq4UQL" sourceRef="_4db8MXLuEd-fEqakq96uUw" targetRef="_P3gr4XLtEd-fEqakq96uUw">
+      <bpmn:conditionExpression>repaired</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="hs2tjgbYekGmr420" sourceRef="DQs4YaybLLq1kMcu" targetRef="_4db8MXLuEd-fEqakq96uUw">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_P3gE1XLtEd-fEqakq96uUw">
@@ -253,5 +245,4 @@
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

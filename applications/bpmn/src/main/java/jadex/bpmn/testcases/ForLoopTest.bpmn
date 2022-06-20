@@ -1,13 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>ForLoopTest</jadex:modelname>
     <jadex:description>Test if the for loop works.</jadex:description>
     <jadex:package>jadex.bpmn.testcases</jadex:package>
@@ -29,88 +21,88 @@
       <jadex:configuration name="Pool">
       </jadex:configuration>
     </jadex:configurations>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_MkR4oRDZEd-hjJU8_9Katg">
-    <semantic:startEvent id="_RMrAERDZEd-hjJU8_9Katg">
-      <semantic:outgoing>_R0Tn0RDZEd-hjJU8_9Katg</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:exclusiveGateway id="_Z2Dk0RDmEd-qQOr2ZLx-Mw" default="_t9_3IRFtEd-qQOr2ZLx-Mw">
-      <semantic:incoming>_r_9Q0RDjEd-hjJU8_9Katg</semantic:incoming>
-      <semantic:outgoing>_cq9VYRDmEd-qQOr2ZLx-Mw</semantic:outgoing>
-      <semantic:outgoing>_t9_3IRFtEd-qQOr2ZLx-Mw</semantic:outgoing>
-    </semantic:exclusiveGateway>
-    <semantic:task name="Success" id="_Dze68RDlEd-qQOr2ZLx-Mw">
-      <semantic:incoming>_cq9VYRDmEd-qQOr2ZLx-Mw</semantic:incoming>
-      <semantic:outgoing>_IcnCMRDlEd-qQOr2ZLx-Mw</semantic:outgoing>
-      <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_MkR4oRDZEd-hjJU8_9Katg" name="Pool">
+    <bpmn:startEvent id="_RMrAERDZEd-hjJU8_9Katg">
+      <bpmn:outgoing>_R0Tn0RDZEd-hjJU8_9Katg</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway default="_t9_3IRFtEd-qQOr2ZLx-Mw" id="_Z2Dk0RDmEd-qQOr2ZLx-Mw">
+      <bpmn:incoming>_r_9Q0RDjEd-hjJU8_9Katg</bpmn:incoming>
+      <bpmn:outgoing>_cq9VYRDmEd-qQOr2ZLx-Mw</bpmn:outgoing>
+      <bpmn:outgoing>_t9_3IRFtEd-qQOr2ZLx-Mw</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="_Dze68RDlEd-qQOr2ZLx-Mw" name="Success">
+      <bpmn:incoming>_cq9VYRDmEd-qQOr2ZLx-Mw</bpmn:incoming>
+      <bpmn:outgoing>_IcnCMRDlEd-qQOr2ZLx-Mw</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>WriteContextTask</jadex:class>
         <jadex:parameter direction="in" name="name" type="String">&quot;testresults&quot;</jadex:parameter>
         <jadex:parameter direction="in" name="value" type="Object">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;For loop testcase.&quot;, true, null)})</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Failure" id="_zfsG4RDlEd-qQOr2ZLx-Mw">
-      <semantic:incoming>_t9_3IRFtEd-qQOr2ZLx-Mw</semantic:incoming>
-      <semantic:outgoing>_gBYeoRDmEd-qQOr2ZLx-Mw</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_zfsG4RDlEd-qQOr2ZLx-Mw" name="Failure">
+      <bpmn:incoming>_t9_3IRFtEd-qQOr2ZLx-Mw</bpmn:incoming>
+      <bpmn:outgoing>_gBYeoRDmEd-qQOr2ZLx-Mw</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>WriteContextTask</jadex:class>
         <jadex:parameter direction="in" name="name" type="String">&quot;testresults&quot;</jadex:parameter>
         <jadex:parameter direction="in" name="value" type="Testcase">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;For loop testcase.&quot;, false, &quot;Wrong number of loops performed.&quot;)})</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Finished" id="_xGKg8RF4Ed-qQOr2ZLx-Mw">
-      <semantic:incoming>_gBYeoRDmEd-qQOr2ZLx-Mw</semantic:incoming>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_xGKg8RF4Ed-qQOr2ZLx-Mw" name="Finished">
+      <bpmn:incoming>_gBYeoRDmEd-qQOr2ZLx-Mw</bpmn:incoming>
+      <bpmn:extensionElements>
         <jadex:parameter direction="in" name="text" type="String">&quot;failure&quot;</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Finished" id="_r_zf0RDjEd-hjJU8_9Katg">
-      <semantic:incoming>_IcnCMRDlEd-qQOr2ZLx-Mw</semantic:incoming>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_r_zf0RDjEd-hjJU8_9Katg" name="Finished">
+      <bpmn:incoming>_IcnCMRDlEd-qQOr2ZLx-Mw</bpmn:incoming>
+      <bpmn:extensionElements>
         <jadex:parameter direction="in" name="text" type="String">&quot;Succeeded&quot;</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Count" id="_MkR4oxDZEd-hjJU8_9Katg">
-      <semantic:incoming>_R0Tn0RDZEd-hjJU8_9Katg</semantic:incoming>
-      <semantic:incoming>_fYdk0RDjEd-hjJU8_9Katg</semantic:incoming>
-      <semantic:outgoing>_d1OQchDjEd-hjJU8_9Katg</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_MkR4oxDZEd-hjJU8_9Katg" name="Count">
+      <bpmn:incoming>_R0Tn0RDZEd-hjJU8_9Katg</bpmn:incoming>
+      <bpmn:incoming>_fYdk0RDjEd-hjJU8_9Katg</bpmn:incoming>
+      <bpmn:outgoing>_d1OQchDjEd-hjJU8_9Katg</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:parameter direction="inout" name="cnt" type="int">!$thread.hasParameterValue(&quot;cnt&quot;)? 0: cnt+1</jadex:parameter>
         <jadex:parameter direction="inout" name="i" type="String">0</jadex:parameter>
         <jadex:parameter direction="in" name="text" type="String">&quot;&quot;+cnt</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:exclusiveGateway id="_d1EfcRDjEd-hjJU8_9Katg" default="_r_9Q0RDjEd-hjJU8_9Katg">
-      <semantic:incoming>_d1OQchDjEd-hjJU8_9Katg</semantic:incoming>
-      <semantic:outgoing>_r_9Q0RDjEd-hjJU8_9Katg</semantic:outgoing>
-      <semantic:outgoing>_fYdk0RDjEd-hjJU8_9Katg</semantic:outgoing>
-    </semantic:exclusiveGateway>
-    <semantic:sequenceFlow sourceRef="_RMrAERDZEd-hjJU8_9Katg" targetRef="_MkR4oxDZEd-hjJU8_9Katg" id="_R0Tn0RDZEd-hjJU8_9Katg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_Z2Dk0RDmEd-qQOr2ZLx-Mw" targetRef="_Dze68RDlEd-qQOr2ZLx-Mw" id="_cq9VYRDmEd-qQOr2ZLx-Mw">
-      <semantic:conditionExpression>cnt+1==length</semantic:conditionExpression>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_Z2Dk0RDmEd-qQOr2ZLx-Mw" targetRef="_zfsG4RDlEd-qQOr2ZLx-Mw" id="_t9_3IRFtEd-qQOr2ZLx-Mw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_Dze68RDlEd-qQOr2ZLx-Mw" targetRef="_r_zf0RDjEd-hjJU8_9Katg" id="_IcnCMRDlEd-qQOr2ZLx-Mw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_zfsG4RDlEd-qQOr2ZLx-Mw" targetRef="_xGKg8RF4Ed-qQOr2ZLx-Mw" id="_gBYeoRDmEd-qQOr2ZLx-Mw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_MkR4oxDZEd-hjJU8_9Katg" targetRef="_d1EfcRDjEd-hjJU8_9Katg" id="_d1OQchDjEd-hjJU8_9Katg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_d1EfcRDjEd-hjJU8_9Katg" targetRef="_Z2Dk0RDmEd-qQOr2ZLx-Mw" id="_r_9Q0RDjEd-hjJU8_9Katg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_d1EfcRDjEd-hjJU8_9Katg" targetRef="_MkR4oxDZEd-hjJU8_9Katg" id="_fYdk0RDjEd-hjJU8_9Katg">
-      <semantic:conditionExpression>i+1&lt;length</semantic:conditionExpression>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:exclusiveGateway default="_r_9Q0RDjEd-hjJU8_9Katg" id="_d1EfcRDjEd-hjJU8_9Katg">
+      <bpmn:incoming>_d1OQchDjEd-hjJU8_9Katg</bpmn:incoming>
+      <bpmn:outgoing>_r_9Q0RDjEd-hjJU8_9Katg</bpmn:outgoing>
+      <bpmn:outgoing>_fYdk0RDjEd-hjJU8_9Katg</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="_R0Tn0RDZEd-hjJU8_9Katg" sourceRef="_RMrAERDZEd-hjJU8_9Katg" targetRef="_MkR4oxDZEd-hjJU8_9Katg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_cq9VYRDmEd-qQOr2ZLx-Mw" sourceRef="_Z2Dk0RDmEd-qQOr2ZLx-Mw" targetRef="_Dze68RDlEd-qQOr2ZLx-Mw">
+      <bpmn:conditionExpression>cnt+1==length</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_t9_3IRFtEd-qQOr2ZLx-Mw" sourceRef="_Z2Dk0RDmEd-qQOr2ZLx-Mw" targetRef="_zfsG4RDlEd-qQOr2ZLx-Mw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_IcnCMRDlEd-qQOr2ZLx-Mw" sourceRef="_Dze68RDlEd-qQOr2ZLx-Mw" targetRef="_r_zf0RDjEd-hjJU8_9Katg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_gBYeoRDmEd-qQOr2ZLx-Mw" sourceRef="_zfsG4RDlEd-qQOr2ZLx-Mw" targetRef="_xGKg8RF4Ed-qQOr2ZLx-Mw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_d1OQchDjEd-hjJU8_9Katg" sourceRef="_MkR4oxDZEd-hjJU8_9Katg" targetRef="_d1EfcRDjEd-hjJU8_9Katg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_r_9Q0RDjEd-hjJU8_9Katg" sourceRef="_d1EfcRDjEd-hjJU8_9Katg" targetRef="_Z2Dk0RDmEd-qQOr2ZLx-Mw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_fYdk0RDjEd-hjJU8_9Katg" sourceRef="_d1EfcRDjEd-hjJU8_9Katg" targetRef="_MkR4oxDZEd-hjJU8_9Katg">
+      <bpmn:conditionExpression>i+1&lt;length</bpmn:conditionExpression>
+      <bpmn:extensionElements>
         <jadex:parametermapping name="i">i+1</jadex:parametermapping>
-      </semantic:extensionElements>
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-      <jadex:dataFlow id="NPyfvexp/S007R+k" sourceRef="_MkR4oxDZEd-hjJU8_9Katg" sourceParam="cnt" targetRef="_MkR4oxDZEd-hjJU8_9Katg" targetParam="cnt">
+      </bpmn:extensionElements>
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+      <jadex:dataFlow id="NPyfvexp/S007R+k" sourceParam="cnt" sourceRef="_MkR4oxDZEd-hjJU8_9Katg" targetParam="cnt" targetRef="_MkR4oxDZEd-hjJU8_9Katg">
         <jadex:dataFlowValueMapping>$value+1</jadex:dataFlowValueMapping>
       </jadex:dataFlow>
-    </semantic:extensionElements>
-  </semantic:process>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_MkR4oRDZEd-hjJU8_9Katg">
@@ -173,9 +165,8 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_t9_3IRFtEd-qQOr2ZLx-Mw">
       </bpmndi:BPMNEdge>
-      <di:Edge type="data" jadexElement="NPyfvexp/S007R+k">
+      <di:Edge jadexElement="NPyfvexp/S007R+k" type="data">
       </di:Edge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

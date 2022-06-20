@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -60,3 +61,58 @@
   </bpmndi:BPMNDiagram>
 </semantic:definitions>
 
+=======
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
+    <jadex:modelname>B1_simple</jadex:modelname>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
+    <jadex:componentflags keepalive="false" monitoring="OFF" persistable="false" suspend="false" synchronous="false"/>
+    <jadex:configurations>
+      <jadex:configuration name="name">
+      </jadex:configuration>
+    </jadex:configurations>
+  </bpmn:extension>
+  <bpmn:process id="tDCmz3ohVjhMuuJR" name="Pool">
+    <bpmn:task id="iOjLbKVRDuni5lO+" name="Print Message">
+      <bpmn:incoming>2NxQ+lTl16lIU0bi</bpmn:incoming>
+      <bpmn:outgoing>q02LbhVtOE60Tm8o</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;The task has been executed&quot;</jadex:parameter>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:endEvent id="7/Aam5FPKdQIjnli">
+      <bpmn:incoming>q02LbhVtOE60Tm8o</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:startEvent id="R9JhsYF5P/06y2ND">
+      <bpmn:outgoing>2NxQ+lTl16lIU0bi</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="q02LbhVtOE60Tm8o" sourceRef="iOjLbKVRDuni5lO+" targetRef="7/Aam5FPKdQIjnli">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="2NxQ+lTl16lIU0bi" sourceRef="R9JhsYF5P/06y2ND" targetRef="iOjLbKVRDuni5lO+">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="tDCmz3ohVjhMuuJR">
+        <dc:Bounds height="600.0" width="3000.0" x="50.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="iOjLbKVRDuni5lO+">
+        <dc:Bounds height="100.0" width="160.0" x="220.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="7/Aam5FPKdQIjnli">
+        <dc:Bounds height="40.0" width="40.0" x="460.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="R9JhsYF5P/06y2ND">
+        <dc:Bounds height="40.0" width="40.0" x="100.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="2NxQ+lTl16lIU0bi">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="q02LbhVtOE60Tm8o">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
+>>>>>>> 4876fd3db5873cdcd62997e01bbfc07085445f38

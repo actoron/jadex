@@ -1,46 +1,38 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>TimerEventStart</jadex:modelname>
     <jadex:description>Process that is triggered by a timer.</jadex:description>
     <jadex:package>jadex.platform.service.processengine</jadex:package>
-    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_LXmc0STtEeKCHsqNbb_z5Q">
-    <semantic:task name="Print" id="_LXwN0STtEeKCHsqNbb_z5Q">
-      <semantic:incoming>_RynYcSTtEeKCHsqNbb_z5Q</semantic:incoming>
-      <semantic:outgoing>_6LLXoSTtEeKCHsqNbb_z5Q</semantic:outgoing>
-      <semantic:extensionElements>
+    <jadex:componentflags keepalive="false" monitoring="OFF" suspend="false" synchronous="false"/>
+  </bpmn:extension>
+  <bpmn:process id="_LXmc0STtEeKCHsqNbb_z5Q" name="Pool">
+    <bpmn:task id="_LXwN0STtEeKCHsqNbb_z5Q" name="Print">
+      <bpmn:incoming>_RynYcSTtEeKCHsqNbb_z5Q</bpmn:incoming>
+      <bpmn:outgoing>_6LLXoSTtEeKCHsqNbb_z5Q</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="String">&quot;Process started: &quot;+$event+&quot; &quot;+$component.getId()</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:endEvent id="_5pEJESTtEeKCHsqNbb_z5Q">
-      <semantic:incoming>_6LLXoSTtEeKCHsqNbb_z5Q</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:startEvent id="_Q-GLQSTtEeKCHsqNbb_z5Q">
-      <semantic:outgoing>_RynYcSTtEeKCHsqNbb_z5Q</semantic:outgoing>
-      <semantic:timerEventDefinition>
-        <semantic:timeDuration>&quot;* * * * *&quot;</semantic:timeDuration>
-      </semantic:timerEventDefinition>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:endEvent id="_5pEJESTtEeKCHsqNbb_z5Q">
+      <bpmn:incoming>_6LLXoSTtEeKCHsqNbb_z5Q</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:startEvent id="_Q-GLQSTtEeKCHsqNbb_z5Q">
+      <bpmn:outgoing>_RynYcSTtEeKCHsqNbb_z5Q</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration>&quot;* * * * *&quot;</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+      <bpmn:extensionElements>
         <jadex:property name="duration">&quot;* * * * *&quot;</jadex:property>
-      </semantic:extensionElements>
-    </semantic:startEvent>
-    <semantic:sequenceFlow sourceRef="_LXwN0STtEeKCHsqNbb_z5Q" targetRef="_5pEJESTtEeKCHsqNbb_z5Q" id="_6LLXoSTtEeKCHsqNbb_z5Q">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_Q-GLQSTtEeKCHsqNbb_z5Q" targetRef="_LXwN0STtEeKCHsqNbb_z5Q" id="_RynYcSTtEeKCHsqNbb_z5Q">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="_6LLXoSTtEeKCHsqNbb_z5Q" sourceRef="_LXwN0STtEeKCHsqNbb_z5Q" targetRef="_5pEJESTtEeKCHsqNbb_z5Q">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_RynYcSTtEeKCHsqNbb_z5Q" sourceRef="_Q-GLQSTtEeKCHsqNbb_z5Q" targetRef="_LXwN0STtEeKCHsqNbb_z5Q">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_LXmc0STtEeKCHsqNbb_z5Q">
@@ -57,13 +49,8 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_6LLXoSTtEeKCHsqNbb_z5Q">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_6LLXoSTtEeKCHsqNbb_z5Q">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_RynYcSTtEeKCHsqNbb_z5Q">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_RynYcSTtEeKCHsqNbb_z5Q">
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

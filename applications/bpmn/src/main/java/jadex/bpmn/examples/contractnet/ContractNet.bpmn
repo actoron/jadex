@@ -1,17 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>ContractNet</jadex:modelname>
     <jadex:description>&lt;h1&gt;Contract Net&lt;/h1&gt;This process implements initiator and participant of a contract net interaction.</jadex:description>
     <jadex:package>jadex.bpmn.examples.contractnet</jadex:package>
-    <jadex:componentflags suspend="false" master="" synchronous="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags keepalive="false" master="" monitoring="OFF" suspend="false" synchronous="false"/>
     <jadex:imports>
       <jadex:import>java.util.*</jadex:import>
       <jadex:import>jadex.commons.SUtil</jadex:import>
@@ -53,408 +45,408 @@
         <jadex:startElement>_wU91AVa6Ed-1RJ7RXx1qjA</jadex:startElement>
       </jadex:configuration>
     </jadex:configurations>
-  </semantic:extension>
-  <semantic:process name="Initiator" id="_cNIeoVT6Ed-32983CGnnJA">
-    <semantic:startEvent name="Initiate" id="_cOd7YVT6Ed-32983CGnnJA">
-      <semantic:outgoing>_y8pRoVapEd-1RJ7RXx1qjA</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:subProcess name="For all Participants" id="_J11FUVapEd-1RJ7RXx1qjA">
-      <semantic:incoming>_y8pRoVapEd-1RJ7RXx1qjA</semantic:incoming>
-      <semantic:outgoing>_9R7RIVauEd-1RJ7RXx1qjA</semantic:outgoing>
-      <semantic:multiInstanceLoopCharacteristics isSequential="false" />
-      <semantic:startEvent id="_0-bjMVapEd-1RJ7RXx1qjA">
-        <semantic:outgoing>_1ybzAVapEd-1RJ7RXx1qjA</semantic:outgoing>
-      </semantic:startEvent>
-      <semantic:intermediateThrowEvent id="_rTd5wVapEd-1RJ7RXx1qjA">
-        <semantic:incoming>_1ybzAVapEd-1RJ7RXx1qjA</semantic:incoming>
-        <semantic:outgoing>_x679AVapEd-1RJ7RXx1qjA</semantic:outgoing>
-        <semantic:messageEventDefinition/>
-        <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_cNIeoVT6Ed-32983CGnnJA" name="Initiator">
+    <bpmn:startEvent id="_cOd7YVT6Ed-32983CGnnJA" name="Initiate">
+      <bpmn:outgoing>_y8pRoVapEd-1RJ7RXx1qjA</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:subProcess id="_J11FUVapEd-1RJ7RXx1qjA" name="For all Participants">
+      <bpmn:incoming>_y8pRoVapEd-1RJ7RXx1qjA</bpmn:incoming>
+      <bpmn:outgoing>_9R7RIVauEd-1RJ7RXx1qjA</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics isSequential="false"/>
+      <bpmn:startEvent id="_0-bjMVapEd-1RJ7RXx1qjA">
+        <bpmn:outgoing>_1ybzAVapEd-1RJ7RXx1qjA</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:intermediateThrowEvent id="_rTd5wVapEd-1RJ7RXx1qjA">
+        <bpmn:incoming>_1ybzAVapEd-1RJ7RXx1qjA</bpmn:incoming>
+        <bpmn:outgoing>_x679AVapEd-1RJ7RXx1qjA</bpmn:outgoing>
+        <bpmn:messageEventDefinition/>
+        <bpmn:extensionElements>
           <jadex:property name="performative">&quot;cfp&quot;</jadex:property>
           <jadex:property name="content">cfp</jadex:property>
           <jadex:property name="conversation_id">convid</jadex:property>
           <jadex:property name="protocol">&quot;fipa-contract-net&quot;</jadex:property>
           <jadex:property name="receiver">participants</jadex:property>
-        </semantic:extensionElements>
-      </semantic:intermediateThrowEvent>
-      <semantic:intermediateCatchEvent id="_MA2ycVapEd-1RJ7RXx1qjA">
-        <semantic:incoming>_x679AVapEd-1RJ7RXx1qjA</semantic:incoming>
-        <semantic:outgoing>_M4SJulapEd-1RJ7RXx1qjA</semantic:outgoing>
-        <semantic:outgoing>_NmBZelapEd-1RJ7RXx1qjA</semantic:outgoing>
-        <semantic:multipleEventDefinition/>
-      </semantic:intermediateCatchEvent>
-      <semantic:task name="Proposal" id="_3-9yUVglEd-UBaPlSCV7pQ">
-        <semantic:incoming>_3_QtQVglEd-UBaPlSCV7pQ</semantic:incoming>
-        <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:intermediateThrowEvent>
+      <bpmn:intermediateCatchEvent id="_MA2ycVapEd-1RJ7RXx1qjA">
+        <bpmn:incoming>_x679AVapEd-1RJ7RXx1qjA</bpmn:incoming>
+        <bpmn:outgoing>_M4SJulapEd-1RJ7RXx1qjA</bpmn:outgoing>
+        <bpmn:outgoing>_NmBZelapEd-1RJ7RXx1qjA</bpmn:outgoing>
+        <bpmn:multipleEventDefinition/>
+      </bpmn:intermediateCatchEvent>
+      <bpmn:task id="_3-9yUVglEd-UBaPlSCV7pQ" name="Proposal">
+        <bpmn:incoming>_3_QtQVglEd-UBaPlSCV7pQ</bpmn:incoming>
+        <bpmn:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.InvokeMethodTask</jadex:class>
           <jadex:parameter direction="in" name="object" type="java.lang.Object">proposals</jadex:parameter>
           <jadex:parameter direction="in" name="methodname" type="java.lang.String">&quot;add&quot;</jadex:parameter>
           <jadex:parameter direction="in" name="param" type="java.lang.Object">new ParticipantProposal($event.get(&quot;sender&quot;), $event.get(&quot;content&quot;))</jadex:parameter>
-        </semantic:extensionElements>
-      </semantic:task>
-      <semantic:intermediateCatchEvent id="_NmBZcVapEd-1RJ7RXx1qjA">
-        <semantic:incoming>_NmBZelapEd-1RJ7RXx1qjA</semantic:incoming>
-        <semantic:outgoing>_3_QtQVglEd-UBaPlSCV7pQ</semantic:outgoing>
-        <semantic:messageEventDefinition/>
-        <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:task>
+      <bpmn:intermediateCatchEvent id="_NmBZcVapEd-1RJ7RXx1qjA">
+        <bpmn:incoming>_NmBZelapEd-1RJ7RXx1qjA</bpmn:incoming>
+        <bpmn:outgoing>_3_QtQVglEd-UBaPlSCV7pQ</bpmn:outgoing>
+        <bpmn:messageEventDefinition/>
+        <bpmn:extensionElements>
           <jadex:property name="performative">&quot;propose&quot;</jadex:property>
           <jadex:property name="conversation_id">convid</jadex:property>
-        </semantic:extensionElements>
-      </semantic:intermediateCatchEvent>
-      <semantic:intermediateCatchEvent id="_M4SJsVapEd-1RJ7RXx1qjA">
-        <semantic:incoming>_M4SJulapEd-1RJ7RXx1qjA</semantic:incoming>
-        <semantic:messageEventDefinition/>
-        <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:intermediateCatchEvent>
+      <bpmn:intermediateCatchEvent id="_M4SJsVapEd-1RJ7RXx1qjA">
+        <bpmn:incoming>_M4SJulapEd-1RJ7RXx1qjA</bpmn:incoming>
+        <bpmn:messageEventDefinition/>
+        <bpmn:extensionElements>
           <jadex:property name="performative">&quot;refuse&quot;</jadex:property>
           <jadex:property name="conversation_id">convid</jadex:property>
-        </semantic:extensionElements>
-      </semantic:intermediateCatchEvent>
-      <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:intermediateCatchEvent>
+      <bpmn:extensionElements>
         <jadex:parameter direction="inout" name="proposals" type="Set">new LinkedHashSet()</jadex:parameter>
         <jadex:parameter direction="inout" name="participants" type="String[]">participants</jadex:parameter>
         <jadex:property name="isThrowing">false</jadex:property>
         <jadex:property name="iterator">participants</jadex:property>
-      </semantic:extensionElements>
-    </semantic:subProcess>
-    <semantic:boundaryEvent id="_z3NDIVauEd-1RJ7RXx1qjA" attachedToRef="_J11FUVapEd-1RJ7RXx1qjA">
-      <semantic:outgoing>_8af54VauEd-1RJ7RXx1qjA</semantic:outgoing>
-      <semantic:timerEventDefinition>
-        <semantic:timeDuration>timeout</semantic:timeDuration>
-      </semantic:timerEventDefinition>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:subProcess>
+    <bpmn:boundaryEvent attachedToRef="_J11FUVapEd-1RJ7RXx1qjA" id="_z3NDIVauEd-1RJ7RXx1qjA">
+      <bpmn:outgoing>_8af54VauEd-1RJ7RXx1qjA</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration>timeout</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+      <bpmn:extensionElements>
         <jadex:property name="duration">timeout</jadex:property>
-      </semantic:extensionElements>
-    </semantic:boundaryEvent>
-    <semantic:exclusiveGateway id="_vpa4QVanEd-1RJ7RXx1qjA" default="eaMqI01HizBqx2PI">
-      <semantic:incoming>_8af54VauEd-1RJ7RXx1qjA</semantic:incoming>
-      <semantic:incoming>_9R7RIVauEd-1RJ7RXx1qjA</semantic:incoming>
-      <semantic:outgoing>_ncPh0VavEd-1RJ7RXx1qjA</semantic:outgoing>
-      <semantic:outgoing>eaMqI01HizBqx2PI</semantic:outgoing>
-    </semantic:exclusiveGateway>
-    <semantic:subProcess name="For all Proposals" id="_oPQXUVaoEd-1RJ7RXx1qjA">
-      <semantic:incoming>_3S3gcVaoEd-1RJ7RXx1qjA</semantic:incoming>
-      <semantic:outgoing>_yBSKsVarEd-1RJ7RXx1qjA</semantic:outgoing>
-      <semantic:multiInstanceLoopCharacteristics isSequential="false" />
-      <semantic:startEvent id="_qCcMMVaoEd-1RJ7RXx1qjA">
-        <semantic:outgoing>_q-MCylaoEd-1RJ7RXx1qjA</semantic:outgoing>
-      </semantic:startEvent>
-      <semantic:intermediateThrowEvent id="_uk_xYVaoEd-1RJ7RXx1qjA">
-        <semantic:incoming>_ulJiYVaoEd-1RJ7RXx1qjA</semantic:incoming>
-        <semantic:outgoing>_t6hi0VguEd-F7Z1jfVSjng</semantic:outgoing>
-        <semantic:messageEventDefinition/>
-        <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:boundaryEvent>
+    <bpmn:exclusiveGateway default="eaMqI01HizBqx2PI" id="_vpa4QVanEd-1RJ7RXx1qjA">
+      <bpmn:incoming>_8af54VauEd-1RJ7RXx1qjA</bpmn:incoming>
+      <bpmn:incoming>_9R7RIVauEd-1RJ7RXx1qjA</bpmn:incoming>
+      <bpmn:outgoing>_ncPh0VavEd-1RJ7RXx1qjA</bpmn:outgoing>
+      <bpmn:outgoing>eaMqI01HizBqx2PI</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:subProcess id="_oPQXUVaoEd-1RJ7RXx1qjA" name="For all Proposals">
+      <bpmn:incoming>_3S3gcVaoEd-1RJ7RXx1qjA</bpmn:incoming>
+      <bpmn:outgoing>_yBSKsVarEd-1RJ7RXx1qjA</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics isSequential="false"/>
+      <bpmn:startEvent id="_qCcMMVaoEd-1RJ7RXx1qjA">
+        <bpmn:outgoing>_q-MCylaoEd-1RJ7RXx1qjA</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:intermediateThrowEvent id="_uk_xYVaoEd-1RJ7RXx1qjA">
+        <bpmn:incoming>_ulJiYVaoEd-1RJ7RXx1qjA</bpmn:incoming>
+        <bpmn:outgoing>_t6hi0VguEd-F7Z1jfVSjng</bpmn:outgoing>
+        <bpmn:messageEventDefinition/>
+        <bpmn:extensionElements>
           <jadex:property name="performative">&quot;accept-proposal&quot;</jadex:property>
           <jadex:property name="receivers">proposals.getParticipant()</jadex:property>
           <jadex:property name="content">proposals.getProposal()</jadex:property>
           <jadex:property name="conversation_id">convid</jadex:property>
           <jadex:property name="protocol">&quot;fipa-contract-net&quot;</jadex:property>
-        </semantic:extensionElements>
-      </semantic:intermediateThrowEvent>
-      <semantic:exclusiveGateway id="_q-MCwVaoEd-1RJ7RXx1qjA" default="_sCuo-laoEd-1RJ7RXx1qjA">
-        <semantic:incoming>_q-MCylaoEd-1RJ7RXx1qjA</semantic:incoming>
-        <semantic:outgoing>_sCuo-laoEd-1RJ7RXx1qjA</semantic:outgoing>
-        <semantic:outgoing>_ulJiYVaoEd-1RJ7RXx1qjA</semantic:outgoing>
-      </semantic:exclusiveGateway>
-      <semantic:task name="Accepted" id="_t6Xx0VguEd-F7Z1jfVSjng">
-        <semantic:incoming>_t6hi0VguEd-F7Z1jfVSjng</semantic:incoming>
-        <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:intermediateThrowEvent>
+      <bpmn:exclusiveGateway default="_sCuo-laoEd-1RJ7RXx1qjA" id="_q-MCwVaoEd-1RJ7RXx1qjA">
+        <bpmn:incoming>_q-MCylaoEd-1RJ7RXx1qjA</bpmn:incoming>
+        <bpmn:outgoing>_sCuo-laoEd-1RJ7RXx1qjA</bpmn:outgoing>
+        <bpmn:outgoing>_ulJiYVaoEd-1RJ7RXx1qjA</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:task id="_t6Xx0VguEd-F7Z1jfVSjng" name="Accepted">
+        <bpmn:incoming>_t6hi0VguEd-F7Z1jfVSjng</bpmn:incoming>
+        <bpmn:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.InvokeMethodTask</jadex:class>
           <jadex:parameter direction="in" name="object" type="java.lang.Object">accepted</jadex:parameter>
           <jadex:parameter direction="in" name="methodname" type="java.lang.String">&quot;add&quot;</jadex:parameter>
           <jadex:parameter direction="in" name="param" type="java.lang.Object">proposals</jadex:parameter>
-        </semantic:extensionElements>
-      </semantic:task>
-      <semantic:intermediateThrowEvent id="_sCuo8VaoEd-1RJ7RXx1qjA">
-        <semantic:incoming>_sCuo-laoEd-1RJ7RXx1qjA</semantic:incoming>
-        <semantic:messageEventDefinition/>
-        <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:task>
+      <bpmn:intermediateThrowEvent id="_sCuo8VaoEd-1RJ7RXx1qjA">
+        <bpmn:incoming>_sCuo-laoEd-1RJ7RXx1qjA</bpmn:incoming>
+        <bpmn:messageEventDefinition/>
+        <bpmn:extensionElements>
           <jadex:property name="performative">&quot;reject-proposal&quot;</jadex:property>
           <jadex:property name="receivers">proposals.getParticipant()</jadex:property>
           <jadex:property name="content">proposals.getProposal()</jadex:property>
           <jadex:property name="conversation_id">convid</jadex:property>
           <jadex:property name="protocol">&quot;fipa-contract-net&quot;</jadex:property>
-        </semantic:extensionElements>
-      </semantic:intermediateThrowEvent>
-      <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:intermediateThrowEvent>
+      <bpmn:extensionElements>
         <jadex:parameter direction="inout" name="proposals" type="Set">proposals</jadex:parameter>
         <jadex:parameter direction="inout" name="accepted" type="Set">new LinkedHashSet()</jadex:parameter>
         <jadex:property name="iterator">proposals</jadex:property>
-      </semantic:extensionElements>
-    </semantic:subProcess>
-    <semantic:subProcess name="Evaluate Proposals" id="_LSKZ0VmxEd-CVtZr0hfiVg">
-      <semantic:incoming>eaMqI01HizBqx2PI</semantic:incoming>
-      <semantic:outgoing>_3S3gcVaoEd-1RJ7RXx1qjA</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:subProcess>
+    <bpmn:subProcess id="_LSKZ0VmxEd-CVtZr0hfiVg" name="Evaluate Proposals">
+      <bpmn:incoming>eaMqI01HizBqx2PI</bpmn:incoming>
+      <bpmn:outgoing>_3S3gcVaoEd-1RJ7RXx1qjA</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:parameter direction="inout" name="proposals" type="Collection">proposals</jadex:parameter>
         <jadex:property name="file">epp</jadex:property>
         <jadex:subprocessexpressionref>epp</jadex:subprocessexpressionref>
-      </semantic:extensionElements>
-    </semantic:subProcess>
-    <semantic:subProcess name="For all Accepted" id="_pv3uIVarEd-1RJ7RXx1qjA">
-      <semantic:incoming>_yBSKsVarEd-1RJ7RXx1qjA</semantic:incoming>
-      <semantic:outgoing>_pKWpcVavEd-1RJ7RXx1qjA</semantic:outgoing>
-      <semantic:multiInstanceLoopCharacteristics isSequential="false" />
-      <semantic:startEvent id="_ONRnoVdiEd-_rc0-j01YLA">
-        <semantic:outgoing>_ONRnqldiEd-_rc0-j01YLA</semantic:outgoing>
-      </semantic:startEvent>
-      <semantic:intermediateCatchEvent id="_z9jqIVarEd-1RJ7RXx1qjA">
-        <semantic:incoming>_ONRnqldiEd-_rc0-j01YLA</semantic:incoming>
-        <semantic:outgoing>_1Qi8ClarEd-1RJ7RXx1qjA</semantic:outgoing>
-        <semantic:outgoing>_6fXKSlarEd-1RJ7RXx1qjA</semantic:outgoing>
-        <semantic:multipleEventDefinition/>
-      </semantic:intermediateCatchEvent>
-      <semantic:intermediateCatchEvent id="_1Qi8AVarEd-1RJ7RXx1qjA">
-        <semantic:incoming>_1Qi8ClarEd-1RJ7RXx1qjA</semantic:incoming>
-        <semantic:messageEventDefinition/>
-        <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:subProcess>
+    <bpmn:subProcess id="_pv3uIVarEd-1RJ7RXx1qjA" name="For all Accepted">
+      <bpmn:incoming>_yBSKsVarEd-1RJ7RXx1qjA</bpmn:incoming>
+      <bpmn:outgoing>_pKWpcVavEd-1RJ7RXx1qjA</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics isSequential="false"/>
+      <bpmn:startEvent id="_ONRnoVdiEd-_rc0-j01YLA">
+        <bpmn:outgoing>_ONRnqldiEd-_rc0-j01YLA</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:intermediateCatchEvent id="_z9jqIVarEd-1RJ7RXx1qjA">
+        <bpmn:incoming>_ONRnqldiEd-_rc0-j01YLA</bpmn:incoming>
+        <bpmn:outgoing>_1Qi8ClarEd-1RJ7RXx1qjA</bpmn:outgoing>
+        <bpmn:outgoing>_6fXKSlarEd-1RJ7RXx1qjA</bpmn:outgoing>
+        <bpmn:multipleEventDefinition/>
+      </bpmn:intermediateCatchEvent>
+      <bpmn:intermediateCatchEvent id="_1Qi8AVarEd-1RJ7RXx1qjA">
+        <bpmn:incoming>_1Qi8ClarEd-1RJ7RXx1qjA</bpmn:incoming>
+        <bpmn:messageEventDefinition/>
+        <bpmn:extensionElements>
           <jadex:property name="performative">&quot;inform&quot;</jadex:property>
           <jadex:property name="sender">accepted.getParticipant()</jadex:property>
           <jadex:property name="conversation_id">convid</jadex:property>
-        </semantic:extensionElements>
-      </semantic:intermediateCatchEvent>
-      <semantic:intermediateCatchEvent id="_6fXKQVarEd-1RJ7RXx1qjA">
-        <semantic:incoming>_6fXKSlarEd-1RJ7RXx1qjA</semantic:incoming>
-        <semantic:messageEventDefinition/>
-        <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:intermediateCatchEvent>
+      <bpmn:intermediateCatchEvent id="_6fXKQVarEd-1RJ7RXx1qjA">
+        <bpmn:incoming>_6fXKSlarEd-1RJ7RXx1qjA</bpmn:incoming>
+        <bpmn:messageEventDefinition/>
+        <bpmn:extensionElements>
           <jadex:property name="performative">&quot;failure&quot;</jadex:property>
           <jadex:property name="sender">accepted.getParticipant()</jadex:property>
           <jadex:property name="conversation_id">convid</jadex:property>
-        </semantic:extensionElements>
-      </semantic:intermediateCatchEvent>
-      <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:intermediateCatchEvent>
+      <bpmn:extensionElements>
         <jadex:parameter direction="inout" name="accepted" type="Set">accepted</jadex:parameter>
         <jadex:property name="iterator">accepted</jadex:property>
-      </semantic:extensionElements>
-    </semantic:subProcess>
-    <semantic:boundaryEvent id="_AhyfYVavEd-1RJ7RXx1qjA" attachedToRef="_pv3uIVarEd-1RJ7RXx1qjA">
-      <semantic:outgoing>_mSCYilavEd-1RJ7RXx1qjA</semantic:outgoing>
-      <semantic:timerEventDefinition>
-        <semantic:timeDuration>timeout</semantic:timeDuration>
-      </semantic:timerEventDefinition>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:subProcess>
+    <bpmn:boundaryEvent attachedToRef="_pv3uIVarEd-1RJ7RXx1qjA" id="_AhyfYVavEd-1RJ7RXx1qjA">
+      <bpmn:outgoing>_mSCYilavEd-1RJ7RXx1qjA</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration>timeout</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+      <bpmn:extensionElements>
         <jadex:property name="duration">timeout</jadex:property>
-      </semantic:extensionElements>
-    </semantic:boundaryEvent>
-    <semantic:endEvent id="_mSCYgVavEd-1RJ7RXx1qjA">
-      <semantic:incoming>_mSCYilavEd-1RJ7RXx1qjA</semantic:incoming>
-      <semantic:incoming>_ncPh0VavEd-1RJ7RXx1qjA</semantic:incoming>
-      <semantic:incoming>_pKWpcVavEd-1RJ7RXx1qjA</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:sequenceFlow sourceRef="_cOd7YVT6Ed-32983CGnnJA" targetRef="_J11FUVapEd-1RJ7RXx1qjA" id="_y8pRoVapEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_J11FUVapEd-1RJ7RXx1qjA" targetRef="_vpa4QVanEd-1RJ7RXx1qjA" id="_9R7RIVauEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_0-bjMVapEd-1RJ7RXx1qjA" targetRef="_rTd5wVapEd-1RJ7RXx1qjA" id="_1ybzAVapEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_rTd5wVapEd-1RJ7RXx1qjA" targetRef="_MA2ycVapEd-1RJ7RXx1qjA" id="_x679AVapEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_MA2ycVapEd-1RJ7RXx1qjA" targetRef="_M4SJsVapEd-1RJ7RXx1qjA" id="_M4SJulapEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_MA2ycVapEd-1RJ7RXx1qjA" targetRef="_NmBZcVapEd-1RJ7RXx1qjA" id="_NmBZelapEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_NmBZcVapEd-1RJ7RXx1qjA" targetRef="_3-9yUVglEd-UBaPlSCV7pQ" id="_3_QtQVglEd-UBaPlSCV7pQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_z3NDIVauEd-1RJ7RXx1qjA" targetRef="_vpa4QVanEd-1RJ7RXx1qjA" id="_8af54VauEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_vpa4QVanEd-1RJ7RXx1qjA" targetRef="_mSCYgVavEd-1RJ7RXx1qjA" id="_ncPh0VavEd-1RJ7RXx1qjA">
-      <semantic:conditionExpression>proposals.isEmpty()</semantic:conditionExpression>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_vpa4QVanEd-1RJ7RXx1qjA" targetRef="_LSKZ0VmxEd-CVtZr0hfiVg" id="eaMqI01HizBqx2PI">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_oPQXUVaoEd-1RJ7RXx1qjA" targetRef="_pv3uIVarEd-1RJ7RXx1qjA" id="_yBSKsVarEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_qCcMMVaoEd-1RJ7RXx1qjA" targetRef="_q-MCwVaoEd-1RJ7RXx1qjA" id="_q-MCylaoEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_uk_xYVaoEd-1RJ7RXx1qjA" targetRef="_t6Xx0VguEd-F7Z1jfVSjng" id="_t6hi0VguEd-F7Z1jfVSjng">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_q-MCwVaoEd-1RJ7RXx1qjA" targetRef="_sCuo8VaoEd-1RJ7RXx1qjA" id="_sCuo-laoEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_q-MCwVaoEd-1RJ7RXx1qjA" targetRef="_uk_xYVaoEd-1RJ7RXx1qjA" id="_ulJiYVaoEd-1RJ7RXx1qjA">
-      <semantic:conditionExpression>proposals.getEvaluation()!=null &amp;&amp; ((Boolean)proposals.getEvaluation()).booleanValue()</semantic:conditionExpression>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_LSKZ0VmxEd-CVtZr0hfiVg" targetRef="_oPQXUVaoEd-1RJ7RXx1qjA" id="_3S3gcVaoEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_pv3uIVarEd-1RJ7RXx1qjA" targetRef="_mSCYgVavEd-1RJ7RXx1qjA" id="_pKWpcVavEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_ONRnoVdiEd-_rc0-j01YLA" targetRef="_z9jqIVarEd-1RJ7RXx1qjA" id="_ONRnqldiEd-_rc0-j01YLA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_z9jqIVarEd-1RJ7RXx1qjA" targetRef="_1Qi8AVarEd-1RJ7RXx1qjA" id="_1Qi8ClarEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_z9jqIVarEd-1RJ7RXx1qjA" targetRef="_6fXKQVarEd-1RJ7RXx1qjA" id="_6fXKSlarEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_AhyfYVavEd-1RJ7RXx1qjA" targetRef="_mSCYgVavEd-1RJ7RXx1qjA" id="_mSCYilavEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-      <jadex:dataFlow id="mTomSfzLA0PGeYh+" sourceRef="_oPQXUVaoEd-1RJ7RXx1qjA" sourceParam="accepted" targetRef="_pv3uIVarEd-1RJ7RXx1qjA" targetParam="accepted"/>
-    </semantic:extensionElements>
-  </semantic:process>
-  <semantic:process name="Participant" id="_mTY88VT6Ed-32983CGnnJA">
-    <semantic:startEvent id="_wU91AVa6Ed-1RJ7RXx1qjA">
-      <semantic:outgoing>_wU91Cla6Ed-1RJ7RXx1qjA</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:intermediateCatchEvent id="_uWrd8VT6Ed-32983CGnnJA">
-      <semantic:incoming>_wU91Cla6Ed-1RJ7RXx1qjA</semantic:incoming>
-      <semantic:outgoing>_3piJalT6Ed-32983CGnnJA</semantic:outgoing>
-      <semantic:messageEventDefinition/>
-    </semantic:intermediateCatchEvent>
-    <semantic:subProcess name="Make Proposal" id="_ooaMAVm6Ed-CVtZr0hfiVg">
-      <semantic:incoming>_3piJalT6Ed-32983CGnnJA</semantic:incoming>
-      <semantic:outgoing>_5-1z6lT6Ed-32983CGnnJA</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:boundaryEvent>
+    <bpmn:endEvent id="_mSCYgVavEd-1RJ7RXx1qjA">
+      <bpmn:incoming>_mSCYilavEd-1RJ7RXx1qjA</bpmn:incoming>
+      <bpmn:incoming>_ncPh0VavEd-1RJ7RXx1qjA</bpmn:incoming>
+      <bpmn:incoming>_pKWpcVavEd-1RJ7RXx1qjA</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="_y8pRoVapEd-1RJ7RXx1qjA" sourceRef="_cOd7YVT6Ed-32983CGnnJA" targetRef="_J11FUVapEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_9R7RIVauEd-1RJ7RXx1qjA" sourceRef="_J11FUVapEd-1RJ7RXx1qjA" targetRef="_vpa4QVanEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_1ybzAVapEd-1RJ7RXx1qjA" sourceRef="_0-bjMVapEd-1RJ7RXx1qjA" targetRef="_rTd5wVapEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_x679AVapEd-1RJ7RXx1qjA" sourceRef="_rTd5wVapEd-1RJ7RXx1qjA" targetRef="_MA2ycVapEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_M4SJulapEd-1RJ7RXx1qjA" sourceRef="_MA2ycVapEd-1RJ7RXx1qjA" targetRef="_M4SJsVapEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_NmBZelapEd-1RJ7RXx1qjA" sourceRef="_MA2ycVapEd-1RJ7RXx1qjA" targetRef="_NmBZcVapEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_3_QtQVglEd-UBaPlSCV7pQ" sourceRef="_NmBZcVapEd-1RJ7RXx1qjA" targetRef="_3-9yUVglEd-UBaPlSCV7pQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_8af54VauEd-1RJ7RXx1qjA" sourceRef="_z3NDIVauEd-1RJ7RXx1qjA" targetRef="_vpa4QVanEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_ncPh0VavEd-1RJ7RXx1qjA" sourceRef="_vpa4QVanEd-1RJ7RXx1qjA" targetRef="_mSCYgVavEd-1RJ7RXx1qjA">
+      <bpmn:conditionExpression>proposals.isEmpty()</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="eaMqI01HizBqx2PI" sourceRef="_vpa4QVanEd-1RJ7RXx1qjA" targetRef="_LSKZ0VmxEd-CVtZr0hfiVg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_yBSKsVarEd-1RJ7RXx1qjA" sourceRef="_oPQXUVaoEd-1RJ7RXx1qjA" targetRef="_pv3uIVarEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_q-MCylaoEd-1RJ7RXx1qjA" sourceRef="_qCcMMVaoEd-1RJ7RXx1qjA" targetRef="_q-MCwVaoEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_t6hi0VguEd-F7Z1jfVSjng" sourceRef="_uk_xYVaoEd-1RJ7RXx1qjA" targetRef="_t6Xx0VguEd-F7Z1jfVSjng">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_sCuo-laoEd-1RJ7RXx1qjA" sourceRef="_q-MCwVaoEd-1RJ7RXx1qjA" targetRef="_sCuo8VaoEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_ulJiYVaoEd-1RJ7RXx1qjA" sourceRef="_q-MCwVaoEd-1RJ7RXx1qjA" targetRef="_uk_xYVaoEd-1RJ7RXx1qjA">
+      <bpmn:conditionExpression>proposals.getEvaluation()!=null &amp;&amp; ((Boolean)proposals.getEvaluation()).booleanValue()</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_3S3gcVaoEd-1RJ7RXx1qjA" sourceRef="_LSKZ0VmxEd-CVtZr0hfiVg" targetRef="_oPQXUVaoEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_pKWpcVavEd-1RJ7RXx1qjA" sourceRef="_pv3uIVarEd-1RJ7RXx1qjA" targetRef="_mSCYgVavEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_ONRnqldiEd-_rc0-j01YLA" sourceRef="_ONRnoVdiEd-_rc0-j01YLA" targetRef="_z9jqIVarEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_1Qi8ClarEd-1RJ7RXx1qjA" sourceRef="_z9jqIVarEd-1RJ7RXx1qjA" targetRef="_1Qi8AVarEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_6fXKSlarEd-1RJ7RXx1qjA" sourceRef="_z9jqIVarEd-1RJ7RXx1qjA" targetRef="_6fXKQVarEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_mSCYilavEd-1RJ7RXx1qjA" sourceRef="_AhyfYVavEd-1RJ7RXx1qjA" targetRef="_mSCYgVavEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+      <jadex:dataFlow id="mTomSfzLA0PGeYh+" sourceParam="accepted" sourceRef="_oPQXUVaoEd-1RJ7RXx1qjA" targetParam="accepted" targetRef="_pv3uIVarEd-1RJ7RXx1qjA"/>
+    </bpmn:extensionElements>
+  </bpmn:process>
+  <bpmn:process id="_mTY88VT6Ed-32983CGnnJA" name="Participant">
+    <bpmn:startEvent id="_wU91AVa6Ed-1RJ7RXx1qjA">
+      <bpmn:outgoing>_wU91Cla6Ed-1RJ7RXx1qjA</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:intermediateCatchEvent id="_uWrd8VT6Ed-32983CGnnJA">
+      <bpmn:incoming>_wU91Cla6Ed-1RJ7RXx1qjA</bpmn:incoming>
+      <bpmn:outgoing>_3piJalT6Ed-32983CGnnJA</bpmn:outgoing>
+      <bpmn:messageEventDefinition/>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:subProcess id="_ooaMAVm6Ed-CVtZr0hfiVg" name="Make Proposal">
+      <bpmn:incoming>_3piJalT6Ed-32983CGnnJA</bpmn:incoming>
+      <bpmn:outgoing>_5-1z6lT6Ed-32983CGnnJA</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:parameter direction="in" name="cfp" type="Object">msg.get(&quot;content&quot;)</jadex:parameter>
         <jadex:parameter direction="in" name="initiator" type="IComponentIdentifier">msg.get(&quot;sender&quot;)</jadex:parameter>
         <jadex:parameter direction="out" name="proposal" type="Object"/>
         <jadex:property name="file">mpp</jadex:property>
         <jadex:subprocessexpressionref>mpp</jadex:subprocessexpressionref>
-      </semantic:extensionElements>
-    </semantic:subProcess>
-    <semantic:exclusiveGateway id="_5-1z4VT6Ed-32983CGnnJA" default="_-n97KFT6Ed-32983CGnnJA">
-      <semantic:incoming>_5-1z6lT6Ed-32983CGnnJA</semantic:incoming>
-      <semantic:outgoing>_7gJOmVT6Ed-32983CGnnJA</semantic:outgoing>
-      <semantic:outgoing>_-n97KFT6Ed-32983CGnnJA</semantic:outgoing>
-    </semantic:exclusiveGateway>
-    <semantic:subProcess name="Execute Request" id="_trpHcVT7Ed-32983CGnnJA">
-      <semantic:incoming>_ts_LQVT7Ed-32983CGnnJA</semantic:incoming>
-      <semantic:outgoing>_1XO6KlT7Ed-32983CGnnJA</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:subProcess>
+    <bpmn:exclusiveGateway default="_-n97KFT6Ed-32983CGnnJA" id="_5-1z4VT6Ed-32983CGnnJA">
+      <bpmn:incoming>_5-1z6lT6Ed-32983CGnnJA</bpmn:incoming>
+      <bpmn:outgoing>_7gJOmVT6Ed-32983CGnnJA</bpmn:outgoing>
+      <bpmn:outgoing>_-n97KFT6Ed-32983CGnnJA</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:subProcess id="_trpHcVT7Ed-32983CGnnJA" name="Execute Request">
+      <bpmn:incoming>_ts_LQVT7Ed-32983CGnnJA</bpmn:incoming>
+      <bpmn:outgoing>_1XO6KlT7Ed-32983CGnnJA</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:parameter direction="in" name="proposal" type="Object">$event.get(&quot;content&quot;)</jadex:parameter>
         <jadex:parameter direction="out" name="result" type="Object"/>
         <jadex:property name="file">erp</jadex:property>
         <jadex:subprocessexpressionref>erp</jadex:subprocessexpressionref>
-      </semantic:extensionElements>
-    </semantic:subProcess>
-    <semantic:boundaryEvent id="_zbtBkVT7Ed-32983CGnnJA" attachedToRef="_trpHcVT7Ed-32983CGnnJA">
-      <semantic:outgoing>_3XYM-lT7Ed-32983CGnnJA</semantic:outgoing>
-      <semantic:errorEventDefinition/>
-    </semantic:boundaryEvent>
-    <semantic:intermediateCatchEvent id="_i2I9gVT7Ed-32983CGnnJA">
-      <semantic:incoming>_i2I9ilT7Ed-32983CGnnJA</semantic:incoming>
-      <semantic:outgoing>_qYG8OlaSEd-1RJ7RXx1qjA</semantic:outgoing>
-      <semantic:outgoing>_t40p4VaSEd-1RJ7RXx1qjA</semantic:outgoing>
-      <semantic:outgoing>_uUFpkVaSEd-1RJ7RXx1qjA</semantic:outgoing>
-      <semantic:multipleEventDefinition/>
-    </semantic:intermediateCatchEvent>
-    <semantic:intermediateCatchEvent id="_qYG8MVaSEd-1RJ7RXx1qjA">
-      <semantic:incoming>_qYG8OlaSEd-1RJ7RXx1qjA</semantic:incoming>
-      <semantic:outgoing>_sgKN0VaSEd-1RJ7RXx1qjA</semantic:outgoing>
-      <semantic:timerEventDefinition>
-        <semantic:timeDuration>timeout</semantic:timeDuration>
-      </semantic:timerEventDefinition>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:subProcess>
+    <bpmn:boundaryEvent attachedToRef="_trpHcVT7Ed-32983CGnnJA" id="_zbtBkVT7Ed-32983CGnnJA">
+      <bpmn:outgoing>_3XYM-lT7Ed-32983CGnnJA</bpmn:outgoing>
+      <bpmn:errorEventDefinition/>
+    </bpmn:boundaryEvent>
+    <bpmn:intermediateCatchEvent id="_i2I9gVT7Ed-32983CGnnJA">
+      <bpmn:incoming>_i2I9ilT7Ed-32983CGnnJA</bpmn:incoming>
+      <bpmn:outgoing>_qYG8OlaSEd-1RJ7RXx1qjA</bpmn:outgoing>
+      <bpmn:outgoing>_t40p4VaSEd-1RJ7RXx1qjA</bpmn:outgoing>
+      <bpmn:outgoing>_uUFpkVaSEd-1RJ7RXx1qjA</bpmn:outgoing>
+      <bpmn:multipleEventDefinition/>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="_qYG8MVaSEd-1RJ7RXx1qjA">
+      <bpmn:incoming>_qYG8OlaSEd-1RJ7RXx1qjA</bpmn:incoming>
+      <bpmn:outgoing>_sgKN0VaSEd-1RJ7RXx1qjA</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration>timeout</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+      <bpmn:extensionElements>
         <jadex:property name="duration">timeout</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateCatchEvent>
-    <semantic:intermediateCatchEvent id="_mEhlEVT7Ed-32983CGnnJA">
-      <semantic:incoming>_t40p4VaSEd-1RJ7RXx1qjA</semantic:incoming>
-      <semantic:outgoing>_rc4w4VT7Ed-32983CGnnJA</semantic:outgoing>
-      <semantic:messageEventDefinition/>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="_mEhlEVT7Ed-32983CGnnJA">
+      <bpmn:incoming>_t40p4VaSEd-1RJ7RXx1qjA</bpmn:incoming>
+      <bpmn:outgoing>_rc4w4VT7Ed-32983CGnnJA</bpmn:outgoing>
+      <bpmn:messageEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="performative">&quot;reject-proposal&quot;</jadex:property>
         <jadex:property name="conversation_id">convid</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateCatchEvent>
-    <semantic:intermediateCatchEvent id="_kEXrMVT7Ed-32983CGnnJA">
-      <semantic:incoming>_uUFpkVaSEd-1RJ7RXx1qjA</semantic:incoming>
-      <semantic:outgoing>_ts_LQVT7Ed-32983CGnnJA</semantic:outgoing>
-      <semantic:messageEventDefinition/>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="_kEXrMVT7Ed-32983CGnnJA">
+      <bpmn:incoming>_uUFpkVaSEd-1RJ7RXx1qjA</bpmn:incoming>
+      <bpmn:outgoing>_ts_LQVT7Ed-32983CGnnJA</bpmn:outgoing>
+      <bpmn:messageEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="performative">&quot;accept-proposal&quot;</jadex:property>
         <jadex:property name="conversation_id">convid</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateCatchEvent>
-    <semantic:intermediateThrowEvent id="_1XO6IVT7Ed-32983CGnnJA">
-      <semantic:incoming>_1XO6KlT7Ed-32983CGnnJA</semantic:incoming>
-      <semantic:outgoing>_GCv1OlT8Ed-32983CGnnJA</semantic:outgoing>
-      <semantic:messageEventDefinition/>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateThrowEvent id="_1XO6IVT7Ed-32983CGnnJA">
+      <bpmn:incoming>_1XO6KlT7Ed-32983CGnnJA</bpmn:incoming>
+      <bpmn:outgoing>_GCv1OlT8Ed-32983CGnnJA</bpmn:outgoing>
+      <bpmn:messageEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="message">SFipa.createReply(msg)</jadex:property>
         <jadex:property name="content">result</jadex:property>
         <jadex:property name="performative">&quot;inform&quot;</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateThrowEvent>
-    <semantic:intermediateThrowEvent id="_3XYM8VT7Ed-32983CGnnJA">
-      <semantic:incoming>_3XYM-lT7Ed-32983CGnnJA</semantic:incoming>
-      <semantic:outgoing>_HOvuQVT8Ed-32983CGnnJA</semantic:outgoing>
-      <semantic:messageEventDefinition/>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:intermediateThrowEvent id="_3XYM8VT7Ed-32983CGnnJA">
+      <bpmn:incoming>_3XYM-lT7Ed-32983CGnnJA</bpmn:incoming>
+      <bpmn:outgoing>_HOvuQVT8Ed-32983CGnnJA</bpmn:outgoing>
+      <bpmn:messageEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="message">SFipa.createReply(msg)</jadex:property>
         <jadex:property name="performative">&quot;failure&quot;</jadex:property>
         <jadex:property name="content">msg.get(&quot;content&quot;)</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateThrowEvent>
-    <semantic:intermediateThrowEvent id="_J5MEsVaQEd-1RJ7RXx1qjA">
-      <semantic:incoming>_-n97KFT6Ed-32983CGnnJA</semantic:incoming>
-      <semantic:outgoing>_eYyVYVaQEd-1RJ7RXx1qjA</semantic:outgoing>
-      <semantic:messageEventDefinition/>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:intermediateThrowEvent id="_J5MEsVaQEd-1RJ7RXx1qjA">
+      <bpmn:incoming>_-n97KFT6Ed-32983CGnnJA</bpmn:incoming>
+      <bpmn:outgoing>_eYyVYVaQEd-1RJ7RXx1qjA</bpmn:outgoing>
+      <bpmn:messageEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="performative">&quot;refuse&quot;</jadex:property>
         <jadex:property name="content">msg.get(&quot;content&quot;)</jadex:property>
         <jadex:property name="message">SFipa.createReply(msg)</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateThrowEvent>
-    <semantic:endEvent id="_GCv1MVT8Ed-32983CGnnJA">
-      <semantic:incoming>_rc4w4VT7Ed-32983CGnnJA</semantic:incoming>
-      <semantic:incoming>_GCv1OlT8Ed-32983CGnnJA</semantic:incoming>
-      <semantic:incoming>_HOvuQVT8Ed-32983CGnnJA</semantic:incoming>
-      <semantic:incoming>_eYyVYVaQEd-1RJ7RXx1qjA</semantic:incoming>
-      <semantic:incoming>_sgKN0VaSEd-1RJ7RXx1qjA</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:intermediateThrowEvent id="_FNYI4VT7Ed-32983CGnnJA">
-      <semantic:incoming>_7gJOmVT6Ed-32983CGnnJA</semantic:incoming>
-      <semantic:outgoing>_i2I9ilT7Ed-32983CGnnJA</semantic:outgoing>
-      <semantic:messageEventDefinition/>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:endEvent id="_GCv1MVT8Ed-32983CGnnJA">
+      <bpmn:incoming>_rc4w4VT7Ed-32983CGnnJA</bpmn:incoming>
+      <bpmn:incoming>_GCv1OlT8Ed-32983CGnnJA</bpmn:incoming>
+      <bpmn:incoming>_HOvuQVT8Ed-32983CGnnJA</bpmn:incoming>
+      <bpmn:incoming>_eYyVYVaQEd-1RJ7RXx1qjA</bpmn:incoming>
+      <bpmn:incoming>_sgKN0VaSEd-1RJ7RXx1qjA</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:intermediateThrowEvent id="_FNYI4VT7Ed-32983CGnnJA">
+      <bpmn:incoming>_7gJOmVT6Ed-32983CGnnJA</bpmn:incoming>
+      <bpmn:outgoing>_i2I9ilT7Ed-32983CGnnJA</bpmn:outgoing>
+      <bpmn:messageEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="performative">&quot;propose&quot;</jadex:property>
         <jadex:property name="content">proposal</jadex:property>
         <jadex:property name="message">SFipa.createReply(msg)</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateThrowEvent>
-    <semantic:sequenceFlow sourceRef="_wU91AVa6Ed-1RJ7RXx1qjA" targetRef="_uWrd8VT6Ed-32983CGnnJA" id="_wU91Cla6Ed-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_uWrd8VT6Ed-32983CGnnJA" targetRef="_ooaMAVm6Ed-CVtZr0hfiVg" id="_3piJalT6Ed-32983CGnnJA">
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sequenceFlow id="_wU91Cla6Ed-1RJ7RXx1qjA" sourceRef="_wU91AVa6Ed-1RJ7RXx1qjA" targetRef="_uWrd8VT6Ed-32983CGnnJA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_3piJalT6Ed-32983CGnnJA" sourceRef="_uWrd8VT6Ed-32983CGnnJA" targetRef="_ooaMAVm6Ed-CVtZr0hfiVg">
+      <bpmn:extensionElements>
         <jadex:parametermapping name="msg">$event</jadex:parametermapping>
         <jadex:parametermapping name="convid">$event.get(&quot;conversation_id&quot;)</jadex:parametermapping>
         <jadex:parametermapping name="initiator">$event.get(&quot;sender&quot;)</jadex:parametermapping>
-      </semantic:extensionElements>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_ooaMAVm6Ed-CVtZr0hfiVg" targetRef="_5-1z4VT6Ed-32983CGnnJA" id="_5-1z6lT6Ed-32983CGnnJA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_5-1z4VT6Ed-32983CGnnJA" targetRef="_FNYI4VT7Ed-32983CGnnJA" id="_7gJOmVT6Ed-32983CGnnJA">
-      <semantic:conditionExpression>proposal!=null</semantic:conditionExpression>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_5-1z4VT6Ed-32983CGnnJA" targetRef="_J5MEsVaQEd-1RJ7RXx1qjA" id="_-n97KFT6Ed-32983CGnnJA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_trpHcVT7Ed-32983CGnnJA" targetRef="_1XO6IVT7Ed-32983CGnnJA" id="_1XO6KlT7Ed-32983CGnnJA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_zbtBkVT7Ed-32983CGnnJA" targetRef="_3XYM8VT7Ed-32983CGnnJA" id="_3XYM-lT7Ed-32983CGnnJA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_i2I9gVT7Ed-32983CGnnJA" targetRef="_qYG8MVaSEd-1RJ7RXx1qjA" id="_qYG8OlaSEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_i2I9gVT7Ed-32983CGnnJA" targetRef="_mEhlEVT7Ed-32983CGnnJA" id="_t40p4VaSEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_i2I9gVT7Ed-32983CGnnJA" targetRef="_kEXrMVT7Ed-32983CGnnJA" id="_uUFpkVaSEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_qYG8MVaSEd-1RJ7RXx1qjA" targetRef="_GCv1MVT8Ed-32983CGnnJA" id="_sgKN0VaSEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_mEhlEVT7Ed-32983CGnnJA" targetRef="_GCv1MVT8Ed-32983CGnnJA" id="_rc4w4VT7Ed-32983CGnnJA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_kEXrMVT7Ed-32983CGnnJA" targetRef="_trpHcVT7Ed-32983CGnnJA" id="_ts_LQVT7Ed-32983CGnnJA">
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_5-1z6lT6Ed-32983CGnnJA" sourceRef="_ooaMAVm6Ed-CVtZr0hfiVg" targetRef="_5-1z4VT6Ed-32983CGnnJA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_7gJOmVT6Ed-32983CGnnJA" sourceRef="_5-1z4VT6Ed-32983CGnnJA" targetRef="_FNYI4VT7Ed-32983CGnnJA">
+      <bpmn:conditionExpression>proposal!=null</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_-n97KFT6Ed-32983CGnnJA" sourceRef="_5-1z4VT6Ed-32983CGnnJA" targetRef="_J5MEsVaQEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_1XO6KlT7Ed-32983CGnnJA" sourceRef="_trpHcVT7Ed-32983CGnnJA" targetRef="_1XO6IVT7Ed-32983CGnnJA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_3XYM-lT7Ed-32983CGnnJA" sourceRef="_zbtBkVT7Ed-32983CGnnJA" targetRef="_3XYM8VT7Ed-32983CGnnJA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_qYG8OlaSEd-1RJ7RXx1qjA" sourceRef="_i2I9gVT7Ed-32983CGnnJA" targetRef="_qYG8MVaSEd-1RJ7RXx1qjA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_t40p4VaSEd-1RJ7RXx1qjA" sourceRef="_i2I9gVT7Ed-32983CGnnJA" targetRef="_mEhlEVT7Ed-32983CGnnJA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_uUFpkVaSEd-1RJ7RXx1qjA" sourceRef="_i2I9gVT7Ed-32983CGnnJA" targetRef="_kEXrMVT7Ed-32983CGnnJA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_sgKN0VaSEd-1RJ7RXx1qjA" sourceRef="_qYG8MVaSEd-1RJ7RXx1qjA" targetRef="_GCv1MVT8Ed-32983CGnnJA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_rc4w4VT7Ed-32983CGnnJA" sourceRef="_mEhlEVT7Ed-32983CGnnJA" targetRef="_GCv1MVT8Ed-32983CGnnJA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_ts_LQVT7Ed-32983CGnnJA" sourceRef="_kEXrMVT7Ed-32983CGnnJA" targetRef="_trpHcVT7Ed-32983CGnnJA">
+      <bpmn:extensionElements>
         <jadex:parametermapping name="msg">$event</jadex:parametermapping>
-      </semantic:extensionElements>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_1XO6IVT7Ed-32983CGnnJA" targetRef="_GCv1MVT8Ed-32983CGnnJA" id="_GCv1OlT8Ed-32983CGnnJA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_3XYM8VT7Ed-32983CGnnJA" targetRef="_GCv1MVT8Ed-32983CGnnJA" id="_HOvuQVT8Ed-32983CGnnJA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_J5MEsVaQEd-1RJ7RXx1qjA" targetRef="_GCv1MVT8Ed-32983CGnnJA" id="_eYyVYVaQEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_FNYI4VT7Ed-32983CGnnJA" targetRef="_i2I9gVT7Ed-32983CGnnJA" id="_i2I9ilT7Ed-32983CGnnJA">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_GCv1OlT8Ed-32983CGnnJA" sourceRef="_1XO6IVT7Ed-32983CGnnJA" targetRef="_GCv1MVT8Ed-32983CGnnJA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_HOvuQVT8Ed-32983CGnnJA" sourceRef="_3XYM8VT7Ed-32983CGnnJA" targetRef="_GCv1MVT8Ed-32983CGnnJA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_eYyVYVaQEd-1RJ7RXx1qjA" sourceRef="_J5MEsVaQEd-1RJ7RXx1qjA" targetRef="_GCv1MVT8Ed-32983CGnnJA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_i2I9ilT7Ed-32983CGnnJA" sourceRef="_FNYI4VT7Ed-32983CGnnJA" targetRef="_i2I9gVT7Ed-32983CGnnJA">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_cNIeoVT6Ed-32983CGnnJA">
@@ -619,7 +611,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="eaMqI01HizBqx2PI">
       </bpmndi:BPMNEdge>
-      <di:Edge type="data" jadexElement="mTomSfzLA0PGeYh+">
+      <di:Edge jadexElement="mTomSfzLA0PGeYh+" type="data">
       </di:Edge>
       <bpmndi:BPMNEdge bpmnElement="_3XYM-lT7Ed-32983CGnnJA">
       </bpmndi:BPMNEdge>
@@ -657,5 +649,4 @@
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

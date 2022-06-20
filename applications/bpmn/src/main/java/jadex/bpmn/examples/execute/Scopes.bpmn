@@ -1,73 +1,65 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>Scopes</jadex:modelname>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags keepalive="false" monitoring="OFF" suspend="false" synchronous="false"/>
     <jadex:imports>
       <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>
     </jadex:imports>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_LQ9oV33pEd6VFdlpWzoevQ">
-    <semantic:subProcess name="Outer Task" id="_S4-ikX3pEd6VFdlpWzoevQ">
-      <semantic:outgoing>_eqOjGH3pEd6VFdlpWzoevQ</semantic:outgoing>
-      <semantic:task name="Inner Task 1" id="_S4-ik33pEd6VFdlpWzoevQ">
-        <semantic:outgoing>_bRj-Kn3pEd6VFdlpWzoevQ</semantic:outgoing>
-        <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_LQ9oV33pEd6VFdlpWzoevQ" name="Pool">
+    <bpmn:subProcess id="_S4-ikX3pEd6VFdlpWzoevQ" name="Outer Task">
+      <bpmn:outgoing>_eqOjGH3pEd6VFdlpWzoevQ</bpmn:outgoing>
+      <bpmn:task id="_S4-ik33pEd6VFdlpWzoevQ" name="Inner Task 1">
+        <bpmn:outgoing>_bRj-Kn3pEd6VFdlpWzoevQ</bpmn:outgoing>
+        <bpmn:extensionElements>
           <jadex:parameter direction="out" name="b" type="String">&quot;b&quot;</jadex:parameter>
-        </semantic:extensionElements>
-      </semantic:task>
-      <semantic:task name="Inner Task 3" id="YFHVtiyyt404PU7W">
-        <semantic:incoming>7/ds+EH3o0POY4vW</semantic:incoming>
-        <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:task>
+      <bpmn:task id="YFHVtiyyt404PU7W" name="Inner Task 3">
+        <bpmn:incoming>7/ds+EH3o0POY4vW</bpmn:incoming>
+        <bpmn:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.WriteParameterTask</jadex:class>
           <jadex:parameter direction="in" name="name" type="java.lang.String">&quot;a&quot;</jadex:parameter>
           <jadex:parameter direction="in" name="value" type="java.lang.Object"/>
-        </semantic:extensionElements>
-      </semantic:task>
-      <semantic:task name="Inner Task 2" id="_bRj-IX3pEd6VFdlpWzoevQ">
-        <semantic:incoming>_bRj-Kn3pEd6VFdlpWzoevQ</semantic:incoming>
-        <semantic:outgoing>7/ds+EH3o0POY4vW</semantic:outgoing>
-        <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:task>
+      <bpmn:task id="_bRj-IX3pEd6VFdlpWzoevQ" name="Inner Task 2">
+        <bpmn:incoming>_bRj-Kn3pEd6VFdlpWzoevQ</bpmn:incoming>
+        <bpmn:outgoing>7/ds+EH3o0POY4vW</bpmn:outgoing>
+        <bpmn:extensionElements>
           <jadex:parameter direction="inout" name="c" type="String"/>
-        </semantic:extensionElements>
-      </semantic:task>
-      <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:task>
+      <bpmn:extensionElements>
         <jadex:parameter direction="inout" name="a" type="String">&quot;a&quot;</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:subProcess>
-    <semantic:task name="Result Task" id="_eqEyEX3pEd6VFdlpWzoevQ">
-      <semantic:incoming>_eqOjGH3pEd6VFdlpWzoevQ</semantic:incoming>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:subProcess>
+    <bpmn:task id="_eqEyEX3pEd6VFdlpWzoevQ" name="Result Task">
+      <bpmn:incoming>_eqOjGH3pEd6VFdlpWzoevQ</bpmn:incoming>
+      <bpmn:extensionElements>
         <jadex:class>PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="String"/>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:sequenceFlow sourceRef="_S4-ikX3pEd6VFdlpWzoevQ" targetRef="_eqEyEX3pEd6VFdlpWzoevQ" id="_eqOjGH3pEd6VFdlpWzoevQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_S4-ik33pEd6VFdlpWzoevQ" targetRef="_bRj-IX3pEd6VFdlpWzoevQ" id="_bRj-Kn3pEd6VFdlpWzoevQ">
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="_eqOjGH3pEd6VFdlpWzoevQ" sourceRef="_S4-ikX3pEd6VFdlpWzoevQ" targetRef="_eqEyEX3pEd6VFdlpWzoevQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_bRj-Kn3pEd6VFdlpWzoevQ" sourceRef="_S4-ik33pEd6VFdlpWzoevQ" targetRef="_bRj-IX3pEd6VFdlpWzoevQ">
+      <bpmn:extensionElements>
         <jadex:parametermapping name="c">a+b</jadex:parametermapping>
         <jadex:parametermapping name="a">b</jadex:parametermapping>
-      </semantic:extensionElements>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_bRj-IX3pEd6VFdlpWzoevQ" targetRef="YFHVtiyyt404PU7W" id="7/ds+EH3o0POY4vW">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-      <jadex:dataFlow id="EyF3sufYf30KzmZw" sourceRef="_S4-ikX3pEd6VFdlpWzoevQ" sourceParam="a" targetRef="_eqEyEX3pEd6VFdlpWzoevQ" targetParam="text"/>
-      <jadex:dataFlow id="BSGeEN5X9EXYHh3f" sourceRef="_S4-ik33pEd6VFdlpWzoevQ" sourceParam="b" targetRef="_bRj-IX3pEd6VFdlpWzoevQ" targetParam="c">
+      </bpmn:extensionElements>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="7/ds+EH3o0POY4vW" sourceRef="_bRj-IX3pEd6VFdlpWzoevQ" targetRef="YFHVtiyyt404PU7W">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+      <jadex:dataFlow id="EyF3sufYf30KzmZw" sourceParam="a" sourceRef="_S4-ikX3pEd6VFdlpWzoevQ" targetParam="text" targetRef="_eqEyEX3pEd6VFdlpWzoevQ"/>
+      <jadex:dataFlow id="BSGeEN5X9EXYHh3f" sourceParam="b" sourceRef="_S4-ik33pEd6VFdlpWzoevQ" targetParam="c" targetRef="_bRj-IX3pEd6VFdlpWzoevQ">
         <jadex:dataFlowValueMapping>a+b</jadex:dataFlowValueMapping>
       </jadex:dataFlow>
-      <jadex:dataFlow id="ekbNvtCktyFSNP8J" sourceRef="_bRj-IX3pEd6VFdlpWzoevQ" sourceParam="c" targetRef="YFHVtiyyt404PU7W" targetParam="value"/>
-    </semantic:extensionElements>
-  </semantic:process>
+      <jadex:dataFlow id="ekbNvtCktyFSNP8J" sourceParam="c" sourceRef="_bRj-IX3pEd6VFdlpWzoevQ" targetParam="value" targetRef="YFHVtiyyt404PU7W"/>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_LQ9oV33pEd6VFdlpWzoevQ">
@@ -93,19 +85,16 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_bRj-Kn3pEd6VFdlpWzoevQ">
       </bpmndi:BPMNEdge>
-      <di:Edge type="data" jadexElement="BSGeEN5X9EXYHh3f">
+      <di:Edge jadexElement="BSGeEN5X9EXYHh3f" type="data">
       </di:Edge>
       <bpmndi:BPMNEdge bpmnElement="7/ds+EH3o0POY4vW">
       </bpmndi:BPMNEdge>
-      <di:Edge type="data" jadexElement="ekbNvtCktyFSNP8J">
+      <di:Edge jadexElement="ekbNvtCktyFSNP8J" type="data">
       </di:Edge>
       <bpmndi:BPMNEdge bpmnElement="_eqOjGH3pEd6VFdlpWzoevQ">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_eqOjGH3pEd6VFdlpWzoevQ">
-      </bpmndi:BPMNEdge>
-      <di:Edge type="data" jadexElement="EyF3sufYf30KzmZw">
+      <di:Edge jadexElement="EyF3sufYf30KzmZw" type="data">
       </di:Edge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

@@ -19,7 +19,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Inet4Address;
@@ -2761,7 +2760,7 @@ public class SUtil
 //		System.out.println(res);
 		
 //		String tst = "jar:file:/C:/projects/jadexgit/jadex-platform-standalone-launch/../../inno/vemaproda-eventsystem/target/vemaproda-eventsystem-0.5-SNAPSHOT.jar!/org/codehaus/plexus/context/ContextMapAdapter.class";
-		String tst = "C:\\Users\\Lars\\bpmntutorial2\\bpmntutorial\\target\\classes\\B1_simple.bpmn2";
+		String tst = "C:\\Users\\Lars\\bpmntutorial2\\bpmntutorial\\target\\classes\\B1_simple.bpmn";
 		
 		long start = System.currentTimeMillis();
 		
@@ -4904,6 +4903,40 @@ public class SUtil
 	}
 	
 	/**
+	 * Run code ignoring exceptions.
+	 * 
+	 * @param r Expression whose exceptions are ignored.
+	 */
+	public static void noEx(NoExRunnable r)
+	{
+		try
+		{
+			r.run();
+		}
+		catch (Exception e)
+		{
+		}
+	}
+	
+	/**
+	 * Run code ignoring exceptions.
+	 * 
+	 * @param r Expression whose exceptions are ignored.
+	 */
+	public static Object noExRet(NoExSupplier r)
+	{
+		Object ret = null;
+		try
+		{
+			ret = r.run();
+		}
+		catch (Exception e)
+		{
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Attempt to close a Closeable (e.g. on error recovery)
 	 *  ignoring any error.
 	 *  
@@ -6373,4 +6406,22 @@ public class SUtil
     										  'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
     										  'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
     										  'Y', 'Z', '?', '!' };
+    
+    /**
+     *  Function for the noEx() method.
+     *
+     */
+    @FunctionalInterface public interface NoExSupplier
+    {
+    	public Object run() throws Exception;
+    }
+    
+    /**
+     *  Runnable for the noEx() method.
+     *
+     */
+    @FunctionalInterface public interface NoExRunnable
+    {
+    	public void run() throws Exception;
+    }
 }

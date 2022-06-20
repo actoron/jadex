@@ -1,17 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>MessageTest</jadex:modelname>
     <jadex:description>Test if a message can be sent and received by a process.</jadex:description>
     <jadex:package>jadex.bpmn.testcases</jadex:package>
-    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags keepalive="false" monitoring="OFF" persistable="false" suspend="false" synchronous="false"/>
     <jadex:imports>
       <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>
       <jadex:import>jadex.base.test.*</jadex:import>
@@ -24,89 +16,89 @@
         <jadex:description>The test results.</jadex:description>
       </jadex:result>
     </jadex:results>
-  </semantic:extension>
-  <semantic:process name="Receiver" id="_uFjqERJREd-3Ruc_856dPQ">
-    <semantic:task name="Pre Message Receival" id="_uFjqExJREd-3Ruc_856dPQ">
-      <semantic:outgoing>_atklERJ6Ed-3Ruc_856dPQ</semantic:outgoing>
-    </semantic:task>
-    <semantic:intermediateCatchEvent id="_ZU6JARJ6Ed-3Ruc_856dPQ">
-      <semantic:incoming>_atklERJ6Ed-3Ruc_856dPQ</semantic:incoming>
-      <semantic:outgoing>_93ja2hJfEd-3Ruc_856dPQ</semantic:outgoing>
-      <semantic:outgoing>_hMko0RJ6Ed-3Ruc_856dPQ</semantic:outgoing>
-      <semantic:multipleEventDefinition/>
-    </semantic:intermediateCatchEvent>
-    <semantic:intermediateCatchEvent name="Receive Message" id="_93ja0RJfEd-3Ruc_856dPQ">
-      <semantic:incoming>_93ja2hJfEd-3Ruc_856dPQ</semantic:incoming>
-      <semantic:outgoing>_5VX00RJ6Ed-3Ruc_856dPQ</semantic:outgoing>
-      <semantic:messageEventDefinition/>
-      <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_uFjqERJREd-3Ruc_856dPQ" name="Receiver">
+    <bpmn:task id="_uFjqExJREd-3Ruc_856dPQ" name="Pre Message Receival">
+      <bpmn:outgoing>_atklERJ6Ed-3Ruc_856dPQ</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:intermediateCatchEvent id="_ZU6JARJ6Ed-3Ruc_856dPQ">
+      <bpmn:incoming>_atklERJ6Ed-3Ruc_856dPQ</bpmn:incoming>
+      <bpmn:outgoing>_93ja2hJfEd-3Ruc_856dPQ</bpmn:outgoing>
+      <bpmn:outgoing>_hMko0RJ6Ed-3Ruc_856dPQ</bpmn:outgoing>
+      <bpmn:multipleEventDefinition/>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="_93ja0RJfEd-3Ruc_856dPQ" name="Receive Message">
+      <bpmn:incoming>_93ja2hJfEd-3Ruc_856dPQ</bpmn:incoming>
+      <bpmn:outgoing>_5VX00RJ6Ed-3Ruc_856dPQ</bpmn:outgoing>
+      <bpmn:messageEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="filter">IFilter.ALWAYS</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateCatchEvent>
-    <semantic:intermediateCatchEvent id="_g5MZ0RJ6Ed-3Ruc_856dPQ">
-      <semantic:incoming>_hMko0RJ6Ed-3Ruc_856dPQ</semantic:incoming>
-      <semantic:outgoing>_jMIFyhJ6Ed-3Ruc_856dPQ</semantic:outgoing>
-      <semantic:timerEventDefinition>
-        <semantic:timeDuration>2000</semantic:timeDuration>
-      </semantic:timerEventDefinition>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="_g5MZ0RJ6Ed-3Ruc_856dPQ">
+      <bpmn:incoming>_hMko0RJ6Ed-3Ruc_856dPQ</bpmn:incoming>
+      <bpmn:outgoing>_jMIFyhJ6Ed-3Ruc_856dPQ</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration>2000</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+      <bpmn:extensionElements>
         <jadex:property name="duration">2000</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateCatchEvent>
-    <semantic:task name="Failed" id="_jMIFwRJ6Ed-3Ruc_856dPQ">
-      <semantic:incoming>_jMIFyhJ6Ed-3Ruc_856dPQ</semantic:incoming>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="_jMIFwRJ6Ed-3Ruc_856dPQ" name="Failed">
+      <bpmn:incoming>_jMIFyhJ6Ed-3Ruc_856dPQ</bpmn:incoming>
+      <bpmn:extensionElements>
         <jadex:class>WriteContextTask</jadex:class>
         <jadex:parameter direction="in" name="name" type="String">&quot;testresults&quot;</jadex:parameter>
         <jadex:parameter direction="in" name="value" type="Testcase">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Message sending test.&quot;, false, &quot;Message did not arrive.&quot;)})</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Succeeded" id="_-btJYRJiEd-3Ruc_856dPQ">
-      <semantic:incoming>_5VX00RJ6Ed-3Ruc_856dPQ</semantic:incoming>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_-btJYRJiEd-3Ruc_856dPQ" name="Succeeded">
+      <bpmn:incoming>_5VX00RJ6Ed-3Ruc_856dPQ</bpmn:incoming>
+      <bpmn:extensionElements>
         <jadex:class>WriteContextTask</jadex:class>
         <jadex:parameter direction="in" name="name" type="String">&quot;testresults&quot;</jadex:parameter>
         <jadex:parameter direction="in" name="value" type="Testcase">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Message sending testcase.&quot;, true, null)})</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:sequenceFlow sourceRef="_uFjqExJREd-3Ruc_856dPQ" targetRef="_ZU6JARJ6Ed-3Ruc_856dPQ" id="_atklERJ6Ed-3Ruc_856dPQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_ZU6JARJ6Ed-3Ruc_856dPQ" targetRef="_93ja0RJfEd-3Ruc_856dPQ" id="_93ja2hJfEd-3Ruc_856dPQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_ZU6JARJ6Ed-3Ruc_856dPQ" targetRef="_g5MZ0RJ6Ed-3Ruc_856dPQ" id="_hMko0RJ6Ed-3Ruc_856dPQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_93ja0RJfEd-3Ruc_856dPQ" targetRef="_-btJYRJiEd-3Ruc_856dPQ" id="_5VX00RJ6Ed-3Ruc_856dPQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_g5MZ0RJ6Ed-3Ruc_856dPQ" targetRef="_jMIFwRJ6Ed-3Ruc_856dPQ" id="_jMIFyhJ6Ed-3Ruc_856dPQ">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
-  <semantic:process name="Sender" id="_v3aCMRJREd-3Ruc_856dPQ">
-    <semantic:task name="Pre Message Sending" id="_eQvvsRJgEd-3Ruc_856dPQ">
-      <semantic:outgoing>_2dIbOhJgEd-3Ruc_856dPQ</semantic:outgoing>
-    </semantic:task>
-    <semantic:task name="Post Message Sending" id="_4D8oARJgEd-3Ruc_856dPQ">
-      <semantic:incoming>_4D8oChJgEd-3Ruc_856dPQ</semantic:incoming>
-    </semantic:task>
-    <semantic:intermediateThrowEvent name="Send Message" id="_2dIbMRJgEd-3Ruc_856dPQ">
-      <semantic:incoming>_2dIbOhJgEd-3Ruc_856dPQ</semantic:incoming>
-      <semantic:outgoing>_4D8oChJgEd-3Ruc_856dPQ</semantic:outgoing>
-      <semantic:messageEventDefinition/>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="_atklERJ6Ed-3Ruc_856dPQ" sourceRef="_uFjqExJREd-3Ruc_856dPQ" targetRef="_ZU6JARJ6Ed-3Ruc_856dPQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_93ja2hJfEd-3Ruc_856dPQ" sourceRef="_ZU6JARJ6Ed-3Ruc_856dPQ" targetRef="_93ja0RJfEd-3Ruc_856dPQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_hMko0RJ6Ed-3Ruc_856dPQ" sourceRef="_ZU6JARJ6Ed-3Ruc_856dPQ" targetRef="_g5MZ0RJ6Ed-3Ruc_856dPQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_5VX00RJ6Ed-3Ruc_856dPQ" sourceRef="_93ja0RJfEd-3Ruc_856dPQ" targetRef="_-btJYRJiEd-3Ruc_856dPQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_jMIFyhJ6Ed-3Ruc_856dPQ" sourceRef="_g5MZ0RJ6Ed-3Ruc_856dPQ" targetRef="_jMIFwRJ6Ed-3Ruc_856dPQ">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
+  <bpmn:process id="_v3aCMRJREd-3Ruc_856dPQ" name="Sender">
+    <bpmn:task id="_eQvvsRJgEd-3Ruc_856dPQ" name="Pre Message Sending">
+      <bpmn:outgoing>_2dIbOhJgEd-3Ruc_856dPQ</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="_4D8oARJgEd-3Ruc_856dPQ" name="Post Message Sending">
+      <bpmn:incoming>_4D8oChJgEd-3Ruc_856dPQ</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:intermediateThrowEvent id="_2dIbMRJgEd-3Ruc_856dPQ" name="Send Message">
+      <bpmn:incoming>_2dIbOhJgEd-3Ruc_856dPQ</bpmn:incoming>
+      <bpmn:outgoing>_4D8oChJgEd-3Ruc_856dPQ</bpmn:outgoing>
+      <bpmn:messageEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="mode">&quot;send&quot;</jadex:property>
         <jadex:property name="message">new FipaMessage(FipaMessage.Performative.INFORM, &quot;content&quot;, $component.getId())</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateThrowEvent>
-    <semantic:sequenceFlow sourceRef="_eQvvsRJgEd-3Ruc_856dPQ" targetRef="_2dIbMRJgEd-3Ruc_856dPQ" id="_2dIbOhJgEd-3Ruc_856dPQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_2dIbMRJgEd-3Ruc_856dPQ" targetRef="_4D8oARJgEd-3Ruc_856dPQ" id="_4D8oChJgEd-3Ruc_856dPQ">
-    </semantic:sequenceFlow>
-    <semantic:messageFlow sourceRef="_2dIbMRJgEd-3Ruc_856dPQ" targetRef="_93ja0RJfEd-3Ruc_856dPQ" id="4DdT7i5bpNbHsw7l">
-    </semantic:messageFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sequenceFlow id="_2dIbOhJgEd-3Ruc_856dPQ" sourceRef="_eQvvsRJgEd-3Ruc_856dPQ" targetRef="_2dIbMRJgEd-3Ruc_856dPQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_4D8oChJgEd-3Ruc_856dPQ" sourceRef="_2dIbMRJgEd-3Ruc_856dPQ" targetRef="_4D8oARJgEd-3Ruc_856dPQ">
+    </bpmn:sequenceFlow>
+    <bpmn:messageFlow id="4DdT7i5bpNbHsw7l" sourceRef="_2dIbMRJgEd-3Ruc_856dPQ" targetRef="_93ja0RJfEd-3Ruc_856dPQ">
+    </bpmn:messageFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_uFjqERJREd-3Ruc_856dPQ">
@@ -144,15 +136,7 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_atklERJ6Ed-3Ruc_856dPQ">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_atklERJ6Ed-3Ruc_856dPQ">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_5VX00RJ6Ed-3Ruc_856dPQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_5VX00RJ6Ed-3Ruc_856dPQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_93ja2hJfEd-3Ruc_856dPQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_hMko0RJ6Ed-3Ruc_856dPQ">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_93ja2hJfEd-3Ruc_856dPQ">
       </bpmndi:BPMNEdge>
@@ -160,13 +144,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_jMIFyhJ6Ed-3Ruc_856dPQ">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_jMIFyhJ6Ed-3Ruc_856dPQ">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_2dIbOhJgEd-3Ruc_856dPQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_2dIbOhJgEd-3Ruc_856dPQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_4D8oChJgEd-3Ruc_856dPQ">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_4D8oChJgEd-3Ruc_856dPQ">
       </bpmndi:BPMNEdge>
@@ -174,5 +152,4 @@
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

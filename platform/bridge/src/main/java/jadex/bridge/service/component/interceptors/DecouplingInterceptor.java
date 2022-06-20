@@ -258,8 +258,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //			}				
 			
 			// todo: why immediate? keep services responsive during suspend?
-			ea.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, false, new InvokeMethodStep(sic))
-				.addResultListener(new CopyReturnValueResultListener(ret, sic));
+			/*ea.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, false, new InvokeMethodStep(sic))
+				.addResultListener(new CopyReturnValueResultListener(ret, sic));*/
+			ea.scheduleStep(IExecutionFeature.STEP_PRIORITY_UNSET, false, new InvokeMethodStep(sic))
+			.addResultListener(new CopyReturnValueResultListener(ret, sic));
 		}
 		
 		return ret;

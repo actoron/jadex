@@ -1,66 +1,58 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>XOR</jadex:modelname>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_kGs10WpAEd6JtKkNrnCCNQ">
-    <semantic:startEvent id="_lYWq8WpAEd6JtKkNrnCCNQ">
-      <semantic:outgoing>_sCFYAWpAEd6JtKkNrnCCNQ</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:endEvent id="_ki5NIWpBEd6JtKkNrnCCNQ">
-      <semantic:incoming>_ki5NKmpBEd6JtKkNrnCCNQ</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:exclusiveGateway id="_feMkMWpBEd6JtKkNrnCCNQ">
-      <semantic:incoming>_feMkOmpBEd6JtKkNrnCCNQ</semantic:incoming>
-      <semantic:incoming>_gDcmUWpBEd6JtKkNrnCCNQ</semantic:incoming>
-      <semantic:outgoing>_ki5NKmpBEd6JtKkNrnCCNQ</semantic:outgoing>
-    </semantic:exclusiveGateway>
-    <semantic:exclusiveGateway name="Toss a Coin" id="_sB7nAWpAEd6JtKkNrnCCNQ" default="_QugcqGpBEd6JtKkNrnCCNQ">
-      <semantic:incoming>_sCFYAWpAEd6JtKkNrnCCNQ</semantic:incoming>
-      <semantic:outgoing>_DvxVUWpBEd6JtKkNrnCCNQ</semantic:outgoing>
-      <semantic:outgoing>_QugcqGpBEd6JtKkNrnCCNQ</semantic:outgoing>
-    </semantic:exclusiveGateway>
-    <semantic:task name="Head" id="_kGs102pAEd6JtKkNrnCCNQ">
-      <semantic:incoming>_DvxVUWpBEd6JtKkNrnCCNQ</semantic:incoming>
-      <semantic:outgoing>_feMkOmpBEd6JtKkNrnCCNQ</semantic:outgoing>
-      <semantic:extensionElements>
+    <jadex:componentflags keepalive="false" monitoring="OFF" suspend="false" synchronous="false"/>
+  </bpmn:extension>
+  <bpmn:process id="_kGs10WpAEd6JtKkNrnCCNQ" name="Pool">
+    <bpmn:startEvent id="_lYWq8WpAEd6JtKkNrnCCNQ">
+      <bpmn:outgoing>_sCFYAWpAEd6JtKkNrnCCNQ</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="_ki5NIWpBEd6JtKkNrnCCNQ">
+      <bpmn:incoming>_ki5NKmpBEd6JtKkNrnCCNQ</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="_feMkMWpBEd6JtKkNrnCCNQ">
+      <bpmn:incoming>_feMkOmpBEd6JtKkNrnCCNQ</bpmn:incoming>
+      <bpmn:incoming>_gDcmUWpBEd6JtKkNrnCCNQ</bpmn:incoming>
+      <bpmn:outgoing>_ki5NKmpBEd6JtKkNrnCCNQ</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway default="_QugcqGpBEd6JtKkNrnCCNQ" id="_sB7nAWpAEd6JtKkNrnCCNQ" name="Toss a Coin">
+      <bpmn:incoming>_sCFYAWpAEd6JtKkNrnCCNQ</bpmn:incoming>
+      <bpmn:outgoing>_DvxVUWpBEd6JtKkNrnCCNQ</bpmn:outgoing>
+      <bpmn:outgoing>_QugcqGpBEd6JtKkNrnCCNQ</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="_kGs102pAEd6JtKkNrnCCNQ" name="Head">
+      <bpmn:incoming>_DvxVUWpBEd6JtKkNrnCCNQ</bpmn:incoming>
+      <bpmn:outgoing>_feMkOmpBEd6JtKkNrnCCNQ</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Head&quot;</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Tail" id="_QuWroWpBEd6JtKkNrnCCNQ">
-      <semantic:incoming>_QugcqGpBEd6JtKkNrnCCNQ</semantic:incoming>
-      <semantic:outgoing>_gDcmUWpBEd6JtKkNrnCCNQ</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="_QuWroWpBEd6JtKkNrnCCNQ" name="Tail">
+      <bpmn:incoming>_QugcqGpBEd6JtKkNrnCCNQ</bpmn:incoming>
+      <bpmn:outgoing>_gDcmUWpBEd6JtKkNrnCCNQ</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Tail&quot;</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:sequenceFlow sourceRef="_lYWq8WpAEd6JtKkNrnCCNQ" targetRef="_sB7nAWpAEd6JtKkNrnCCNQ" id="_sCFYAWpAEd6JtKkNrnCCNQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_feMkMWpBEd6JtKkNrnCCNQ" targetRef="_ki5NIWpBEd6JtKkNrnCCNQ" id="_ki5NKmpBEd6JtKkNrnCCNQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_sB7nAWpAEd6JtKkNrnCCNQ" targetRef="_kGs102pAEd6JtKkNrnCCNQ" id="_DvxVUWpBEd6JtKkNrnCCNQ">
-      <semantic:conditionExpression>Math.random()&gt;0.5</semantic:conditionExpression>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_sB7nAWpAEd6JtKkNrnCCNQ" targetRef="_QuWroWpBEd6JtKkNrnCCNQ" id="_QugcqGpBEd6JtKkNrnCCNQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_kGs102pAEd6JtKkNrnCCNQ" targetRef="_feMkMWpBEd6JtKkNrnCCNQ" id="_feMkOmpBEd6JtKkNrnCCNQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_QuWroWpBEd6JtKkNrnCCNQ" targetRef="_feMkMWpBEd6JtKkNrnCCNQ" id="_gDcmUWpBEd6JtKkNrnCCNQ">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="_sCFYAWpAEd6JtKkNrnCCNQ" sourceRef="_lYWq8WpAEd6JtKkNrnCCNQ" targetRef="_sB7nAWpAEd6JtKkNrnCCNQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_ki5NKmpBEd6JtKkNrnCCNQ" sourceRef="_feMkMWpBEd6JtKkNrnCCNQ" targetRef="_ki5NIWpBEd6JtKkNrnCCNQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_DvxVUWpBEd6JtKkNrnCCNQ" sourceRef="_sB7nAWpAEd6JtKkNrnCCNQ" targetRef="_kGs102pAEd6JtKkNrnCCNQ">
+      <bpmn:conditionExpression>Math.random()&gt;0.5</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_QugcqGpBEd6JtKkNrnCCNQ" sourceRef="_sB7nAWpAEd6JtKkNrnCCNQ" targetRef="_QuWroWpBEd6JtKkNrnCCNQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_feMkOmpBEd6JtKkNrnCCNQ" sourceRef="_kGs102pAEd6JtKkNrnCCNQ" targetRef="_feMkMWpBEd6JtKkNrnCCNQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_gDcmUWpBEd6JtKkNrnCCNQ" sourceRef="_QuWroWpBEd6JtKkNrnCCNQ" targetRef="_feMkMWpBEd6JtKkNrnCCNQ">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_kGs10WpAEd6JtKkNrnCCNQ">
@@ -86,29 +78,16 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_feMkOmpBEd6JtKkNrnCCNQ">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_feMkOmpBEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_sCFYAWpAEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_sCFYAWpAEd6JtKkNrnCCNQ">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_DvxVUWpBEd6JtKkNrnCCNQ">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_QugcqGpBEd6JtKkNrnCCNQ">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_DvxVUWpBEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_QugcqGpBEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_gDcmUWpBEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_gDcmUWpBEd6JtKkNrnCCNQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_ki5NKmpBEd6JtKkNrnCCNQ">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_ki5NKmpBEd6JtKkNrnCCNQ">
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

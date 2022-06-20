@@ -1,45 +1,37 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>ExternalTask</jadex:modelname>
-    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
-  </semantic:extension>
-  <semantic:process name="Pool" id="uUo+E7Iz86Nazznz">
-    <semantic:startEvent id="g0NDzyLMXStBG1xs">
-      <semantic:outgoing>zE2luSs7+aDDs5oo</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:task name="External\nPrint Task" id="qF6CBu1UTgFil65U">
-      <semantic:incoming>wuwvQVnsja/r//+i</semantic:incoming>
-      <semantic:outgoing>lGH9A1LBQ087pz82</semantic:outgoing>
-      <semantic:extensionElements>
+    <jadex:componentflags keepalive="false" monitoring="OFF" persistable="false" suspend="false" synchronous="false"/>
+  </bpmn:extension>
+  <bpmn:process id="uUo+E7Iz86Nazznz" name="Pool">
+    <bpmn:startEvent id="g0NDzyLMXStBG1xs">
+      <bpmn:outgoing>zE2luSs7+aDDs5oo</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="qF6CBu1UTgFil65U" name="External\nPrint Task">
+      <bpmn:incoming>wuwvQVnsja/r//+i</bpmn:incoming>
+      <bpmn:outgoing>lGH9A1LBQ087pz82</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Hello external task&quot;</jadex:parameter>
         <jadex:property name="external" type="boolean">true</jadex:property>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Internal\nPrint Task" id="V6elLG56+oEVR7mB">
-      <semantic:incoming>lGH9A1LBQ087pz82</semantic:incoming>
-      <semantic:outgoing>ek+xTqoJjNcVXXcd</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="V6elLG56+oEVR7mB" name="Internal\nPrint Task">
+      <bpmn:incoming>lGH9A1LBQ087pz82</bpmn:incoming>
+      <bpmn:outgoing>ek+xTqoJjNcVXXcd</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Hello internal task&quot;</jadex:parameter>
         <jadex:property name="external" type="boolean">false</jadex:property>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:endEvent id="94RjaiT6rJ9Ukp88">
-      <semantic:incoming>ek+xTqoJjNcVXXcd</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:task name="Hack\n(create service agent)" id="QcjCjTvoXhILJhPT">
-      <semantic:incoming>zE2luSs7+aDDs5oo</semantic:incoming>
-      <semantic:outgoing>wuwvQVnsja/r//+i</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:endEvent id="94RjaiT6rJ9Ukp88">
+      <bpmn:incoming>ek+xTqoJjNcVXXcd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="QcjCjTvoXhILJhPT" name="Hack\n(create service agent)">
+      <bpmn:incoming>zE2luSs7+aDDs5oo</bpmn:incoming>
+      <bpmn:outgoing>wuwvQVnsja/r//+i</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.CreateComponentTask</jadex:class>
         <jadex:parameter direction="in" name="name" type="java.lang.String"/>
         <jadex:parameter direction="in" name="model" type="java.lang.String">&quot;jadex.platform.service.processengine.ActivityExecutionAgent.class&quot;</jadex:parameter>
@@ -52,19 +44,19 @@
         <jadex:parameter direction="in" name="persistable" type="java.lang.Boolean"/>
         <jadex:parameter direction="in" name="killlistener" type="jadex.commons.future.IResultListener"/>
         <jadex:parameter direction="in" name="value" type="java.lang.Object"/>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:sequenceFlow sourceRef="g0NDzyLMXStBG1xs" targetRef="QcjCjTvoXhILJhPT" id="zE2luSs7+aDDs5oo">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="qF6CBu1UTgFil65U" targetRef="V6elLG56+oEVR7mB" id="lGH9A1LBQ087pz82">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="V6elLG56+oEVR7mB" targetRef="94RjaiT6rJ9Ukp88" id="ek+xTqoJjNcVXXcd">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="QcjCjTvoXhILJhPT" targetRef="qF6CBu1UTgFil65U" id="wuwvQVnsja/r//+i">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="zE2luSs7+aDDs5oo" sourceRef="g0NDzyLMXStBG1xs" targetRef="QcjCjTvoXhILJhPT">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="lGH9A1LBQ087pz82" sourceRef="qF6CBu1UTgFil65U" targetRef="V6elLG56+oEVR7mB">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ek+xTqoJjNcVXXcd" sourceRef="V6elLG56+oEVR7mB" targetRef="94RjaiT6rJ9Ukp88">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="wuwvQVnsja/r//+i" sourceRef="QcjCjTvoXhILJhPT" targetRef="qF6CBu1UTgFil65U">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="uUo+E7Iz86Nazznz">
@@ -101,5 +93,4 @@
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

@@ -1,79 +1,71 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>D2_Exception</jadex:modelname>
     <jadex:package>jadex.bpmn.tutorial</jadex:package>
-    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
-  </semantic:extension>
-  <semantic:process name="Pool" id="BCmyZI3xpu2rA5Qy">
-    <semantic:subProcess id="2SLonlWSS4+2cVBC">
-      <semantic:incoming>O9OCaK08mPVMr9X5</semantic:incoming>
-      <semantic:outgoing>JHCJlpWJg0wCX3+L</semantic:outgoing>
-      <semantic:startEvent id="/wpopkRMU1UKxRKU">
-        <semantic:outgoing>zmaGHXr7jAJFCGzU</semantic:outgoing>
-      </semantic:startEvent>
-      <semantic:endEvent id="QwZR1yDvkgC4EhSR">
-        <semantic:incoming>z9UtsGg6goqoDNM8</semantic:incoming>
-      </semantic:endEvent>
-      <semantic:task name="Credit Check" id="rFe74lKKWzm3ab+B">
-        <semantic:incoming>zmaGHXr7jAJFCGzU</semantic:incoming>
-        <semantic:outgoing>z9UtsGg6goqoDNM8</semantic:outgoing>
-        <semantic:extensionElements>
+    <jadex:componentflags keepalive="false" monitoring="OFF" persistable="false" suspend="false" synchronous="false"/>
+  </bpmn:extension>
+  <bpmn:process id="BCmyZI3xpu2rA5Qy" name="Pool">
+    <bpmn:subProcess id="2SLonlWSS4+2cVBC">
+      <bpmn:incoming>O9OCaK08mPVMr9X5</bpmn:incoming>
+      <bpmn:outgoing>JHCJlpWJg0wCX3+L</bpmn:outgoing>
+      <bpmn:startEvent id="/wpopkRMU1UKxRKU">
+        <bpmn:outgoing>zmaGHXr7jAJFCGzU</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:endEvent id="QwZR1yDvkgC4EhSR">
+        <bpmn:incoming>z9UtsGg6goqoDNM8</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:task id="rFe74lKKWzm3ab+B" name="Credit Check">
+        <bpmn:incoming>zmaGHXr7jAJFCGzU</bpmn:incoming>
+        <bpmn:outgoing>z9UtsGg6goqoDNM8</bpmn:outgoing>
+        <bpmn:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.UserInteractionTask</jadex:class>
-        </semantic:extensionElements>
-      </semantic:task>
-    </semantic:subProcess>
-    <semantic:boundaryEvent id="zpgdJM19WccnQfeg" attachedToRef="2SLonlWSS4+2cVBC">
-      <semantic:outgoing>RWWTU4oA5uiybLqc</semantic:outgoing>
-      <semantic:errorEventDefinition/>
-    </semantic:boundaryEvent>
-    <semantic:startEvent id="8AXosaOTPCfzDBav">
-      <semantic:outgoing>O9OCaK08mPVMr9X5</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:task name="Credit Approved" id="MD4U0crP8XVQALQ1">
-      <semantic:incoming>JHCJlpWJg0wCX3+L</semantic:incoming>
-      <semantic:outgoing>+qeW2iJXI3iKR84R</semantic:outgoing>
-      <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:task>
+    </bpmn:subProcess>
+    <bpmn:boundaryEvent attachedToRef="2SLonlWSS4+2cVBC" id="zpgdJM19WccnQfeg">
+      <bpmn:outgoing>RWWTU4oA5uiybLqc</bpmn:outgoing>
+      <bpmn:errorEventDefinition/>
+    </bpmn:boundaryEvent>
+    <bpmn:startEvent id="8AXosaOTPCfzDBav">
+      <bpmn:outgoing>O9OCaK08mPVMr9X5</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="MD4U0crP8XVQALQ1" name="Credit Approved">
+      <bpmn:incoming>JHCJlpWJg0wCX3+L</bpmn:incoming>
+      <bpmn:outgoing>+qeW2iJXI3iKR84R</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Credit approved&quot;</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:task name="Credit Denied" id="5U8iBSJDxWu54q8j">
-      <semantic:incoming>RWWTU4oA5uiybLqc</semantic:incoming>
-      <semantic:outgoing>mQ/8Rr+eokcoRVEG</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:task id="5U8iBSJDxWu54q8j" name="Credit Denied">
+      <bpmn:incoming>RWWTU4oA5uiybLqc</bpmn:incoming>
+      <bpmn:outgoing>mQ/8Rr+eokcoRVEG</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Credit denied&quot;</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:endEvent id="gJxUj0dDRWn16kZg">
-      <semantic:incoming>+qeW2iJXI3iKR84R</semantic:incoming>
-      <semantic:incoming>mQ/8Rr+eokcoRVEG</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:sequenceFlow sourceRef="2SLonlWSS4+2cVBC" targetRef="MD4U0crP8XVQALQ1" id="JHCJlpWJg0wCX3+L">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="/wpopkRMU1UKxRKU" targetRef="rFe74lKKWzm3ab+B" id="zmaGHXr7jAJFCGzU">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="rFe74lKKWzm3ab+B" targetRef="QwZR1yDvkgC4EhSR" id="z9UtsGg6goqoDNM8">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="zpgdJM19WccnQfeg" targetRef="5U8iBSJDxWu54q8j" id="RWWTU4oA5uiybLqc">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="8AXosaOTPCfzDBav" targetRef="2SLonlWSS4+2cVBC" id="O9OCaK08mPVMr9X5">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="MD4U0crP8XVQALQ1" targetRef="gJxUj0dDRWn16kZg" id="+qeW2iJXI3iKR84R">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="5U8iBSJDxWu54q8j" targetRef="gJxUj0dDRWn16kZg" id="mQ/8Rr+eokcoRVEG">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:endEvent id="gJxUj0dDRWn16kZg">
+      <bpmn:incoming>+qeW2iJXI3iKR84R</bpmn:incoming>
+      <bpmn:incoming>mQ/8Rr+eokcoRVEG</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="JHCJlpWJg0wCX3+L" sourceRef="2SLonlWSS4+2cVBC" targetRef="MD4U0crP8XVQALQ1">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="zmaGHXr7jAJFCGzU" sourceRef="/wpopkRMU1UKxRKU" targetRef="rFe74lKKWzm3ab+B">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="z9UtsGg6goqoDNM8" sourceRef="rFe74lKKWzm3ab+B" targetRef="QwZR1yDvkgC4EhSR">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="RWWTU4oA5uiybLqc" sourceRef="zpgdJM19WccnQfeg" targetRef="5U8iBSJDxWu54q8j">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="O9OCaK08mPVMr9X5" sourceRef="8AXosaOTPCfzDBav" targetRef="2SLonlWSS4+2cVBC">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="+qeW2iJXI3iKR84R" sourceRef="MD4U0crP8XVQALQ1" targetRef="gJxUj0dDRWn16kZg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="mQ/8Rr+eokcoRVEG" sourceRef="5U8iBSJDxWu54q8j" targetRef="gJxUj0dDRWn16kZg">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="BCmyZI3xpu2rA5Qy">
@@ -122,5 +114,4 @@
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

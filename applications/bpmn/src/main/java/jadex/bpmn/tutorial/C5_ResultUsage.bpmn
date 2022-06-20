@@ -1,112 +1,141 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_BaQP0UZFEd-3iKqz0F2Flw" iD="_BaQP0EZFEd-3iKqz0F2Flw">
-  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Cn3ScEZFEd-3iKqz0F2Flw" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Cn3ScUZFEd-3iKqz0F2Flw" key="Description" value="&lt;h1>Pizza Counter&lt;/h1>The process usages the external inventory process to count tomatoes and cheese and prints out how many pizzas can be made."/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Cn3SckZFEd-3iKqz0F2Flw" key="Package" value="jadex.bpmn.tutorial"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVrQRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
-  </eAnnotations>
-  <pools xmi:type="bpmn:Pool" xmi:id="_BaQP10ZFEd-3iKqz0F2Flw" iD="_BaQP1kZFEd-3iKqz0F2Flw" name="Pool">
-    <vertices xmi:type="bpmn:Activity" xmi:id="_D-kmsUZFEd-3iKqz0F2Flw" iD="_D-kmsEZFEd-3iKqz0F2Flw" outgoingEdges="_E94HmkZFEd-3iKqz0F2Flw" activityType="EventStartEmpty"/>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_E94HkUZFEd-3iKqz0F2Flw" iD="_E94HkEZFEd-3iKqz0F2Flw" outgoingEdges="_F-PYYUZFEd-3iKqz0F2Flw _KBJ0SkZFEd-3iKqz0F2Flw" incomingEdges="_E94HmkZFEd-3iKqz0F2Flw" activityType="GatewayParallel"/>
-    <vertices xmi:type="bpmn:SubProcess" xmi:id="_F972YUZFEd-3iKqz0F2Flw" iD="_F972YEZFEd-3iKqz0F2Flw" outgoingEdges="_Q836wWKBEd-Q9q1HfsZXQw" incomingEdges="_F-PYYUZFEd-3iKqz0F2Flw" name="Count Tomatoes" activityType="SubProcess">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_GUlb0EZFEd-3iKqz0F2Flw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GUlb0UZFEd-3iKqz0F2Flw" key="class" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_CBfygWJ_Ed-Q9q1HfsZXQw" key="file" value="&quot;C4_Arguments.bpmn&quot;"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_CBpjgGJ_Ed-Q9q1HfsZXQw" key="parallel" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_CBpjgWJ_Ed-Q9q1HfsZXQw" key="items" value=""/>
-      </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_u8kVgARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVgQRPEeCnwcpWvxOwkg" key="dimension" value="2:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVggRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVgwRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVhARPEeCnwcpWvxOwkg" key="0:1" value="item_type"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVhQRPEeCnwcpWvxOwkg" key="0:2" value="String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVhgRPEeCnwcpWvxOwkg" key="0:3" value="&quot;Tomatoes&quot;"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVhwRPEeCnwcpWvxOwkg" key="1:0" value="out"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kViARPEeCnwcpWvxOwkg" key="1:1" value="item_count"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kViQRPEeCnwcpWvxOwkg" key="1:2" value="int"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVigRPEeCnwcpWvxOwkg" key="1:3" value=""/>
-      </eAnnotations>
-    </vertices>
-    <vertices xmi:type="bpmn:SubProcess" xmi:id="_KBJ0MUZFEd-3iKqz0F2Flw" iD="_KBJ0MEZFEd-3iKqz0F2Flw" outgoingEdges="_WOryqmKBEd-Q9q1HfsZXQw" incomingEdges="_KBJ0SkZFEd-3iKqz0F2Flw" name="Count Cheese" activityType="SubProcess">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KbXrAEZFEd-3iKqz0F2Flw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KbXrAUZFEd-3iKqz0F2Flw" key="class" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_D7idUWJ_Ed-Q9q1HfsZXQw" key="file" value="&quot;C4_Arguments.bpmn&quot;"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_D7idUmJ_Ed-Q9q1HfsZXQw" key="parallel" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_D7idU2J_Ed-Q9q1HfsZXQw" key="items" value=""/>
-      </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_u8kViwRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVjARPEeCnwcpWvxOwkg" key="dimension" value="2:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVjQRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVjgRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVjwRPEeCnwcpWvxOwkg" key="0:1" value="item_type"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVkARPEeCnwcpWvxOwkg" key="0:2" value="String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVkQRPEeCnwcpWvxOwkg" key="0:3" value="&quot;Cheese&quot;"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVkgRPEeCnwcpWvxOwkg" key="1:0" value="out"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVkwRPEeCnwcpWvxOwkg" key="1:1" value="item_count"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVlARPEeCnwcpWvxOwkg" key="1:2" value="int"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVlQRPEeCnwcpWvxOwkg" key="1:3" value=""/>
-      </eAnnotations>
-    </vertices>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_OwKhAUZFEd-3iKqz0F2Flw" iD="_OwKhAEZFEd-3iKqz0F2Flw" outgoingEdges="_Q3uqekZFEd-3iKqz0F2Flw" incomingEdges="_OwKhCkZFEd-3iKqz0F2Flw _PFnMkUZFEd-3iKqz0F2Flw" name="" activityType="GatewayParallel"/>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_Q3uqcUZFEd-3iKqz0F2Flw" iD="_Q3uqcEZFEd-3iKqz0F2Flw" incomingEdges="_Q3uqekZFEd-3iKqz0F2Flw" name="Print Pizza Count" activityType="Task">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Q9PckEZFEd-3iKqz0F2Flw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Q9PckUZFEd-3iKqz0F2Flw" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
-      </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_u8kVlgRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVlwRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVmARPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVmQRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVmgRPEeCnwcpWvxOwkg" key="0:1" value="text"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVmwRPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVnARPEeCnwcpWvxOwkg" key="0:3" value="&quot;Ingredients available for &quot;+Math.min(tomatoe_count, cheese_count)+&quot; pizzas.&quot;"/>
-      </eAnnotations>
-    </vertices>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_Q8uJwWKBEd-Q9q1HfsZXQw" iD="_Q8uJwGKBEd-Q9q1HfsZXQw" outgoingEdges="_OwKhCkZFEd-3iKqz0F2Flw" incomingEdges="_Q836wWKBEd-Q9q1HfsZXQw" name="Map result" activityType="Task">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_TbbA0GKBEd-Q9q1HfsZXQw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TbbA0WKBEd-Q9q1HfsZXQw" key="class" value=""/>
-      </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_u8kVnQRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVngRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVnwRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVoARPEeCnwcpWvxOwkg" key="0:0" value="out"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVoQRPEeCnwcpWvxOwkg" key="0:1" value="tomatoe_count"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVogRPEeCnwcpWvxOwkg" key="0:2" value="Object"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVowRPEeCnwcpWvxOwkg" key="0:3" value="item_count"/>
-      </eAnnotations>
-    </vertices>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_WOryoWKBEd-Q9q1HfsZXQw" iD="_WOryoGKBEd-Q9q1HfsZXQw" outgoingEdges="_PFnMkUZFEd-3iKqz0F2Flw" incomingEdges="_WOryqmKBEd-Q9q1HfsZXQw" name="Map result" activityType="Task">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_W7PWoGKBEd-Q9q1HfsZXQw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_W7PWoWKBEd-Q9q1HfsZXQw" key="class" value=""/>
-      </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_u8kVpARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVpQRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVpgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVpwRPEeCnwcpWvxOwkg" key="0:0" value="out"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVqARPEeCnwcpWvxOwkg" key="0:1" value="cheese_count"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVqQRPEeCnwcpWvxOwkg" key="0:2" value="Object"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u8kVqgRPEeCnwcpWvxOwkg" key="0:3" value="item_count"/>
-      </eAnnotations>
-    </vertices>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_E94HmkZFEd-3iKqz0F2Flw" iD="_E94HmUZFEd-3iKqz0F2Flw"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_F-PYYUZFEd-3iKqz0F2Flw" iD="_F-PYYEZFEd-3iKqz0F2Flw"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_KBJ0SkZFEd-3iKqz0F2Flw" iD="_KBJ0SUZFEd-3iKqz0F2Flw"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_OwKhCkZFEd-3iKqz0F2Flw" iD="_OwKhCUZFEd-3iKqz0F2Flw">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_gU5pcEZNEd-3iKqz0F2Flw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gU5pcUZNEd-3iKqz0F2Flw" key="condition" value=""/>
-      </eAnnotations>
-    </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_PFnMkUZFEd-3iKqz0F2Flw" iD="_PFnMkEZFEd-3iKqz0F2Flw">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_jGBtQEZNEd-3iKqz0F2Flw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jGBtQUZNEd-3iKqz0F2Flw" key="condition" value=""/>
-      </eAnnotations>
-    </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Q3uqekZFEd-3iKqz0F2Flw" iD="_Q3uqeUZFEd-3iKqz0F2Flw">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_MFIvEEZOEd-3iKqz0F2Flw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MFIvEUZOEd-3iKqz0F2Flw" key="condition" value=""/>
-      </eAnnotations>
-    </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Q836wWKBEd-Q9q1HfsZXQw" iD="_Q836wGKBEd-Q9q1HfsZXQw"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_WOryqmKBEd-Q9q1HfsZXQw" iD="_WOryqWKBEd-Q9q1HfsZXQw"/>
-  </pools>
-</bpmn:BpmnDiagram>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
+    <jadex:modelname>C5_ResultUsage</jadex:modelname>
+    <jadex:description>&lt;h1&gt;Pizza Counter&lt;/h1&gt;The process usages the external inventory process to count tomatoes and cheese and prints out how many pizzas can be made.</jadex:description>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
+  </bpmn:extension>
+  <bpmn:process id="_BaQP10ZFEd-3iKqz0F2Flw" name="Pool">
+    <bpmn:subProcess id="_F972YUZFEd-3iKqz0F2Flw" name="Count Tomatoes">
+      <bpmn:incoming>_F-PYYUZFEd-3iKqz0F2Flw</bpmn:incoming>
+      <bpmn:outgoing>_Q836wWKBEd-Q9q1HfsZXQw</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <jadex:parameter direction="in" name="item_type" type="String">&quot;Tomatoes&quot;</jadex:parameter>
+        <jadex:parameter direction="out" name="item_count" type="int"/>
+        <jadex:property name="file">&quot;C4_Arguments.bpmn&quot;</jadex:property>
+        <jadex:subprocessexpressionref>&quot;C4_Arguments.bpmn&quot;</jadex:subprocessexpressionref>
+      </bpmn:extensionElements>
+    </bpmn:subProcess>
+    <bpmn:parallelGateway id="_E94HkUZFEd-3iKqz0F2Flw">
+      <bpmn:incoming>_E94HmkZFEd-3iKqz0F2Flw</bpmn:incoming>
+      <bpmn:outgoing>_F-PYYUZFEd-3iKqz0F2Flw</bpmn:outgoing>
+      <bpmn:outgoing>_KBJ0SkZFEd-3iKqz0F2Flw</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:startEvent id="_D-kmsUZFEd-3iKqz0F2Flw">
+      <bpmn:outgoing>_E94HmkZFEd-3iKqz0F2Flw</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="_Q8uJwWKBEd-Q9q1HfsZXQw" name="Map result">
+      <bpmn:incoming>_Q836wWKBEd-Q9q1HfsZXQw</bpmn:incoming>
+      <bpmn:outgoing>_OwKhCkZFEd-3iKqz0F2Flw</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <jadex:parameter direction="out" name="tomatoe_count" type="Object">item_count</jadex:parameter>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:subProcess id="_KBJ0MUZFEd-3iKqz0F2Flw" name="Count Cheese">
+      <bpmn:incoming>_KBJ0SkZFEd-3iKqz0F2Flw</bpmn:incoming>
+      <bpmn:outgoing>_WOryqmKBEd-Q9q1HfsZXQw</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <jadex:parameter direction="in" name="item_type" type="String">&quot;Cheese&quot;</jadex:parameter>
+        <jadex:parameter direction="out" name="item_count" type="int"/>
+        <jadex:property name="file">&quot;C4_Arguments.bpmn&quot;</jadex:property>
+        <jadex:subprocessexpressionref>&quot;C4_Arguments.bpmn&quot;</jadex:subprocessexpressionref>
+      </bpmn:extensionElements>
+    </bpmn:subProcess>
+    <bpmn:task id="_WOryoWKBEd-Q9q1HfsZXQw" name="Map result">
+      <bpmn:incoming>_WOryqmKBEd-Q9q1HfsZXQw</bpmn:incoming>
+      <bpmn:outgoing>_PFnMkUZFEd-3iKqz0F2Flw</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <jadex:parameter direction="out" name="cheese_count" type="Object">item_count</jadex:parameter>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:parallelGateway id="_OwKhAUZFEd-3iKqz0F2Flw">
+      <bpmn:incoming>_OwKhCkZFEd-3iKqz0F2Flw</bpmn:incoming>
+      <bpmn:incoming>_PFnMkUZFEd-3iKqz0F2Flw</bpmn:incoming>
+      <bpmn:outgoing>_Q3uqekZFEd-3iKqz0F2Flw</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:task id="_Q3uqcUZFEd-3iKqz0F2Flw" name="Print Pizza Count">
+      <bpmn:incoming>_Q3uqekZFEd-3iKqz0F2Flw</bpmn:incoming>
+      <bpmn:outgoing>zusLr6V90Jz7LpQR</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Ingredients available for &quot;+Math.min(tomatoe_count, cheese_count)+&quot; pizzas.&quot;</jadex:parameter>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:endEvent id="JQGlWcs51OwOryFf">
+      <bpmn:incoming>zusLr6V90Jz7LpQR</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="_Q836wWKBEd-Q9q1HfsZXQw" sourceRef="_F972YUZFEd-3iKqz0F2Flw" targetRef="_Q8uJwWKBEd-Q9q1HfsZXQw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_F-PYYUZFEd-3iKqz0F2Flw" sourceRef="_E94HkUZFEd-3iKqz0F2Flw" targetRef="_F972YUZFEd-3iKqz0F2Flw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_KBJ0SkZFEd-3iKqz0F2Flw" sourceRef="_E94HkUZFEd-3iKqz0F2Flw" targetRef="_KBJ0MUZFEd-3iKqz0F2Flw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_E94HmkZFEd-3iKqz0F2Flw" sourceRef="_D-kmsUZFEd-3iKqz0F2Flw" targetRef="_E94HkUZFEd-3iKqz0F2Flw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_OwKhCkZFEd-3iKqz0F2Flw" sourceRef="_Q8uJwWKBEd-Q9q1HfsZXQw" targetRef="_OwKhAUZFEd-3iKqz0F2Flw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_WOryqmKBEd-Q9q1HfsZXQw" sourceRef="_KBJ0MUZFEd-3iKqz0F2Flw" targetRef="_WOryoWKBEd-Q9q1HfsZXQw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_PFnMkUZFEd-3iKqz0F2Flw" sourceRef="_WOryoWKBEd-Q9q1HfsZXQw" targetRef="_OwKhAUZFEd-3iKqz0F2Flw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_Q3uqekZFEd-3iKqz0F2Flw" sourceRef="_OwKhAUZFEd-3iKqz0F2Flw" targetRef="_Q3uqcUZFEd-3iKqz0F2Flw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="zusLr6V90Jz7LpQR" sourceRef="_Q3uqcUZFEd-3iKqz0F2Flw" targetRef="JQGlWcs51OwOryFf">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_BaQP10ZFEd-3iKqz0F2Flw">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_F972YUZFEd-3iKqz0F2Flw">
+        <dc:Bounds height="100.0" width="160.0" x="410.0" y="160.0"/>
+        <dc:Bounds height="100.0" width="160.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_E94HkUZFEd-3iKqz0F2Flw">
+        <dc:Bounds height="60.0" width="60.0" x="270.0" y="250.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_D-kmsUZFEd-3iKqz0F2Flw">
+        <dc:Bounds height="40.0" width="40.0" x="80.0" y="260.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_Q8uJwWKBEd-Q9q1HfsZXQw">
+        <dc:Bounds height="100.0" width="160.0" x="670.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_KBJ0MUZFEd-3iKqz0F2Flw">
+        <dc:Bounds height="100.0" width="160.0" x="410.0" y="280.0"/>
+        <dc:Bounds height="100.0" width="160.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_WOryoWKBEd-Q9q1HfsZXQw">
+        <dc:Bounds height="100.0" width="160.0" x="670.0" y="280.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_OwKhAUZFEd-3iKqz0F2Flw">
+        <dc:Bounds height="60.0" width="60.0" x="950.0" y="240.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_Q3uqcUZFEd-3iKqz0F2Flw">
+        <dc:Bounds height="100.0" width="160.0" x="1100.0" y="220.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="JQGlWcs51OwOryFf">
+        <dc:Bounds height="40.0" width="40.0" x="1380.0" y="250.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_E94HmkZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_F-PYYUZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_KBJ0SkZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_Q836wWKBEd-Q9q1HfsZXQw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_WOryqmKBEd-Q9q1HfsZXQw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_Q3uqekZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_OwKhCkZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_PFnMkUZFEd-3iKqz0F2Flw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="zusLr6V90Jz7LpQR">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

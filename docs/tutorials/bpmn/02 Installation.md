@@ -87,7 +87,7 @@ To execute a process you need to add the corresponding resource path to the JCC 
 
 ![02 Installation@8.png](02%20Installation/02%20Installation-8.png)
 
-A file requester appears that should initially present the directory, where you unpacked the Jadex distribution. Open the *lib* directory and select the file *jadex-applications-bpmn-xyz.jar* (with xyz as placeholder for the current version). You can now unfold the contents of the jar file and browse to the helloworld example. After you selected the *HelloWorld.bpmn2* in the tree, you can start the process by clicking 'Start'.
+A file requester appears that should initially present the directory, where you unpacked the Jadex distribution. Open the *lib* directory and select the file *jadex-applications-bpmn-xyz.jar* (with xyz as placeholder for the current version). You can now unfold the contents of the jar file and browse to the helloworld example. After you selected the *HelloWorld.bpmn* in the tree, you can start the process by clicking 'Start'.
 
 ![02 Installation@9.png](02%20Installation/02%20Installation-9.png)
 

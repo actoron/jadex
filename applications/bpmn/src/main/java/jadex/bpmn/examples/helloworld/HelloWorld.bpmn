@@ -1,64 +1,56 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>HelloWorld</jadex:modelname>
     <jadex:description>&lt;h3&gt;HelloWorld Process&lt;/h3&gt;The HelloWorld example starts a process, which prints a welcome message and then terminates.</jadex:description>
     <jadex:package>jadex.bpmn.examples.helloworld</jadex:package>
-    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_1cEzRxZEEd-yC473XtaJZQ">
-    <semantic:task name="Print Hello" id="_1cOkQRZEEd-yC473XtaJZQ">
-      <semantic:incoming>_WwWlcRZHEd-yC473XtaJZQ</semantic:incoming>
-      <semantic:outgoing>_fEUmwRZHEd-yC473XtaJZQ</semantic:outgoing>
-      <semantic:extensionElements>
+    <jadex:componentflags keepalive="false" monitoring="OFF" persistable="false" suspend="false" synchronous="false"/>
+  </bpmn:extension>
+  <bpmn:process id="_1cEzRxZEEd-yC473XtaJZQ" name="Pool">
+    <bpmn:task id="_1cOkQRZEEd-yC473XtaJZQ" name="Print Hello">
+      <bpmn:incoming>_WwWlcRZHEd-yC473XtaJZQ</bpmn:incoming>
+      <bpmn:outgoing>_fEUmwRZHEd-yC473XtaJZQ</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="String">&quot;Hello world, this is a Jadex bpmn process.&quot;</jadex:parameter>
         <jadex:property name="external" type="boolean">false</jadex:property>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:intermediateCatchEvent id="_eSQQoRZHEd-yC473XtaJZQ">
-      <semantic:incoming>_fEUmwRZHEd-yC473XtaJZQ</semantic:incoming>
-      <semantic:outgoing>_gCmz8RZHEd-yC473XtaJZQ</semantic:outgoing>
-      <semantic:timerEventDefinition>
-        <semantic:timeDuration>1000</semantic:timeDuration>
-      </semantic:timerEventDefinition>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:intermediateCatchEvent id="_eSQQoRZHEd-yC473XtaJZQ">
+      <bpmn:incoming>_fEUmwRZHEd-yC473XtaJZQ</bpmn:incoming>
+      <bpmn:outgoing>_gCmz8RZHEd-yC473XtaJZQ</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration>1000</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+      <bpmn:extensionElements>
         <jadex:property name="duration">1000</jadex:property>
-      </semantic:extensionElements>
-    </semantic:intermediateCatchEvent>
-    <semantic:task name="Print Good Bye" id="_gCdC8RZHEd-yC473XtaJZQ">
-      <semantic:incoming>_gCmz8RZHEd-yC473XtaJZQ</semantic:incoming>
-      <semantic:outgoing>_3ZpL0RZHEd-yC473XtaJZQ</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="_gCdC8RZHEd-yC473XtaJZQ" name="Print Good Bye">
+      <bpmn:incoming>_gCmz8RZHEd-yC473XtaJZQ</bpmn:incoming>
+      <bpmn:outgoing>_3ZpL0RZHEd-yC473XtaJZQ</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="String">&quot;Good bye world.&quot;</jadex:parameter>
         <jadex:property name="external" type="boolean">false</jadex:property>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:endEvent id="_3Zfa0RZHEd-yC473XtaJZQ">
-      <semantic:incoming>_3ZpL0RZHEd-yC473XtaJZQ</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:startEvent id="_WTJFARZHEd-yC473XtaJZQ">
-      <semantic:outgoing>_WwWlcRZHEd-yC473XtaJZQ</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:sequenceFlow sourceRef="_1cOkQRZEEd-yC473XtaJZQ" targetRef="_eSQQoRZHEd-yC473XtaJZQ" id="_fEUmwRZHEd-yC473XtaJZQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_eSQQoRZHEd-yC473XtaJZQ" targetRef="_gCdC8RZHEd-yC473XtaJZQ" id="_gCmz8RZHEd-yC473XtaJZQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_gCdC8RZHEd-yC473XtaJZQ" targetRef="_3Zfa0RZHEd-yC473XtaJZQ" id="_3ZpL0RZHEd-yC473XtaJZQ">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_WTJFARZHEd-yC473XtaJZQ" targetRef="_1cOkQRZEEd-yC473XtaJZQ" id="_WwWlcRZHEd-yC473XtaJZQ">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:endEvent id="_3Zfa0RZHEd-yC473XtaJZQ">
+      <bpmn:incoming>_3ZpL0RZHEd-yC473XtaJZQ</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:startEvent id="_WTJFARZHEd-yC473XtaJZQ">
+      <bpmn:outgoing>_WwWlcRZHEd-yC473XtaJZQ</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="_fEUmwRZHEd-yC473XtaJZQ" sourceRef="_1cOkQRZEEd-yC473XtaJZQ" targetRef="_eSQQoRZHEd-yC473XtaJZQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_gCmz8RZHEd-yC473XtaJZQ" sourceRef="_eSQQoRZHEd-yC473XtaJZQ" targetRef="_gCdC8RZHEd-yC473XtaJZQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_3ZpL0RZHEd-yC473XtaJZQ" sourceRef="_gCdC8RZHEd-yC473XtaJZQ" targetRef="_3Zfa0RZHEd-yC473XtaJZQ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_WwWlcRZHEd-yC473XtaJZQ" sourceRef="_WTJFARZHEd-yC473XtaJZQ" targetRef="_1cOkQRZEEd-yC473XtaJZQ">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_1cEzRxZEEd-yC473XtaJZQ">
@@ -87,21 +79,12 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_fEUmwRZHEd-yC473XtaJZQ">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_fEUmwRZHEd-yC473XtaJZQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_WwWlcRZHEd-yC473XtaJZQ">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_WwWlcRZHEd-yC473XtaJZQ">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_gCmz8RZHEd-yC473XtaJZQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_gCmz8RZHEd-yC473XtaJZQ">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_3ZpL0RZHEd-yC473XtaJZQ">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_3ZpL0RZHEd-yC473XtaJZQ">
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

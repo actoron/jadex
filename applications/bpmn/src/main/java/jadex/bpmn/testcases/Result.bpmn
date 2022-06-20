@@ -1,13 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>Result</jadex:modelname>
     <jadex:description>Simple process that fowards an argument as its result.</jadex:description>
     <jadex:package>jadex.bpmn.testcases</jadex:package>
@@ -32,30 +24,30 @@
       <jadex:configuration name="Pool">
       </jadex:configuration>
     </jadex:configurations>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_QZvnoRcWEd-OSKK6OfNWqA">
-    <semantic:startEvent id="_jUWbARcXEd-OSKK6OfNWqA">
-      <semantic:outgoing>_kPgbsRcXEd-OSKK6OfNWqA</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:task name="Save the result" id="_QZvnoxcWEd-OSKK6OfNWqA">
-      <semantic:incoming>_kPgbsRcXEd-OSKK6OfNWqA</semantic:incoming>
-      <semantic:outgoing>_lAOuChcXEd-OSKK6OfNWqA</semantic:outgoing>
-      <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_QZvnoRcWEd-OSKK6OfNWqA" name="Pool">
+    <bpmn:startEvent id="_jUWbARcXEd-OSKK6OfNWqA">
+      <bpmn:outgoing>_kPgbsRcXEd-OSKK6OfNWqA</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="_QZvnoxcWEd-OSKK6OfNWqA" name="Save the result">
+      <bpmn:incoming>_kPgbsRcXEd-OSKK6OfNWqA</bpmn:incoming>
+      <bpmn:outgoing>_lAOuChcXEd-OSKK6OfNWqA</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:class>WriteContextTask</jadex:class>
         <jadex:parameter direction="in" name="name" type="String">&quot;out&quot;</jadex:parameter>
         <jadex:parameter direction="in" name="value" type="Object">in</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:endEvent id="_lAOuARcXEd-OSKK6OfNWqA">
-      <semantic:incoming>_lAOuChcXEd-OSKK6OfNWqA</semantic:incoming>
-    </semantic:endEvent>
-    <semantic:sequenceFlow sourceRef="_jUWbARcXEd-OSKK6OfNWqA" targetRef="_QZvnoxcWEd-OSKK6OfNWqA" id="_kPgbsRcXEd-OSKK6OfNWqA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_QZvnoxcWEd-OSKK6OfNWqA" targetRef="_lAOuARcXEd-OSKK6OfNWqA" id="_lAOuChcXEd-OSKK6OfNWqA">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:endEvent id="_lAOuARcXEd-OSKK6OfNWqA">
+      <bpmn:incoming>_lAOuChcXEd-OSKK6OfNWqA</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="_kPgbsRcXEd-OSKK6OfNWqA" sourceRef="_jUWbARcXEd-OSKK6OfNWqA" targetRef="_QZvnoxcWEd-OSKK6OfNWqA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_lAOuChcXEd-OSKK6OfNWqA" sourceRef="_QZvnoxcWEd-OSKK6OfNWqA" targetRef="_lAOuARcXEd-OSKK6OfNWqA">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_QZvnoRcWEd-OSKK6OfNWqA">
@@ -76,13 +68,8 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_lAOuChcXEd-OSKK6OfNWqA">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_lAOuChcXEd-OSKK6OfNWqA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_kPgbsRcXEd-OSKK6OfNWqA">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_kPgbsRcXEd-OSKK6OfNWqA">
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

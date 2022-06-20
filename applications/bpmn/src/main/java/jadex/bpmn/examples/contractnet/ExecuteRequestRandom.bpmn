@@ -1,17 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>ExecuteRequestRandom</jadex:modelname>
     <jadex:description>&lt;h1&gt;Execute a Request&lt;/h1&gt; This process randomly produces a result or fails.</jadex:description>
     <jadex:package>jadex.bpmn.examples.contractnet</jadex:package>
-    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags keepalive="false" monitoring="OFF" persistable="false" suspend="false" synchronous="false"/>
     <jadex:arguments>
       <jadex:argument name="proposal" type="Object">
         <jadex:description>The proposal.</jadex:description>
@@ -22,39 +14,39 @@
         <jadex:description>The result of the execution</jadex:description>
       </jadex:result>
     </jadex:results>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_eyJZMVrFEd-ircvS5nprxA">
-    <semantic:endEvent id="_iX7NEVrFEd-ircvS5nprxA">
-      <semantic:incoming>_iYEXCFrFEd-ircvS5nprxA</semantic:incoming>
-      <semantic:errorEventDefinition/>
-      <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_eyJZMVrFEd-ircvS5nprxA" name="Pool">
+    <bpmn:endEvent id="_iX7NEVrFEd-ircvS5nprxA">
+      <bpmn:incoming>_iYEXCFrFEd-ircvS5nprxA</bpmn:incoming>
+      <bpmn:errorEventDefinition/>
+      <bpmn:extensionElements>
         <jadex:property name="exception">new RuntimeException(&quot;Failed to execute: &quot;+proposal)</jadex:property>
-      </semantic:extensionElements>
-    </semantic:endEvent>
-    <semantic:startEvent id="_hVT5gVrFEd-ircvS5nprxA">
-      <semantic:outgoing>_hVdqgVrFEd-ircvS5nprxA</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:exclusiveGateway id="_gYN_IVrFEd-ircvS5nprxA" default="_iYEXCFrFEd-ircvS5nprxA">
-      <semantic:incoming>_hVdqgVrFEd-ircvS5nprxA</semantic:incoming>
-      <semantic:outgoing>_iYEXCFrFEd-ircvS5nprxA</semantic:outgoing>
-      <semantic:outgoing>_9JVMumJdEd-Q9q1HfsZXQw</semantic:outgoing>
-    </semantic:exclusiveGateway>
-    <semantic:task name="Store Result" id="_9JVMsWJdEd-Q9q1HfsZXQw">
-      <semantic:incoming>_9JVMumJdEd-Q9q1HfsZXQw</semantic:incoming>
-    </semantic:task>
-    <semantic:sequenceFlow sourceRef="_hVT5gVrFEd-ircvS5nprxA" targetRef="_gYN_IVrFEd-ircvS5nprxA" id="_hVdqgVrFEd-ircvS5nprxA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_gYN_IVrFEd-ircvS5nprxA" targetRef="_iX7NEVrFEd-ircvS5nprxA" id="_iYEXCFrFEd-ircvS5nprxA">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_gYN_IVrFEd-ircvS5nprxA" targetRef="_9JVMsWJdEd-Q9q1HfsZXQw" id="_9JVMumJdEd-Q9q1HfsZXQw">
-      <semantic:conditionExpression>Math.random()&lt;0.5</semantic:conditionExpression>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:endEvent>
+    <bpmn:startEvent id="_hVT5gVrFEd-ircvS5nprxA">
+      <bpmn:outgoing>_hVdqgVrFEd-ircvS5nprxA</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway default="_iYEXCFrFEd-ircvS5nprxA" id="_gYN_IVrFEd-ircvS5nprxA">
+      <bpmn:incoming>_hVdqgVrFEd-ircvS5nprxA</bpmn:incoming>
+      <bpmn:outgoing>_iYEXCFrFEd-ircvS5nprxA</bpmn:outgoing>
+      <bpmn:outgoing>_9JVMumJdEd-Q9q1HfsZXQw</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="_9JVMsWJdEd-Q9q1HfsZXQw" name="Store Result">
+      <bpmn:incoming>_9JVMumJdEd-Q9q1HfsZXQw</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="_hVdqgVrFEd-ircvS5nprxA" sourceRef="_hVT5gVrFEd-ircvS5nprxA" targetRef="_gYN_IVrFEd-ircvS5nprxA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_iYEXCFrFEd-ircvS5nprxA" sourceRef="_gYN_IVrFEd-ircvS5nprxA" targetRef="_iX7NEVrFEd-ircvS5nprxA">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="_9JVMumJdEd-Q9q1HfsZXQw" sourceRef="_gYN_IVrFEd-ircvS5nprxA" targetRef="_9JVMsWJdEd-Q9q1HfsZXQw">
+      <bpmn:conditionExpression>Math.random()&lt;0.5</bpmn:conditionExpression>
+      <bpmn:extensionElements>
         <jadex:parametermapping name="result">&quot;Executed: &quot;+proposal</jadex:parametermapping>
-      </semantic:extensionElements>
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_eyJZMVrFEd-ircvS5nprxA">
@@ -80,5 +72,4 @@
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

@@ -32,7 +32,7 @@ public class BPMNStartElementsTest //extends TestCase
 		ci.setConfiguration("Case A");
 		ci.setSuspend(true);
 		
-		IExternalAccess exta = platform.createComponent(ci.setFilename("jadex.bpmn.testcases.StartElements.bpmn2")).get();
+		IExternalAccess exta = platform.createComponent(ci.setFilename("jadex.bpmn.testcases.StartElements.bpmn")).get();
 		IFuture<Map<String, Object>> fresults = exta.waitForTermination();
 		exta.resumeComponent();
 		Map<String, Object> results = fresults.get();
@@ -45,7 +45,7 @@ public class BPMNStartElementsTest //extends TestCase
 		ci = new CreationInfo();
 		ci.setConfiguration("Case B");
 		ci.setSuspend(true);
-		exta = platform.createComponent(ci.setFilename("jadex.bpmn.testcases.StartElements.bpmn2")).get();
+		exta = platform.createComponent(ci.setFilename("jadex.bpmn.testcases.StartElements.bpmn")).get();
 		fresults = exta.waitForTermination();
 		exta.resumeComponent();
 		results = fresults.get();

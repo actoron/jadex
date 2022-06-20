@@ -1,40 +1,32 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>ScopesE</jadex:modelname>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags keepalive="false" monitoring="OFF" suspend="false" synchronous="false"/>
     <jadex:imports>
       <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>
     </jadex:imports>
-  </semantic:extension>
-  <semantic:process name="Pool" id="_LQ9oV33pEd6VFdlpWzoevQ">
-    <semantic:task name="Result Task" id="_eqEyEX3pEd6VFdlpWzoevQ">
-      <semantic:incoming>_eqOjGH3pEd6VFdlpWzoevQ</semantic:incoming>
-      <semantic:extensionElements>
+  </bpmn:extension>
+  <bpmn:process id="_LQ9oV33pEd6VFdlpWzoevQ" name="Pool">
+    <bpmn:task id="_eqEyEX3pEd6VFdlpWzoevQ" name="Result Task">
+      <bpmn:incoming>_eqOjGH3pEd6VFdlpWzoevQ</bpmn:incoming>
+      <bpmn:extensionElements>
         <jadex:class>PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="String"/>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:subProcess name="Outer Task" id="_S4-ikX3pEd6VFdlpWzoevQ">
-      <semantic:outgoing>_eqOjGH3pEd6VFdlpWzoevQ</semantic:outgoing>
-      <semantic:extensionElements>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    <bpmn:subProcess id="_S4-ikX3pEd6VFdlpWzoevQ" name="Outer Task">
+      <bpmn:outgoing>_eqOjGH3pEd6VFdlpWzoevQ</bpmn:outgoing>
+      <bpmn:extensionElements>
         <jadex:parameter direction="inout" name="a" type="String">&quot;a&quot;</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:subProcess>
-    <semantic:sequenceFlow sourceRef="_S4-ikX3pEd6VFdlpWzoevQ" targetRef="_eqEyEX3pEd6VFdlpWzoevQ" id="_eqOjGH3pEd6VFdlpWzoevQ">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-      <jadex:dataFlow id="EyF3sufYf30KzmZw" sourceRef="_S4-ikX3pEd6VFdlpWzoevQ" sourceParam="a" targetRef="_eqEyEX3pEd6VFdlpWzoevQ" targetParam="text"/>
-    </semantic:extensionElements>
-  </semantic:process>
+      </bpmn:extensionElements>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="_eqOjGH3pEd6VFdlpWzoevQ" sourceRef="_S4-ikX3pEd6VFdlpWzoevQ" targetRef="_eqEyEX3pEd6VFdlpWzoevQ">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+      <jadex:dataFlow id="EyF3sufYf30KzmZw" sourceParam="a" sourceRef="_S4-ikX3pEd6VFdlpWzoevQ" targetParam="text" targetRef="_eqEyEX3pEd6VFdlpWzoevQ"/>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_LQ9oV33pEd6VFdlpWzoevQ">
@@ -49,15 +41,12 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_eqOjGH3pEd6VFdlpWzoevQ">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_eqOjGH3pEd6VFdlpWzoevQ">
-      </bpmndi:BPMNEdge>
-      <di:Edge type="data" jadexElement="EyF3sufYf30KzmZw">
+      <di:Edge jadexElement="EyF3sufYf30KzmZw" type="data">
       </di:Edge>
       <bpmndi:BPMNEdge bpmnElement="_bRj-Kn3pEd6VFdlpWzoevQ">
       </bpmndi:BPMNEdge>
-      <di:Edge type="data" jadexElement="BSGeEN5X9EXYHh3f">
+      <di:Edge jadexElement="BSGeEN5X9EXYHh3f" type="data">
       </di:Edge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

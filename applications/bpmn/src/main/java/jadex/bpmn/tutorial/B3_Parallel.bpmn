@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -162,3 +163,160 @@
   </bpmndi:BPMNDiagram>
 </semantic:definitions>
 
+=======
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
+    <jadex:modelname>B3_parallel</jadex:modelname>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
+    <jadex:componentflags keepalive="false" monitoring="OFF" persistable="false" suspend="false" synchronous="false"/>
+  </bpmn:extension>
+  <bpmn:process id="vq1VKFEd5CnfmLko" name="Pool">
+    <bpmn:task id="iCPm4vVrOZZZWQKZ" name="Task 2aI">
+      <bpmn:incoming>jGqBHedWaI2ZB9iI</bpmn:incoming>
+      <bpmn:outgoing>Fq4kyfkUe20+nnM7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="1hIGhZsO/GYW1mjz" name=" Task 2aII">
+      <bpmn:incoming>XN+cUosJVTz+JDPB</bpmn:incoming>
+      <bpmn:outgoing>mXU5dAf/UcjdycmZ</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="HTczYiF0awpGHn+5" name=" Task 1a">
+      <bpmn:incoming>WOYDd3ci2DF53LS8</bpmn:incoming>
+      <bpmn:outgoing>inlcMJMZoc5XiSwE</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:startEvent id="nbseML2wiKt9FkL3">
+      <bpmn:outgoing>WOYDd3ci2DF53LS8</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:parallelGateway id="UzZVq7y+Jmsu4TnW">
+      <bpmn:incoming>inlcMJMZoc5XiSwE</bpmn:incoming>
+      <bpmn:outgoing>jGqBHedWaI2ZB9iI</bpmn:outgoing>
+      <bpmn:outgoing>XN+cUosJVTz+JDPB</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:endEvent id="/WdmrxHpiJVee12+">
+      <bpmn:incoming>81TPXLB8rYU+vk5F</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:parallelGateway id="5koesCtJJrn4dIT4">
+      <bpmn:incoming>Fq4kyfkUe20+nnM7</bpmn:incoming>
+      <bpmn:incoming>mXU5dAf/UcjdycmZ</bpmn:incoming>
+      <bpmn:outgoing>XCIJ2u6GwNWodQgh</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:task id="oLsJaxJl2pzfnz2z" name=" Task 3a">
+      <bpmn:incoming>XCIJ2u6GwNWodQgh</bpmn:incoming>
+      <bpmn:outgoing>81TPXLB8rYU+vk5F</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:startEvent id="A4Pb0dHFH1keFssU">
+      <bpmn:outgoing>Zi5QE/SMkePXK+Yk</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="3cTiUk6ggM6eZQUk" name=" Task 1b">
+      <bpmn:incoming>Zi5QE/SMkePXK+Yk</bpmn:incoming>
+      <bpmn:outgoing>XaogcsiZpGuFcLrj</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="pc1RYwt/gAmYyRtK" name="Task">
+      <bpmn:incoming>QuCM8gRumVH8/TTc</bpmn:incoming>
+      <bpmn:outgoing>AaOv6arXPeGz1+V7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="oRBXsQl/8WctzzEg" name="Task 2b">
+      <bpmn:incoming>XaogcsiZpGuFcLrj</bpmn:incoming>
+      <bpmn:outgoing>QuCM8gRumVH8/TTc</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="XthJfbLgPL3NYGun">
+      <bpmn:incoming>AaOv6arXPeGz1+V7</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Fq4kyfkUe20+nnM7" sourceRef="iCPm4vVrOZZZWQKZ" targetRef="5koesCtJJrn4dIT4">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="mXU5dAf/UcjdycmZ" sourceRef="1hIGhZsO/GYW1mjz" targetRef="5koesCtJJrn4dIT4">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="inlcMJMZoc5XiSwE" sourceRef="HTczYiF0awpGHn+5" targetRef="UzZVq7y+Jmsu4TnW">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="WOYDd3ci2DF53LS8" sourceRef="nbseML2wiKt9FkL3" targetRef="HTczYiF0awpGHn+5">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="jGqBHedWaI2ZB9iI" sourceRef="UzZVq7y+Jmsu4TnW" targetRef="iCPm4vVrOZZZWQKZ">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="XN+cUosJVTz+JDPB" sourceRef="UzZVq7y+Jmsu4TnW" targetRef="1hIGhZsO/GYW1mjz">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="XCIJ2u6GwNWodQgh" sourceRef="5koesCtJJrn4dIT4" targetRef="oLsJaxJl2pzfnz2z">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="81TPXLB8rYU+vk5F" sourceRef="oLsJaxJl2pzfnz2z" targetRef="/WdmrxHpiJVee12+">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Zi5QE/SMkePXK+Yk" sourceRef="A4Pb0dHFH1keFssU" targetRef="3cTiUk6ggM6eZQUk">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="XaogcsiZpGuFcLrj" sourceRef="3cTiUk6ggM6eZQUk" targetRef="oRBXsQl/8WctzzEg">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="AaOv6arXPeGz1+V7" sourceRef="pc1RYwt/gAmYyRtK" targetRef="XthJfbLgPL3NYGun">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="QuCM8gRumVH8/TTc" sourceRef="oRBXsQl/8WctzzEg" targetRef="pc1RYwt/gAmYyRtK">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="vq1VKFEd5CnfmLko">
+        <dc:Bounds height="440.0" width="1250.0" x="50.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="iCPm4vVrOZZZWQKZ">
+        <dc:Bounds height="100.0" width="160.0" x="510.0" y="30.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="1hIGhZsO/GYW1mjz">
+        <dc:Bounds height="100.0" width="160.0" x="510.0" y="170.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="HTczYiF0awpGHn+5">
+        <dc:Bounds height="100.0" width="160.0" x="170.0" y="100.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="nbseML2wiKt9FkL3">
+        <dc:Bounds height="40.0" width="40.0" x="70.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UzZVq7y+Jmsu4TnW">
+        <dc:Bounds height="60.0" width="60.0" x="390.0" y="120.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="/WdmrxHpiJVee12+">
+        <dc:Bounds height="40.0" width="40.0" x="1120.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="5koesCtJJrn4dIT4">
+        <dc:Bounds height="60.0" width="60.0" x="760.0" y="120.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="oLsJaxJl2pzfnz2z">
+        <dc:Bounds height="100.0" width="160.0" x="890.0" y="100.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="A4Pb0dHFH1keFssU">
+        <dc:Bounds height="40.0" width="40.0" x="70.0" y="320.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="3cTiUk6ggM6eZQUk">
+        <dc:Bounds height="100.0" width="160.0" x="170.0" y="290.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="pc1RYwt/gAmYyRtK">
+        <dc:Bounds height="100.0" width="160.0" x="890.0" y="290.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="oRBXsQl/8WctzzEg">
+        <dc:Bounds height="100.0" width="160.0" x="510.0" y="290.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="XthJfbLgPL3NYGun">
+        <dc:Bounds height="40.0" width="40.0" x="1120.0" y="320.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="WOYDd3ci2DF53LS8">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="inlcMJMZoc5XiSwE">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="jGqBHedWaI2ZB9iI">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="XN+cUosJVTz+JDPB">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="Fq4kyfkUe20+nnM7">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="mXU5dAf/UcjdycmZ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="XCIJ2u6GwNWodQgh">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="81TPXLB8rYU+vk5F">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="Zi5QE/SMkePXK+Yk">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="XaogcsiZpGuFcLrj">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="QuCM8gRumVH8/TTc">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="AaOv6arXPeGz1+V7">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
+>>>>>>> 4876fd3db5873cdcd62997e01bbfc07085445f38

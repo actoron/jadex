@@ -1,45 +1,37 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
-                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
-  <semantic:extension>
+<?xml version="1.0" ?><bpmn:definitions targetNamespace="http://www.activecomponents.org/bpmn/" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jadex="http://www.activecomponents.org/bpmnextensions" xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmn:extension>
     <jadex:modelname>TestSubprocessStartEvent</jadex:modelname>
-    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
-  </semantic:extension>
-  <semantic:process name="Pool" id="mXGzRdvHUI25sRaq">
-    <semantic:subProcess id="Kp6KR82JRVzgGctR">
-      <semantic:incoming>lVGrbSa5270++aH7</semantic:incoming>
-      <semantic:startEvent id="Ik5zn29QT/yfIezp">
-        <semantic:outgoing>zssMLLpd7lPShQPE</semantic:outgoing>
-        <semantic:conditionalEventDefinition/>
-        <semantic:extensionElements>
+    <jadex:componentflags keepalive="false" monitoring="OFF" suspend="false" synchronous="false"/>
+  </bpmn:extension>
+  <bpmn:process id="mXGzRdvHUI25sRaq" name="Pool">
+    <bpmn:subProcess id="Kp6KR82JRVzgGctR">
+      <bpmn:incoming>lVGrbSa5270++aH7</bpmn:incoming>
+      <bpmn:startEvent id="Ik5zn29QT/yfIezp">
+        <bpmn:outgoing>zssMLLpd7lPShQPE</bpmn:outgoing>
+        <bpmn:conditionalEventDefinition/>
+        <bpmn:extensionElements>
           <jadex:property name="eventtypes">new java.lang.String[]{&quot;SubprocessStart&quot;}</jadex:property>
           <jadex:property name="condition">$event.value==7</jadex:property>
-        </semantic:extensionElements>
-      </semantic:startEvent>
-      <semantic:task name="Task" id="yAMNau1/DbrnVBzw">
-        <semantic:incoming>zssMLLpd7lPShQPE</semantic:incoming>
-        <semantic:extensionElements>
+        </bpmn:extensionElements>
+      </bpmn:startEvent>
+      <bpmn:task id="yAMNau1/DbrnVBzw" name="Task">
+        <bpmn:incoming>zssMLLpd7lPShQPE</bpmn:incoming>
+        <bpmn:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
           <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;&quot;+$component.getId()+&quot; after event: &quot;+$event</jadex:parameter>
-        </semantic:extensionElements>
-      </semantic:task>
-    </semantic:subProcess>
-    <semantic:startEvent id="mLR+eRTFPqwse2ET">
-      <semantic:outgoing>lVGrbSa5270++aH7</semantic:outgoing>
-    </semantic:startEvent>
-    <semantic:sequenceFlow sourceRef="Ik5zn29QT/yfIezp" targetRef="yAMNau1/DbrnVBzw" id="zssMLLpd7lPShQPE">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="mLR+eRTFPqwse2ET" targetRef="Kp6KR82JRVzgGctR" id="lVGrbSa5270++aH7">
-    </semantic:sequenceFlow>
-    <semantic:extensionElements>
-    </semantic:extensionElements>
-  </semantic:process>
+        </bpmn:extensionElements>
+      </bpmn:task>
+    </bpmn:subProcess>
+    <bpmn:startEvent id="mLR+eRTFPqwse2ET">
+      <bpmn:outgoing>lVGrbSa5270++aH7</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="zssMLLpd7lPShQPE" sourceRef="Ik5zn29QT/yfIezp" targetRef="yAMNau1/DbrnVBzw">
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="lVGrbSa5270++aH7" sourceRef="mLR+eRTFPqwse2ET" targetRef="Kp6KR82JRVzgGctR">
+    </bpmn:sequenceFlow>
+    <bpmn:extensionElements>
+    </bpmn:extensionElements>
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="mXGzRdvHUI25sRaq">
@@ -63,5 +55,4 @@
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</semantic:definitions>
-
+</bpmn:definitions>

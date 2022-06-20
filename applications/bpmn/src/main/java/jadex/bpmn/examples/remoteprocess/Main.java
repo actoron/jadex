@@ -21,7 +21,7 @@ public class Main
 	public static void main(String[] args) 
 	{
 		IExternalAccess platform = Starter.createPlatform(PlatformConfigurationHandler.getDefaultNoGui()).get();
-		CreationInfo ci = new CreationInfo().setFilename("jadex/bpmn/examples/remoteprocess/ParentProcess.bpmn2");
+		CreationInfo ci = new CreationInfo().setFilename("jadex/bpmn/examples/remoteprocess/ParentProcess.bpmn");
 		platform.createComponent(ci).get();
 	}
 }

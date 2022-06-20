@@ -33,7 +33,7 @@ public class PlatformsTest //extends TestCase
 	{
 //		"jadex.component.ComponentComponentFactory", "jadex.platform.Platform.component.xml",
 		"jadex.micro.MicroAgentFactory", "jadex.platform.PlatformAgent"
-//		"jadex.bpmn.BpmnFactory", "jadex.platform.Platform.bpmn2"
+//		"jadex.bpmn.BpmnFactory", "jadex.platform.Platform.bpmn"
 	};
 	// Base arguments used for every platform.
 	String[]	BASEARGS	= new String[]
@@ -61,7 +61,7 @@ public class PlatformsTest //extends TestCase
 	/** Platforms to exclude from comparison. */
 	protected static final Set<String>	EXCLUDEPLATFORMS	= new HashSet<String>(Arrays.asList(new String[]
 	{
-		"jadex.platform.Platform.bpmn2"	// BPMN platform is just proof of concept. 
+		"jadex.platform.Platform.bpmn"	// BPMN platform is just proof of concept. 
 	}));
 
 	/**

@@ -63,7 +63,7 @@ public class IntermediateTestAgent
 		
 		final List<TestReport> trs = new ArrayList<TestReport>();
 		
-		runTests("jadex.platform.service.processengine.TestIntermediateEvent.bpmn2", "Intermediate")
+		runTests("jadex.platform.service.processengine.TestIntermediateEvent.bpmn", "Intermediate")
 			.addResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void intermediateResultAvailable(TestReport result)
@@ -73,7 +73,7 @@ public class IntermediateTestAgent
 			
 			public void finished()
 			{
-				runTests("jadex.platform.service.processengine.TestSubprocessStartEvent.bpmn2", "SubprocessStart")
+				runTests("jadex.platform.service.processengine.TestSubprocessStartEvent.bpmn", "SubprocessStart")
 					.addResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void intermediateResultAvailable(TestReport result)
@@ -83,7 +83,7 @@ public class IntermediateTestAgent
 					
 					public void finished()
 					{
-						runTests2("jadex.platform.service.processengine.TestEventprocessStartEvent.bpmn2", "EventSubprocessStart")
+						runTests2("jadex.platform.service.processengine.TestEventprocessStartEvent.bpmn", "EventSubprocessStart")
 							.addResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
 						{
 							public void intermediateResultAvailable(TestReport result)
