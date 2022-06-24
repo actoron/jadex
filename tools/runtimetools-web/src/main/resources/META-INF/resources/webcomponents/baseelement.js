@@ -52,7 +52,6 @@ export class BaseElement extends LitElement
 	static loaded = {};
 	
 	app = null;
-	jadexservice = null;
 	cid = null;
 	//langlistener = null;
 	inited = false;
@@ -204,6 +203,11 @@ export class BaseElement extends LitElement
 			BaseElement.login.removeListener(this.loginlistener);
 	}
 	
+	getJadexService()
+	{
+		throw new Error("jadexservice method not implemented");
+	}
+	
 	// todo: why does caching (above) not work :-(
 	loadStyle(url)
 	{
@@ -351,11 +355,13 @@ export class BaseElement extends LitElement
    		            // https://stackoverflow.com/questions/40663150/script-injected-with-innerhtml-doesnt-trigger-onload-and-onerror
    		            // append child returns BEFORE script is executed :-( In contrast to text
    		            let funname = "Submodule_" + url;
-					try {
+					try 
+					{
 						let componentfunc = new Function(js + "\n window.loadedScript('"+url+"')\n//# sourceURL=" + funname + "\n");
 						componentfunc();
 					}
-					catch (error) {
+					catch (error) 
+					{
 						console.log("Script " + url + " failed to start " + error);
 					}
    		            //importShim.topLevelLoad(importShim.getFakeUrl(), js+"\n window.loadedScript('"+url+"')");
@@ -374,7 +380,7 @@ export class BaseElement extends LitElement
 	
 	loadServiceStyle(stylepath)
     {
-		console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!load style ' + stylepath);
+		//console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!load style ' + stylepath);
 		return this.loadStyle(this.getResourceUrl(stylepath));
     }
 	
@@ -398,7 +404,8 @@ export class BaseElement extends LitElement
     {
 		let scriptpromises = [];
 		let self = this;
-		scriptpaths.forEach(function(scriptpath) {
+		scriptpaths.forEach(function(scriptpath) 
+		{
 			scriptpromises.push(self.loadServiceScript(scriptpath));
 		})
 		
@@ -426,7 +433,9 @@ export class BaseElement extends LitElement
 	
 	getResourceUrl(respath)
 	{
-		let prefix = 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.jadexservice;
+		if(!this.cid)
+			throw new Error("cid must not null");
+		let prefix = 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.getJadexService();
 		let url = prefix+'&methodname=loadResource&args_0='+respath+"&argtypes_0=java.lang.String";
 		return url;
 	}

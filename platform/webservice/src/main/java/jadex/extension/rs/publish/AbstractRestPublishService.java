@@ -2021,8 +2021,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 */
 	protected void writeResponse(ResponseInfo ri)
 //	protected void writeResponse(Object result, int status, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin, Integer max)
-	{
-		// System.out.println("writeResponse: "+result+", "+status+", "+callid);
+	{		
+		if(ri.getRequest().getQueryString()!=null && ri.getRequest().getQueryString().indexOf("suspend")!=-1)
+			System.out.println("writeResponse: "+ri.getResult()+", "+ri.getRequest().getRequestURI()+", "+ri.getCallid());
 		// Only write response on first exception
 		if(isComplete(ri.getRequest(), ri.getResponse()))
 			return;
@@ -2135,7 +2136,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			//Optional<String> f = ri.getResultTypes().stream().filter(rt -> rt.indexOf("text/event-stream")!=-1).findFirst();
 			//if(f.isPresent())
 		//}
-		
+				
 		if(ri.getException()!=null)
 			System.out.println("timeout ex"+ri);
 			

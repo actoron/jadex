@@ -11,7 +11,6 @@ class DebuggerElement extends CidElement
 		//this.listener = null;
 		this.app.lang.listeners.add(this);
 		this.comp = null; // selected component
-		this.myservice = "jadex.tools.web.debugger.IJCCDebuggerService";
 		this.debuggers = {};
 		this.desc = null;
 		this.breakpointnames = []; // loaded from model
@@ -39,7 +38,7 @@ class DebuggerElement extends CidElement
 				self.getComponentDescription(obj.item.node.id).then(desc => 
 				{
 					// Fetch component desc of debugged component
-					self.desc = desc;
+					self.setDescription(desc);
 					
 					self.loadBreakpointNames().then(brs =>
 					{
@@ -73,6 +72,11 @@ class DebuggerElement extends CidElement
 		this.concom = false;	
 		this.stopUpdater();
 		this.terminateSubscription();
+	}
+	
+	getJadexService()
+	{
+		return "jadex.tools.web.debugger.IJCCDebuggerService";
 	}
 	
 	// todo: better debugger / subdebugger
@@ -177,7 +181,7 @@ class DebuggerElement extends CidElement
 	
 	getMethodPrefix() 
 	{
-		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.myservice;
+		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.getJadexService();
 	}
 	
 	getType(type)
@@ -286,7 +290,7 @@ class DebuggerElement extends CidElement
 		{
 			axios.get(self.getMethodPrefix()+'&methodname=suspendComponent&args_0='+self.getAgentName(), self.transform).then(resp =>
 			{
-				self.desc = resp.data;
+				self.setDescription(resp.data);
 				self.requestUpdate();
 				resolve(resp.data);
 			}).catch(function(err) 
@@ -310,7 +314,7 @@ class DebuggerElement extends CidElement
 		{
 			axios.get(self.getMethodPrefix()+'&methodname=stepComponent&args_0='+self.getAgentName()+"&args_1="+stepinfo, self.transform).then(resp =>
 			{
-				self.desc = resp.data;
+				self.setDescription(resp.data);
 				self.requestUpdate();
 				resolve(resp.data);
 			}).catch(function(err) 
@@ -331,7 +335,7 @@ class DebuggerElement extends CidElement
 		{
 			axios.get(self.getMethodPrefix()+'&methodname=resumeComponent&args_0='+self.getAgentName(), self.transform).then(resp =>
 			{
-				self.desc = resp.data;
+				self.setDescription(resp.data);
 				self.requestUpdate();
 				resolve(resp.data);
 			}).catch(function(err) 
@@ -339,31 +343,56 @@ class DebuggerElement extends CidElement
 				console.log("err: "+err);	
 				self.getComponentDescription().then(desc => 
 				{
-					self.desc = desc; self.requestUpdate();
+					self.setDescription(desc);
+					self.requestUpdate();
 				}).catch(e => console.log("err: "+e));
 				reject(err);
 			});
 		});		
 	}
 	
+	setDescription(desc)
+	{
+		this.desc = desc;
+		if(desc!=null)
+			this.setState(desc.state);
+	}
+	
+	getInternalDebugger()
+	{
+		var md = this.shadowRoot.getElementById("debugger");
+		var ret = null;
+		if(md?.children[0]?.getStepInfo!=null)
+			ret = md.children[0]
+		return ret;
+	}
+	
 	getStepInfo()
 	{
 		// internal debugger panel must have function getStepInfo()
-		var md = this.shadowRoot.getElementById("debugger");
-		var ret = null;
-		if(md.children[0].getStepInfo!=null)
-			ret = md.children[0].getStepInfo();
-		return ret;
+		var comp = this.getInternalDebugger();
+		return comp?.getStepInfo? comp.getStepInfo(): null;
 	}
 	
 	hasSteps()
 	{
 		// internal debugger panel must have function hasSteps()
-		var md = this.shadowRoot.getElementById("debugger");
-		var ret = false;
-		if(md?.children[0]?.getStepInfo)
-			ret = md.children[0].hasSteps();
-		return ret;
+		var comp = this.getInternalDebugger();
+		return comp?.hasSteps? comp.hasSteps(): null;
+	}
+	
+	getState()
+	{
+		return this.desc?.state;
+	}
+	
+	setState(state)
+	{
+		console.log("setState: "+state);
+		// internal debugger panel must have function setState()
+		var comp = this.getInternalDebugger();
+		if(comp?.setState)
+			comp.setState(state);
 	}
 	
 	updateButtons()

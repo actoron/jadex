@@ -4,7 +4,8 @@ import * as cidelement from "../webcomponents/cidelement.js"
 
 //console.log("Executing modloader " + Object.keys(litelement));
 
-window.modLoad = (function () {
+window.modLoad = (function () 
+{
 	let resolvemap = {};
 	resolvemap["lit-element"] = litelement;
 	resolvemap["base-element"] = baseelement;
@@ -15,8 +16,10 @@ window.modLoad = (function () {
 		resolvemap[mappedmodule.dataset.name] = mappedmodule.src;
 	});
 	
-	return function(name, url) {
-		if (arguments.length === 1) {
+	return function(name, url) 
+	{
+		if (arguments.length === 1) 
+		{
 			let ret = resolvemap[name];
 			//console.log("Statically loaded " +name);//+ ret);
 			if (!ret)

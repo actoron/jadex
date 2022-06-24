@@ -1,6 +1,7 @@
 let { LitElement, html, css } = modLoad('lit-element');
 let { BaseElement } = modLoad('base-element');
 let { CidElement } = modLoad('cid-element');
+let { RingBuffer } = modLoad('ringbuffer');
 
 // Tag name 'jadex-bdiagentdebugger'
 class BDIV3AgentDebuggerElement extends CidElement 
@@ -11,19 +12,18 @@ class BDIV3AgentDebuggerElement extends CidElement
 		this.app.lang.listeners.add(this);
 		this.comp = null; // selected component
 		this.concom = false;
-		this.myservice = "jadex.tools.web.debugger.IJCCDebuggerService";
 		this.sub = {};
 		this.steps = [];
-		this.history = [];
 		this.selstep = null;
 		this.treedata = {};
 		this.treedata["#"] = {};
 		this.treeopens = {};
 		this.treerefreshtimer = null;
+		this.state = null;
 		
-		this.allgoals = [];
-		this.allplans = [];
-		this.allbeliefs = {}; // id -> belief
+		//this.allgoals = [];
+		//this.allplans = [];
+		//this.allbeliefs = {}; // id -> belief
 		
 		var agent = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/debugger/images/agent.png';
 		var capability = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/debugger/images/capability.png';
@@ -47,22 +47,50 @@ class BDIV3AgentDebuggerElement extends CidElement
 			"planbase": {"icon": planbase}
 		}
 		
-		var res = "jadex/tools/web/commons/detailsview.js";
-		var ures = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String";
+		//var res1 = "jadex/tools/web/commons/detailsview.js";
+		//var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+		var res2 = "jadex/tools/web/commons/ringbuffer.js";
+		var ures2 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 
+		
 		var self = this;
 		return new Promise((resolve, reject) =>
 		{
 			// load subcomponents
-			this.loadSubmodule(ures)
+			let scripts = ["jadex/tools/web/commons/detailsview.js", "jadex/tools/web/commons/ringbuffer.js"];
+            this.loadServiceScripts(scripts).then(() =>
+            {
+				this.history = new RingBuffer();
+	
+				this.initTree()
+				.then(() => 
+				{
+					var parent = self.shadowRoot.host.getRootNode().host;
+					self.setState(parent.getState()); 
+					resolve();
+				})
+				.catch(err => reject(err));
+            });
+			
+			/*this.loadSubmodule(ures2)
 			.then(() =>
 			{ 
 				this.initTree()
-				.then(() => {self.subscribe(); resolve()})
+				.then(() => 
+				{
+					var parent = self.shadowRoot.host.getRootNode().host;
+					self.setState(parent.getState()); 
+					resolve();
+				})
 				.catch(err => reject(err));
 			})
-			.catch(err => reject(err));
+			.catch(err => reject(err));*/
 		});
+	}
+	
+	getJadexService()
+	{
+		return "jadex.tools.web.debugger.IJCCDebuggerService";
 	}
 	
 	initTree()
@@ -192,6 +220,14 @@ class BDIV3AgentDebuggerElement extends CidElement
 				resolve();
 			}).catch(err => reject(err));
 		});
+	}
+	
+	emptyTree()
+	{
+		this.treedata = {};
+		this.treedata["#"] = {};
+		this.treeopens = {};
+		//this.treerefreshtimer = null;
 	}
 	
 	loadJSTree()
@@ -591,6 +627,9 @@ class BDIV3AgentDebuggerElement extends CidElement
 	updateEvent(event)
 	{
 		//console.log("event: "+event.type);
+	
+		if(this.state!=="suspended")
+			return;
 		
 		var type = event.type.toLowerCase();
 		var info = event.properties.details;
@@ -598,7 +637,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 		
 		if(type.startsWith("created") && type.endsWith("step"))
 		{
-			//console.log("add step: "+event.properties.id);
+			console.log("add step: "+event.properties.id);
 			this.steps.push(event);
 			//if(laststep==null && steps.size()==1)
 			//	sl.setSelectedIndex(0);
@@ -622,10 +661,10 @@ class BDIV3AgentDebuggerElement extends CidElement
 			
 			info.element = "belief";
 			
-			var oldbel = this.allbeliefs[info.id];
-			if(oldbel)
-				info.type = oldbel.type; // Hack!!! Keep capability information which is unavailable for modified events.
-			this.allbeliefs[info.id] = info;
+			//var oldbel = this.allbeliefs[info.id];
+			//if(oldbel)
+			//	info.type = oldbel.type; // Hack!!! Keep capability information which is unavailable for modified events.
+			//this.allbeliefs[info.id] = info;
 			
 			var valinfo = " : "+info.valueType;
 			//if(kind.toLowerCase().indexof("beliefset")!=-1)
@@ -679,7 +718,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 			if(type.startsWith("created"))
 			{
 				//console.log("created goal");
-				this.allgoals.push(info);
+				//this.allgoals.push(info);
 				var valinfo = " : "+info.lifecycleState.toLowerCase()+" "+info.processingState.toLowerCase();
 				info.valinfo = valinfo;
 				refresh = this.createNodeDataForEvent(event);
@@ -693,7 +732,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 			{
 				//console.log("disposed goal");
 				refresh = this.getParentId(info.id);
-				this.removeElement(info, this.allgoals);
+				//this.removeElement(info, this.allgoals);
 				this.deleteNodeData(info.id);
 				
 				// todo remove tree node
@@ -729,7 +768,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 			if(type.startsWith("created"))
 			{
 				//console.log("created plan");
-				this.allplans.push(info);
+				//this.allplans.push(info);
 				var valinfo = " : "+info.state.toLowerCase();
 				info.valinfo = valinfo;
 				refresh = this.createNodeDataForEvent(event);
@@ -743,7 +782,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 			{
 				//console.log("disposed plan");
 				refresh = this.getParentId(info.id);
-				this.removeElement(info, this.allplans);
+				//this.removeElement(info, this.allplans);
 				this.deleteNodeData(info.id);
 				/*allplans.remove(event.getProperty("details"));
 				plans.remove(event.getProperty("details"));*/
@@ -822,7 +861,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 	
 	getMethodPrefix() 
 	{
-		return 'webjcc/invokeServiceMethod?cid='+this.getPlatformCid(this.cid)+'&servicetype='+this.myservice;
+		return 'webjcc/invokeServiceMethod?cid='+this.getPlatformCid(this.cid)+'&servicetype='+this.getJadexService();
 	}
 	
 	getPlatformCid(cid)
@@ -860,6 +899,29 @@ class BDIV3AgentDebuggerElement extends CidElement
 	hasSteps()
 	{
 		return this.steps!=null? this.steps.length>0: false;
+	}
+	
+	setState(state)
+	{
+		console.log("state is: "+state);
+		if(this.state!==state)
+		{
+			this.state = state;
+			if(state==="suspended")
+			{
+				this.subscribe();
+			}
+			else
+			{
+				this.terminateSubscription();
+				
+				this.emptyTree();
+				this.refreshTree();
+				this.steps = [];
+				this.history = [];
+				this.requestUpdate();
+			}
+		}
 	}
 	
 	stepToString(step)
