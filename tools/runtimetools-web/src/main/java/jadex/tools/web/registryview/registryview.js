@@ -45,17 +45,17 @@ class RegistryViewElement extends CidElement
 			.then(()=>
 			{
 				var res1 ="jadex/tools/web/registryview/st_styles.css";
-				var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+				//var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
 				var res2 ="jadex/tools/web/registryview/st_min.js";
-				var ures2 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
+				//var ures2 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 				
 				//console.log("load datatables start");
-				this.loadStyle(ures1)
+				this.loadServiceStyle(res1)
 				.then(()=>
 				{
 					//console.log("loaded datatables.js");
 					
-					this.loadScript(ures2)
+					this.import(res2)
 					.then(()=>
 					{
 						//console.log("loaded datatables.css");
@@ -341,6 +341,11 @@ class RegistryViewElement extends CidElement
 	getMethodPrefix() 
 	{
 		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype=jadex.tools.web.registryview.IJCCRegistryViewService';
+	}
+	
+	getJadexService()
+	{
+		return "jadex.tools.web.registryview.IJCCRegistryViewService";
 	}
 	
 	subscribeToX(x, interval, equals, add)

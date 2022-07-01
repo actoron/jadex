@@ -20,8 +20,8 @@ class ChatElement extends CidElement
 		this.previewimages = [];
 		
 		var res1 ="jadex/tools/web/chat/libs/emojibutton/emojibutton.js";
-		var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
-		return this.loadScript(ures1);
+		//var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+		return this.import(res1);
 	}
 	
 	postInit()
@@ -214,6 +214,11 @@ class ChatElement extends CidElement
 	getMethodPrefix() 
 	{
 		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype=jadex.tools.web.chat.IJCCChatService';
+	}
+	
+	getJadexService()
+	{
+		return "jadex.tools.web.chat.IJCCChatService";
 	}
 	
 	getSelectedUserCids()

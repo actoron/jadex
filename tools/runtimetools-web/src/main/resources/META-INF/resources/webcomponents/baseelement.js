@@ -244,6 +244,8 @@ export class BaseElement extends LitElement
 	
 	loadScript(url)
     {
+		//return this.import2(url);
+		
 		if(window.loadedScript==null)
 		{
 			window.calls = {};
@@ -309,6 +311,8 @@ export class BaseElement extends LitElement
 	
 	loadSubmodule(url)
     {
+		//return this.import2(url);
+	
 		if(window.loadedScript==null)
 		{
 			window.calls = {};
@@ -377,11 +381,27 @@ export class BaseElement extends LitElement
    	    	}
 		});	
     }
+
+	import(scriptpath)
+	{
+		return import(this.getResourceUrl(scriptpath, "text/javascript"));
+	}
+	
+	imports(scriptpaths)
+	{
+		let proms = [];
+		let self = this;
+		scriptpaths.forEach(path =>
+		{
+			proms.push(self.import(path));
+		})
+		return Promise.all(proms);
+	}
 	
 	loadServiceStyle(stylepath)
     {
 		//console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!load style ' + stylepath);
-		return this.loadStyle(this.getResourceUrl(stylepath));
+		return this.loadStyle(this.getResourceUrl(stylepath, "text/css"));
     }
 	
 	loadServiceStyles(stylepaths)
@@ -389,7 +409,7 @@ export class BaseElement extends LitElement
 		let stylepromises = [];
 		let self = this;
 		stylepaths.forEach(function(stylepath) {
-			stylepromises.push(self.loadServiceStyle(stylepath));
+			stylepromises.push(self.loadServiceStyle(stylepath, "text/css"));
 		})
 		
 		return Promise.all(stylepromises);
@@ -397,7 +417,8 @@ export class BaseElement extends LitElement
 	
 	loadServiceScript(scriptpath)
     {
-		return this.loadScript(this.getResourceUrl(scriptpath));
+		//return this.loadScript(this.getResourceUrl(scriptpath));
+		return this.loadSubmodule(this.getResourceUrl(scriptpath, "text/javascript"));
     }
 	
 	loadServiceScripts(scriptpaths)
@@ -431,12 +452,19 @@ export class BaseElement extends LitElement
 		});
 	}
 	
-	getResourceUrl(respath)
+	getResourceUrl(respath, mimetype)
 	{
 		if(!this.cid)
 			throw new Error("cid must not null");
-		let prefix = 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.getJadexService();
+		let prefix = '/webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.getJadexService();
+		//let hostport = location.host
+		//let hostport = location.protocol + '//' + location.host;
 		let url = prefix+'&methodname=loadResource&args_0='+respath+"&argtypes_0=java.lang.String";
+		if(mimetype)
+			url += "&__accept__="+mimetype;
+			
+		if(url.indexOf("load")!==url.lastIndexOf("load"))
+			console.log("url is: "+url);
 		return url;
 	}
 	

@@ -34,17 +34,19 @@ class SecurityElement extends CidElement
 		this.selnet = null;
 		this.netname = null;
 		
-		let ret = new Promise((resolve, reject) => {
+		let ret = new Promise((resolve, reject) => 
+		{
 			console.log("security: "+this.cid);
 			
-			this.myservice = "jadex.tools.web.security.IJCCSecurityService";
+			//this.myservice = "jadex.tools.web.security.IJCCSecurityService";
 		
-			let res1 ="jadex/tools/web/security/scrypt.js";
-			let ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+			//let res1 ="jadex/tools/web/security/scrypt.js";
+			//let ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
 	
 			//console.log("jstree load files start");
 			
-			this.loadScript(ures1).then((values) => 
+			//this.loadScript(ures1).then((values) => 
+			this.import("jadex/tools/web/security/scrypt.js").then((values) => 
 			{
 				//console.log("scrypt load ok");
 				if(window.scrypt!=null)
@@ -59,6 +61,13 @@ class SecurityElement extends CidElement
 			});
 		});
 		return ret;
+		
+		
+	}
+	
+	getJadexService()
+	{
+		return "jadex.tools.web.security.IJCCSecurityService";
 	}
 	
 	postInit()

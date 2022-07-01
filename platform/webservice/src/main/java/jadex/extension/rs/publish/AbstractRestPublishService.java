@@ -54,6 +54,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.collection.LeaseTimeMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DelegationResultListener;
@@ -146,9 +147,18 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	
 	/** Finished result marker. */
 	public static final String FINISHED	= "__finished__";
+	
+	/** URL parameter random request. */
+	public static final String RANDOM = "__random";
+	
+	/** URL parameter type request. */
+	public static final String CONTENTTYPE = "contenttype";
+	
+	/** URL parameter accept request. */
+	public static final String ACCEPT = "__accept__";
 
 	/** Some basic media types for service invocations. */
-	public static List<String> PARAMETER_MEDIATYPES = Arrays.asList(new String[]{MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML});
+	public static final List<String> PARAMETER_MEDIATYPES = Arrays.asList(new String[]{MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML});
 
 	/** The component. */
 	@ServiceComponent
@@ -1392,6 +1402,24 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		
 		return ret;
 	}
+	
+	public static void addMimeTypes(Object cs, List<String> types)
+	{
+		if(cs instanceof Collection)
+		{
+			for(String c : (Collection<String>)cs)
+			{
+				if(!types.contains(c))
+					types.add(c);
+			}
+		}
+		else if(cs instanceof String)
+		{
+			String c = (String)cs;
+			if(!types.contains(c))
+				types.add(c);
+		}
+	}
 
 	/**
 	 * Map the incoming uri/post/multipart parameters to the service target
@@ -1413,8 +1441,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			// posted form data not for multi-part
 			if(request.getQueryString() != null)
 				inparamsmap.putAll(splitQueryString(request.getQueryString()));
-			// Hack, removes internal random id used to avoid browser cache
-			inparamsmap.remove("__random");
 
 			// Read multi-part form data
 			if(request.getContentType() != null && request.getContentType().startsWith(MediaType.MULTIPART_FORM_DATA) && request.getParts().size() > 0)
@@ -1436,6 +1462,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					}
 				}
 			}
+			
+			// Hack, removes internal random id used to avoid browser cache
+			inparamsmap.remove(RANDOM);
+			// For GET requests attribute 'contenttype' are added
+			Object cs = inparamsmap.remove(CONTENTTYPE); // why not accept
+			
+			//if(cs!=null)
+			//	System.out.println("found contenttype: "+cs);
 					
 			// Find correct method using paramter count
 			MappingInfo mi = null;
@@ -1479,7 +1513,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				else if(matches2.size()>0)
 				{
 					matches2.sort((x,y) -> ((Integer)y[2]).intValue()-((Integer)x[2]).intValue());
-					Object[] res = matches1.get(0);
+					Object[] res = matches2.get(0);
 					mi = (MappingInfo)res[0];
 					binding = (Map<String, String>)res[1];
 				}
@@ -1500,26 +1534,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			// acceptable media types for input
 			//String mts = request.getHeader("Content-Type");
 			List<String> cl = parseMimetypes(ct);
+			addMimeTypes(cs, cl);
 
-			// For GET requests attribute 'contenttype' are added
-			Object cs = inparamsmap.remove("contenttype");
-			if(cs instanceof Collection)
-			{
-				for(String c : (Collection<String>)cs)
-				{
-					if(!cl.contains(c))
-						cl.add(c);
-				}
-			}
-			else if(cs instanceof String)
-			{
-				String c = (String)cs;
-				if(!cl.contains(c))
-					cl.add(c);
-			}
-
-			// Why not consumed media types?!
-			List<String> sr = new ArrayList<String>(mi.getProducedMediaTypes());
+			List<String> sr = new ArrayList<String>(mi.getConsumedMediaTypes());
 			if(sr == null || sr.size() == 0)
 			{
 				sr = cl;
@@ -2022,8 +2039,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	protected void writeResponse(ResponseInfo ri)
 //	protected void writeResponse(Object result, int status, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin, Integer max)
 	{		
-		if(ri.getRequest().getQueryString()!=null && ri.getRequest().getQueryString().indexOf("suspend")!=-1)
-			System.out.println("writeResponse: "+ri.getResult()+", "+ri.getRequest().getRequestURI()+", "+ri.getCallid());
+		//if(ri.getRequest().getQueryString()!=null && ri.getRequest().getQueryString().indexOf(ACCEPT)!=-1)
+		//	System.out.println("writeResponse: "+ri.getResult()+", "+ri.getRequest().getRequestURI()+", "+ri.getCallid()+" "+ ri.getRequest().getQueryString());
 		// Only write response on first exception
 		if(isComplete(ri.getRequest(), ri.getResponse()))
 			return;
@@ -2047,7 +2064,10 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	//	HttpServletRequest request, HttpServletResponse response, boolean fin, Integer max)
 	protected List<String> writeResponseHeader(ResponseInfo ri)
 	{
-		List<String> sr = null;
+		List<String> sr = ri.getResultTypes();
+		if(sr==null)
+			sr = new ArrayList<String>();
+		//List<String> sr = null;
 
 		if(ri.getResult() instanceof Response)
 		{
@@ -2063,7 +2083,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			ri.setResult(resp.getEntity());
 			if(resp.getMediaType() != null)
 			{
-				sr = new ArrayList<String>();
+				//sr = new ArrayList<String>();
 				sr.add(resp.getMediaType().toString());
 			}
 		}
@@ -2073,9 +2093,16 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				ri.getResponse().setStatus(ri.getStatus());
 
 			// acceptable media types for response (HTTP is case insensitive!)
+			List<String> cl = new ArrayList<String>();
+			String acc = ri.getRequest().getParameter(ACCEPT);
+			if(acc!=null)
+				addMimeTypes(acc, cl);
 			String mts = ri.getRequest().getHeader("accept");
-			List<String> cl = parseMimetypes(mts);
-			sr = ri.getMappingInfo() == null ? null : ri.getMappingInfo().getProducedMediaTypes();
+			cl.addAll(parseMimetypes(mts));
+			
+			List<String> pmt = ri.getMappingInfo() == null ? null : ri.getMappingInfo().getProducedMediaTypes();
+			if(pmt!=null)
+				sr.addAll(pmt);
 			if(sr == null || sr.size() == 0)
 			{
 				sr = cl;

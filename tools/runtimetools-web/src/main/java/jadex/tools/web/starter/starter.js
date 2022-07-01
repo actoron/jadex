@@ -17,18 +17,24 @@ class StarterElement extends CidElement
 		
 		var res1 = "jadex/tools/web/commons/modeltree.js";
 		var res2 = "jadex/tools/web/commons/componenttree.js";
-		var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
-		var ures2 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
+		//var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+		//var ures2 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 
 		// load subcomponents
-		var p1 = this.loadSubmodule(ures1);
-		var p2 = this.loadSubmodule(ures2);
+		//var p1 = this.loadSubmodule(ures1);
+		//var p2 = this.loadSubmodule(ures2);
 		
 		//Promise.all([p1, p2]).then((values) => 
 		//{
 			//console.log("starter load files ok");
 		//});
-		return Promise.all([p1, p2]);
+		//return Promise.all([p1, p2]);
+		return this.imports([res1, res2]);
+	}
+	
+	getJadexService()
+	{
+		return "jadex.tools.web.debugger.IJCCStarterService";
 	}
 	
 	connectedCallback() 

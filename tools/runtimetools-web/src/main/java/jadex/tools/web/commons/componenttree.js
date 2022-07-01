@@ -18,8 +18,7 @@ class ComponentTree extends BaseElement
 		this.treedata["#"] = {};
 		this.treeid = "componenttree";
 		this.info = null;
-		//this.commands = [];
-
+		//this.commands = []
 		// fixed types
 		var cloud = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/cloud.png';
 		var applications = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/commons/images/applications.png';
@@ -795,6 +794,11 @@ class ComponentTree extends BaseElement
 	getMethodPrefix() 
 	{
 		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype=jadex.tools.web.starter.IJCCStarterService';
+	}
+	
+	getJadexService()
+	{
+		return "jadex.tools.web.debugger.IJCCStarterService";
 	}
 	
 	getTree(treeid)

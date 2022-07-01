@@ -18,9 +18,9 @@ class DebuggerElement extends CidElement
 		this.sub = {};
 		
 		// load subcomponent
-		var res = "jadex/tools/web/commons/componenttree.js";
-		var ures = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String";
-		return this.loadSubmodule(ures);
+		//var res = "jadex/tools/web/commons/componenttree.js";
+		//var ures = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String";
+		return this.imports(["jadex/tools/web/commons/componenttree.js", "jadex/tools/web/commons/ringbuffer.js"]);
 	}
 	
 	postInit()

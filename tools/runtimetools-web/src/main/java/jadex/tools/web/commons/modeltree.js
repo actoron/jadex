@@ -189,13 +189,13 @@ class ModelTree extends CidElement
 			//var res2 = "jadex/tools/web/commons/libs/jstree_3.3.7.js";
 			var res1 ="jadex/tools/web/commons/libs/jstree-3.3.12/themes/default/style.css";
 			var res2 = "jadex/tools/web/commons/libs/jstree-3.3.12/jstree.js";
-			var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
-			var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
+			//var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+			//var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 	
 			//console.log("jstree load files start");
 			
-			var p1 = self.loadStyle(ures1);
-			var p2 = self.loadScript(ures2);
+			var p1 = self.loadServiceStyle(res1);
+			var p2 = self.import(res2);
 			
 			Promise.all([p1, p2]).then((values) => 
 			{
@@ -213,6 +213,11 @@ class ModelTree extends CidElement
 	getMethodPrefix() 
 	{
 		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype=jadex.tools.web.starter.IJCCStarterService';
+	}
+	
+	getJadexService()
+	{
+		return "jadex.tools.web.starter.IJCCStarterService";
 	}
 		
 	getModelNames()
