@@ -571,7 +571,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 			+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		response =>
 		{
-			//console.log("service sub received: "+response.data);
+			console.log("service sub received comp event: "+response.data);
 			
 			self.sub.connected = true;
 			var event = response.data;
@@ -630,7 +630,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 	{
 		//console.log("event: "+event.type);
 	
-		if(this.state!=="suspended")
+		if(this.state!=="suspended" || this.sub.callid==null)
 			return;
 		
 		var type = event.type.toLowerCase();
@@ -639,7 +639,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 		
 		if(type.startsWith("created") && type.endsWith("step"))
 		{
-			console.log("add step: "+event.properties.id);
+			//console.log("add step: "+event.properties.id);
 			this.steps.push(event);
 			//if(laststep==null && steps.size()==1)
 			//	sl.setSelectedIndex(0);

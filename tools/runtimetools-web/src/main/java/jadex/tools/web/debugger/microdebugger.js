@@ -14,9 +14,21 @@ class MicroAgentDebuggerElement extends CidElement
 		this.myservice = "jadex.tools.web.debugger.IJCCDebuggerService";
 		this.sub = {};
 		this.steps = [];
-		this.history = [];
+		//this.history = [];
 		this.selstep = null;
-		this.subscribe();
+		
+		var self = this;
+		return new Promise((resolve, reject) =>
+		{
+			// load subcomponent
+            this.import("jadex/tools/web/commons/ringbuffer.js").then((module) =>
+            {
+				self.history = new module.RingBuffer(500);
+				self.subscribe();
+				resolve();
+			})
+			.catch(err => {console.log(err); reject(err);})
+		});
 	}
 	
 	connectedCallback()
@@ -31,6 +43,11 @@ class MicroAgentDebuggerElement extends CidElement
 		super.disconnectedCallback();
 		this.concom = false;	
 		this.terminateSubscription();
+	}
+	
+	getJadexService()
+	{
+		return "jadex.tools.web.debugger.IJCCDebuggerService";
 	}
 	
 	subscribe(interval)
@@ -209,14 +226,14 @@ class MicroAgentDebuggerElement extends CidElement
 	
 	getHistory()
 	{
-		return this.history!=null? this.history: [];
+		return this.history!=null? this.history.toArray(): [];
 	}
 	
 	toggleHistory()
 	{
 		var elem = this.shadowRoot.getElementById("historyon");
 		if(!elem.checked)
-			this.history.length = 0;
+			this.history.clear();
 		this.requestUpdate();
 	}
 	
