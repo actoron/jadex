@@ -20,7 +20,7 @@ class ModelTree extends CidElement
 	
 	init()
 	{
-		console.log("modetree init");
+		console.log("modeltree init");
 		
 		let self = this;
 		this.app.lang.listeners.add(this);

@@ -62,6 +62,9 @@ export class BaseElement extends LitElement
 		
 		//console.log("const of baseelem");
 		
+		// Add holder for subcomponent initialization promises (subcomp-id -> promise)
+		this.subcomps = {};
+		
 		let self = this;
 		//console.log(typeof self.prototype.init);
 		self.preInit().then(() =>
@@ -77,11 +80,17 @@ export class BaseElement extends LitElement
 			let callpostinit = function() 
 			{
 				self.inited = true;
-				self.requestUpdate();//.then(() => 
+				self.requestUpdate();//.then(() =>
 				self.updateComplete.then(() =>
 				{
 					//console.log("update done, calling postinit");
 					self.postInit();
+					let id = self.getAttribute('id');
+					if (id){
+						if (self.getParentComponent())
+							self.getParentComponent().subcomponentInitialized(id);
+					}
+					
 				}).catch(err => 
 				{
 					console.log("Error updating element: " + self.constructor.name)
@@ -468,10 +477,65 @@ export class BaseElement extends LitElement
 		return url;
 	}
 	
+	getParentComponent()
+	{
+		let parent = null;
+		var p = this.shadowRoot;
+		
+		// Defensive checks, if in doubt, report no parent.
+		if (p){
+			p = p.host;
+			if (p) {
+				p = p.getRootNode();
+				if (p) {
+					p = p.host;
+					if (p.getParentComponent)
+						parent = p;
+				}
+			}
+		}
+		
+		return parent;
+	}
+	
 	switchLanguage() 
 	{
 	    this.app.lang.switchLanguage(); 
 	    //this.requestUpdate(); // update is done via event listeners on the language object
+	}
+	
+	waitForSubcomponentById(id)
+	{
+		
+	}
+	
+	waitForSubcomponent(id)
+	{
+		let prom = this.subcomps[id];
+		if (!prom) {
+			let resolvefunc;
+			prom = new Promise((resolve, reject) => {
+				resolvefunc = resolve;
+				setTimeout(() => {
+					reject("Waiting for subcomponent " + id + " failed: 30s Timeout.");
+				}, 30000);
+			});
+			prom.resolve = resolvefunc;
+			this.subcomps[id] = prom;
+		}
+		return prom;
+	}
+	
+	subcomponentInitialized(id)
+	{
+		let prom = this.subcomps[id];
+		if (prom) {
+			prom.resolve();
+		} else {
+			prom = Promise.resolve(id);
+			this.subcomps[id] = prom;
+		}
+		console.log('Loaded: ' + id)
 	}
 	
 	createErrorMessage(text, data) 
