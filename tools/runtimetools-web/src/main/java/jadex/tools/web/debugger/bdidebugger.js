@@ -1,7 +1,6 @@
 let { LitElement, html, css } = modLoad('lit-element');
 let { BaseElement } = modLoad('base-element');
 let { CidElement } = modLoad('cid-element');
-let { RingBuffer } = modLoad('ringbuffer');
 
 // Tag name 'jadex-bdiagentdebugger'
 class BDIV3AgentDebuggerElement extends CidElement 
@@ -20,6 +19,8 @@ class BDIV3AgentDebuggerElement extends CidElement
 		this.treeopens = {};
 		this.treerefreshtimer = null;
 		this.state = null;
+		this.hidesteps = false;
+		this.picpre = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/debugger/images/';
 		
 		//this.allgoals = [];
 		//this.allplans = [];
@@ -49,8 +50,8 @@ class BDIV3AgentDebuggerElement extends CidElement
 		
 		//var res1 = "jadex/tools/web/commons/detailsview.js";
 		//var ures1 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
-		var res2 = "jadex/tools/web/commons/ringbuffer.js";
-		var ures2 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
+		//var res2 = "jadex/tools/web/commons/ringbuffer.js";
+		//var ures2 = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 
 		
 		var self = this;
@@ -58,13 +59,14 @@ class BDIV3AgentDebuggerElement extends CidElement
 		{
 			// load subcomponents
 			let scripts = ["jadex/tools/web/commons/detailsview.js", "jadex/tools/web/commons/ringbuffer.js"];
-            this.loadServiceScripts(scripts).then(() =>
+            this.imports(scripts).then((modules) =>
             {
-				this.history = new RingBuffer();
+				self.history = new modules[1].RingBuffer(500);
 	
-				this.initTree()
+				self.initTree()
 				.then(() => 
 				{
+					// hack?! fetch the state from parent / can be make parent set the state?!
 					var parent = self.shadowRoot.host.getRootNode().host;
 					self.setState(parent.getState()); 
 					resolve();
@@ -569,7 +571,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 			+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		response =>
 		{
-			//console.log("service sub received: "+response.data);
+			console.log("service sub received comp event: "+response.data);
 			
 			self.sub.connected = true;
 			var event = response.data;
@@ -628,7 +630,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 	{
 		//console.log("event: "+event.type);
 	
-		if(this.state!=="suspended")
+		if(this.state!=="suspended" || this.sub.callid==null)
 			return;
 		
 		var type = event.type.toLowerCase();
@@ -637,7 +639,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 		
 		if(type.startsWith("created") && type.endsWith("step"))
 		{
-			console.log("add step: "+event.properties.id);
+			//console.log("add step: "+event.properties.id);
 			this.steps.push(event);
 			//if(laststep==null && steps.size()==1)
 			//	sl.setSelectedIndex(0);
@@ -918,7 +920,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 				this.emptyTree();
 				this.refreshTree();
 				this.steps = [];
-				this.history = [];
+				this.history.clear();
 				this.requestUpdate();
 			}
 		}
@@ -948,14 +950,14 @@ class BDIV3AgentDebuggerElement extends CidElement
 	
 	getHistory()
 	{
-		return this.history!=null? this.history: [];
+		return this.history!=null? this.history.toArray(): [];
 	}
 	
 	toggleHistory()
 	{
 		var elem = this.shadowRoot.getElementById("historyon");
 		if(!elem.checked)
-			this.history.length = 0;
+			this.history.clear();
 		this.requestUpdate();
 	}
 	
@@ -1063,6 +1065,12 @@ class BDIV3AgentDebuggerElement extends CidElement
 				grid-template-rows: minmax(200px, 30vh) minmax(200px, 30vh);
 				grid-gap: 10px;
 			}
+			.grid-container-closed {
+				display: grid;
+				grid-template-columns: minmax(auto, 1fr); 
+				grid-template-rows: minmax(200px, 60vh);
+				grid-gap: 10px;
+			}
 			.span {
 				grid-row: 1 / 4;
 			}
@@ -1087,6 +1095,10 @@ class BDIV3AgentDebuggerElement extends CidElement
 			.nomarginbottom {
 				margin-bottom: 0.5em;
 			}
+			.imgpad {
+				padding-top: 5px;
+				padding-bottom: 5px;
+			}
 		    `);
 		return ret;
 	}
@@ -1094,14 +1106,15 @@ class BDIV3AgentDebuggerElement extends CidElement
 	asyncRender() 
 	{
 		return html`
-			<div id="panel" class="grid-container">
+			<div id="panel" class="${this.hidesteps? 'grid-container-closed': 'grid-container'}">
 				
 				<div class="back-lightgray span">
-					<h4 class="margin nomargintop nomarginbottom">${this.app.lang.t('BDI')}</h4>
+					<h4 class="margin nomargintop nomarginbottom">${this.app.lang.t('BDI')} 
+						<img src="${this.picpre+(this.hidesteps? 'left.png': 'right.png')}" class="right imgpad" @click="${e => {this.hidesteps = !this.hidesteps; this.requestUpdate();}}"></img></h4>
 					<div id="agent"></div>
 				</div>
 				
-				<div id="steps" class="back-lightgray inner">
+				<div id="steps" class="back-lightgray inner ${this.hidesteps? 'hidden': ''}">
 					<h4 class="margin nomargintop nomarginbottom">${this.app.lang.t('Steps')}</h4>
 					<div class="yscrollable h100">
 						<table class="margin">
@@ -1114,7 +1127,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 					</div>
 				</div>
 				
-				<div id="history" class="back-lightgray inner">
+				<div id="history" class="back-lightgray inner ${this.hidesteps? 'hidden': ''}">
 					<h4 class="margin nomargintop nomarginbottom">${this.app.lang.t('History')}</h4>
 					<div class="yscrollable h100">
 						<table class="margin">

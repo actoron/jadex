@@ -93,10 +93,10 @@ class ComponentTree extends BaseElement
 						});*/
 						
 						// Open root node after node has been loaded asyncronously
-						console.log("adding load_node listener");
+						//console.log("adding load_node listener");
 						self.getTree(self.treeid).on('load_node.jstree', function (event, args) 
 						{
-							console.log("loaded node: "+event+" "+args);
+							//console.log("loaded node: "+event+" "+args);
 							
 							if(args.node.id==="#")
 							{
@@ -155,7 +155,7 @@ class ComponentTree extends BaseElement
 									{
 										return new Promise(function(r, e)
 										{
-											console.log("loadComponentChildData: "+cid);
+											//console.log("loadComponentChildData: "+cid);
 											var url = self.getMethodPrefix()+'&methodname=getChildComponentDescriptions&args_0=null&args_1='+cid;
 											//console.log("fetching: "+url);
 											axios.get(url, self.transform).then(function(resp)

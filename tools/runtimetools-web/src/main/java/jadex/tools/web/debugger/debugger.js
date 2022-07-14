@@ -16,11 +16,12 @@ class DebuggerElement extends CidElement
 		this.breakpointnames = []; // loaded from model
 		this.breakpoints = []; // active breakpoints selected by user
 		this.sub = {};
-		
+
+		var self = this;		
 		// load subcomponent
 		//var res = "jadex/tools/web/commons/componenttree.js";
 		//var ures = this.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String";
-		return this.imports(["jadex/tools/web/commons/componenttree.js", "jadex/tools/web/commons/ringbuffer.js"]);
+		return this.import("jadex/tools/web/commons/componenttree.js");
 	}
 	
 	postInit()
@@ -84,7 +85,7 @@ class DebuggerElement extends CidElement
 	{
 		this.updater = setInterval(() =>
 		{
-			//console.log("Update buttons");
+			console.log("Update buttons");
 			this.updateButtons();
 		}, 1000);
 		//console.log("updater: "+this.updater);
@@ -285,17 +286,20 @@ class DebuggerElement extends CidElement
 	{
 		var self = this;
 		
+		console.log("pause pressed");
+		
 		this.setEnabled("pause", false);
 		return new Promise(function(resolve, reject) 
 		{
 			axios.get(self.getMethodPrefix()+'&methodname=suspendComponent&args_0='+self.getAgentName(), self.transform).then(resp =>
 			{
+				console.log("pause succ");
 				self.setDescription(resp.data);
 				self.requestUpdate();
 				resolve(resp.data);
 			}).catch(function(err) 
 			{
-				console.log("err: "+err);	
+				console.log("pause err: "+err);	
 				self.requestUpdate();
 				reject(err);
 			});
@@ -309,17 +313,26 @@ class DebuggerElement extends CidElement
 		this.setEnabled("step", false);
 
 		var stepinfo = this.getStepInfo();
+
+		console.log("step pressed");
 		
 		return new Promise(function(resolve, reject) 
 		{
-			axios.get(self.getMethodPrefix()+'&methodname=stepComponent&args_0='+self.getAgentName()+"&args_1="+stepinfo, self.transform).then(resp =>
+			axios.get(self.getMethodPrefix()
+				+"&methodname=stepComponent"
+				+"&args_0="+self.getAgentName()
+				+"&args_1="+stepinfo
+				+"&argtypes_0=jadex.bridge.IComponentIdentifier"
+				+"&argtypes_1=java.lang.String",
+				self.transform).then(resp =>
 			{
+				console.log("step succ");
 				self.setDescription(resp.data);
 				self.requestUpdate();
 				resolve(resp.data);
 			}).catch(function(err) 
 			{
-				console.log("err: "+err);
+				console.log("step err: "+err);
 				self.requestUpdate();	
 				reject(err);
 			});

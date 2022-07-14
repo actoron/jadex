@@ -222,7 +222,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		converters = new MultiCollection<String, IObjectStringConverter>();
 		conversationinfos = new LinkedHashMap<String, ConversationInfo>();
 		sseevents = new ArrayList<SSEEvent>();
-		sessions = new LeaseTimeMap<String, Map<String,Object>>(1000*60*10);// new HashMap<String, Map<String,Object>>();
+		//sessions = new LeaseTimeMap<String, Map<String,Object>>(1000*60*10);// new HashMap<String, Map<String,Object>>();
+		sessions = new HashMap<String, Map<String,Object>>();// new HashMap<String, Map<String,Object>>();
 
 		// todo: move this code out
 		IObjectStringConverter jsonc = new IObjectStringConverter()
@@ -695,6 +696,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					final MappingInfo mi = tup.getFirstEntity();
 					Object[] params = tup.getSecondEntity();
 					
+					//System.out.println("handleRequest: "+mi.getMethod());
+					
 					//if(mi.getMethod().toString().indexOf("invokeServiceMe")!=-1)
 					//	System.out.println("heeereeee");
 					
@@ -873,7 +876,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 											}
 											else
 											{
-												System.out.println("No sse connection, delay sending: "+result+" "+session);
+												System.out.println("No sse connection, delay sending: "+result+" "+sessionid);
 												sseevents.add(createSSEEvent(ri));
 												return;
 											}
@@ -1083,9 +1086,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					    response.setStatus(HttpServletResponse.SC_OK);
 						//out.write("data: {'a': 'a'}\n\n");
 						response.flushBuffer();
-					    System.out.println("sse connection saved: "+request.getAsyncContext()+" "+getSessionId(request));
+					    System.out.println("sse connection saved: "+request.getAsyncContext()+" "+fsessionid+" "+getSessionId(request));
 					    
-					    sendDelayedSSEEvents(getSession(sessionid, true));
+					    sendDelayedSSEEvents(getSession(fsessionid, true));
 					}
 					else
 					{
@@ -2165,7 +2168,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		//}
 				
 		if(ri.getException()!=null)
-			System.out.println("timeout ex"+ri);
+			System.out.println("ex: "+ri.getException());
 			
 		try
 		{
@@ -2189,8 +2192,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					return;
 				}
 				
-				if(ri.isSSEConnectionAvailable())
-				{
+				//if(ri.isSSEConnectionAvailable())
+				//{
 					PrintWriter out = ri.getResponse().getWriter();
 					String ret = createSSEJson(event);
 					out.write(ret);				
@@ -2201,14 +2204,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					//System.out.println(ri.getResponse());
 					
 					//System.out.println("SSE response content:  "+ret);
-				}
-				else
-				{
-					sseevents.add(event);
+				//}
+				//else
+				//{
+				//	sseevents.add(event);
 					
 					// defer response
-					System.out.println("no SSE connection - delaying event: "+event);
-				}
+				//	System.out.println("no SSE connection - delaying event: "+event+" "+getSessionId(ri.getRequest()));
+				//}
 			}
 			// Send normal http response
 			else

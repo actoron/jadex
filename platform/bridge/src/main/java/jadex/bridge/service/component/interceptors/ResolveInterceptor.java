@@ -187,8 +187,8 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 				Object[] as = (Object[])args.get(2);
 				//ClassInfo rettype = (ClassInfo)args.get(3);
 				
-				if(ia.getId().toString().indexOf("Hello")!=-1)
-					System.out.println("invoke on: "+ia.getId());
+				//if(ia.getId().toString().indexOf("Hello")!=-1)
+				//	System.out.println("invoke on: "+ia.getId());
 				
 				//if(methodname.indexOf("postIm")!=-1)
 				//	System.out.println("herere");
@@ -220,6 +220,9 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 						}
 					}
 				}
+				
+				if(methodname.indexOf("stepComponent")!=-1)
+					System.out.println("steppi");
 				
 				Tuple2<java.lang.reflect.Method, Object[]> res = findMethod(as, argtypes, si.getDomainService().getClass(), methodname);
 				

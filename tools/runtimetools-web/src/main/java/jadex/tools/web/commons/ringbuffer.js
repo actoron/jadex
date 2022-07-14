@@ -2,6 +2,9 @@ export class RingBuffer
 {
 	constructor(n) 
 	{
+		if(!n)
+			n = 100;
+		this.n = n;
     	this.values = new Array(n);
 		this.pos = 0;
 	}
@@ -41,6 +44,17 @@ export class RingBuffer
 			}
 		}
 		return ret;
+	}
+	
+	clear()
+	{
+		this.values = new Array(this.n);
+		this.pos = 0;
+	}
+	
+	push(v)
+	{
+		this.add(v);
 	}
 	
 	toString() 
