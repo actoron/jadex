@@ -1,7 +1,10 @@
 package jadex.commons.future;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.commons.SReflect;
 
 /**
  *  A terminable intermediate delegation future can be used when a termination intermediate future 
@@ -31,6 +34,8 @@ public class TerminableIntermediateDelegationFuture<E> extends IntermediateFutur
 	/** The list of stored infos, to be sent when src is connected. */ 
 	protected List<Object> storedinfos;
 	
+	protected Exception ex;
+	
 	//-------- constructors --------
 	
 	/**
@@ -38,6 +43,7 @@ public class TerminableIntermediateDelegationFuture<E> extends IntermediateFutur
 	 */
 	public TerminableIntermediateDelegationFuture()
 	{
+		ex = new RuntimeException();
 	}
 	
 	/**
@@ -45,6 +51,7 @@ public class TerminableIntermediateDelegationFuture<E> extends IntermediateFutur
 	 */
 	public TerminableIntermediateDelegationFuture(ITerminableIntermediateFuture<?> src)
 	{
+		ex = new RuntimeException();
 		src.addResultListener(new TerminableIntermediateDelegationResultListener(this, src));
 	}
 	
@@ -116,8 +123,22 @@ public class TerminableIntermediateDelegationFuture<E> extends IntermediateFutur
 				this.reason	= reason;
 		}
 		
+		if(src==null)
+		{
+			System.out.println("delegation future without source");
+			ex.printStackTrace();
+		}
+		
 		if(mynotify)
+		{
+			System.out.println("terminate forwarded: "+this+" "+src+" "+getTerminationCommand());
 			src.terminate(reason);
+		}
+		else
+		{
+			System.out.println("terminate not forwarded: "+this+" "+src+" "+getTerminationCommand());
+			//System.out.println("terminate not forwarded: "+notified+" "+this+" "+src);
+		}
 	
 		// TODO: why stored infos after terminate? -> should be done in set source??? 
 //		if(storedinfos!=null)
@@ -129,6 +150,92 @@ public class TerminableIntermediateDelegationFuture<E> extends IntermediateFutur
 //			storedinfos = null;
 //		}
 	}
+	
+	/**
+	 * 
+	 * /
+	protected void printSourceDetails()
+	{
+		try
+		{
+			Object p = src;
+			
+			while(p!=null)
+			{
+				Field f = SReflect.getField(p.getClass(), "src");
+				if(f!=null)
+				{
+					Object nextp = f.get(p);
+					if(nextp==null)
+						break;
+					else
+						p = nextp;
+				}
+				else
+				{
+					break;
+				}
+			}
+			
+			Object term = null;
+			if(p!=null)
+			{
+				Field f = SReflect.getField(p.getClass(), "terminate");
+				if(f!=null)
+					term = f.get(p);
+			}
+			
+			System.out.println("Source infos of terminable: "+this+" term="+term+" p="+p+" src="+src);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}*/
+	
+	/**
+	 * 
+	 */
+	protected Object getTerminationCommand()
+	{
+		try
+		{
+			Object p = src;
+			
+			while(p!=null)
+			{
+				Field f = SReflect.getField(p.getClass(), "src");
+				if(f!=null)
+				{
+					Object nextp = f.get(p);
+					if(nextp==null)
+						break;
+					else
+						p = nextp;
+				}
+				else
+				{
+					break;
+				}
+			}
+			
+			Object term = null;
+			if(p!=null)
+			{
+				Field f = SReflect.getField(p.getClass(), "terminate");
+				if(f!=null)
+					term = f.get(p);
+			}
+			
+			return term;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	
 	/**
 	 *  Send a backward command in direction of the source.

@@ -71,10 +71,14 @@ public class JCCDebuggerPluginAgent extends JCCPluginAgent implements IJCCDebugg
 	 */
 	public IFuture<IComponentDescription> suspendComponent(IComponentIdentifier compo)
 	{
+		System.out.println("JCCDebugger suspend 1: "+compo);
 		Future<IComponentDescription> ret = new Future<IComponentDescription>();
 		agent.getExternalAccess(compo).suspendComponent().then(Void ->
 		{
-			agent.getDescription(compo).delegate(ret);
+			System.out.println("JCCDebugger suspend 2: "+compo);
+			IFuture<IComponentDescription> fut = agent.getDescription(compo);
+			fut.then(x -> System.out.println("JCCDebugger suspend 3: "+compo)).catchEx(ex -> System.out.println("JCCDebugger suspend 4: "+compo));
+			fut.delegate(ret);
 		}).catchEx(ret);
 		return ret;
 	}

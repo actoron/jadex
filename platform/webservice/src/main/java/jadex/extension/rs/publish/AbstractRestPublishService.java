@@ -584,7 +584,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			// check if call is an intermediate result fetch
 			String terminate = request.getHeader(HEADER_JADEX_TERMINATE);
 	
-			//System.out.println("handleRequest: "+callid+" "+terminate);
+			System.out.println("handleRequest: "+callid+" "+terminate);
 			
 			// request info manages an ongoing conversation
 			if(conversationinfos.containsKey(callid))
@@ -603,6 +603,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					
 					//IAsyncContextInfo ctx = getAsyncContextInfo(request);
 					//saveRequestContext(callid, ctx);
+					
+					System.out.println("request terminate conversation: "+callid);
 					
 					terminateConversation(rinfo, null);
 					
@@ -669,7 +671,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			// handle new call
 			else
 			{
-				//System.out.println("received new call: "+request);
+				System.out.println("received new call: "+request);
 					
 				String methodname = request.getPathInfo();
 	
@@ -717,9 +719,13 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					conversationinfos.put(fcallid, cinfo);
 	
 					// Check security
+					if(request.toString().indexOf("suspend")!=-1)
+						System.out.println("call 2: "+request);
 					BasicService.isUnrestricted(service.getServiceId(), component, mi.getMethod())
 					.then((Boolean unres) ->
 					{
+						if(request.toString().indexOf("suspend")!=-1)
+							System.out.println("call 3: "+request);
 						try
 						{
 							if(loginsec && !unres && !isLoggedIn(request))
@@ -737,6 +743,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 								
 								//System.out.println("request: "+request.getRequestURL()+" "+fcallid+" "+method.getName()+" "+Arrays.toString(params));
 								
+								if(request.toString().indexOf("suspend")!=-1)
+									System.out.println("call 4: "+request);
 								final Object ret = method.invoke(service, params);
 								ri.setMethod(method);
 
@@ -1158,7 +1166,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		}
 		else
 		{
-			System.out.println("WARNING: future cannot be terminated: "+cinfo);
+			System.out.println("WARNING: future cannot be terminated: "+cinfo+" "+cinfo.getFuture());
 		}
 	}
 	

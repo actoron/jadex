@@ -385,7 +385,7 @@
 					//terminated = true;
 					var r = reason==null? 'true': reason;
 					
-					//console.log("terminating request sent: "+path);
+					console.log("terminating request: "+path);
 					axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': r, 
 						'cache-control': 'no-cache, no-store', "x-jadex-sse": true}}, this.transform)
 						.then(resolve).catch(errhandler);

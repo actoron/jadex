@@ -11,7 +11,8 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.ServiceScope;
-import jadex.bridge.service.component.interceptors.ServiceGetter;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -20,7 +21,6 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -33,10 +33,11 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 public class MonitoringComponentFeature extends AbstractComponentFeature implements IMonitoringComponentFeature
 {
 	/** The subscriptions (subscription future -> subscription info). */
-	protected Map<SubscriptionIntermediateFuture<IMonitoringEvent>, Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>>	subscriptions;
+	protected Map<SubscriptionIntermediateFuture<IMonitoringEvent>, Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>> subscriptions;
 	
 	/** The monitoring service getter. */
-	protected ServiceGetter<IMonitoringService>	getter;
+	//protected ServiceGetter<IMonitoringService> getter;
+	protected IMonitoringService monser;
 
 	/** The event emit level for subscriptions. */
 	protected PublishEventLevel	emitlevelsub;
@@ -50,7 +51,26 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 		this.emitlevelsub = cinfo.getComponentDescription().getMonitoring();
 		if(emitlevelsub==null)
 			emitlevelsub = PublishEventLevel.OFF;
+		
 //		System.out.println("mon is: "+cinfo.getComponentDescription().getName()+" "+emitlevelsub);
+	}
+	
+	/**
+	 *  Execute the main activity of the feature.
+	 */
+	public IFuture<Void> body()
+	{
+		// todo?! make all components use the same query via doing the search in platform component and writing result in platform data
+		getComponent().getFeature(IRequiredServicesFeature.class).addQuery(new ServiceQuery<IMonitoringService>(IMonitoringService.class).setScope(ServiceScope.PLATFORM))
+		.next(monser ->
+		{
+			System.out.println("setting moser: "+monser);
+			this.monser = monser;
+		}).catchEx(ex ->
+		{
+			ex.printStackTrace();
+		});
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -81,7 +101,7 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 //		if((PublishTarget.TOALL.equals(pt) || PublishTarget.TOMONITORING.equals(pt) 
 //			&& event.getLevel().getLevel()<=getPublishEmitLevelMonitoring().getLevel()))
 //		{
-			return publishEvent(event, getMonitoringServiceGetter());
+			return publishEvent(event, monser);
 //		}
 //		else
 //		{
@@ -103,40 +123,28 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	/**
 	 *  Publish a monitoring event to the monitoring service.
 	 */
-	public static IFuture<Void> publishEvent(final IMonitoringEvent event, final ServiceGetter<IMonitoringService> getter)
+	public static IFuture<Void> publishEvent(final IMonitoringEvent event, final IMonitoringService monser)
 	{
 //		return IFuture.DONE;
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		if(getter!=null)
+		if(monser!=null)
 		{
-			getter.getService().addResultListener(new ExceptionDelegationResultListener<IMonitoringService, Void>(ret)
+//			System.out.println("Published: "+event);
+			monser.publishEvent(event).addResultListener(new DelegationResultListener<Void>(ret)
 			{
-				public void customResultAvailable(IMonitoringService monser)
+				public void exceptionOccurred(Exception exception)
 				{
-					if(monser!=null)
-					{
-//						System.out.println("Published: "+event);
-						monser.publishEvent(event).addResultListener(new DelegationResultListener<Void>(ret)
-						{
-							public void exceptionOccurred(Exception exception)
-							{
-								getter.resetService();
-								ret.setException(exception);
-							}
-						});
-					}
-					else
-					{
-//						System.out.println("Could not publish: "+event);
-						ret.setResult(null);
-					}
+					//MonitoringComponentFeature.this.monser = null;
+					System.out.println("Publish event problem: "+exception);
+					ret.setException(exception);
 				}
 			});
 		}
 		else
 		{
+			//System.out.println("No monitoring service to publish event: "+event);
 			ret.setResult(null);
 		}
 		
@@ -156,13 +164,13 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	 * Get the monitoring service getter.
 	 * 
 	 * @return The monitoring service getter.
-	 */
+	 * /
 	public ServiceGetter<IMonitoringService> getMonitoringServiceGetter()
 	{
 		if(getter == null)
 			getter = new ServiceGetter<IMonitoringService>(getInternalAccess(), IMonitoringService.class, ServiceScope.PLATFORM);
 		return getter;
-	}
+	}*/
 
 	/**
 	 * Forward event to all currently registered subscribers.
@@ -244,13 +252,14 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	 */
 	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel emitlevel)
 	{
-		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = (SubscriptionIntermediateFuture<IMonitoringEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class,
-			getInternalAccess());
-
+		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = (SubscriptionIntermediateFuture<IMonitoringEvent>)
+			SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getInternalAccess());
+		
 		ITerminationCommand tcom = new ITerminationCommand()
 		{
 			public void terminated(Exception reason)
 			{
+				System.out.println("terminated subscribeToEvents");
 				removeSubscription(ret);
 			}
 
@@ -262,8 +271,8 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 		ret.setTerminationCommand(tcom);
 
 		// Signal that subscription has been done
-		MonitoringEvent subscribed = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.TYPE_SUBSCRIPTION_START, System.currentTimeMillis(),
-			PublishEventLevel.COARSE);
+		MonitoringEvent subscribed = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), 
+			IMonitoringEvent.TYPE_SUBSCRIPTION_START, System.currentTimeMillis(),PublishEventLevel.COARSE);
 		boolean post = false;
 		try
 		{
@@ -273,9 +282,7 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 		{
 		}
 		if(post)
-		{
 			ret.addIntermediateResult(subscribed);
-		}
 
 		addSubscription(ret, filter, emitlevel);
 
@@ -300,6 +307,9 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	 */
 	protected void addSubscription(SubscriptionIntermediateFuture<IMonitoringEvent> future, IFilter<IMonitoringEvent> filter, PublishEventLevel emitlevel)
 	{
+		if(getComponent().getId().toString().toLowerCase().indexOf("cleaner")!=-1)
+			System.out.println("monitoring add subscription: "+future);
+			
 		if(subscriptions == null)
 			subscriptions = new LinkedHashMap<SubscriptionIntermediateFuture<IMonitoringEvent>, Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>>();
 		if(emitlevel.getLevel() > emitlevelsub.getLevel())
@@ -314,6 +324,9 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	 */
 	protected void removeSubscription(SubscriptionIntermediateFuture<IMonitoringEvent> fut)
 	{
+		if(getComponent().getId().toString().toLowerCase().indexOf("cleaner")!=-1)
+			System.out.println("monitoring remove subscription: "+fut);
+		
 		if(subscriptions == null || !subscriptions.containsKey(fut))
 			throw new RuntimeException("Subscriber not known: " + fut);
 		subscriptions.remove(fut);

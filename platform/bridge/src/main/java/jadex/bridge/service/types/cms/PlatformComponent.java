@@ -1762,13 +1762,16 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 //								System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 							
 							IFuture<Object>	fut	= doInvoke(ia, method, args);
+							// Must connect futures in case of subscriptions
+							// Otherwise termination will not work
+							FutureFunctionality.connectDelegationFuture(ret, fut);
 							
 							if(shutdown && debug)
 								PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute2: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+fut.isDone());
 							
 							try
 							{
-								boolean intermediate = SReflect.isSupertype(IIntermediateFuture.class, fut.getClass());
+								/*boolean intermediate = SReflect.isSupertype(IIntermediateFuture.class, fut.getClass());
 								if(shutdown && debug)
 									PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute2a: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+fut.isDone());
 								if(!intermediate)
@@ -1805,7 +1808,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 									fut.addResultListener(new IntermediateDelegationResultListener<>((IntermediateFuture)ret));
 									if(shutdown && debug)
 										PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute2e: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+fut.isDone());
-								}
+								}*/
 								return IFuture.DONE;
 							}
 							finally
@@ -1827,7 +1830,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					if(shutdown && debug)
 						PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute4: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+ret.isDone());
 					
-					IFuture<Object>	myret	= getDecoupledFuture(ret);
+					//IFuture<Object>	myret = getDecoupledFuture(ret);
+					IFuture<Object>	myret = getDecoupledFuture(ret);
 					
 					if(shutdown && debug)
 						PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute5: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+myret.isDone());
@@ -1849,7 +1853,6 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				//if(method.getName().indexOf("stepComp")!=-1)
 				//	System.out.println("call");
 			
-//				Future<Object> ret = new Future<>();
 			IFuture<Object> ret = null;
 			
 			try
@@ -1857,7 +1860,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				Class<?> iface = method.getDeclaringClass();
 				String name = SReflect.getClassName(iface);
 				String intname = SUtil.replaceLast(name, "External", "");
-//					System.out.println(name+" "+intname);
+//				System.out.println(name+" "+intname);
 				
 				Class<?> clazz = SReflect.findClass0(intname, null, ia.getClassLoader());
 				Object feat = clazz!=null? ia.getFeature0(clazz): null;
@@ -1932,7 +1935,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		}
 
 		/**
-		 *  Returns a future that schedules back to calling component if necessary..
+		 *  Returns a future that schedules back to calling component if necessary.
 		 *  @param infut Input future.
 		 *  @return 
 		 */

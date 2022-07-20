@@ -482,6 +482,9 @@ export class BaseElement extends LitElement
 		let parent = null;
 		var p = this.shadowRoot;
 		
+		//let parent = this.shadowRoot?.host?.getRootNode()?.host;
+		//return parent? parent: null;
+		
 		// Defensive checks, if in doubt, report no parent.
 		if (p){
 			p = p.host;

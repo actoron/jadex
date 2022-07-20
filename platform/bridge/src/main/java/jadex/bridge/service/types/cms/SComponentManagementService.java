@@ -1466,7 +1466,9 @@ public class SComponentManagementService
 	 */
 	public static IFuture<Void> suspendComponent(final IComponentIdentifier cid, IInternalAccess agent)
 	{
-		IFuture<Void>	ret;
+		System.out.println("cms suspend start: "+cid);
+		
+		IFuture<Void> ret;
 		
 		CMSComponentDescription desc = null;
 		boolean notifylisteners = false;
@@ -1507,6 +1509,8 @@ public class SComponentManagementService
 		
 		if(notifylisteners)
 			SComponentManagementService.notifyListenersChanged(desc);
+		
+		ret.then(x -> System.out.println("cms suspend end: "+cid)).catchEx(ex -> System.out.println("cms suspend end ex: "+cid+" "+ex));
 		
 		return ret;
 	}

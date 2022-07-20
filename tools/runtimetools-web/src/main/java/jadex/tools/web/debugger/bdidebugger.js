@@ -67,7 +67,8 @@ class BDIV3AgentDebuggerElement extends CidElement
 				.then(() => 
 				{
 					// hack?! fetch the state from parent / can be make parent set the state?!
-					var parent = self.shadowRoot.host.getRootNode().host;
+					//var parent = self.shadowRoot.host.getRootNode().host;
+					var parent = self.getParentComponent();
 					self.setState(parent.getState()); 
 					resolve();
 				})
@@ -620,7 +621,7 @@ class BDIV3AgentDebuggerElement extends CidElement
 			jadex.terminateCall(callid).then(() => 
 			{
 				this.sub.connected = false;
-				//console.log("Terminated subscription: "+self.callid)
+				console.log("Terminated subscription: "+callid)
 			})
 			.catch(err => {console.log("Could not terminate subscription: "+err+" "+callid)});
 		}

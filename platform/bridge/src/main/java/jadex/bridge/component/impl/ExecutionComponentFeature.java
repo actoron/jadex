@@ -1240,6 +1240,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		try {
 		
 		if(endstepcnt!=-1 && debug)
+		//if(getComponent().getId().toString().toLowerCase().indexOf("jcc")!=-1)
 			getComponent().getLogger().severe("execute()0: "+getComponent().getId()+", "+IComponentIdentifier.LOCAL.get()+", endstepcnt="+endstepcnt+", stepcnt="+stepcnt);
 
 		synchronized(this)
@@ -2052,8 +2053,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	protected void addStep(StepInfo step)
 	{
 		if(steps==null)
-			steps	= new TreeSet<StepInfo>();
+			steps = new TreeSet<StepInfo>();
 		steps.add(step);
+		
+		//if(getComponent().getId().toString().toLowerCase().indexOf("jccweb")!=-1)
+		//	System.out.println("addStep: "+getComponent().getId()+" "+step);
 		
 		publishStepEvent(step, IMonitoringEvent.EVENT_TYPE_CREATION);
 	}
