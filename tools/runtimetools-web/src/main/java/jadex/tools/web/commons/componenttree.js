@@ -798,7 +798,7 @@ class ComponentTree extends BaseElement
 	
 	getJadexService()
 	{
-		return "jadex.tools.web.debugger.IJCCStarterService";
+		return "jadex.tools.web.starter.IJCCStarterService";
 	}
 	
 	getTree(treeid)

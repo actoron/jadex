@@ -34,7 +34,7 @@ class StarterElement extends CidElement
 	
 	getJadexService()
 	{
-		return "jadex.tools.web.debugger.IJCCStarterService";
+		return "jadex.tools.web.starter.IJCCStarterService";
 	}
 	
 	connectedCallback() 
