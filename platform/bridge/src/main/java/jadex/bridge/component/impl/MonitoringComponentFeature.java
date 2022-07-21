@@ -259,7 +259,7 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 		{
 			public void terminated(Exception reason)
 			{
-				System.out.println("terminated subscribeToEvents");
+				//System.out.println("terminated subscribeToEvents");
 				removeSubscription(ret);
 			}
 
@@ -307,8 +307,8 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	 */
 	protected void addSubscription(SubscriptionIntermediateFuture<IMonitoringEvent> future, IFilter<IMonitoringEvent> filter, PublishEventLevel emitlevel)
 	{
-		if(getComponent().getId().toString().toLowerCase().indexOf("cleaner")!=-1)
-			System.out.println("monitoring add subscription: "+future);
+		//if(getComponent().getId().toString().toLowerCase().indexOf("cleaner")!=-1)
+		//	System.out.println("monitoring add subscription: "+future);
 			
 		if(subscriptions == null)
 			subscriptions = new LinkedHashMap<SubscriptionIntermediateFuture<IMonitoringEvent>, Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>>();
@@ -324,8 +324,8 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	 */
 	protected void removeSubscription(SubscriptionIntermediateFuture<IMonitoringEvent> fut)
 	{
-		if(getComponent().getId().toString().toLowerCase().indexOf("cleaner")!=-1)
-			System.out.println("monitoring remove subscription: "+fut);
+		//if(getComponent().getId().toString().toLowerCase().indexOf("cleaner")!=-1)
+		//	System.out.println("monitoring remove subscription: "+fut);
 		
 		if(subscriptions == null || !subscriptions.containsKey(fut))
 			throw new RuntimeException("Subscriber not known: " + fut);

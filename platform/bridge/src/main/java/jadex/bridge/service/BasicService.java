@@ -769,11 +769,11 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	{
 		IComponentIdentifier cid = sid.getProviderId();
 		
-		System.out.println("isUnrestricted 1: "+cid);
+		//System.out.println("isUnrestricted 1: "+cid);
 		
 		return component.getExternalAccess(cid).scheduleStep((IInternalAccess access) -> 
 		{
-			System.out.println("isUnrestricted 2: "+cid);
+			//System.out.println("isUnrestricted 2: "+cid);
 			Security sec = getSecurityLevel(access, null, null, null, method, sid);
 			Set<String>	roles = ServiceIdentifier.getRoles(sec, access);
 			return new Future<Boolean>(roles!=null && roles.contains(Security.UNRESTRICTED));

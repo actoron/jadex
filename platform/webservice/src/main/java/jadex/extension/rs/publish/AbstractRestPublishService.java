@@ -222,8 +222,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		converters = new MultiCollection<String, IObjectStringConverter>();
 		conversationinfos = new LinkedHashMap<String, ConversationInfo>();
 		sseevents = new ArrayList<SSEEvent>();
-		//sessions = new LeaseTimeMap<String, Map<String,Object>>(1000*60*10);// new HashMap<String, Map<String,Object>>();
-		sessions = new HashMap<String, Map<String,Object>>();// new HashMap<String, Map<String,Object>>();
+		sessions = new LeaseTimeMap<String, Map<String,Object>>(1000*60*10);// new HashMap<String, Map<String,Object>>();
+		//sessions = new HashMap<String, Map<String,Object>>();// new HashMap<String, Map<String,Object>>();
 
 		// todo: move this code out
 		IObjectStringConverter jsonc = new IObjectStringConverter()
@@ -569,7 +569,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				}
 				else
 				{
-					terminateConversation(cinfo, new RuntimeException("Terminated from client"));
+					terminateConversation(cinfo, new RuntimeException("Terminated from client"), true);
 				}
 				writeResponse(ri.setStatus(Response.Status.OK.getStatusCode()).setFinished(true));
 			}
@@ -584,7 +584,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			// check if call is an intermediate result fetch
 			String terminate = request.getHeader(HEADER_JADEX_TERMINATE);
 	
-			System.out.println("handleRequest: "+callid+" "+terminate);
+			//System.out.println("handleRequest: "+callid+" "+terminate);
 			
 			// request info manages an ongoing conversation
 			if(conversationinfos.containsKey(callid))
@@ -604,9 +604,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					//IAsyncContextInfo ctx = getAsyncContextInfo(request);
 					//saveRequestContext(callid, ctx);
 					
-					System.out.println("request terminate conversation: "+callid);
+					//System.out.println("request terminate conversation: "+callid);
 					
-					terminateConversation(rinfo, null);
+					terminateConversation(rinfo, null, true);
 					
 					/*if(!"true".equals(terminate))
 						((ITerminableFuture)rinfo.getFuture()).terminate(new RuntimeException(terminate)); 
@@ -671,7 +671,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			// handle new call
 			else
 			{
-				System.out.println("received new call: "+request);
+				//System.out.println("received new call: "+request);
 					
 				String methodname = request.getPathInfo();
 	
@@ -715,17 +715,17 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					ri.setCallid(fcallid);
 					
 					//final ConversationInfo cinfo = new ConversationInfo(getSession(request, true));
-					final ConversationInfo cinfo = new ConversationInfo(sessionid);
+					final ConversationInfo cinfo = new ConversationInfo(fcallid, sessionid);
 					conversationinfos.put(fcallid, cinfo);
 	
 					// Check security
-					if(request.toString().indexOf("suspend")!=-1)
-						System.out.println("call 2: "+request);
+					//if(request.toString().indexOf("suspend")!=-1)
+					//	System.out.println("call 2: "+request);
 					BasicService.isUnrestricted(service.getServiceId(), component, mi.getMethod())
 					.then((Boolean unres) ->
 					{
-						if(request.toString().indexOf("suspend")!=-1)
-							System.out.println("call 3: "+request);
+						//if(request.toString().indexOf("suspend")!=-1)
+						//	System.out.println("call 3: "+request);
 						try
 						{
 							if(loginsec && !unres && !isLoggedIn(request))
@@ -743,8 +743,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 								
 								//System.out.println("request: "+request.getRequestURL()+" "+fcallid+" "+method.getName()+" "+Arrays.toString(params));
 								
-								if(request.toString().indexOf("suspend")!=-1)
-									System.out.println("call 4: "+request);
+								//if(request.toString().indexOf("suspend")!=-1)
+								//	System.out.println("call 4: "+request);
 								final Object ret = method.invoke(service, params);
 								ri.setMethod(method);
 
@@ -1127,7 +1127,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				// System.out.println("terminating due to timeout: "+exception);
 				//System.out.println("Conversation timed out: "+entry.getKey());
 				
-				terminateConversation(entry.getValue(), null);
+				terminateConversation(entry.getValue(), null, false);
 				
 				/*entry.getValue().setTerminated(true);
 				if(entry.getValue().getFuture() instanceof ITerminableFuture<?>)
@@ -1151,7 +1151,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 * @param cinfo
 	 * @param ex
 	 */
-	protected void terminateConversation(ConversationInfo cinfo, Exception ex)
+	protected void terminateConversation(ConversationInfo cinfo, Exception ex, boolean clientterm)
 	{
 		// Terminate the future if requested
 		cinfo.setTerminated(true);
@@ -1162,9 +1162,11 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			else
 				((ITerminableFuture)cinfo.getFuture()).terminate();
 			
-			conversationinfos.remove(cinfo);
+			//System.out.println("terminate on: "+cinfo.getFuture().hashCode());
+			
+			conversationinfos.remove(cinfo.getCallId());
 		}
-		else
+		else if(clientterm)
 		{
 			System.out.println("WARNING: future cannot be terminated: "+cinfo+" "+cinfo.getFuture());
 		}
@@ -3494,13 +3496,16 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		
 		protected String sessionid;
 		
+		protected String callid;
+		
 		/**
 		 *  Create a request info.
 		 */
 		//public RequestInfo(MappingInfo mappingInfo, IFuture<?> future)
-		public ConversationInfo(String sessionid)
+		public ConversationInfo(String callid, String sessionid)
 		//public ConversationInfo(HttpSession session, IFuture<?> future)
 		{
+			this.callid = callid;
 			this.sessionid = sessionid;
 			//this.mappingInfo = mappingInfo;
 			//this.future = future;
@@ -3643,6 +3648,24 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			this.sessionid = sessionid;
 		}
 		
+		/**
+		 *  Get the callid.
+		 *  @return the callid.
+		 */
+		public String getCallId() 
+		{
+			return callid;
+		}
+
+		/**
+		 *  Set the callid.
+		 *  @param callid The callid.
+		 */
+		public void setCallId(String callid) 
+		{
+			this.callid = callid;
+		}
+
 		/**
 		 *  Test if it is an intermediate future.
 		 *  @return True, if is intermediate future.

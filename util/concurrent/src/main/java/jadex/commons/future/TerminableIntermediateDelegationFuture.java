@@ -125,18 +125,19 @@ public class TerminableIntermediateDelegationFuture<E> extends IntermediateFutur
 		
 		if(src==null)
 		{
-			System.out.println("delegation future without source");
-			ex.printStackTrace();
+			System.out.println("ERROR, delegation future without source: "+this);
+			//ex.printStackTrace();
 		}
 		
 		if(mynotify)
 		{
-			System.out.println("terminate forwarded: "+this+" "+src+" "+getTerminationCommand());
+			//System.out.println("terminate forwarded: "+this+" "+src+" "+getTerminationCommand());
 			src.terminate(reason);
 		}
 		else
 		{
 			System.out.println("terminate not forwarded: "+this+" "+src+" "+getTerminationCommand());
+			ex.printStackTrace();
 			//System.out.println("terminate not forwarded: "+notified+" "+this+" "+src);
 		}
 	

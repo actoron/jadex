@@ -175,7 +175,7 @@ public class JCCWebAgent implements IJCCWebService
 	protected int cnt = 0;
 	public ISubscriptionIntermediateFuture<ServiceEvent<IComponentIdentifier>> subscribeToPlatforms()
 	{
-		int fcnt = cnt++;
+		//int fcnt = cnt++;
 		//System.out.println("subscribeToPlatforms called: "+fcnt);
 		
 		ISubscriptionIntermediateFuture<ServiceEvent<IExternalAccess>> net = agent.addQuery(new ServiceQuery<>(IExternalAccess.class, ServiceScope.NETWORK).setEventMode().setServiceTags(IExternalAccess.PLATFORM));
@@ -400,8 +400,8 @@ public class JCCWebAgent implements IJCCWebService
 		if(cid==null)
 			return new Future<Object>(new RuntimeException("Cid must not be null"));
 		
-		if(methodname!=null && methodname.indexOf("suspend")!=-1)
-			System.out.println("invokeServiceMethod 1: " + methodname + " " + servicetype+" "+cid);
+		//if(methodname!=null && methodname.indexOf("suspend")!=-1)
+		//	System.out.println("invokeServiceMethod 1: " + methodname + " " + servicetype+" "+cid);
 		
 		// todo: the return type could not be available on this platform :-(
 		Class<?> rtype = rettype!=null? rettype.getType(agent.getClassLoader(), agent.getModel().getAllImports()): null;
@@ -419,8 +419,8 @@ public class JCCWebAgent implements IJCCWebService
 			@Override
 			public void customResultAvailable(IService ser) throws Exception
 			{
-				if(methodname!=null && methodname.indexOf("suspend")!=-1)
-					System.out.println("invokeServiceMethod 2: " + methodname + " " + servicetype+" "+cid);
+				//if(methodname!=null && methodname.indexOf("suspend")!=-1)
+				//	System.out.println("invokeServiceMethod 2: " + methodname + " " + servicetype+" "+cid);
 				IFuture<Object> fut = checkSecurityAndInvoke(ser, servicetype, methodname, args, argtypes, rettype);
 				FutureFunctionality.connectDelegationFuture(ret, fut);
 			}
@@ -487,8 +487,8 @@ public class JCCWebAgent implements IJCCWebService
 	protected IFuture<Object> checkSecurityAndInvoke(IService ser, ClassInfo servicetypep, final String methodname, final Object[] args, 
 		final ClassInfo[] argtypes, ClassInfo rettype)
 	{
-		if(methodname!=null && methodname.indexOf("suspend")!=-1)
-			System.out.println("checkSecurityAndInvoke: " + methodname);
+		//if(methodname!=null && methodname.indexOf("suspend")!=-1)
+		//	System.out.println("checkSecurityAndInvoke: " + methodname);
 		
 		Class<?> rtype = rettype!=null? rettype.getType(agent.getClassLoader(), agent.getModel().getAllImports()): null;
 		final Future<Object> ret = (Future<Object>)SFuture.getFuture(rtype);

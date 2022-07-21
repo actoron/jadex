@@ -73,7 +73,7 @@ public class TerminableIntermediateFuture<E> extends IntermediateFuture<E>
 	{
 		boolean	term = !isDone() && (terminate==null || terminate.checkTermination(reason));
 		
-		System.out.println("terminate: "+term+" "+terminate);
+		//System.out.println("terminate: "+term+" "+terminate);
 		
 		if(term && setExceptionIfUndone(reason))
 		{

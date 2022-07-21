@@ -221,8 +221,8 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 					}
 				}
 				
-				if(methodname.indexOf("stepComponent")!=-1)
-					System.out.println("steppi");
+				//if(methodname.indexOf("stepComponent")!=-1)
+				//	System.out.println("steppi");
 				
 				Tuple2<java.lang.reflect.Method, Object[]> res = findMethod(as, argtypes, si.getDomainService().getClass(), methodname);
 				
