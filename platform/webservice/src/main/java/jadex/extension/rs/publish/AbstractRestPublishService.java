@@ -1119,7 +1119,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 */
 	protected void pruneObsoleteConversations()
 	{
-		for(Map.Entry<String, ConversationInfo> entry: conversationinfos.entrySet())
+		for(Map.Entry<String, ConversationInfo> entry: conversationinfos.entrySet().toArray(new Map.Entry[conversationinfos.size()]))
 		{
 			// TODO: which timeout? (client vs server).
 			if(System.currentTimeMillis() - entry.getValue().getTimestamp() > Starter.getDefaultTimeout(component.getId()))
