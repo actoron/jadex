@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
@@ -27,6 +28,7 @@ import jadex.commons.future.IIntermediateFuture;
 /**
  *  Test that a search does not timeout even when there is an unresponsive platform.
  */
+@Ignore	// TODO: can no longer use use comp.suspend() due to new semantic steps?
 public class BlockedPlatformSearchTest extends AbstractInfrastructureTest
 {
 	//-------- constants --------
