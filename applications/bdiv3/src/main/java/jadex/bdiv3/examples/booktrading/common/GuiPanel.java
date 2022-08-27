@@ -128,11 +128,11 @@ public class GuiPanel extends JPanel
 			}
 			else if(column == 1)
 			{
-				value = new Integer(order.getStartPrice());
+				value = Integer.valueOf(order.getStartPrice());
 			}
 			else if(column == 2)
 			{
-				value = new Integer(order.getLimit());
+				value = Integer.valueOf(order.getLimit());
 			}
 			else if(column == 3)
 			{

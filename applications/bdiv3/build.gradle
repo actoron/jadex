@@ -1,6 +1,7 @@
 description 'The Jadex BDI V3 applications package contains several example applications, benchmarks and testcases using BDI V3 agents.'
 
 // Test ASM with different versions -> add extra compile/test tasks for each desired java version
+// TODO: Java 17, but breaks Java 8 wtf!?
 ['8', '11'].each { version ->
 	// Compile main and test classes into combined custom output dir
 	def compileJavaX	= task "compileJava$version"(type: JavaCompile) {

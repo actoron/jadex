@@ -113,7 +113,7 @@ public class GoalGoalBDI
 	{
 //		g.inc();
 		plan.waitFor(200).get();
-		return new Double(Math.random());
+		return Double.valueOf(Math.random());
 	}
 	
 	//@AgentBody
