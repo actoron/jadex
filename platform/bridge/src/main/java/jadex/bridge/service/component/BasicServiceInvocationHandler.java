@@ -647,7 +647,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		{
 			for(UnparsedExpression exp : info.getProperties())
 			{
-				Object val = SJavaParser.parseExpression(exp, ia.getModel().getAllImports(), ia.getClassLoader()).getValue(null);
+				Object val = SJavaParser.parseExpression(exp, ia.getModel().getAllImports(), ia.getClassLoader()).getValue(ia.getFetcher());
 				serprops.put(exp.getName(), val);
 			}
 		}
