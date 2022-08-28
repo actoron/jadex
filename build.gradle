@@ -582,6 +582,8 @@ subprojects
 			buildName = 'rebuild-'+distname	// required to avoid name clashes in newer gradle versions, grrr.
 			tasks = ["clean", "jadexDistZip"]
 			startParameter.projectProperties << ["dist": distname]
+			// Rebuild to same version (otherwise src zip defaults to snapshot build)
+			startParameter.projectProperties << ["jadexversion_patch": version.patch]
 			
 			doLast {					
 				// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
