@@ -75,6 +75,14 @@ Object	createBuildname(version, patch, branchpatch, isnew)
 		}
 	};
 	
+	// Fetch timestamp from gradle command property (e.g. for checkDist rebuild of srcDist)
+	buildname.timestamp = gradle.startParameter.getProjectProperties().get('jadexversion_timestamp');
+	if (buildname.timestamp == null)
+	{
+		// Generate new timestamp (i.e. build time)
+		buildname.timestamp	= (long) ((new Date()).getTime() / 1000) // Divide by 1000 to make UNIX time
+	}
+	
 	//def buildname = [:]
 	//buildname.suffix = patch + (includeBranchName(env.BRANCH_NAME) ? "-"+env.BRANCH_NAME+"-"+branchpatch : "")
 	def splitversion = version.split("\\.");

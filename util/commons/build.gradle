@@ -15,7 +15,7 @@ def generateJadexVersionFile() {
 	ret += 'jadexversion_minor=' + version.minor + '\n';
 	ret += 'jadexversion_patch=' + version.patch + '\n';
 	ret += 'jadexversion=' + version.toString() + '\n';
-	ret += 'jadextimestamp=' + rootProject.ext.timestamp + '\n';
+	ret += 'jadextimestamp=' + version.timestamp + '\n';
 	return ret;
 }
 
