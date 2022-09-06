@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import jadex.commons.ICommand;
-import jadex.commons.SUtil;
 
 /**
  *  Default implementation of an intermediate future.
@@ -809,7 +808,8 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     {
     	if(undone && listener instanceof IUndoneIntermediateResultListener)
     	{
-    		((IUndoneIntermediateResultListener<E>)listener).intermediateResultAvailableIfUndone(result);
+			IUndoneIntermediateResultListener<E>	ulistener	= (IUndoneIntermediateResultListener<E>)listener;
+    		ulistener.intermediateResultAvailableIfUndone(result);
     	}
     	else
     	{
@@ -922,11 +922,24 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 		}
 	}
 	
+	/**
+	 *  Delegate the result and exception from another future.
+	 *  @param source The source future.
+	 */
+	// Overwritten to always add intermediate listener
+	public void delegateFrom(IFuture<Collection<E>> source)
+	{
+		if(source==null)
+			throw new IllegalArgumentException("Source must not null");
+		
+		source.addResultListener(new IntermediateDelegationResultListener<>(this));
+	}
+	
 	//-------- java 8 extensions --------
 	
 	public IIntermediateFuture<E> catchEx(final Consumer<? super Exception> consumer, Class<?> futuretype)
     {
-		IResultListener reslis = new IntermediateEmptyResultListener()
+		IResultListener<Collection<E>> reslis = new IntermediateEmptyResultListener<>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
@@ -958,7 +971,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 */
 	public <T> IIntermediateFuture<E> delegateEx(Future<T> delegate)
 	{
-		IResultListener reslis = new IntermediateEmptyResultListener()
+		IResultListener<Collection<E>> reslis = new IntermediateEmptyResultListener<>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{

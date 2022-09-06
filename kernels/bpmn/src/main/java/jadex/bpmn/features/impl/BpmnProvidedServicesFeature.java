@@ -120,7 +120,7 @@ public class BpmnProvidedServicesFeature extends ProvidedServicesComponentFeatur
 		// External service implementation
 		else
 		{
-			super.createServiceImplementation(info, fetcher).delegate(ret);
+			super.createServiceImplementation(info, fetcher).delegateTo(ret);
 		}
 		
 		return ret;

@@ -18,7 +18,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 /**
  *  Service for deployment files on file system.
@@ -70,8 +69,7 @@ public class FileTransferService implements IFileTransferService
 				ret.addIntermediateResult(f.length());
 				FileInputStream fis = new FileInputStream(f);
 				ISubscriptionIntermediateFuture<Long> fut = con.writeFromInputStream(fis, agent);
-				TerminableIntermediateDelegationResultListener<Long> lis = new TerminableIntermediateDelegationResultListener<Long>(ret, fut);
-				fut.addResultListener(lis);
+				fut.delegateTo(ret);
 			}
 			else
 			{

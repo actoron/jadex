@@ -103,7 +103,7 @@ public class FactoryFilter implements IAsyncFilter<IComponentFactory>
 				if(System.currentTimeMillis()-start>5000)
 					System.out.println("SLOWWWWW: "+model);
 			})*/
-			.delegate((Future)ret);
+			.delegateTo(ret);
 		}
 		
 		return ret;

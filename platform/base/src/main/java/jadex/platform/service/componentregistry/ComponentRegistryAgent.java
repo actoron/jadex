@@ -40,7 +40,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Imports;
@@ -191,7 +190,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        		                        				public void customResultAvailable(IService service) throws Exception
 	        		                        				{
 	        		                        					 IFuture<Object> res = (IFuture<Object>)method.invoke(service, args);
-	        		                                             FutureFunctionality.connectDelegationFuture(ret, res);
+	        		                                             res.delegateTo(ret);
 	        		                        				}
 	        											});
 	        		                            	}

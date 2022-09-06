@@ -7,13 +7,13 @@ import java.util.List;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
-import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 /**
  *  Listener that ranks results.
  */
-public class ServiceRankingDelegationResultListener<S> extends TerminableIntermediateDelegationResultListener<S>
+public class ServiceRankingDelegationResultListener<S> extends IntermediateDelegationResultListener<S>
 {
 	/** The saved results. */
 	protected List<S> results = new ArrayList<S>();
@@ -33,7 +33,8 @@ public class ServiceRankingDelegationResultListener<S> extends TerminableInterme
 	public ServiceRankingDelegationResultListener(TerminableIntermediateDelegationFuture<S> future, ITerminableIntermediateFuture<S> src, 
 		IServiceRanker<S> ranker, IRankingSearchTerminationDecider<S> decider)
 	{
-		super(future, src);
+		super(future);
+		src.delegateTo(future);
 		this.ranker = ranker;
 		this.decider = decider;
 	}
@@ -129,7 +130,7 @@ public class ServiceRankingDelegationResultListener<S> extends TerminableInterme
 		if(!isFinished())
 		{
 			// Terminate the source
-			((TerminableIntermediateDelegationFuture<S>)future).getSource().terminate();
+			((TerminableIntermediateDelegationFuture<S>)future).terminate();
 			
 			ranker.rankWithScores(results).addResultListener(new IResultListener<List<Tuple2<S, Double>>>()
 			{

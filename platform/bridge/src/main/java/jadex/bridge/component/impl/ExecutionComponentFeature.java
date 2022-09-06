@@ -1505,7 +1505,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				// null was step.getCause()
 //			}
 			
-			IFuture<?>	stepfut	= null;
+			IFuture<Object>	stepfut	= null;
 			Throwable ex = null;
 			boolean	hardex	= false;
 			try
@@ -1543,7 +1543,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						IComponentStep.setCurrentStep(step);
 						debugstep = step;
 						
-						stepfut	= exstep.execute(component);
+						stepfut	= (IFuture<Object>)exstep.execute(component);
 						//IComponentStep.setCurrentStep(null);
 						
 						Thread tafter = Thread.currentThread();
@@ -1664,7 +1664,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				try
 				{
 					// Use generic connection method to avoid issues with different future types.
-					FutureFunctionality.connectDelegationFuture(step.getFuture(), stepfut);
+					stepfut.delegateTo((Future<Object>)step.getFuture());
 					
 					// Monitoring only when active after step started (outer check) and step completed (inner check).
 					if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getFeature0(IMonitoringComponentFeature.class)!=null && 

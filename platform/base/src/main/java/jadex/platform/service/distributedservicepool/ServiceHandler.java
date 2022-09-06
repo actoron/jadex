@@ -236,7 +236,7 @@ public class ServiceHandler implements InvocationHandler
 				}
 			}
 			IFuture<Object> res = (IFuture<Object>)method.invoke(service, args);
-			FutureFunctionality.connectDelegationFuture(ret, res);
+			res.delegateTo(ret);
 //			if(method.getName().indexOf("calculate")!=-1)
 //				System.out.println("connect in pool: "+ret);
 			
@@ -360,9 +360,9 @@ public class ServiceHandler implements InvocationHandler
 				}
 				else
 				{
-					findFreeService(services, fpos+1, tried+1).delegate(ret);
+					findFreeService(services, fpos+1, tried+1).delegateTo(ret);
 				}
-			}).catchEx(ex -> findFreeService(services, fpos+1, tried+1).delegate(ret));
+			}).catchEx(ex -> findFreeService(services, fpos+1, tried+1).delegateTo(ret));
 		}
 		
 		return ret;

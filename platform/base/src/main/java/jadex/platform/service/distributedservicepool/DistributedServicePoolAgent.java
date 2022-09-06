@@ -68,7 +68,7 @@ public class DistributedServicePoolAgent implements IDistributedServicePoolServi
 
 		if(query!=null)
 		{
-			addServiceType(query, pi, scope).delegate(ret);
+			addServiceType(query, pi, scope).delegateTo(ret);
 
 			//IIntermediateFuture<IService> fut = (IIntermediateFuture)agent.searchServices(query);
 			

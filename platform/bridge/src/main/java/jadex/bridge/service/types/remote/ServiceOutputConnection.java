@@ -15,7 +15,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
-import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 /**
  *  A service output connection can be used to write data to a remote input connection.
@@ -40,7 +39,7 @@ public class ServiceOutputConnection implements IOutputConnection
 	protected Future<Integer> readyfuture;
 	
 	/** The transfer future. */
-	protected ICommand transfercommand;
+	protected ICommand<?> transfercommand;
 
 	/**
 	 *  Create a new connection.
@@ -232,13 +231,12 @@ public class ServiceOutputConnection implements IOutputConnection
 		{
 			if(transfercommand==null)
 			{
-				transfercommand = new ICommand()
+				transfercommand = new ICommand<Object>()
 				{
 					public void execute(Object args)
 					{
 						ISubscriptionIntermediateFuture<Long> src = con.writeFromInputStream(is, component);
-						TerminableIntermediateDelegationResultListener<Long> lis = new TerminableIntermediateDelegationResultListener<Long>(ret, src);
-						src.addResultListener(lis);
+						src.delegateTo(ret);
 					}
 				};
 			}
@@ -250,8 +248,7 @@ public class ServiceOutputConnection implements IOutputConnection
 		else
 		{
 			ISubscriptionIntermediateFuture<Long> src = con.writeFromInputStream(is, component);
-			TerminableIntermediateDelegationResultListener<Long> lis = new TerminableIntermediateDelegationResultListener<Long>(ret, src);
-			src.addResultListener(lis);
+			src.delegateTo(ret);
 		}
 		
 		return ret;

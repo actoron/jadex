@@ -705,19 +705,19 @@ public abstract class AbstractWebSocketServer
 				{
 					serviceinfos.put(iface, mis);
 					ServiceInfo si = new ServiceInfo(((IService)res).getServiceId(), getMethodNames(mis));
-					sendMessage(new ResultMessage(si, callid, finished), session).delegate(ret);
+					sendMessage(new ResultMessage(si, callid, finished), session).delegateTo(ret);
 				}).catchEx(ret);
 			}
 			else
 			{
 				MethodInfo[] mis = serviceinfos.get(iface);
 				ServiceInfo si = new ServiceInfo(((IService)res).getServiceId(), getMethodNames(mis));
-				sendMessage(new ResultMessage(si, callid, finished), session).delegate(ret);
+				sendMessage(new ResultMessage(si, callid, finished), session).delegateTo(ret);
 			}
 		}
 		else
 		{
-			sendMessage(new ResultMessage(res, callid, finished), session).delegate(ret);
+			sendMessage(new ResultMessage(res, callid, finished), session).delegateTo(ret);
 		}
 		
 		return ret;

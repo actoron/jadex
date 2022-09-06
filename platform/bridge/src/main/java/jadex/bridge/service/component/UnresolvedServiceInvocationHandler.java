@@ -64,21 +64,22 @@ public class UnresolvedServiceInvocationHandler implements InvocationHandler
 			}
 			else
 			{
-				Future<?> ret = FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality(ia.getLogger()));
+				@SuppressWarnings("unchecked")
+				Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality(ia.getLogger()));
 				delegatefut.addResultListener(new IResultListener<IService>()
 				{
 					public void resultAvailable(IService result)
 					{
-						IFuture<?> origret = null;
 						try
 						{
-							origret = (IFuture<?>) method.invoke(result, args);
+							@SuppressWarnings("unchecked")
+							IFuture<Object>	origret = (IFuture<Object>) method.invoke(result, args);
+							origret.delegateTo(ret);
 						}
 						catch (Exception e)
 						{
 							ret.setException(e);
 						}
-						FutureFunctionality.connectDelegationFuture(ret, origret);
 					}
 					
 					public void exceptionOccurred(Exception exception)

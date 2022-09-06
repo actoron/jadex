@@ -80,7 +80,7 @@ public class BDIProvidedServicesComponentFeature extends ProvidedServicesCompone
 		}
 		else
 		{
-			super.createServiceImplementation(info, fetcher).delegate(ret);
+			super.createServiceImplementation(info, fetcher).delegateTo(ret);
 		}
 		
 //		hackguesser = null;

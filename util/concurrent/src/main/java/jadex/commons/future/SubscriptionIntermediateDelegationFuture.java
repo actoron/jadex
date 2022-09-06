@@ -43,7 +43,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	{
 		super();
 		//super(src); does not work as storeforfirst is not yet set :-(
-		src.addResultListener(new TerminableIntermediateDelegationResultListener<E>(this, src));
+		delegateFrom(src);
 	}
 	
 	//-------- methods (hack!!! copied from subscription future) --------
@@ -350,7 +350,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	 */
     public IIntermediateFuture<E> catchEx(final Consumer<? super Exception> consumer, Class<?> futuretype)
     {
-		IResultListener reslis = new IntermediateEmptyResultListener()
+		IResultListener<Collection<E>> reslis = new IntermediateEmptyResultListener<>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
@@ -368,7 +368,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	 */
 	public <T> IIntermediateFuture<E> catchEx(Future<T> delegate)
 	{
-		IResultListener reslis = new IntermediateEmptyResultListener()
+		IResultListener<Collection<E>> reslis = new IntermediateEmptyResultListener<>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{

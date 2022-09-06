@@ -1,8 +1,5 @@
 package jadex.commons.future;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  *  A terminable delegation future can be used when a termination future 
  *  should be delegated. This kind of future needs to be connected to the
@@ -15,21 +12,9 @@ public class TerminableDelegationFuture<E> extends Future<E> implements ITermina
 {
 	//-------- attributes --------
 	
-	/** The termination source. */
-	protected ITerminableFuture<?> src;
+	/** The forward/backward handling helper. */
+	protected TerminableDelegationFutureHandler<E>	handler;
 	
-	/** Flag if source has to be notified. */
-	protected boolean notify;
-	
-	/** Flag if source has been notified. */
-	protected boolean notified;
-
-	/** Exception used for notification. */
-	protected Exception reason;
-	
-	/** The list of stored infos, to be sent when src is connected. */ 
-	protected List<Object> storedinfos;
-
 	//-------- constructors --------
 	
 	/**
@@ -38,16 +23,18 @@ public class TerminableDelegationFuture<E> extends Future<E> implements ITermina
 	public TerminableDelegationFuture()
 	{
 //		System.out.println("tfut: "+hashCode());
+		this.handler	= new TerminableDelegationFutureHandler<>();
 	}
 	
 	/**
 	 *  Create a new future.
 	 */
-	public TerminableDelegationFuture(ITerminableFuture<?> src)
+	public TerminableDelegationFuture(ITerminableFuture<E> src)
 	{
+		this.handler	= new TerminableDelegationFutureHandler<>();
 		if(this.getClass().getName().indexOf("DelegatingTerminableDelegationFuture")!=-1)
 			System.out.println("func: "+hashCode());
-		src.addResultListener(new TerminableDelegationResultListener(this, src));
+		delegateFrom(src);
 	}
 	
 	//-------- methods --------
@@ -55,31 +42,9 @@ public class TerminableDelegationFuture<E> extends Future<E> implements ITermina
 	/**
 	 *  Set the termination source.
 	 */
-	public void setTerminationSource(ITerminableFuture<?> src)
+	public void setTerminationSource(ITerminableFuture<E> src)
 	{
-		assert this.src==null;
-		
-		boolean mynotify;
-		synchronized(this)
-		{
-			// Notify when someone has called terminate (notify is set)
-			// src is set and not already notified
-			this.src = src;
-			mynotify = notify && !notified;
-			notified = notified || mynotify;
-		}
-		
-		if(mynotify)
-			src.terminate(reason);
-		
-		if(storedinfos!=null)
-		{
-			for(Object info: storedinfos)
-			{
-				src.sendBackwardCommand(info);
-			}
-			storedinfos = null;
-		}
+		handler.setTerminationSource(src);
 	}
 	
 	/**
@@ -88,7 +53,7 @@ public class TerminableDelegationFuture<E> extends Future<E> implements ITermina
 	 */
 	public void terminate()
 	{
-		terminate(new FutureTerminatedException());
+		handler.terminate();
 	}
 	
 	/**
@@ -96,30 +61,18 @@ public class TerminableDelegationFuture<E> extends Future<E> implements ITermina
 	 */
 	public void terminate(Exception reason)
 	{
-		boolean mynotify;
-		synchronized(this)
-		{
-			// Notify when src is set and not already notified
-			// Remember to notify when src is not set and not already notified
-			mynotify = src!=null && !notified;
-			notify = src==null && !notified;
-			notified = notified || mynotify;
-			if(notify)
-				this.reason	= reason;
-		}
-		
-		if(mynotify)
-			src.terminate(reason);
+		handler.terminate(reason);
 	}
 	
-//	/**
-//	 *  Test if future is terminated.
-//	 *  @return True, if terminated.
-//	 */
-//	public boolean isTerminated()
-//	{
-//		return isDone() && exception instanceof FutureTerminatedException;
-//	}
+	/**
+	 *  Delegate the result and exception from another future.
+	 *  @param source The source future.
+	 */
+	public void delegateFrom(IFuture<E> source)
+	{
+		super.delegateFrom(source);
+		setTerminationSource((ITerminableFuture<E>)source);
+	}
 	
 	/**
 	 *  Send a backward command in direction of the source.
@@ -127,16 +80,7 @@ public class TerminableDelegationFuture<E> extends Future<E> implements ITermina
 	 */
 	public void sendBackwardCommand(Object info)
 	{
-		if(src!=null)
-		{
-			src.sendBackwardCommand(info);
-		}
-		else
-		{
-			if(storedinfos==null)
-				storedinfos = new ArrayList<Object>();
-			storedinfos.add(info);
-		}
+		handler.sendBackwardCommand(info);
 	}
 }
 

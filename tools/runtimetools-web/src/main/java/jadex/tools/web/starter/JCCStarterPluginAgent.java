@@ -1,6 +1,5 @@
 package jadex.tools.web.starter;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -301,7 +300,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 			{
 				return ia.getDescriptions();
 			}
-		}).delegate(ret);
+		}).delegateTo(ret);
 		
 		return ret;
 	}
@@ -329,7 +328,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 			{
 				return new Future<IComponentDescription>(ia.getDescription());
 			}
-		}).delegate(ret);
+		}).delegateTo(ret);
 		
 		return ret;
 	}
@@ -398,7 +397,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 				});
 				return ret;
 			}
-		}).delegate(ret);
+		}).delegateTo(ret);
 		
 		return ret;
 	}
@@ -462,11 +461,11 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 					{
 						if(mi!=null)
 						{
-							ia.getRequiredMethodNFPropertyMetaInfos(sid, mi).delegate(ret);
+							ia.getRequiredMethodNFPropertyMetaInfos(sid, mi).delegateTo(ret);
 						}
 						else
 						{
-							ia.getRequiredNFPropertyMetaInfos(sid).delegate(ret);
+							ia.getRequiredNFPropertyMetaInfos(sid).delegateTo(ret);
 						}
 					}
 					// provided services and methods
@@ -474,17 +473,17 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 					{
 						if(mi!=null)
 						{
-							ia.getMethodNFPropertyMetaInfos(sid, mi).delegate(ret);
+							ia.getMethodNFPropertyMetaInfos(sid, mi).delegateTo(ret);
 						}
 						else
 						{
-							ia.getNFPropertyMetaInfos(sid).delegate(ret);
+							ia.getNFPropertyMetaInfos(sid).delegateTo(ret);
 						}
 					}
 					// components
 					else //if(ea!=null)
 					{
-						ia.getNFPropertyMetaInfos().delegate(ret);
+						ia.getNFPropertyMetaInfos().delegateTo(ret);
 					}
 					/*else
 					{
@@ -492,7 +491,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 					}*/
 					return ret;
 				}
-			}).delegate(ret);
+			}).delegateTo(ret);
 		}
 		else
 		{
@@ -565,7 +564,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 					}	*/
 					return ret;
 				}
-			}).delegate(ret);
+			}).delegateTo(ret);
 		}
 		else
 		{

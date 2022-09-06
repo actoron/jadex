@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 /**
  * Intermediate version of the delegation result listener.
  */
-public class IntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>, IFutureCommandResultListener<Collection<E>>, IUndoneIntermediateResultListener<E>
+public class IntermediateDelegationResultListener<E> implements IFutureCommandResultListener<Collection<E>>, IUndoneIntermediateResultListener<E>
 {
 	// -------- attributes --------
 
@@ -173,7 +173,7 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 		{
 			if(undone && delegate instanceof IUndoneIntermediateResultListener)
 			{
-				((IUndoneIntermediateResultListener)delegate).finishedIfUndone();
+				((IUndoneIntermediateResultListener<E>)delegate).finishedIfUndone();
 			}
 			else
 			{
@@ -203,7 +203,7 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 		{
 			if (undone && delegate instanceof IUndoneResultListener) 
 			{
-				((IUndoneResultListener) delegate).resultAvailableIfUndone(result);
+				((IUndoneIntermediateResultListener<E>) delegate).resultAvailableIfUndone(result);
 			} 
 			else 
 			{
@@ -233,7 +233,7 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 		{
 			if(undone && delegate instanceof IUndoneResultListener)
 			{
-				((IUndoneResultListener)delegate).exceptionOccurredIfUndone(exception);
+				((IUndoneIntermediateResultListener<E>)delegate).exceptionOccurredIfUndone(exception);
 			}
 			else
 			{
@@ -271,7 +271,7 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 		{
 			if (undone && delegate instanceof IUndoneIntermediateResultListener) 
 			{
-				((IUndoneIntermediateResultListener) delegate).intermediateResultAvailableIfUndone(result);
+				((IUndoneIntermediateResultListener<E>) delegate).intermediateResultAvailableIfUndone(result);
 			} 
 			else 
 			{
@@ -407,7 +407,7 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 		{
 			if(undone && delegate instanceof IUndoneResultListener)
 			{
-				((IUndoneResultListener)delegate).exceptionOccurredIfUndone(e);
+				((IUndoneIntermediateResultListener<E>)delegate).exceptionOccurredIfUndone(e);
 			}
 			else
 			{

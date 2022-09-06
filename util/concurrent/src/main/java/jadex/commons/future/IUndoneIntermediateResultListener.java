@@ -5,7 +5,7 @@ import java.util.Collection;
 /**
  * 
  */
-public interface IUndoneIntermediateResultListener<E> extends IUndoneResultListener<Collection <E>>
+public interface IUndoneIntermediateResultListener<E> extends IUndoneResultListener<Collection <E>>, IIntermediateResultListener<E>
 {
 	/**
 	 *  Called when an intermediate result is available.

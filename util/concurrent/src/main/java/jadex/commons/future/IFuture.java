@@ -270,8 +270,17 @@ public interface IFuture<E>
 	 *  Delegate the result and exception to another future.
 	 *  Short form for adding a delegation listener.
 	 *  @param delegate The other future.
+	 *  
+	 *  @deprecated Use delegateTo.
 	 */
 	public void delegate(Future<E> delegate);
+	
+	/**
+	 *  Forward the result and exception to another future.
+	 *  Short form for adding a delegation listener.
+	 *  @param target The target future.
+	 */
+	public void delegateTo(Future<E> target);
 	
 	/**
 	 *  Called on exception.

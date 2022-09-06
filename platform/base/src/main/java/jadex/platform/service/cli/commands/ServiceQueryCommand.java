@@ -91,7 +91,7 @@ public class ServiceQueryCommand extends ACliCommand
 					q.setServiceTags(tags);
 				
 				//SServiceProvider.getServices(ia, q, false);
-				ia.getFeature(IRequiredServicesFeature.class).searchServices(q).delegate(ret);
+				ia.getFeature(IRequiredServicesFeature.class).searchServices(q).delegateTo(ret);
 				//ia.getFeature(IRequiredServicesFeature.class).searchServices(q)
 				//	.addIntermediateResultListener(new IntermediateDelegationResultListener<IService>(ret));
 				

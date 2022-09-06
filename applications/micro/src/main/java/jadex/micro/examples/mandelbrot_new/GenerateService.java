@@ -360,7 +360,7 @@ public class GenerateService implements IGenerateService
 								{
 									System.out.println("retrying task after delay: "+task);
 									task.setRetryCount(task.getRetryCount()+1);
-									agent.waitForDelay(5000).then(t -> performTask(task, alda).delegate(ret)).catchEx(ret);
+									agent.waitForDelay(5000).then(t -> performTask(task, alda).delegateTo(ret)).catchEx(ret);
 								}
 								else
 								{

@@ -148,8 +148,9 @@ public class ServiceSearchMultiplicityAgent extends TestAgent
 				agent.getFeature(IExecutionFeature.class).waitForDelay(local? 1000: 11000, Starter.isRealtimeTimeout(agent.getId(), true)).then(v -> waitfut.setResultIfUndone(null));
 			
 			waitfut.get();
-			queryfut.terminate();
 			System.out.println("wait dur: "+(agent.getLocalService(IClockService.class).getTime()-start));
+			
+			assertTrue(queryfut.isDone());	// Should be finished due to max results found.
 					
 //			System.out.println("Correct: could find service: "+ser.getInfo().get());
 		}
