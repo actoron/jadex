@@ -22,9 +22,11 @@ public class ChatEvent
 	/** Event type for a received file (value is file info, nick only available for initial file events). */
 	public static final String TYPE_FILE = "file";
 	
-	/** Event type for added or removed user. */
-	public static final String TYPE_USER = "user";
+	/** Event type for added or removed user (value is service). */
+	public static final String TYPE_USERADDED = "useradded";
 
+	/** Event type for added or removed user  (value is service identifier). */
+	public static final String TYPE_USERREMOVED = "userremoved";
 	
 	//-------- attributes --------
 	

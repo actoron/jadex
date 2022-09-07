@@ -823,7 +823,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		protected ISubscriptionIntermediateFuture<Void>	connection;
 		
 		/** Query on the local registry used to transmit changes to super peer. */
-		protected ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>> localquery;
+		protected ISubscriptionIntermediateFuture<ServiceEvent> localquery;
 		
 		/** User queries waiting for a connection to superpeer. */
 		Collection<QueryManager<?>>	waitingqueries	= new ArrayList<>();
@@ -940,7 +940,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									waitingqueries.clear();
 									
 									// Local query uses registry directly (w/o feature) -> only service identifiers needed and also removed events
-									ServiceQuery<ServiceEvent<IServiceIdentifier>>	lquery	= new ServiceQuery<>((Class<IServiceIdentifier>)null)
+									ServiceQuery<ServiceEvent>	lquery	= new ServiceQuery<>((Class<IServiceIdentifier>)null)
 										.setEventMode()
 										.setOwner(agent.getId())
 										.setSearchStart(spid);	// Only find services that are visible to SP
@@ -958,9 +958,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									}
 									localquery = ServiceRegistry.getRegistry(agent.getId()).addQuery(lquery);									
 
-									localquery.addResultListener(new IntermediateEmptyResultListener<ServiceEvent<IServiceIdentifier>>()
+									localquery.addResultListener(new IntermediateEmptyResultListener<ServiceEvent>()
 									{
-										public void resultAvailable(Collection<ServiceEvent<IServiceIdentifier>> result)
+										public void resultAvailable(Collection<ServiceEvent> result)
 										{
 											System.out.println("Service event query finished!?: "+result);
 											// Should not happen?
@@ -973,7 +973,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 											assert exception instanceof FutureTerminatedException : exception;
 										}
 		
-										public void intermediateResultAvailable(final ServiceEvent<IServiceIdentifier> event)
+										public void intermediateResultAvailable(final ServiceEvent event)
 										{
 											if(global && event.getService().getScope().isGlobal()
 												// spcache==true -> global services also sent to network SPs

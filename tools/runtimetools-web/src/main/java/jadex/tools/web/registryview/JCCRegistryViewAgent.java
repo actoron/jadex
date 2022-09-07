@@ -10,7 +10,6 @@ import java.util.Set;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
@@ -28,7 +27,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
@@ -287,16 +285,16 @@ public class JCCRegistryViewAgent extends JCCPluginAgent implements IJCCRegistry
 	 *  Get the managed services, if this platform is a super peer (i.e. has an ISuperpeerService).
 	 *  @return Service events for a self-updating list of services.
 	 */
-	public ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>> subscribeToServices()
+	public ISubscriptionIntermediateFuture<ServiceEvent> subscribeToServices()
 	{
 		// Returns the view of the own platform, i.e. the queries managed by this platform
 		
-		ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>> ret;
+		ISubscriptionIntermediateFuture<ServiceEvent> ret;
 		
 		try
 		{
 			ISuperpeerService sps = agent.getLocalService(new ServiceQuery<>(ISuperpeerService.class));
-			ret = sps.addQuery(new ServiceQuery<>((Class<IServiceIdentifier>)null)
+			ret = sps.addQuery(new ServiceQuery<>((Class<?>)null)
 				.setEventMode()
 				.setOwner(agent.getId())
 				.setNetworkNames((String[])null)
@@ -306,14 +304,14 @@ public class JCCRegistryViewAgent extends JCCPluginAgent implements IJCCRegistry
 		{
 			// Get local services when superpeer mode is disabled
 			
-			ret = agent.addQuery(new ServiceQuery<>((Class<IServiceIdentifier>)null)
+			ret = agent.addQuery(new ServiceQuery<>((Class<?>)null)
 				.setEventMode()
 				.setOwner(agent.getId())
 				.setNetworkNames((String[])null)
 				.setScope(ServiceScope.PLATFORM));
 		}
 
-		SubscriptionIntermediateDelegationFuture<ServiceEvent<IServiceIdentifier>> fut = new SubscriptionIntermediateDelegationFuture<ServiceEvent<IServiceIdentifier>>(ret);
+		SubscriptionIntermediateDelegationFuture<ServiceEvent> fut = new SubscriptionIntermediateDelegationFuture<ServiceEvent>(ret);
 		
 //		IIntermediateResultListener<ServiceEvent<IServiceIdentifier>> lis = new IIntermediateResultListener<ServiceEvent<IServiceIdentifier>>()
 //		{

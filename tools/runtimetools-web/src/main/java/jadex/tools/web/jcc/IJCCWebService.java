@@ -39,7 +39,7 @@ public interface IJCCWebService
 	 *  Get events about known platforms.
 	 *  @return Events for platforms.
 	 */
-	public ISubscriptionIntermediateFuture<ServiceEvent<IComponentIdentifier>> subscribeToPlatforms();
+	public ISubscriptionIntermediateFuture<ServiceEvent> subscribeToPlatforms();
 	
 	/**
 	 *  Get the JCC plugin html fragments.

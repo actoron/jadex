@@ -3,7 +3,6 @@ package jadex.platform.service.distributedservicepool;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnInit;
@@ -59,47 +58,39 @@ public class DistributedServicePoolAgent implements IDistributedServicePoolServi
 		final Future<Void> ret = new Future<Void>();
 
 		//RequiredServiceInfo rsi = (RequiredServiceInfo)agent.getArguments().get("serviceinfo");
-		ServiceQuery<IService> query = (ServiceQuery<IService>)agent.getArguments().get("serviceinfo");		
+		ServiceQuery<?> query = (ServiceQuery<?>)agent.getArguments().get("serviceinfo");		
 		PublishInfo pi = (PublishInfo)agent.getArguments().get("publishinfo");
 		ServiceScope scope = (ServiceScope)agent.getArguments().get("scope");
 		
 		query.setOwner(agent.getId());
-		query.setEventMode();
 
-		if(query!=null)
-		{
-			addServiceType(query, pi, scope).delegateTo(ret);
+		addServiceType(query, pi, scope).delegateTo(ret);
 
-			//IIntermediateFuture<IService> fut = (IIntermediateFuture)agent.searchServices(query);
-			
-			ISubscriptionIntermediateFuture<ServiceEvent> fut = (ISubscriptionIntermediateFuture)agent.addQuery(query);
-				fut.next(event ->
-			{
-				//if(!((IService)event).getServiceId().getProviderId().equals(agent.getId()))
-				//	handler.addService((IService)event);
-				
-				//System.out.println("event: "+event);
-				if(event.getType()==ServiceEvent.SERVICE_ADDED)
-				{
-					if(!((IService)event.getService()).getServiceId().getProviderId().equals(agent.getId()))
-						handler.addService((IService)event.getService());
-				}
-				else if(event.getType()==ServiceEvent.SERVICE_REMOVED)
-				{
-					handler.removeService((IServiceIdentifier)event.getService());
-				}
-			})
-				.catchEx(ex ->
-			{
-				System.out.println("Query error: "+ex);
-				ex.printStackTrace();
-			});
-		}
-		else
-		{
-			ret.setResult(null);
-		}
+		//IIntermediateFuture<IService> fut = (IIntermediateFuture)agent.searchServices(query);
 		
+		ISubscriptionIntermediateFuture<ServiceEvent> fut = (ISubscriptionIntermediateFuture<ServiceEvent>)agent.addQuery(query.setEventMode());
+			fut.next(event ->
+		{
+			//if(!((IService)event).getServiceId().getProviderId().equals(agent.getId()))
+			//	handler.addService((IService)event);
+			
+			//System.out.println("event: "+event);
+			if(event.getType()==ServiceEvent.SERVICE_ADDED)
+			{
+				if(!event.getService().getProviderId().equals(agent.getId()))
+					handler.addService(agent.getServiceProxy(event.getService(), null));
+			}
+			else if(event.getType()==ServiceEvent.SERVICE_REMOVED)
+			{
+				handler.removeService(event.getService());
+			}
+		})
+			.catchEx(ex ->
+		{
+			System.out.println("Query error: "+ex);
+			ex.printStackTrace();
+		});
+
 		return ret;
 	}
 	
@@ -108,7 +99,7 @@ public class DistributedServicePoolAgent implements IDistributedServicePoolServi
 	 *  @param servicetype The service type.
 	 *  @param strategy The service pool strategy.
 	 */
-	public IFuture<Void> addServiceType(ServiceQuery<IService> query, PublishInfo pi, ServiceScope scope)
+	public IFuture<Void> addServiceType(ServiceQuery<?> query, PublishInfo pi, ServiceScope scope)
 	{
 		// remove old service
 		if(handler!=null)

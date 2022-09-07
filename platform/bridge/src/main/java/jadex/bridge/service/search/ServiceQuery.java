@@ -17,7 +17,6 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
-import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple3;
 
@@ -309,10 +308,10 @@ public class ServiceQuery<T>
 	 *  @return The new query.
 	 */
 	@SuppressWarnings("unchecked")
-	public ServiceQuery<ServiceEvent<T>> setEventMode()
+	public ServiceQuery<ServiceEvent> setEventMode()
 	{
 		this.eventmode = true;
-		return (ServiceQuery<ServiceEvent<T>>)this;
+		return (ServiceQuery<ServiceEvent>)this;
 	}
 	
 	/**

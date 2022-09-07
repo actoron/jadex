@@ -31,7 +31,6 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.MultiplicityException;
-import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
@@ -734,9 +733,9 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	protected Object processResult(Object result, RequiredServiceInfo info)
 	{
-		if(result instanceof ServiceEvent<?>)
-			return processServiceEvent((ServiceEvent<?>)result, info);
-		else if(result instanceof IServiceIdentifier)
+//		if(result instanceof ServiceEvent<?>)
+//			return processServiceEvent((ServiceEvent<?>)result, info);
+		/*else*/ if(result instanceof IServiceIdentifier)
 			return getServiceProxy((IServiceIdentifier)result, info);
 		else if(result instanceof IService)
 			return addRequiredServiceProxy((IService)result, info);
@@ -1249,30 +1248,30 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		return info;
 	}
 	
-	/**
-	 *  Create the user-facing object from the received search or query result.
-	 *  Result may be service object, service identifier (local or remote), or event.
-	 *  User object is either event or service (with or without required proxy).
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected ServiceEvent processServiceEvent(ServiceEvent event, RequiredServiceInfo info)
-	{
-		if(event.getService() instanceof IService)
-		{
-			IService service = addRequiredServiceProxy((IService)event.getService(), info);
-			event.setService(service);
-		}
-		else if(event.getService() instanceof IServiceIdentifier
-			&& event.getType()!=ServiceEvent.SERVICE_REMOVED)
-		{
-			IService service = getServiceProxy((IServiceIdentifier)event.getService(), info);
-			// can null when service is not available any more
-			if(service!=null)
-				event.setService(service);
-		}
-		
-		return event;
-	}
+//	/**
+//	 *  Create the user-facing object from the received search or query result.
+//	 *  Result may be service object, service identifier (local or remote), or event.
+//	 *  User object is either event or service (with or without required proxy).
+//	 */
+//	@SuppressWarnings({ "rawtypes", "unchecked" })
+//	protected ServiceEvent processServiceEvent(ServiceEvent event, RequiredServiceInfo info)
+//	{
+//		if(event.getService() instanceof IService)
+//		{
+//			IService service = addRequiredServiceProxy((IService)event.getService(), info);
+//			event.setService(service);
+//		}
+//		else if(event.getService() instanceof IServiceIdentifier
+//			&& event.getType()!=ServiceEvent.SERVICE_REMOVED)
+//		{
+//			IService service = getServiceProxy((IServiceIdentifier)event.getService(), info);
+//			// can null when service is not available any more
+//			if(service!=null)
+//				event.setService(service);
+//		}
+//		
+//		return event;
+//	}
 	
 	/**
 	 *  Create the user-facing object from the received search or query result.

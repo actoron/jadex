@@ -3,7 +3,6 @@ package jadex.tools.web.registryview;
 import java.util.Collection;
 import java.util.Map;
 
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.QueryEvent;
@@ -51,7 +50,7 @@ public interface IJCCRegistryViewService extends IJCCPluginService
 	 *  Get the managed services, if this platform is a super peer (i.e. has an ISuperpeerService).
 	 *  @return Service events for a self-updating list of services.
 	 */
-	public ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>> subscribeToServices();
+	public ISubscriptionIntermediateFuture<ServiceEvent> subscribeToServices();
 	
 	/**
 	 *  Get all memory stats. cf IMemstatService

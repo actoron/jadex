@@ -176,11 +176,10 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			}
 		}, new ICommand<Object>()
 		{
-			@SuppressWarnings("unchecked")
 			public void execute(Object obj)
 			{
 				agent.getLogger().info("Superpeer registry received client event: "+obj);
-				ServiceEvent<IServiceIdentifier> event = (ServiceEvent<IServiceIdentifier>) obj;
+				ServiceEvent event = (ServiceEvent) obj;
 				
 				if(debug(event.getService()))
 					System.out.println(agent+" received client event: "+event);
@@ -358,8 +357,8 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	{
 		final ServiceRegistry regcache = new ServiceRegistry();
 		final Set<String> nwnames = ((IService) peer).getServiceId().getNetworkNames();
-		ServiceQuery<ServiceEvent<IServiceIdentifier>> query = new ServiceQuery<>((Class<IServiceIdentifier>) null).setEventMode();
-		ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>> sub = peer.addIntransitiveQuery(query);
+		ServiceQuery<ServiceEvent> query = new ServiceQuery<>((Class<IServiceIdentifier>) null).setEventMode();
+		ISubscriptionIntermediateFuture<ServiceEvent> sub = peer.addIntransitiveQuery(query);
 		for (String nwname : nwnames)
 			peercaches.add(nwname, regcache);
 		
@@ -382,14 +381,14 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			}
 		}
 		
-		sub.addResultListener(new IntermediateEmptyResultListener<ServiceEvent<IServiceIdentifier>>()
+		sub.addResultListener(new IntermediateEmptyResultListener<ServiceEvent>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
 				finished();
 			}
 			
-			public void intermediateResultAvailable(ServiceEvent<IServiceIdentifier> result)
+			public void intermediateResultAvailable(ServiceEvent result)
 			{
 				dispatchEventToRegistry(regcache, result);
 			}
@@ -438,7 +437,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	 *  @param registry The registry.
 	 *  @param event The service event.
 	 */
-	protected void dispatchEventToRegistry(IServiceRegistry registry, ServiceEvent<IServiceIdentifier> event)
+	protected void dispatchEventToRegistry(IServiceRegistry registry, ServiceEvent event)
 	{
 		switch(event.getType())
 		{

@@ -96,7 +96,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
-import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
@@ -1228,22 +1227,16 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 								}
 							}
 						}
-						else if(ChatEvent.TYPE_USER.equals(ce.getType()))
+						else if(ChatEvent.TYPE_USERADDED.equals(ce.getType()))
 						{
-							ServiceEvent<IChatService> event = (ServiceEvent<IChatService>)ce.getValue();
-							
-							//System.out.println("user event: "+event);
-							
-							if(event.getType()==ServiceEvent.SERVICE_ADDED)
-							{
-								IComponentIdentifier cid = ((IService)event.getService()).getServiceId().getProviderId();
-								updateChatUser(cid, event.getService());
-							}
-							else if(event.getType()==ServiceEvent.SERVICE_REMOVED)
-							{
-								IServiceIdentifier sid = (IServiceIdentifier)event.getService();
-								setUserState(sid.getProviderId(), Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, ce.getNick(), ce.getImage());
-							}
+							IChatService service = (IChatService)ce.getValue();
+							IComponentIdentifier cid = ((IService)service).getServiceId().getProviderId();
+							updateChatUser(cid, service);
+						}
+						else if(ChatEvent.TYPE_USERREMOVED.equals(ce.getType()))
+						{
+							IServiceIdentifier service = (IServiceIdentifier)ce.getValue();
+							setUserState(service.getProviderId(), Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, ce.getNick(), ce.getImage());
 						}
 					}
 					

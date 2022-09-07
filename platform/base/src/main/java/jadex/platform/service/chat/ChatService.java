@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,7 +26,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
-import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.OnEnd;
@@ -190,14 +188,15 @@ public class ChatService implements IChatService, IChatGuiService
 						}
 					});*/
 					
-					ISubscriptionIntermediateFuture<ServiceEvent<IChatService>> fut = (ISubscriptionIntermediateFuture)agent.addQuery(agent.getServiceQuery("chatservices").setEventMode());
+					ISubscriptionIntermediateFuture<ServiceEvent> fut = (ISubscriptionIntermediateFuture)agent.addQuery(agent.getServiceQuery("chatservices").setEventMode());
 					fut.next(event ->
 					{
 						if(event.getType()==ServiceEvent.SERVICE_ADDED)
 						{
-							event.getService().status(nick, STATE_IDLE, null);
-							chatservices.add(event.getService());
-							publishEvent(ChatEvent.TYPE_USER, nick, agent.getId(), event, false, null);
+							IChatService	service	= (IChatService)agent.getServiceProxy(event.getService(), null);
+							service.status(nick, STATE_IDLE, null);
+							chatservices.add(service);
+							publishEvent(ChatEvent.TYPE_USERADDED, nick, agent.getId(), service, false, null);
 						}
 						else if(event.getType()==ServiceEvent.SERVICE_REMOVED)
 						{
@@ -211,7 +210,7 @@ public class ChatService implements IChatService, IChatGuiService
 								}
 							}
 							//chatservices.remove(event.getService());
-							publishEvent(ChatEvent.TYPE_USER, nick, agent.getId(), event, false, null);
+							publishEvent(ChatEvent.TYPE_USERREMOVED, nick, agent.getId(), event.getService(), false, null);
 						}
 					}).catchEx(ex -> ex.printStackTrace());
 					

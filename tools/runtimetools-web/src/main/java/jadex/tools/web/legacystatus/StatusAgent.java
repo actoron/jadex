@@ -286,10 +286,10 @@ public class StatusAgent implements IStatusService
 	 *  Get the managed services, if this platform is a super peer (i.e. has an ISuperpeerService).
 	 *  @return Service events for a self-updating list of services.
 	 */
-	public ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>>	subscribeToServices()
+	public ISubscriptionIntermediateFuture<ServiceEvent>	subscribeToServices()
 	{
 		ISuperpeerService	sps	= agent.getFeature(IRequiredServicesFeature.class).getLocalService(new ServiceQuery<>(ISuperpeerService.class));
-		return sps.addQuery(new ServiceQuery<>((Class<IServiceIdentifier>)null)
+		return sps.addQuery(new ServiceQuery<>((Class<?>)null)
 			.setEventMode()
 			.setOwner(agent.getId())
 			.setNetworkNames((String[])null)

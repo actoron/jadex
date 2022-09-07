@@ -1,6 +1,5 @@
 package jadex.platform.service.distributedservicepool;
 
-import jadex.bridge.service.IService;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
@@ -19,7 +18,7 @@ public interface IDistributedServicePoolService
 	 *  @param pi The publish info.
 	 *  @param scope The publication scope of the pool service.
 	 */
-	public IFuture<Void> addServiceType(ServiceQuery<IService> query, PublishInfo pi, ServiceScope scope);
+	public IFuture<Void> addServiceType(ServiceQuery<?> query, PublishInfo pi, ServiceScope scope);
 
 	/**
 	 *  Remove a service type.
