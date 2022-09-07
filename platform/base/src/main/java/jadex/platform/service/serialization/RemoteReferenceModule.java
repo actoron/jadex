@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.context.Context;
 import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentIdentifier;
@@ -1868,6 +1870,17 @@ public class RemoteReferenceModule
 					OutputConnection ocon = new OutputConnection(null, null, socp.getConnectionId(), true, och);
 					
 					return ocon;
+				}
+			});
+			
+			newprocs.add(newprocs.size()-1, new ImmutableProcessor()
+			{
+				@Override
+				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+				{
+					if(object instanceof Span || object instanceof Context)
+						System.out.println("found span: "+object);
+					return object instanceof Span || object instanceof Context;
 				}
 			});
 			

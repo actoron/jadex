@@ -27,6 +27,7 @@ public interface IDisplayService
 	
 	/**
 	 *  Subscribe to display events.
+	 *  Can receive AreaData, ProgressData or PartDataChunk
 	 */
 //	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<Object> subscribeToDisplayUpdates(String displayid);

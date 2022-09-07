@@ -38,6 +38,8 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
+import jadex.bridge.service.component.interceptors.TracingInterceptor;
+import jadex.bridge.service.component.interceptors.TracingInterceptor.TracingMode;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.address.ITransportAddressService;
@@ -126,6 +128,10 @@ public class Starter
     /** The cache of component models found by scanning available resources. */
     public static String DATA_COMPONENTMODELS = "componentmodels";
     public static String DATA_KERNELFILTERS = "kernelfilters";
+
+    
+	/** If debug is turned on it will send traces via open telemetry. */
+	public static TracingMode TRACING = TracingMode.OFF;
 
     
     // todo: cannot be used because registry needs to know when superpeer changes (remap queries)
@@ -397,6 +403,41 @@ public class Starter
 	}
 	
 	/**
+	 *  Get a boolean value from args (otherwise return default value passed as arg).
+	 *  Any non-boolean, non-null value (e.g. a string) is also considered 'true'. 
+	 *  @param args The args map.
+	 *  @param argname The argument name.
+	 *  @param conf The platform config.
+	 *  @return The arg value.
+	 */
+	public static Object getValueWithArgs(Map<String, Object> args, String argname, IPlatformConfiguration conf)
+	{
+		Object val	= null;
+		if(args!=null)
+		{
+			val = args.get(argname);
+		}
+		
+		if(val==null)
+		{
+			val	= conf.getValue(argname, null);
+			if(val instanceof String)
+			{
+				try
+				{
+					val = SJavaParser.evaluateExpression((String)val, null);
+				}
+				catch(Exception e)
+				{
+					System.out.println("Argument parse exception using as string: " + argname + " \"" + val + "\"");
+				}
+			}
+		}
+		
+		return val;
+	}
+	
+	/**
 	 *  Create the platform.
 	 *  @param config The PlatformConfiguration object.
 	 *  @return The external access of the root component.
@@ -443,6 +484,10 @@ public class Starter
 		
 		// pass configuration parameters to static fields:
 		MethodInvocationInterceptor.DEBUG = getBooleanValueWithArgs(args, "debugservices", config);
+		
+		Object tval = getValueWithArgs(args, "tracing", config);
+		Starter.TRACING = tval instanceof Boolean? ((Boolean)tval).booleanValue()? TracingMode.ON: TracingMode.OFF: (TracingMode)tval;
+		
 		ExecutionComponentFeature.DEBUG = getBooleanValueWithArgs(args, "debugsteps", config);
 		Future.NO_STACK_COMPACTION	= getBooleanValueWithArgs(args, "nostackcompaction", config);
 //		Future.NO_STACK_COMPACTION	= true;
