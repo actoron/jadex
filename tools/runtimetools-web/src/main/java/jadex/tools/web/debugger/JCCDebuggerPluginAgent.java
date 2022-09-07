@@ -1,11 +1,7 @@
 package jadex.tools.web.debugger;
 
-import java.util.Collection;
-
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
-import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
@@ -15,9 +11,7 @@ import jadex.commons.Boolean3;
 import jadex.commons.IFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -78,7 +72,7 @@ public class JCCDebuggerPluginAgent extends JCCPluginAgent implements IJCCDebugg
 			//System.out.println("JCCDebugger suspend 2: "+compo);
 			IFuture<IComponentDescription> fut = agent.getDescription(compo);
 			//fut.then(x -> System.out.println("JCCDebugger suspend 3: "+compo)).catchEx(ex -> System.out.println("JCCDebugger suspend 4: "+compo));
-			fut.delegate(ret);
+			fut.delegateTo(ret);
 		}).catchEx(ret);
 		return ret;
 	}
@@ -92,7 +86,7 @@ public class JCCDebuggerPluginAgent extends JCCPluginAgent implements IJCCDebugg
 		Future<IComponentDescription> ret = new Future<IComponentDescription>();
 		agent.getExternalAccess(compo).stepComponent(step).then(Void ->
 		{
-			agent.getDescription(compo).delegate(ret);
+			agent.getDescription(compo).delegateTo(ret);
 		}).catchEx(ret);
 		return ret;
 	}
@@ -106,7 +100,7 @@ public class JCCDebuggerPluginAgent extends JCCPluginAgent implements IJCCDebugg
 		Future<IComponentDescription> ret = new Future<IComponentDescription>();
 		agent.getExternalAccess(compo).resumeComponent().then(Void ->
 		{
-			agent.getDescription(compo).delegate(ret);
+			agent.getDescription(compo).delegateTo(ret);
 		}).catchEx(ret);
 		return ret;
 	}
@@ -127,7 +121,7 @@ public class JCCDebuggerPluginAgent extends JCCPluginAgent implements IJCCDebugg
 				.then(filename ->
 			{
 				if(filename!=null)
-					loadResource((String)filename).delegate(ret);
+					loadResource((String)filename).delegateTo(ret);
 				else
 					ret.setException(new RuntimeException("No debugger.panel_web for component type defined"));
 					

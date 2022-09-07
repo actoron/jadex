@@ -54,7 +54,6 @@ import jadex.commons.future.IntermediateEmptyResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
@@ -710,8 +709,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 					// listener that notifies when new instances are created
 	//				crons.addJob(cj).addResultListener();
 					ISubscriptionIntermediateFuture<CMSStatusEvent> fut = crons.addJob(cj);
-					TerminableIntermediateDelegationResultListener<CMSStatusEvent> lis = new TerminableIntermediateDelegationResultListener<CMSStatusEvent>(ret2, fut);
-					fut.addResultListener(lis);
+					fut.delegateTo(ret2);
 					ret1.setResult(null);
 				}
 			});

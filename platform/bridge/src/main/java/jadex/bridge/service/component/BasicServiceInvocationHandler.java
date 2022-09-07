@@ -293,6 +293,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 				if(rettype==null)
 					rettype = method.getReturnType();
 				
+				@SuppressWarnings("unchecked")
 				final Future<Object> fret = (Future<Object>)FutureFunctionality.getDelegationFuture(rettype, 
 					new FutureFunctionality(logger));
 //					new ServiceCallFutureFunctionality(logger, sic.getLastServiceCall(), method.getName()));
@@ -340,7 +341,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //									System.err.println("connect getRegisteredClients future: "+fret+", "+sic.getResult());
 //								}
 
-								FutureFunctionality.connectDelegationFuture((Future<?>)fret, (IFuture<?>)sic.getResult());
+								@SuppressWarnings("unchecked")
+								IFuture<Object>	fut	= (IFuture<Object>)sic.getResult(); 
+								fut.delegateTo(fret);
 							}
 						}
 						catch(Exception e)
@@ -649,7 +652,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		{
 			for(UnparsedExpression exp : info.getProperties())
 			{
-				Object val = SJavaParser.parseExpression(exp, ia.getModel().getAllImports(), ia.getClassLoader()).getValue(null);
+				Object val = SJavaParser.parseExpression(exp, ia.getModel().getAllImports(), ia.getClassLoader()).getValue(ia.getFetcher());
 				serprops.put(exp.getName(), val);
 			}
 		}

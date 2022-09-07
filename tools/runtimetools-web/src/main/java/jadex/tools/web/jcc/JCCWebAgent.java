@@ -1,6 +1,6 @@
 package jadex.tools.web.jcc;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,7 +24,6 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.FutureReturnType;
-import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.publish.IPublishService;
@@ -422,7 +421,7 @@ public class JCCWebAgent implements IJCCWebService
 				//if(methodname!=null && methodname.indexOf("suspend")!=-1)
 				//	System.out.println("invokeServiceMethod 2: " + methodname + " " + servicetype+" "+cid);
 				IFuture<Object> fut = checkSecurityAndInvoke(ser, servicetype, methodname, args, argtypes, rettype);
-				FutureFunctionality.connectDelegationFuture(ret, fut);
+				fut.delegateTo(ret);
 			}
 			
 			@Override
@@ -451,7 +450,7 @@ public class JCCWebAgent implements IJCCWebService
 				}
 				
 				IFuture<Object> fut = checkSecurityAndInvoke(ser, servicetype, methodname, args2, argtypes2, rettype);
-				FutureFunctionality.connectDelegationFuture(ret, fut);
+				fut.delegateTo(ret);
 			}
 		});
 		
@@ -471,7 +470,7 @@ public class JCCWebAgent implements IJCCWebService
 			.then(ser ->
 		{
 			IFuture<Object> fut = checkSecurityAndInvoke(ser, null, methodname, args, argtypes, rettype);
-			FutureFunctionality.connectDelegationFuture(ret, fut);
+			fut.delegateTo(ret);
 		})
 		.catchEx(ret);
 		
@@ -534,7 +533,7 @@ public class JCCWebAgent implements IJCCWebService
 									// If found on target platform directly invoke on that platform
 									//System.out.println("Invoking service method: "+ser+" "+methodname);
 									IFuture<Object> fut = ser.invokeMethod(methodname, argtypes, args, rettype);
-									FutureFunctionality.connectDelegationFuture(ret, fut);
+									fut.delegateTo(ret);
 								}
 							}
 						});
@@ -545,7 +544,7 @@ public class JCCWebAgent implements IJCCWebService
 					// If found on target platform directly invoke on that platform
 					//System.out.println("Invoking service method: "+ser+" "+methodname);
 					IFuture<Object> fut = ser.invokeMethod(methodname, argtypes, args, rettype);
-					FutureFunctionality.connectDelegationFuture(ret, fut);
+					fut.delegateTo(ret);
 				}
 			}
 		});
@@ -580,7 +579,7 @@ public class JCCWebAgent implements IJCCWebService
 				Future<String> f = new Future<>();
 				f.setResult(VersionInfo.getInstance().getVersion() + " (" + VersionInfo.getInstance().getTextDateString() + ")");
 				return f;
-			}).delegate(ret);
+			}).delegateTo(ret);
 		}
 		else
 		{

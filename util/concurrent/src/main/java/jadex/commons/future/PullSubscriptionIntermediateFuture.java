@@ -13,7 +13,7 @@ import jadex.commons.ICommand;
  *  gets executed if terminate is called.
  */
 public class PullSubscriptionIntermediateFuture<E> extends SubscriptionIntermediateFuture<E> 
-	implements IPullSubscriptionIntermediateFuture<E>
+	implements IPullSubscriptionIntermediateFuture<E>, IPullIntermediateFuture<E>
 {
 	//-------- attributes --------
 	

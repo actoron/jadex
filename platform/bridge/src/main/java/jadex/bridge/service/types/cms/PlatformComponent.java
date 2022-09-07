@@ -78,12 +78,9 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.ExceptionResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
-import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.Tuple2Future;
 
@@ -692,6 +689,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 *  @param name The argument name.
 	 *  @return The argument value.
 	 */
+	@Deprecated
 	public Object getArgument(String name)
 	{
 		return getFeature(IArgumentsResultsFeature.class).getArguments().get(name);
@@ -925,7 +923,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		if(!SReflect.isSupertype(IExternalComponentFeature.class, iface))
 			throw new IllegalArgumentException("Must be external feature interface (extend IExternalComponentFeature)");
 		
-		return (T)ProxyFactory.newProxyInstance(cl, new Class[]{iface, IExternalAccess.class}, new InvocationHandler()
+		@SuppressWarnings("unchecked")
+		T	ret	= (T)ProxyFactory.newProxyInstance(cl, new Class[]{iface, IExternalAccess.class}, new InvocationHandler()
 		{
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
@@ -933,6 +932,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				return method.invoke(original, args);
 			}
 		});
+		return ret;
 	}
 	
 	/**
@@ -1606,8 +1606,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 						step = (IComponentStep<?>)args[i];
 						if(step instanceof IPriorityComponentStep)
 						{
-							prio = ((IPriorityComponentStep)step).getPriority();
-							inherit = ((IPriorityComponentStep)step).isInherit();
+							prio = ((IPriorityComponentStep<?>)step).getPriority();
+							inherit = ((IPriorityComponentStep<?>)step).isInherit();
 						}
 						break;
 					}
@@ -1711,6 +1711,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				
 				if(!getFeature(IExecutionFeature.class).isComponentThread())
 				{
+					@SuppressWarnings("unchecked")
 					final Future<Object> ret = (Future<Object>)SFuture.getFuture(rettype);
 //						System.out.println("scheduleStep: "+method.getName()+" "+method.getReturnType());
 					final Exception ex	= Future.DEBUG ? new DebugException() : null;
@@ -1762,9 +1763,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 //								System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 							
 							IFuture<Object>	fut	= doInvoke(ia, method, args);
-							// Must connect futures in case of subscriptions
-							// Otherwise termination will not work
-							FutureFunctionality.connectDelegationFuture(ret, fut);
+							fut.delegateTo(ret);
 							
 							if(shutdown && debug)
 								PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doExecute2: "+cid+", "+method+", "+SUtil.arrayToString(args)+" done="+fut.isDone());
@@ -1912,13 +1911,15 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				if(res instanceof IFuture)
 				{
 					if(shutdown && debug)
-						PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doInvoke6: "+cid+", "+method+", "+SUtil.arrayToString(args)+": "+res+", done="+((IFuture)res).isDone());
-					ret = (IFuture<Object>)res;
+						PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doInvoke6: "+cid+", "+method+", "+SUtil.arrayToString(args)+": "+res+", done="+((IFuture<?>)res).isDone());
+					@SuppressWarnings("unchecked")
+					IFuture<Object>	iret = (IFuture<Object>)res;
+					ret	= iret;
 				}
 				else
 				{
 					ret = new Future<Object>();
-					((Future)ret).setResult(res);
+					((Future<Object>)ret).setResult(res);
 				}
 			}
 			catch(Exception e)
@@ -1926,7 +1927,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				if(shutdown && debug)
 					PlatformComponent.this.getLogger().severe("ExternalAccessInvocationHandler.doInvoke7: "+cid+", "+method+", "+SUtil.arrayToString(args)+"\n"+SUtil.getExceptionStacktrace(e));
 				ret = new Future<Object>();
-				((Future)ret).setException(e);
+				((Future<Object>)ret).setException(e);
 			}
 			
 //				return getDecoupledFuture(ret);

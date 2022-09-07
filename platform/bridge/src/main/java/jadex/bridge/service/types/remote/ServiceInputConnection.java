@@ -14,7 +14,6 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 /**
  * 
@@ -34,7 +33,7 @@ public class ServiceInputConnection implements IInputConnection
 	protected ITerminableIntermediateFuture<Long> transferfuture;
 
 	/** The transfer future. */
-	protected ICommand transfercommand;
+	protected ICommand<?> transfercommand;
 	
 	/**
 	 *  Create a new service input connection.
@@ -221,13 +220,12 @@ public class ServiceInputConnection implements IInputConnection
 		{
 			if(transfercommand==null)
 			{
-				transfercommand = new ICommand()
+				transfercommand = new ICommand<Object>()
 				{
 					public void execute(Object args)
 					{
 						ISubscriptionIntermediateFuture<Long> src = con.writeToOutputStream(os, component);
-						TerminableIntermediateDelegationResultListener<Long> lis = new TerminableIntermediateDelegationResultListener<Long>(ret, src);
-						src.addResultListener(lis);
+						src.delegateTo(ret);
 					}
 				};
 			}
@@ -239,8 +237,7 @@ public class ServiceInputConnection implements IInputConnection
 		else
 		{
 			ITerminableIntermediateFuture<Long> src = con.writeToOutputStream(os, component);
-			TerminableIntermediateDelegationResultListener<Long> lis = new TerminableIntermediateDelegationResultListener<Long>(ret, src);
-			src.addResultListener(lis);
+			src.delegateTo(ret);
 		}
 		
 		return ret;

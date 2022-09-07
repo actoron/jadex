@@ -5,7 +5,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -151,14 +150,14 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 						
 						if(!isagentimpl)
 						{
-							invokeDoubleMethod(sic, si, START_METHOD, OnStart.class, true, true).delegate(ret);	
+							invokeDoubleMethod(sic, si, START_METHOD, OnStart.class, true, true).delegateTo(ret);	
 						}
 						else
 						{
 							// Only invokes start on management service (pojo is agent)
 							//System.out.println("Deferring call on OnStart method as impl is agent class: "+obj.getClass());
 							sic.setObject(si.getManagementService());
-							sic.invoke().delegate(ret);
+							sic.invoke().delegateTo(ret);
 						}
 					});
 				//.addResultListener(new DelegationResultListener<Void>(ret));
@@ -171,7 +170,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 					.then(x->ret.setResult(null))
 					.catchEx(x->
 					{
-						invokeDoubleMethod(sic, si, SHUTDOWN_METHOD, OnEnd.class, true, true).delegate(ret);	
+						invokeDoubleMethod(sic, si, SHUTDOWN_METHOD, OnEnd.class, true, true).delegateTo(ret);	
 					});
 				//invokeDoubleMethod(sic, si, SHUTDOWN_METHOD, ServiceShutdown.class, false).addResultListener(new DelegationResultListener<Void>(ret));
 			}
@@ -312,7 +311,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		{
 //			System.out.println("already called: "+obj+" "+anname);
 			sic.setObject(si.getManagementService());
-			sic.invoke().delegate(ret);
+			sic.invoke().delegateTo(ret);
 		}
 		// both must be inited
 		else

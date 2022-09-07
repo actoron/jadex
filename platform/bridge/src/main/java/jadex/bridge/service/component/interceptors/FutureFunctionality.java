@@ -23,9 +23,7 @@ import jadex.commons.future.PullIntermediateDelegationFuture;
 import jadex.commons.future.PullSubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableDelegationFuture;
-import jadex.commons.future.TerminableDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
-import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 import jadex.commons.future.Tuple2Future;
 import jadex.commons.future.TupleResult;
 
@@ -298,63 +296,13 @@ public class FutureFunctionality
 		return ret;
 	}
 	
-	/**
-	 *  Connect a delegation future with the source.
-	 *  Add delegation listener on the source (+ termination handling).
-	 */
-	public static void connectDelegationFuture(Future target, IFuture source)
-	{
-		if(target==null)
-			throw new IllegalArgumentException("Target must not null");
-		if(source==null)
-			throw new IllegalArgumentException("Source must not null");
-		
-		if(target instanceof IPullSubscriptionIntermediateFuture)
-		{
-			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
-				(PullSubscriptionIntermediateDelegationFuture)target, (IPullSubscriptionIntermediateFuture)source);
-			source.addResultListener(lis);
-		}
-		else if(target instanceof IPullIntermediateFuture)
-		{
-			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
-				(PullIntermediateDelegationFuture)target, (IPullIntermediateFuture)source);
-			source.addResultListener(lis);
-		}
-		else if(target instanceof ISubscriptionIntermediateFuture)
-		{
-			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
-				(TerminableIntermediateDelegationFuture)target, (ISubscriptionIntermediateFuture)source);
-			source.addResultListener(lis);
-		}
-		else if(target instanceof ITerminableIntermediateFuture)
-		{
-			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
-				(TerminableIntermediateDelegationFuture)target, (ITerminableIntermediateFuture)source);
-			source.addResultListener(lis);
-		}
-		else if(target instanceof ITerminableFuture)
-		{
-			TerminableDelegationResultListener lis = new TerminableDelegationResultListener(
-				(TerminableDelegationFuture)target, (ITerminableFuture)source);
-			source.addResultListener(lis);
-		}
-		else if(target instanceof IIntermediateFuture)
-		{
-			source.addResultListener(new IntermediateDelegationResultListener((IntermediateFuture)target));
-		}
-		else
-		{
-			source.addResultListener(new DelegationResultListener(target));
-		}
-	}
 }
 
 
 /**
  * 
  */
-class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscriptionIntermediateDelegationFuture<Object>
+class DelegatingPullSubscriptionIntermediateDelegationFuture<E> extends PullSubscriptionIntermediateDelegationFuture<E>
 {
 	/** The future functionality. */
 	protected FutureFunctionality func;
@@ -372,23 +320,23 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 	/**
 	 * 
 	 */
-	public DelegatingPullSubscriptionIntermediateDelegationFuture(IPullSubscriptionIntermediateFuture<?> src, FutureFunctionality func)
+	public DelegatingPullSubscriptionIntermediateDelegationFuture(IPullSubscriptionIntermediateFuture<E> src, FutureFunctionality func)
 	{
 		if(func==null)
 			throw new IllegalArgumentException("Func must not null.");
 		this.func = func;
-		src.addResultListener(new TerminableIntermediateDelegationResultListener(this, src));
+		src.delegateTo(this);
 	}
 	
 	/**
 	 *  Overwritten to change result or undone, if necessary.
 	 */
 	@Override
-	protected boolean	doSetResult(Collection<Object> result, boolean undone)
+	protected boolean	doSetResult(Collection<E> result, boolean undone)
 	{
 		try
 		{
-			result = (Collection<Object>)func.handleResult(result);
+			result = (Collection<E>)func.handleResult(result);
 			return DelegatingPullSubscriptionIntermediateDelegationFuture.super.doSetResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
@@ -411,11 +359,11 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 	 *  Overwritten to change result, if necessary.
 	 */
 	@Override
-	protected boolean	doAddIntermediateResult(Object result, boolean undone)
+	protected boolean	doAddIntermediateResult(E result, boolean undone)
 	{
 		try
 		{
-			result = func.handleIntermediateResult(result);
+			result = (E)func.handleIntermediateResult(result);
 			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingPullSubscriptionIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
 			func.handleAfterIntermediateResult(result);
@@ -435,7 +383,7 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 	{
 		try
 		{
-			func.handleFinished(getIntermediateResults());
+			func.handleFinished((Collection<Object>)getIntermediateResults());
 			return DelegatingPullSubscriptionIntermediateDelegationFuture.super.doSetFinished(func.isUndone(undone));
 		}
 		catch(Exception e)
@@ -448,7 +396,7 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
      *  Execute a notification. Override for scheduling on other threads.
      */
 	@Override
-    protected void	executeNotification(IResultListener<Collection<Object>> listener, ICommand<IResultListener<Collection<Object>>> command)
+    protected void	executeNotification(IResultListener<Collection<E>> listener, ICommand<IResultListener<Collection<E>>> command)
     {
 		func.scheduleForward(command, listener);
     }
@@ -508,7 +456,7 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 /**
  * 
  */
-class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegationFuture<Object>
+class DelegatingPullIntermediateDelegationFuture<E> extends PullIntermediateDelegationFuture<E>
 {
 	/** The future functionality. */
 	protected FutureFunctionality func;
@@ -526,23 +474,23 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 	/**
 	 * 
 	 */
-	public DelegatingPullIntermediateDelegationFuture(IPullIntermediateFuture<?> src, FutureFunctionality func)
+	public DelegatingPullIntermediateDelegationFuture(IPullIntermediateFuture<E> src, FutureFunctionality func)
 	{
 		if(func==null)
 			throw new IllegalArgumentException("Func must not null.");
 		this.func = func;
-		src.addResultListener(new TerminableIntermediateDelegationResultListener(this, src));
+		src.delegateTo(this);
 	}
 
 	/**
 	 *  Overwritten to change result, if necessary.
 	 */
 	@Override
-	protected boolean doSetResult(Collection<Object> result, boolean undone)
+	protected boolean doSetResult(Collection<E> result, boolean undone)
 	{
 		try
 		{
-			result = (Collection<Object>)func.handleResult(result);
+			result = (Collection<E>)func.handleResult(result);
 			return DelegatingPullIntermediateDelegationFuture.super.doSetResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
@@ -565,11 +513,11 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 	 *  Overwritten to change result, if necessary.
 	 */
 	@Override
-	protected boolean doAddIntermediateResult(Object result, boolean undone)
+	protected boolean doAddIntermediateResult(E result, boolean undone)
 	{
 		try
 		{
-			result = func.handleIntermediateResult(result);
+			result = (E)func.handleIntermediateResult(result);
 			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingPullIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
 			func.handleAfterIntermediateResult(result);
@@ -589,7 +537,7 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 	{
 		try
 		{
-			func.handleFinished(getIntermediateResults());
+			func.handleFinished((Collection<Object>)getIntermediateResults());
 			return DelegatingPullIntermediateDelegationFuture.super.doSetFinished(func.isUndone(undone));
 		}
 		catch(Exception e)
@@ -602,7 +550,7 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
      *  Execute a notification. Override for scheduling on other threads.
      */
 	@Override
-    protected void	executeNotification(IResultListener<Collection<Object>> listener, ICommand<IResultListener<Collection<Object>>> command)
+    protected void	executeNotification(IResultListener<Collection<E>> listener, ICommand<IResultListener<Collection<E>>> command)
     {
 		func.scheduleForward(command, listener);
     }
@@ -663,7 +611,7 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 /**
  * 
  */
-class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionIntermediateDelegationFuture<Object>
+class DelegatingSubscriptionIntermediateDelegationFuture<E> extends SubscriptionIntermediateDelegationFuture<E>
 {
 	/** The future functionality. */
 	protected FutureFunctionality func;
@@ -712,25 +660,25 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	/**
 	 * 
 	 */
-	public DelegatingSubscriptionIntermediateDelegationFuture(ISubscriptionIntermediateFuture<?> src, FutureFunctionality func)
+	public DelegatingSubscriptionIntermediateDelegationFuture(ISubscriptionIntermediateFuture<E> src, FutureFunctionality func)
 	{
 //		this.mysrc	= src;	// for debugging only
 		
 		if(func==null)
 			throw new IllegalArgumentException("Func must not null.");
 		this.func = func;
-		src.addResultListener(new TerminableIntermediateDelegationResultListener(this, src));
+		src.delegateTo(this);
 	}
 	
 	/**
 	 *  Overwritten to change result, if necessary.
 	 */
 	@Override
-	protected boolean	doSetResult(Collection<Object> result, boolean undone)
+	protected boolean	doSetResult(Collection<E> result, boolean undone)
 	{
 		try
 		{
-			result = (Collection<Object>)func.handleResult(result);
+			result = (Collection<E>)func.handleResult(result);
 			return DelegatingSubscriptionIntermediateDelegationFuture.super.doSetResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
@@ -753,7 +701,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	 *  Overwritten to change result, if necessary.
 	 */
 	@Override
-	protected boolean	doAddIntermediateResult(Object result, boolean undone)
+	protected boolean	doAddIntermediateResult(E result, boolean undone)
 	{
 //		if((""+result).contains("IMarkerService"))
 ////			|| (""+result).contains("PartDataChunk"))
@@ -762,7 +710,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 //		}
 		try
 		{
-			result = func.handleIntermediateResult(result);
+			result = (E)func.handleIntermediateResult(result);
 			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingSubscriptionIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
 			func.handleAfterIntermediateResult(result);
@@ -782,7 +730,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	{
 		try
 		{
-			func.handleFinished(getIntermediateResults());
+			func.handleFinished((Collection<Object>)getIntermediateResults());
 			return DelegatingSubscriptionIntermediateDelegationFuture.super.doSetFinished(func.isUndone(undone));
 		}
 		catch(Exception e)
@@ -795,7 +743,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
      *  Execute a notification. Override for scheduling on other threads.
      */
 	@Override
-    protected void	executeNotification(IResultListener<Collection<Object>> listener, ICommand<IResultListener<Collection<Object>>> command)
+    protected void	executeNotification(IResultListener<Collection<E>> listener, ICommand<IResultListener<Collection<E>>> command)
     {
 		func.scheduleForward(command, listener);
     }
@@ -839,7 +787,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 /**
  * 
  */
-class DelegatingTerminableIntermediateDelegationFuture extends TerminableIntermediateDelegationFuture<Object>
+class DelegatingTerminableIntermediateDelegationFuture<E> extends TerminableIntermediateDelegationFuture<E>
 {
 	/** The future functionality. */
 	protected FutureFunctionality func;
@@ -857,23 +805,23 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	/**
 	 * 
 	 */
-	public DelegatingTerminableIntermediateDelegationFuture(ITerminableIntermediateFuture<?> src, FutureFunctionality func)
+	public DelegatingTerminableIntermediateDelegationFuture(ITerminableIntermediateFuture<E> src, FutureFunctionality func)
 	{
 		if(func==null)
 			throw new IllegalArgumentException("Func must not null.");
 		this.func = func;
-		src.addResultListener(new TerminableIntermediateDelegationResultListener(this, src));
+		src.delegateTo(this);
 	}
 	
 	/**
 	 *  Overwritten to change result, if necessary.
 	 */
 	@Override
-	protected boolean doSetResult(Collection<Object> result, boolean undone)
+	protected boolean doSetResult(Collection<E> result, boolean undone)
 	{
 		try
 		{
-			result = (Collection<Object>)func.handleResult(result);
+			result = (Collection<E>)func.handleResult(result);
 			return DelegatingTerminableIntermediateDelegationFuture.super.doSetResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
@@ -896,11 +844,11 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	 *  Overwritten to change result, if necessary.
 	 */
 	@Override
-	protected boolean	doAddIntermediateResult(Object result, boolean undone)
+	protected boolean	doAddIntermediateResult(E result, boolean undone)
 	{
 		try
 		{
-			result = func.handleIntermediateResult(result);
+			result = (E)func.handleIntermediateResult(result);
 			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingTerminableIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
 			func.handleAfterIntermediateResult(result);
@@ -920,7 +868,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	{
 		try
 		{
-			func.handleFinished(getIntermediateResults());
+			func.handleFinished((Collection<Object>)getIntermediateResults());
 			return DelegatingTerminableIntermediateDelegationFuture.super.doSetFinished(func.isUndone(undone));
 		}
 		catch(Exception e)
@@ -933,7 +881,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
      *  Execute a notification. Override for scheduling on other threads.
      */
 	@Override
-    protected void	executeNotification(IResultListener<Collection<Object>> listener, ICommand<IResultListener<Collection<Object>>> command)
+    protected void	executeNotification(IResultListener<Collection<E>> listener, ICommand<IResultListener<Collection<E>>> command)
     {
 		func.scheduleForward(command, listener);
     }
@@ -976,7 +924,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 /**
  * 
  */
-class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Object>
+class DelegatingTerminableDelegationFuture<E> extends TerminableDelegationFuture<E>
 {
 	/** The future functionality. */
 	protected FutureFunctionality func;
@@ -992,23 +940,23 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 	/**
 	 * 
 	 */
-	public DelegatingTerminableDelegationFuture(ITerminableFuture<?> src, FutureFunctionality func)
+	public DelegatingTerminableDelegationFuture(ITerminableFuture<E> src, FutureFunctionality func)
 	{
 		// Cannot use super because it triggers and func is still null
 //		super(src);
 		this.func = func;
-		src.addResultListener(new TerminableDelegationResultListener(this, src));
+		src.delegateTo(this);
 	}
 	
 	/**
 	 *  Overwritten to change result, if necessary.
 	 */
 	@Override
-	protected boolean	doSetResult(Object result, boolean undone)
+	protected boolean	doSetResult(E result, boolean undone)
 	{
 		try
 		{
-			result = func.handleResult(result);
+			result = (E)func.handleResult(result);
 			return DelegatingTerminableDelegationFuture.super.doSetResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
@@ -1031,7 +979,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
      *  Execute a notification. Override for scheduling on other threads.
      */
 	@Override
-    protected void	executeNotification(IResultListener<Object> listener, ICommand<IResultListener<Object>> command)
+    protected void	executeNotification(IResultListener<E> listener, ICommand<IResultListener<E>> command)
     {
 		func.scheduleForward(command, listener);
     }

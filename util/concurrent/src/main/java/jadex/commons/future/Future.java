@@ -1056,7 +1056,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
         	public void customResultAvailable(E result)
         	{
         		 IFuture<T> res = function.apply(result);
-                 res.delegate(ret);
+                 res.delegateTo(ret);
         	}	
         });
 
@@ -1239,55 +1239,39 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
         });
         return ret;
     }*/
-	
+		
 	/**
 	 *  Delegate the result and exception to another future.
 	 *  Short form for adding a delegation listener.
 	 *  @param delegate The other future.
+	 *  
+	 *  @deprecated Use delegateTo.
 	 */
-	public void delegate(Future<E> target)
+	public void delegate(Future<E> delegate)
 	{
-		if(target==null)
-			throw new IllegalArgumentException("Target must not null");
+		delegateTo(delegate);
+	}
+	
+	/**
+	 *  Forward the result and exception to another future.
+	 *  Short form for adding a delegation listener.
+	 *  @param target The target future.
+	 */
+	public void delegateTo(Future<E> target)
+	{
+		target.delegateFrom(this);
+	}
+	
+	/**
+	 *  Delegate the result and exception from another future.
+	 *  @param source The source future.
+	 */
+	public void delegateFrom(IFuture<E> source)
+	{
+		if(source==null)
+			throw new IllegalArgumentException("Source must not null");
 		
-		if(target instanceof IPullSubscriptionIntermediateFuture)
-		{
-			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
-				(PullSubscriptionIntermediateDelegationFuture)target, (IPullSubscriptionIntermediateFuture)this);
-			this.addResultListener(lis);
-		}
-		else if(target instanceof IPullIntermediateFuture)
-		{
-			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
-				(PullIntermediateDelegationFuture)target, (IPullIntermediateFuture)this);
-			this.addResultListener(lis);
-		}
-		else if(target instanceof ISubscriptionIntermediateFuture)
-		{
-			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
-				(TerminableIntermediateDelegationFuture)target, (ISubscriptionIntermediateFuture)this);
-			this.addResultListener(lis);
-		}
-		else if(target instanceof ITerminableIntermediateFuture)
-		{
-			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
-				(TerminableIntermediateDelegationFuture)target, (ITerminableIntermediateFuture)this);
-			this.addResultListener(lis);
-		}
-		else if(target instanceof ITerminableFuture)
-		{
-			TerminableDelegationResultListener lis = new TerminableDelegationResultListener(
-				(TerminableDelegationFuture)target, (ITerminableFuture)this);
-			this.addResultListener(lis);
-		}
-		else if(target instanceof IIntermediateFuture)
-		{
-			this.addResultListener(new IntermediateDelegationResultListener((IntermediateFuture)target));
-		}
-		else
-		{
-			this.addResultListener(new DelegationResultListener(target));
-		}
+		source.addResultListener(new DelegationResultListener<>(this));
 	}
 	
 	/**
@@ -1354,28 +1338,28 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
         return this;
     }
 	
-	/**
-	 *  Called on exception.
-	 *  @param delegate The future the exception will be delegated to.
-	 */
-	public <T> IFuture<E> delegateEx(Future<T> delegate)
-	{
-		this.addResultListener(new IResultListener<E>()
-		{
-			@Override
-			public void exceptionOccurred(Exception exception)
-			{
-				delegate.setException(exception);
-			}
-			
-			@Override
-			public void resultAvailable(E result)
-			{
-			}
-		});
-		
-		return this;
-	}
+//	/**
+//	 *  Called on exception.
+//	 *  @param delegate The future the exception will be delegated to.
+//	 */
+//	public <T> IFuture<E> delegateEx(Future<T> delegate)
+//	{
+//		this.addResultListener(new IResultListener<E>()
+//		{
+//			@Override
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				delegate.setException(exception);
+//			}
+//			
+//			@Override
+//			public void resultAvailable(E result)
+//			{
+//			}
+//		});
+//		
+//		return this;
+//	}
 	
 	/**
 	 *  Sequential execution of async methods via implicit delegation.
@@ -1393,7 +1377,10 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		{
 			try
 			{
-				ret = (Future<T>)futuretype.getDeclaredConstructor().newInstance();
+				
+				@SuppressWarnings("unchecked")
+				Future<T>	fut	= (Future<T>)futuretype.getDeclaredConstructor().newInstance();
+				ret	= fut;
 			}
 			catch(Exception e)
 			{

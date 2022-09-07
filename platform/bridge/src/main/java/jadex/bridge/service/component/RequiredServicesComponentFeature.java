@@ -117,8 +117,12 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 						sqmsfut.terminate();
 						for (Tuple2<ServiceQuery<?>, SubscriptionIntermediateDelegationFuture<?>> sqi : delayedremotequeries)
 						{
-							ISubscriptionIntermediateFuture<?> dfut = addQuery(sqi.getFirstEntity());
-							FutureFunctionality.connectDelegationFuture(sqi.getSecondEntity(), dfut);
+							@SuppressWarnings({"unchecked"})
+							ISubscriptionIntermediateFuture<Object> source = (ISubscriptionIntermediateFuture<Object>)addQuery(sqi.getFirstEntity());
+							@SuppressWarnings("unchecked")
+							SubscriptionIntermediateDelegationFuture<Object>	target	= (SubscriptionIntermediateDelegationFuture<Object>)sqi.getSecondEntity();
+							
+							source.delegateTo(target);
 						}
 						delayedremotequeries = null;
 					}
@@ -369,6 +373,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		}
 		else
 		{
+			@SuppressWarnings("unchecked")
 			ServiceQuery<T> sq = (ServiceQuery<T>)getServiceQuery(info).setMultiplicity(Multiplicity.ZERO_ONE);
 			return resolveLocalService(sq, info);
 			
@@ -729,8 +734,8 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	protected Object processResult(Object result, RequiredServiceInfo info)
 	{
-		if(result instanceof ServiceEvent)
-			return processServiceEvent((ServiceEvent)result, info);
+		if(result instanceof ServiceEvent<?>)
+			return processServiceEvent((ServiceEvent<?>)result, info);
 		else if(result instanceof IServiceIdentifier)
 			return getServiceProxy((IServiceIdentifier)result, info);
 		else if(result instanceof IService)
@@ -899,6 +904,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			// Search remotely and connect to delegation future.
 			ITerminableIntermediateFuture<IServiceIdentifier> remotes = sqms.searchServices(query);
 
+			@SuppressWarnings("unchecked")
 			final IntermediateFuture<IServiceIdentifier>[] futs = new IntermediateFuture[1];
 			
 			// Combined delegation future for local and remote results.
@@ -985,7 +991,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 
 //			System.out.println("Search: "+query);
 //			remotes.addResultListener(res -> System.out.println("Search finished: "+query));
-			FutureFunctionality.connectDelegationFuture(futs[0], remotes); // target, source
+			remotes.delegateTo(futs[0]);
 			
 			@SuppressWarnings("unchecked")
 			IIntermediateFuture<T>	casted	= (IIntermediateFuture<T>)futs[0];
@@ -1273,7 +1279,6 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 *  Result may be service object, service identifier (local or remote), or event.
 	 *  User object is either event or service (with or without required proxy).
 	 */
-	@SuppressWarnings({"rawtypes", "unchecked" })
 	public IService getServiceProxy(IServiceIdentifier sid, RequiredServiceInfo info)
 	{
 		IService ret = null;

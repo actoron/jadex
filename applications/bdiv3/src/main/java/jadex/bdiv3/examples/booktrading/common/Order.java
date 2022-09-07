@@ -220,7 +220,7 @@ public class Order
 	{
 		long oldstarttime = this.starttime;
 		this.starttime = starttime;
-		pcs.firePropertyChange("startTime", new Long(oldstarttime), new Long(starttime));
+		pcs.firePropertyChange("startTime", Long.valueOf(oldstarttime), Long.valueOf(starttime));
 	}
 
 	/**

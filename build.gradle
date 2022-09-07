@@ -46,9 +46,6 @@ println "Jadex Build Version " + project.ext.jadex_build_version
 def buildutilsdirfile = new File(project.projectDir, 'src/main/buildutils');
 project.ext.buildutilsdir = buildutilsdirfile.getCanonicalPath()
 
-// Generate new timestamp (i.e. build time)
-project.ext.timestamp	= (long) ((new Date()).getTime() / 1000) // Divide by 1000 to make UNIX time
-
 System.setOut(new PrintStream(new OutputStream() {
 	private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 	public void write(int b) {
@@ -287,11 +284,11 @@ subprojects
             testImplementation junit
         }
 
+		// Replace jadex version in some source files (e.g. schema version in xmls)
         processResources {
 			filesMatching('**/version.properties')
 			{
 				filter{String line -> line.replace('${jadex_build_version}', "" + project.version.toString())}
-				filter{String line -> line.replace('${timestamp}', "" + rootProject.ext.timestamp)}
 			}
 		}
 
@@ -582,6 +579,9 @@ subprojects
 			buildName = 'rebuild-'+distname	// required to avoid name clashes in newer gradle versions, grrr.
 			tasks = ["clean", "jadexDistZip"]
 			startParameter.projectProperties << ["dist": distname]
+			// Rebuild to same version (otherwise src zip defaults to snapshot build)
+			startParameter.projectProperties << ["jadexversion_patch": version.patch]
+			startParameter.projectProperties << ["jadexversion_timestamp": version.timestamp]
 			
 			doLast {					
 				// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)

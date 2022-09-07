@@ -2,14 +2,12 @@ package jadex.platform.service.cron.jobs;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
-import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 /**
  *  The create command is used to create a component via the cms.
@@ -46,14 +44,14 @@ public class CreateCommand implements IResultCommand<IIntermediateFuture<CMSStat
 	 */
 	public ISubscriptionIntermediateFuture<CMSStatusEvent> execute(final IInternalAccess ia)
 	{
+		@SuppressWarnings("unchecked")
 		final SubscriptionIntermediateDelegationFuture<CMSStatusEvent> ret = (SubscriptionIntermediateDelegationFuture<CMSStatusEvent>)
 			SFuture.getNoTimeoutFuture(SubscriptionIntermediateDelegationFuture.class, ia);
 		
 		info.setName(name);
 		info.setFilename(model);
 		ISubscriptionIntermediateFuture<CMSStatusEvent> fut = ia.createComponentWithEvents(info);
-		TerminableIntermediateDelegationResultListener<CMSStatusEvent> lis = new TerminableIntermediateDelegationResultListener<CMSStatusEvent>(ret, fut);
-		fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(lis));
+		fut.delegateTo(ret);
 				
 		return ret;
 	}

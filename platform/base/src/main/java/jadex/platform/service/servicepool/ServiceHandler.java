@@ -361,7 +361,7 @@ public class ServiceHandler implements InvocationHandler
 				}
 			}
 			IFuture<Object> res = (IFuture<Object>)method.invoke(service, args);
-			FutureFunctionality.connectDelegationFuture(ret, res);
+			res.delegateTo((Future<Object>)ret);
 //			if(method.getName().indexOf("calculate")!=-1)
 //				System.out.println("connect in pool: "+ret);
 			
