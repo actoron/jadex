@@ -14,7 +14,7 @@ dependencies
 	api project(':platform:base')
 
 	implementation project(':platform:webservice')
-	implementation project(':applications-micro')
+	implementation project(':applications:micro')
 	testImplementation project(':platform:webservice-jetty')
 	testImplementation project(':transports:intravm')
 	

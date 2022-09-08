@@ -14,10 +14,10 @@ dependencies
 	//api 'io.opentracing:opentracing-api:0.33.0'
 	//api 'io.opentracing:opentracing-util:0.33.0'
 	//api 'io.opentracing:opentracing-mock:0.33.0'
-	implementation 'io.opentelemetry:opentelemetry-api:1.16.0'
+	api 'io.opentelemetry:opentelemetry-api:1.16.0'
 	implementation 'io.opentelemetry:opentelemetry-sdk:1.16.0'
 	implementation 'io.opentelemetry:opentelemetry-context:1.16.0'
 	implementation 'io.opentelemetry:opentelemetry-exporter-otlp:1.16.0'
 	//implementation 'io.opentelemetry:opentelemetry-exporter-jaeger:1.16.0'
-	runtimeOnly 'io.opentelemetry:opentelemetry-semconv:1.16.0-alpha'
+	implementation 'io.opentelemetry:opentelemetry-semconv:1.16.0-alpha'
 }
