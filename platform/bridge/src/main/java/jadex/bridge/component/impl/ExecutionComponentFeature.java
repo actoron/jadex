@@ -56,9 +56,9 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
-import jadex.commons.SAccess;
 import jadex.commons.DebugException;
 import jadex.commons.IResultCommand;
+import jadex.commons.SAccess;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
@@ -1860,7 +1860,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			cl	= setExecutionState();
 			
-			endagenda.setResult(null);
+			// Hack!!! only done when double execution!?
+			endagenda.setResultIfUndone(null);
 
 			resetExecutionState(cl);
 		}
