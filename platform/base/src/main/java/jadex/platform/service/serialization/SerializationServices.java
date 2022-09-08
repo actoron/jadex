@@ -11,12 +11,15 @@ import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import io.opentracing.Span;
-import io.opentracing.SpanContext;
-import io.opentracing.propagation.Format.Builtin;
-import io.opentracing.propagation.TextMapExtractAdapter;
-import io.opentracing.propagation.TextMapInjectAdapter;
-import io.opentracing.util.GlobalTracer;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.propagation.ContextPropagators;
+import io.opentelemetry.context.propagation.TextMapPropagator;
+import io.opentelemetry.context.propagation.TextMapSetter;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
@@ -35,6 +38,7 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.interceptors.SpanContextInfo;
+import jadex.bridge.service.component.interceptors.TracingInterceptor;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
@@ -434,9 +438,18 @@ public class SerializationServices implements ISerializationServices
 				try
 				{
 					SpanContextInfo sci = (SpanContextInfo)object;
+					Map<String, String> vals = sci.getValues();
+					Context ctx = Context.root();
+					OpenTelemetry ot = GlobalOpenTelemetry.get();
+					ContextPropagators propas = ot.getPropagators();
+					TextMapPropagator tmp = propas.getTextMapPropagator();
+					tmp.extract(ctx, vals, TracingInterceptor.TextMapExtractAdapter.GETTER);
+					
+					System.out.println("span decoded: "+vals);
+					
 					//Map<String, Object> ctx = (Map<String, Object>)((IUserContextContainer)context).getUserContext();
-					SpanContext sc = GlobalTracer.get().extract(Builtin.TEXT_MAP_EXTRACT, new TextMapExtractAdapter(sci.getValues()));
-					return sc;
+					//SpanContext sc = GlobalTracer.get().extract(Builtin.TEXT_MAP_EXTRACT, new TextMapExtractAdapter(sci.getValues()));
+					return ctx;
 				}
 				catch(RuntimeException e)
 				{
@@ -623,10 +636,14 @@ public class SerializationServices implements ISerializationServices
 					// Converts the span(context) to a simple map -> SpanContextInfo
 					
 					Span span = (Span)object;
-					SpanContext sc = span.context();
 					Map<String, String> vals = new HashMap<>();
-					GlobalTracer.get().inject(sc, Builtin.TEXT_MAP_INJECT, new TextMapInjectAdapter(vals));
-					//System.out.println("span: "+vals);
+					OpenTelemetry ot = GlobalOpenTelemetry.get();
+					ContextPropagators propas = ot.getPropagators();
+					Context ctx = Context.current().with(span);
+					TextMapPropagator tmp = propas.getTextMapPropagator();
+					tmp.inject(ctx, vals, TracingInterceptor.TextMapInjectAdapter.SETTER);
+					
+					System.out.println("span encoded: "+vals);
 					
 					return new SpanContextInfo(vals);
 				}

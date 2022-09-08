@@ -1,20 +1,35 @@
 package jadex.bridge.service.component.interceptors;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
-import io.opentracing.Scope;
-import io.opentracing.ScopeManager;
-import io.opentracing.Span;
-import io.opentracing.SpanContext;
-import io.opentracing.Tracer;
-import io.opentracing.mock.MockTracer;
-import io.opentracing.util.GlobalTracer;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanBuilder;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.propagation.ContextPropagators;
+import io.opentelemetry.context.propagation.TextMapGetter;
+import io.opentelemetry.context.propagation.TextMapSetter;
+import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.resources.Resource;
+import io.opentelemetry.sdk.trace.ReadableSpan;
+import io.opentelemetry.sdk.trace.SdkTracerProvider;
+import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
+import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
+import jadex.base.Starter;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
-import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.commons.SAccess;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -24,6 +39,49 @@ import jadex.commons.future.IFuture;
  */
 public class TracingInterceptor extends ComponentThreadInterceptor
 {
+	public enum TracingMode
+	{
+		OFF,
+		SYSTEM,
+		ON,
+		ALL
+	}
+	
+	protected static Map<IComponentIdentifier, Resource> resources;
+	protected static long pcnt;
+	public static final IComponentIdentifier ECID = new ComponentIdentifier("External Process");
+
+	static 
+	{
+		try 
+		{
+			//System.out.println("Tracing: "+this.getClass().getClassLoader());
+			
+			SdkTracerProvider tracerprovider = SdkTracerProvider.builder()
+				.addSpanProcessor(BatchSpanProcessor.builder(OtlpGrpcSpanExporter.builder().build()).build())
+				//.addSpanProcessor(BatchSpanProcessor.builder(JaegerGrpcSpanExporter.builder().build()).build())
+				.build();
+	
+			//SdkMeterProvider meterprovider = SdkMeterProvider.builder()
+			// .registerMetricReader(PeriodicMetricReader.builder(OtlpGrpcMetricExporter.builder().build()).build())
+			//  .build();
+	
+			OpenTelemetry ot = OpenTelemetrySdk.builder()
+				.setTracerProvider(tracerprovider)
+				//.setMeterProvider(meterprovider)
+				.setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
+				.buildAndRegisterGlobal();
+		
+			//System.out.println("Tracing system inited");
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		resources = new HashMap<IComponentIdentifier, Resource>();
+	}
+	
 	/**
 	 *  Create a new interceptor.
 	 */
@@ -53,12 +111,30 @@ public class TracingInterceptor extends ComponentThreadInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(!GlobalTracer.isRegistered())
-			GlobalTracer.registerIfAbsent(new MockTracer(new JadexScopeManager()));
+		String methodname = sic.getMethod().getName();
+		String servicename = sic.getServiceIdentifier().getServiceType().getClassNameOnly();
+		String provider = sic.getServiceIdentifier().getProviderId().toString();
+		String invoked = methodname+":"+servicename+"@"+provider;
 		
-		Tracer t = GlobalTracer.get();
+		ServiceCall sc = sic.getCurrentServiceCall();
+		// What is this for a case that there is no service call?!
+		/*if(sc==null)
+		{
+			sc = CallAccess.createServiceCall(IComponentIdentifier.LOCAL.get(), null);
+			CallAccess.setCurrentInvocation(sc);
+		}*/
 		
-		try
+		IComponentIdentifier caller = sic.getCaller();
+		
+		//SdkTracerProvider.builder().setResource(getOrCreateResource(caller));
+		//Tracer tracer = GlobalOpenTelemetry.getTracerProvider().tracerBuilder("jadex").build();
+		Tracer tracer = GlobalOpenTelemetry.getTracer("jadex", "1.0.0");
+		
+		//if(!GlobalTracer.isRegistered())
+		//	GlobalTracer.registerIfAbsent(new MockTracer(new JadexScopeManager()));
+		//Tracer t = GlobalTracer.get();
+		
+		/*try
 		{
 			Field f = GlobalTracer.class.getDeclaredField("tracer");
 			SAccess.setAccessible(f, true);
@@ -68,49 +144,128 @@ public class TracingInterceptor extends ComponentThreadInterceptor
 		catch(Exception e)
 		{
 			e.printStackTrace();
-		}
+		}*/
 		
-		String methodname = sic.getMethod().getName();
-		ServiceCall sc = ServiceCall.getCurrentInvocation();
+		//if(getComponent().getId().getLocalName().indexOf("Customer")!=-1)
+		//	System.out.println("Customer: "+methodname);
+		//if(methodname.indexOf("display")!=-1)
+		//	System.out.println("method: "+methodname);
 		
-		// What is this for a case that there is no service call?!
-		if(sc==null)
-		{
-			sc = CallAccess.createServiceCall(IComponentIdentifier.LOCAL.get(), null);
-			CallAccess.setCurrentInvocation(sc);
-		}
-		
-		Object paspan = sc.getProperty("span");
+		Object paspan = sc==null? null: sc.getProperty("span");
 		Span span = null;
-		if(paspan instanceof SpanContext)
+		if(paspan instanceof Context)
 		{
-			span = GlobalTracer.get().buildSpan(methodname).asChildOf((SpanContext)paspan).start();
+			ReadableSpan parentspan = (ReadableSpan)Span.fromContext((Context)paspan);
+			Boolean system = ((ReadableSpan)parentspan).getAttribute(AttributeKey.booleanKey("system"));
+			span = createSpan(tracer, invoked, sic.getMethod(), caller, system, (Context)paspan);
+			//String pmeth = ((ReadableSpan)parentspan).getAttribute(AttributeKey.stringKey("method"));
+			//String spanid = ((ReadableSpan)span).getSpanContext().getSpanId();
+			//System.out.println("child span created: "+spanid+" parentid:"+parentspan.getSpanContext().getSpanId()+" "+getComponent()+" caller:"+caller+" "+sic.getMethod().getName()+" parent method: "+pmeth);
 		}
-		else if(paspan instanceof Span)
+		/*else
+		if(paspan instanceof Span)
 		{
-			span = GlobalTracer.get().buildSpan(methodname).asChildOf((Span)paspan).start();
-		}
+			span = tracer.spanBuilder(methodname)
+				.setParent(Context.current().with((Span)paspan))
+				.startSpan();
+		}*/
 		else if(paspan==null)
 		{
-			span = GlobalTracer.get().buildSpan(methodname).start();
+			boolean system = getComponent().getDescription().isSystemComponent();
+		
+			if(!system || (TracingMode.ALL==Starter.TRACING || TracingMode.SYSTEM==Starter.TRACING))
+			{
+				span = createSpan(tracer, invoked, sic.getMethod(), caller, system, null);
+				String spanid = ((ReadableSpan)span).getSpanContext().getSpanId();
+				//System.out.println("root span created: "+spanid+" "+getComponent()+" caller:"+caller+" "+sic.getMethod());
+			}
+			/*else
+			{
+				System.out.println("no root span created: "+getComponent()+" caller:"+caller+" "+sic.getMethod());
+			}*/
 		}
 		else
 		{
 			System.out.println("unknown span class: "+paspan);
 		}
 		
-		//ServiceCall sc = CallAccess.getCurrentInvocation();
-		//Span parentspan = (Span)sc.getProperty("span");
-		//sic.getNextServiceCall()
-		
-		Scope scope = null;
 		if(span!=null)
-			scope = t.activateSpan(span); // activate the span
+		{
+			setResource(span, getComponent().getId());
+			
+			//ServiceCall sc = CallAccess.getCurrentInvocation();
+			//Span parentspan = (Span)sc.getProperty("span");
+			//sic.getNextServiceCall()
+			
+			span.makeCurrent();
+			//System.out.println("span started: "+span);
+			
+			ServiceCall nsc = sic.getNextServiceCall();
+			nsc.setProperty("span", Context.current());
+			//sc.setProperty("span", span);
+		}
 		
-		sic.invoke().addResultListener(new ReturnValueResultListener(ret, sic, span, scope));
+		sic.invoke().addResultListener(new ReturnValueResultListener(ret, sic, (ReadableSpan)span));//, scope));
 			
 		return ret;
 	}
+	
+	protected Span createSpan(Tracer tracer, String invoked, Method method, IComponentIdentifier caller, Boolean system, Context parent)
+	{
+		SpanBuilder sb = tracer.spanBuilder(invoked)
+			.setAttribute("method", method.getName())
+			.setAttribute("caller", caller!=null? caller.getName(): ECID.getName());
+		if(system!=null && system.booleanValue())
+			sb.setAttribute("system", true);
+		if(parent!=null)
+		{
+			ReadableSpan parentspan = (ReadableSpan)Span.fromContext((Context)parent);
+			sb.setParent(parent);
+			sb.setAttribute("parentid", parentspan.getSpanContext().getSpanId());
+		}
+		Span span = sb.startSpan();
+		return span;
+	}
+	
+	protected void setResource(Span span, IComponentIdentifier cid)
+	{
+		try
+		{
+			Field fr = span.getClass().getDeclaredField("resource");
+			fr.setAccessible(true);
+			fr.set(span, getOrCreateResource(cid));
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 *  Add cid to pid mapping.
+	 *  @param cid The component id.
+	 *  @return pid The process id.
+	 */
+	protected synchronized Resource getOrCreateResource(IComponentIdentifier cid)
+	{
+		Resource ret = resources.get(cid);
+		
+		if(ret==null)
+		{
+			Attributes attrs = Attributes.builder()
+				.put(ResourceAttributes.SERVICE_NAME,  getComponent().getModel().getName())
+				.put(ResourceAttributes.SERVICE_INSTANCE_ID, getComponent().getId().toString())
+				.put(ResourceAttributes.PROCESS_EXECUTABLE_NAME, getComponent().getId().toString())
+				.put(ResourceAttributes.PROCESS_PID, pcnt++)
+				.put("jadex_cid", getComponent().getId().toString())
+				.build();
+			ret = Resource.create(attrs);
+			resources.put(cid, ret);
+		}
+		
+		return ret;
+	}
+	
 	
 	/**
 	 *  Listener that handles the end of the call.
@@ -123,20 +278,18 @@ public class TracingInterceptor extends ComponentThreadInterceptor
 		protected ServiceInvocationContext	sic;
 		
 		/** The span. */
-		protected Span span;
-		protected Scope scope;
+		protected ReadableSpan span;
 		
 		//-------- constructors --------
 		
 		/**
 		 *  Create a result listener.
 		 */
-		protected ReturnValueResultListener(Future<Void> future, ServiceInvocationContext sic, Span span, Scope scope)
+		protected ReturnValueResultListener(Future<Void> future, ServiceInvocationContext sic, ReadableSpan span)//, Scope scope)
 		{
 			super(future);
 			this.sic = sic;
 			this.span = span;
-			this.scope = scope;
 		}
 		
 		//-------- IResultListener interface --------
@@ -146,50 +299,71 @@ public class TracingInterceptor extends ComponentThreadInterceptor
 		 */
 		public void customResultAvailable(Void result)
 		{
+			closeSpan();
+			super.customResultAvailable(null);
+		}
+		
+		@Override
+		public void exceptionOccurred(Exception exception) 
+		{
+			closeSpan();
+			super.exceptionOccurred(exception);
+		}
+		
+		protected void closeSpan()
+		{
 			if(span!=null)
-				span.finish();
-			scope.close();
-			
-			ReturnValueResultListener.super.customResultAvailable(null);
+			{
+				String spanid = span.getSpanContext().getSpanId();
+				String parentid = ((ReadableSpan)span).getAttribute(AttributeKey.stringKey("parentid"));
+				//System.out.println("spanid: "+span.getSpanContext().getSpanId()+" "+((ReadableSpan)span).getAttribute(AttributeKey.stringKey("parentid")));
+				//System.out.println("invalid id: "+Span.getInvalid().getSpanContext().getSpanId());
+				//if(span.getParentSpanContext().getSpanId().equals(Span.getInvalid().getSpanContext().getSpanId()))
+				
+				//if(parentid==null)
+				//	System.out.println("closing root span: "+spanid+" parentid: "+parentid+" "+getComponent()+" "+sic.getMethod().getName());
+				
+				//else
+				//	System.out.println("closing child span: "+spanid+" parentid: "+parentid+" "+getComponent()+" "+sic.getMethod().getName()+" "+span.getParentSpanContext());
+				((Span)span).end();
+				//System.out.println("span closed: "+span);
+			}
+		}
+	}
+
+	public static class TextMapInjectAdapter implements TextMapSetter<Map<String, String>> 
+	{
+		public static final TextMapInjectAdapter SETTER = new TextMapInjectAdapter();
+
+		@Override
+		public void set(Map<String, String> carrier, String key, String value) 
+		{
+			carrier.put(key, value);
+		}
+	}
+	
+	public static class TextMapExtractAdapter implements TextMapGetter<Map<String, String>> 
+	{
+		public static final TextMapExtractAdapter GETTER = new TextMapExtractAdapter();
+
+		@Override
+		public String get(Map<String, String> carrier, String key) 
+		{
+			return carrier.get(key);
+		}
+		
+		@Override
+		public Iterable<String> keys(Map<String, String> carrier) 
+		{
+			return carrier.keySet();
 		}
 	}
 }
 
-class JadexScopeManager implements ScopeManager
-{
-	 protected Span oldspan;
-	 
-	 public Scope activate(Span span) 
-	 {
-		ServiceCall call = ServiceCall.getCurrentInvocation();
-		
-		if(call==null)
-			return new Scope()
-			{
-				public void close()
-				{
-					System.out.println("todo: no call");
-				}
-			};
-		
-		oldspan = (Span)call.getProperty("span");
-		// Make the new span accessible
-		call.setProperty("span", span);
-		
-		return new Scope()
-		{
-			public void close()
-			{
-				call.setProperty("span", oldspan);
-			}
-		};
-	 }
 
-	 public Span activeSpan() 
-	 {
-		 ServiceCall call = ServiceCall.getCurrentInvocation();
-		 return call==null? null: (Span)call.getProperty("span");
-	 }
-}
+	
+
+
+
 
 

@@ -329,7 +329,7 @@ public class CustomerPanel extends JPanel
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							BuyItem	big	= new BuyItem(name, shop, price.doubleValue());
-							IFuture<BuyItem>	ret	= capa.getAgent().getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(big);
+							IFuture<BuyItem> ret = capa.getAgent().getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(big);
 							ret.addResultListener(new SwingResultListener<BuyItem>(new IResultListener<BuyItem>()
 							{
 								public void resultAvailable(BuyItem result)

@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.IService;
@@ -277,7 +278,7 @@ public class GenerateService implements IGenerateService
 	
 	public Future<AreaData> performTask(AreaData task, AllocationData alda)
 	{
-		//System.out.println("perform task start: "+task);
+		//System.out.println("perform1 task start: "+task+" "+ServiceCall.getCurrentInvocation());
 		Future<AreaData> ret = new Future<>();
 		
 		//final Object task	=	this.tasks.keySet().iterator().next();
@@ -290,6 +291,8 @@ public class GenerateService implements IGenerateService
 		IFuture<IDisplayService> futd = agent.getFeature(IRequiredServicesFeature.class).getService("displayservice");
 		futd.then(ds ->
 		{
+			//System.out.println("perform2 task start: "+task+" "+ServiceCall.getCurrentInvocation());
+
 //			System.out.println("display: "+result);
 			//final ProgressData pd = new ProgressData(part.getCalculatorId(), part.getId(),
 			//	new Rectangle(part.getXOffset(), part.getYOffset(), part.getSizeX(), part.getSizeY()),

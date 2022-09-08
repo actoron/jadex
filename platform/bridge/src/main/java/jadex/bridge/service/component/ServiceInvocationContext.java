@@ -182,7 +182,12 @@ public class ServiceInvocationContext
 		this.interceptors = interceptors;
 		
 		this.caller = ServiceCall.getOrCreateNextInvocation().getCaller();
-//		IComponentIdentifier caller2 = IComponentIdentifier.LOCAL.get();
+		
+		// Caller can be null when caller is external process such as swing gui
+		//if(this.caller==null)
+		//	System.out.println("no caller: "+IComponentIdentifier.LOCAL.get()+" "+method);
+
+		//		IComponentIdentifier caller2 = IComponentIdentifier.LOCAL.get();
 //		if(caller!=null && (!caller.equals(caller2)))
 //			System.out.println("Caller different: "+caller+" "+caller2);
 			
