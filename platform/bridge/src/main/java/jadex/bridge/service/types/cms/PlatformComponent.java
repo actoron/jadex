@@ -413,13 +413,15 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 */
 	protected IFuture<Void>	executeInitOnFeatures(final Iterator<IComponentFeature> features)
 	{
+		//System.out.println("executeInitOnFeatures");
+		
 		// Try synchronous init.
 		IFuture<Void>	ret	= IFuture.DONE;
 		while(ret.isDone() && ret.getException()==null && features.hasNext())
 		{
 			IComponentFeature	cf	= features.next();
 //			if(getComponentIdentifier().getName().indexOf("Custom")!=-1)
-//				System.out.println("Initing "+cf+" of "+getComponentIdentifier());
+				//System.out.println("Initing "+cf+" of "+getId());
 			ifeatures.add(cf);
 			ret	= cf.init();
 		}
@@ -428,11 +430,13 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		if(!ret.isDone() || features.hasNext())
 		{
 			// Recurse for asynchronous feature.
+			//System.out.println("wait for init future");
 			final Future<Void>	fut	= new Future<Void>();
 			ret.addResultListener(getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(fut)
 			{
 				public void customResultAvailable(Void result)
 				{
+				//	System.out.println("wait for init future finished");
 					executeInitOnFeatures(features).addResultListener(new DelegationResultListener<Void>(fut));
 				}
 			}));
@@ -444,7 +448,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		{
 			if(ret.getException()!=null)
 			{
-//				System.out.println("Initing of "+getComponentIdentifier()+" failed due to "+fut.getException());
+				//System.out.println("Initing of "+getId()+" failed due to "+ret.getException());
 				
 				// Init failed: remove failed feature.
 				IComponentFeature	feature	= ifeatures.remove(ifeatures.size()-1);
@@ -452,7 +456,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			}
 			else
 			{
-//				System.out.println("Initing of "+getComponentIdentifier()+" done.");
+				//System.out.println("Initing of "+getId()+" done.");
 				
 				// Init succeeded: list no longer needed.
 				ifeatures	= null;
@@ -473,7 +477,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		{
 			final IComponentFeature	cf	= features.next();
 			//if(getId().getName().indexOf("Hello")!=-1)
-			//	System.out.println("Body "+cf+" of "+getId());
+			//System.out.println("Body "+cf+" of "+getId());
 			
 			// Execute user body on separate step to allow blocking get() and still execute the other bodies.
 			if(cf.hasUserBody())

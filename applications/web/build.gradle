@@ -12,6 +12,11 @@ dependencies
 	api project(':kernels:micro')
 	api project(':kernels:component')
 	api project(':platform:base')
+
+	implementation project(':platform:webservice')
+	implementation project(':applications-micro')
+	testImplementation project(':platform:webservice-jetty')
+	testImplementation project(':transports:intravm')
 	
 	//compileOnly 'javax.servlet:javax.servlet-api:3.1.0'
 	providedCompile 'javax.servlet:javax.servlet-api:4.0.1'

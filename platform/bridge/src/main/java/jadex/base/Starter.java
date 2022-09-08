@@ -745,6 +745,7 @@ public class Starter
 						{
 							public void customResultAvailable(Void result)
 							{
+								System.out.println("bootstrap fac");
 								@SuppressWarnings("rawtypes")
 								List comps = config.getComponents();
 								if(args!=null && args.containsKey("component"))
@@ -778,6 +779,13 @@ public class Starter
 										super.exceptionOccurred(exception);
 									}
 								});
+							}
+							
+							@Override
+							public void exceptionOccurred(Exception exception) 
+							{
+								exception.printStackTrace();
+								super.exceptionOccurred(exception);
 							}
 						});
 					}

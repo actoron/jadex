@@ -785,7 +785,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		{
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 			
-			if(!Starter.TRACING.equals(TracingMode.OFF))
+			if(Starter.TRACING!=null && TracingMode.OFF!=Starter.TRACING)
 			{
 				//System.out.println("Tracing addProv: "+BasicServiceInvocationHandler.class.getClassLoader());
 				handler.addFirstServiceInterceptor(new TracingInterceptor(ia));
