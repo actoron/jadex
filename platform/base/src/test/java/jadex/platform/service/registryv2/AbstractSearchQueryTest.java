@@ -1,6 +1,8 @@
 package jadex.platform.service.registryv2;
 
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -22,6 +24,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -96,10 +99,6 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 	public void	testQueries()
 	{
 		// SSP is optional (TODO: support ssp started after client)
-//		if(sspconf!=null)
-//		{
-//			createPlatform(sspconf);
-//		}
 		STest.runSimLocked(sspconf!=null ? sspconf : clientconf, ia ->
 		{
 			// 1) (maybe) start client platform and add query
@@ -265,13 +264,13 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			}
 		});
 	}
-
+	
 	/**
 	 *  Collect and test a query result.
 	 *  @param resultmap	collected platform id -> set of service ids.
 	 *  @param svc	The newly found service.
 	 */
-	protected <T> void checkNextResultAndAdd(IExternalAccess client, Map<IComponentIdentifier, Set<IServiceIdentifier>> resultmap, IIntermediateFuture<T> fut, IComponentIdentifier... ids)
+	protected void checkNextResultAndAdd(IExternalAccess client, Map<IComponentIdentifier, Set<IServiceIdentifier>> resultmap, IIntermediateFuture<ITestService> fut, IComponentIdentifier... ids)
 	{
 		IServiceIdentifier	sid	= ((IService)fut.getNextIntermediateResult(Starter.getScaledDefaultTimeout(client.getId(), 3), Starter.isRealtimeTimeout(client.getId(), true))).getServiceId();
 		IComponentIdentifier	cid	= sid.getProviderId().getRoot();
@@ -288,13 +287,201 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 	}
 	
 	/**
+	 *  cases for testing: event-mode queries
+	 */
+	@Test
+	public void	testEventMode()
+	{
+		// SSP is optional (TODO: support ssp started after client)
+		STest.runSimLocked(sspconf!=null ? sspconf : clientconf, ia0 ->
+		{
+			//-------- Tests with awareness fallback only (no SP) --------
+			
+			// start client platform and register query
+			IExternalAccess	client	= null;
+			if(sspconf!=null)
+			{
+				client	= createPlatform(clientconf);				
+			}
+			else
+			{
+				client	= ia0.getExternalAccess();
+			}
+			ISubscriptionIntermediateFuture<ServiceEvent>	results
+				= client.addQuery(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL).setEventMode());
+			
+			IExternalAccess	pro1, pro2;
+			if(awa)
+			{
+				// test if awa fallback works with one platform 
+				System.out.println("1) start provider platform and wait for added events");
+				pro1	= createPlatform(proconf);
+				// two services: network and global provider
+				checkNextEvent(client, results, ServiceEvent.SERVICE_ADDED, pro1.getId());
+				checkNextEvent(client, results, ServiceEvent.SERVICE_ADDED, pro1.getId());
+				
+				// test if awa fallback works with one platform 
+				System.out.println("2) start provider platform and wait for added events");
+				pro2	= createPlatform(proconf);
+				// two services: network and global provider
+				checkNextEvent(client, results, ServiceEvent.SERVICE_ADDED, pro2.getId());
+				checkNextEvent(client, results, ServiceEvent.SERVICE_ADDED, pro2.getId());
+				
+				// test if platform is removed from awareness
+				System.out.println("3) kill one provider platform and wait for removed events");
+				removePlatform(pro1);
+				// two services: network and global provider
+				checkNextEvent(client, results, ServiceEvent.SERVICE_REMOVED, pro1.getId());
+				checkNextEvent(client, results, ServiceEvent.SERVICE_REMOVED, pro1.getId());
+			}
+			else	// if sspconf!=null
+			{
+				// -> test if platforms don't see each other without SP.
+				System.out.println("1/2) start provider platforms and wait for added events");
+				pro1	= createPlatform(proconf);
+				pro2	= createPlatform(proconf);
+				checkNextEvent(client, results, ServiceEvent.SERVICE_ADDED, pro1.getId(), pro2.getId());
+				checkNextEvent(client, results, ServiceEvent.SERVICE_ADDED, pro1.getId(), pro2.getId());
+				
+				// 4) test if platform is removed from global registry (if any)
+				System.out.println("3) kill one provider platform and wait for removed event");
+				removePlatform(pro1);
+				checkNextEvent(client, results, ServiceEvent.SERVICE_REMOVED, pro1.getId());
+			}
+	
+			//-------- Tests with SP if any --------
+			
+			if(spconf!=null)
+			{
+				// start SP
+				IExternalAccess	sp	= createPlatform(spconf);	
+				waitForSuperpeerConnections(sp, client);
+				// for expected number of new services per provider
+				boolean nossp	= sspconf==null && !SuperpeerClientAgent.SPCACHE;
+				
+				// test if event works for new platform and existing SP
+				System.out.println("4) start sp and provider platform, wait for added events");
+				pro1	= createPlatform(proconf);
+				if(nossp)
+				{
+					// pro2 services already found by awa
+					checkNextEvent(client, results, ServiceEvent.SERVICE_ADDED, pro1.getId());
+				}
+				else
+				{
+					// only global services found by ssp -> new pro2 network service found 
+					checkNextEvent(client, results, ServiceEvent.SERVICE_ADDED, pro1.getId(), pro2.getId());
+					checkNextEvent(client, results, ServiceEvent.SERVICE_ADDED, pro1.getId(), pro2.getId());
+					checkNextEvent(client, results, ServiceEvent.SERVICE_ADDED, pro1.getId(), pro2.getId());
+				}
+				
+				// test if remote disconnection and service removal works
+				System.out.println("5) kill provider platform "+pro1.getId()+", wait for removed events");
+				removePlatform(pro1);
+				if(nossp)
+				{
+					// only network service was found
+					checkNextEvent(client, results, ServiceEvent.SERVICE_REMOVED, pro1.getId());
+				}
+				else
+				{
+					// global and network services found
+					checkNextEvent(client, results, ServiceEvent.SERVICE_REMOVED, pro1.getId());
+					checkNextEvent(client, results, ServiceEvent.SERVICE_REMOVED, pro1.getId());
+				}
+		
+				// test if re-fallback to awa works
+				System.out.println("6) kill SP, search for service");
+				IFuture<Void>	conlost	= client.getExternalAccess(new ComponentIdentifier("superpeerclient", client.getId())).scheduleStep(ia ->
+				{
+					// Wait until SP connection is lost on client.
+					Future<Void>	ret	= new Future<>();
+					SuperpeerClientAgent	sca	= (SuperpeerClientAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
+					sca.getSPConnection(sp.getId()).addResultListener(new IntermediateDefaultResultListener<Void>()
+					{
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+//							System.out.println("SP connection ended: "+exception);
+							ret.setResult(null);
+						}
+						
+						@Override
+						public void finished()
+						{
+//							System.out.println("SP connection ended.");
+							ret.setResult(null);
+						}
+					});
+					return ret;
+				});
+				removePlatform(sp);
+				conlost.get();
+				
+				if(awa)
+				{
+					// test if awa fallback works with one platform 
+					System.out.println("1) start provider platform and wait for added events");
+					pro1	= createPlatform(proconf);
+					// two services: network and global provider
+					checkNextEvent(client, results, ServiceEvent.SERVICE_ADDED, pro1.getId());
+					checkNextEvent(client, results, ServiceEvent.SERVICE_ADDED, pro1.getId());
+					
+					// test if awa fallback works with one platform 
+					System.out.println("2) start provider platform and wait for added events");
+					pro2	= createPlatform(proconf);
+					// two services: network and global provider
+					checkNextEvent(client, results, ServiceEvent.SERVICE_ADDED, pro2.getId());
+					checkNextEvent(client, results, ServiceEvent.SERVICE_ADDED, pro2.getId());
+					
+					// test if platform is removed from awareness
+					System.out.println("3) kill one provider platform and wait for removed events");
+					removePlatform(pro1);
+					// two services: network and global provider
+					checkNextEvent(client, results, ServiceEvent.SERVICE_REMOVED, pro1.getId());
+					checkNextEvent(client, results, ServiceEvent.SERVICE_REMOVED, pro1.getId());
+				}
+				else	// if sspconf!=null
+				{
+					// -> test if platforms don't see each other without SP.
+					System.out.println("1/2) start provider platforms and wait for added events");
+					pro1	= createPlatform(proconf);
+					pro2	= createPlatform(proconf);
+					checkNextEvent(client, results, ServiceEvent.SERVICE_ADDED, pro1.getId(), pro2.getId());
+					checkNextEvent(client, results, ServiceEvent.SERVICE_ADDED, pro1.getId(), pro2.getId());
+					
+					// 4) test if platform is removed from global registry (if any)
+					System.out.println("3) kill one provider platform and wait for removed event");
+					removePlatform(pro1);
+					checkNextEvent(client, results, ServiceEvent.SERVICE_REMOVED, pro1.getId());
+				}
+			}
+		});
+	}
+	
+	/**
+	 *  Collect and test a query result.
+	 *  @param resultmap	collected platform id -> set of service ids.
+	 *  @param svc	The newly found service.
+	 */
+	protected void checkNextEvent(IExternalAccess client, IIntermediateFuture<ServiceEvent> fut, int type, IComponentIdentifier... ids)
+	{
+		ServiceEvent	next	= fut.getNextIntermediateResult(Starter.getScaledDefaultTimeout(client.getId(), 3), Starter.isRealtimeTimeout(client.getId(), true));
+		assertEquals("Wrong service event type.", type, next.getType());
+		if(ids.length>0)
+		{
+			IComponentIdentifier	cid	= next.getService().getProviderId().getRoot();
+			Assert.assertTrue("Service '"+cid+"' should be from patform(s): "+Arrays.asList(ids), Arrays.asList(ids).contains(cid));
+		}
+	}
+	
+	/**
 	 *  cases for testing: services
 	 */
 	@Test
 	public void	testServices()
 	{
 		// SSP is optional (TODO: support ssp started after client)
-//		IExternalAccess	ssp	= sspconf!=null ? createPlatform(sspconf) : null;
 		STest.runSimLocked(sspconf!=null ? sspconf : clientconf, ia0 ->
 		{
 			//-------- Tests with awareness fallback only (no SP) --------
@@ -445,14 +632,14 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 						@Override
 						public void exceptionOccurred(Exception exception)
 						{
-							System.out.println("SP connection ended: "+exception);
+//							System.out.println("SP connection ended: "+exception);
 							ret.setResult(null);
 						}
 						
 						@Override
 						public void finished()
 						{
-							System.out.println("SP connection ended.");
+//							System.out.println("SP connection ended.");
 							ret.setResult(null);
 						}
 					});

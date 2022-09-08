@@ -43,6 +43,7 @@ import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
+import jadex.commons.collection.IdentityHashSet;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -1218,8 +1219,17 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		/** State counter to check if new search should be started after wait. */
 		protected int	state;
 		
-		/** Filter to avoid resetting polltime backoff on known results.*/ 
-		protected SlidingCuckooFilter	filter	= new SlidingCuckooFilter();
+		/** Filter for known results when not in event mode. */ 
+		protected SlidingCuckooFilter	filter;
+		
+		/** The current result set when in events mode. */ 
+		protected Set<IServiceIdentifier>	results;
+		
+		/** The shared results of ongoing polling searches (if any) for detecting removals. */ 
+		protected Set<Set<IServiceIdentifier>>	searches;
+		
+//		/** The search counter (for debugging). */
+//		protected int	searchcnt;
 		
 		//-------- constructors --------
 		
@@ -1233,6 +1243,10 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			SFuture.avoidCallTimeouts(retfut, agent);
 			this.networkspersuperpeer	= new MultiCollection<>();
 			this.futures	= new LinkedHashSet<>();
+			
+			filter	= query.isEventMode() ? null : new SlidingCuckooFilter();
+			results	= query.isEventMode() ? new LinkedHashSet<>() : null;
+
 			
 			// Start handling
 //			updateQuery(getSearchableNetworks(query));
@@ -1275,7 +1289,6 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		
 		//-------- internal methods --------
 		
-		
 		/**
 		 *  Add/update query connections to relevant super peers for given networks.
 		 */
@@ -1315,6 +1328,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				// Add queries for each relevant superpeer
 				if(!newsuperpeers.isEmpty())
 				{
+					// Cleanup awa mode.
+					searches	= null;
+					
 					for(ISuperpeerService superpeer: newsuperpeers)
 					{
 						adjustConnectionTimeout();
@@ -1330,7 +1346,34 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 //								{
 									//System.out.println("Received result: "+agent+", "+result+", "+query);
 //								}
-								retfut.addIntermediateResultIfUndone(result);
+								// New event result?
+								Object	res	= null;
+								if(query.isEventMode())
+								{
+									// Forward event if consistent with current results.
+									ServiceEvent	event	= (ServiceEvent)result;
+									if(event.getType()==ServiceEvent.SERVICE_ADDED && results.add(event.getService())
+										|| event.getType()==ServiceEvent.SERVICE_CHANGED && results.contains(event.getService())
+										|| event.getType()==ServiceEvent.SERVICE_REMOVED && results.remove(event.getService()))
+									{
+//										System.out.println("Received SP event: "+result+"\n\t"+results);
+										res = result;
+									}
+								}
+								// New non-event result?
+								else if(!filter.contains(result.toString()))
+								{
+									filter.insert(result.toString());
+									res	= result;
+								}	
+							
+								if(res!=null)
+								{									
+									// Forward result to user query
+									@SuppressWarnings({"unchecked"})
+									SubscriptionIntermediateFuture<Object> rawfut = (SubscriptionIntermediateFuture<Object>)retfut;
+									rawfut.addIntermediateResultIfUndone(res);
+								}
 							}
 							
 							@Override
@@ -1377,53 +1420,106 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				// polling fallback, when no superpeers at all
 				else if(futures.isEmpty())
 				{
+					final Set<IServiceIdentifier>	myresults;
+					if(query.isEventMode())
+					{
+						if(searches==null)
+						{
+							searches	= new IdentityHashSet<>();
+						}
+						myresults	= new LinkedHashSet<>();
+						searches.add(myresults);
+					}
+					else
+					{
+						myresults	= null;
+					}
+					
 					// Start current search
+//					int cnt	= ++searchcnt;
 					searchRemoteServices(query)
 						.addResultListener(new IntermediateEmptyResultListener<IServiceIdentifier>()
 					{
-						@SuppressWarnings({ "unchecked", "rawtypes" })
 						@Override
 						public void intermediateResultAvailable(IServiceIdentifier result)
 						{
-							if(filter.contains(result.toString()))
+							// still no superpeer available (polling not stopped)?
+							if(!query.isEventMode() || searches!=null)
 							{
-								// no increment -> no doFinished()
-								return;
-							}
-							
-							filter.insert(result.toString());
-							
-							// Forward result to user query
-							Object res = result;
-							if(query.isEventMode())
-								res = new ServiceEvent(result, ServiceEvent.SERVICE_ADDED);
-							
-							SubscriptionIntermediateFuture rawfut = retfut;
-							rawfut.addIntermediateResultIfUndone(res);
-							
-							// Reset search backoff and when something was found after at least one polling interval has passed
-							if(polltime>getNextPollingInterval(0))
-							{
-								if(debug(query))
+								Object	res	= null;
+								if(query.isEventMode())
 								{
-									System.out.println(QueryManager.this.hashCode()+": Reset polltime due to result "+result+" for "+SUtil.arrayToString(networknames)+": "+query);
+									// Remember found service for all ongoing searches
+									for(Set<IServiceIdentifier> search: searches)
+									{
+										search.add(result);
+									}
+									
+									// New event result?
+									if(results.add(result))
+									{
+//										System.out.println("Search "+cnt+" found service: "+result+"\n\t"+results+"\n\t"+myresults);
+										res = new ServiceEvent(result, ServiceEvent.SERVICE_ADDED);
+									}
 								}
-								polltime	= 0;
-								scheduleSearch(networknames);
+								// New non-event result?
+								else if(!filter.contains(result.toString()))
+								{
+									filter.insert(result.toString());
+									res	= result;
+								}	
+								
+								if(res!=null)
+								{									
+									// Forward result to user query
+									@SuppressWarnings({"unchecked"})
+									SubscriptionIntermediateFuture<Object> rawfut = (SubscriptionIntermediateFuture<Object>)retfut;
+									rawfut.addIntermediateResultIfUndone(res);
+									
+									// Reset search backoff when something was found after at least one polling interval has passed
+									if(polltime>getNextPollingInterval(0))
+									{
+										if(debug(query))
+										{
+											System.out.println(QueryManager.this.hashCode()+": Reset polltime due to result "+result+" for "+SUtil.arrayToString(networknames)+": "+query);
+										}
+										polltime	= 0;
+										scheduleSearch(networknames);
+									}
+									// else NOP -> avoid unnecessary waitFors when many results are available at once
+								}
 							}
-							// else NOP -> avoid unnecessary waitFors when many results are available at once
 						}
 						
 						@Override
 						public void exceptionOccurred(Exception exception)
 						{
-							// Ignore
+//							System.out.println("Exception: "+exception);
+							// Ignore exception
+							finished();
 						}
 						
 						@Override
 						public void finished()
 						{
-							// Ignore
+							// Send removed events for old services.
+							if(query.isEventMode() && searches!=null)
+							{
+								searches.remove(myresults);
+//								System.out.println("Search "+cnt+" finished:\n\t"+results+"\n\t"+myresults);
+								
+								for(IServiceIdentifier result: results.toArray(new IServiceIdentifier[results.size()]))
+								{
+									if(!myresults.contains(result))
+									{
+										results.remove(result);
+//										System.out.println("Service lost: "+result+"\n\t"+results+"\n\t"+myresults);
+										@SuppressWarnings({"unchecked"})
+										SubscriptionIntermediateFuture<Object> rawfut = (SubscriptionIntermediateFuture<Object>)retfut;
+										rawfut.addIntermediateResultIfUndone(new ServiceEvent(result, ServiceEvent.SERVICE_REMOVED));
+									}
+								}
+							}
 						}
 						
 						@Override

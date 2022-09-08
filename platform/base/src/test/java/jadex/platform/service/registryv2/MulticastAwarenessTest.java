@@ -52,7 +52,8 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 			}
 			catch(IOException se)
 			{
-				System.out.println("port "+port+" problem?\n"+SUtil.getExceptionStacktrace(se));
+				if(i==9)
+					System.out.println("port "+port+" problem?\n"+SUtil.getExceptionStacktrace(se));
 			}
 		}
 		System.out.println("MulticastAwarenessTest custom port: "+port);
