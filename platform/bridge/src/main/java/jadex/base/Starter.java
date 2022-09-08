@@ -38,7 +38,6 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
-import jadex.bridge.service.component.interceptors.TracingInterceptor;
 import jadex.bridge.service.component.interceptors.TracingInterceptor.TracingMode;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
@@ -745,7 +744,7 @@ public class Starter
 						{
 							public void customResultAvailable(Void result)
 							{
-								System.out.println("bootstrap fac");
+//								System.out.println("bootstrap fac");
 								@SuppressWarnings("rawtypes")
 								List comps = config.getComponents();
 								if(args!=null && args.containsKey("component"))
