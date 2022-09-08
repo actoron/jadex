@@ -1,11 +1,17 @@
 package jadex.bridge;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Properties;
+import java.util.Scanner;
+import java.util.regex.Pattern;
 
 
 /**
@@ -52,6 +58,14 @@ public class VersionInfo
 			Properties	props	= new Properties();
 			//InputStream is = SUtil.getResource0("jadexversion.properties", VersionInfo.class.getClassLoader());
 			InputStream	is = VersionInfo.class.getResourceAsStream("jadexversion.properties");
+			
+			// Hack!!! when running Jadex from source in eclipse there is no properties
+			if(is==null)
+			{
+				File	fprops	= new File("../../src/main/buildutils/jadexversion.properties");
+				is	= new FileInputStream(fprops);
+			}
+			
 			//InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("jadexversion.properties");
 			props.load(is);
 			is.close();
@@ -81,9 +95,14 @@ public class VersionInfo
 		catch(Exception e)
 		{
 //			e.printStackTrace();
-			date = date!=null ? date : new Date();
-			version	= version!=null ? version : "n/a";
 		}
+		
+		date = date!=null ? date : new Date();
+		version	= version!=null ? version :
+			jadexversion.isUnknown() ? "n/a"
+			: jadexversion.getMajorVersion()+"."+jadexversion.getMinorVersion()
+				+".9999-SNAPSHOT";
+
 	}
 	
 	//-------- methods --------
@@ -156,5 +175,29 @@ public class VersionInfo
 	public String	toString()
 	{
 		return "Jadex Version " + version + " ("+getTimestamp()+")";
+	}
+	
+	/**
+	 *  Check if the current version is uptodate.
+	 */
+	public static void	main(String[] args)
+	{
+		try
+		{
+			String	updateurl	= "https://repo1.maven.org/maven2/org/activecomponents/jadex/jadex-distribution-minimal/maven-metadata.xml";
+			URL	url	= new URL(updateurl);
+			URLConnection con	= url.openConnection();
+			con.connect();
+			long	lastmod	= con.getLastModified();
+			System.out.println("lastmod: "+new Date(lastmod));
+			InputStream	is	= con.getInputStream();
+			Scanner	s	= new Scanner(is);
+			s.findAll(Pattern.compile("<version>([^<]*)</version>"))
+				.map(match -> match.group(1)).forEach(System.out::println);
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 }
