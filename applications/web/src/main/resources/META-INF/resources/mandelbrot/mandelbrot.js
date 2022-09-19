@@ -16,6 +16,8 @@ export class MandelbrotElement extends LitElement
 		var self = this;
 		var data = null;
 		var colors = null; // the color scheme
+		var data = null; // the data to draw
+		var progressdata = null; // the progress infos
 		
 		this.setColorScheme([this.createColor[50, 100, 0], this.createColor[255, 0, 0]], true);
 						
@@ -82,58 +84,21 @@ export class MandelbrotElement extends LitElement
 	
 	setResults(data)
 	{
-		if(data.fetchData()==null)
-			data.setData(new short[data.getSizeX()][data.getSizeY()]);
+		if(data.data==null)
+			data.data([data.sizex, data.sizey]);
 		this.data = data;
 					
-		dirty = true;
-				
-				/*DisplayPanel.this.image	= createImage(results.length, results[0].length);
-				Graphics	g	= image.getGraphics();
-				for(int x=0; x<results.length; x++)
-				{
-					for(int y=0; y<results[x].length; y++)
-					{
-						Color	c;
-						if(results[x][y]==-1)
-						{
-							c	= Color.black;
-						}
-						else
-						{
-							c	= colors[results[x][y]%colors.length];
-						}
-						g.setColor(c);
-//						g.drawLine(x, results[x].length-y-1, x, results[x].length-y-1);	// Todo: use euclidean coordinates
-						g.drawLine(x, y, x, y);
-					}
-				}
-				
-				point	= null;
-				range	= null;
-				progressdata = null;
-				/*if(progressupdate!=null)
-				{
-					progressupdate.stop();
-					progressupdate	= null;
-				}*/
-				calculating	= false;
-				DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-
-				//getParent().invalidate();
-				//getParent().doLayout();
-				//getParent().repaint();
-			}
-		});
+		this.dirty = true;
+		this.calculating = false;
 	}
 	
 	/**
 	 *  Display intermediate calculation results.
 	 */
-	public void addProgress(part)
+	addProgress(part)
 	{		
 		if(progressdata==null)
-			progressdata = new HashSet<ProgressData>();
+			progressdata = {};//new HashSet<ProgressData>();
 				
 		progressdata.remove(part);
 		if(!part.isFinished())
@@ -151,86 +116,114 @@ export class MandelbrotElement extends LitElement
 	/**
 	 *  Set new results.
 	 */
-	public void	addDataChunk(final PartDataChunk data)
+	addDataChunk(data) //PartDataChunk 
 	{
 		// first chunk is empty and only delivers name of worker
-		if(data.getData()==null)
+		if(data.data=null)
 			return; 
 		
-		short[] chunk = data.getData();
-		short[][] results;
-		results = DisplayPanel.this.data.fetchData();
+		var chunk = data.data;
 		
-		int xi = ((int)data.getArea().getX())+data.getXStart();
-		int yi = ((int)data.getArea().getY())+data.getYStart();
-		int xmax = (int)(data.getArea().getX()+data.getArea().getWidth());
+		var xi = data.area.x+data.xstart;
+		var yi = data.area.y+data.ystart;
+		var xmax = data.area.x+data.area.width;
 				
-		int cnt = 0;
+		var cnt = 0;
 		while(cnt<chunk.length)
 		{
-			results[xi][yi] = chunk[cnt++];
+			this.data[xi][yi] = chunk[cnt++];
 			if(++xi>=xmax)
 			{
-				xi=((int)data.getArea().getX());
+				xi=data.area.x);
 				yi++;
 			}
 		}		
 	}
 	
+	makeArray(d1, d2) 
+	{
+    	var arr = [];
+    	for(let i = 0; i < d2; i++) 
+    	{
+        	arr.push(new Array(d1));
+    	}
+    	return arr;
+	}
+	
+	drawPixel(data, width, x, y, color) 
+	{
+		this.drawPixel2(data, width, x, y, this.getRed(color), this.getGreen(color), this.getBlue(color), this.getAlpha(color));
+	}
+	
+	drawPixel2(data, width, x, y, r, g, b, a) 
+	{
+    	var index = (x + y * width) * 4;
+	    data[index + 0] = r;
+	    data[index + 1] = g;
+	    data[index + 2] = b;
+	    if(a)
+	    	data[index + 3] = a;
+	}
+	
 	paint()
 	{
-		if(data!=null)
+		if(this.data!=null)
 		{
-			short[][] results = data.fetchData();
+			let results = this.data.data;
 			
 			if(results==null)
 				return;
 			
-			//if(image==null || image.getWidth(this)!=results[0].length || image.getHeight(this)!=results.length)
-			//image = createImage(data.getSizeX(), data.getSizeY());
-			image = createImage(results.length, results[0].length);
+			let canvas = document.getElementById("canvas");
+			let ctx = canvas.getContext("2d");
+			let cwidth = canvas.width;
+			let cheight = canvas.height;
+			let cdata = ctx.getImageData(0, 0, cwidth, cheight);
 			
-			Graphics go = image.getGraphics();
-			for(int x=0; x<results.length; x++)
+			let	iwidth = results.length;
+			let iheight = results[0].length;
+
+			let image = this.makeArray(iwidth, iheight);
+			
+			for(let x=0; x<results.length; x++)
 			{
-				for(int y=0; y<results[x].length; y++)
+				for(let y=0; y<results[x].length; y++)
 				{
-					Color	c;
+					var c;
 					if(results[x][y]==-1)
 					{
-						c	= Color.black;
+						c	= this.createColor(0xFF, 0xFF, 0xFF);
 					}
 					else
 					{
-						c	= colors[results[x][y]%colors.length];
+						c	= this.colors[results[x][y]%colors.length];
 					}
-					go.setColor(c);
-	//				g.drawLine(x, results[x].length-y-1, x, results[x].length-y-1);	// Todo: use euclidean coordinates
-					go.drawLine(x, y, x, y);
+					
+					this.drawPixel(cdata.data, cwidth, x, y, c);
 				}
 			}
+			//ctx.putImageData(cdata, 0, 0);
 		}
 		
 		// Draw image.
 		if(image!=null)
 		{
 			Rectangle bounds = getInnerBounds(true);
-			int	ix	= 0;
-			int iy	= 0;
-			int	iwidth	= image.getWidth(this);
-			int iheight	= image.getHeight(this);
-			Rectangle drawarea = scaleToFit(bounds, iwidth, iheight);
+			let	ix = 0;
+			let iy = 0;
+			
+			let drawarea = scaleToFit(bounds, iwidth, iheight);
 
 			// Zoom into original image while calculating
-			if(calculating && range!=null)
+			if(this.calculating && this.range!=null)
 			{
-				ix	= (range.x-drawarea.x-bounds.x)*iwidth/drawarea.width;
-				iy	= (range.y-drawarea.y-bounds.y)*iheight/drawarea.height;
-				iwidth	= range.width*iwidth/drawarea.width;
-				iheight	= range.height*iheight/drawarea.height;
+				ix = (range.x-drawarea.x)*iwidth/drawarea.width; // ix = (range.x-drawarea.x-bounds.x)*iwidth/drawarea.width;
+				iy = (range.y-drawarea.y)*iheight/drawarea.height;
+				iwidth = range.width*iwidth/drawarea.width;
+				iheight = range.height*iheight/drawarea.height;
 				
 				// Scale again to fit new image size.
-				drawarea = scaleToFit(bounds, iwidth, iheight);
+				drawarea = this.scaleToFit(bounds, iwidth, iheight);
 				
 				g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
 					bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
@@ -238,10 +231,10 @@ export class MandelbrotElement extends LitElement
 			}
 			
 			// Offset and clip image and show border while dragging.
-			else if(startdrag!=null && enddrag!=null)
+			else if(this.startdrag!=null && this.enddrag!=null)
 			{
 				// Draw original image in background
-				g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
+				/*g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
 					bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
 					ix, iy, ix+iwidth, iy+iheight, this);
 				g.setColor(new Color(32,32,32,160));
@@ -256,7 +249,7 @@ export class MandelbrotElement extends LitElement
 				g.drawImage(image, bounds.x+drawarea.x+xoff, bounds.y+drawarea.y+yoff,
 					bounds.x+drawarea.x+xoff+drawarea.width, bounds.y+drawarea.y+yoff+drawarea.height,
 					ix, iy, ix+iwidth, iy+iheight, this);
-				g.setClip(clip);
+				g.setClip(clip);*/
 			}
 			else
 			{
