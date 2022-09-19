@@ -375,11 +375,17 @@ public class JCCWebAgent implements IJCCWebService
 	/**
 	 *  Invoke a Jadex service on the managed platform.
 	 */
-	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, 
+	public IFuture<Object> invokeServiceMethod(IComponentIdentifier pcid, ClassInfo servicetype, 
 		final String methodname, final Object[] args, final ClassInfo[] argtypes, @FutureReturnType final ClassInfo rettype)
 	{
-		if(cid==null)
-			return new Future<Object>(new RuntimeException("Cid must not be null"));
+		if(pcid==null)
+		{
+			pcid = agent.getId().getRoot();
+			System.out.println("cid not set in web call, using: "+pcid);
+		}
+		IComponentIdentifier cid = pcid;
+		
+		//return new Future<Object>(new RuntimeException("Cid must not be null"));
 		
 		//if(methodname!=null && methodname.indexOf("suspend")!=-1)
 		//	System.out.println("invokeServiceMethod 1: " + methodname + " " + servicetype+" "+cid);

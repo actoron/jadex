@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -22,7 +23,7 @@ public class DisplayService implements IDisplayService
 	
 	/** The agent. */
 	@ServiceComponent
-	protected DisplayAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The display subscribers. */
 	protected Map<String, SubscriptionIntermediateFuture<Object>> subscribers = new HashMap<String, SubscriptionIntermediateFuture<Object>>();
@@ -113,7 +114,7 @@ public class DisplayService implements IDisplayService
 	public ISubscriptionIntermediateFuture<Object> subscribeToDisplayUpdates(String displayid)
 	{
 //		SubscriptionIntermediateFuture<Object> ret = new SubscriptionIntermediateFuture<Object>();
-		final SubscriptionIntermediateFuture<Object> ret = (SubscriptionIntermediateFuture<Object>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent.agent);
+		final SubscriptionIntermediateFuture<Object> ret = (SubscriptionIntermediateFuture<Object>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
 
 		subscribers.put(displayid, ret);
 		return ret;

@@ -1,5 +1,6 @@
 package jadex.micro.examples.mandelbrot_new;
 
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -8,6 +9,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *  Service for displaying the result of a calculation. 
  */
 @Service
+@Security(roles=Security.UNRESTRICTED)
 public interface IDisplayService
 {
 	/**

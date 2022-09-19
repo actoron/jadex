@@ -19,6 +19,7 @@ import jadex.micro.examples.mandelbrot_new.GenerateAgent;
 })
 @Imports(
 {
+	"jadex.micro.examples.mandelbrot_new.*",
 	"jadex.platform.service.servicepool.*",
 	"jadex.platform.service.distributedservicepool.*",
 	"jadex.bridge.service.*",

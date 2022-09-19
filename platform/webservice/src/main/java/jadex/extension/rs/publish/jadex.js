@@ -15,7 +15,7 @@
 {
 	var Jadex = 
 	{
-		baseurl: 'webjcc',
+		baseurl: '/webjcc',
 		source: null,
 		conversations: {},
 	
@@ -37,7 +37,7 @@
 			this.source = new EventSource(this.baseurl);
 			this.source.addEventListener('open', function(e) 
 			{
-				//console.log('con established');
+				console.log('see connection established');
 			}, false);
 			this.source.onmessage = function(event) 
 			{
@@ -141,7 +141,7 @@
 					}
 					else
 					{*/
-						console.log("cannot handle event: "+JSON.stringify(event)+" "+cnt);
+						console.log("cannot handle event: "+event.lastEventId+" "+cnt);
 					//}
 				}
 			}
@@ -303,10 +303,10 @@
 			{
 				callid = self.generateUUID();
 			
-				//console.log("response via sse: "+path+" "+callid);
+				console.log("response via sse: "+path+" "+callid);
 				if(self.conversations[callid]==null)
 				{
-					//console.log("saved conversation: "+callid);
+					console.log("saved conversation: "+callid+" "+self);
 					self.conversations[callid] = [handler, errfunc, maxhandler, path]; //errhandler
 					ok = true;
 				}
