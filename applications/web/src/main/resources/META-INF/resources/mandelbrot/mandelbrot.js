@@ -14,12 +14,17 @@ export class MandelbrotElement extends LitElement
 		console.log('connected');
 		
 		var self = this;
-		var data = null;
-		var colors = null; // the color scheme
-		var data = null; // the data to draw
-		var progressdata = null; // the progress infos
+		this.data = null;
+		this.colors = null; // the color scheme
+		this.data = null; // the data to draw
+		this.progressdata = null; // the progress infos
 		
-		this.setColorScheme([this.createColor[50, 100, 0], this.createColor[255, 0, 0]], true);
+		this.setColorScheme([this.createColor(50, 100, 0), this.createColor(255, 0, 0)], true);
+		
+		for(var i=0; i<this.colors.length; i++)
+		{
+			console.log("col_"+i+": "+this.colors[i]);
+		}
 						
 		var terminate = jadex.getIntermediate('/mandelbrotwebapi/subscribeToDisplayUpdates?args_0=webdisplay&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		function(response)
@@ -27,6 +32,28 @@ export class MandelbrotElement extends LitElement
 			console.log("recceived display update: "+response.data);
 			var data = response.data;
 			//System.out.println("rec: "+result.getClass());
+			
+			if(data.data!=null) // result instanceof PartDataChunk
+			{
+				self.addDataChunk(data);
+			}
+			
+			if(data.algorithm!=null) // result instanceof AreaData
+			{
+				self.setResults(data);
+			}
+			
+			if(data.progress!=null) // result instanceof ProgressData
+			{
+				let prog = {};
+				prog.name = data.worker.name;
+				prog.area = data.area;
+				prog.progress = data.progress;
+				prog.width = data.imageWidth;
+				prog.height = data.imageHeight; 
+				self.addProgress(prog);
+			}
+			
 			/*if(result instanceof AreaData)
 			{
 				setResults((AreaData)result);
@@ -85,11 +112,8 @@ export class MandelbrotElement extends LitElement
 	setResults(data)
 	{
 		if(data.data==null)
-			data.data([data.sizex, data.sizey]);
+			data.data = this.makeArray(data.sizeX, data.sizeY);
 		this.data = data;
-					
-		this.dirty = true;
-		this.calculating = false;
 	}
 	
 	/**
@@ -97,20 +121,27 @@ export class MandelbrotElement extends LitElement
 	 */
 	addProgress(part)
 	{		
-		if(progressdata==null)
-			progressdata = {};//new HashSet<ProgressData>();
+		if(this.progressdata==null)
+			this.progressdata = {};//new HashSet<ProgressData>();
 				
-		progressdata.remove(part);
-		if(!part.isFinished())
-			progressdata.add(part);
+		let key = this.getProgressKey(part);
+		
+		delete this.progressdata[key];	
+		if(!part.finished)
+			this.progressdata[key] = part;
 				
-		if(progressdata.size()==1)
-			range = null;
+		if(this.progressdata.length==1)
+			this.range = null;
 				
-		if(progressdata.size()==0)
-			calculating = false;
-				
-		dirty = true;
+		if(this.progressdata.length==0)
+			this.calculating = false;
+	}
+	
+	getProgressKey(part)
+	{
+		let area = part.area;
+		let key = 'x='+area.x+"y="+area.y+"w="+area.w+"h="+area.h;
+		return key;
 	}
 	
 	/**
@@ -119,25 +150,28 @@ export class MandelbrotElement extends LitElement
 	addDataChunk(data) //PartDataChunk 
 	{
 		// first chunk is empty and only delivers name of worker
-		if(data.data=null)
+		if(data.data==null)
 			return; 
 		
 		var chunk = data.data;
+		var results = this.data.data;
 		
-		var xi = data.area.x+data.xstart;
-		var yi = data.area.y+data.ystart;
-		var xmax = data.area.x+data.area.width;
+		var xi = data.area.x+data.xStart;
+		var yi = data.area.y+data.yStart;
+		var xmax = data.area.x+data.area.w;
 				
 		var cnt = 0;
 		while(cnt<chunk.length)
 		{
-			this.data[xi][yi] = chunk[cnt++];
+			results[xi][yi] = chunk[cnt++];
 			if(++xi>=xmax)
 			{
-				xi=data.area.x);
+				xi=data.area.x;
 				yi++;
 			}
 		}		
+		
+		this.requestUpdate();
 	}
 	
 	makeArray(d1, d2) 
@@ -157,12 +191,14 @@ export class MandelbrotElement extends LitElement
 	
 	drawPixel2(data, width, x, y, r, g, b, a) 
 	{
-    	var index = (x + y * width) * 4;
+    	var index = x*4 + y*width*4;
 	    data[index + 0] = r;
 	    data[index + 1] = g;
 	    data[index + 2] = b;
 	    if(a)
 	    	data[index + 3] = a;
+	    else
+	    	data[index + 3] = 255; // make NOT transparent 
 	}
 	
 	paint()
@@ -174,16 +210,30 @@ export class MandelbrotElement extends LitElement
 			if(results==null)
 				return;
 			
-			let canvas = document.getElementById("canvas");
+			let canvas = this.shadowRoot.getElementById("canvas");
 			let ctx = canvas.getContext("2d");
-			let cwidth = canvas.width;
-			let cheight = canvas.height;
-			let cdata = ctx.getImageData(0, 0, cwidth, cheight);
-			
-			let	iwidth = results.length;
-			let iheight = results[0].length;
+			//let cwidth = canvas.width;
+			//let cheight = canvas.height;
+			//let cdata = ctx.getImageData(0, 0, cwidth, cheight);
 
-			let image = this.makeArray(iwidth, iheight);
+			let sx = 0;
+			let sy = 0;
+			let swidth = results.length;
+			let sheight = results[0].length;
+			let tx = 0;
+			let ty = 0;
+			let twidth = swidth;		
+			let theight = sheight;
+			
+			ctx.canvas.width  = swidth;
+  			ctx.canvas.height = sheight;
+			
+			//ctx.drawImage(this.data, sx, sy, swidth, sheight, tx, ty, twidth, theight);
+
+			// generate image data from results, i.e. assign colors for values according to the palette
+
+			// creates a typed array of 8-bit unsigned integers clamped to 0-255
+			let image = new Uint8ClampedArray(swidth*sheight*4);
 			
 			for(let x=0; x<results.length; x++)
 			{
@@ -192,19 +242,45 @@ export class MandelbrotElement extends LitElement
 					var c;
 					if(results[x][y]==-1)
 					{
-						c	= this.createColor(0xFF, 0xFF, 0xFF);
+						c = this.createColor(0xFF, 0xFF, 0xFF);
 					}
 					else
 					{
-						c	= this.colors[results[x][y]%colors.length];
+						c = this.colors[results[x][y]%this.colors.length];
 					}
 					
-					this.drawPixel(cdata.data, cwidth, x, y, c);
+					this.drawPixel(image, twidth, x, y, c);
 				}
 			}
+			
 			//ctx.putImageData(cdata, 0, 0);
+			
+			/*img 	Specifies the image, canvas, or video element to use 	 
+			sx 	Optional. The x coordinate where to start clipping 	
+			sy 	Optional. The y coordinate where to start clipping 	
+			swidth 	Optional. The width of the clipped image 	
+			sheight 	Optional. The height of the clipped image 	
+			tx 	The x coordinate where to place the image on the canvas 	
+			ty 	The y coordinate where to place the image on the canvas 	
+			twidth 	Optional. The width of the image to use (stretch or reduce the image) 	
+			theight 	Optional. The height of the image to use (stretch or reduce the image)*/
+			
+			var imgdata = new ImageData(image, swidth, sheight);
+			ctx.putImageData(imgdata, 0, 0);
+			
+			/*
+			createImageBitmap(imgdata).then(imgbitmap => 
+			{
+				ctx.drawImage(imgbitmap, sx, sy, swidth, sheight, tx, ty, twidth, theight);
+			})
+			.catch(err =>
+			{
+				console.log(err);
+			});*/
+			
 		}
 		
+		/*
 		// Draw image.
 		if(image!=null)
 		{
@@ -234,7 +310,7 @@ export class MandelbrotElement extends LitElement
 			else if(this.startdrag!=null && this.enddrag!=null)
 			{
 				// Draw original image in background
-				/*g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
+				g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
 					bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
 					ix, iy, ix+iwidth, iy+iheight, this);
 				g.setColor(new Color(32,32,32,160));
@@ -249,7 +325,7 @@ export class MandelbrotElement extends LitElement
 				g.drawImage(image, bounds.x+drawarea.x+xoff, bounds.y+drawarea.y+yoff,
 					bounds.x+drawarea.x+xoff+drawarea.width, bounds.y+drawarea.y+yoff+drawarea.height,
 					ix, iy, ix+iwidth, iy+iheight, this);
-				g.setClip(clip);*/
+				g.setClip(clip);
 			}
 			else
 			{
@@ -257,9 +333,10 @@ export class MandelbrotElement extends LitElement
 					bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
 					ix, iy, ix+iwidth, iy+iheight, this);
 			}
+			*/
 			
 			// Draw progress boxes.
-			if(progressdata!=null)
+			/*if(progressdata!=null)
 			{
 				JProgressBar bar = new JProgressBar(0, 100);
 				bar.setStringPainted(true);
@@ -353,10 +430,10 @@ export class MandelbrotElement extends LitElement
 					}
 				}
 			}
-		}
+		}*/
 		
 		// Draw range area.
-		if(!calculating && range!=null)
+		/*if(!calculating && range!=null)
 		{
 			Rectangle bounds = getInnerBounds(false);
 			double	rratio	= (double)range.width/range.height;
@@ -383,7 +460,7 @@ export class MandelbrotElement extends LitElement
 		
 			g.setColor(Color.white);
 			g.drawRect(range.x, range.y, range.width, range.height);
-		}
+		}*/
 	}
 	
 	/**
@@ -457,12 +534,17 @@ export class MandelbrotElement extends LitElement
 		return color & 0xff;
 	}
 
-	createColorBetween(start, end, i)
+	createColorBetween(start, end, diff)
 	{
-		return this.createColor(
-			this.getRed(start)+(i%16)/16.0*(this.getRed(end)-this.getRed(start)),
-			this.getGreen(start)+(i%16)/16.0*(this.getGreen(end)-this.getGreen(start)),
-			this.getBlue(start)+(i%16)/16.0*(this.getBlue(end)-this.getBlue(start));
+		let ret = this.createColor(
+			this.getRed(start)+diff*(this.getRed(end)-this.getRed(start)),
+			this.getGreen(start)+diff*(this.getGreen(end)-this.getGreen(start)),
+			this.getBlue(start)+diff*(this.getBlue(end)-this.getBlue(start))
+		);
+		
+		console.log("start: "+start+" end: "+end+" diff: "+diff+" created: "+ret);
+		
+		return ret;
 	}
 
 	setColorScheme(scheme, cycle)
@@ -477,13 +559,14 @@ export class MandelbrotElement extends LitElement
 		}
 		else if(cycle)
 		{
-			this.colors	= [scheme.length*16];
-			for(var i=0; i<colors.length; i++)
+			this.colors	= new Array(scheme.length*16);
+			for(var i=0; i<this.colors.length; i++)
 			{
-				var index = i/16;
+				var index = Math.trunc(i/16);
+				var diff = (i%16)/16;
 				var start = scheme[index];
 				var end	= index+1<scheme.length? scheme[index+1] : scheme[0];
-				this.colors[i] = this.createColorBetween(start, end, i);
+				this.colors[i] = this.createColorBetween(start, end, diff);
 			}
 		}
 		else
@@ -493,13 +576,19 @@ export class MandelbrotElement extends LitElement
 			this.colors = new Color[max];
 			for(var i=0; i<colors.length; i++)
 			{
-				var index = i*(scheme.length-1)/max;
+				var index =  Math.trunc(i*(scheme.length-1)/max);
 				var diff = i*(scheme.length-1)/max - index;
 				var start = scheme[index];
 				var end	= scheme[index+1];
-				this.colors[i] = this.createColorBetween(start, end, i);
+				this.colors[i] = this.createColorBetween(start, end, diff);
 			}
 		}
+	}
+	
+	update()
+	{
+		super.update();
+		this.paint();
 	}
 }
 
