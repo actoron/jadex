@@ -14,17 +14,11 @@ export class MandelbrotElement extends LitElement
 		console.log('connected');
 		
 		var self = this;
-		this.data = null;
 		this.colors = null; // the color scheme
 		this.data = null; // the data to draw
 		this.progressdata = null; // the progress infos
 		
 		this.setColorScheme([this.createColor(50, 100, 0), this.createColor(255, 0, 0)], true);
-		
-		for(var i=0; i<this.colors.length; i++)
-		{
-			console.log("col_"+i+": "+this.colors[i]);
-		}
 						
 		var terminate = jadex.getIntermediate('/mandelbrotwebapi/subscribeToDisplayUpdates?args_0=webdisplay&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		function(response)
@@ -49,8 +43,9 @@ export class MandelbrotElement extends LitElement
 				prog.name = data.worker.name;
 				prog.area = data.area;
 				prog.progress = data.progress;
-				prog.width = data.imageWidth;
-				prog.height = data.imageHeight; 
+				prog.imageWidth = data.imageWidth;
+				prog.imageHeight = data.imageHeight; 
+				prog.finished = data.progress==100;
 				self.addProgress(prog);
 			}
 			
@@ -114,6 +109,7 @@ export class MandelbrotElement extends LitElement
 		if(data.data==null)
 			data.data = this.makeArray(data.sizeX, data.sizeY);
 		this.data = data;
+		this.data.image = new Uint8ClampedArray(data.sizeX*data.sizeY*4);
 	}
 	
 	/**
@@ -127,14 +123,21 @@ export class MandelbrotElement extends LitElement
 		let key = this.getProgressKey(part);
 		
 		delete this.progressdata[key];	
+		
+		let len = Object.keys(this.progressdata).length;
+
 		if(!part.finished)
 			this.progressdata[key] = part;
 				
-		if(this.progressdata.length==1)
+		if(len==1)
 			this.range = null;
 				
-		if(this.progressdata.length==0)
+		if(len==0)
 			this.calculating = false;
+			
+		console.log("progressdata len (before, after): "+len+" "+Object.keys(this.progressdata).length+" "+part.finished+" "+part.progress);
+		
+		this.requestUpdate();
 	}
 	
 	getProgressKey(part)
@@ -144,9 +147,6 @@ export class MandelbrotElement extends LitElement
 		return key;
 	}
 	
-	/**
-	 *  Set new results.
-	 */
 	addDataChunk(data) //PartDataChunk 
 	{
 		// first chunk is empty and only delivers name of worker
@@ -155,15 +155,19 @@ export class MandelbrotElement extends LitElement
 		
 		var chunk = data.data;
 		var results = this.data.data;
+		var image = this.data.image;
 		
 		var xi = data.area.x+data.xStart;
 		var yi = data.area.y+data.yStart;
 		var xmax = data.area.x+data.area.w;
 				
+		//console.log("chunk: "+xi+" "+yi+" "+xmax);
+				
 		var cnt = 0;
 		while(cnt<chunk.length)
 		{
 			results[xi][yi] = chunk[cnt++];
+			this.drawPixel(image, this.data.sizeX, xi, yi, this.getColor(results[xi][yi]));
 			if(++xi>=xmax)
 			{
 				xi=data.area.x;
@@ -177,11 +181,25 @@ export class MandelbrotElement extends LitElement
 	makeArray(d1, d2) 
 	{
     	var arr = [];
-    	for(let i = 0; i < d2; i++) 
+    	for(let i = 0; i < d1; i++) 
     	{
-        	arr.push(new Array(d1));
+        	arr.push(new Array(d2));
     	}
     	return arr;
+	}
+	
+	getColor(value)
+	{
+		let ret;
+		if(value==-1)
+		{
+			ret = this.createColor(0, 0, 0);
+		}
+		else
+		{
+			ret = this.colors[value%this.colors.length];
+		}
+		return ret
 	}
 	
 	drawPixel(data, width, x, y, color) 
@@ -203,264 +221,184 @@ export class MandelbrotElement extends LitElement
 	
 	paint()
 	{
-		if(this.data!=null)
-		{
-			let results = this.data.data;
+		if(this.data==null || this.data.data==null || this.data.image==null)
+			return;
 			
-			if(results==null)
-				return;
-			
-			let canvas = this.shadowRoot.getElementById("canvas");
-			let ctx = canvas.getContext("2d");
-			//let cwidth = canvas.width;
-			//let cheight = canvas.height;
-			//let cdata = ctx.getImageData(0, 0, cwidth, cheight);
+		let results = this.data.data;
+		let oimage = this.data.image;
+		var image = new Uint8ClampedArray(oimage); // clone the image data
+		let canvas = this.shadowRoot.getElementById("canvas");
+		let ctx = canvas.getContext("2d");
+		//let cwidth = canvas.width;
+		//let cheight = canvas.height;
+		//let cdata = ctx.getImageData(0, 0, cwidth, cheight);
 
-			let sx = 0;
-			let sy = 0;
-			let swidth = results.length;
-			let sheight = results[0].length;
-			let tx = 0;
-			let ty = 0;
-			let twidth = swidth;		
-			let theight = sheight;
-			
-			ctx.canvas.width  = swidth;
-  			ctx.canvas.height = sheight;
-			
-			//ctx.drawImage(this.data, sx, sy, swidth, sheight, tx, ty, twidth, theight);
-
-			// generate image data from results, i.e. assign colors for values according to the palette
-
-			// creates a typed array of 8-bit unsigned integers clamped to 0-255
-			let image = new Uint8ClampedArray(swidth*sheight*4);
-			
-			for(let x=0; x<results.length; x++)
-			{
-				for(let y=0; y<results[x].length; y++)
-				{
-					var c;
-					if(results[x][y]==-1)
-					{
-						c = this.createColor(0xFF, 0xFF, 0xFF);
-					}
-					else
-					{
-						c = this.colors[results[x][y]%this.colors.length];
-					}
-					
-					this.drawPixel(image, twidth, x, y, c);
-				}
-			}
-			
-			//ctx.putImageData(cdata, 0, 0);
-			
-			/*img 	Specifies the image, canvas, or video element to use 	 
-			sx 	Optional. The x coordinate where to start clipping 	
-			sy 	Optional. The y coordinate where to start clipping 	
-			swidth 	Optional. The width of the clipped image 	
-			sheight 	Optional. The height of the clipped image 	
-			tx 	The x coordinate where to place the image on the canvas 	
-			ty 	The y coordinate where to place the image on the canvas 	
-			twidth 	Optional. The width of the image to use (stretch or reduce the image) 	
-			theight 	Optional. The height of the image to use (stretch or reduce the image)*/
-			
-			var imgdata = new ImageData(image, swidth, sheight);
-			ctx.putImageData(imgdata, 0, 0);
-			
-			/*
-			createImageBitmap(imgdata).then(imgbitmap => 
-			{
-				ctx.drawImage(imgbitmap, sx, sy, swidth, sheight, tx, ty, twidth, theight);
-			})
-			.catch(err =>
-			{
-				console.log(err);
-			});*/
-			
-		}
+		let sx = 0;
+		let sy = 0;
+		let swidth = results.length;
+		let sheight = results[0].length;
+		let tx = 0;
+		let ty = 0;
+		let twidth = swidth;		
+		let theight = sheight;
 		
-		/*
-		// Draw image.
-		if(image!=null)
+		ctx.canvas.width  = swidth;
+		ctx.canvas.height = sheight;
+  			
+		//console.log("background color: "+canvas.style.background);
+		
+		//ctx.drawImage(this.data, sx, sy, swidth, sheight, tx, ty, twidth, theight);
+
+		// generate image data from results, i.e. assign colors for values according to the palette
+
+		// creates a typed array of 8-bit unsigned integers clamped to 0-255
+		/*let image = new Uint8ClampedArray(swidth*sheight*4);
+		
+		for(let x=0; x<results.length; x++)
 		{
-			Rectangle bounds = getInnerBounds(true);
-			let	ix = 0;
-			let iy = 0;
-			
-			let drawarea = scaleToFit(bounds, iwidth, iheight);
-
-			// Zoom into original image while calculating
-			if(this.calculating && this.range!=null)
+			for(let y=0; y<results[x].length; y++)
 			{
-				ix = (range.x-drawarea.x)*iwidth/drawarea.width; // ix = (range.x-drawarea.x-bounds.x)*iwidth/drawarea.width;
-				iy = (range.y-drawarea.y)*iheight/drawarea.height;
-				iwidth = range.width*iwidth/drawarea.width;
-				iheight = range.height*iheight/drawarea.height;
-				
-				// Scale again to fit new image size.
-				drawarea = this.scaleToFit(bounds, iwidth, iheight);
-				
-				g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
-					bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
-					ix, iy, ix+iwidth, iy+iheight, this);
-			}
-			
-			// Offset and clip image and show border while dragging.
-			else if(this.startdrag!=null && this.enddrag!=null)
-			{
-				// Draw original image in background
-				g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
-					bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
-					ix, iy, ix+iwidth, iy+iheight, this);
-				g.setColor(new Color(32,32,32,160));
-				g.fillRect(bounds.x+drawarea.x, bounds.y+drawarea.y, drawarea.width, drawarea.height);
-
-				// Draw offsetted image in foreground
-				Shape	clip	= g.getClip();
-				g.setClip(bounds.x+drawarea.x, bounds.y+drawarea.y, drawarea.width, drawarea.height);
-				int	xoff	= enddrag.x-startdrag.x;
-				int	yoff	= enddrag.y-startdrag.y;
-				
-				g.drawImage(image, bounds.x+drawarea.x+xoff, bounds.y+drawarea.y+yoff,
-					bounds.x+drawarea.x+xoff+drawarea.width, bounds.y+drawarea.y+yoff+drawarea.height,
-					ix, iy, ix+iwidth, iy+iheight, this);
-				g.setClip(clip);
-			}
-			else
-			{
-				g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
-					bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
-					ix, iy, ix+iwidth, iy+iheight, this);
-			}
-			*/
-			
-			// Draw progress boxes.
-			/*if(progressdata!=null)
-			{
-				JProgressBar bar = new JProgressBar(0, 100);
-				bar.setStringPainted(true);
-				Dimension barsize	= bar.getPreferredSize();
-				for(Iterator<ProgressData> it=progressdata.iterator(); it.hasNext(); )
+				var c;
+				if(results[x][y]==-1)
 				{
-					ProgressData progress = (ProgressData)it.next();
-					//System.out.println("progress is: "+progress);
+					c = this.createColor(0, 0, 0);
+				}
+				else
+				{
+					c = this.colors[results[x][y]%this.colors.length];
+				}
+				
+				this.drawPixel(image, twidth, x, y, c);
+			}
+		}*/
+		
+		//ctx.putImageData(cdata, 0, 0);
+		
+		/*img 	Specifies the image, canvas, or video element to use 	 
+		sx 	Optional. The x coordinate where to start clipping 	
+		sy 	Optional. The y coordinate where to start clipping 	
+		swidth 	Optional. The width of the clipped image 	
+		sheight 	Optional. The height of the clipped image 	
+		tx 	The x coordinate where to place the image on the canvas 	
+		ty 	The y coordinate where to place the image on the canvas 	
+		twidth 	Optional. The width of the image to use (stretch or reduce the image) 	
+		theight 	Optional. The height of the image to use (stretch or reduce the image)*/
+			
+		var imgdata = new ImageData(image, swidth, sheight);
+		ctx.putImageData(imgdata, 0, 0);
+			
+		/*
+		createImageBitmap(imgdata).then(imgbitmap => 
+		{
+			ctx.drawImage(imgbitmap, sx, sy, swidth, sheight, tx, ty, twidth, theight);
+		})
+		.catch(err =>
+		{
+			console.log(err);
+		});*/
+		
+		// Draw progress boxes.
+		if(this.progressdata!=null && Object.keys(this.progressdata).length>0)
+		{
+			let canvas2 = document.createElement('canvas');
+			let ctx2 = canvas2.getContext('2d');
+			//canvas2.style.background = "transparent";
+			ctx2.canvas.width  = twidth;
+			ctx2.canvas.height = theight;
+			//ctx2.clearRect(0, 0, twidth, theight);
+			
+			for(let key of Object.keys(this.progressdata)) 
+			{
+				let progress = this.progressdata[key];
+				
+				console.log("progress is: "+progress);
 					
-					double xf = drawarea.getWidth()/progress.getImageWidth();
-					double yf = drawarea.getHeight()/progress.getImageHeight();
-					int corx = (int)(progress.getArea().x*xf);
-					int cory = (int)(progress.getArea().y*yf);
-					int corw = (int)(progress.getArea().width*xf);
-					int corh = (int)(progress.getArea().height*yf);
+				let xf = twidth/progress.imageWidth;
+				let yf = theight/progress.imageHeight;
+				let corx = Math.trunc(progress.area.x*xf);
+				let cory = Math.trunc(progress.area.y*yf);
+				let corw = Math.trunc(progress.area.w*xf);
+				let corh = Math.trunc(progress.area.h*yf);
 					
-					if(!progress.isFinished())
-					{
-						g.setColor(new Color(32,32,32,160));
-						g.fillRect(bounds.x+drawarea.x+corx+1, bounds.y+drawarea.y+cory+1, corw-1, corh-1);							
-					}
-					g.setColor(Color.white);
-					g.drawRect(bounds.x+drawarea.x+corx, bounds.y+drawarea.y+cory, corw, corh);
-					
-					// Print provider name.
-					String name = progress.getProviderId()!=null? progress.getProviderId().toString(): "";
-					String provider	= "";
-					int index =	name.indexOf('@');
-					if(index!=-1)
-					{
-						provider = name.substring(index+1);
-						name = name.substring(0, index);
-					}
-//					provider = progress.getTaskId().toString();
-					
-					int width;
-					int	height;
-					
-					while(true)
-					{
-						FontMetrics fm = g.getFontMetrics();
-						Rectangle2D	sb1	= fm.getStringBounds(name, g);
-						Rectangle2D	sb2	= fm.getStringBounds(provider, g);
-						width = (int)Math.max(sb1.getWidth(), sb2.getWidth());
-						height = fm.getHeight()*2 + barsize.height + 2;
-						Font f = g.getFont();
-						
-						if(width<corw-4 && height<corh-4 || f.getSize()<6)		
-							break;
+				if(!progress.finished)
+				{
+					//ctx2.fillStyle = this.createColor(20, 20, 150, 160); //160
+					ctx2.fillStyle = "rgba(20, 20, 150, 0.1)";
+					ctx2.fillRect(corx+1, cory+1, corw-1, corh-1);
+				}
+				ctx2.strokeStyle = "white";
+				ctx2.rect(corx, cory, corw, corh);
+				
+				// Print worker name
+				let name = progress.name
+				let provider = "";
+				let index =	name.indexOf('@');
+				if(index!=-1)
+				{
+					provider = name.substring(index+1);
+					name = name.substring(0, index);
+				}
 
-						Font nf = f.deriveFont(f.getSize()*0.9f);
-						g.setFont(nf);
-					}
+				let textwidth;
+				let textheight;
+				let fsize = 20;				
+				while(true)
+				{
+					ctx.font = fsize+'px sans-serif';
+					let m1 = ctx.measureText(name);
+					let m2 = ctx.measureText(provider);
+					textwidth = Math.max(m1.width, m2.width);
+					textheight = (m1.fontBoundingBoxAscent + m1.fontBoundingBoxDescent)*2 + 2; // + barsize.height + 2;
 					
-					if(width<corw-4 && height<corh-4)
-					{
-						//System.out.println("a: "+width+" "+height+" "+corw+" "+corh+" "+g.getFont().getSize());
-						// Draw provider id.
-						FontMetrics fm = g.getFontMetrics();
-						int	x = bounds.x+drawarea.x+corx + (corw-width)/2;
-						int	y = bounds.y+drawarea.y+cory + (corh-height)/2 + fm.getLeading()/2;
-						g.drawString(name, x, y + fm.getAscent());
-						g.drawString(provider, x, y + fm.getAscent() + fm.getHeight());
-					
-						// Draw progress bar.
-						if(!progress.isFinished())
-						{
-							bar.setStringPainted(true);
-							bar.setValue(progress.getProgress());
-							width = Math.min(corw-10, barsize.width);
-							x = bounds.x+drawarea.x+corx + (corw-width)/2;
-							y = y + fm.getHeight()*2 + 2;
-							bar.setBounds(0, 0, width, barsize.height);
-							Graphics	g2	= g.create();
-							g2.translate(x, y);
-							bar.paint(g2);
-						}
-					}
-					else if(!progress.isFinished() && corw>8 && corh>8)
-					{
-						//System.out.println("b: "+width+" "+height+" "+corw+" "+corh);
+					if(textwidth<corw-4 && textheight<corh-4 || fsize<5)		
+						break;
 
-						bar.setStringPainted(false);
-						int	x = bounds.x+drawarea.x+corx + 2;
-						int	y = bounds.y+drawarea.y+cory + Math.max((corh-barsize.height)/2, 2);
+					fsize = Math.trunc(fsize*0.9);
+				}
+				
+				if(textwidth<corw-4 && textheight<corh-4)
+				{
+					console.log("a: "+textwidth+" "+textheight+" "+corw+" "+corh+" "+fsize);
+					// Draw provider id.
+					let x = Math.trunc(corx + (corw-textwidth)/2);
+					let y = Math.trunc(cory + (corh-textheight)/2);// + fm.getLeading()/2;
+					ctx2.fillStyle = "rgb(255, 255, 255)";
+					ctx2.fillText(name , x, y);
+					ctx2.fillText(provider, x, y+textheight);
+					//g.drawString(name, x, y + fm.getAscent());
+					//g.drawString(provider, x, y + fm.getAscent() + fm.getHeight());
+				
+					// Draw progress bar.
+					/*if(!progress.isFinished())
+					{
+						bar.setStringPainted(true);
 						bar.setValue(progress.getProgress());
-						bar.setBounds(0, 0, corw-4, Math.min(barsize.height, corh-4));
-						Graphics g2 = g.create();
+						width = Math.min(corw-10, barsize.width);
+						x = bounds.x+drawarea.x+corx + (corw-width)/2;
+						y = y + fm.getHeight()*2 + 2;
+						bar.setBounds(0, 0, width, barsize.height);
+						Graphics	g2	= g.create();
 						g2.translate(x, y);
 						bar.paint(g2);
-					}
+					}*/
+				}
+				else if(!progress.finished && corw>8 && corh>8)
+				{
+					console.log("b: "+textwidth+" "+textheight+" "+corw+" "+corh+" "+fsize);
+
+					//bar.setStringPainted(false);
+					//let	x = corx + 2;
+					//let	y = cory + 2;//Math.max((corh-barsize.height)/2, 2);
+					//bar.setValue(progress.getProgress());
+					//bar.setBounds(0, 0, corw-4, Math.min(barsize.height, corh-4));
+					//Graphics g2 = g.create();
+					//g2.translate(x, y);
+					//bar.paint(g2);
 				}
 			}
-		}*/
-		
-		// Draw range area.
-		/*if(!calculating && range!=null)
-		{
-			Rectangle bounds = getInnerBounds(false);
-			double	rratio	= (double)range.width/range.height;
-			double	bratio	= (double)bounds.width/bounds.height;
 			
-			// Draw left and right boxes to show unused space
-			if(rratio<bratio)
-			{
-				int	drawwidth	= range.height*bounds.width/bounds.height;
-				int offset = (range.width-drawwidth)/2;
-				g.setColor(new Color(128,128,128,64));
-				g.fillRect(range.x+offset, range.y, -offset, range.height+1);
-				g.fillRect(range.x+range.width, range.y, -offset, range.height+1);
-			}
-			// Draw upper and lower boxes to show unused space
-			else if(rratio>bratio)
-			{
-				int	drawheight	= range.width*bounds.height/bounds.width;
-				int offset = (range.height-drawheight)/2;
-				g.setColor(new Color(128,128,128,64));
-				g.fillRect(range.x, range.y+offset, range.width+1, -offset);
-				g.fillRect(range.x, range.y+range.height, range.width+1, -offset);
-			}
-		
-			g.setColor(Color.white);
-			g.drawRect(range.x, range.y, range.width, range.height);
-		}*/
+			ctx.drawImage(canvas2, 0, 0, twidth, theight);
+		}	
 	}
 	
 	/**
@@ -493,21 +431,6 @@ export class MandelbrotElement extends LitElement
 		return [Math.trunc(drawstartx), Math.truc(drawendx), Math.trunc(drawstarty), Math.trunc(drawendy)];
 	}
 	
-	/**
-	 *  Get the desired size of the panel.
-	 * /
-	public Dimension getMinimumSize()
-	{
-		Insets	ins	= getInsets();
-		Dimension	ret	= new Dimension(ins!=null ? ins.left+ins.right : 0, ins!=null ? ins.top+ins.bottom : 0);
-		if(image!=null)
-		{
-			ret.width	+= image.getWidth(this);
-			ret.height	+= image.getHeight(this);
-		}
-		return ret;
-	}*/
-
 	createColor(r, g, b, a)
 	{
 		const color = a << 24 | r << 16 | g << 8 | b; 
@@ -542,7 +465,7 @@ export class MandelbrotElement extends LitElement
 			this.getBlue(start)+diff*(this.getBlue(end)-this.getBlue(start))
 		);
 		
-		console.log("start: "+start+" end: "+end+" diff: "+diff+" created: "+ret);
+		//console.log("start: "+start+" end: "+end+" diff: "+diff+" created: "+ret);
 		
 		return ret;
 	}

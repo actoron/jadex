@@ -61,7 +61,7 @@ public class CalculateService implements ICalculateService
 //		};
 		
 		//long start = System.currentTimeMillis();
-		System.out.println("calc start: "+data.getId()+" "+ag.getId());
+		//System.out.println("calc start: "+data.getId()+" "+ag.getId());
 		
 		agent.setTaskId(data.getId());
 		ret.addIntermediateResult(new PartDataChunk(0, null, 0, 0, ag.getId()));

@@ -353,7 +353,7 @@ public class ServiceHandler implements InvocationHandler
 			int fpos = pos;
 			ServicePoolHelper.getFreeCapacity(component, (IService)service).then(cap ->
 			{
-				System.out.println("capacity of worker: "+cap+" "+service);
+				//System.out.println("capacity of worker: "+cap+" "+service);
 				if(cap>0)
 				{
 					ret.setResult(new Tuple2<IService, Integer>(service, fpos+1));
