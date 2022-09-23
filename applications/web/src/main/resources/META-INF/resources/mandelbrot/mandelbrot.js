@@ -219,6 +219,44 @@ export class MandelbrotElement extends LitElement
 	    	data[index + 3] = 255; // make NOT transparent 
 	}
 	
+	drawProgressBar(x, y, w, h, color, percentage, complete, ctx)
+	{
+    	if(complete)
+    	{
+	    	ctx.beginPath();
+	    	ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 * Math.PI);
+	    	ctx.lineTo(w - h + x, 0 + y);
+	    	ctx.arc(w - h / 2 + x, h / 2 + y, h / 2, 3 / 2 *Math.PI, Math.PI / 2);
+	    	ctx.lineTo(h / 2 + x, h + y);
+	    	ctx.strokeStyle = '#000000';
+	    	ctx.stroke();
+	    	ctx.closePath();
+	    }
+    	
+		let p = percentage * w;
+    	if(p <= h)
+    	{
+      		ctx.beginPath();
+      		ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI - Math.acos((h - p) / h), Math.PI + Math.acos((h - p) / h));
+      		ctx.save();
+      		ctx.scale(-1, 1);
+      		ctx.arc((h / 2) - p - x, h / 2 + y, h / 2, Math.PI - Math.acos((h - p) / h), Math.PI + Math.acos((h - p) / h));
+      		ctx.restore();
+      		ctx.closePath();
+    	} 
+    	else 
+    	{
+      		ctx.beginPath();
+      		ctx.arc(h / 2 + x, h / 2 + y, h / 2, Math.PI / 2, 3 / 2 *Math.PI);
+      		ctx.lineTo(p - h + x, 0 + y);
+      		ctx.arc(p - (h / 2) + x, h / 2 + y, h / 2, 3 / 2 * Math.PI, Math.PI / 2);
+      		ctx.lineTo(h / 2 + x, h + y);
+      		ctx.closePath();
+    	}
+    	ctx.fillStyle = color;
+    	ctx.fill();
+  	}
+	
 	paint()
 	{
 		if(this.data==null || this.data.data==null || this.data.image==null)
@@ -323,10 +361,10 @@ export class MandelbrotElement extends LitElement
 				if(!progress.finished)
 				{
 					//ctx2.fillStyle = this.createColor(20, 20, 150, 160); //160
-					ctx2.fillStyle = "rgba(20, 20, 150, 0.1)";
+					ctx2.fillStyle = "rgba(20, 20, 150, 0.3)";
 					ctx2.fillRect(corx+1, cory+1, corw-1, corh-1);
 				}
-				ctx2.strokeStyle = "white";
+				ctx2.strokeStyle = "yellow";
 				ctx2.rect(corx, cory, corw, corh);
 				
 				// Print worker name
@@ -344,56 +382,38 @@ export class MandelbrotElement extends LitElement
 				let fsize = 20;				
 				while(true)
 				{
-					ctx.font = fsize+'px sans-serif';
-					let m1 = ctx.measureText(name);
-					let m2 = ctx.measureText(provider);
+					ctx2.font = fsize+'px sans-serif';
+					let m1 = ctx2.measureText(name);
+					let m2 = ctx2.measureText(provider);
 					textwidth = Math.max(m1.width, m2.width);
-					textheight = (m1.fontBoundingBoxAscent + m1.fontBoundingBoxDescent)*2 + 2; // + barsize.height + 2;
+					//textheight = (m1.fontBoundingBoxAscent + m1.fontBoundingBoxDescent)*3; // + barsize.height + 2;
+					textheight = Math.max(m1.actualBoundingBoxAscent + m1.actualBoundingBoxDescent, m2.actualBoundingBoxAscent + m2.actualBoundingBoxDescent);
+					//textheight = Math.max(m1.fontBoundingBoxAscent + m1.fontBoundingBoxDescent, m2.fontBoundingBoxAscent + m2.fontBoundingBoxDescent);
 					
-					if(textwidth<corw-4 && textheight<corh-4 || fsize<5)		
+					if(textwidth<corw-4 && textheight*3<corh-4 || fsize<5)		
 						break;
-
-					fsize = Math.trunc(fsize*0.9);
+					else
+						fsize = Math.trunc(fsize*0.9);
 				}
 				
-				if(textwidth<corw-4 && textheight<corh-4)
+				if(textwidth<corw-4 && textheight*3<corh-4)
 				{
 					console.log("a: "+textwidth+" "+textheight+" "+corw+" "+corh+" "+fsize);
 					// Draw provider id.
 					let x = Math.trunc(corx + (corw-textwidth)/2);
-					let y = Math.trunc(cory + (corh-textheight)/2);// + fm.getLeading()/2;
+					let y = Math.trunc(cory + (corh-textheight*3)/2);// + fm.getLeading()/2;
 					ctx2.fillStyle = "rgb(255, 255, 255)";
 					ctx2.fillText(name , x, y);
 					ctx2.fillText(provider, x, y+textheight);
-					//g.drawString(name, x, y + fm.getAscent());
-					//g.drawString(provider, x, y + fm.getAscent() + fm.getHeight());
-				
-					// Draw progress bar.
-					/*if(!progress.isFinished())
-					{
-						bar.setStringPainted(true);
-						bar.setValue(progress.getProgress());
-						width = Math.min(corw-10, barsize.width);
-						x = bounds.x+drawarea.x+corx + (corw-width)/2;
-						y = y + fm.getHeight()*2 + 2;
-						bar.setBounds(0, 0, width, barsize.height);
-						Graphics	g2	= g.create();
-						g2.translate(x, y);
-						bar.paint(g2);
-					}*/
+					//ctx.fillRect(x,y,textwidth,textheight*2);
+					this.drawProgressBar(x, y+textheight*2, textwidth, textheight, 'red', progress.progress/100, true, ctx2);
 				}
 				else if(!progress.finished && corw>8 && corh>8)
 				{
 					console.log("b: "+textwidth+" "+textheight+" "+corw+" "+corh+" "+fsize);
-
-					//bar.setStringPainted(false);
-					//let	x = corx + 2;
-					//let	y = cory + 2;//Math.max((corh-barsize.height)/2, 2);
-					//bar.setValue(progress.getProgress());
-					//bar.setBounds(0, 0, corw-4, Math.min(barsize.height, corh-4));
-					//Graphics g2 = g.create();
-					//g2.translate(x, y);
-					//bar.paint(g2);
+					let x = corx + 2;
+					let y = cory + Math.max((corh-textheight)/2, 2);
+					this.drawProgressBar(x, y, textwidth, textheight, 'red', progress.progress/100, true, ctx2);
 				}
 			}
 			

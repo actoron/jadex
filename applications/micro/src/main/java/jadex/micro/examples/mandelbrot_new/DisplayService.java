@@ -11,6 +11,7 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminationCommand;
 
 /**
  *  The service allows displaying results in the frame
@@ -115,7 +116,14 @@ public class DisplayService implements IDisplayService
 	{
 //		SubscriptionIntermediateFuture<Object> ret = new SubscriptionIntermediateFuture<Object>();
 		final SubscriptionIntermediateFuture<Object> ret = (SubscriptionIntermediateFuture<Object>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
-
+		ret.setTerminationCommand(new TerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				subscribers.remove(displayid);
+				System.out.println("removed display: "+displayid+" "+reason);
+			}
+		});
 		subscribers.put(displayid, ret);
 		return ret;
 	}

@@ -14,7 +14,7 @@ public interface ITerminationCommand
 	 *  @param reason The reason supplied for termination.
 	 *  @return True, if termination should proceed.
 	 */
-	public boolean	checkTermination(Exception reason);
+	public boolean checkTermination(Exception reason);
 	
 	/**
 	 *  Called after termination was performed.
