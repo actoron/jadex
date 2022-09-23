@@ -349,7 +349,7 @@ export class MandelbrotElement extends LitElement
 			{
 				let progress = this.progressdata[key];
 				
-				console.log("progress is: "+progress);
+				//console.log("progress is: "+progress);
 					
 				let xf = twidth/progress.imageWidth;
 				let yf = theight/progress.imageHeight;
@@ -364,8 +364,8 @@ export class MandelbrotElement extends LitElement
 					ctx2.fillStyle = "rgba(20, 20, 150, 0.3)";
 					ctx2.fillRect(corx+1, cory+1, corw-1, corh-1);
 				}
-				ctx2.strokeStyle = "yellow";
-				ctx2.rect(corx, cory, corw, corh);
+				ctx2.strokeStyle = "white";
+				ctx2.strokeRect(corx, cory, corw, corh);
 				
 				// Print worker name
 				let name = progress.name
