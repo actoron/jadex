@@ -515,6 +515,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		String callid = request.getHeader(HEADER_JADEX_CALLID);
 		ri.setCallid(callid);
 		
+		// update on alive and all incoming requests with that callid
+		/*ConversationInfo coninfo = conversationinfos.get(callid);
+		if(coninfo!=null)
+		{
+			//System.out.println("timestamp updated: "+callid);
+			coninfo.updateTimestamp();
+		}*/
+		
 		String alive = request.getHeader(HEADER_JADEX_ALIVE);
 		
 		// check if it is a login request
@@ -558,6 +566,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		}
 		else if(alive!=null)
 		{
+			// update on alive and all incoming requests with that callid
 			ConversationInfo cinfo = conversationinfos.get(callid);
 			if(cinfo!=null)
 			{
@@ -1126,6 +1135,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			{
 				//System.out.println("terminating due to timeout: "+exception);
 				System.out.println("Conversation timed out: "+entry.getKey());
+				System.out.println("cur time: "+System.currentTimeMillis());
+				System.out.println("timestamp: "+entry.getValue().getTimestamp());
+				System.out.println("timeout: "+Starter.getDefaultTimeout(component.getId()));
 				
 				terminateConversation(entry.getValue(), null, false);
 				
@@ -1165,13 +1177,13 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				((ITerminableFuture)cinfo.getFuture()).terminate();
 			
 			//System.out.println("terminate on: "+cinfo.getFuture().hashCode());
-			
-			conversationinfos.remove(cinfo.getCallId());
 		}
 		else if(clientterm)
 		{
 			System.out.println("WARNING: future cannot be terminated: "+cinfo+" "+cinfo.getFuture());
 		}
+		
+		conversationinfos.remove(cinfo.getCallId());
 	}
 	
 	/**

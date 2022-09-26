@@ -135,7 +135,7 @@ export class MandelbrotElement extends LitElement
 		if(len==0)
 			this.calculating = false;
 			
-		console.log("progressdata len (before, after): "+len+" "+Object.keys(this.progressdata).length+" "+part.finished+" "+part.progress);
+		//console.log("progressdata len (before, after): "+len+" "+Object.keys(this.progressdata).length+" "+part.finished+" "+part.progress);
 		
 		this.requestUpdate();
 	}
@@ -398,7 +398,7 @@ export class MandelbrotElement extends LitElement
 				
 				if(textwidth<corw-4 && textheight*3<corh-4)
 				{
-					console.log("a: "+textwidth+" "+textheight+" "+corw+" "+corh+" "+fsize);
+					//console.log("a: "+textwidth+" "+textheight+" "+corw+" "+corh+" "+fsize);
 					// Draw provider id.
 					let x = Math.trunc(corx + (corw-textwidth)/2);
 					let y = Math.trunc(cory + (corh-textheight*3)/2);// + fm.getLeading()/2;
@@ -410,7 +410,7 @@ export class MandelbrotElement extends LitElement
 				}
 				else if(!progress.finished && corw>8 && corh>8)
 				{
-					console.log("b: "+textwidth+" "+textheight+" "+corw+" "+corh+" "+fsize);
+					//console.log("b: "+textwidth+" "+textheight+" "+corw+" "+corh+" "+fsize);
 					let x = corx + 2;
 					let y = cory + Math.max((corh-textheight)/2, 2);
 					this.drawProgressBar(x, y, textwidth, textheight, 'red', progress.progress/100, true, ctx2);
