@@ -632,6 +632,8 @@ public class DisplayPanel extends JComponent
 					int corw = (int)(progress.getArea().width*xf);
 					int corh = (int)(progress.getArea().height*yf);
 					
+					//System.out.println("progress info: "+corx+" "+cory+" "+corw+" "+corh);
+					
 					if(!progress.isFinished())
 					{
 						g.setColor(new Color(32,32,32,160));

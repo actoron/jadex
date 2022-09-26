@@ -681,7 +681,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					methodname = methodname.substring(0, methodname.length() - 2);
 				final String fmn = methodname;
 
-				//if(methodname!=null && request.toString().indexOf("setIm")!=-1)
+				//if(methodname!=null && request.toString().indexOf("display")!=-1)
 				//	System.out.println("INVOKE: " + methodname);
 				
 				Collection<MappingInfo> mis = pm.getElementsForPath(methodname);
@@ -1124,8 +1124,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			// TODO: which timeout? (client vs server).
 			if(System.currentTimeMillis() - entry.getValue().getTimestamp() > Starter.getDefaultTimeout(component.getId()))
 			{
-				// System.out.println("terminating due to timeout: "+exception);
-				//System.out.println("Conversation timed out: "+entry.getKey());
+				//System.out.println("terminating due to timeout: "+exception);
+				System.out.println("Conversation timed out: "+entry.getKey());
 				
 				terminateConversation(entry.getValue(), null, false);
 				
@@ -1153,6 +1153,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 */
 	protected void terminateConversation(ConversationInfo cinfo, Exception ex, boolean clientterm)
 	{
+		System.out.println("terminate in rest: "+cinfo+" "+ex+" "+clientterm);
+		
 		// Terminate the future if requested
 		cinfo.setTerminated(true);
 		if(cinfo.getFuture() instanceof ITerminableFuture)
@@ -3673,6 +3675,12 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		public boolean isIntermediateFuture()
 		{
 			return future instanceof IIntermediateFuture;
+		}
+
+		public String toString() 
+		{
+			return "ConversationInfo [terminated=" + terminated + ", lastcheck=" + lastcheck + ", future=" + future
+				+ ", sessionid=" + sessionid + ", callid=" + callid + "]";
 		}
 	}
 

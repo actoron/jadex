@@ -745,9 +745,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 						
 						if(fields[i].isAnnotationPresent(ServiceComponent.class))
 						{
-							Object val	= ia.getParameterGuesser().guessParameter(fields[i].getType(), false);
 							try
 							{
+								Object val	= ia.getParameterGuesser().guessParameter(fields[i].getType(), false);
 								SAccess.setAccessible(fields[i], true);
 								fields[i].set(service, val);
 							}
