@@ -516,12 +516,12 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		ri.setCallid(callid);
 		
 		// update on alive and all incoming requests with that callid
-		/*ConversationInfo coninfo = conversationinfos.get(callid);
+		ConversationInfo coninfo = conversationinfos.get(callid);
 		if(coninfo!=null)
 		{
 			//System.out.println("timestamp updated: "+callid);
 			coninfo.updateTimestamp();
-		}*/
+		}
 		
 		String alive = request.getHeader(HEADER_JADEX_ALIVE);
 		

@@ -120,6 +120,7 @@
 									console.log("Giving up sending alive: "+callid);
 							});
 					};
+					sendalive();
 				}
 			}
 			else
