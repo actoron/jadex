@@ -66,6 +66,7 @@
 					{
 						var cb = self.conversations[convid];
 						cb[1](event);
+						self.terminateCall(convid, "sse closed", true);
 					}
 					self.conversations = {};
 				}
@@ -88,17 +89,7 @@
 				if(cinfo==null)
 				{
 					console.log("updatetimer, conversation not found: "+callid);
-					
-					// todo: which path???
-					axios.get(self.baseurl, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': "true", 
-						'cache-control': 'no-cache, no-store'}}, this.transform)
-						.then(x =>
-						{
-							//console.log("terminate success: "+callid);
-						}).catch(err =>
-						{
-							console.log("terminate err: "+callid+" "+err);
-						});
+					self.terminateCall(callid, "updatetimer, conversation not found", true);					
 				}
 				else
 				{
@@ -234,7 +225,7 @@
 					callid = fini;
 				//console.log("call sse:"+sse+" "+resp.data);
 				
-				if(!sse)
+				/*if(!sse)
 				{
 					if(resp.status!=202)	
 					{
@@ -270,7 +261,7 @@
 							console.log("received unknown command: "+resp.data);
 						}
 					}
-				}
+				}'/'
 				
 				//call = axios.CancelToken.source();
 				
@@ -287,20 +278,14 @@
 						self.conversations[callid] = [handler, errfunc, maxhandler]; //errhandler
 					}
 				}
-				else */if(fini)
+				else if(fini)
 				{
 					//console.log("call finished: "+fini);
 				}
-				else if(!sse)
+				else*/ 
+				if(!sse)
 				{
 					console.log("not supported long poll: "+path+" "+callid);
-					/*if(callid!=null)
-					{
-						//console.log("long-poll request sent: "+path);
-						
-						var headers = {'x-jadex-callid': callid, 'cache-control': 'no-cache, no-store', "x-jadex-sse": true};
-						axios.get(path, {cancelToken: call.token, headers: headers}, this.transform).then(func).catch(errfunc); 
-					}*/
 				}
 				
 				return callid;
@@ -349,11 +334,11 @@
 			return callid;
 		},
 		
-		terminateCall: function(callid, reason)
+		terminateCall: function(callid, reason, internal)
 		{
 			var self = this;
 			
-			if(this.conversations[callid]==undefined)
+			if(this.conversations[callid]==undefined && !internal)
 			{
 				return new Promise(function(resolve, reject)
 				{
@@ -362,8 +347,8 @@
 			}
 			else
 			{
-				// remove the property
-				var path = this.conversations[callid][3];
+				var cinfo = this.conversations[callid];
+				var path = cinfo!=null? cinfo[3]: self.baseurl;
 				delete this.conversations.callid;
 				
 				return new Promise(function(resolve, reject)
@@ -395,6 +380,7 @@
 					var r = reason==null? 'true': reason;
 					
 					console.log("terminating request: "+path);
+					
 					axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': r, 
 						'cache-control': 'no-cache, no-store', "x-jadex-sse": true}}, this.transform)
 						.then(resolve).catch(errhandler);

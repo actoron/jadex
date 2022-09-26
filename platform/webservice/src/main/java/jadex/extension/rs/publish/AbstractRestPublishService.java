@@ -709,7 +709,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					
 					//System.out.println("handleRequest: "+mi.getMethod());
 					
-					//if(mi.getMethod().toString().indexOf("invokeServiceMe")!=-1)
+					//if(mi.getMethod().toString().indexOf("Display")!=-1)
 					//	System.out.println("heeereeee");
 					
 					//if(mi.getMethod().toString().indexOf("isAvailable")!=-1)
@@ -1165,7 +1165,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 */
 	protected void terminateConversation(ConversationInfo cinfo, Exception ex, boolean clientterm)
 	{
-		System.out.println("terminate in rest: "+cinfo+" "+ex+" "+clientterm);
+		//System.out.println("terminate in rest: "+cinfo+" "+ex+" "+clientterm);
 		
 		// Terminate the future if requested
 		cinfo.setTerminated(true);

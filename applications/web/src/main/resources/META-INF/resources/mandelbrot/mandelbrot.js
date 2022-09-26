@@ -13,18 +13,20 @@ export class MandelbrotElement extends LitElement
 		super.connectedCallback();
 		console.log('connected');
 		
-		var self = this;
+		let self = this;
 		this.colors = null; // the color scheme
 		this.data = null; // the data to draw
 		this.progressdata = null; // the progress infos
 		
 		this.setColorScheme([this.createColor(50, 100, 0), this.createColor(255, 0, 0)], true);
 						
-		var terminate = jadex.getIntermediate('/mandelbrotwebapi/subscribeToDisplayUpdates?args_0=webdisplay&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
+		let displayid = "webgui"+jadex.generateUUID();
+		// must not use args_0 as parameter name as this will be made to args list
+		let terminate = jadex.getIntermediate('/mandelbrotwebapi/subscribeToDisplayUpdates?a='+displayid+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		function(response)
 		{
 			console.log("recceived display update: "+response.data);
-			var data = response.data;
+			let data = response.data;
 			//System.out.println("rec: "+result.getClass());
 			
 			if(data.data!=null) // result instanceof PartDataChunk

@@ -114,6 +114,7 @@ public class DisplayService implements IDisplayService
 	 */
 	public ISubscriptionIntermediateFuture<Object> subscribeToDisplayUpdates(String displayid)
 	{
+		//System.out.println("subscribeToDisplay: "+displayid);
 //		SubscriptionIntermediateFuture<Object> ret = new SubscriptionIntermediateFuture<Object>();
 		final SubscriptionIntermediateFuture<Object> ret = (SubscriptionIntermediateFuture<Object>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
 		ret.setTerminationCommand(new TerminationCommand()
@@ -121,7 +122,7 @@ public class DisplayService implements IDisplayService
 			public void terminated(Exception reason)
 			{
 				subscribers.remove(displayid);
-				System.out.println("removed display: "+displayid+" "+reason);
+				//System.out.println("removed display: "+displayid+" "+reason);
 			}
 		});
 		subscribers.put(displayid, ret);

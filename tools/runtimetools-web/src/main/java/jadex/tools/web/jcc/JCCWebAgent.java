@@ -387,7 +387,7 @@ public class JCCWebAgent implements IJCCWebService
 		
 		//return new Future<Object>(new RuntimeException("Cid must not be null"));
 		
-		//if(methodname!=null && methodname.indexOf("suspend")!=-1)
+		//if(methodname!=null && methodname.indexOf("display")!=-1)
 		//	System.out.println("invokeServiceMethod 1: " + methodname + " " + servicetype+" "+cid);
 		
 		// todo: the return type could not be available on this platform :-(
