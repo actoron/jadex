@@ -102,16 +102,24 @@
 				}
 				else
 				{
-					//console.log("terminating request sent: "+path);
-					axios.get(cinfo[3], {headers: {'x-jadex-callid': callid, 'x-jadex-alive': "true", 
-						'cache-control': 'no-cache, no-store'}}, this.transform)
-						.then(x =>
-						{
-							//console.log("alive success: "+callid);
-						}).catch(err =>
-						{
-							console.log("alive err: "+callid+" "+err);
-						});
+					//console.log("alive request sent: "+path);
+					let retrycnt = 0;
+					let sendalive = x =>
+					{
+						axios.get(cinfo[3], {headers: {'x-jadex-callid': callid, 'x-jadex-alive': "true", 
+							'cache-control': 'no-cache, no-store'}}, this.transform)
+							.then(x =>
+							{
+								//console.log("alive success: "+callid);
+							}).catch(err =>
+							{
+								console.log("alive err: "+callid+" retrycmt: "+retrycnt+" "+err);
+								if(retrycnt++<3)
+									setTimeout(sendalive, 3000);
+								else
+									console.log("Giving up sending alive: "+callid);
+							});
+					};
 				}
 			}
 			else
