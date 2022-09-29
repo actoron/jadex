@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.swing.SwingUtilities;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
@@ -37,7 +38,7 @@ public class GenerateService implements IGenerateService
 	//-------- constants --------
 	
 	/** The available algorithms. */
-	public static IFractalAlgorithm[]	ALGORITHMS	= new IFractalAlgorithm[] 
+	public static IFractalAlgorithm[] ALGORITHMS = new IFractalAlgorithm[] 
 	{
 		new MandelbrotAlgorithm(),
 		new LyapunovAlgorithm()
@@ -117,19 +118,78 @@ public class GenerateService implements IGenerateService
 	 *  Generate a specific area using a defined x and y size.
 	 */
 	//public IFuture<AreaData> generateArea(final AreaData data)
-	public IFuture<Void> generateArea(final AreaData data)
+	public IFuture<Void> generateArea(AreaData data)
 	{
-		GenerateAgent ga = (GenerateAgent)agent.getFeature(IPojoComponentFeature.class).getPojoAgent();
-		
+		//GenerateAgent ga = (GenerateAgent)agent.getFeature(IPojoComponentFeature.class).getPojoAgent();
 		//if(ga.getCalculateService()==null)
 		//	return new Future<AreaData>(new RuntimeException("No calculate service available"));
+
+		if(data==null)
+		{
+			System.out.println("no generate info supplied, using defaults.");
+			data = ALGORITHMS[0].getDefaultSettings();
+		}
+		else
+		{
+			IFractalAlgorithm alg = data.getAlgorithm(agent.getClassLoader());
+			if(alg==null)
+			{
+				System.out.println("no algorithm set, using: "+ALGORITHMS[0]);
+				alg = ALGORITHMS[0];
+				data.setAlgorithmClass(new ClassInfo(alg.getClass()));
+			}
+			AreaData defaults = alg.getDefaultSettings();
+			
+			if(data.getSizeX()==0)
+			{
+				System.out.println("no sizex");
+				data.setSizeX(defaults.getSizeX());
+			}
+			if(data.getSizeY()==0)
+			{
+				System.out.println("no sizey");
+				data.setSizeY(defaults.getSizeY());
+			}
+			if(data.getMax()==0)
+			{
+				System.out.println("no max");
+				data.setMax(defaults.getMax());
+			}
+			if(data.getTaskSize()==0)
+			{
+				System.out.println("no tasksize");
+				data.setTaskSize(defaults.getTaskSize());
+			}
+			if(data.getChunkCount()==0)
+			{
+				System.out.println("no chunk count");
+				data.setChunkCount(defaults.getChunkCount());
+			}
+			
+			// if same assume that all has to be set
+			if(data.getXStart()==data.getXEnd())
+			{
+				System.out.println("no x start end");
+				data.setXStart(defaults.getXStart());
+				data.setXEnd(defaults.getXEnd());
+			}
+			if(data.getYStart()==data.getYEnd())
+			{
+				System.out.println("no y start end");
+				data.setYStart(defaults.getYStart());
+				data.setYEnd(defaults.getYEnd());
+			}
+			
+			// todo: off?
+		}
 		
 		// Update own gui settings
+		final AreaData fdata = data;
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				panel.updateProperties(data);
+				panel.updateProperties(fdata);
 			}
 		});
 		
@@ -147,7 +207,7 @@ public class GenerateService implements IGenerateService
 		// Split area into work units.
 		final Set<AreaData>	areas = new HashSet<>();	// {AreaData}
 		long task = (long)data.getTaskSize()*data.getTaskSize()*256;
-		long pic	= (long)data.getSizeX()*data.getSizeY()*data.getMax();
+		long pic = (long)data.getSizeX()*data.getSizeY()*data.getMax();
 		int numx = (int)Math.max(Math.round(Math.sqrt((double)pic/task)), 1);
 		int numy = (int)Math.max(Math.round((double)pic/(task*numx)), 1);
 		
@@ -178,7 +238,7 @@ public class GenerateService implements IGenerateService
 //				System.out.println("x:y: start "+x1+" "+(x1+xdiff)+" "+y1+" "+(y1+ydiff)+" "+xdiff);
 				areas.add(new AreaData(xstart, xend, ystart, yend,
 					data.getSizeX()-restx, data.getSizeY()-resty, sizex, sizey,
-					data.getMax(), 0, data.getAlgorithm(), null, null, data.getDisplayId(), data.getChunkCount()));
+					data.getMax(), 0, data.getAlgorithmClass(), null, null, data.getDisplayId(), data.getChunkCount()));
 //				System.out.println("x:y: "+xi+" "+yi+" "+ad);
 				restx	-= sizex;
 			}

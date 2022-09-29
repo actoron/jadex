@@ -15,11 +15,10 @@ public interface IFractalAlgorithm
 	 */
 	public short determineColor(double x, double y, short max);
 
-
 	/**
 	 *  Can areas be filled?
 	 */
-	public boolean	isOptimizationAllowed();
+	public boolean isOptimizationAllowed();
 	
 	/**
 	 *  Get default settings for rendering the fractal. 
@@ -29,5 +28,5 @@ public interface IFractalAlgorithm
 	/**
 	 *  Should a cyclic color scheme be used?
 	 */
-	public boolean	useColorCycle();
+	public boolean useColorCycle();
 }

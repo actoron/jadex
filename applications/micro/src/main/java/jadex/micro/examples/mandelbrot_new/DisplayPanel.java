@@ -950,7 +950,7 @@ public class DisplayPanel extends JComponent
 		AreaData settings;
 		if(data!=null)
 		{
-			settings = data.getAlgorithm().getDefaultSettings();
+			settings = data.getAlgorithm(this.getClass().getClassLoader()).getDefaultSettings();
 		}
 		else
 		{
@@ -1032,7 +1032,7 @@ public class DisplayPanel extends JComponent
 			settings = data;
 		
 		final AreaData ad = new AreaData(x1, x2, y1, y2, sizex, sizey,
-			settings.getMax(), settings.getTaskSize(), settings.getAlgorithm(), displayid, settings.getChunkCount());
+			settings.getMax(), settings.getTaskSize(), settings.getAlgorithmClass(), displayid, settings.getChunkCount());
 			//settings.getMax(), settings.getParallel(), settings.getTaskSize(), settings.getAlgorithm(), displayid);
 		
 		DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));

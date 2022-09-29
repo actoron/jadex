@@ -15,14 +15,23 @@ export class MandelbrotElement extends LitElement
 		
 		let self = this;
 		this.colors = null; // the color scheme
-		this.data = null; // the data to draw
+		this.data = null; // the area data to draw
 		this.progressdata = null; // the progress infos
+		this.calculating = false;
+		this.startdrag = null;
+		this.enddrag  = null;
+		this.point = null; // The current selection start point (if any).
+		this.range = null;
 		
 		this.setColorScheme([this.createColor(50, 100, 0), this.createColor(255, 0, 0)], true);
+					
+		// shadow dom not available here :-(	
+		// -> firstUpdated()
+		//this.addMouseListener();				
 						
 		let displayid = "webgui"+jadex.generateUUID();
 		// must not use args_0 as parameter name as this will be made to args list
-		let terminate = jadex.getIntermediate('/mandelbrotwebapi/subscribeToDisplayUpdates?a='+displayid+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
+		let terminate = jadex.getIntermediate('/mandelbrotdisplay/subscribeToDisplayUpdates?a='+displayid+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		function(response)
 		{
 			console.log("recceived display update: "+response.data);
@@ -31,11 +40,13 @@ export class MandelbrotElement extends LitElement
 			
 			if(data.data!=null) // result instanceof PartDataChunk
 			{
+				self.calculating = true;
 				self.addDataChunk(data);
 			}
 			
 			if(data.algorithm!=null) // result instanceof AreaData
 			{
+				self.calculating = true;
 				self.setResults(data);
 			}
 			
@@ -50,22 +61,6 @@ export class MandelbrotElement extends LitElement
 				prog.finished = data.progress==100;
 				self.addProgress(prog);
 			}
-			
-			/*if(result instanceof AreaData)
-			{
-				setResults((AreaData)result);
-			}
-			else if(result instanceof ProgressData)
-			{
-				addProgress(((ProgressData)result));
-			}
-			else if(result instanceof PartDataChunk)
-			{
-				PartDataChunk chunk = (PartDataChunk)result;
-				//System.out.println("received: "+result);
-				addProgress(new ProgressData(chunk.getWorker(), null, chunk.getArea(), chunk.getProgress(), chunk.getImageWidth(), chunk.getImageHeight(), chunk.getDisplayId()));
-				addDataChunk((PartDataChunk)result);
-			}*/		
 		},
 		function(err)
 		{
@@ -73,7 +68,7 @@ export class MandelbrotElement extends LitElement
 		});
 		
 		
-		/*axios.get('/mandelbrotwebapi/subscribeToDisplayUpdates?args_0=webdisplay&returntype=jadex.commons.future.ISubscriptionIntermediateFuture', this.transform)
+		/*axios.get('/mandelbrotdisplay/subscribeToDisplayUpdates?args_0=webdisplay&returntype=jadex.commons.future.ISubscriptionIntermediateFuture', this.transform)
 		.then(function(resp)
 		{
 			console.log("recceived display update: "+resp.data);
@@ -87,6 +82,11 @@ export class MandelbrotElement extends LitElement
 		})
 		.catch(ex => console.log(ex))*/
 	}
+	
+	firstUpdated() 
+	{
+		this.addMouseListener();
+  	}
 	
 	disconnectedCallback()
 	{
@@ -114,9 +114,6 @@ export class MandelbrotElement extends LitElement
 		this.data.image = new Uint8ClampedArray(data.sizeX*data.sizeY*4);
 	}
 	
-	/**
-	 *  Display intermediate calculation results.
-	 */
 	addProgress(part)
 	{		
 		if(this.progressdata==null)
@@ -285,6 +282,53 @@ export class MandelbrotElement extends LitElement
 		ctx.canvas.width  = swidth;
 		ctx.canvas.height = sheight;
   			
+		// Zoom into original image while calculating
+		if(calculating && range!=null)
+		{
+			ix	= (range.x-drawarea.x-bounds.x)*iwidth/drawarea.width;
+			iy	= (range.y-drawarea.y-bounds.y)*iheight/drawarea.height;
+			iwidth	= range.width*iwidth/drawarea.width;
+			iheight	= range.height*iheight/drawarea.height;
+			
+			// Scale again to fit new image size.
+			drawarea = scaleToFit(bounds, iwidth, iheight);
+			
+			g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
+				bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
+				ix, iy, ix+iwidth, iy+iheight, this);
+		}
+		
+		// Offset and clip image and show border while dragging.
+		else if(startdrag!=null && enddrag!=null)
+		{
+			// Draw original image in background
+			g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
+				bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
+				ix, iy, ix+iwidth, iy+iheight, this);
+			g.setColor(new Color(32,32,32,160));
+			g.fillRect(bounds.x+drawarea.x, bounds.y+drawarea.y, drawarea.width, drawarea.height);
+
+			// Draw offsetted image in foreground
+			Shape	clip	= g.getClip();
+			g.setClip(bounds.x+drawarea.x, bounds.y+drawarea.y, drawarea.width, drawarea.height);
+			int	xoff	= enddrag.x-startdrag.x;
+			int	yoff	= enddrag.y-startdrag.y;
+			
+			g.drawImage(image, bounds.x+drawarea.x+xoff, bounds.y+drawarea.y+yoff,
+				bounds.x+drawarea.x+xoff+drawarea.width, bounds.y+drawarea.y+yoff+drawarea.height,
+				ix, iy, ix+iwidth, iy+iheight, this);
+			g.setClip(clip);
+		}
+		else
+		{
+			//g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
+			//	bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
+			//	ix, iy, ix+iwidth, iy+iheight, this);
+				
+			var imgdata = new ImageData(image, swidth, sheight);
+			ctx.putImageData(imgdata, 0, 0);
+		}
+  			
 		//console.log("background color: "+canvas.style.background);
 		
 		//ctx.drawImage(this.data, sx, sy, swidth, sheight, tx, ty, twidth, theight);
@@ -337,15 +381,13 @@ export class MandelbrotElement extends LitElement
 			console.log(err);
 		});*/
 		
+		let canvas2 = null;
+		let ctx2 = null;
 		// Draw progress boxes.
 		if(this.progressdata!=null && Object.keys(this.progressdata).length>0)
 		{
-			let canvas2 = document.createElement('canvas');
-			let ctx2 = canvas2.getContext('2d');
-			//canvas2.style.background = "transparent";
-			ctx2.canvas.width  = twidth;
-			ctx2.canvas.height = theight;
-			//ctx2.clearRect(0, 0, twidth, theight);
+			canvas2 = this.createCanvas(twidth, theight);
+			ctx2 = canvas2.getContext('2d');
 			
 			for(let key of Object.keys(this.progressdata)) 
 			{
@@ -419,38 +461,86 @@ export class MandelbrotElement extends LitElement
 				}
 			}
 			
-			ctx.drawImage(canvas2, 0, 0, twidth, theight);
+			
 		}	
+		
+		// Draw range area.
+		if(!this.calculating && this.range!=null)
+		{
+			if(canvas2==null)
+			{
+				canvas2 = this.createCanvas(twidth, theight);
+				ctx2 = canvas2.getContext('2d');
+			}
+			
+			let rratio = this.range.width/this.range.height;
+			let bratio = swidth/sheight;
+			
+			// Draw left and right boxes to show unused space
+			if(rratio<bratio)
+			{
+				let drawwidth = this.range.height*swidth/sheight;
+				let offset = (this.range.width-drawwidth)/2;
+				ctx2.fillStyle = "rgba(128,128,128,0.25)";
+				ctx2.fillRect(this.range.x+offset, this.range.y, -offset, this.range.height+1);
+				ctx2.fillRect(this.range.x+this.range.width, this.range.y, -offset, this.range.height+1);
+			}
+			// Draw upper and lower boxes to show unused space
+			else if(rratio>bratio)
+			{
+				let	drawheight	= this.range.width*sheight/swidth;
+				let offset = (this.range.height-drawheight)/2;
+				ctx2.fillStyle = "rgba(128,128,128,0.25)";
+				ctx2.fillRect(this.range.x, this.range.y+offset, this.range.width+1, -offset);
+				ctx2.fillRect(this.range.x, this.range.y+this.range.height, this.range.width+1, -offset);
+			}
+		
+			ctx2.strokeStyle = "white";
+			ctx2.strokeRect(this.range.x, this.range.y, this.range.width, this.range.height);
+		}
+		
+		if(canvas2!=null)
+			ctx.drawImage(canvas2, 0, 0, twidth, theight);
 	}
 	
-	/**
-	 *  Calculate draw area for image.
-	 */
-	scaleToFit(bwidth, bheight, iwidth, iheight)
+	createCanvas(width, height)
 	{
+		let canvas = document.createElement('canvas');
+		let ctx = canvas.getContext('2d');
+		//canvas2.style.background = "transparent";
+		ctx.canvas.width  = width;
+		ctx.canvas.height = height;
+		return canvas;
+	}
+	
+	// Determine how the image can be printed on screen
+	// swidth/height: screen width/height (screen)
+	// iwidth/height: image width/height (calculated)
+	scaleToFit(swidth, sheight, iwidth, iheight)
+	{
+		var sratio = swidth/sheight;
 		var iratio = iwidth/iheight;
-		var bratio = bwidth/bheight;
 		
 		var drawstartx = 0;
 		var drawstarty = 0;
-		var drawendx = bwidth;
-		var drawendy = bheight;
+		var drawendx = swidth;
+		var drawendy = sheight;
 		
 		// Scale to fit height
-		if(iratio<=bratio)
+		if(iratio<=sratio)
 		{
-			 var hratio	= bheight/iheight;
+			 var hratio	= sheight/iheight;
 			 drawendy = iwidth*hratio;
-			 drawstartx	= (bwidth-drawendx)/2;
+			 drawstartx	= (swidth-drawendx)/2;
 		}
 		// Scale to fit width
-		else if(iratio>bratio)
+		else if(iratio>sratio)
 		{
-			 var wratio = bwidth/iwidth;
+			 var wratio = swidth/iwidth;
 			 drawendy = iheight*wratio;
-			 drawstarty	= (bheight-drawendy)/2;
+			 drawstarty	= (sheight-drawendy)/2;
 		}
-		return [Math.trunc(drawstartx), Math.truc(drawendx), Math.trunc(drawstarty), Math.trunc(drawendy)];
+		return {x: Math.trunc(drawstartx), y: Math.trunc(drawstarty), width: Math.truc(drawendx), height: Math.trunc(drawendy)};
 	}
 	
 	createColor(r, g, b, a)
@@ -530,6 +620,271 @@ export class MandelbrotElement extends LitElement
 		}
 	}
 	
+	addMouseListener()
+	{
+		let self = this;
+		let element = this.shadowRoot.getElementById("canvas");
+		
+		let downlis = e => 
+		{
+			if(!self.calculating)
+			{
+				if(e.button===2)
+				{
+	            	self.startdrag = self.getMousePosition(element, e);
+	            	self.range = null;
+					self.point = null;
+					console.dir("startdrag: "+self.startdrag);
+            	}
+            	else if(e.button===0)
+            	{
+					self.point = self.getMousePosition(element, e);
+				}
+           	}
+            else
+			{
+				self.startdrag = null;
+			}
+		}
+		element.addEventListener('mousedown', downlis);
+		
+		let movelis = e => 
+		{
+			console.log("mouse move: "+e.button);
+			
+			if(self.startdrag!=null && e.buttons===2)
+			{
+	            self.enddrag = self.getMousePosition(element, e);
+				console.dir('new enddrag: '+self.enddrag);
+				self.requestUpdate();
+			}
+			
+			if(!self.calculating && self.point!=null && e.buttons===1)
+			{
+				let pos = self.getMousePosition(element, e); 
+				self.range = {x: self.point.x<pos.x? self.point.x: pos.x,
+					y: self.point.y<pos.y? self.point.y: pos.y,
+					width: Math.abs(self.point.x-pos.x),
+					height: Math.abs(self.point.y-pos.y)
+				};
+				
+				self.requestUpdate();
+			}
+		}
+		element.addEventListener('mousemove', movelis);
+		
+		let uplis = e => 
+		{
+			if(self.startdrag!=null && self.enddrag!=null)
+			{
+				console.log("dragged: "+self.startdrag+" "+self.enddrag);
+				//dragImage();
+			}
+			
+			self.startdrag = null;
+			self.enddrag = null;
+		}
+		element.addEventListener('mouseup', uplis);
+		
+		let wheellis = e =>
+		{
+			let pos = self.getMousePosition(element, e);
+			let delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+			console.log("wheel: "+delta);
+			
+			let percent = Math.abs(10*delta);
+			let factor;
+			if(delta>0)
+			{
+				factor = (100+percent)/100;
+			}
+			else
+			{
+				factor = 100/(100+percent);
+			}
+			//this.zoomImage(e.getX(), e.getY(), factor);
+			console.log("zoom: "+pos+" "+factor);
+		}
+		element.addEventListener("wheel", wheellis);
+		
+		let clicklis = e =>
+		{
+			let pos = this.getMousePosition(element, e);
+			if(e.button===2)
+			{
+				//self.calcDefaultImage();
+			}
+			else if(!calculating && range!=null)
+			{
+				if(pos.x>=range.x && pos.x<=range.x+range.width
+					&& pos.y>=range.y && pos.y<=range.y+range.height)
+				{
+					console.log("zoomIntoRange: "+pos+" "+range);
+					//zoomIntoRange();
+				}
+			}
+		}
+	}
+	
+	getMousePosition(element, event)
+	{
+		let rect = element.getBoundingClientRect();
+	    let x = event.clientX - rect.left;
+	    let y = event.clientY - rect.top;
+		return {x,y};
+	}
+	
+	getImageWidth()
+	{
+		let results = this.data.data;
+		let width = results.length;
+		return width;
+	}
+	
+	getImageHeight()
+	{
+		let results = this.data.data;
+		let height = results[0].length;
+		return height;
+	}
+	
+	dragImage()
+	{
+		let sw = this.getImageWidth();
+		let sh = this.getImageHeight();
+		let iw = this.getImageWidth();
+		let ih = this.getImageHeight();
+		let drawarea = this.scaleToFit(sw, sh, iw, ih);
+		
+		let xdiff = this.startdrag.x-this.enddrag.x;
+		let ydiff = this.startdrag.y-this.enddrag.y;
+		let xp = xdiff/drawarea.width;
+		let yp = ydiff/drawarea.height;
+		
+		let xm = (this.data.XEnd-this.data.XStart)*xp;
+		let ym = (this.data.YEnd-this.data.YStart)*yp;
+	 	let xs = this.data.XStart+xm;
+		let xe = this.data.XEnd+xm;
+		let ys = this.data.YStart+ym;
+		let ye = this.data.YEnd+ym;
+		
+		this.startdrag = null;
+		this.enddrag = null;
+		this.range = {x: drawarea.x+xdiff, y: drawarea.y+ydiff, width: drawarea.width, height: drawarea.height};
+
+		this.calcArea(xs, xe, ys, ye, this.data.SizeX, this.data.SizeY);
+	}
+
+	/**
+	 *  Zoom into the given location by the given factor.
+	 */
+	protected void zoomImage(int x, int y, double factor)
+	{
+		let sw = this.getImageWidth();
+		let sh = this.getImageHeight();
+		let iw = this.getImageWidth();
+		let ih = this.getImageHeight();
+		let drawarea = this.scaleToFit(sw, sh, iw, ih);
+		
+		int mx = Math.min(bounds.x+drawarea.x+drawarea.width, Math.max(bounds.x+drawarea.x, x));
+		int my = Math.min(bounds.y+drawarea.y+drawarea.height, Math.max(bounds.y+drawarea.y, y));
+		double xrel = ((double)mx-(bounds.x+drawarea.x))/drawarea.width;
+		double yrel = ((double)my-(bounds.y+drawarea.y))/drawarea.height;
+
+		double wold = data.getXEnd()-data.getXStart();
+		double hold = data.getYEnd()-data.getYStart();
+		double wnew = wold*factor;
+		double hnew = hold*factor;
+		double wd = wold-wnew;
+		double hd = hold-hnew;
+		
+		final double xs = data.getXStart()+wd*xrel;
+		final double xe = xs+wnew;
+		final double ys = data.getYStart()+hd*yrel;
+		final double ye = ys+hnew;
+		
+		// Set range for drawing preview of zoom area.
+		double	xdiff	= drawarea.width - drawarea.width*factor;
+		double	ydiff	= drawarea.height - drawarea.height*factor;
+		range = new Rectangle(bounds.x+drawarea.x+(int)Math.round(xdiff*xrel), bounds.y+drawarea.y+(int)Math.round(ydiff*yrel),
+			(int)Math.round(drawarea.width*factor), (int)Math.round(drawarea.height*factor));
+		
+//		zoomIntoRange();
+		this.calcArea(xs, xe, ys, ye, data.getSizeX(), data.getSizeY());
+	}
+	
+	zoomIntoRange()
+	{
+		// Calculate bounds relative to original image.
+		Rectangle	bounds	= getInnerBounds(true);
+		Rectangle	drawarea	= scaleToFit(bounds, image.getWidth(DisplayPanel.this), image.getHeight(DisplayPanel.this));
+		
+		final double	x	= (double)(range.x-bounds.x-drawarea.x)/drawarea.width;
+		final double	y	= (double)(range.y-bounds.y-drawarea.y)/drawarea.height;
+		final double	x2	= x + (double)range.width/drawarea.width;
+		final double	y2	= y + (double)range.height/drawarea.height;
+		
+		// Original bounds
+		final double	ox	= data.getXStart();
+		final double	oy	= data.getYStart();
+		final double	owidth	= data.getXEnd()-data.getXStart();
+		final double	oheight	= data.getYEnd()-data.getYStart();
+		
+		// Calculate pixel width/height of visible area.
+		bounds	= getInnerBounds(false);
+		double	rratio	= (double)range.width/range.height;
+		double	bratio	= (double)bounds.width/bounds.height;
+		if(rratio<bratio)
+		{
+			bounds.width	= (int)(bounds.height*rratio);
+		}
+		else if(rratio>bratio)
+		{
+			bounds.height	= (int)(bounds.width/rratio);
+		}
+		final Rectangle	area	= bounds;
+
+		this.calcArea(ox+owidth*x, ox+owidth*x2, oy+oheight*y, oy+oheight*y2, area.width, area.height);
+	}
+		
+	calcArea(x1, x2, y1, y2, sizex, sizey)
+	{
+		let data = {};
+		data.XStart = x1;
+		data.XEnd = x2;
+		data.YStart = y1;
+		data.YEnd = y2; 
+		data.SizeX = sizex;
+		data.Sizey = sizey;
+		
+		if(this.data!=null)
+		{
+			data.Algorithm = this.data.algorithm;
+			data.Max = this.data.max;
+			data.TaskSize = this.data.TaskSize;
+			data.ChunkCount = this.data.ChunkCount;
+			data.DisplayId = this.data.DisplayId;
+		}
+		
+		//DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		this.calculating = true;
+		
+		this.requestUpdate();
+		
+		axios.get('/mandelbrotgenerate/generateArea?a='+JSON.stringify(data), this.transform)
+			.then(function(resp)
+			{
+				console.log("recceived display update: "+resp.data);
+				this.calculating = false;
+				//DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			})
+			.catch(ex => 
+			{
+				console.log(ex);
+				this.calculating = false;
+			}
+	}
+
 	update()
 	{
 		super.update();
@@ -539,225 +894,3 @@ export class MandelbrotElement extends LitElement
 
 if(customElements.get('jadex-mandelbrot') === undefined)
 	customElements.define('jadex-mandelbrot', MandelbrotElement);
-
-	
-	/**
-	 *  Subscribe for updates when display service is available.
-	 *  @param ds The display service.
-	 * /
-	// Annotation only possible on agent
-	//@OnService(requiredservice = @RequiredService(min = 1, max = 1))
-	public void	displayServiceAvailable(IDisplayService ds)
-	{
-		ISubscriptionIntermediateFuture<Object> sub = ds.subscribeToDisplayUpdates(displayid);
-		sub.addResultListener(new IntermediateEmptyResultListener<Object>()
-		{
-			public void resultAvailable(Collection<Object> result)
-			{
-				//System.out.println("rec: "+result.getClass());
-				if(result instanceof AreaData)
-				{
-					setResults((AreaData)result);
-				}
-				else if(result instanceof ProgressData)
-				{
-					addProgress(((ProgressData)result));
-				}
-				else if(result instanceof PartDataChunk)
-				{
-					PartDataChunk chunk = (PartDataChunk)result;
-					//System.out.println("received: "+result);
-					addProgress(new ProgressData(chunk.getWorker(), null, chunk.getArea(), chunk.getProgress(), chunk.getImageWidth(), chunk.getImageHeight(), chunk.getDisplayId()));
-					addDataChunk((PartDataChunk)result);
-				}
-			}
-			
-			public void intermediateResultAvailable(Object result)
-			{
-				//System.out.println("rec: "+result.getClass());
-				if(result instanceof AreaData)
-				{
-					setResults((AreaData)result);
-				}
-				else if(result instanceof ProgressData)
-				{
-					addProgress(((ProgressData)result));
-				}
-				else if(result instanceof PartDataChunk)
-				{
-					PartDataChunk chunk = (PartDataChunk)result;
-					//System.out.println("received: "+result);
-					addProgress(new ProgressData(chunk.getWorker(), null, chunk.getArea(), chunk.getProgress(), chunk.getImageWidth(), chunk.getImageHeight(), chunk.getDisplayId()));
-					addDataChunk((PartDataChunk)result);
-				}
-			}
-			
-			public void finished()
-			{
-				// todo: close
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
-			}
-		});
-		
-		setColorScheme(new Color[]{new Color(50, 100, 0), Color.red}, true);
-		
-		// Dragging with right mouse button.
-		MouseAdapter draghandler = new MouseAdapter()
-		{
-			public void mousePressed(MouseEvent e)
-			{
-				if(!calculating && e.getButton()==MouseEvent.BUTTON3 && e.getClickCount()==1 && image!=null)
-				{
-					startdrag = new Point(e.getX(), e.getY());
-					range	= null;
-					point	= null;
-				}
-				else
-				{
-					startdrag	= null;
-				}
-			}
-			
-			public void mouseDragged(MouseEvent e)
-			{
-				if(startdrag!=null)
-				{
-					enddrag = new Point(e.getX(), e.getY());
-					repaint();
-				}
-			}
-			
-			public void mouseReleased(MouseEvent e)
-			{
-				if(startdrag!=null && enddrag!=null)
-				{
-//							System.out.println("dragged: "+startdrag+" "+enddrag);
-					dragImage();
-				}
-			}
-		};
-		addMouseMotionListener(draghandler);
-		addMouseListener(draghandler);
-				
-		// Zooming with mouse wheel.
-		addMouseWheelListener(new MouseAdapter()
-		{
-			public void mouseWheelMoved(MouseWheelEvent e)
-			{
-				if(!calculating)
-				{
-					int sa = e.getScrollAmount();
-					double	dir = Math.signum(e.getWheelRotation());
-					double	percent	= 10*sa;
-					double	factor;
-					if(dir>0)
-					{
-						factor	= (100+percent)/100;
-					}
-					else
-					{
-						factor	= 100/(100+percent);
-					}
-					zoomImage(e.getX(), e.getY(), factor);
-				}
-			}
-		});
-		
-		// Selecting range and default area.
-		addMouseListener(new MouseAdapter()
-		{
-			public void mouseClicked(MouseEvent e)
-			{
-				if(SwingUtilities.isRightMouseButton(e))
-				{
-					calcDefaultImage();
-				}
-				
-				else if(!calculating && range!=null)
-				{
-					if(e.getX()>=range.x && e.getX()<=range.x+range.width
-						&& e.getY()>=range.y && e.getY()<=range.y+range.height)
-					{
-						zoomIntoRange();
-					}
-				}
-			}
-			
-			public void mousePressed(MouseEvent e)
-			{
-				if(!calculating)
-				{
-					if(SwingUtilities.isRightMouseButton(e))
-					{
-						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-					}
-					else
-					{
-						point	= e.getPoint();
-						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-					}
-				}
-			}
-			
-			public void mouseReleased(MouseEvent e)
-			{
-				if(!calculating)
-				{
-					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				}
-			}
-		});
-		addMouseMotionListener(new MouseAdapter()
-		{
-			public void mouseMoved(MouseEvent e)
-			{
-				if(!calculating && range!=null)
-				{
-					if(e.getX()>=range.x && e.getX()<=range.x+range.width
-						&& e.getY()>=range.y && e.getY()<=range.y+range.height)
-					{
-						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-					}
-					else
-					{
-						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));						
-					}
-				}
-			}
-			
-			public void mouseDragged(MouseEvent e)
-			{
-				if(!calculating && point!=null)
-				{
-					range	= new Rectangle(
-						point.x<e.getX() ? point.x : e.getX(),
-						point.y<e.getY() ? point.y : e.getY(),
-						Math.abs(point.x-e.getX()), Math.abs(point.y-e.getY()));
-					
-					repaint();
-				}
-			}
-		});
-		
-		// ESC stops dragging / range selection
-		setFocusable(true);
-		addKeyListener(new KeyAdapter()
-		{
-			public void keyPressed(KeyEvent e)
-			{
-				if(e.getKeyCode()==KeyEvent.VK_ESCAPE)
-				{
-					range	= null;
-					point	= null;
-					startdrag	= null;
-					enddrag	= null;
-					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));						
-					repaint();
-				}
-			}
-		});
-	}*/

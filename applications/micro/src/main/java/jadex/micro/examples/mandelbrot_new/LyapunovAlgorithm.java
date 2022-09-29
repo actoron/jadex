@@ -1,5 +1,7 @@
 package jadex.micro.examples.mandelbrot_new;
 
+import jadex.bridge.ClassInfo;
+
 /**
  *  Algorithm for calculating Lyapunov fractals.
  */
@@ -8,7 +10,7 @@ public class LyapunovAlgorithm implements IFractalAlgorithm
 	//-------- constants --------
 	
 	/** Generator string (any combination of As and Bs). */
-	public static final String	GENERATOR	= "AAAAABBBBB";
+	public static final String	GENERATOR = "AAAAABBBBB";
 	
 	//-------- IFractalAlgorithm interface --------
 	
@@ -19,7 +21,7 @@ public class LyapunovAlgorithm implements IFractalAlgorithm
 	 *  @param max	The maximum depth.
 	 *  @return	A value for the point from 0 to max-1 or -1 for max.
 	 */
-	public short	determineColor(double a, double b, short max)
+	public short determineColor(double a, double b, short max)
 	{
 		// Calculates population: x'=rx(1-x)
 		// x: population relative to max. possible population (0-1)
@@ -47,16 +49,16 @@ public class LyapunovAlgorithm implements IFractalAlgorithm
 	/**
 	 *  Get default settings for rendering the fractal. 
 	 */
-	public AreaData	getDefaultSettings()
+	public AreaData getDefaultSettings()
 	{
 		//return new AreaData(1.7, 4, 2.7, 4.2, 230, 150, (short)160, 10, 300, this, null);
-		return new AreaData(1.7, 4, 2.7, 4.2, 230, 150, (short)160, 300, this, null, 20);
+		return new AreaData(1.7, 4, 2.7, 4.2, 230, 150, (short)160, 300, new ClassInfo(LyapunovAlgorithm.class), null, 20);
 	}
 
 	/**
 	 *  Should a cyclic color scheme be used?
 	 */
-	public boolean	useColorCycle()
+	public boolean useColorCycle()
 	{
 		return false;
 	}
@@ -64,7 +66,7 @@ public class LyapunovAlgorithm implements IFractalAlgorithm
 	/**
 	 *  Can areas be filled?
 	 */
-	public boolean	isOptimizationAllowed()
+	public boolean isOptimizationAllowed()
 	{
 		return false;
 	}
