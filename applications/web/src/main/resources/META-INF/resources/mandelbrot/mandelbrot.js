@@ -38,16 +38,16 @@ export class MandelbrotElement extends LitElement
 			let data = response.data;
 			//System.out.println("rec: "+result.getClass());
 			
+			if(data.algorithmClass!=null) // result instanceof AreaData
+			{
+				self.calculating = true;
+				self.initResults(data);
+			}
+			
 			if(data.data!=null) // result instanceof PartDataChunk
 			{
 				self.calculating = true;
 				self.addDataChunk(data);
-			}
-			
-			if(data.algorithm!=null) // result instanceof AreaData
-			{
-				self.calculating = true;
-				self.setResults(data);
 			}
 			
 			if(data.progress!=null) // result instanceof ProgressData
@@ -106,7 +106,7 @@ export class MandelbrotElement extends LitElement
 		<canvas id="canvas"></canvas>`;
 	}
 	
-	setResults(data)
+	initResults(data)
 	{
 		if(data.data==null)
 			data.data = this.makeArray(data.sizeX, data.sizeY);
@@ -149,8 +149,11 @@ export class MandelbrotElement extends LitElement
 	addDataChunk(data) //PartDataChunk 
 	{
 		// first chunk is empty and only delivers name of worker
-		if(data.data==null)
+		if(data.data===null || this.data===null)
+		{
+			console.log("Cannot add data chunk, no initial AreaData received");
 			return; 
+		}
 		
 		var chunk = data.data;
 		var results = this.data.data;
@@ -283,26 +286,29 @@ export class MandelbrotElement extends LitElement
 		ctx.canvas.height = sheight;
   			
 		// Zoom into original image while calculating
-		if(calculating && range!=null)
+		if(this.calculating && this.range!=null)
 		{
-			ix	= (range.x-drawarea.x-bounds.x)*iwidth/drawarea.width;
-			iy	= (range.y-drawarea.y-bounds.y)*iheight/drawarea.height;
-			iwidth	= range.width*iwidth/drawarea.width;
-			iheight	= range.height*iheight/drawarea.height;
+			console.log("draw range");
+			
+			/*ix = (range.x-drawarea.x)*iwidth/drawarea.width;
+			iy = (range.y-drawarea.y)*iheight/drawarea.height;
+			iwidth = range.width*iwidth/drawarea.width;
+			iheight = range.height*iheight/drawarea.height;
 			
 			// Scale again to fit new image size.
 			drawarea = scaleToFit(bounds, iwidth, iheight);
 			
 			g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
 				bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
-				ix, iy, ix+iwidth, iy+iheight, this);
+				ix, iy, ix+iwidth, iy+iheight, this);*/
 		}
 		
 		// Offset and clip image and show border while dragging.
-		else if(startdrag!=null && enddrag!=null)
+		else if(this.startdrag!=null && this.enddrag!=null)
 		{
+			console.log("draw dragged");
 			// Draw original image in background
-			g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
+			/*g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
 				bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
 				ix, iy, ix+iwidth, iy+iheight, this);
 			g.setColor(new Color(32,32,32,160));
@@ -317,7 +323,7 @@ export class MandelbrotElement extends LitElement
 			g.drawImage(image, bounds.x+drawarea.x+xoff, bounds.y+drawarea.y+yoff,
 				bounds.x+drawarea.x+xoff+drawarea.width, bounds.y+drawarea.y+yoff+drawarea.height,
 				ix, iy, ix+iwidth, iy+iheight, this);
-			g.setClip(clip);
+			g.setClip(clip);*/
 		}
 		else
 		{
@@ -368,8 +374,8 @@ export class MandelbrotElement extends LitElement
 		twidth 	Optional. The width of the image to use (stretch or reduce the image) 	
 		theight 	Optional. The height of the image to use (stretch or reduce the image)*/
 			
-		var imgdata = new ImageData(image, swidth, sheight);
-		ctx.putImageData(imgdata, 0, 0);
+		//var imgdata = new ImageData(image, swidth, sheight);
+		//ctx.putImageData(imgdata, 0, 0);
 			
 		/*
 		createImageBitmap(imgdata).then(imgbitmap => 
@@ -650,7 +656,7 @@ export class MandelbrotElement extends LitElement
 		
 		let movelis = e => 
 		{
-			console.log("mouse move: "+e.button);
+			//console.log("mouse move: "+e.button);
 			
 			if(self.startdrag!=null && e.buttons===2)
 			{
@@ -677,8 +683,7 @@ export class MandelbrotElement extends LitElement
 		{
 			if(self.startdrag!=null && self.enddrag!=null)
 			{
-				console.log("dragged: "+self.startdrag+" "+self.enddrag);
-				//dragImage();
+				this.dragImage();
 			}
 			
 			self.startdrag = null;
@@ -702,8 +707,7 @@ export class MandelbrotElement extends LitElement
 			{
 				factor = 100/(100+percent);
 			}
-			//this.zoomImage(e.getX(), e.getY(), factor);
-			console.log("zoom: "+pos+" "+factor);
+			this.zoomImage(e.getX(), e.getY(), factor);
 		}
 		element.addEventListener("wheel", wheellis);
 		
@@ -719,8 +723,7 @@ export class MandelbrotElement extends LitElement
 				if(pos.x>=range.x && pos.x<=range.x+range.width
 					&& pos.y>=range.y && pos.y<=range.y+range.height)
 				{
-					console.log("zoomIntoRange: "+pos+" "+range);
-					//zoomIntoRange();
+					this.zoomIntoRange();
 				}
 			}
 		}
@@ -750,6 +753,7 @@ export class MandelbrotElement extends LitElement
 	
 	dragImage()
 	{
+		console.log("dragImage: "+self.startdrag+" "+self.enddrag);
 		let sw = this.getImageWidth();
 		let sh = this.getImageHeight();
 		let iw = this.getImageWidth();
@@ -775,63 +779,65 @@ export class MandelbrotElement extends LitElement
 		this.calcArea(xs, xe, ys, ye, this.data.SizeX, this.data.SizeY);
 	}
 
-	/**
-	 *  Zoom into the given location by the given factor.
-	 */
-	protected void zoomImage(int x, int y, double factor)
+	// Zoom into the given location by the given factor.
+	zoomImage(x, y, factor)
 	{
+		console.log("zoomImage "+factor);
 		let sw = this.getImageWidth();
 		let sh = this.getImageHeight();
 		let iw = this.getImageWidth();
 		let ih = this.getImageHeight();
 		let drawarea = this.scaleToFit(sw, sh, iw, ih);
 		
-		int mx = Math.min(bounds.x+drawarea.x+drawarea.width, Math.max(bounds.x+drawarea.x, x));
-		int my = Math.min(bounds.y+drawarea.y+drawarea.height, Math.max(bounds.y+drawarea.y, y));
-		double xrel = ((double)mx-(bounds.x+drawarea.x))/drawarea.width;
-		double yrel = ((double)my-(bounds.y+drawarea.y))/drawarea.height;
+		let mx = Math.min(drawarea.x+drawarea.width, Math.max(drawarea.x, x));
+		let my = Math.min(drawarea.y+drawarea.height, Math.max(drawarea.y, y));
+		let xrel = (mx-drawarea.x)/drawarea.width;
+		let yrel = (my-drawarea.y)/drawarea.height;
 
-		double wold = data.getXEnd()-data.getXStart();
-		double hold = data.getYEnd()-data.getYStart();
-		double wnew = wold*factor;
-		double hnew = hold*factor;
-		double wd = wold-wnew;
-		double hd = hold-hnew;
+		let wold = this.data.XEnd-this.data.XStart;
+		let hold = this.data.YEnd-this.data.YStart;
+		let wnew = wold*factor;
+		let hnew = hold*factor;
+		let wd = wold-wnew;
+		let hd = hold-hnew;
 		
-		final double xs = data.getXStart()+wd*xrel;
-		final double xe = xs+wnew;
-		final double ys = data.getYStart()+hd*yrel;
-		final double ye = ys+hnew;
+		let xs = this.data.XStart+wd*xrel;
+		let xe = xs+wnew;
+		let ys = this.data.YStart+hd*yrel;
+		let ye = ys+hnew;
 		
 		// Set range for drawing preview of zoom area.
-		double	xdiff	= drawarea.width - drawarea.width*factor;
-		double	ydiff	= drawarea.height - drawarea.height*factor;
-		range = new Rectangle(bounds.x+drawarea.x+(int)Math.round(xdiff*xrel), bounds.y+drawarea.y+(int)Math.round(ydiff*yrel),
-			(int)Math.round(drawarea.width*factor), (int)Math.round(drawarea.height*factor));
+		let xdiff = drawarea.width - drawarea.width*factor;
+		let ydiff = drawarea.height - drawarea.height*factor;
+		range = {x: Math.trunc(drawarea.x+xdiff*xrel), y: Math.trunc(drawarea.y+ydiff*yrel),
+			width: Math.trunc(drawarea.width*factor), height: Math.trunc(drawarea.height*factor)};
 		
 //		zoomIntoRange();
-		this.calcArea(xs, xe, ys, ye, data.getSizeX(), data.getSizeY());
+		this.calcArea(xs, xe, ys, ye, this.data.SizeX, this.data.SizeY);
 	}
 	
 	zoomIntoRange()
 	{
-		// Calculate bounds relative to original image.
-		Rectangle	bounds	= getInnerBounds(true);
-		Rectangle	drawarea	= scaleToFit(bounds, image.getWidth(DisplayPanel.this), image.getHeight(DisplayPanel.this));
+		console.log("zoomIntoRange: "+this.range);
+		let sw = this.range.width();
+		let sh = this.range.height();
+		let iw = this.getImageWidth();
+		let ih = this.getImageHeight();
+		let drawarea = this.scaleToFit(sw, sh, iw, ih);
 		
-		final double	x	= (double)(range.x-bounds.x-drawarea.x)/drawarea.width;
-		final double	y	= (double)(range.y-bounds.y-drawarea.y)/drawarea.height;
-		final double	x2	= x + (double)range.width/drawarea.width;
-		final double	y2	= y + (double)range.height/drawarea.height;
+		let x = (this.range.x-drawarea.x)/drawarea.width;
+		let y = (range.y-drawarea.y)/drawarea.height;
+		let x2 = x + range.width/drawarea.width;
+		let y2 = y + range.height/drawarea.height;
 		
 		// Original bounds
-		final double	ox	= data.getXStart();
-		final double	oy	= data.getYStart();
-		final double	owidth	= data.getXEnd()-data.getXStart();
-		final double	oheight	= data.getYEnd()-data.getYStart();
+		let ox = this.data.XStart;
+		let oy = this.data.YStart;
+		let owidth = this.data.XEnd-this.data.XStart;
+		let oheight	= this.data.YEnd-this.data.YStart;
 		
 		// Calculate pixel width/height of visible area.
-		bounds	= getInnerBounds(false);
+		/*bounds = getInnerBounds(false);
 		double	rratio	= (double)range.width/range.height;
 		double	bratio	= (double)bounds.width/bounds.height;
 		if(rratio<bratio)
@@ -842,9 +848,9 @@ export class MandelbrotElement extends LitElement
 		{
 			bounds.height	= (int)(bounds.width/rratio);
 		}
-		final Rectangle	area	= bounds;
+		final Rectangle	area	= bounds;*/
 
-		this.calcArea(ox+owidth*x, ox+owidth*x2, oy+oheight*y, oy+oheight*y2, area.width, area.height);
+		this.calcArea(ox+owidth*x, ox+owidth*x2, oy+oheight*y, oy+oheight*y2, this.range.width, this.range.height);
 	}
 		
 	calcArea(x1, x2, y1, y2, sizex, sizey)
@@ -882,7 +888,7 @@ export class MandelbrotElement extends LitElement
 			{
 				console.log(ex);
 				this.calculating = false;
-			}
+			});
 	}
 
 	update()
