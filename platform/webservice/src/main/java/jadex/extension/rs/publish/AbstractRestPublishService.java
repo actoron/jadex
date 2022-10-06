@@ -1991,7 +1991,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+					//e.printStackTrace();
 				}
 			}
 	

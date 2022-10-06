@@ -137,17 +137,19 @@ export class MandelbrotElement extends LitElement
 	    	}
 
 			e = e || window.event;
-	    	e.preventDefault();
+	    	//e.preventDefault(); // if used will hinder input fields from working
 			x2 = e.clientX;
 	    	y2 = e.clientY;
 			//console.log("from: "+x2+" "+y2);
 			
 			// clean up document mouse listeners after mouse released
-			document.addEventListener("mouseup", e =>
+			var mu = e =>
 			{
-				document.removeEventListener("mouseup", this);
+				document.removeEventListener("mouseup", mu);
 				document.removeEventListener("mousemove", moved);
-			});
+			};
+			
+			document.addEventListener("mouseup", mu);
 			
 			// watch now for movements
 			document.addEventListener("mousemove", moved);
@@ -975,12 +977,26 @@ export class MandelbrotElement extends LitElement
 		var ymin = this.shadowRoot.getElementById("ymin").value;
 		var ymax = this.shadowRoot.getElementById("ymax").value;
 		var sizex = this.shadowRoot.getElementById("sizex").value;
-		var sizey = this.shadowRoot.getElementById("sizex").value;
+		var sizey = this.shadowRoot.getElementById("sizey").value;
 		var max = this.shadowRoot.getElementById("max").value;
 		var chunks = this.shadowRoot.getElementById("chunks").value;
 		var tasksize = this.shadowRoot.getElementById("tasksize").value;
 		
 		this.calcArea(xmin, xmax, ymin, ymax, sizex, sizey, algo, max, chunks, tasksize);
+	}
+	
+	resetSettings(e)
+	{
+		this.shadowRoot.getElementById("algorithm").value = "jadex.micro.examples.mandelbrot_new.MandelbrotAlgorithm";
+		this.shadowRoot.getElementById("xmin").value = -2.0;
+		this.shadowRoot.getElementById("xmax").value = 1.0;
+		this.shadowRoot.getElementById("ymin").value = -1.5;
+		this.shadowRoot.getElementById("ymax").value = 1.5;
+		this.shadowRoot.getElementById("sizex").value = 100;
+		this.shadowRoot.getElementById("sizey").value = 100;
+		this.shadowRoot.getElementById("max").value = 256;
+		this.shadowRoot.getElementById("chunks").value = 4;
+		this.shadowRoot.getElementById("tasksize").value = 300;
 	}
 
 	update()
@@ -1011,11 +1027,36 @@ export class MandelbrotElement extends LitElement
 			}
 			.grid {
 				display: grid;
-				grid-template-columns: auto 1fr;
-				grid-gap: 10px;
+				grid-template-columns: min-content auto;
+				grid-gap: 0.5em;
 			}
 			.fitcontent {
 				width: fit-content;
+			}
+			.fitcontentheight {
+				height: fit-content;
+			}
+			.floatright {
+				float: right;
+			}
+			.margintop {
+				margin-top: 0.5em; 
+			}
+			.jadexbtn {
+				background-color:#2a6699;
+				border-radius:6px 6px 6px 6px;
+				font-weight:bold;
+				font-weight:600;
+				padding-top:10px;
+				padding-bottom:10px;
+				border: 0px;
+				color: #fff;
+			}
+			.jadexbtn:disabled,
+			.jadexbtn.disabled {
+				border: 1px solid #999999;
+				background-color: #cccccc;
+		  		color: #666666;
 			}
 		    `);
 		return ret;
@@ -1025,45 +1066,50 @@ export class MandelbrotElement extends LitElement
 	{
 		return html`
 			<h1>Mandelbrot</h1>
-			<div id="settings" class="dragable grid">
-				<label class="fitcontent" for="alogrithm">Algorithm</label> 
-				<select name="algorithm" id="algorithm">
-					<option value="jadex.micro.examples.mandelbrot_new.MandelbrotAlgorithm">Mandelbrot</option>
-  					<option value="jadex.micro.examples.mandelbrot_new.LyapunovAlgorithm">Lyapunov</option>
-				</select> 
-				
-				<label class="fitcontent" for="xmin">Min x</label> 
-				<input name="xmin" id="xmin" placeholder="-2.0" value="-2" type="number" min="-5" value="5" step="0.1">
-				
-				<label class="fitcontent" for="xmax">Max x</label> 
-				<input name="xmax" id="xmax" placeholder="1.0" value="1" type="number" min="-5" value="5" step="0.1">
-				
-				<label class="fitcontent" for="ymin">Min y</label> 
-				<input name="ymin" id="ymin" placeholder="-1.5" value="-1.5" type="number" min="-5" value="5" step="0.1">
-				
-				<label class="fitcontent" for="ymax">Max y</label> 
-				<input name="ymax" id="ymax"placeholder="1.5" value="1.5" type="number" min="-5" value="5" step="0.1">
-				
-				<label class="fitcontent" for="sizex">Size x</label> 
-				<input name="sizex" id="sizex" value="100" type="number" min="10" max="10000" step="10">
-				
-				<label class="fitcontent" for="sizey">Size x</label> 
-				<input name="sizey" id="sizey" value="100" type="number" min="10" max="10000 step="10">
-				
-				<label class="fitcontent" for="max">Max</label> 
-				<input name="max" id="max" value="256" type="number" min="2" max="10000">
-				
-				<label class="fitcontent" for="chunks">Chunks</label> 
-				<input name="chunks" id="chunks" value="4" type="number" min=1" max="10000">
-				
-				<label class="fitcontent" for="tasksize">Task size</label> 
-				<input name="tasksize" id="tasksize" value="1" type="number" min=1" max="100000">
-				
-				<input class="fitcontent" type="reset" value="Reset">
-				<button class="fitcontent jadexbtn" @click="${e => this.generateArea(e)}">Generate</button>
-			<div>
+			
+			<div id="settings" class="dragable fitcontent fitcontentheight">
+				<div class="grid">
+					<label class="fitcontent" for="alogrithm">Algorithm</label> 
+					<select name="algorithm" id="algorithm">
+						<option value="jadex.micro.examples.mandelbrot_new.MandelbrotAlgorithm">Mandelbrot</option>
+	  					<option value="jadex.micro.examples.mandelbrot_new.LyapunovAlgorithm">Lyapunov</option>
+					</select> 
+					
+					<label class="fitcontent" for="xmin">Min x</label> 
+					<input name="xmin" id="xmin" placeholder="-2.0" value="-2" type="number" min="-5" value="5" step="0.1">
+					
+					<label class="fitcontent" for="xmax">Max x</label> 
+					<input name="xmax" id="xmax" placeholder="1.0" value="1" type="number" min="-5" value="5" step="0.1">
+					
+					<label class="fitcontent" for="ymin">Min y</label> 
+					<input name="ymin" id="ymin" placeholder="-1.5" value="-1.5" type="number" min="-5" value="5" step="0.1">
+					
+					<label class="fitcontent" for="ymax">Max y</label> 
+					<input name="ymax" id="ymax"placeholder="1.5" value="1.5" type="number" min="-5" value="5" step="0.1">
+					
+					<label class="fitcontent" for="sizex">Size x</label> 
+					<input name="sizex" id="sizex" value="100" type="number" min="10" max="10000" step="10">
+					
+					<label class="fitcontent" for="sizey">Size y</label> 
+					<input name="sizey" id="sizey" value="100" type="number" min="10" max="10000" step="10">
+					
+					<label class="fitcontent" for="max">Max</label> 
+					<input name="max" id="max" value="256" type="number" min="2" max="10000">
+					
+					<label class="fitcontent" for="chunks">Chunks</label> 
+					<input name="chunks" id="chunks" value="4" type="number" min="1" max="10000">
+					
+					<label class="fitcontent" for="tasksize">Task size</label> 
+					<input name="tasksize" id="tasksize" value="300" type="number" min="1" max="100000">				
+				</div>
+			
+				<div class="floatright margintop">
+					<button class="fitcontent jadexbtn" @click="${e => this.resetSettings(e)}">Reset</button>
+					<button class="fitcontent jadexbtn" @click="${e => this.generateArea(e)}">Generate</button>
+				</div>
+			</div>
+			
 			<canvas id="canvas"></canvas>
-		
 		`;
 	}
 }

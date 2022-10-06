@@ -120,6 +120,9 @@ public class GenerateService implements IGenerateService
 	//public IFuture<AreaData> generateArea(final AreaData data)
 	public IFuture<Void> generateArea(AreaData data)
 	{
+		System.out.println("data: "+data);
+		System.out.println("default data: "+ALGORITHMS[0].getDefaultSettings());
+		
 		//GenerateAgent ga = (GenerateAgent)agent.getFeature(IPojoComponentFeature.class).getPojoAgent();
 		//if(ga.getCalculateService()==null)
 		//	return new Future<AreaData>(new RuntimeException("No calculate service available"));

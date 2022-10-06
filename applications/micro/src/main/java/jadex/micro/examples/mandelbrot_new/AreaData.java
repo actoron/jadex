@@ -1,5 +1,7 @@
 package jadex.micro.examples.mandelbrot_new;
 
+import java.util.Arrays;
+
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Base64;
@@ -580,10 +582,19 @@ public class AreaData
 
 	/**
 	 *  Get the string representation.
-	 */
+	 * /
 	public String toString()
 	{
 		return "AreaData(x="+xoff+", y="+yoff+" xstart="+xstart+" ystart="+ystart+")";
+	}*/
+	
+	@Override
+	public String toString() 
+	{
+		return "AreaData [xstart=" + xstart + ", xend=" + xend + ", ystart=" + ystart + ", yend=" + yend + ", xoff="
+				+ xoff + ", yoff=" + yoff + ", sizex=" + sizex + ", sizey=" + sizey + ", max=" + max + ", cid=" + cid
+				+ ", tasksize=" + tasksize + ", algorithm=" + algorithm + ", data=" + Arrays.toString(data)
+				+ ", displayid=" + displayid + ", chunkcount=" + chunkcount + ", retrycnt=" + retrycnt + "]";
 	}
 	
 	/**
@@ -645,18 +656,5 @@ public class AreaData
 	{
 		this.retrycnt = retrycnt;
 	}
-
-	// /**
-	// * Get the string representation.
-	// */
-	// public String toString()
-	// {
-	// return "AreaData (xstart=" + xstart + ", xend=" + xend + ", ystart="
-	// + ystart + ", yend=" + yend + ", sizex=" + sizex + ", sizey="
-	// + sizey + ", max=" + max + ", par=" + par + ", id=" + id
-	// + ", tasksize=" + tasksize + ", data="
-	// + (data != null ? Arrays.asList(data) : null) + ")";
-	// }
-
 
 }
