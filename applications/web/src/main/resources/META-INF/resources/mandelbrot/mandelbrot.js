@@ -34,33 +34,7 @@ export class MandelbrotElement extends LitElement
 		let terminate = jadex.getIntermediate('/mandelbrotdisplay/subscribeToDisplayUpdates?a='+displayid+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		function(response)
 		{
-			console.log("recceived display update: "+response.data);
-			let data = response.data;
-			//System.out.println("rec: "+result.getClass());
-			
-			if(data.algorithmClass!=null) // result instanceof AreaData
-			{
-				self.calculating = true;
-				self.initResults(data);
-			}
-			
-			if(data.data!=null) // result instanceof PartDataChunk
-			{
-				self.calculating = true;
-				self.addDataChunk(data);
-			}
-			
-			if(data.progress!=null) // result instanceof ProgressData
-			{
-				let prog = {};
-				prog.name = data.worker.name;
-				prog.area = data.area;
-				prog.progress = data.progress;
-				prog.imageWidth = data.imageWidth;
-				prog.imageHeight = data.imageHeight; 
-				prog.finished = data.progress==100;
-				self.addProgress(prog);
-			}
+			self.handleDisplayUpdate(response);
 		},
 		function(err)
 		{
@@ -86,6 +60,8 @@ export class MandelbrotElement extends LitElement
 	firstUpdated() 
 	{
 		this.addMouseListener();
+		// make details dragable
+		this.dragElement(this.shadowRoot.getElementById("settings"));
   	}
 	
 	disconnectedCallback()
@@ -94,16 +70,97 @@ export class MandelbrotElement extends LitElement
 		console.log('disconnected')
 	}
 	
+	handleDisplayUpdate(response)
+	{
+		console.log("recceived display update: "+response.data);
+		let self = this;
+		
+		let data = response.data;
+		//System.out.println("rec: "+result.getClass());
+		
+		if(data.algorithmClass!=null) // result instanceof AreaData
+		{
+			self.calculating = true;
+			self.initResults(data);
+		}
+		else if(data.data!=null) // result instanceof PartDataChunk
+		{
+			self.calculating = true;
+			self.addDataChunk(data);
+		}
+		
+		if(data.progress!=null) // result instanceof ProgressData
+		{
+			let prog = {};
+			prog.name = data.worker.name;
+			prog.area = data.area;
+			prog.progress = data.progress;
+			prog.imageWidth = data.imageWidth;
+			prog.imageHeight = data.imageHeight; 
+			prog.finished = data.progress==100;
+			self.addProgress(prog);
+		}	
+	}
+	
+	// methods for making dragable an element
+	dragElement(element) 
+	{
+		var x1 = 0;
+		var y1 = 0;
+		var x2 = 0; 
+		var y2 = 0;
+
+		var moved = e =>
+		{
+			e = e || window.event;
+	    	e.preventDefault();
+	    	x1 = x2 - e.clientX;
+	    	y1 = y2 - e.clientY;
+	    	x2 = e.clientX;
+	    	y2 = e.clientY;
+			//console.log("to: "+x2+" "+y2);
+	    	// set the element's new position:
+			//var y = parseInt(element.style.top) || 0;
+	    	//var x = parseInt(element.style.left) || 0;
+			element.style.top = element.offsetTop-y1+"px";
+	    	element.style.left = element.offsetLeft-x1+"px";
+		}
+
+		var md = e => 
+		{
+			//console.log("offsetx: "+e.offsetX+" "+e.clientX);
+			
+			if(element.offsetWidth-e.offsetX < 20 && element.offsetHeight-e.offsetY < 20)
+			{
+				//console.log("at resize border");
+				return;
+	    	}
+
+			e = e || window.event;
+	    	e.preventDefault();
+			x2 = e.clientX;
+	    	y2 = e.clientY;
+			//console.log("from: "+x2+" "+y2);
+			
+			// clean up document mouse listeners after mouse released
+			document.addEventListener("mouseup", e =>
+			{
+				document.removeEventListener("mouseup", this);
+				document.removeEventListener("mousemove", moved);
+			});
+			
+			// watch now for movements
+			document.addEventListener("mousemove", moved);
+	  	}
+
+		// listen on mouse clicks on that element
+		element.addEventListener("mousedown", md);
+	}
+	
 	getMethodPrefix() 
 	{
 		//return '/webjcc/invokeServiceMethod?cid=null'+'&servicetype='+'jadex.micro.examples.mandelbrot_new.IDisplayService'; cid=null leads to CID(null) :-()
 		return '/webjcc/invokeServiceMethod?servicetype='+'jadex.micro.examples.mandelbrot_new.IDisplayService';
-	}
-
-	render() 
-	{
-		return html`<h1>Mandelbrot</h1>
-		<canvas id="canvas"></canvas>`;
 	}
 	
 	initResults(data)
@@ -546,7 +603,7 @@ export class MandelbrotElement extends LitElement
 			 drawendy = iheight*wratio;
 			 drawstarty	= (sheight-drawendy)/2;
 		}
-		return {x: Math.trunc(drawstartx), y: Math.trunc(drawstarty), width: Math.truc(drawendx), height: Math.trunc(drawendy)};
+		return {x: Math.trunc(drawstartx), y: Math.trunc(drawstarty), width: Math.trunc(drawendx), height: Math.trunc(drawendy)};
 	}
 	
 	createColor(r, g, b, a)
@@ -694,10 +751,10 @@ export class MandelbrotElement extends LitElement
 		let wheellis = e =>
 		{
 			let pos = self.getMousePosition(element, e);
-			let delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+			let delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)))*-1;
 			console.log("wheel: "+delta);
 			
-			let percent = Math.abs(10*delta);
+			let percent = Math.abs(10*delta)*2;
 			let factor;
 			if(delta>0)
 			{
@@ -707,7 +764,7 @@ export class MandelbrotElement extends LitElement
 			{
 				factor = 100/(100+percent);
 			}
-			this.zoomImage(e.getX(), e.getY(), factor);
+			this.zoomImage(pos.x, pos.y, factor);
 		}
 		element.addEventListener("wheel", wheellis);
 		
@@ -776,7 +833,7 @@ export class MandelbrotElement extends LitElement
 		this.enddrag = null;
 		this.range = {x: drawarea.x+xdiff, y: drawarea.y+ydiff, width: drawarea.width, height: drawarea.height};
 
-		this.calcArea(xs, xe, ys, ye, this.data.SizeX, this.data.SizeY);
+		this.calcArea(xs, xe, ys, ye, this.data.sizeX, this.data.sizeY);
 	}
 
 	// Zoom into the given location by the given factor.
@@ -794,26 +851,26 @@ export class MandelbrotElement extends LitElement
 		let xrel = (mx-drawarea.x)/drawarea.width;
 		let yrel = (my-drawarea.y)/drawarea.height;
 
-		let wold = this.data.XEnd-this.data.XStart;
-		let hold = this.data.YEnd-this.data.YStart;
+		let wold = this.data.xEnd-this.data.xStart;
+		let hold = this.data.yEnd-this.data.yStart;
 		let wnew = wold*factor;
 		let hnew = hold*factor;
 		let wd = wold-wnew;
 		let hd = hold-hnew;
 		
-		let xs = this.data.XStart+wd*xrel;
+		let xs = this.data.xStart+wd*xrel;
 		let xe = xs+wnew;
-		let ys = this.data.YStart+hd*yrel;
+		let ys = this.data.yStart+hd*yrel;
 		let ye = ys+hnew;
 		
 		// Set range for drawing preview of zoom area.
 		let xdiff = drawarea.width - drawarea.width*factor;
 		let ydiff = drawarea.height - drawarea.height*factor;
-		range = {x: Math.trunc(drawarea.x+xdiff*xrel), y: Math.trunc(drawarea.y+ydiff*yrel),
+		this.range = {x: Math.trunc(drawarea.x+xdiff*xrel), y: Math.trunc(drawarea.y+ydiff*yrel),
 			width: Math.trunc(drawarea.width*factor), height: Math.trunc(drawarea.height*factor)};
 		
 //		zoomIntoRange();
-		this.calcArea(xs, xe, ys, ye, this.data.SizeX, this.data.SizeY);
+		this.calcArea(xs, xe, ys, ye, this.data.sizeX, this.data.sizeY);
 	}
 	
 	zoomIntoRange()
@@ -831,10 +888,10 @@ export class MandelbrotElement extends LitElement
 		let y2 = y + range.height/drawarea.height;
 		
 		// Original bounds
-		let ox = this.data.XStart;
-		let oy = this.data.YStart;
-		let owidth = this.data.XEnd-this.data.XStart;
-		let oheight	= this.data.YEnd-this.data.YStart;
+		let ox = this.data.xStart;
+		let oy = this.data.yStart;
+		let owidth = this.data.xEnd-this.data.xStart;
+		let oheight	= this.data.yEnd-this.data.yStart;
 		
 		// Calculate pixel width/height of visible area.
 		/*bounds = getInnerBounds(false);
@@ -853,48 +910,161 @@ export class MandelbrotElement extends LitElement
 		this.calcArea(ox+owidth*x, ox+owidth*x2, oy+oheight*y, oy+oheight*y2, this.range.width, this.range.height);
 	}
 		
-	calcArea(x1, x2, y1, y2, sizex, sizey)
+	calcArea(x1, x2, y1, y2, sizex, sizey, algo, max, chunks, tasksize)
 	{
 		let data = {};
-		data.XStart = x1;
-		data.XEnd = x2;
-		data.YStart = y1;
-		data.YEnd = y2; 
-		data.SizeX = sizex;
-		data.Sizey = sizey;
+		data.xStart = x1;
+		data.xEnd = x2;
+		data.yStart = y1;
+		data.yEnd = y2; 
+		data.sizeX = sizex;
+		data.sizeY = sizey;
 		
-		if(this.data!=null)
-		{
-			data.Algorithm = this.data.algorithm;
-			data.Max = this.data.max;
-			data.TaskSize = this.data.TaskSize;
-			data.ChunkCount = this.data.ChunkCount;
-			data.DisplayId = this.data.DisplayId;
-		}
+		if(algo)
+			data.algorithmClass = algo;
+		else if(this.data!=null)
+			data.algorithmClass = this.data.algorithmClass;
+		
+		if(max)
+			data.max = max;
+		else if(this.data!=null)
+			data.max = this.data.max;
+		
+		if(chunks)
+			data.chunkCount = chunks;
+		else if(this.data!=null)
+			data.chunkCount = this.data.chunkCount;
+			
+		if(tasksize)
+			data.taskSize = tasksize;
+		else if(this.data!=null)
+			data.taskSize = this.data.taskSize;
+		
+		if(this.data!=null && this.data.displayId)
+			data.displayId = this.data.displayId;
 		
 		//DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		this.calculating = true;
 		
 		this.requestUpdate();
 		
+		console.log("request data: "+JSON.stringify(data));
 		axios.get('/mandelbrotgenerate/generateArea?a='+JSON.stringify(data), this.transform)
-			.then(function(resp)
+			.then(function(response)
 			{
-				console.log("recceived display update: "+resp.data);
-				this.calculating = false;
+				console.log("generateArea finished: "+response.data);
+				self.calculating = false;
+				//self.handleDisplayUpdate(response);
 				//DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			})
 			.catch(ex => 
 			{
 				console.log(ex);
-				this.calculating = false;
+				self.calculating = false;
 			});
+	}
+	
+	generateArea(e)
+	{
+		var algo = this.shadowRoot.getElementById("algorithm").value;
+		if(algo)
+			algo = {value: algo};
+		
+		var xmin = this.shadowRoot.getElementById("xmin").value;
+		var xmax = this.shadowRoot.getElementById("xmax").value;
+		var ymin = this.shadowRoot.getElementById("ymin").value;
+		var ymax = this.shadowRoot.getElementById("ymax").value;
+		var sizex = this.shadowRoot.getElementById("sizex").value;
+		var sizey = this.shadowRoot.getElementById("sizex").value;
+		var max = this.shadowRoot.getElementById("max").value;
+		var chunks = this.shadowRoot.getElementById("chunks").value;
+		var tasksize = this.shadowRoot.getElementById("tasksize").value;
+		
+		this.calcArea(xmin, xmax, ymin, ymax, sizex, sizey, algo, max, chunks, tasksize);
 	}
 
 	update()
 	{
 		super.update();
 		this.paint();
+	}
+	
+	static get styles() 
+	{
+		var ret = [];
+		if(super.styles!=null)
+			ret.push(super.styles);
+		ret.push(
+		    css`
+			.dragable {
+				padding: 10px;
+				position: fixed;
+				left: 50%;
+    			top: 50%;
+    			transform: translate(-50%, -50%);
+				width: 30%;
+			  	background-color: #00000011;
+			  	border: 1px solid #d3d3d3;
+				z-axis: 1;
+		 		resize: both;
+    			overflow: hidden;
+			}
+			.grid {
+				display: grid;
+				grid-template-columns: auto 1fr;
+				grid-gap: 10px;
+			}
+			.fitcontent {
+				width: fit-content;
+			}
+		    `);
+		return ret;
+	}
+	
+	render() 
+	{
+		return html`
+			<h1>Mandelbrot</h1>
+			<div id="settings" class="dragable grid">
+				<label class="fitcontent" for="alogrithm">Algorithm</label> 
+				<select name="algorithm" id="algorithm">
+					<option value="jadex.micro.examples.mandelbrot_new.MandelbrotAlgorithm">Mandelbrot</option>
+  					<option value="jadex.micro.examples.mandelbrot_new.LyapunovAlgorithm">Lyapunov</option>
+				</select> 
+				
+				<label class="fitcontent" for="xmin">Min x</label> 
+				<input name="xmin" id="xmin" placeholder="-2.0" value="-2" type="number" min="-5" value="5" step="0.1">
+				
+				<label class="fitcontent" for="xmax">Max x</label> 
+				<input name="xmax" id="xmax" placeholder="1.0" value="1" type="number" min="-5" value="5" step="0.1">
+				
+				<label class="fitcontent" for="ymin">Min y</label> 
+				<input name="ymin" id="ymin" placeholder="-1.5" value="-1.5" type="number" min="-5" value="5" step="0.1">
+				
+				<label class="fitcontent" for="ymax">Max y</label> 
+				<input name="ymax" id="ymax"placeholder="1.5" value="1.5" type="number" min="-5" value="5" step="0.1">
+				
+				<label class="fitcontent" for="sizex">Size x</label> 
+				<input name="sizex" id="sizex" value="100" type="number" min="10" max="10000" step="10">
+				
+				<label class="fitcontent" for="sizey">Size x</label> 
+				<input name="sizey" id="sizey" value="100" type="number" min="10" max="10000 step="10">
+				
+				<label class="fitcontent" for="max">Max</label> 
+				<input name="max" id="max" value="256" type="number" min="2" max="10000">
+				
+				<label class="fitcontent" for="chunks">Chunks</label> 
+				<input name="chunks" id="chunks" value="4" type="number" min=1" max="10000">
+				
+				<label class="fitcontent" for="tasksize">Task size</label> 
+				<input name="tasksize" id="tasksize" value="1" type="number" min=1" max="100000">
+				
+				<input class="fitcontent" type="reset" value="Reset">
+				<button class="fitcontent jadexbtn" @click="${e => this.generateArea(e)}">Generate</button>
+			<div>
+			<canvas id="canvas"></canvas>
+		
+		`;
 	}
 }
 

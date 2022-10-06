@@ -702,6 +702,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				}
 				else if(mis!=null && mis.size()>0)
 				{
+					//if(request.toString().indexOf("generateArea")!=-1)
+					//	System.out.println("call 4: "+request);
+					
 					// convert and map parameters
 					Tuple2<MappingInfo, Object[]> tup = mapParameters(request, mis, bindings);
 					final MappingInfo mi = tup.getFirstEntity();
@@ -752,7 +755,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 								
 								//System.out.println("request: "+request.getRequestURL()+" "+fcallid+" "+method.getName()+" "+Arrays.toString(params));
 								
-								//if(request.toString().indexOf("suspend")!=-1)
+								//if(request.toString().indexOf("generateArea")!=-1)
 								//	System.out.println("call 4: "+request);
 								final Object ret = method.invoke(service, params);
 								ri.setMethod(method);
@@ -1988,7 +1991,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				}
 				catch(Exception e)
 				{
-					//e.printStackTrace();
+					e.printStackTrace();
 				}
 			}
 	

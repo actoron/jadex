@@ -939,6 +939,9 @@ public class DisplayPanel extends JComponent
 			(int)Math.round(drawarea.width*factor), (int)Math.round(drawarea.height*factor));
 		
 //		zoomIntoRange();
+		
+		System.out.println("zoom: "+x+" "+y+" "+factor+" "+xs+" "+xe+" "+ys+" "+ye+" "+data.getSizeX()+" "+data.getSizeY());
+		
 		calcArea(xs, xe, ys, ye, data.getSizeX(), data.getSizeY());
 	}
 
@@ -1061,6 +1064,43 @@ public class DisplayPanel extends JComponent
 		{
 			System.out.println("No generate service found");
 		}
+	}
+	
+	public static void main(String[] args) 
+	{
+		int x = 461;
+		int y = 235;
+		double factor = 1.2;
+		final Rectangle drawarea = new Rectangle(0,0,500,500);
+			
+		int mx = Math.min(drawarea.x+drawarea.width, Math.max(drawarea.x, x));
+		int my = Math.min(drawarea.y+drawarea.height, Math.max(drawarea.y, y));
+		double xrel = ((double)mx-(drawarea.x))/drawarea.width;
+		double yrel = ((double)my-(drawarea.y))/drawarea.height;
+
+		double wold = 2.08;
+		double hold = 2.08;
+		double wnew = wold*factor;
+		double hnew = hold*factor;
+		double wd = wold-wnew;
+		double hd = hold-hnew;
+		
+		final double xs = -2.272226080246914+wd*xrel;
+		final double xe = xs+wnew;
+		final double ys = -0.9846365740740745+hd*yrel;
+		final double ye = ys+hnew;
+		
+		// Set range for drawing preview of zoom area.
+		double	xdiff	= drawarea.width - drawarea.width*factor;
+		double	ydiff	= drawarea.height - drawarea.height*factor;
+		Rectangle range	= new Rectangle(drawarea.x+(int)Math.round(xdiff*xrel), drawarea.y+(int)Math.round(ydiff*yrel),
+			(int)Math.round(drawarea.width*factor), (int)Math.round(drawarea.height*factor));
+			
+//			zoomIntoRange();
+			
+			System.out.println("zoom: "+x+" "+y+" "+factor+" "+xs+" "+xe+" "+ys+" "+ye+" "+500+" "+500);
+			
+		//calcArea(xs, xe, ys, ye, data.getSizeX(), data.getSizeY());
 	}
 	
 }
