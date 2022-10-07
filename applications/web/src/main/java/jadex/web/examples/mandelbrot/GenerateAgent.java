@@ -35,7 +35,7 @@ import jadex.micro.examples.mandelbrot_new.IGenerateService;
 	@RequiredService(name="generateservice", type=IGenerateService.class)
 })
 @Agent
-public class GenerateAgent
+public class GenerateAgent // todo: implements IGenerateGui 
 {
 	@Agent
 	protected IInternalAccess agent;

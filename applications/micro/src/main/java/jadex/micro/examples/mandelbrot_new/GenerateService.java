@@ -50,69 +50,34 @@ public class GenerateService implements IGenerateService
 	@ServiceComponent
 	protected IInternalAccess agent;
 	
-	/** The generate panel. */
-	protected GeneratePanel panel;
-
+	protected IGenerateGui ggui;
+	
 	/** The current calculator count (for selecting the next). */
 	protected int curcalc;
 	
 	/** The number of maximum retries for calculations. */
 	protected int maxretries = 1;
 	
-	//-------- constructors --------
-	
-	/**
-	 *  Create a new service.
-	 */
-	//@ServiceStart
-	@OnStart
-	public void start()
-	{
-//		System.out.println("start: "+agent.getAgentName());
-		this.panel = (GeneratePanel)GeneratePanel.createGui(agent.getExternalAccess());
-	}
-	
-	/**
-	 *  Stop the service.
-	 */
-	//@ServiceShutdown
-	@OnEnd
-	public IFuture<Void>	shutdown()
-	{
-//		System.out.println("shutdown: "+agent.getAgentName());
-		final Future<Void>	ret	= new Future<Void>();
-		if(panel!=null)
-		{
-//			System.out.println("shutdown1: "+agent.getAgentName());
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-//					System.out.println("shutdown2: "+agent.getAgentName());
-					SGUI.getWindowParent(panel).dispose();
-					ret.setResult(null);
-//					System.out.println("shutdown3: "+agent.getAgentName());
-				}
-			});
-		}
-		else
-		{
-//			System.out.println("shutdown4: "+agent.getAgentName());
-			ret.setResult(null);
-		}
-		return ret;
-	}
-	
 	//-------- methods --------
+	
+	@OnStart
+	public void body()
+	{
+		Object pagent = agent.getFeature(IPojoComponentFeature.class).getPojoAgent();
+		if(pagent instanceof IGenerateGui)
+			ggui = (IGenerateGui)pagent;
+		else
+			System.out.println("gen gui interface not found");
+	}
 	
 	/**
 	 *  Calculate and display the default image from current settings.
-	 */
+	 * /
 	public IFuture<Void> calcDefaultImage()
 	{
 		panel.calcDefaultImage();
 		return IFuture.DONE;
-	}
+	}*/
 	
 	/**
 	 *  Generate a specific area using a defined x and y size.
@@ -120,8 +85,8 @@ public class GenerateService implements IGenerateService
 	//public IFuture<AreaData> generateArea(final AreaData data)
 	public IFuture<Void> generateArea(AreaData data)
 	{
-		System.out.println("data: "+data);
-		System.out.println("default data: "+ALGORITHMS[0].getDefaultSettings());
+		//System.out.println("data: "+data);
+		//System.out.println("default data: "+ALGORITHMS[0].getDefaultSettings());
 		
 		//GenerateAgent ga = (GenerateAgent)agent.getFeature(IPojoComponentFeature.class).getPojoAgent();
 		//if(ga.getCalculateService()==null)
@@ -187,14 +152,8 @@ public class GenerateService implements IGenerateService
 		}
 		
 		// Update own gui settings
-		final AreaData fdata = data;
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				panel.updateProperties(fdata);
-			}
-		});
+		if(ggui!=null)
+			ggui.updateData(data);
 		
 		return distributeWork(data);
 	}
@@ -272,14 +231,9 @@ public class GenerateService implements IGenerateService
 			{
 				if(ad.fetchData()==null)
 					return;
-								
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						panel.getStatusBar().setText("Finished: "+(++cnt)+"("+number+")");
-					}
-				});
+				
+				if(ggui!=null)
+					ggui.updateStatus(++cnt, number);
 				
 //				int xs = ad.getXOffset();
 //				int ys = ad.getYOffset();

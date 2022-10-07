@@ -59,9 +59,9 @@ export class MandelbrotElement extends LitElement
 	
 	firstUpdated() 
 	{
-		this.addMouseListener();
-		// make details dragable
-		this.dragElement(this.shadowRoot.getElementById("settings"));
+		this.addMouseListener(this.shadowRoot.getElementById("canvas"));
+		this.makeElementDragable(this.shadowRoot.getElementById("settings"));
+		this.makeElementDragable(this.shadowRoot.getElementById("image"), true);
   	}
 	
 	disconnectedCallback()
@@ -102,8 +102,7 @@ export class MandelbrotElement extends LitElement
 		}	
 	}
 	
-	// methods for making dragable an element
-	dragElement(element) 
+	makeElementDragable(element, leftborder) 
 	{
 		var x1 = 0;
 		var y1 = 0;
@@ -128,7 +127,14 @@ export class MandelbrotElement extends LitElement
 
 		var md = e => 
 		{
-			//console.log("offsetx: "+e.offsetX+" "+e.clientX);
+			//console.log("offsetx: "+e.offsetX+" "+e.clientX+" "+element.offsetWidth);
+			
+			// only dragable when at left border (in case leftborder true)
+			if(leftborder && e.offsetX>0)
+			{
+				console.log("not at border");
+				return;
+			}
 			
 			if(element.offsetWidth-e.offsetX < 20 && element.offsetHeight-e.offsetY < 20)
 			{
@@ -192,7 +198,6 @@ export class MandelbrotElement extends LitElement
 				
 		if(len==0)
 			this.calculating = false;
-			
 		//console.log("progressdata len (before, after): "+len+" "+Object.keys(this.progressdata).length+" "+part.finished+" "+part.progress);
 		
 		this.requestUpdate();
@@ -325,7 +330,9 @@ export class MandelbrotElement extends LitElement
 			
 		let results = this.data.data;
 		let oimage = this.data.image;
-		var image = new Uint8ClampedArray(oimage); // clone the image data
+		let image = new Uint8ClampedArray(oimage); // clone the image data
+		let adaptsize = this.shadowRoot.getElementById("adaptsize").checked;
+		let container = this.shadowRoot.getElementById("image");
 		let canvas = this.shadowRoot.getElementById("canvas");
 		let ctx = canvas.getContext("2d");
 		//let cwidth = canvas.width;
@@ -343,6 +350,11 @@ export class MandelbrotElement extends LitElement
 		
 		ctx.canvas.width  = swidth;
 		ctx.canvas.height = sheight;
+		if(adaptsize)
+		{
+			container.style.width = swidth+"px";
+			container.style.height = sheight+"px";
+  		}
   			
 		// Zoom into original image while calculating
 		if(this.calculating && this.range!=null)
@@ -685,10 +697,9 @@ export class MandelbrotElement extends LitElement
 		}
 	}
 	
-	addMouseListener()
+	addMouseListener(element)
 	{
 		let self = this;
-		let element = this.shadowRoot.getElementById("canvas");
 		
 		let downlis = e => 
 		{
@@ -992,11 +1003,12 @@ export class MandelbrotElement extends LitElement
 		this.shadowRoot.getElementById("xmax").value = 1.0;
 		this.shadowRoot.getElementById("ymin").value = -1.5;
 		this.shadowRoot.getElementById("ymax").value = 1.5;
-		this.shadowRoot.getElementById("sizex").value = 100;
-		this.shadowRoot.getElementById("sizey").value = 100;
+		this.shadowRoot.getElementById("sizex").value = 300;
+		this.shadowRoot.getElementById("sizey").value = 300;
 		this.shadowRoot.getElementById("max").value = 256;
 		this.shadowRoot.getElementById("chunks").value = 4;
 		this.shadowRoot.getElementById("tasksize").value = 300;
+		this.range = null;
 	}
 
 	update()
@@ -1019,16 +1031,29 @@ export class MandelbrotElement extends LitElement
     			top: 50%;
     			transform: translate(-50%, -50%);
 				width: 30%;
-			  	background-color: #00000011;
+			  	background-color: #00000066;
 			  	border: 1px solid #d3d3d3;
-				z-axis: 1;
+				z-index: 1;
 		 		resize: both;
     			overflow: hidden;
+    			color: white;
+			}
+			.dragable2 {
+				position: fixed;
+				width: fit-content;
+				height: fit-content;
+				resize: both;
+				overflow: hidden;
+				background-color: yellow;
 			}
 			.grid {
 				display: grid;
-				grid-template-columns: min-content auto;
+				grid-template-columns: max-content auto;
 				grid-gap: 0.5em;
+			}
+			.grid2 {
+				display: grid;
+				grid-template-columns: auto auto;
 			}
 			.fitcontent {
 				width: fit-content;
@@ -1058,6 +1083,19 @@ export class MandelbrotElement extends LitElement
 				background-color: #cccccc;
 		  		color: #666666;
 			}
+			.leftborder {
+				border-left: 10px solid red; 
+			}
+			.w100 {
+				width: 100%;
+			}
+			.h100 {
+				height: 100%;
+			}
+			.checkboxleft {
+				width: fit-content;
+				margin-left: 0px;
+			}
 		    `);
 		return ret;
 	}
@@ -1065,42 +1103,45 @@ export class MandelbrotElement extends LitElement
 	render() 
 	{
 		return html`
-			<h1>Mandelbrot</h1>
+			<h1>Factals</h1>
 			
 			<div id="settings" class="dragable fitcontent fitcontentheight">
 				<div class="grid">
-					<label class="fitcontent" for="alogrithm">Algorithm</label> 
+					<label for="alogrithm">Algorithm</label> 
 					<select name="algorithm" id="algorithm">
 						<option value="jadex.micro.examples.mandelbrot_new.MandelbrotAlgorithm">Mandelbrot</option>
 	  					<option value="jadex.micro.examples.mandelbrot_new.LyapunovAlgorithm">Lyapunov</option>
 					</select> 
 					
-					<label class="fitcontent" for="xmin">Min x</label> 
+					<label for="xmin">Min x</label> 
 					<input name="xmin" id="xmin" placeholder="-2.0" value="-2" type="number" min="-5" value="5" step="0.1">
 					
-					<label class="fitcontent" for="xmax">Max x</label> 
+					<label for="xmax">Max x</label> 
 					<input name="xmax" id="xmax" placeholder="1.0" value="1" type="number" min="-5" value="5" step="0.1">
 					
-					<label class="fitcontent" for="ymin">Min y</label> 
+					<label for="ymin">Min y</label> 
 					<input name="ymin" id="ymin" placeholder="-1.5" value="-1.5" type="number" min="-5" value="5" step="0.1">
 					
-					<label class="fitcontent" for="ymax">Max y</label> 
+					<label for="ymax">Max y</label> 
 					<input name="ymax" id="ymax"placeholder="1.5" value="1.5" type="number" min="-5" value="5" step="0.1">
 					
-					<label class="fitcontent" for="sizex">Size x</label> 
-					<input name="sizex" id="sizex" value="100" type="number" min="10" max="10000" step="10">
+					<label for="sizex">Size x</label> 
+					<input name="sizex" id="sizex" value="300" type="number" min="10" max="10000" step="100">
 					
-					<label class="fitcontent" for="sizey">Size y</label> 
-					<input name="sizey" id="sizey" value="100" type="number" min="10" max="10000" step="10">
+					<label for="sizey">Size y</label> 
+					<input name="sizey" id="sizey" value="300" type="number" min="10" max="10000" step="100">
 					
-					<label class="fitcontent" for="max">Max</label> 
+					<label for="max">Max</label> 
 					<input name="max" id="max" value="256" type="number" min="2" max="10000">
 					
-					<label class="fitcontent" for="chunks">Chunks</label> 
+					<label for="chunks">Chunks</label> 
 					<input name="chunks" id="chunks" value="4" type="number" min="1" max="10000">
 					
-					<label class="fitcontent" for="tasksize">Task size</label> 
-					<input name="tasksize" id="tasksize" value="300" type="number" min="1" max="100000">				
+					<label for="tasksize">Task size</label> 
+					<input name="tasksize" id="tasksize" value="300" type="number" min="1" max="100000">
+					
+					<label class="adaptsize" for="adaptsize">Adapt canvas size</label> 
+					<input name="adaptsize" id="adaptsize" class="checkboxleft" checked type="checkbox">				
 				</div>
 			
 				<div class="floatright margintop">
@@ -1109,7 +1150,9 @@ export class MandelbrotElement extends LitElement
 				</div>
 			</div>
 			
-			<canvas id="canvas"></canvas>
+			<div id="image" class="leftborder dragable2">
+				<canvas id="canvas" class="w100 h100"></canvas>
+			</div>
 		`;
 	}
 }
