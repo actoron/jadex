@@ -28,7 +28,7 @@ export class MandelbrotElement extends LitElement
 		// shadow dom not available here :-(	
 		// -> firstUpdated()
 		//this.addMouseListener();				
-						
+
 		let displayid = "webgui"+jadex.generateUUID();
 		// must not use args_0 as parameter name as this will be made to args list
 		let terminate = jadex.getIntermediate('/mandelbrotdisplay/subscribeToDisplayUpdates?a='+displayid+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',

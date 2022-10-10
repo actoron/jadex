@@ -21,7 +21,7 @@
 	
 		init: function()
 		{
-			//console.log("jadex init running");
+			console.log("jadex init running");
 			
 			var self = this;
 			
@@ -454,7 +454,8 @@
 		setCookie: function(cname, value)
 		{
 			this.deleteCookie(cname);
-			document.cookie=cname+"="+btoa(encodeURIComponent(value));
+			document.cookie=cname+"="+btoa(encodeURIComponent(value))+";path=/";// otherwise browser suppresses cookie for calls of subdirs
+			console.log("cookie set: "+document.cookie); 
 		}
 	};
 	Jadex.init();

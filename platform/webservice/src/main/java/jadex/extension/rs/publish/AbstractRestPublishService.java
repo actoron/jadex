@@ -506,6 +506,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		// solution: always create on container thread and remember
 		//final Map<String, Object> session = getSession(request, true);
 		final String sessionid = getSessionId(request);
+		if(sessionid==null)
+			System.out.println("Call has no jadex session id, Jadex cookie missing: "+request.getRequestURL());
+		// todo: if missing generate one?! as it is cookie it would be used by further requests
 		
 		//if(request.getRequestURI().indexOf("subscribeTo")!=-1)
 		//System.out.println("handleRequest: "+request.getRequestURI()+" session: "+request.getSession().getId());
