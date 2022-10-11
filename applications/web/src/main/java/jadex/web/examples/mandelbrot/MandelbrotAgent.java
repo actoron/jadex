@@ -45,11 +45,11 @@ import jadex.micro.annotation.Imports;
 				value="new PoolServiceInfo[]{new PoolServiceInfo().setWorkermodel(\"jadex/micro/examples/mandelbrot_new/CalculateAgent.class\").setServiceType(ICalculateService.class).setPoolStrategy(new jadex.commons.DefaultPoolStrategy(2, 2)).setPublicationScope($args.scope)}"),
 			@NameValue(name="scope", value="$args.scope")
 		}),
-		/*@Component(type="DistributedPool", arguments = 
+		@Component(type="DistributedPool", arguments = 
 		{
 			@NameValue(name="serviceinfo", value="new ServiceQuery(ICalculateService.class).setScope($args.scope)"),
 			@NameValue(name="scope", value="$args.scope")	
-		}),*/
+		}),
 		@Component(type="Display")
 	}),
 	@Configuration(name="pools", components={

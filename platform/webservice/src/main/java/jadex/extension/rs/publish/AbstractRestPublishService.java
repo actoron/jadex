@@ -1141,9 +1141,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			{
 				//System.out.println("terminating due to timeout: "+exception);
 				System.out.println("Conversation timed out: "+entry.getKey());
-				System.out.println("cur time: "+System.currentTimeMillis());
-				System.out.println("timestamp: "+entry.getValue().getTimestamp());
-				System.out.println("timeout: "+Starter.getDefaultTimeout(component.getId()));
+				//System.out.println("cur time: "+System.currentTimeMillis());
+				//System.out.println("timestamp: "+entry.getValue().getTimestamp());
+				//System.out.println("timeout: "+Starter.getDefaultTimeout(component.getId()));
 				
 				terminateConversation(entry.getValue(), null, false);
 				

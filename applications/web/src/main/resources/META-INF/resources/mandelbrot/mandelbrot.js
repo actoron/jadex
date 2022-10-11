@@ -82,6 +82,7 @@ export class MandelbrotElement extends LitElement
 		{
 			self.calculating = true;
 			self.initResults(data);
+			self.setSettings(data);
 		}
 		else if(data.data!=null) // result instanceof PartDataChunk
 		{
@@ -343,10 +344,6 @@ export class MandelbrotElement extends LitElement
 		let sy = 0;
 		let swidth = results.length;
 		let sheight = results[0].length;
-		let tx = 0;
-		let ty = 0;
-		let twidth = swidth;		
-		let theight = sheight;
 		
 		ctx.canvas.width  = swidth;
 		ctx.canvas.height = sheight;
@@ -361,17 +358,12 @@ export class MandelbrotElement extends LitElement
 		{
 			console.log("draw range");
 			
-			/*ix = (range.x-drawarea.x)*iwidth/drawarea.width;
-			iy = (range.y-drawarea.y)*iheight/drawarea.height;
-			iwidth = range.width*iwidth/drawarea.width;
-			iheight = range.height*iheight/drawarea.height;
+			let canvas2 = this.createCanvas(swidth, sheight);
+			let ctx2 = canvas2.getContext('2d');
+			var imgdata = new ImageData(image, swidth, sheight);
+			ctx2.putImageData(imgdata, 0, 0);
 			
-			// Scale again to fit new image size.
-			drawarea = scaleToFit(bounds, iwidth, iheight);
-			
-			g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
-				bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
-				ix, iy, ix+iwidth, iy+iheight, this);*/
+			ctx.drawImage(canvas2, this.range.x, this.range.y, this.range.width, this.range.height, 0, 0, swidth, sheight);
 		}
 		
 		// Offset and clip image and show border while dragging.
@@ -434,16 +426,6 @@ export class MandelbrotElement extends LitElement
 		}*/
 		
 		//ctx.putImageData(cdata, 0, 0);
-		
-		/*img 	Specifies the image, canvas, or video element to use 	 
-		sx 	Optional. The x coordinate where to start clipping 	
-		sy 	Optional. The y coordinate where to start clipping 	
-		swidth 	Optional. The width of the clipped image 	
-		sheight 	Optional. The height of the clipped image 	
-		tx 	The x coordinate where to place the image on the canvas 	
-		ty 	The y coordinate where to place the image on the canvas 	
-		twidth 	Optional. The width of the image to use (stretch or reduce the image) 	
-		theight 	Optional. The height of the image to use (stretch or reduce the image)*/
 			
 		//var imgdata = new ImageData(image, swidth, sheight);
 		//ctx.putImageData(imgdata, 0, 0);
@@ -463,7 +445,7 @@ export class MandelbrotElement extends LitElement
 		// Draw progress boxes.
 		if(this.progressdata!=null && Object.keys(this.progressdata).length>0)
 		{
-			canvas2 = this.createCanvas(twidth, theight);
+			canvas2 = this.createCanvas(swidth, sheight);
 			ctx2 = canvas2.getContext('2d');
 			
 			for(let key of Object.keys(this.progressdata)) 
@@ -472,8 +454,8 @@ export class MandelbrotElement extends LitElement
 				
 				//console.log("progress is: "+progress);
 					
-				let xf = twidth/progress.imageWidth;
-				let yf = theight/progress.imageHeight;
+				let xf = swidth/progress.imageWidth;
+				let yf = sheight/progress.imageHeight;
 				let corx = Math.trunc(progress.area.x*xf);
 				let cory = Math.trunc(progress.area.y*yf);
 				let corw = Math.trunc(progress.area.w*xf);
@@ -546,7 +528,7 @@ export class MandelbrotElement extends LitElement
 		{
 			if(canvas2==null)
 			{
-				canvas2 = this.createCanvas(twidth, theight);
+				canvas2 = this.createCanvas(swidth, sheight);
 				ctx2 = canvas2.getContext('2d');
 			}
 			
@@ -577,7 +559,7 @@ export class MandelbrotElement extends LitElement
 		}
 		
 		if(canvas2!=null)
-			ctx.drawImage(canvas2, 0, 0, twidth, theight);
+			ctx.drawImage(canvas2, 0, 0, swidth, sheight);
 	}
 	
 	createCanvas(width, height)
@@ -593,7 +575,7 @@ export class MandelbrotElement extends LitElement
 	// Determine how the image can be printed on screen
 	// swidth/height: screen width/height (screen)
 	// iwidth/height: image width/height (calculated)
-	scaleToFit(swidth, sheight, iwidth, iheight)
+	/*scaleToFit(swidth, sheight, iwidth, iheight)
 	{
 		var sratio = swidth/sheight;
 		var iratio = iwidth/iheight;
@@ -618,7 +600,7 @@ export class MandelbrotElement extends LitElement
 			 drawstarty	= (sheight-drawendy)/2;
 		}
 		return {x: Math.trunc(drawstartx), y: Math.trunc(drawstarty), width: Math.trunc(drawendx), height: Math.trunc(drawendy)};
-	}
+	}*/
 	
 	createColor(r, g, b, a)
 	{
@@ -700,9 +682,12 @@ export class MandelbrotElement extends LitElement
 	addMouseListener(element)
 	{
 		let self = this;
+		let drag = false;
 		
 		let downlis = e => 
 		{
+			drag = false;
+			
 			if(!self.calculating)
 			{
 				if(e.button===2)
@@ -727,6 +712,7 @@ export class MandelbrotElement extends LitElement
 		let movelis = e => 
 		{
 			//console.log("mouse move: "+e.button);
+			drag = true;
 			
 			if(self.startdrag!=null && e.buttons===2)
 			{
@@ -753,11 +739,13 @@ export class MandelbrotElement extends LitElement
 		{
 			if(self.startdrag!=null && self.enddrag!=null)
 			{
-				this.dragImage();
+				self.dragImage();
 			}
 			
 			self.startdrag = null;
 			self.enddrag = null;
+			
+			self.requestUpdate();
 		}
 		element.addEventListener('mouseup', uplis);
 		
@@ -777,26 +765,34 @@ export class MandelbrotElement extends LitElement
 			{
 				factor = 100/(100+percent);
 			}
-			this.zoomImage(pos.x, pos.y, factor);
+			self.zoomImage(pos.x, pos.y, factor);
 		}
 		element.addEventListener("wheel", wheellis);
 		
 		let clicklis = e =>
 		{
-			let pos = this.getMousePosition(element, e);
+			console.log("drag: "+drag);
+			if(drag)
+				return;
+	
+			let pos = self.getMousePosition(element, e); 
+			
 			if(e.button===2)
 			{
 				//self.calcDefaultImage();
 			}
-			else if(!calculating && range!=null)
+			else if(e.button===0 && !self.calculating && self.range!=null)
 			{
-				if(pos.x>=range.x && pos.x<=range.x+range.width
-					&& pos.y>=range.y && pos.y<=range.y+range.height)
+				// Zoom when user clicked into range
+				if(pos.x>=self.range.x && pos.x<=self.range.x+self.range.width
+					&& pos.y>=self.range.y && pos.y<=self.range.y+self.range.height)
 				{
-					this.zoomIntoRange();
+					self.zoomIntoRange();
 				}
 			}
 		}
+		
+		element.addEventListener("click", clicklis);
 	}
 	
 	getMousePosition(element, event)
@@ -821,6 +817,20 @@ export class MandelbrotElement extends LitElement
 		return height;
 	}
 	
+	getCanvasWidth()
+	{
+		let canvas = this.shadowRoot.getElementById("canvas");
+		let ctx = canvas.getContext("2d");
+		return ctx.canvas.width;
+	}
+	
+	getCanvasHeight()
+	{
+		let canvas = this.shadowRoot.getElementById("canvas");
+		let ctx = canvas.getContext("2d");
+		return ctx.canvas.height;
+	}
+	
 	dragImage()
 	{
 		console.log("dragImage: "+self.startdrag+" "+self.enddrag);
@@ -828,12 +838,12 @@ export class MandelbrotElement extends LitElement
 		let sh = this.getImageHeight();
 		let iw = this.getImageWidth();
 		let ih = this.getImageHeight();
-		let drawarea = this.scaleToFit(sw, sh, iw, ih);
+		//let drawarea = this.scaleToFit(sw, sh, iw, ih);
 		
 		let xdiff = this.startdrag.x-this.enddrag.x;
 		let ydiff = this.startdrag.y-this.enddrag.y;
-		let xp = xdiff/drawarea.width;
-		let yp = ydiff/drawarea.height;
+		let xp = xdiff/sw;
+		let yp = ydiff/sh;
 		
 		let xm = (this.data.XEnd-this.data.XStart)*xp;
 		let ym = (this.data.YEnd-this.data.YStart)*yp;
@@ -844,7 +854,7 @@ export class MandelbrotElement extends LitElement
 		
 		this.startdrag = null;
 		this.enddrag = null;
-		this.range = {x: drawarea.x+xdiff, y: drawarea.y+ydiff, width: drawarea.width, height: drawarea.height};
+		this.range = {x: xdiff, y: ydiff, width: sw, height: sh};
 
 		this.calcArea(xs, xe, ys, ye, this.data.sizeX, this.data.sizeY);
 	}
@@ -857,12 +867,12 @@ export class MandelbrotElement extends LitElement
 		let sh = this.getImageHeight();
 		let iw = this.getImageWidth();
 		let ih = this.getImageHeight();
-		let drawarea = this.scaleToFit(sw, sh, iw, ih);
+		//let drawarea = this.scaleToFit(sw, sh, iw, ih);
 		
-		let mx = Math.min(drawarea.x+drawarea.width, Math.max(drawarea.x, x));
-		let my = Math.min(drawarea.y+drawarea.height, Math.max(drawarea.y, y));
-		let xrel = (mx-drawarea.x)/drawarea.width;
-		let yrel = (my-drawarea.y)/drawarea.height;
+		let mx = Math.min(sw, Math.max(0, x));
+		let my = Math.min(sh, Math.max(0, y));
+		let xrel = mx/sw;
+		let yrel = my/sh;
 
 		let wold = this.data.xEnd-this.data.xStart;
 		let hold = this.data.yEnd-this.data.yStart;
@@ -877,10 +887,10 @@ export class MandelbrotElement extends LitElement
 		let ye = ys+hnew;
 		
 		// Set range for drawing preview of zoom area.
-		let xdiff = drawarea.width - drawarea.width*factor;
-		let ydiff = drawarea.height - drawarea.height*factor;
-		this.range = {x: Math.trunc(drawarea.x+xdiff*xrel), y: Math.trunc(drawarea.y+ydiff*yrel),
-			width: Math.trunc(drawarea.width*factor), height: Math.trunc(drawarea.height*factor)};
+		let xdiff = sw - sw*factor;
+		let ydiff = sh - sh*factor;
+		this.range = {x: Math.trunc(xdiff*xrel), y: Math.trunc(ydiff*yrel),
+			width: Math.trunc(sw*factor), height: Math.trunc(sh*factor)};
 		
 //		zoomIntoRange();
 		this.calcArea(xs, xe, ys, ye, this.data.sizeX, this.data.sizeY);
@@ -889,16 +899,15 @@ export class MandelbrotElement extends LitElement
 	zoomIntoRange()
 	{
 		console.log("zoomIntoRange: "+this.range);
-		let sw = this.range.width();
-		let sh = this.range.height();
+		let sw = this.range.width;
+		let sh = this.range.height;
 		let iw = this.getImageWidth();
 		let ih = this.getImageHeight();
-		let drawarea = this.scaleToFit(sw, sh, iw, ih);
 		
-		let x = (this.range.x-drawarea.x)/drawarea.width;
-		let y = (range.y-drawarea.y)/drawarea.height;
-		let x2 = x + range.width/drawarea.width;
-		let y2 = y + range.height/drawarea.height;
+		let x = this.range.x/iw;
+		let y = this.range.y/ih;
+		let x2 = x + this.range.width/iw;
+		let y2 = y + this.range.height/ih;
 		
 		// Original bounds
 		let ox = this.data.xStart;
@@ -906,21 +915,22 @@ export class MandelbrotElement extends LitElement
 		let owidth = this.data.xEnd-this.data.xStart;
 		let oheight	= this.data.yEnd-this.data.yStart;
 		
-		// Calculate pixel width/height of visible area.
-		/*bounds = getInnerBounds(false);
-		double	rratio	= (double)range.width/range.height;
-		double	bratio	= (double)bounds.width/bounds.height;
-		if(rratio<bratio)
+		let neww;
+		let newh;
+		let rw = this.range.width/this.range.height;
+		let rh = this.range.height/this.range.width;
+		if(rh<1)
 		{
-			bounds.width	= (int)(bounds.height*rratio);
+			neww = iw;
+			newh = Math.trunc(rh*ih);
 		}
-		else if(rratio>bratio)
+		else
 		{
-			bounds.height	= (int)(bounds.width/rratio);
+			neww = Math.trunc(rw*iw);
+			newh = ih;
 		}
-		final Rectangle	area	= bounds;*/
-
-		this.calcArea(ox+owidth*x, ox+owidth*x2, oy+oheight*y, oy+oheight*y2, this.range.width, this.range.height);
+		
+		this.calcArea(ox+owidth*x, ox+owidth*x2, oy+oheight*y, oy+oheight*y2, neww, newh);
 	}
 		
 	calcArea(x1, x2, y1, y2, sizex, sizey, algo, max, chunks, tasksize)
@@ -1009,6 +1019,30 @@ export class MandelbrotElement extends LitElement
 		this.shadowRoot.getElementById("chunks").value = 4;
 		this.shadowRoot.getElementById("tasksize").value = 300;
 		this.range = null;
+		
+		this.generateArea();
+	}
+	
+	setSettings(data)
+	{
+		if(data.algorithmClass!=null)
+			this.shadowRoot.getElementById("algorithm").value = data.algorithmClass.value;
+		this.shadowRoot.getElementById("xmin").value = data.xStart;
+		this.shadowRoot.getElementById("xmax").value = data.xEnd;
+		this.shadowRoot.getElementById("ymin").value = data.yStart;
+		this.shadowRoot.getElementById("ymax").value = data.yEnd;
+		this.shadowRoot.getElementById("sizex").value = data.sizeX;
+		this.shadowRoot.getElementById("sizey").value = data.sizeY;
+		this.shadowRoot.getElementById("max").value = data.max;
+		this.shadowRoot.getElementById("chunks").value = data.chunkCount;
+		this.shadowRoot.getElementById("tasksize").value = data.taskSize;
+	}
+	
+	adaptSizeToCanvas(e)
+	{
+		let canvas = this.shadowRoot.getElementById("canvas");
+		this.shadowRoot.getElementById("sizex").value = canvas.offsetWidth;
+		this.shadowRoot.getElementById("sizey").value = canvas.offsetHeight;
 	}
 
 	update()
@@ -1140,11 +1174,13 @@ export class MandelbrotElement extends LitElement
 					<label for="tasksize">Task size</label> 
 					<input name="tasksize" id="tasksize" value="300" type="number" min="1" max="100000">
 					
-					<label class="adaptsize" for="adaptsize">Adapt canvas size</label> 
+					<label for="adaptsize">Adapt canvas size</label> 
 					<input name="adaptsize" id="adaptsize" class="checkboxleft" checked type="checkbox">				
+
 				</div>
 			
 				<div class="floatright margintop">
+					<button class="fitcontent jadexbtn" @click="${e => this.adaptSizeToCanvas(e)}">Adapt size to canvas</button>
 					<button class="fitcontent jadexbtn" @click="${e => this.resetSettings(e)}">Reset</button>
 					<button class="fitcontent jadexbtn" @click="${e => this.generateArea(e)}">Generate</button>
 				</div>
