@@ -574,7 +574,7 @@ export class MandelbrotElement extends LitElement
 		}
 		
 		if(canvas2!=null)
-			ctx.drawImage(canvas2, 0, 0, swidth, sheight);
+			ctx.drawImage(canvas2, 0, 0, swidth, sheight, 0, 0, swidth, sheight);
 	}
 	
 	createCanvas(width, height)
