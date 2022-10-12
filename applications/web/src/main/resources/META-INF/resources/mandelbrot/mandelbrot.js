@@ -59,9 +59,22 @@ export class MandelbrotElement extends LitElement
 	
 	firstUpdated() 
 	{
+		let self = this;
+		
 		this.addMouseListener(this.shadowRoot.getElementById("canvas"));
 		this.makeElementDragable(this.shadowRoot.getElementById("settings"));
 		this.makeElementDragable(this.shadowRoot.getElementById("image"), true);
+		
+		let ro = new ResizeObserver(entries => 
+		{
+			for(let entry of entries) 
+			{
+				let adaptsize = self.shadowRoot.getElementById("adaptsize2").checked;
+				if(adaptsize)
+					self.adaptSizeToCanvas(entry, self);				
+  			}
+		});		
+		ro.observe(this.shadowRoot.getElementById("canvas"));
   	}
 	
 	disconnectedCallback()
@@ -83,6 +96,17 @@ export class MandelbrotElement extends LitElement
 			self.calculating = true;
 			self.initResults(data);
 			self.setSettings(data);
+			
+			let adaptsize = this.shadowRoot.getElementById("adaptsize").checked;
+			if(adaptsize)
+			{
+				let results = this.data.data;
+				let swidth = results.length;
+				  let sheight = results[0].length;
+				let container = this.shadowRoot.getElementById("image");
+				container.style.width = swidth+"px";
+				container.style.height = sheight+"px";
+	  		}
 		}
 		else if(data.data!=null) // result instanceof PartDataChunk
 		{
@@ -336,10 +360,6 @@ export class MandelbrotElement extends LitElement
 		let container = this.shadowRoot.getElementById("image");
 		let canvas = this.shadowRoot.getElementById("canvas");
 		let ctx = canvas.getContext("2d");
-		//let cwidth = canvas.width;
-		//let cheight = canvas.height;
-		//let cdata = ctx.getImageData(0, 0, cwidth, cheight);
-
 		let sx = 0;
 		let sy = 0;
 		let swidth = results.length;
@@ -347,11 +367,6 @@ export class MandelbrotElement extends LitElement
 		
 		ctx.canvas.width  = swidth;
 		ctx.canvas.height = sheight;
-		if(adaptsize)
-		{
-			container.style.width = swidth+"px";
-			container.style.height = sheight+"px";
-  		}
   			
 		// Zoom into original image while calculating
 		if(this.calculating && this.range!=null)
@@ -932,6 +947,25 @@ export class MandelbrotElement extends LitElement
 		
 		this.calcArea(ox+owidth*x, ox+owidth*x2, oy+oheight*y, oy+oheight*y2, neww, newh);
 	}
+	
+	getAlgorithmDefaultSettings(name)
+	{
+		return new Promise((resolve, reject) => 
+		{
+			axios.get('/mandelbrotdisplay/getAlgorithmDefaultSettings?a='+name, this.transform)
+			.then(function(response)
+			{
+				console.log("fetching default settings finished: "+response.data);
+				resolve(response.data);
+			})
+			.catch(ex => 
+			{
+				console.log(ex);
+				reject(err);
+			});
+		});
+		
+	}
 		
 	calcArea(x1, x2, y1, y2, sizex, sizey, algo, max, chunks, tasksize)
 	{
@@ -973,18 +1007,18 @@ export class MandelbrotElement extends LitElement
 		
 		console.log("request data: "+JSON.stringify(data));
 		axios.get('/mandelbrotgenerate/generateArea?a='+JSON.stringify(data), this.transform)
-			.then(function(response)
-			{
-				console.log("generateArea finished: "+response.data);
-				self.calculating = false;
-				//self.handleDisplayUpdate(response);
-				//DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			})
-			.catch(ex => 
-			{
-				console.log(ex);
-				self.calculating = false;
-			});
+		.then(function(response)
+		{
+			console.log("generateArea finished: "+response.data);
+			self.calculating = false;
+			//self.handleDisplayUpdate(response);
+			//DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		})
+		.catch(ex => 
+		{
+			console.log(ex);
+			self.calculating = false;
+		});
 	}
 	
 	generateArea(e)
@@ -1038,11 +1072,30 @@ export class MandelbrotElement extends LitElement
 		this.shadowRoot.getElementById("tasksize").value = data.taskSize;
 	}
 	
-	adaptSizeToCanvas(e)
+	setDefaultSettings(e)
 	{
+		let self = this;
+		let elem = this.shadowRoot.getElementById('algorithm');
+		let value = elem.options[elem.selectedIndex].value;
+		this.getAlgorithmDefaultSettings(value).then(data =>
+		{
+			self.setSettings(data);
+		})
+		.catch(err =>
+		{
+			console.log(err);
+		});
+		
+	}
+	
+	adaptSizeToCanvas(e, self)
+	{
+		if(self==null)
+			self = this;
+		
 		let canvas = this.shadowRoot.getElementById("canvas");
-		this.shadowRoot.getElementById("sizex").value = canvas.offsetWidth;
-		this.shadowRoot.getElementById("sizey").value = canvas.offsetHeight;
+		self.shadowRoot.getElementById("sizex").value = canvas.offsetWidth;
+		self.shadowRoot.getElementById("sizey").value = canvas.offsetHeight;
 	}
 
 	update()
@@ -1142,7 +1195,7 @@ export class MandelbrotElement extends LitElement
 			<div id="settings" class="dragable fitcontent fitcontentheight">
 				<div class="grid">
 					<label for="alogrithm">Algorithm</label> 
-					<select name="algorithm" id="algorithm">
+					<select name="algorithm" id="algorithm" @change="${e => this.setDefaultSettings(e)}">
 						<option value="jadex.micro.examples.mandelbrot_new.MandelbrotAlgorithm">Mandelbrot</option>
 	  					<option value="jadex.micro.examples.mandelbrot_new.LyapunovAlgorithm">Lyapunov</option>
 					</select> 
@@ -1174,13 +1227,14 @@ export class MandelbrotElement extends LitElement
 					<label for="tasksize">Task size</label> 
 					<input name="tasksize" id="tasksize" value="300" type="number" min="1" max="100000">
 					
-					<label for="adaptsize">Adapt canvas size</label> 
+					<label for="adaptsize">Adapt screen size to result</label> 
 					<input name="adaptsize" id="adaptsize" class="checkboxleft" checked type="checkbox">				
 
+					<label for="adaptsize2">Adapt calc size to screen</label> 
+					<input name="adaptsize2" id="adaptsize2" class="checkboxleft" checked type="checkbox">
 				</div>
 			
 				<div class="floatright margintop">
-					<button class="fitcontent jadexbtn" @click="${e => this.adaptSizeToCanvas(e)}">Adapt size to canvas</button>
 					<button class="fitcontent jadexbtn" @click="${e => this.resetSettings(e)}">Reset</button>
 					<button class="fitcontent jadexbtn" @click="${e => this.generateArea(e)}">Generate</button>
 				</div>

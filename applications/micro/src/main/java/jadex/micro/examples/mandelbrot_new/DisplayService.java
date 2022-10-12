@@ -8,6 +8,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -127,5 +128,21 @@ public class DisplayService implements IDisplayService
 		});
 		subscribers.put(displayid, ret);
 		return ret;
+	}
+	
+	/**
+	 *  Get info about an algorithm (for web). todo: move?!
+	 *  @return The info.
+	 */
+	public IFuture<AreaData> getAlgorithmDefaultSettings(Class<IFractalAlgorithm> clazz)
+	{
+		try
+		{
+			return new Future<AreaData>(clazz.getDeclaredConstructor().newInstance().getDefaultSettings());
+		}
+		catch(Exception e)
+		{
+			return new Future<AreaData>(e);
+		}
 	}
 }
