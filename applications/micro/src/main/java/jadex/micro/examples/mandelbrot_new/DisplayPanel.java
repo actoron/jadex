@@ -1028,7 +1028,7 @@ public class DisplayPanel extends JComponent
 	 */
 	protected void calcArea(double x1, double x2, double y1, double y2, int sizex, int sizey)
 	{
-		AreaData	settings;
+		AreaData settings;
 		if(data==null)
 			settings = GenerateService.ALGORITHMS[0].getDefaultSettings();
 		else

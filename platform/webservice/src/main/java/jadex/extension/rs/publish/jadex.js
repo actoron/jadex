@@ -175,8 +175,16 @@
 				return data;
 			}]
 		},	
-			
-		getIntermediate: function(path, handler, errhandler, maxhandler) 
+
+		/* 
+		 * path: The path to call (should reach published Jadex service)
+		 * handler: The response handler (called for each result)
+		 * errhandler: The error handler (called at most once)
+		 * maxhandler: Called with number of expected results (at most once)
+		 * inithandler: Called when the connection has been established (once)			
+		 * return: callid
+		 */
+		getIntermediate: function(path, handler, errhandler, maxhandler, inithandler) 
 		{
 			//console.log("getIntermediate: "+path);
 			
@@ -209,7 +217,8 @@
 					return;
 				}
 				
-				errhandler(err);
+				if(errhandler)
+					errhandler(err);
 			}
 			
 			var	func = function(resp)
@@ -319,11 +328,8 @@
 				.then(function(resp) 
 				{
 					var callid = func(resp); 
-					//if(callid!=null) 
-					//{
-						//console.log("received callid: "+callid);
-						//resolve(callid);
-					//}
+					if(inithandler)
+						inithandler();
 				})
 				.catch(function(err) 
 				{

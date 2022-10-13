@@ -14,6 +14,7 @@ export class MandelbrotElement extends LitElement
 		console.log('connected');
 		
 		let self = this;
+		this.displayid = "webgui"+jadex.generateUUID();
 		this.colors = null; // the color scheme
 		this.data = null; // the area data to draw
 		this.progressdata = null; // the progress infos
@@ -29,16 +30,22 @@ export class MandelbrotElement extends LitElement
 		// -> firstUpdated()
 		//this.addMouseListener();				
 
-		let displayid = "webgui"+jadex.generateUUID();
 		// must not use args_0 as parameter name as this will be made to args list
-		let terminate = jadex.getIntermediate('/mandelbrotdisplay/subscribeToDisplayUpdates?a='+displayid+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
+		let terminate = jadex.getIntermediate('/mandelbrotdisplay/subscribeToDisplayUpdates?a='+this.displayid+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		function(response)
 		{
+			console.log("subscribe received: "+response.data);
 			self.handleDisplayUpdate(response);
 		},
 		function(err)
 		{
 			console.log("display subscribe err: "+err);
+		},
+		null,
+		function() // init handler
+		{
+			console.log("display subscribed");
+			self.calcArea();
 		});
 		
 		
@@ -62,9 +69,17 @@ export class MandelbrotElement extends LitElement
 		let self = this;
 		
 		this.addMouseListener(this.shadowRoot.getElementById("canvas"));
+		
 		this.makeElementDragable(this.shadowRoot.getElementById("settings"));
 		this.makeElementDragable(this.shadowRoot.getElementById("image"), true);
 		
+		// turn off right click popup menu
+		this.shadowRoot.getElementById("canvas").oncontextmenu = e => 
+		{
+    		e.preventDefault();
+		};
+		
+		// get informed on resize events of the canvas
 		let ro = new ResizeObserver(entries => 
 		{
 			for(let entry of entries) 
@@ -75,6 +90,8 @@ export class MandelbrotElement extends LitElement
   			}
 		});		
 		ro.observe(this.shadowRoot.getElementById("canvas"));
+		
+		//this.resetSettings(e);
   	}
 	
 	disconnectedCallback()
@@ -125,6 +142,237 @@ export class MandelbrotElement extends LitElement
 			prog.finished = data.progress==100;
 			self.addProgress(prog);
 		}	
+	}
+	
+	paint()
+	{
+		if(this.data==null || this.data.data==null || this.data.image==null)
+			return;
+			
+		let results = this.data.data;
+		let oimage = this.data.image;
+		let image = new Uint8ClampedArray(oimage); // clone the image data
+		let adaptsize = this.shadowRoot.getElementById("adaptsize").checked;
+		let container = this.shadowRoot.getElementById("image");
+		let canvas = this.shadowRoot.getElementById("canvas");
+		let ctx = canvas.getContext("2d");
+		let sx = 0;
+		let sy = 0;
+		let swidth = results.length;
+		let sheight = results[0].length;
+		
+		ctx.canvas.width  = swidth;
+		ctx.canvas.height = sheight;
+  			
+		// Zoom into original image while calculating
+		if(this.calculating && this.range!=null)
+		{
+			console.log("draw range");
+			
+			let canvas2 = this.createCanvas(swidth, sheight);
+			let ctx2 = canvas2.getContext('2d');
+			var imgdata = new ImageData(image, swidth, sheight);
+			ctx2.putImageData(imgdata, 0, 0);
+			
+			ctx.drawImage(canvas2, this.range.x, this.range.y, this.range.width, this.range.height, 0, 0, swidth, sheight);
+		}
+		
+		// Offset and clip image and show border while dragging.
+		else if(this.startdrag!=null && this.enddrag!=null)
+		{
+			console.log("draw dragged");
+			// Draw original image in background
+			/*g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
+				bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
+				ix, iy, ix+iwidth, iy+iheight, this);
+			g.setColor(new Color(32,32,32,160));
+			g.fillRect(bounds.x+drawarea.x, bounds.y+drawarea.y, drawarea.width, drawarea.height);
+
+			// Draw offsetted image in foreground
+			Shape	clip	= g.getClip();
+			g.setClip(bounds.x+drawarea.x, bounds.y+drawarea.y, drawarea.width, drawarea.height);
+			int	xoff	= enddrag.x-startdrag.x;
+			int	yoff	= enddrag.y-startdrag.y;
+			
+			g.drawImage(image, bounds.x+drawarea.x+xoff, bounds.y+drawarea.y+yoff,
+				bounds.x+drawarea.x+xoff+drawarea.width, bounds.y+drawarea.y+yoff+drawarea.height,
+				ix, iy, ix+iwidth, iy+iheight, this);
+			g.setClip(clip);*/
+		}
+		else
+		{
+			//g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
+			//	bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
+			//	ix, iy, ix+iwidth, iy+iheight, this);
+				
+			var imgdata = new ImageData(image, swidth, sheight);
+			ctx.putImageData(imgdata, 0, 0);
+		}
+  			
+		//console.log("background color: "+canvas.style.background);
+		
+		//ctx.drawImage(this.data, sx, sy, swidth, sheight, tx, ty, twidth, theight);
+
+		// generate image data from results, i.e. assign colors for values according to the palette
+
+		// creates a typed array of 8-bit unsigned integers clamped to 0-255
+		/*let image = new Uint8ClampedArray(swidth*sheight*4);
+		
+		for(let x=0; x<results.length; x++)
+		{
+			for(let y=0; y<results[x].length; y++)
+			{
+				var c;
+				if(results[x][y]==-1)
+				{
+					c = this.createColor(0, 0, 0);
+				}
+				else
+				{
+					c = this.colors[results[x][y]%this.colors.length];
+				}
+				
+				this.drawPixel(image, twidth, x, y, c);
+			}
+		}*/
+		
+		//ctx.putImageData(cdata, 0, 0);
+			
+		//var imgdata = new ImageData(image, swidth, sheight);
+		//ctx.putImageData(imgdata, 0, 0);
+			
+		/*
+		createImageBitmap(imgdata).then(imgbitmap => 
+		{
+			ctx.drawImage(imgbitmap, sx, sy, swidth, sheight, tx, ty, twidth, theight);
+		})
+		.catch(err =>
+		{
+			console.log(err);
+		});*/
+		
+		let canvas2 = null;
+		let ctx2 = null;
+		// Draw progress boxes.
+		if(this.progressdata!=null && Object.keys(this.progressdata).length>0)
+		{
+			//canvas2 = this.createCanvas(swidth, sheight);
+			let width = canvas.offsetWidth;
+			let height = canvas.offsetHeight;
+			canvas2 = this.createCanvas(width, height);
+			ctx2 = canvas2.getContext('2d');
+			
+			for(let key of Object.keys(this.progressdata)) 
+			{
+				let progress = this.progressdata[key];
+				
+				//console.log("progress is: "+progress);
+					
+				let xf = width/progress.imageWidth;
+				let yf = height/progress.imageHeight;
+				let corx = Math.trunc(progress.area.x*xf);
+				let cory = Math.trunc(progress.area.y*yf);
+				let corw = Math.trunc(progress.area.w*xf);
+				let corh = Math.trunc(progress.area.h*yf);
+					
+				if(!progress.finished)
+				{
+					//ctx2.fillStyle = this.createColor(20, 20, 150, 160); //160
+					ctx2.fillStyle = "rgba(20, 20, 150, 0.3)";
+					ctx2.fillRect(corx+1, cory+1, corw-1, corh-1);
+				}
+				ctx2.strokeStyle = "white";
+				ctx2.strokeRect(corx, cory, corw, corh);
+				
+				// Print worker name
+				let name = progress.name
+				let provider = "";
+				let index =	name.indexOf('@');
+				if(index!=-1)
+				{
+					provider = name.substring(index+1);
+					name = name.substring(0, index);
+				}
+
+				let textwidth;
+				let textheight;
+				let fsize = 20;				
+				while(true)
+				{
+					ctx2.font = fsize+'px sans-serif';
+					let m1 = ctx2.measureText(name);
+					let m2 = ctx2.measureText(provider);
+					textwidth = Math.max(m1.width, m2.width);
+					//textheight = (m1.fontBoundingBoxAscent + m1.fontBoundingBoxDescent)*3; // + barsize.height + 2;
+					textheight = Math.max(m1.actualBoundingBoxAscent + m1.actualBoundingBoxDescent, m2.actualBoundingBoxAscent + m2.actualBoundingBoxDescent);
+					//textheight = Math.max(m1.fontBoundingBoxAscent + m1.fontBoundingBoxDescent, m2.fontBoundingBoxAscent + m2.fontBoundingBoxDescent);
+					
+					if(textwidth<corw-4 && textheight*3<corh-4 || fsize<5)		
+						break;
+					else
+						fsize = Math.trunc(fsize*0.9);
+				}
+				
+				if(textwidth<corw-4 && textheight*3<corh-4)
+				{
+					//console.log("a: "+textwidth+" "+textheight+" "+corw+" "+corh+" "+fsize);
+					// Draw provider id.
+					let x = Math.trunc(corx + (corw-textwidth)/2);
+					let y = Math.trunc(cory + (corh-textheight*3)/2);// + fm.getLeading()/2;
+					ctx2.fillStyle = "rgb(255, 255, 255)";
+					ctx2.fillText(name , x, y);
+					ctx2.fillText(provider, x, y+textheight);
+					//ctx.fillRect(x,y,textwidth,textheight*2);
+					this.drawProgressBar(x, y+textheight*2, textwidth, textheight, 'red', progress.progress/100, true, ctx2);
+				}
+				else if(!progress.finished && corw>8 && corh>8)
+				{
+					//console.log("b: "+textwidth+" "+textheight+" "+corw+" "+corh+" "+fsize);
+					let x = corx + 2;
+					let y = cory + Math.max((corh-textheight)/2, 2);
+					this.drawProgressBar(x, y, textwidth, textheight, 'red', progress.progress/100, true, ctx2);
+				}
+			}
+		}	
+		
+		// Draw range area.
+		if(!this.calculating && this.range!=null)
+		{
+			if(canvas2==null)
+			{
+				//canvas2 = this.createCanvas(swidth, sheight);
+				canvas2 = this.createCanvas(canvas.offsetWidth, canvas.offsetHeight);
+				ctx2 = canvas2.getContext('2d');
+			}
+			
+			let rratio = this.range.width/this.range.height;
+			let bratio = swidth/sheight;
+			
+			// Draw left and right boxes to show unused space
+			if(rratio<bratio)
+			{
+				let drawwidth = this.range.height*swidth/sheight;
+				let offset = (this.range.width-drawwidth)/2;
+				ctx2.fillStyle = "rgba(128,128,128,0.25)";
+				ctx2.fillRect(this.range.x+offset, this.range.y, -offset, this.range.height+1);
+				ctx2.fillRect(this.range.x+this.range.width, this.range.y, -offset, this.range.height+1);
+			}
+			// Draw upper and lower boxes to show unused space
+			else if(rratio>bratio)
+			{
+				let	drawheight	= this.range.width*sheight/swidth;
+				let offset = (this.range.height-drawheight)/2;
+				ctx2.fillStyle = "rgba(128,128,128,0.25)";
+				ctx2.fillRect(this.range.x, this.range.y+offset, this.range.width+1, -offset);
+				ctx2.fillRect(this.range.x, this.range.y+this.range.height, this.range.width+1, -offset);
+			}
+		
+			ctx2.strokeStyle = "white";
+			ctx2.strokeRect(this.range.x, this.range.y, this.range.width, this.range.height);
+		}
+		
+		if(canvas2!=null)
+			ctx.drawImage(canvas2, 0, 0, canvas.offsetWidth, canvas.offsetHeight, 0, 0, swidth, sheight);
 	}
 	
 	makeElementDragable(element, leftborder) 
@@ -347,235 +595,6 @@ export class MandelbrotElement extends LitElement
     	ctx.fillStyle = color;
     	ctx.fill();
   	}
-	
-	paint()
-	{
-		if(this.data==null || this.data.data==null || this.data.image==null)
-			return;
-			
-		let results = this.data.data;
-		let oimage = this.data.image;
-		let image = new Uint8ClampedArray(oimage); // clone the image data
-		let adaptsize = this.shadowRoot.getElementById("adaptsize").checked;
-		let container = this.shadowRoot.getElementById("image");
-		let canvas = this.shadowRoot.getElementById("canvas");
-		let ctx = canvas.getContext("2d");
-		let sx = 0;
-		let sy = 0;
-		let swidth = results.length;
-		let sheight = results[0].length;
-		
-		ctx.canvas.width  = swidth;
-		ctx.canvas.height = sheight;
-  			
-		// Zoom into original image while calculating
-		if(this.calculating && this.range!=null)
-		{
-			console.log("draw range");
-			
-			let canvas2 = this.createCanvas(swidth, sheight);
-			let ctx2 = canvas2.getContext('2d');
-			var imgdata = new ImageData(image, swidth, sheight);
-			ctx2.putImageData(imgdata, 0, 0);
-			
-			ctx.drawImage(canvas2, this.range.x, this.range.y, this.range.width, this.range.height, 0, 0, swidth, sheight);
-		}
-		
-		// Offset and clip image and show border while dragging.
-		else if(this.startdrag!=null && this.enddrag!=null)
-		{
-			console.log("draw dragged");
-			// Draw original image in background
-			/*g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
-				bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
-				ix, iy, ix+iwidth, iy+iheight, this);
-			g.setColor(new Color(32,32,32,160));
-			g.fillRect(bounds.x+drawarea.x, bounds.y+drawarea.y, drawarea.width, drawarea.height);
-
-			// Draw offsetted image in foreground
-			Shape	clip	= g.getClip();
-			g.setClip(bounds.x+drawarea.x, bounds.y+drawarea.y, drawarea.width, drawarea.height);
-			int	xoff	= enddrag.x-startdrag.x;
-			int	yoff	= enddrag.y-startdrag.y;
-			
-			g.drawImage(image, bounds.x+drawarea.x+xoff, bounds.y+drawarea.y+yoff,
-				bounds.x+drawarea.x+xoff+drawarea.width, bounds.y+drawarea.y+yoff+drawarea.height,
-				ix, iy, ix+iwidth, iy+iheight, this);
-			g.setClip(clip);*/
-		}
-		else
-		{
-			//g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
-			//	bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
-			//	ix, iy, ix+iwidth, iy+iheight, this);
-				
-			var imgdata = new ImageData(image, swidth, sheight);
-			ctx.putImageData(imgdata, 0, 0);
-		}
-  			
-		//console.log("background color: "+canvas.style.background);
-		
-		//ctx.drawImage(this.data, sx, sy, swidth, sheight, tx, ty, twidth, theight);
-
-		// generate image data from results, i.e. assign colors for values according to the palette
-
-		// creates a typed array of 8-bit unsigned integers clamped to 0-255
-		/*let image = new Uint8ClampedArray(swidth*sheight*4);
-		
-		for(let x=0; x<results.length; x++)
-		{
-			for(let y=0; y<results[x].length; y++)
-			{
-				var c;
-				if(results[x][y]==-1)
-				{
-					c = this.createColor(0, 0, 0);
-				}
-				else
-				{
-					c = this.colors[results[x][y]%this.colors.length];
-				}
-				
-				this.drawPixel(image, twidth, x, y, c);
-			}
-		}*/
-		
-		//ctx.putImageData(cdata, 0, 0);
-			
-		//var imgdata = new ImageData(image, swidth, sheight);
-		//ctx.putImageData(imgdata, 0, 0);
-			
-		/*
-		createImageBitmap(imgdata).then(imgbitmap => 
-		{
-			ctx.drawImage(imgbitmap, sx, sy, swidth, sheight, tx, ty, twidth, theight);
-		})
-		.catch(err =>
-		{
-			console.log(err);
-		});*/
-		
-		let canvas2 = null;
-		let ctx2 = null;
-		// Draw progress boxes.
-		if(this.progressdata!=null && Object.keys(this.progressdata).length>0)
-		{
-			canvas2 = this.createCanvas(swidth, sheight);
-			ctx2 = canvas2.getContext('2d');
-			
-			for(let key of Object.keys(this.progressdata)) 
-			{
-				let progress = this.progressdata[key];
-				
-				//console.log("progress is: "+progress);
-					
-				let xf = swidth/progress.imageWidth;
-				let yf = sheight/progress.imageHeight;
-				let corx = Math.trunc(progress.area.x*xf);
-				let cory = Math.trunc(progress.area.y*yf);
-				let corw = Math.trunc(progress.area.w*xf);
-				let corh = Math.trunc(progress.area.h*yf);
-					
-				if(!progress.finished)
-				{
-					//ctx2.fillStyle = this.createColor(20, 20, 150, 160); //160
-					ctx2.fillStyle = "rgba(20, 20, 150, 0.3)";
-					ctx2.fillRect(corx+1, cory+1, corw-1, corh-1);
-				}
-				ctx2.strokeStyle = "white";
-				ctx2.strokeRect(corx, cory, corw, corh);
-				
-				// Print worker name
-				let name = progress.name
-				let provider = "";
-				let index =	name.indexOf('@');
-				if(index!=-1)
-				{
-					provider = name.substring(index+1);
-					name = name.substring(0, index);
-				}
-
-				let textwidth;
-				let textheight;
-				let fsize = 20;				
-				while(true)
-				{
-					ctx2.font = fsize+'px sans-serif';
-					let m1 = ctx2.measureText(name);
-					let m2 = ctx2.measureText(provider);
-					textwidth = Math.max(m1.width, m2.width);
-					//textheight = (m1.fontBoundingBoxAscent + m1.fontBoundingBoxDescent)*3; // + barsize.height + 2;
-					textheight = Math.max(m1.actualBoundingBoxAscent + m1.actualBoundingBoxDescent, m2.actualBoundingBoxAscent + m2.actualBoundingBoxDescent);
-					//textheight = Math.max(m1.fontBoundingBoxAscent + m1.fontBoundingBoxDescent, m2.fontBoundingBoxAscent + m2.fontBoundingBoxDescent);
-					
-					if(textwidth<corw-4 && textheight*3<corh-4 || fsize<5)		
-						break;
-					else
-						fsize = Math.trunc(fsize*0.9);
-				}
-				
-				if(textwidth<corw-4 && textheight*3<corh-4)
-				{
-					//console.log("a: "+textwidth+" "+textheight+" "+corw+" "+corh+" "+fsize);
-					// Draw provider id.
-					let x = Math.trunc(corx + (corw-textwidth)/2);
-					let y = Math.trunc(cory + (corh-textheight*3)/2);// + fm.getLeading()/2;
-					ctx2.fillStyle = "rgb(255, 255, 255)";
-					ctx2.fillText(name , x, y);
-					ctx2.fillText(provider, x, y+textheight);
-					//ctx.fillRect(x,y,textwidth,textheight*2);
-					this.drawProgressBar(x, y+textheight*2, textwidth, textheight, 'red', progress.progress/100, true, ctx2);
-				}
-				else if(!progress.finished && corw>8 && corh>8)
-				{
-					//console.log("b: "+textwidth+" "+textheight+" "+corw+" "+corh+" "+fsize);
-					let x = corx + 2;
-					let y = cory + Math.max((corh-textheight)/2, 2);
-					this.drawProgressBar(x, y, textwidth, textheight, 'red', progress.progress/100, true, ctx2);
-				}
-			}
-			
-			
-		}	
-		
-		// Draw range area.
-		if(!this.calculating && this.range!=null)
-		{
-			if(canvas2==null)
-			{
-				canvas2 = this.createCanvas(swidth, sheight);
-				ctx2 = canvas2.getContext('2d');
-			}
-			
-			let rratio = this.range.width/this.range.height;
-			let bratio = swidth/sheight;
-			
-			// Draw left and right boxes to show unused space
-			if(rratio<bratio)
-			{
-				let drawwidth = this.range.height*swidth/sheight;
-				let offset = (this.range.width-drawwidth)/2;
-				ctx2.fillStyle = "rgba(128,128,128,0.25)";
-				ctx2.fillRect(this.range.x+offset, this.range.y, -offset, this.range.height+1);
-				ctx2.fillRect(this.range.x+this.range.width, this.range.y, -offset, this.range.height+1);
-			}
-			// Draw upper and lower boxes to show unused space
-			else if(rratio>bratio)
-			{
-				let	drawheight	= this.range.width*sheight/swidth;
-				let offset = (this.range.height-drawheight)/2;
-				ctx2.fillStyle = "rgba(128,128,128,0.25)";
-				ctx2.fillRect(this.range.x, this.range.y+offset, this.range.width+1, -offset);
-				ctx2.fillRect(this.range.x, this.range.y+this.range.height, this.range.width+1, -offset);
-			}
-		
-			ctx2.strokeStyle = "white";
-			ctx2.strokeRect(this.range.x, this.range.y, this.range.width, this.range.height);
-		}
-		
-		if(canvas2!=null)
-			ctx.drawImage(canvas2, 0, 0, swidth, sheight, 0, 0, swidth, sheight);
-	}
 	
 	createCanvas(width, height)
 	{
@@ -804,6 +823,11 @@ export class MandelbrotElement extends LitElement
 				{
 					self.zoomIntoRange();
 				}
+				else
+				{
+					self.range = null;
+					self.requestUpdate();
+				}
 			}
 		}
 		
@@ -844,6 +868,18 @@ export class MandelbrotElement extends LitElement
 		let canvas = this.shadowRoot.getElementById("canvas");
 		let ctx = canvas.getContext("2d");
 		return ctx.canvas.height;
+	}
+	
+	getCanvasScreenWidth()
+	{
+		let canvas = this.shadowRoot.getElementById("canvas");
+		return canvas.offsetWidth;
+	}
+	
+	getCanvasScreenHeight()
+	{
+		let canvas = this.shadowRoot.getElementById("canvas");
+		return canvas.offsetHeight;
 	}
 	
 	dragImage()
@@ -916,8 +952,10 @@ export class MandelbrotElement extends LitElement
 		console.log("zoomIntoRange: "+this.range);
 		let sw = this.range.width;
 		let sh = this.range.height;
-		let iw = this.getImageWidth();
-		let ih = this.getImageHeight();
+		let iw = this.getCanvasScreenWidth();
+		let ih = this.getCanvasScreenHeight();
+		//let iw = this.getImageWidth();
+		//let ih = this.getImageHeight();
 		
 		let x = this.range.x/iw;
 		let y = this.range.y/ih;
@@ -997,8 +1035,7 @@ export class MandelbrotElement extends LitElement
 		else if(this.data!=null)
 			data.taskSize = this.data.taskSize;
 		
-		if(this.data!=null && this.data.displayId)
-			data.displayId = this.data.displayId;
+		data.displayId = this.displayid;
 		
 		//DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		this.calculating = true;
@@ -1006,6 +1043,7 @@ export class MandelbrotElement extends LitElement
 		this.requestUpdate();
 		
 		console.log("request data: "+JSON.stringify(data));
+		
 		axios.get('/mandelbrotgenerate/generateArea?a='+JSON.stringify(data), this.transform)
 		.then(function(response)
 		{
@@ -1042,19 +1080,15 @@ export class MandelbrotElement extends LitElement
 	
 	resetSettings(e)
 	{
-		this.shadowRoot.getElementById("algorithm").value = "jadex.micro.examples.mandelbrot_new.MandelbrotAlgorithm";
-		this.shadowRoot.getElementById("xmin").value = -2.0;
-		this.shadowRoot.getElementById("xmax").value = 1.0;
-		this.shadowRoot.getElementById("ymin").value = -1.5;
-		this.shadowRoot.getElementById("ymax").value = 1.5;
-		this.shadowRoot.getElementById("sizex").value = 300;
-		this.shadowRoot.getElementById("sizey").value = 300;
-		this.shadowRoot.getElementById("max").value = 256;
-		this.shadowRoot.getElementById("chunks").value = 4;
-		this.shadowRoot.getElementById("tasksize").value = 300;
+		this.setDefaultSettings().then(x =>
+		{
+			this.generateArea();
+		})
+		.catch(err =>
+		{
+			console.log(err);
+		});
 		this.range = null;
-		
-		this.generateArea();
 	}
 	
 	setSettings(data)
@@ -1075,17 +1109,21 @@ export class MandelbrotElement extends LitElement
 	setDefaultSettings(e)
 	{
 		let self = this;
-		let elem = this.shadowRoot.getElementById('algorithm');
-		let value = elem.options[elem.selectedIndex].value;
-		this.getAlgorithmDefaultSettings(value).then(data =>
+		return new Promise(function(resolve, reject)
 		{
-			self.setSettings(data);
+			let elem = self.shadowRoot.getElementById('algorithm');
+			let value = elem.options[elem.selectedIndex].value;
+			self.getAlgorithmDefaultSettings(value).then(data =>
+			{
+				self.setSettings(data);
+				resolve();
+			})
+			.catch(err =>
+			{
+				console.log(err);
+				reject(err);
+			});
 		})
-		.catch(err =>
-		{
-			console.log(err);
-		});
-		
 	}
 	
 	adaptSizeToCanvas(e, self)
@@ -1201,31 +1239,31 @@ export class MandelbrotElement extends LitElement
 					</select> 
 					
 					<label for="xmin">Min x</label> 
-					<input name="xmin" id="xmin" placeholder="-2.0" value="-2" type="number" min="-5" value="5" step="0.1">
+					<input name="xmin" id="xmin" placeholder="-2.0" type="number" min="-5" value="5" step="0.1">
 					
 					<label for="xmax">Max x</label> 
-					<input name="xmax" id="xmax" placeholder="1.0" value="1" type="number" min="-5" value="5" step="0.1">
+					<input name="xmax" id="xmax" placeholder="1.0" type="number" min="-5" value="5" step="0.1">
 					
 					<label for="ymin">Min y</label> 
-					<input name="ymin" id="ymin" placeholder="-1.5" value="-1.5" type="number" min="-5" value="5" step="0.1">
+					<input name="ymin" id="ymin" placeholder="-1.5" type="number" min="-5" value="5" step="0.1">
 					
 					<label for="ymax">Max y</label> 
-					<input name="ymax" id="ymax"placeholder="1.5" value="1.5" type="number" min="-5" value="5" step="0.1">
+					<input name="ymax" id="ymax"placeholder="1.5" type="number" min="-5" value="5" step="0.1">
 					
 					<label for="sizex">Size x</label> 
-					<input name="sizex" id="sizex" value="300" type="number" min="10" max="10000" step="100">
+					<input name="sizex" id="sizex" type="number" min="10" max="10000" step="100">
 					
 					<label for="sizey">Size y</label> 
-					<input name="sizey" id="sizey" value="300" type="number" min="10" max="10000" step="100">
+					<input name="sizey" id="sizey" type="number" min="10" max="10000" step="100">
 					
 					<label for="max">Max</label> 
-					<input name="max" id="max" value="256" type="number" min="2" max="10000">
+					<input name="max" id="max" type="number" min="2" max="10000">
 					
 					<label for="chunks">Chunks</label> 
-					<input name="chunks" id="chunks" value="4" type="number" min="1" max="10000">
+					<input name="chunks" id="chunks" type="number" min="1" max="10000">
 					
 					<label for="tasksize">Task size</label> 
-					<input name="tasksize" id="tasksize" value="300" type="number" min="1" max="100000">
+					<input name="tasksize" id="tasksize" type="number" min="1" max="100000">
 					
 					<label for="adaptsize">Adapt screen size to result</label> 
 					<input name="adaptsize" id="adaptsize" class="checkboxleft" checked type="checkbox">				

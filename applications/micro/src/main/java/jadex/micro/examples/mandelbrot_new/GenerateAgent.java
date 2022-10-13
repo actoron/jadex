@@ -113,7 +113,10 @@ public class GenerateAgent implements IGenerateGui
 		this.displayservice = ds;
 		//if(calcservices.size()>0)
 			//agent.getLocalService(IGenerateService.class).calcDefaultImage();
-			agent.getLocalService(IGenerateService.class).generateArea(null);
+		//agent.getLocalService(IGenerateService.class).generateArea(null);
+		// makes it sense at all to generate on display service discovery?
+		// better is when display itself initiates a generation request,
+		// because it knows the displayid (generate does not).
 	}
 
 	/**

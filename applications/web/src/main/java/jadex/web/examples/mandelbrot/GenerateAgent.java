@@ -58,7 +58,7 @@ public class GenerateAgent // todo: implements IGenerateGui
 	@OnService(name="displayservice")
 	protected void displayServiceAvailable(IDisplayService ds)
 	{
-		//System.out.println("Found display service: "+cs);
+		System.out.println("Found display service: "+ds);
 		this.displayservice = ds;
 		//if(calcservices.size()>0)
 			agent.getLocalService(IGenerateService.class).generateArea(null);

@@ -88,13 +88,16 @@ public class GenerateService implements IGenerateService
 		//System.out.println("data: "+data);
 		//System.out.println("default data: "+ALGORITHMS[0].getDefaultSettings());
 		
+		if(data==null || data.getDisplayId()==null)
+			System.out.println("generateArea without displayid: "+data);
+		
 		//GenerateAgent ga = (GenerateAgent)agent.getFeature(IPojoComponentFeature.class).getPojoAgent();
 		//if(ga.getCalculateService()==null)
 		//	return new Future<AreaData>(new RuntimeException("No calculate service available"));
 
 		if(data==null)
 		{
-			System.out.println("no generate info supplied, using defaults.");
+			//System.out.println("no generate info supplied, using defaults.");
 			data = ALGORITHMS[0].getDefaultSettings();
 		}
 		else
@@ -102,7 +105,7 @@ public class GenerateService implements IGenerateService
 			IFractalAlgorithm alg = data.getAlgorithm(agent.getClassLoader());
 			if(alg==null)
 			{
-				System.out.println("no algorithm set, using: "+ALGORITHMS[0]);
+				//System.out.println("no algorithm set, using: "+ALGORITHMS[0]);
 				alg = ALGORITHMS[0];
 				data.setAlgorithmClass(new ClassInfo(alg.getClass()));
 			}
@@ -110,40 +113,40 @@ public class GenerateService implements IGenerateService
 			
 			if(data.getSizeX()==0)
 			{
-				System.out.println("no sizex");
+				//System.out.println("no sizex");
 				data.setSizeX(defaults.getSizeX());
 			}
 			if(data.getSizeY()==0)
 			{
-				System.out.println("no sizey");
+				//System.out.println("no sizey");
 				data.setSizeY(defaults.getSizeY());
 			}
 			if(data.getMax()==0)
 			{
-				System.out.println("no max");
+				//System.out.println("no max");
 				data.setMax(defaults.getMax());
 			}
 			if(data.getTaskSize()==0)
 			{
-				System.out.println("no tasksize");
+				//System.out.println("no tasksize");
 				data.setTaskSize(defaults.getTaskSize());
 			}
 			if(data.getChunkCount()==0)
 			{
-				System.out.println("no chunk count");
+				//System.out.println("no chunk count");
 				data.setChunkCount(defaults.getChunkCount());
 			}
 			
 			// if same assume that all has to be set
 			if(data.getXStart()==data.getXEnd())
 			{
-				System.out.println("no x start end");
+				//System.out.println("no x start end");
 				data.setXStart(defaults.getXStart());
 				data.setXEnd(defaults.getXEnd());
 			}
 			if(data.getYStart()==data.getYEnd())
 			{
-				System.out.println("no y start end");
+				//System.out.println("no y start end");
 				data.setYStart(defaults.getYStart());
 				data.setYEnd(defaults.getYEnd());
 			}

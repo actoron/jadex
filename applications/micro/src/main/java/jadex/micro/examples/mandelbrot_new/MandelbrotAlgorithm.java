@@ -52,7 +52,7 @@ public class MandelbrotAlgorithm implements IFractalAlgorithm
 	{
 		//return new AreaData(-2, 1, -1.5, 1.5, 100, 100, (short)256, 10, 300, this, null);
 //		return new AreaData(-2, 1, -1.5, 1.5, 100, 100, (short)256, 300, this, null, 20);
-		return new AreaData(-2, 1, -1.5, 1.5, 100, 100, (short)256, 300, new ClassInfo(MandelbrotAlgorithm.class), null, 4);
+		return new AreaData(-2, 1, -1.5, 1.5, 300, 300, (short)256, 300, new ClassInfo(MandelbrotAlgorithm.class), null, 4);
 	}
 	
 	/**
