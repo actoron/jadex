@@ -63,6 +63,10 @@ public class JsonPrimitiveProcessor implements ITraverseProcessor
 			{
 				ret = val.asLong();
 			}
+			else if(Short.class.equals(clazz) || short.class.equals(clazz))
+			{
+				ret = (short)val.asInt();
+			}
 			else if(String.class.equals(clazz))
 			{
 				ret = val.toString();

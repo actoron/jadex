@@ -56,7 +56,7 @@ public class DisplayAgent
 		
 		IServiceIdentifier sid = ((IService)agent.getProvidedService(IDisplayService.class)).getServiceId();
 		
-		wps.publishService(sid, new PublishInfo("[http://localhost:"+port+"/]mandelbrotwebapi", IPublishService.PUBLISH_RS, null)).get();
+		wps.publishService(sid, new PublishInfo("[http://localhost:"+port+"/]mandelbrotdisplay", IPublishService.PUBLISH_RS, null)).get();
 		
 		System.out.println("display publish started: "+wps);
 		wps.publishResources("[http://localhost:"+port+"/mandelbrot]", "META-INF/resources/mandelbrot").get();

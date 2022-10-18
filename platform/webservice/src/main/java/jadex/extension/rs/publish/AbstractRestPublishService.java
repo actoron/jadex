@@ -506,6 +506,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		// solution: always create on container thread and remember
 		//final Map<String, Object> session = getSession(request, true);
 		final String sessionid = getSessionId(request);
+		if(sessionid==null)
+			System.out.println("Call has no jadex session id, Jadex cookie missing: "+request.getRequestURL());
+		// todo: if missing generate one?! as it is cookie it would be used by further requests
 		
 		//if(request.getRequestURI().indexOf("subscribeTo")!=-1)
 		//System.out.println("handleRequest: "+request.getRequestURI()+" session: "+request.getSession().getId());
@@ -516,12 +519,12 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		ri.setCallid(callid);
 		
 		// update on alive and all incoming requests with that callid
-		/*ConversationInfo coninfo = conversationinfos.get(callid);
+		ConversationInfo coninfo = conversationinfos.get(callid);
 		if(coninfo!=null)
 		{
 			//System.out.println("timestamp updated: "+callid);
 			coninfo.updateTimestamp();
-		}*/
+		}
 		
 		String alive = request.getHeader(HEADER_JADEX_ALIVE);
 		
@@ -690,7 +693,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					methodname = methodname.substring(0, methodname.length() - 2);
 				final String fmn = methodname;
 
-				//if(methodname!=null && request.toString().indexOf("display")!=-1)
+				//if(methodname!=null && request.toString().indexOf("efault")!=-1)
 				//	System.out.println("INVOKE: " + methodname);
 				
 				Collection<MappingInfo> mis = pm.getElementsForPath(methodname);
@@ -702,6 +705,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				}
 				else if(mis!=null && mis.size()>0)
 				{
+					//if(request.toString().indexOf("generateArea")!=-1)
+					//	System.out.println("call 4: "+request);
+					
 					// convert and map parameters
 					Tuple2<MappingInfo, Object[]> tup = mapParameters(request, mis, bindings);
 					final MappingInfo mi = tup.getFirstEntity();
@@ -709,7 +715,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					
 					//System.out.println("handleRequest: "+mi.getMethod());
 					
-					//if(mi.getMethod().toString().indexOf("invokeServiceMe")!=-1)
+					//if(mi.getMethod().toString().indexOf("Display")!=-1)
 					//	System.out.println("heeereeee");
 					
 					//if(mi.getMethod().toString().indexOf("isAvailable")!=-1)
@@ -752,7 +758,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 								
 								//System.out.println("request: "+request.getRequestURL()+" "+fcallid+" "+method.getName()+" "+Arrays.toString(params));
 								
-								//if(request.toString().indexOf("suspend")!=-1)
+								//if(request.toString().indexOf("generateArea")!=-1)
 								//	System.out.println("call 4: "+request);
 								final Object ret = method.invoke(service, params);
 								ri.setMethod(method);
@@ -1135,9 +1141,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			{
 				//System.out.println("terminating due to timeout: "+exception);
 				System.out.println("Conversation timed out: "+entry.getKey());
-				System.out.println("cur time: "+System.currentTimeMillis());
-				System.out.println("timestamp: "+entry.getValue().getTimestamp());
-				System.out.println("timeout: "+Starter.getDefaultTimeout(component.getId()));
+				//System.out.println("cur time: "+System.currentTimeMillis());
+				//System.out.println("timestamp: "+entry.getValue().getTimestamp());
+				//System.out.println("timeout: "+Starter.getDefaultTimeout(component.getId()));
 				
 				terminateConversation(entry.getValue(), null, false);
 				
@@ -1165,7 +1171,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 */
 	protected void terminateConversation(ConversationInfo cinfo, Exception ex, boolean clientterm)
 	{
-		System.out.println("terminate in rest: "+cinfo+" "+ex+" "+clientterm);
+		//System.out.println("terminate in rest: "+cinfo+" "+ex+" "+clientterm);
 		
 		// Terminate the future if requested
 		cinfo.setTerminated(true);

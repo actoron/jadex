@@ -1,5 +1,8 @@
 package jadex.micro.examples.mandelbrot_new;
 
+import java.util.Arrays;
+
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Base64;
 
@@ -46,7 +49,8 @@ public class AreaData
 	protected int tasksize;
 	
 	/** The algorithm used to calculate the data. */
-	protected IFractalAlgorithm	algorithm;
+	//protected IFractalAlgorithm	algorithm;
+	protected ClassInfo	algorithm;
 
 	/** The result data. */
 	protected short[][]	data;
@@ -72,7 +76,7 @@ public class AreaData
 	 * Create a new area data.
 	 */
 	public AreaData(double xstart, double xend, double ystart, double yend,
-		int sizex, int sizey, short max, int tasksize, IFractalAlgorithm algorithm, String displayid, int chunkcount)
+		int sizex, int sizey, short max, int tasksize, ClassInfo algorithm, String displayid, int chunkcount)
 		//int sizex, int sizey, short max, int par, int tasksize, IFractalAlgorithm algorithm, String displayid)
 	{
 		this(xstart, xend, ystart, yend, 0, 0, sizex, sizey, max, tasksize, algorithm, null, null, displayid, chunkcount);
@@ -83,7 +87,7 @@ public class AreaData
 	 * Create a new area data.
 	 */
 	public AreaData(double xstart, double xend, double ystart, double yend,
-		int xoff, int yoff, int sizex, int sizey, short max, int tasksize, IFractalAlgorithm algorithm,
+		int xoff, int yoff, int sizex, int sizey, short max, int tasksize, ClassInfo algorithm,
 		//int xoff, int yoff, int sizex, int sizey, short max, int par, int tasksize, IFractalAlgorithm algorithm,
 		IComponentIdentifier cid, short[][] data, String displayid, int chunkcount)
 	{
@@ -469,8 +473,26 @@ public class AreaData
 	/**
 	 *  Get the algorithm.
 	 *  @return the algorithm.
+	 * /
+	public IFractalAlgorithm getAlgorithm()
+	{
+		return algorithm;
+	}*/
+
+	/**
+	 *  Set the algorithm.
+	 *  @param algorithm	The algorithm to set.
+	 * /
+	public void setAlgorithm(IFractalAlgorithm algorithm)
+	{
+		this.algorithm	= algorithm;
+	}*/
+	
+	/**
+	 *  Get the algorithm.
+	 *  @return the algorithm.
 	 */
-	public IFractalAlgorithm	getAlgorithm()
+	public ClassInfo getAlgorithmClass()
 	{
 		return algorithm;
 	}
@@ -479,9 +501,31 @@ public class AreaData
 	 *  Set the algorithm.
 	 *  @param algorithm	The algorithm to set.
 	 */
-	public void setAlgorithm(IFractalAlgorithm algorithm)
+	public void setAlgorithmClass(ClassInfo algorithm)
 	{
 		this.algorithm	= algorithm;
+	}
+	
+	/**
+	 *  Get the algorithm.
+	 *  @return the algorithm.
+	 */
+	public IFractalAlgorithm getAlgorithm(ClassLoader cl)
+	{
+		IFractalAlgorithm ret = null;
+		if(algorithm!=null)
+		{
+			Class<IFractalAlgorithm> clazz = (Class<IFractalAlgorithm>)algorithm.getType(cl!=null? cl: AreaData.class.getClassLoader());
+			try 
+			{
+				ret = clazz.getDeclaredConstructor().newInstance();
+			} 
+			catch(Exception e) 
+			{
+				e.printStackTrace();
+			} 
+		}
+		return ret;
 	}
 	
 	/**
@@ -538,10 +582,19 @@ public class AreaData
 
 	/**
 	 *  Get the string representation.
-	 */
+	 * /
 	public String toString()
 	{
 		return "AreaData(x="+xoff+", y="+yoff+" xstart="+xstart+" ystart="+ystart+")";
+	}*/
+	
+	@Override
+	public String toString() 
+	{
+		return "AreaData [xstart=" + xstart + ", xend=" + xend + ", ystart=" + ystart + ", yend=" + yend + ", xoff="
+				+ xoff + ", yoff=" + yoff + ", sizex=" + sizex + ", sizey=" + sizey + ", max=" + max + ", cid=" + cid
+				+ ", tasksize=" + tasksize + ", algorithm=" + algorithm + ", data=" + Arrays.toString(data)
+				+ ", displayid=" + displayid + ", chunkcount=" + chunkcount + ", retrycnt=" + retrycnt + "]";
 	}
 	
 	/**
@@ -603,18 +656,5 @@ public class AreaData
 	{
 		this.retrycnt = retrycnt;
 	}
-
-	// /**
-	// * Get the string representation.
-	// */
-	// public String toString()
-	// {
-	// return "AreaData (xstart=" + xstart + ", xend=" + xend + ", ystart="
-	// + ystart + ", yend=" + yend + ", sizex=" + sizex + ", sizey="
-	// + sizey + ", max=" + max + ", par=" + par + ", id=" + id
-	// + ", tasksize=" + tasksize + ", data="
-	// + (data != null ? Arrays.asList(data) : null) + ")";
-	// }
-
 
 }

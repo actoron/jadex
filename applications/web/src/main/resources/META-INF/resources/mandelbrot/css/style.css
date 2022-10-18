@@ -1,5 +1,16 @@
-body {
+body { 
 	font-family: 'Roboto', sans-serif;
+    /*padding-top: 100px;*/
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	padding-top: 0px; 
+	padding-bottom: 0px; 
+	margin-top: 0px;
+	margin-bottom: 0px;
+	/*padding-bottom: 60px;*/
+	/*background-color: #cfcfcf!important;*/
 }
 
 #app {
@@ -190,17 +201,6 @@ h6 {
 fieldset, label { 
 	margin: 0; 
 	padding: 0; 
-}
-
-body{ 
-    /*padding-top: 100px;*/
-	min-height: 100vh;
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	padding: 0px; 
-	padding-bottom: 60px;
-	/*background-color: #cfcfcf!important;*/
 }
 
 /*h1 { 

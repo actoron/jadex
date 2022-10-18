@@ -11,7 +11,6 @@ import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Imports;
-import jadex.micro.examples.mandelbrot_new.GenerateAgent;
 
 @Arguments(
 {

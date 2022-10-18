@@ -17,6 +17,6 @@ public interface IGenerateService
 	
 	/**
 	 *  Calculate and display the default image from current settings.
-	 */
-	public IFuture<Void> calcDefaultImage();
+	 * /
+	public IFuture<Void> calcDefaultImage();*/
 }

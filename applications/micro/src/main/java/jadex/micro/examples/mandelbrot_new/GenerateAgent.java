@@ -1,10 +1,14 @@
 package jadex.micro.examples.mandelbrot_new;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.swing.SwingUtilities;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.SGUI;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
@@ -25,13 +29,73 @@ import jadex.micro.annotation.RequiredServices;
 	@RequiredService(name="generateservice", type=IGenerateService.class)
 })
 @Agent
-public class GenerateAgent
+public class GenerateAgent implements IGenerateGui 
 {
 	@Agent
 	protected IInternalAccess agent;
 	
+	/** The generate panel. */
+	protected GeneratePanel panel;
+
+	
 	//protected List<ICalculateService> calcservices = new ArrayList<>();
 	protected IDisplayService displayservice;
+	
+	@OnStart
+	protected void body()
+	{
+		this.panel = (GeneratePanel)GeneratePanel.createGui(agent.getExternalAccess());
+	}
+	
+	/**
+	 *  Update the area data.
+	 *  @param data The data.
+	 */
+	public void updateData(AreaData data)
+	{
+		SwingUtilities.invokeLater(() -> panel.updateProperties(data));
+	}
+	
+	/** 
+	 * Update the status.
+	 * @param cnt The cnt.
+	 * @param number The number.
+	 */
+	public void updateStatus(int cnt, int number)
+	{
+		SwingUtilities.invokeLater(() -> panel.getStatusBar().setText("Finished: "+cnt+"("+number+")"));
+	}
+	
+	/**
+	 *  Stop the service.
+	 */
+	//@ServiceShutdown
+	@OnEnd
+	public IFuture<Void>	shutdown()
+	{
+//		System.out.println("shutdown: "+agent.getAgentName());
+		final Future<Void>	ret	= new Future<Void>();
+		if(panel!=null)
+		{
+//			System.out.println("shutdown1: "+agent.getAgentName());
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+//					System.out.println("shutdown2: "+agent.getAgentName());
+					SGUI.getWindowParent(panel).dispose();
+					ret.setResult(null);
+//					System.out.println("shutdown3: "+agent.getAgentName());
+				}
+			});
+		}
+		else
+		{
+//			System.out.println("shutdown4: "+agent.getAgentName());
+			ret.setResult(null);
+		}
+		return ret;
+	}
 	
 	/*@OnService(name="calculateservice")
 	protected void calculateServiceAvailable(ICalculateService cs)
@@ -48,7 +112,11 @@ public class GenerateAgent
 		//System.out.println("Found display service: "+cs);
 		this.displayservice = ds;
 		//if(calcservices.size()>0)
-			agent.getLocalService(IGenerateService.class).calcDefaultImage();
+			//agent.getLocalService(IGenerateService.class).calcDefaultImage();
+		//agent.getLocalService(IGenerateService.class).generateArea(null);
+		// makes it sense at all to generate on display service discovery?
+		// better is when display itself initiates a generation request,
+		// because it knows the displayid (generate does not).
 	}
 
 	/**

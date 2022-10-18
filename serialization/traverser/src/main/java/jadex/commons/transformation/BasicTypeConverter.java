@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import jadex.commons.SUtil;
+import jadex.bridge.ClassInfo;
 
 /**
  *  Converter for basic types.
@@ -55,6 +56,13 @@ public class BasicTypeConverter //implements IStringObjectConverter
 	/** String -> URI converter. */
 	public static final IStringObjectConverter URI_CONVERTER = new URITypeConverter();
 	
+	/** String -> Class. */
+	public static final IStringObjectConverter CLASS_CONVERTER = new ClassTypeConverter();
+
+	/** String -> ClassInfo. */
+	public static final IStringObjectConverter CLASSINFO_CONVERTER = new ClassInfoTypeConverter();
+	
+	
 //	/** String(base64) -> Byte Array converter. */
 //	public static final IStringObjectConverter BA_CONVERTER = new ByteArrayTypeConverter();
 
@@ -91,6 +99,8 @@ public class BasicTypeConverter //implements IStringObjectConverter
 		extconverters.put(Date.class, DATE_CONVERTER);
 		extconverters.put(URI.class, URI_CONVERTER);
 		extconverters.put(URL.class, URL_CONVERTER);
+		extconverters.put(Class.class, CLASS_CONVERTER);
+		extconverters.put(ClassInfo.class, CLASSINFO_CONVERTER);
 //		extconverters.put(byte[].class, BA_CONVERTER);
 	}
 	
@@ -526,6 +536,58 @@ class URITypeConverter implements IStringObjectConverter
 		try
 		{
 			return new URI(val);
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+}
+
+/**
+ *  String -> Class converter.
+ */
+class ClassTypeConverter implements IStringObjectConverter
+{
+	/**
+	 *  Convert a string value to another type.
+	 *  @param val The string value to convert.
+	 */
+	public Object convertString(String val, Object context)
+	{
+		try
+		{
+			return Class.forName(val);
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+}
+
+/**
+ *  String -> ClassInfo converter.
+ */
+class ClassInfoTypeConverter implements IStringObjectConverter
+{
+	/**
+	 *  Convert a string value to another type.
+	 *  @param val The string value to convert.
+	 */
+	public Object convertString(String val, Object context)
+	{
+		try
+		{
+			return new ClassInfo(val);
 		}
 		catch(RuntimeException e)
 		{

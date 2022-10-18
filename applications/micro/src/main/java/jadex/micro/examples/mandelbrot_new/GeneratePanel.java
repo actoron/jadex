@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import jadex.base.gui.StatusBar;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -55,7 +56,7 @@ public class GeneratePanel extends JPanel
 		});
 		
 		pp.addComponent("algorithm", alg, 0);
-		AreaData	data	= GenerateService.ALGORITHMS[0].getDefaultSettings();
+		AreaData data = GenerateService.ALGORITHMS[0].getDefaultSettings();
 		
 		pp.createTextField("xmin", ""+data.getXStart(), true, 0);
 		pp.createTextField("xmax", ""+data.getXEnd(), true, 0);
@@ -103,7 +104,7 @@ public class GeneratePanel extends JPanel
 									IGenerateService gs = (IGenerateService)result;
 									
 									//AreaData ad = new AreaData(x1, x2, y1, y2, sizex, sizey, max, par, tasksize, algorithm, null);
-									AreaData ad = new AreaData(x1, x2, y1, y2, sizex, sizey, max, tasksize, algorithm, null, chunkcount);
+									AreaData ad = new AreaData(x1, x2, y1, y2, sizex, sizey, max, tasksize, new ClassInfo(algorithm.getClass()), null, chunkcount);
 									gs.generateArea(ad).addResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object result)
@@ -171,9 +172,9 @@ public class GeneratePanel extends JPanel
 	 */
 	public void	updateProperties(AreaData data)
 	{
-		if(!((JComboBox)pp.getComponent("algorithm")).getSelectedItem().equals(data.getAlgorithm()))
+		if(!((JComboBox)pp.getComponent("algorithm")).getSelectedItem().equals(data.getAlgorithm(this.getClass().getClassLoader())))
 		{
-			((JComboBox)pp.getComponent("algorithm")).setSelectedItem(data.getAlgorithm());
+			((JComboBox)pp.getComponent("algorithm")).setSelectedItem(data.getAlgorithm(this.getClass().getClassLoader()));
 		}
 		pp.getTextField("xmin").setText(Double.toString(data.getXStart()));
 		pp.getTextField("xmax").setText(Double.toString(data.getXEnd()));

@@ -116,7 +116,7 @@ public class CalculateService implements ICalculateService
 					//int psize = (yend-ystart+1)*(xend-xstart+1);
 					//System.out.println("cnt: "+cnt+" "+size+" "+psize);
 					//res[xi] = justfill? fillcol: data.getAlgorithm().determineColor(data.getXStart()+xi*stepx, data.getYStart()+yi*stepy, data.getMax());
-					chunk[pointcnt] = justfill? fillcol: data.getAlgorithm().determineColor(data.getXStart()+xi*stepx, data.getYStart()+yi*stepy, data.getMax());
+					chunk[pointcnt] = justfill? fillcol: data.getAlgorithm(ag.getClassLoader()).determineColor(data.getXStart()+xi*stepx, data.getYStart()+yi*stepy, data.getMax());
 					if(!justfill && xi==xstart)
 						fillcol = chunk[pointcnt];
 					pointcnt++;

@@ -157,7 +157,7 @@ public class JsonBeanProcessor extends AbstractJsonProcessor
 					{
 						Type sot = null;
 						if(val instanceof JsonObject)
-							JsonTraverser.findClazzOfJsonObject((JsonObject)val, targetcl);
+							sot = JsonTraverser.findClazzOfJsonObject((JsonObject)val, targetcl);
 						if(sot==null)
 							sot = prop.getGenericType();
 						

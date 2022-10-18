@@ -33,4 +33,10 @@ public interface IDisplayService
 	 */
 //	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<Object> subscribeToDisplayUpdates(String displayid);
+	
+	/**
+	 *  Get info about an algorithm (for web). todo: move?!
+	 *  @return The info.
+	 */
+	public IFuture<AreaData> getAlgorithmDefaultSettings(Class<IFractalAlgorithm> clazz);
 }
