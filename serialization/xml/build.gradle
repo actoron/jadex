@@ -8,14 +8,15 @@ dependencies
 	api project(':util:commons')
 	api project(':serialization:traverser')
 	
-	// Wrong way: (doesn't work for eclipse, depends on generated jar from gradle build)
-//	testImplementation files(project(':serialization:traverser').sourceSets.test.output)
-//	testImplementation files(project(':serialization:traverser').sourceSets.test.runtimeClasspath)
-	
-	// Correct(?) way: (project dependency correctly interpreted by eclipse import as well as gradle build)
-	// currently broken in newer gradles :( >= 6.7 https://github.com/eclipse/buildship/issues/1035
-	// This now works in 7+
-	testImplementation(testFixtures(project(':serialization:traverser')))
+	// test for gradle (console) vs. eclipse (buildhsip)
+	if(System.getProperty('eclipse.vmargs')==null)
+	{
+		// Correct(?) way: (project dependency correctly interpreted by eclipse import as well as gradle build)
+		// currently broken in newer gradles :( >= 6.7 https://github.com/eclipse/buildship/issues/1035
+		// This now works in 7+
+		// Broken again in eclipse with gradle 7.3+ :-(
+		testImplementation(testFixtures(project(':serialization:traverser')))
+	}
 }
 //publishing
 //{
