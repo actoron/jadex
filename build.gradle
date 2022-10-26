@@ -718,10 +718,12 @@ task copyJars(type: Copy) {
 }
 
 task testReport(type: TestReport) {
-    destinationDir = file("$buildDir/testreport")
+    destinationDirectory = file("$buildDir/testreport")
     // Include the results from the `test` task in all subprojects
 	// Use dir.asFile.get() to avoid dependency to test task being added
-	reportOn subprojects.collect { it.tasks.withType(Test).collect {it.binaryResultsDirectory.asFile.get()} }
+	//reportOn subprojects.collect { it.tasks.withType(Test).collect {it.binaryResultsDirectory.asFile.get()} }
+	// https://discuss.gradle.org/t/reporton-replacement-for-gradle-8/42177
+	testResults.from( subprojects.collect { it.tasks.withType(Test).collect {it.binaryResultsDirectory.asFile.get()} } )
 	mustRunAfter subprojects.collect { it.tasks.withType(Test) }
 }
 

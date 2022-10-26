@@ -1,11 +1,18 @@
 package jadex.bridge;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Properties;
+import java.util.Scanner;
+import java.util.regex.Pattern;
 
 
 /**
@@ -52,6 +59,14 @@ public class VersionInfo
 			Properties	props	= new Properties();
 			//InputStream is = SUtil.getResource0("jadexversion.properties", VersionInfo.class.getClassLoader());
 			InputStream	is = VersionInfo.class.getResourceAsStream("jadexversion.properties");
+			
+			// Hack!!! when running Jadex from source in eclipse there is no properties
+			if(is==null)
+			{
+				File	fprops	= new File("../../src/main/buildutils/jadexversion.properties");
+				is	= new FileInputStream(fprops);
+			}
+			
 			//InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("jadexversion.properties");
 			props.load(is);
 			is.close();
@@ -81,9 +96,14 @@ public class VersionInfo
 		catch(Exception e)
 		{
 //			e.printStackTrace();
-			date = date!=null ? date : new Date();
-			version	= version!=null ? version : "n/a";
 		}
+		
+		date = date!=null ? date : new Date();
+		version	= version!=null ? version :
+			jadexversion.isUnknown() ? "n/a"
+			: jadexversion.getMajorVersion()+"."+jadexversion.getMinorVersion()
+				+".9999-SNAPSHOT";
+
 	}
 	
 	//-------- methods --------
@@ -156,5 +176,62 @@ public class VersionInfo
 	public String	toString()
 	{
 		return "Jadex Version " + version + " ("+getTimestamp()+")";
+	}
+	
+	/**
+	 *  Check if the current version is uptodate.
+	 */
+	public static void	main(String[] args)
+	{
+		VersionInfo	instance	= VersionInfo.getInstance();
+		String	pattern	= instance.getJadexVersion().isUnknown()
+			? "<version>([^<]*)</version>"
+			: matchLatestPatch(instance.getJadexVersion().getMajorVersion(),
+				instance.getJadexVersion().getMinorVersion());
+		
+		try
+		{
+			String	baseurl		= "https://repo1.maven.org/maven2/org/activecomponents/jadex/jadex-distribution-minimal/";
+			String	updateurl	= baseurl + "maven-metadata.xml";
+			String	lastmodurl	= baseurl + "4.0.$patch/jadex-distribution-minimal-4.0.$patch.pom";
+			URL	url	= new URL(updateurl);
+			URLConnection con	= url.openConnection();
+			con.connect();
+			long	lastmod	= con.getLastModified();
+			System.out.println("lastmod: "+new Date(lastmod));
+			InputStream	is	= con.getInputStream();
+			try(Scanner	s	= new Scanner(is))
+			{
+				s.findAll(Pattern.compile(pattern))
+					.map(match -> match.group(1)).forEach(patch -> 
+				{
+					try
+					{
+						URL	url1	= new URL(lastmodurl.replace("$patch", String.valueOf(patch)));
+						URLConnection	con1 = url1.openConnection();
+						con.connect();
+						long	lastmod1	= con1.getLastModified();
+						System.out.println(patch+" - "+new Date(lastmod1));
+					}
+					catch(IOException e)
+					{
+						System.err.println("Error fetching patch "+patch+": "+e);
+					}
+				});
+			}
+			is.close();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 *  Regex for matching the latest path of a given version.
+	 */
+	protected static String	matchLatestPatch(int major, int minor)
+	{
+		return "<version>" + major + "." + minor + "\\.([^<]*)</version>";
 	}
 }
