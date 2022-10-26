@@ -1270,6 +1270,9 @@ export class MandelbrotElement extends LitElement
 
 					<label for="adaptsize2">Adapt calc size to screen</label> 
 					<input name="adaptsize2" id="adaptsize2" class="checkboxleft" checked type="checkbox">
+					
+					<label for="recalconresize">Recalculate on screen resize</label> 
+					<input name="recalconresize" id="recalconresize" class="checkboxleft" type="checkbox">
 				</div>
 			
 				<div class="floatright margintop">
