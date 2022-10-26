@@ -84,9 +84,17 @@ export class MandelbrotElement extends LitElement
 		{
 			for(let entry of entries) 
 			{
-				let adaptsize = self.shadowRoot.getElementById("adaptsize2").checked;
-				if(adaptsize)
-					self.adaptSizeToCanvas(entry, self);				
+				let tracksize = self.shadowRoot.getElementById("tracksize").checked;
+				if(tracksize)
+					self.adaptSizeToCanvas(entry, self);
+				let adaptresize = this.shadowRoot.getElementById("adaptresize").checked;
+				if(adaptresize)
+				{
+					let canvas = this.shadowRoot.getElementById("canvas");
+					canvas.width = canvas.offsetWidth;
+					canvas.height = canvas.offsetHeight;
+					self.requestUpdate();
+				}				
   			}
 		});		
 		ro.observe(this.shadowRoot.getElementById("canvas"));
@@ -152,7 +160,9 @@ export class MandelbrotElement extends LitElement
 		let results = this.data.data;
 		let oimage = this.data.image;
 		let image = new Uint8ClampedArray(oimage); // clone the image data
-		let adaptsize = this.shadowRoot.getElementById("adaptsize").checked;
+		//let adaptsize = this.shadowRoot.getElementById("adaptsize").checked;
+		//let adaptresize = this.shadowRoot.getElementById("adaptresize").checked;
+		let fill = this.shadowRoot.getElementById("fill").checked;
 		let container = this.shadowRoot.getElementById("image");
 		let canvas = this.shadowRoot.getElementById("canvas");
 		let ctx = canvas.getContext("2d");
@@ -160,53 +170,70 @@ export class MandelbrotElement extends LitElement
 		let sy = 0;
 		let swidth = results.length;
 		let sheight = results[0].length;
+		let width = canvas.width;
+		let height = canvas.height;
 		
-		ctx.canvas.width  = swidth;
-		ctx.canvas.height = sheight;
-  			
+		/*if(canvas.width<swidth || canvas.height<sheight)
+		{
+			canvas.width  = swidth;
+			canvas.height = sheight;
+			width = swidth;
+			height = sheight;
+  		}*/
+  		
+  		// Clear exitisting canvas
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+  		
+  		let startx = Math.trunc((canvas.width-swidth)/2);
+		let starty = Math.trunc((canvas.height-sheight)/2);
+ 		//let startx = Math.max(0, Math.trunc((canvas.width-swidth)/2));
+		//let starty = Math.max(0, Math.trunc((canvas.height-sheight)/2));
+		console.log("width: "+canvas.width+" "+swidth+" "+startx);
+		console.log("height: "+canvas.height+" "+sheight+" "+starty);
+  				
 		// Zoom into original image while calculating
 		if(this.calculating && this.range!=null)
 		{
 			console.log("draw range");
 			
-			let canvas2 = this.createCanvas(swidth, sheight);
+			let canvas2 = this.createCanvas(width, height);
 			let ctx2 = canvas2.getContext('2d');
 			var imgdata = new ImageData(image, swidth, sheight);
-			ctx2.putImageData(imgdata, 0, 0);
-			
-			ctx.drawImage(canvas2, this.range.x, this.range.y, this.range.width, this.range.height, 0, 0, swidth, sheight);
+			ctx2.putImageData(imgdata, startx, starty);
+			ctx.drawImage(canvas2, this.range.x, this.range.y, this.range.width, this.range.height, 0, 0, width, height);
 		}
 		
 		// Offset and clip image and show border while dragging.
 		else if(this.startdrag!=null && this.enddrag!=null)
 		{
-			console.log("draw dragged");
+			// draw existing image at dragged position to indicate how it will look like
+			
 			// Draw original image in background
-			/*g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
-				bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
-				ix, iy, ix+iwidth, iy+iheight, this);
-			g.setColor(new Color(32,32,32,160));
-			g.fillRect(bounds.x+drawarea.x, bounds.y+drawarea.y, drawarea.width, drawarea.height);
+			//var imgdata = new ImageData(image, swidth, sheight);
+			//ctx.putImageData(imgdata, startx, starty);
+			this.drawImage(ctx, image, swidth, sheight, width, height, fill);
+			
+			// draw shadow on orginal (make it look darker)
+			let myw = fill? width: swidth;
+			let myh = fill? height: sheight;
+			let canvas2 = this.createCanvas(myw, myh);
+			let ctx2 = canvas2.getContext('2d');
+			ctx2.fillStyle = "rgba(0,0,0,0.6)";
+			ctx2.fillRect(0, 0, myw, myh);
+			ctx.drawImage(canvas2, 0, 0, myw, myh, fill? 0: startx, fill? 0: starty, fill? width: swidth, fill? height: swidth);
 
 			// Draw offsetted image in foreground
-			Shape	clip	= g.getClip();
-			g.setClip(bounds.x+drawarea.x, bounds.y+drawarea.y, drawarea.width, drawarea.height);
-			int	xoff	= enddrag.x-startdrag.x;
-			int	yoff	= enddrag.y-startdrag.y;
-			
-			g.drawImage(image, bounds.x+drawarea.x+xoff, bounds.y+drawarea.y+yoff,
-				bounds.x+drawarea.x+xoff+drawarea.width, bounds.y+drawarea.y+yoff+drawarea.height,
-				ix, iy, ix+iwidth, iy+iheight, this);
-			g.setClip(clip);*/
+			let xoff = this.enddrag.x-this.startdrag.x;
+			let	yoff = this.enddrag.y-this.startdrag.y;
+			/*canvas2 = this.createCanvas(width, height);
+			ctx2 = canvas2.getContext('2d');
+			ctx2.putImageData(imgdata, startx, starty);
+			ctx.drawImage(canvas2, 0, 0, swidth, sheight, xoff, yoff, width, height);*/
+			this.drawImage(ctx, image, swidth, sheight, width, height, fill, xoff, yoff);
 		}
 		else
-		{
-			//g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
-			//	bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
-			//	ix, iy, ix+iwidth, iy+iheight, this);
-				
-			var imgdata = new ImageData(image, swidth, sheight);
-			ctx.putImageData(imgdata, 0, 0);
+		{	
+			this.drawImage(ctx, image, swidth, sheight, width, height, fill);
 		}
   			
 		//console.log("background color: "+canvas.style.background);
@@ -257,9 +284,10 @@ export class MandelbrotElement extends LitElement
 		if(this.progressdata!=null && Object.keys(this.progressdata).length>0)
 		{
 			//canvas2 = this.createCanvas(swidth, sheight);
-			let width = canvas.offsetWidth;
-			let height = canvas.offsetHeight;
-			canvas2 = this.createCanvas(width, height);
+			let w = canvas.offsetWidth;
+			let h = canvas.offsetHeight;
+			
+			canvas2 = this.createCanvas(w, h);
 			ctx2 = canvas2.getContext('2d');
 			
 			for(let key of Object.keys(this.progressdata)) 
@@ -268,21 +296,23 @@ export class MandelbrotElement extends LitElement
 				
 				//console.log("progress is: "+progress);
 					
-				let xf = width/progress.imageWidth;
-				let yf = height/progress.imageHeight;
+				let xf = fill? w/progress.imageWidth: 1;
+				let yf = fill? h/progress.imageHeight: 1;
 				let corx = Math.trunc(progress.area.x*xf);
 				let cory = Math.trunc(progress.area.y*yf);
 				let corw = Math.trunc(progress.area.w*xf);
 				let corh = Math.trunc(progress.area.h*yf);
+				let mystartx = fill? corx: corx+startx;
+				let mystarty = fill? cory: cory+starty;
 					
 				if(!progress.finished)
 				{
 					//ctx2.fillStyle = this.createColor(20, 20, 150, 160); //160
 					ctx2.fillStyle = "rgba(20, 20, 150, 0.3)";
-					ctx2.fillRect(corx+1, cory+1, corw-1, corh-1);
+					ctx2.fillRect(mystartx+1, mystarty+1, corw-1, corh-1);
 				}
 				ctx2.strokeStyle = "white";
-				ctx2.strokeRect(corx, cory, corw, corh);
+				ctx2.strokeRect(mystartx, mystarty, corw, corh);
 				
 				// Print worker name
 				let name = progress.name
@@ -317,8 +347,8 @@ export class MandelbrotElement extends LitElement
 				{
 					//console.log("a: "+textwidth+" "+textheight+" "+corw+" "+corh+" "+fsize);
 					// Draw provider id.
-					let x = Math.trunc(corx + (corw-textwidth)/2);
-					let y = Math.trunc(cory + (corh-textheight*3)/2);// + fm.getLeading()/2;
+					let x = Math.trunc(mystartx + (corw-textwidth)/2);
+					let y = Math.trunc(mystarty + (corh-textheight*3)/2);// + fm.getLeading()/2;
 					ctx2.fillStyle = "rgb(255, 255, 255)";
 					ctx2.fillText(name , x, y);
 					ctx2.fillText(provider, x, y+textheight);
@@ -328,8 +358,8 @@ export class MandelbrotElement extends LitElement
 				else if(!progress.finished && corw>8 && corh>8)
 				{
 					//console.log("b: "+textwidth+" "+textheight+" "+corw+" "+corh+" "+fsize);
-					let x = corx + 2;
-					let y = cory + Math.max((corh-textheight)/2, 2);
+					let x = mystartx + 2;
+					let y = mystarty + Math.max((corh-textheight)/2, 2);
 					this.drawProgressBar(x, y, textwidth, textheight, 'red', progress.progress/100, true, ctx2);
 				}
 			}
@@ -340,13 +370,12 @@ export class MandelbrotElement extends LitElement
 		{
 			if(canvas2==null)
 			{
-				//canvas2 = this.createCanvas(swidth, sheight);
 				canvas2 = this.createCanvas(canvas.offsetWidth, canvas.offsetHeight);
 				ctx2 = canvas2.getContext('2d');
 			}
 			
 			let rratio = this.range.width/this.range.height;
-			let bratio = swidth/sheight;
+			let bratio = width/height;
 			
 			// Draw left and right boxes to show unused space
 			if(rratio<bratio)
@@ -372,7 +401,43 @@ export class MandelbrotElement extends LitElement
 		}
 		
 		if(canvas2!=null)
-			ctx.drawImage(canvas2, 0, 0, canvas.offsetWidth, canvas.offsetHeight, 0, 0, swidth, sheight);
+			ctx.drawImage(canvas2, 0, 0, canvas2.width, canvas2.height, 0, 0, width, height);
+	}
+	
+	/**
+	 * ctx: The draw context
+	 * image: The image data to draw
+	 * swidth: with in pixel of source picture
+	 * sheight: height in pixel of source picture
+	 * startx: where to start at target
+	 * starty: where to start at target
+	 * width: width of target
+	 * height: height of target
+	 * fill: fill target (resize) or paint pixel as is
+	 */
+	drawImage(ctx, image, swidth, sheight, width, height, fill, xoff, yoff)
+	{
+		let startx = Math.trunc((width-swidth)/2);
+		let starty = Math.trunc((height-sheight)/2);
+		xoff = xoff===undefined? 0: xoff;
+		yoff = yoff===undefined? 0: yoff;
+		
+		let imgdata = new ImageData(image, swidth, sheight);
+		if(!fill)
+		{
+			//ctx.putImageData(imgdata, startx, starty, xoff, yoff, swidth, sheight);
+			let canvas2 = this.createCanvas(swidth, sheight);
+			let ctx2 = canvas2.getContext('2d');
+			ctx2.putImageData(imgdata, 0, 0);
+			ctx.drawImage(canvas2, -xoff, -yoff, swidth, sheight, startx, starty, swidth, sheight);
+		}
+		else
+		{
+			let canvas2 = this.createCanvas(swidth, sheight);
+			let ctx2 = canvas2.getContext('2d');
+			ctx2.putImageData(imgdata, 0, 0);
+			ctx.drawImage(canvas2, 0, 0, swidth, sheight, xoff, yoff, width, height);
+		}
 	}
 	
 	makeElementDragable(element, leftborder) 
@@ -758,11 +823,23 @@ export class MandelbrotElement extends LitElement
 			if(!self.calculating && self.point!=null && e.buttons===1)
 			{
 				let pos = self.getMousePosition(element, e); 
-				self.range = {x: self.point.x<pos.x? self.point.x: pos.x,
+				
+				self.range = {
+					x: self.point.x<pos.x? self.point.x: pos.x,
 					y: self.point.y<pos.y? self.point.y: pos.y,
 					width: Math.abs(self.point.x-pos.x),
 					height: Math.abs(self.point.y-pos.y)
 				};
+				
+				let startx = Math.trunc((self.getCanvasWidth()-self.getImageWidth())/2);
+				let starty = Math.trunc((self.getCanvasHeight()-self.getImageHeight())/2);
+				if(!self.isFill())
+				{
+					self.range.x = Math.min(self.range.x, startx);
+					self.range.y = Math.min(self.range.y, starty);
+					self.range.width = Math.min(self.range.width, self.getImageWidth());
+					self.range.height = Math.min(self.range.height, self.getImageHeight());
+				}
 				
 				self.requestUpdate();
 			}
@@ -884,7 +961,8 @@ export class MandelbrotElement extends LitElement
 	
 	dragImage()
 	{
-		console.log("dragImage: "+self.startdrag+" "+self.enddrag);
+		console.log("dragImage: "+this.startdrag+" "+this.enddrag);
+		
 		let sw = this.getImageWidth();
 		let sh = this.getImageHeight();
 		let iw = this.getImageWidth();
@@ -896,16 +974,16 @@ export class MandelbrotElement extends LitElement
 		let xp = xdiff/sw;
 		let yp = ydiff/sh;
 		
-		let xm = (this.data.XEnd-this.data.XStart)*xp;
-		let ym = (this.data.YEnd-this.data.YStart)*yp;
-	 	let xs = this.data.XStart+xm;
-		let xe = this.data.XEnd+xm;
-		let ys = this.data.YStart+ym;
-		let ye = this.data.YEnd+ym;
+		let xm = (this.data.xEnd-this.data.xStart)*xp;
+		let ym = (this.data.yEnd-this.data.yStart)*yp;
+	 	let xs = this.data.xStart+xm;
+		let xe = this.data.xEnd+xm;
+		let ys = this.data.yStart+ym;
+		let ye = this.data.yEnd+ym;
 		
 		this.startdrag = null;
 		this.enddrag = null;
-		this.range = {x: xdiff, y: ydiff, width: sw, height: sh};
+		//this.range = {x: xdiff, y: ydiff, width: sw, height: sh};
 
 		this.calcArea(xs, xe, ys, ye, this.data.sizeX, this.data.sizeY);
 	}
@@ -1135,6 +1213,12 @@ export class MandelbrotElement extends LitElement
 		self.shadowRoot.getElementById("sizex").value = canvas.offsetWidth;
 		self.shadowRoot.getElementById("sizey").value = canvas.offsetHeight;
 	}
+	
+	isFill()
+	{
+		let fill = this.shadowRoot.getElementById("fill").checked;
+		return fill;
+	}
 
 	update()
 	{
@@ -1221,8 +1305,15 @@ export class MandelbrotElement extends LitElement
 				width: fit-content;
 				margin-left: 0px;
 			}
+			.block {
+				display: block;
+			}
 		    `);
 		return ret;
+		
+		// display block for canvas to
+		// avoid strange 5px bottom :-( https://stackoverflow.com/questions/15807833/div-containing-canvas-have-got-a-strange-bottom-margin-of-5px
+
 	}
 	
 	render() 
@@ -1265,24 +1356,28 @@ export class MandelbrotElement extends LitElement
 					<label for="tasksize">Task size</label> 
 					<input name="tasksize" id="tasksize" type="number" min="1" max="100000">
 					
-					<label for="adaptsize">Adapt screen size to result</label> 
-					<input name="adaptsize" id="adaptsize" class="checkboxleft" checked type="checkbox">				
-
-					<label for="adaptsize2">Adapt calc size to screen</label> 
-					<input name="adaptsize2" id="adaptsize2" class="checkboxleft" checked type="checkbox">
+					<label for="adaptsize">Adapt canvas to result</label> 
+					<input name="adaptsize" id="adaptsize" class="checkboxleft" type="checkbox">	
 					
-					<label for="recalconresize">Recalculate on screen resize</label> 
-					<input name="recalconresize" id="recalconresize" class="checkboxleft" type="checkbox">
+					<label for="adaptresize">Adapt canvas to resize</label> 
+					<input name="adaptresize" id="adaptresize" class="checkboxleft" checked type="checkbox">				
+			
+					<label for="tracksize">Track screen size</label> 
+					<input name="tracksize" id="tracksize" class="checkboxleft" checked type="checkbox">
+					
+					<label for="fill">Fill image in canvas</label> 
+					<input name="fill" id="fill" class="checkboxleft" type="checkbox" @click="${e => this.requestUpdate()}">
 				</div>
 			
 				<div class="floatright margintop">
+					<button class="fitcontent jadexbtn" @click="${e => this.requestUpdate()}">Repaint</button>
 					<button class="fitcontent jadexbtn" @click="${e => this.resetSettings(e)}">Reset</button>
 					<button class="fitcontent jadexbtn" @click="${e => this.generateArea(e)}">Generate</button>
 				</div>
 			</div>
 			
 			<div id="image" class="leftborder dragable2">
-				<canvas id="canvas" class="w100 h100"></canvas>
+				<canvas id="canvas" class="w100 h100 block"></canvas>
 			</div>
 		`;
 	}
