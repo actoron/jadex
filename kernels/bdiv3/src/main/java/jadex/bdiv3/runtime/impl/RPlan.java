@@ -31,7 +31,7 @@ import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
-import jadex.bridge.IComponentStep;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -568,11 +568,10 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			|| PlanLifecycleState.FAILED.equals(lifecyclestate)
 			|| PlanLifecycleState.ABORTED.equals(lifecyclestate))
 		{
+			//System.out.println("rplan finished: "+finished+" "+this);
 			assert finished!=null;
 			if(finished!=null)
-			{
 				finished.setResult(null);
-			}
 			
 			// todo: where to notify listeners
 			notifyListeners();
@@ -866,12 +865,26 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	
 	/**
 	 *  Start the finishing of the plan.
-	 */
+	 * /
 	public void setFinishing()
 	{
+		if(finished!=null)
+			System.out.println("setFini fail: "+finished);
 		assert finished==null;
 		assert getAgent().getFeature(IExecutionFeature.class).isComponentThread();
-		finished	= new Future<Void>();
+		finished = new Future<Void>();
+	}*/
+	
+	public boolean setFinishing()
+	{
+		boolean ret = false;
+		assert getAgent().getFeature(IExecutionFeature.class).isComponentThread();
+		if(!isFinishing())
+		{
+			finished = new Future<Void>();
+			ret = true;
+		}
+		return ret;
 	}
 	
 	/**
@@ -921,10 +934,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		//if(agent.getId().toString().indexOf("Sokrates")!=-1)
 		//System.out.println("aborting: "+this+" "+IComponentIdentifier.LOCAL.get()+" "+agent.getId());
 		
-		if(!isFinishing())
+		if(setFinishing())
 		{
-			setFinishing();
-			
 			if(!isFinished())
 			{
 	//			setLifecycleState(PLANLIFECYCLESTATE_ABORTED);

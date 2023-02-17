@@ -23,6 +23,7 @@ import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameter.Direction;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MPlanParameter;
+import jadex.bdiv3.runtime.BDIAgent;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
@@ -459,7 +460,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //			if(getId().indexOf("cleanup")!=-1)
 //				System.out.println("dropping: "+getId());
 			
-//			System.out.println("dropping: "+getId());
+			//System.out.println("dropping: "+getId());
 			
 //			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALDROPPED, this));
 			// goal is dropping (no more plan executions)
@@ -1179,7 +1180,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	 */
 	public void setGoalResult(Object result, ClassLoader cl, ChangeEvent<?> event, RPlan rplan, RProcessableElement rpe)
 	{
-//		System.out.println("set goal result: "+result);
+		//System.out.println("set goal result: "+result);
 		
 		MGoal mgoal = (MGoal)getModelElement();
 		Object wa = mgoal.getPojoResultWriteAccess(cl);
@@ -1187,9 +1188,10 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		{
 			try
 			{
-				Field f = (Field)wa;
-				SAccess.setAccessible(f, true);
-				f.set(getPojoElement(), result);
+				BDIAgentFeature.writeParameterField(result, ((Field)wa).getName(), getPojoElement(), getAgent());
+				//Field f = (Field)wa;
+				//SAccess.setAccessible(f, true);
+				//f.set(getPojoElement(), result);
 			}
 			catch(Exception e)
 			{

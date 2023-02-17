@@ -1,5 +1,6 @@
 package jadex.bdiv3.tutorial.stamp;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Goals;
@@ -17,7 +18,7 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Goals(@Goal(clazz = StampGoal.class))
 @RequiredServices(@RequiredService(name = "stampser", type = IStampService.class, scope = ServiceScope.PLATFORM))
 @Plans(@Plan(trigger = @Trigger(goals = StampGoal.class), body = @Body(service = @ServicePlan(name = "stampser"))))

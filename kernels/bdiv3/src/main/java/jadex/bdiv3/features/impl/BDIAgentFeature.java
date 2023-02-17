@@ -1039,6 +1039,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/**
 	 *  Method that is called automatically when a parameter 
 	 *  is written as field access.
+	 *  @param val The parameter value.
+	 *  @param fieldname The name of the field the value is set upon.
+	 *  @param obj The pojo object of the goal.
+	 *  @param agent The agent.
 	 */
 	public static void writeParameterField(Object val, String fieldname, Object obj, IInternalAccess agent)
 	{
