@@ -35,36 +35,8 @@ public class JCCBpmnPluginAgent extends JCCPluginAgent implements IJCCBpmnServic
 	@AgentArgument
 	protected File wfstore = new File("workflows");
 	
-	@OnInit
-	public IFuture<Void> agentStart()
-	{
-		Future<Void> ret = new Future<>();
-		
-		if (!wfstore.exists())
-		{
-			if (!wfstore.mkdir())
-			{
-				SUtil.noEx(() -> {
-					agent.getLogger().warning("BPMN: Unable to create workflow directory: " + wfstore.getCanonicalPath());
-				});
-				
-			}
-		}
-		
-		if (!wfstore.isDirectory())
-		{
-			SUtil.noEx(() -> {
-				agent.getLogger().warning("BPMN: Workflow storage exists but not a directory: " + wfstore.getCanonicalPath());
-			});
-		}
-		
-		URL wfstoreurl = (URL) SUtil.noExRet(() -> {return wfstore.toURI().toURL();});
-		
-		ILibraryService libser = agent.getLocalService(ILibraryService.class);
-		libser.addTopLevelURL(wfstoreurl).addResultListener(new DelegationResultListener<>(ret));
-		
-		return ret;
-	}
+	/** Flag if the workflow store has been added to the classpath/library service */
+	protected boolean wfstoreInClasspath = false;
 	
 	/**
 	 *  Get the plugin name.
@@ -110,27 +82,71 @@ public class JCCBpmnPluginAgent extends JCCPluginAgent implements IJCCBpmnServic
 	 */
 	public IFuture<String[]> getBpmnModels()
 	{
-		URL wfstoreurl = (URL) SUtil.noExRet(() -> {return wfstore.toURI().toURL();});
-		String[] models = SReflect.scanForFiles(new URL[] { wfstoreurl }, new IFilter<Object>()
+		if (hasWfStore())
 		{
-			public boolean filter(Object obj)
+			URL wfstoreurl = (URL) SUtil.noExRet(() -> {return getWfStore().toURI().toURL();});
+			String[] models = SReflect.scanForFiles(new URL[] { wfstoreurl }, new IFilter<Object>()
 			{
-				if (obj instanceof File)
+				public boolean filter(Object obj)
 				{
-					return ((File) obj).getName().endsWith(".bpmn");
-				}
-				return false;
-			};
-		});
+					if (obj instanceof File)
+					{
+						return ((File) obj).getName().endsWith(".bpmn");
+					}
+					return false;
+				};
+			});
+			
+			Path wfpath = (Path) SUtil.noExRet(() -> getWfStore().getCanonicalFile().toPath());
+			models = Arrays.stream(models).map((s) -> {
+				Path p = (Path) SUtil.noExRet(() -> (new File(s)).getCanonicalFile().toPath());
+				p = wfpath.relativize(p);
+				return p.toString().replace(File.separatorChar, '.');
+			}).toArray(String[]::new);
+			
+			Arrays.stream(models).forEach((s) -> System.out.println("MODEL " + s));
+			return new Future<>(models);
+		}
+		else
+		{
+			return new Future<>(new String[0]);
+		}
+	}
+	
+	protected boolean hasWfStore()
+	{
+		return wfstore.exists();
+	}
+	
+	protected File getWfStore()
+	{
+		if (!wfstore.exists())
+		{
+			if (!wfstore.mkdir())
+			{
+				SUtil.noEx(() -> {
+					agent.getLogger().warning("BPMN: Unable to create workflow directory: " + wfstore.getCanonicalPath());
+				});
+				
+			}
+		}
 		
-		Path wfpath = (Path) SUtil.noExRet(() -> wfstore.getCanonicalFile().toPath());
-		models = Arrays.stream(models).map((s) -> {
-			Path p = (Path) SUtil.noExRet(() -> (new File(s)).getCanonicalFile().toPath());
-			p = wfpath.relativize(p);
-			return p.toString().replace(File.separatorChar, '.');
-		}).toArray(String[]::new);
+		if (!wfstore.isDirectory())
+		{
+			SUtil.noEx(() -> {
+				agent.getLogger().warning("BPMN: Workflow storage exists but not a directory: " + wfstore.getCanonicalPath());
+			});
+		}
 		
-		Arrays.stream(models).forEach((s) -> System.out.println("MODEL " + s));
-		return new Future<>(models);
+		if (!wfstoreInClasspath)
+		{
+			URL wfstoreurl = (URL) SUtil.noExRet(() -> {return wfstore.toURI().toURL();});
+			
+			ILibraryService libser = agent.getLocalService(ILibraryService.class);
+			libser.addTopLevelURL(wfstoreurl).get();
+			wfstoreInClasspath = true;
+		}
+		
+		return wfstore;
 	}
 }

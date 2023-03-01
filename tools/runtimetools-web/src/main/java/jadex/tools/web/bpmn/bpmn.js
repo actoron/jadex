@@ -5,11 +5,44 @@ let { CidElement } = modLoad('cid-element');
 // Tag name 'jadex-starter'
 class BpmnElement extends CidElement {
 
+	// The BPMN.js modeler.
 	bpmnmodeler = null;
+	
+	/**
+	 * The Jadex BPMN extensions
+	 * <bpmnobjectid> -> <extensionobject>
+	 */
+	bpmnextensionmodel = {};
 	
 	static get properties() 
 	{ 
 		return { cid: { type: String }};
+	}
+	
+	static get styles() 
+	{
+		let ret = [];
+		if(super.styles!=null)
+			ret.push(super.styles);
+		ret.push(
+		    css`
+	    		.gridcontainer {
+					 display: grid;
+				}
+				.splitcontainer {
+					grid-template-rows: 2fr 1fr; 
+					grid-template-columns: 1fr;
+				}
+				.modelcontainer {
+					grid-row-start: 1;
+  					grid-row-end: 2;
+				}
+				.propcontainer {
+					grid-row-start: 3;
+  					grid-row-end: 3;
+				}
+		    `);
+		return ret;
 	}
 	
 	attributeChangedCallback(name, oldVal, newVal) 
@@ -25,7 +58,6 @@ class BpmnElement extends CidElement {
 		
 		this.model = null; // loaded model
 		this.reversed = false;
-		this.jadexservice = "jadex.tools.web.bpmn.IJCCBpmnService";
 		
 		let self = this;
 		
@@ -41,7 +73,9 @@ class BpmnElement extends CidElement {
 			{
 				console.log("BPMN load styles ok");
 
-				let scripts = ["jadex/tools/web/bpmn/bpmn-modeler.development.js" ];
+				let scripts = ["jadex/tools/web/bpmn/bpmn-modeler.development.js",
+							   "jadex/tools/web/bpmn/servicetaskpanel.js",
+							   "jadex/tools/web/bpmn/jadexservicetaskpanel.js" ];
 				this.loadServiceScripts(scripts).then((values) =>
 				{
 					console.log("BPMN load scripts ok");
@@ -54,6 +88,22 @@ class BpmnElement extends CidElement {
 					});
 					// Load empty model.
 					self.bpmnmodeler.createDiagram();
+					self.bpmnextensionmodel = {};
+					self.bpmnmodeler.on('selection.changed', (bpmnselection) => {
+						let proppanel = self.shadowRoot.getElementById("propertypanel");
+						while (proppanel.hasChildNodes()) {
+							proppanel.removeChild(proppanel.firstChild);
+						}
+						
+						//console.log(self.bpmnmodeler.businessObject)
+						if (bpmnselection.newSelection.length > 0) {
+							let bpmnelem = bpmnselection.newSelection[0];
+							if (bpmnelem.type && bpmnelem.type === "bpmn:ServiceTask") {
+								proppanel.innerHTML = "<jadex-servicetaskpanel></jadex-servicetaskpanel>";
+							}
+						}
+						
+					});
 				});
 			});
 		});
@@ -72,12 +122,26 @@ class BpmnElement extends CidElement {
 		
 	}
 	
-	render() {
+	getBpmnModel() {
+		return this.bpmnmodeler;
+	}
+	
+	getExtensionModel() {
+		return bthis.bpmnextensionmodel;
+	}
+	
+	asyncRender() {
 		return html`
-		<div style="height: 100%; display: flex;">
-			<div style="flex:1;" id="bpmnview"/>
+		<div style="height:60vh" class="gridcontainer splitcontainer">
+			<div class="modelcontainer" id="bpmnview"></div>
+			<div id="propertypanel"></div>
 		</div>
 		`;
+	}
+	
+	getJadexService()
+	{
+		return "jadex.tools.web.bpmn.IJCCBpmnService";
 	}
 }
 if (customElements.get('jadex-bpmn') === undefined)
