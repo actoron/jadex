@@ -10,7 +10,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.micro.annotation.Agent;
 
 
-@Agent(type = BDIAgentFactory.TYPE)
+@Agent(type=BDIAgentFactory.TYPE)
 @Goals(@Goal(clazz = StampGoal.class, publish = @Publish(type = IStampService.class)))
 public class StampBDI
 {

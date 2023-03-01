@@ -34,7 +34,7 @@ export class MandelbrotElement extends LitElement
 		let terminate = jadex.getIntermediate('/mandelbrotdisplay/subscribeToDisplayUpdates?a='+this.displayid+'&returntype=jadex.commons.future.ISubscriptionIntermediateFuture',
 		function(response)
 		{
-			console.log("subscribe received: "+response.data);
+			//console.log("subscribe received: "+response.data);
 			self.handleDisplayUpdate(response);
 		},
 		function(err)
@@ -188,8 +188,8 @@ export class MandelbrotElement extends LitElement
 		let starty = Math.trunc((canvas.height-sheight)/2);
  		//let startx = Math.max(0, Math.trunc((canvas.width-swidth)/2));
 		//let starty = Math.max(0, Math.trunc((canvas.height-sheight)/2));
-		console.log("width: "+canvas.width+" "+swidth+" "+startx);
-		console.log("height: "+canvas.height+" "+sheight+" "+starty);
+		//console.log("width: "+canvas.width+" "+swidth+" "+startx);
+		//console.log("height: "+canvas.height+" "+sheight+" "+starty);
   				
 		// Zoom into original image while calculating
 		if(this.calculating && this.range!=null)
@@ -824,22 +824,47 @@ export class MandelbrotElement extends LitElement
 			{
 				let pos = self.getMousePosition(element, e); 
 				
-				self.range = {
-					x: self.point.x<pos.x? self.point.x: pos.x,
-					y: self.point.y<pos.y? self.point.y: pos.y,
-					width: Math.abs(self.point.x-pos.x),
-					height: Math.abs(self.point.y-pos.y)
-				};
+				let startx = this.getStartX();
+				let starty = this.getStartY();
 				
-				let startx = Math.trunc((self.getCanvasWidth()-self.getImageWidth())/2);
-				let starty = Math.trunc((self.getCanvasHeight()-self.getImageHeight())/2);
+				console.table("x1: "+self.point.x+" x2: "+pos.x);
+				console.table("y1: "+self.point.y+" x2: "+pos.y);
+				
+				let x1 = self.point.x;
+				let x2 = pos.x;
+				let y1 = self.point.y;
+				let y2 = pos.y;
+				
 				if(!self.isFill())
 				{
-					self.range.x = Math.min(self.range.x, startx);
-					self.range.y = Math.min(self.range.y, starty);
-					self.range.width = Math.min(self.range.width, self.getImageWidth());
-					self.range.height = Math.min(self.range.height, self.getImageHeight());
+					if(x1<startx)
+						x1 = startx;
+					if(x2<startx)
+						x2 = startx;
+					if(x1>startx+self.getImageWidth())
+						x1 = startx+self.getImageWidth();
+					if(x2>startx+self.getImageWidth())
+						x2 = startx+self.getImageWidth();
+					if(y1<starty)
+						y1 = starty;
+					if(y2<starty)
+						y2 = starty;
+					if(y1>starty+self.getImageHeight())
+						y1 = starty+self.getImageHeight();
+					if(y2>starty+self.getImageHeight())
+						y2 = starty+self.getImageHeight();
 				}
+				
+				let range = {
+					x: x1<x2? x1: x2,
+					y: y1<y2? y1: y2,
+					width: Math.abs(x1-x2),
+					height: Math.abs(y1-y2)
+				};
+				
+				self.range = self.convertRangeToImageValues(range);
+				
+				console.table(self.range);
 				
 				self.requestUpdate();
 			}
@@ -876,7 +901,19 @@ export class MandelbrotElement extends LitElement
 			{
 				factor = 100/(100+percent);
 			}
-			self.zoomImage(pos.x, pos.y, factor);
+			let x = pos.x;
+			let y = pos.y;
+			if(!self.isFill())
+			{
+				x = x-self.getStartX();
+				y = y-self.getStartY();
+			}
+			else
+			{
+				x = x*self.getImageWidth()/self.getCanvasScreenWidth();
+				y = y*self.getImageHeight()/self.getCanvasScreenHeight();
+			}
+			self.zoomImage(x, y, factor);
 		}
 		element.addEventListener("wheel", wheellis);
 		
@@ -959,6 +996,61 @@ export class MandelbrotElement extends LitElement
 		return canvas.offsetHeight;
 	}
 	
+	convertRangeToScreenValues(r)
+	{
+		let range = {...r}; // clone
+		
+		if(!this.isFill())
+		{
+			range.x = range.x+this.getStartX();
+			range.y = range.y+this.getStartY();
+		}
+		else
+		{
+			range.x = range.x*this.getCanvasScreenWidth()/this.getImageWidth();
+			range.y = range.y*this.getCanvasScreenHeight()/this.getImageHeight();
+			range.width = range.width*this.getCanvasScreenWidth()/this.getImageWidth();
+			range.height = range.height*this.getCanvasScreenHeight()/this.getImageHeight();
+		}
+		
+		return range;
+	}
+	
+	convertRangeToImageValues(r)
+	{
+		let range = {...r}; // clone
+		
+		if(!this.isFill())
+		{
+			range.x = range.x-this.getStartX();
+			range.y = range.y-this.getStartY();
+		}
+		else
+		{
+			range.x = range.x*this.getImageWidth()/this.getCanvasScreenWidth();
+			range.y = range.y*this.getImageHeight()/this.getCanvasScreenHeight();
+			range.width = range.width*this.getImageWidth()/this.getCanvasScreenWidth();
+			range.height = range.height*this.getImageHeight()/this.getCanvasScreenHeight();
+		}
+		
+		return range;
+	}
+	
+	getScreenRange()
+	{
+		return this.range==null? null: convertRangeToScreenValues(this.range);
+	}
+	
+	getStartX()
+	{
+		return Math.trunc((this.getCanvasWidth()-this.getImageWidth())/2);
+	}
+	
+	getStartY()
+	{
+		return Math.trunc((this.getCanvasHeight()-this.getImageHeight())/2);
+	}
+	
 	dragImage()
 	{
 		console.log("dragImage: "+this.startdrag+" "+this.enddrag);
@@ -989,14 +1081,15 @@ export class MandelbrotElement extends LitElement
 	}
 
 	// Zoom into the given location by the given factor.
+	// x, y must be coordinates in image scale (not screen)
 	zoomImage(x, y, factor)
 	{
 		console.log("zoomImage "+factor);
+		
 		let sw = this.getImageWidth();
 		let sh = this.getImageHeight();
 		let iw = this.getImageWidth();
 		let ih = this.getImageHeight();
-		//let drawarea = this.scaleToFit(sw, sh, iw, ih);
 		
 		let mx = Math.min(sw, Math.max(0, x));
 		let my = Math.min(sh, Math.max(0, y));
@@ -1018,6 +1111,8 @@ export class MandelbrotElement extends LitElement
 		// Set range for drawing preview of zoom area.
 		let xdiff = sw - sw*factor;
 		let ydiff = sh - sh*factor;
+		
+		// range is set in image scale
 		this.range = {x: Math.trunc(xdiff*xrel), y: Math.trunc(ydiff*yrel),
 			width: Math.trunc(sw*factor), height: Math.trunc(sh*factor)};
 		
@@ -1028,12 +1123,12 @@ export class MandelbrotElement extends LitElement
 	zoomIntoRange()
 	{
 		console.log("zoomIntoRange: "+this.range);
+
 		let sw = this.range.width;
 		let sh = this.range.height;
-		let iw = this.getCanvasScreenWidth();
-		let ih = this.getCanvasScreenHeight();
-		//let iw = this.getImageWidth();
-		//let ih = this.getImageHeight();
+		
+		let iw = this.getImageWidth();
+		let ih = this.getImageHeight();
 		
 		let x = this.range.x/iw;
 		let y = this.range.y/ih;

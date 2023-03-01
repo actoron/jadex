@@ -9,6 +9,7 @@ import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.GoalRecurCondition;
 import jadex.bdiv3.annotation.GoalResult;
+import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
@@ -16,6 +17,7 @@ import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
@@ -59,6 +61,7 @@ public class TranslationBDI
 		
 		/** The german word. */
 		@GoalResult
+		@GoalParameter
 		protected String gword;
 		
 		/**
@@ -77,6 +80,13 @@ public class TranslationBDI
 		{
 			return true;
 		}
+		
+		@GoalTargetCondition(parameters="gword")
+		public boolean checkTarget()
+		{
+			//System.out.println("checktarget: "+gword);
+			return gword!=null;
+		}
 	}
 	
 	//-------- methods --------
@@ -84,7 +94,7 @@ public class TranslationBDI
 	/**
 	 *  The init code.
 	 */
-	@AgentCreated
+	@OnInit
 	public void init()
 	{
 		wordtable.put("coffee", "Kaffee");
@@ -123,6 +133,7 @@ public class TranslationBDI
 	protected String translate(String eword)
 	{
 		String ret = wordtable.get(eword);
+		System.out.println("plan: "+eword+" "+ret);
 		if(ret==null)
 			throw new PlanFailureException();
 		return ret;

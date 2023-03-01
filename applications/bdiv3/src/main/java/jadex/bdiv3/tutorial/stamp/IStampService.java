@@ -5,6 +5,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
 @Service
-public interface IStampService {
+public interface IStampService 
+{
 	public IFuture<Void> stamp(IComponentIdentifier wp, String text);
 }

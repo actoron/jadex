@@ -167,9 +167,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 				assert getAgent().getFeature(IExecutionFeature.class).isComponentThread();
 				assert rplan.isFinishing() != (next==2): SUtil.getExceptionStacktrace(exception);	// either finishing (due to abort) or failed.
 				if(next==2)
-				{
 					rplan.setFinishing();
-				}
 				
 				// Schedule passed/failed/aborted on separate component step, as it might be triggered inside other plan execution
 				ia.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Object>()
