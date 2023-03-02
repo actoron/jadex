@@ -2071,6 +2071,11 @@ public class SReflect
 	// This cache cannot really work due to a key with plain objects like filters (other filter object = new entry)
 //	protected static Map<Tuple3<Set<URL>, IFilter<Object>, IFilter<ClassInfo>>, Set<ClassInfo>> CICACHE	= Collections.synchronizedMap(new LinkedHashMap<>());
 	
+	public static Set<ClassInfo> scanForClassInfos(ClassLoader cl, IFilter<Object> filefilter, IFilter<ClassInfo> classfilter, boolean includebootpath)
+	{
+		return scanForClassInfos(SUtil.getClasspathURLs(cl, includebootpath).toArray(new URL[0]), filefilter, classfilter); 
+	}
+	
 	/**
 	 *  Scan for component classes in the classpath.
 	 */
