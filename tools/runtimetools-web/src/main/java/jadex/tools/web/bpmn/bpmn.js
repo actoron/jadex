@@ -83,7 +83,7 @@ class BpmnElement extends CidElement {
 					self.bpmnmodeler = new BpmnJS({
 			        	container: celem,
 			        	keyboard: {
-			          		bindTo: window
+			          		bindTo: celem
 			        	}
 					});
 					// Load empty model.
