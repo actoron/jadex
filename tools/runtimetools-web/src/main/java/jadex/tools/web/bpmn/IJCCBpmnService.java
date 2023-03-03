@@ -16,4 +16,10 @@ public interface IJCCBpmnService extends IJCCPluginService
 	 *  @return The BPMN models.
 	 */
 	public IFuture<String[]> getBpmnModels();
+	
+	/**
+	 *  Get all available Jadex service interfaces.
+	 *  @return List of Jadex service interfaces.
+	 */
+	public IFuture<String[]> getServiceInterfaces();
 }

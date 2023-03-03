@@ -56,6 +56,9 @@ export class BaseElement extends LitElement
 	//langlistener = null;
 	inited = false;
 	
+	// Tasks to call once initialization has finished
+	taskswaitingforinit = [];
+	
 	constructor() 
 	{
 		super();
@@ -90,7 +93,9 @@ export class BaseElement extends LitElement
 						if (self.getParentComponent())
 							self.getParentComponent().subcomponentInitialized(id);
 					}
-					
+					self.taskswaitingforinit.forEach( (task) => {
+						task();
+					});
 				}).catch(err => 
 				{
 					console.log("Error updating element: " + self.constructor.name)
@@ -178,7 +183,16 @@ export class BaseElement extends LitElement
 	{
 		super.connectedCallback();
 
-		var self = this;
+		let self = this;
+		
+		if (self.inited) {
+			self.attached();
+		} else {
+			self.taskswaitingforinit.push(() => {
+				self.attached();
+			});
+		}
+		
 		//console.log('connected')
 		
 		/*if(this.langlistener==null)
@@ -210,8 +224,28 @@ export class BaseElement extends LitElement
 			BaseElement.language.removeListener(this.langlistener);*/
 		if(this.loginlistener!=null)
 			BaseElement.login.removeListener(this.loginlistener);
+			
+		if (self.inited) {
+			self.detached();
+		} else {
+			self.taskswaitingforinit.push(() => {
+				self.detached();
+			});
+		}
 	}
 	
+	// Called when the component is initialized and attached to document
+	// Like connectedCallback() but waiting for init.
+	attached()
+	{
+	}
+	
+	// Called when the component is initialized and detached from document
+	// Like disconnectedCallback() but waiting for init.
+	detached()
+	{
+	}
+		
 	getJadexService()
 	{
 		throw new Error("jadexservice method not implemented");

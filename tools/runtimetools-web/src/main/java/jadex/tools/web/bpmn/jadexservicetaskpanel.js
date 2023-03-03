@@ -32,7 +32,7 @@ class JadexServiceTaskPanel extends BaseElement {
 	asyncRender() {
 		return html`
 		<div id="jadexservicetaskpanel">
-			<p>JADEX SERVICE PANEL</p>
+			<input id="serviceinterface" class="jadexbtn" style="margin: 25px 25px 25px 0px" type="text" name="serviceinterface" placeholder="Service Interface...">
 		</div>
 		`;
 	}

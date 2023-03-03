@@ -31,8 +31,8 @@ class ServiceTaskPanel extends BaseElement {
 		return ret;
 	}
 	
-	postInit() {
-		this.selectType(this.shadowRoot.getElementById(servicetype).value);
+	attached() {
+		this.selectType(this.shadowRoot.getElementById(this.servicetype).value);
 	}
 	
 	selectTypeEvent(selectEvent) {
@@ -57,7 +57,7 @@ class ServiceTaskPanel extends BaseElement {
 		return html`
 		<div id="servicetaskpanel">
 			<!-- <label for=${this.servicetype}>Choose a service type:</label> -->
-			<select id=${this.servicetype} @change="${this.selectTypeEvent}">
+			<select id=${this.servicetype} class="jadexbtn" @change="${this.selectTypeEvent}">
 				<option selected value="jadexservice">Jadex Service</option>
 				<option value="restservice">REST Service</option>
 			</select>
