@@ -29,10 +29,18 @@ class JadexServiceTaskPanel extends BaseElement {
 		return ret;
 	}
 	
+	postInit() {
+		let ifaces = this.shadowRoot.getElementById("serviceinterface");
+		ifaces.setDataCallback((input) => {
+			return ['Hello', 'ABC', 'AAA'];
+		});
+		
+	}
+	
 	asyncRender() {
 		return html`
 		<div id="jadexservicetaskpanel">
-			<input id="serviceinterface" class="jadexbtn" style="margin: 25px 25px 25px 0px" type="text" name="serviceinterface" placeholder="Service Interface...">
+			<jadex-suggestionbox id="serviceinterface" class="jadexbtn" style="margin: 25px 25px 25px 0px"></jadex-suggestionbox>
 		</div>
 		`;
 	}

@@ -219,6 +219,7 @@ export class BaseElement extends LitElement
 	
 	disconnectedCallback()
 	{
+		let self = this;
 		super.disconnectedCallback();
 		/*if(this.langlistener!=null)
 			BaseElement.language.removeListener(this.langlistener);*/
